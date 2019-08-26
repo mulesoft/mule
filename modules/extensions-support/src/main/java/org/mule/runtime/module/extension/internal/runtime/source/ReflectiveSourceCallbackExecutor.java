@@ -12,11 +12,9 @@ import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIAT
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.BACK_PRESSURE_ACTION_CONTEXT_PARAM;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.SOURCE_CALLBACK_CONTEXT_PARAM;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.SOURCE_COMPLETION_CALLBACK_PARAM;
-import static reactor.core.publisher.Mono.create;
-import static reactor.core.publisher.Mono.empty;
-import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -37,17 +35,13 @@ import org.mule.runtime.module.extension.internal.loader.java.property.SourceCal
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveMethodComponentExecutor;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.ImmutableList;
-
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Implementation of {@link SourceCallbackExecutor} which uses reflection to execute the callback through a {@link Method}
@@ -56,7 +50,6 @@ import java.util.stream.Stream;
  */
 class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ReflectiveSourceCallbackExecutor.class);
   private final ExtensionModel extensionModel;
   private final Optional<ConfigurationInstance> configurationInstance;
   private final SourceModel sourceModel;
@@ -112,24 +105,23 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
    * {@inheritDoc}
    */
   @Override
-  public Publisher<Void> execute(CoreEvent event, Map<String, Object> parameters, SourceCallbackContext context) {
+  public void execute(CoreEvent event, Map<String, Object> parameters, SourceCallbackContext context,
+                      CompletableCallback<Void> callback) {
     if (async) {
-      return create(sink -> {
-        final ExecutionContext<SourceModel> executionContext =
-            createExecutionContext(event, parameters, context, new ReactorSourceCompletionCallback(sink));
-        try {
-          executor.execute(executionContext);
-        } catch (Throwable t) {
-          sink.error(wrapFatal(t));
-        }
-      });
-    }
-
-    try {
-      executor.execute(createExecutionContext(event, parameters, context, null));
-      return empty();
-    } catch (Throwable t) {
-      return error(wrapFatal(t));
+      final ExecutionContext<SourceModel> executionContext =
+          createExecutionContext(event, parameters, context, new CompletableSourceCompletionCallback(callback));
+      try {
+        executor.execute(executionContext);
+      } catch (Throwable t) {
+        callback.error(wrapFatal(t));
+      }
+    } else {
+      try {
+        executor.execute(createExecutionContext(event, parameters, context, null));
+        callback.complete(null);
+      } catch (Throwable t) {
+        callback.error(wrapFatal(t));
+      }
     }
   }
 

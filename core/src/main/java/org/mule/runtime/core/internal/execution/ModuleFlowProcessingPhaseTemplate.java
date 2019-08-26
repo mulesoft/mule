@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
@@ -65,21 +66,23 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
    * <p>
    * This method is executed within the flow so if it fails it will trigger the exception strategy.
    *
-   * @param response the result of the flow execution
+   * @param response   the result of the flow execution
    * @param parameters the resolved set of parameters required to send the response.
-   * @return void publisher that will signal the success or failure of sending response to client.
+   * @param callback   the callback used to signal completion
    */
-  Publisher<Void> sendResponseToClient(CoreEvent response, Map<String, Object> parameters);
+  void sendResponseToClient(CoreEvent response, Map<String, Object> parameters, CompletableCallback<Void> callback);
 
 
   /**
    * Template method to send a failure response after processing the message.
    *
-   * @param exception exception thrown during the flow execution.
+   * @param exception  exception thrown during the flow execution.
    * @param parameters the resolved set of parameters required to send the failure response.
-   * @return void publisher that will signal the success or failure of sending failure response to client.
+   * @param callback   the callback used to signal completion
    */
-  Publisher<Void> sendFailureResponseToClient(MessagingException exception, Map<String, Object> parameters);
+  void sendFailureResponseToClient(MessagingException exception,
+                                   Map<String, Object> parameters,
+                                   CompletableCallback<Void> callback);
 
   /**
    * Template method to be executed after the flow completes it's execution including any policy that may be applied.
@@ -87,10 +90,10 @@ public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplat
    * This method will always be executed and the {@code either} parameter will indicate the result of the execution.
    *
    * @param either that communicates the result of the flow execution.
-   *        <ul>
-   *        <li>{@link CoreEvent} if the execution finished correctly</li>
-   *        <li>{@link MessagingException} if an error occurred during the execution</li>
-   *        </ul>
+   *               <ul>
+   *               <li>{@link CoreEvent} if the execution finished correctly</li>
+   *               <li>{@link MessagingException} if an error occurred during the execution</li>
+   *               </ul>
    */
   void afterPhaseExecution(Either<MessagingException, CoreEvent> either);
 }

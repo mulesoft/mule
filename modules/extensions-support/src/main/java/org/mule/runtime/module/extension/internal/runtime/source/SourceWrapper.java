@@ -6,14 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static reactor.core.publisher.Mono.empty;
+import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 import java.util.Map;
-
-import org.reactivestreams.Publisher;
 
 /**
  * An abstract wrapper for {@link Source} implementations that allows to intercept
@@ -36,19 +34,23 @@ public abstract class SourceWrapper<T, A> extends Source<T, A> {
     return delegate;
   }
 
-  public Publisher<Void> onSuccess(CoreEvent event, Map<String, Object> parameters, SourceCallbackContext context) {
-    return empty();
+  public void onSuccess(CoreEvent event, Map<String, Object> parameters, SourceCallbackContext context,
+                        CompletableCallback<Void> callback) {
+    callback.complete(null);
   }
 
-  public Publisher<Void> onError(CoreEvent event, Map<String, Object> parameters, SourceCallbackContext context) {
-    return empty();
+  public void onError(CoreEvent event, Map<String, Object> parameters, SourceCallbackContext context,
+                      CompletableCallback<Void> callback) {
+    callback.complete(null);
   }
 
-  public Publisher<Void> onTerminate(CoreEvent event, Map<String, Object> parameters, SourceCallbackContext context) {
-    return empty();
+  public void onTerminate(CoreEvent event, Map<String, Object> parameters, SourceCallbackContext context,
+                          CompletableCallback<Void> callback) {
+    callback.complete(null);
   }
 
-  public Publisher<Void> onBackPressure(CoreEvent event, Map<String, Object> parameters, SourceCallbackContext context) {
-    return empty();
+  public void onBackPressure(CoreEvent event, Map<String, Object> parameters, SourceCallbackContext context,
+                             CompletableCallback<Void> callback) {
+    callback.complete(null);
   }
 }

@@ -179,7 +179,8 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
 
       @Override
       public boolean isSatisfied() {
-        return listener.getCorrelationCount(correlationId) >= 4;
+        return listener.getNotifications().getAll(BATCH_FAILED).stream()
+            .anyMatch(n -> n.getEvent().getCorrelationId().equals(correlationId));
       }
 
       @Override
@@ -198,12 +199,7 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
 
     int batchNumber = (Integer) backPressureNotification.getData().getValue();
 
-    verifyNotificationAndValue(getNotificationMatch(notifications, correlationId, NEW_BATCH), batchNumber);
-
-    verifyNotificationAndValue(getNotificationMatch(notifications, correlationId, NEXT_BATCH), 1L);
-
     verifyNotificationAndValue(backPressureNotification, batchNumber);
-
     verifyNotificationAndValue(getNotificationMatch(notifications, correlationId, BATCH_TERMINATED), batchNumber);
   }
 
