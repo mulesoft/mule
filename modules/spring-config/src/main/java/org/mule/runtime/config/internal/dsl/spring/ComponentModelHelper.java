@@ -33,7 +33,6 @@ import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.processor.Router;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -100,11 +99,10 @@ public class ComponentModelHelper {
   }
 
   public static void addAnnotation(QName annotationKey, Object annotationValue, SpringComponentModel componentModel) {
-    // TODO MULE-17363 remove this check
-    if (isOfType(componentModel, Collection.class) || isOfType(componentModel, Map.class)) {
+    // TODO MULE-10970 - remove condition once everything is AnnotatedObject.
+    if (!ComponentModelHelper.isAnnotatedObject(componentModel) && !componentModel.getIdentifier().getName().equals("flow-ref")) {
       return;
     }
-
     BeanDefinition beanDefinition = componentModel.getBeanDefinition();
     if (beanDefinition == null) {
       // This is the case of components that are references
