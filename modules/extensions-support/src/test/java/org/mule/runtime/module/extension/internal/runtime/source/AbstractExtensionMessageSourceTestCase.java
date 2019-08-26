@@ -282,7 +282,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
         .setListener(messageProcessor)
         .setSource(messageSource)
         .setMuleContext(muleContext)
-        .setProcessContext(() -> messageProcessContext)
+        .setProcessContext(messageProcessContext)
         .setCompletionHandlerFactory(completionHandlerFactory)
         .setExceptionCallback(exceptionCallback)
         .setCursorStreamProviderFactory(cursorStreamProviderFactory)
