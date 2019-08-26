@@ -101,9 +101,7 @@ public class ComponentModelHelper {
 
   public static void addAnnotation(QName annotationKey, Object annotationValue, SpringComponentModel componentModel) {
     // TODO MULE-17363 remove this check
-    if (isOfType(componentModel, String.class)
-        || isOfType(componentModel, Collection.class)
-        || isOfType(componentModel, Map.class)) {
+    if (isOfType(componentModel, Collection.class) || isOfType(componentModel, Map.class)) {
       return;
     }
 

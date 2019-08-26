@@ -137,12 +137,14 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
   }
 
   private void processAnnotations(ComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder) {
-    Map<QName, Object> annotations =
-        processMetadataAnnotationsHelper(beanDefinitionBuilder, componentModel);
-    processNestedAnnotations(componentModel, annotations);
-    processMacroExpandedAnnotations(componentModel, annotations);
-    if (!annotations.isEmpty()) {
-      beanDefinitionBuilder.addPropertyValue(ANNOTATIONS_PROPERTY_NAME, annotations);
+    if (Component.class.isAssignableFrom(componentModel.getType())) {
+      Map<QName, Object> annotations =
+          processMetadataAnnotationsHelper(beanDefinitionBuilder, componentModel);
+      processNestedAnnotations(componentModel, annotations);
+      processMacroExpandedAnnotations(componentModel, annotations);
+      if (!annotations.isEmpty()) {
+        beanDefinitionBuilder.addPropertyValue(ANNOTATIONS_PROPERTY_NAME, annotations);
+      }
     }
   }
 
