@@ -103,7 +103,9 @@ public class OnErrorCheckLogHandlerTestCase extends AbstractMuleContextTestCase 
   }
 
   private void handleException() {
-    Flux.from(checkLogHandler.route(just(mock(CoreEvent.class)))).subscribe(e -> {}, e -> {});
+    Flux.from(checkLogHandler.route(just(mock(CoreEvent.class)))).subscribe(e -> {
+    }, e -> {
+    });
   }
 
 }
