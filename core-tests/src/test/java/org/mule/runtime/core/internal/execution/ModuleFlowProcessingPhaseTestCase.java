@@ -10,7 +10,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -63,7 +62,6 @@ import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
-import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.matcher.EventMatcher;
@@ -162,7 +160,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     when(source.getLocation()).thenReturn(mock(ComponentLocation.class));
     when(context.getMessageSource()).thenReturn(source);
     when(context.getTransactionConfig()).thenReturn(empty());
-    when(muleContext.getConfigurationComponentLocator().find(any(Location.class))).thenReturn(of(flow));
+    when(context.getFlowConstruct()).thenReturn(flow);
 
     template = mock(ModuleFlowProcessingPhaseTemplate.class);
     resultAdapter = mock(SourceResultAdapter.class);

@@ -140,7 +140,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   protected MuleMetadataService metadataService;
 
   @Inject
-  private ConfigurationComponentLocator componentLocator;
+  protected ConfigurationComponentLocator componentLocator;
 
   @Inject
   protected ReflectionCache reflectionCache;

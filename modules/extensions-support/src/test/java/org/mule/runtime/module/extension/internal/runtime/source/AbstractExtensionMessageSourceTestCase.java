@@ -64,8 +64,8 @@ import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamProviderFactory;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
-import org.mule.runtime.core.privileged.execution.MessageProcessContext;
-import org.mule.runtime.core.privileged.execution.MessageProcessingManager;
+import org.mule.runtime.core.internal.execution.MessageProcessContext;
+import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
@@ -282,7 +282,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
         .setListener(messageProcessor)
         .setSource(messageSource)
         .setMuleContext(muleContext)
-        .setProcessContextSupplier(() -> messageProcessContext)
+        .setProcessContext(() -> messageProcessContext)
         .setCompletionHandlerFactory(completionHandlerFactory)
         .setExceptionCallback(exceptionCallback)
         .setCursorStreamProviderFactory(cursorStreamProviderFactory)

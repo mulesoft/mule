@@ -20,7 +20,6 @@ import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.privileged.routing.OutboundRouter;
-import org.mule.runtime.core.privileged.transport.LegacyConnector;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationMetaData;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationUtils;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -52,7 +51,6 @@ public class MuleContextInitialisePhase extends DefaultLifecyclePhase {
         StreamingManager.class,
         ConfigurationProvider.class,
         Config.class,
-        LegacyConnector.class,
         SecurityManager.class,
         FlowConstruct.class,
         Initialisable.class

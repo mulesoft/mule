@@ -82,6 +82,78 @@
           "methodName": "route",
           "elementKind": "method",
           "justification": "Performance improvement on a non externally used method."
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.execution.EndPhaseTemplate",
+          "package": "org.mule.runtime.core.privileged.execution",
+          "classSimpleName": "EndPhaseTemplate",
+          "elementKind": "interface",
+          "justification": "MULE-17390: Dead and unused code that hurts performance"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.execution.FlowProcessingPhaseTemplate",
+          "package": "org.mule.runtime.core.privileged.execution",
+          "classSimpleName": "FlowProcessingPhaseTemplate",
+          "elementKind": "interface",
+          "justification": "MULE-17390: Dead and unused code that hurts performance"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.execution.MessageProcessContext",
+          "package": "org.mule.runtime.core.privileged.execution",
+          "classSimpleName": "MessageProcessContext",
+          "elementKind": "interface",
+          "justification": "MULE-17390: Dead and unused code that hurts performance"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.execution.MessageProcessTemplate",
+          "package": "org.mule.runtime.core.privileged.execution",
+          "classSimpleName": "MessageProcessTemplate",
+          "elementKind": "interface",
+          "justification": "MULE-17390: Dead and unused code that hurts performance"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.execution.MessageProcessingManager",
+          "package": "org.mule.runtime.core.privileged.execution",
+          "classSimpleName": "MessageProcessingManager",
+          "elementKind": "interface",
+          "justification": "MULE-17390: Dead and unused code that hurts performance"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.execution.RequestResponseFlowProcessingPhaseTemplate",
+          "package": "org.mule.runtime.core.privileged.execution",
+          "classSimpleName": "RequestResponseFlowProcessingPhaseTemplate",
+          "elementKind": "interface",
+          "justification": "MULE-17390: Dead and unused code that hurts performance"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.execution.ValidationPhaseTemplate",
+          "package": "org.mule.runtime.core.privileged.execution",
+          "classSimpleName": "ValidationPhaseTemplate",
+          "elementKind": "interface",
+          "justification": "MULE-17390: Dead and unused code that hurts performance"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.transport.LegacyConnector",
+          "package": "org.mule.runtime.core.privileged.transport",
+          "classSimpleName": "LegacyConnector",
+          "elementKind": "interface",
+          "justification": "MULE-17390: Dead and unused code that hurts performance"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.transport.LegacyInboundEndpoint",
+          "package": "org.mule.runtime.core.privileged.transport",
+          "classSimpleName": "LegacyInboundEndpoint",
+          "elementKind": "interface",
+          "justification": "MULE-17390: Dead and unused code that hurts performance"
         }
       ]
     }

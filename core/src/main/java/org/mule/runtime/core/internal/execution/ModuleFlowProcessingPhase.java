@@ -25,8 +25,10 @@ import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageCollection;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
@@ -34,7 +36,6 @@ import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -45,7 +46,10 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.notification.ConnectorMessageNotification;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.functional.Either;
@@ -68,8 +72,6 @@ import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.execution.MessageProcessContext;
-import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Collection;
@@ -86,30 +88,30 @@ import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 /**
  * This phase routes the message through the flow.
  * <p>
- * To participate of this phase, {@link MessageProcessTemplate} must implement {@link ModuleFlowProcessingPhaseTemplate}
- * <p>
  * This implementation will know how to process messages from extension's sources
  */
-public class ModuleFlowProcessingPhase
-    extends NotificationFiringProcessingPhase<ModuleFlowProcessingPhaseTemplate> implements Initialisable {
+public class ModuleFlowProcessingPhase implements Initialisable {
+
+  private static final Logger LOGGER = getLogger(ModuleFlowProcessingPhase.class);
+
+  @Inject
+  private InterceptorManager processorInterceptorManager;
+
+  private final PolicyManager policyManager;
+  private final List<CompletableInterceptorSourceCallbackAdapter> additionalInterceptors = new LinkedList<>();
 
   private ErrorType sourceResponseGenerateErrorType;
   private ErrorType sourceResponseSendErrorType;
   private ErrorType sourceErrorResponseGenerateErrorType;
   private ErrorType sourceErrorResponseSendErrorType;
-  private ConfigurationComponentLocator componentLocator;
-
-  private final PolicyManager policyManager;
-
-  private final List<CompletableInterceptorSourceCallbackAdapter> additionalInterceptors = new LinkedList<>();
-
-  @Inject
-  private InterceptorManager processorInterceptorManager;
   private ErrorType flowBackPressureErrorType;
+  private NotificationHelper notificationHelper;
+  private MuleContext muleContext;
 
   public ModuleFlowProcessingPhase(PolicyManager policyManager) {
     this.policyManager = policyManager;
@@ -118,7 +120,6 @@ public class ModuleFlowProcessingPhase
   @Override
   public void initialise() throws InitialisationException {
     final ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
-    componentLocator = muleContext.getConfigurationComponentLocator();
 
     sourceResponseGenerateErrorType = errorTypeRepository.getErrorType(SOURCE_RESPONSE_GENERATE).get();
     sourceResponseSendErrorType = errorTypeRepository.getErrorType(SOURCE_RESPONSE_SEND).get();
@@ -140,21 +141,15 @@ public class ModuleFlowProcessingPhase
     }
   }
 
-  @Override
-  public boolean supportsTemplate(MessageProcessTemplate messageProcessTemplate) {
-    return messageProcessTemplate instanceof ModuleFlowProcessingPhaseTemplate;
-  }
-
-  @Override
   public void runPhase(final ModuleFlowProcessingPhaseTemplate template, final MessageProcessContext messageProcessContext,
                        final PhaseResultNotifier phaseResultNotifier) {
     try {
 
       final MessageSource messageSource = messageProcessContext.getMessageSource();
-      final FlowConstruct flowConstruct = (FlowConstruct) componentLocator.find(messageSource.getRootContainerLocation()).get();
+      final FlowConstruct flowConstruct = messageProcessContext.getFlowConstruct();
       final CompletableFuture<Void> responseCompletion = new CompletableFuture<>();
       final FlowProcessor flowExecutionProcessor = new FlowProcessor(template, flowConstruct);
-      CoreEvent event = createEvent(template, messageSource, responseCompletion, flowConstruct);
+      final CoreEvent event = createEvent(template, messageSource, responseCompletion, flowConstruct);
 
       try {
         final SourcePolicy policy =
@@ -485,14 +480,32 @@ public class ModuleFlowProcessingPhase
     })));
   }
 
-  @Override
-  public int compareTo(MessageProcessPhase messageProcessPhase) {
-    if (messageProcessPhase instanceof ValidationPhase) {
-      return 1;
+  private void fireNotification(Component source, CoreEvent event, FlowConstruct flow, int action) {
+    try {
+      if (event == null) {
+        // Null result only happens when there's a filter in the chain.
+        // Unfortunately a filter causes the whole chain to return null
+        // and there's no other way to retrieve the last event but using the RequestContext.
+        // see https://www.mulesoft.org/jira/browse/MULE-8670
+        event = getCurrentEvent();
+        if (event == null) {
+          return;
+        }
+      }
+      notificationHelper.fireNotification(source, event, flow.getLocation(), action);
+    } catch (Exception e) {
+      if (LOGGER.isWarnEnabled()) {
+        LOGGER.warn("Could not fire notification. Action: " + action, e);
+      }
     }
-    return 0;
   }
 
+  @Inject
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+    this.notificationHelper =
+        new NotificationHelper(muleContext.getNotificationManager(), ConnectorMessageNotification.class, false);
+  }
 
   private class FlowProcessor implements Processor, Component {
 

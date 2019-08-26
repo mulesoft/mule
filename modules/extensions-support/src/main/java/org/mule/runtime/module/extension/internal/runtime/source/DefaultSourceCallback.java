@@ -30,10 +30,10 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
+import org.mule.runtime.core.internal.execution.MessageProcessContext;
+import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
 import org.mule.runtime.core.internal.util.mediatype.PayloadMediaTypeResolver;
-import org.mule.runtime.core.privileged.execution.MessageProcessContext;
-import org.mule.runtime.core.privileged.execution.MessageProcessingManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
@@ -44,7 +44,6 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * Default implementation of {@link SourceCallback}. Instances are to be created through the {@link #builder()} method.
@@ -114,8 +113,8 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
       return this;
     }
 
-    public Builder<T, A> setProcessContextSupplier(Supplier<MessageProcessContext> processContextSupplier) {
-      product.processContextSupplier = processContextSupplier;
+    public Builder<T, A> setProcessContext(MessageProcessContext processContext) {
+      product.messageProcessContext = processContext;
       return this;
     }
 
@@ -133,7 +132,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
       checkArgument(product.listener, "listener");
       checkArgument(product.exceptionCallback, "exceptionCallback");
       checkArgument(product.messageProcessingManager, "messageProcessingManager");
-      checkArgument(product.processContextSupplier, "processContextSupplier");
+      checkArgument(product.messageProcessContext, "processContext");
       checkArgument(product.completionHandlerFactory, "completionHandlerSupplier");
       checkArgument(product.sourceModel, "source");
       checkArgument(product.cursorProviderFactory, "cursorStreamProviderFactory");
@@ -167,7 +166,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   private ExtensionMessageSource messageSource;
   private ExceptionCallback<ConnectionException> exceptionCallback;
   private MessageProcessingManager messageProcessingManager;
-  private Supplier<MessageProcessContext> processContextSupplier;
+  private MessageProcessContext messageProcessContext;
   private SourceCompletionHandlerFactory completionHandlerFactory;
   private CursorProviderFactory cursorProviderFactory;
   private TransactionConfig transactionConfig;
@@ -212,7 +211,6 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
     SourceCallbackContextAdapter contextAdapter = (SourceCallbackContextAdapter) context;
     validateNotifications(contextAdapter);
-    MessageProcessContext messageProcessContext = processContextSupplier.get();
     MediaType mediaType = resolveMediaType(result);
     PayloadMediaTypeResolver payloadMediaTypeResolver = new PayloadMediaTypeResolver(getDefaultEncoding(muleContext),
                                                                                      defaultMediaType,
