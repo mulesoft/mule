@@ -675,7 +675,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
       new PollingProber(DEFAULT_TIMEOUT * 10, DEFAULT_POLLING_INTERVAL)
           .check(new JUnitLambdaProbe(() -> {
-            LOGGER.error("DONE " + processed.get() + " , REJECTED " + rejected.get() + ", ");
+            LOGGER.debug("DONE " + processed.get() + " , REJECTED " + rejected.get() + ", ");
 
             assertThat("total", rejected.get() + processed.get(), totalAssertion);
             assertThat("processed", processed.get(), processedAssertion);
