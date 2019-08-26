@@ -70,6 +70,18 @@
           "classSimpleName": "PeriodicScheduler",
           "elementKind": "class",
           "justification": "This was missing annotations"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.function.Function<org.mule.runtime.core.api.event.CoreEvent, org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>> org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::route(java.lang.Exception)",
+          "new": "method java.util.function.Function<org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>, org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>> org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::route()",
+          "oldType": "java.util.function.Function<org.mule.runtime.core.api.event.CoreEvent, org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>>",
+          "newType": "java.util.function.Function<org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>, org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>>",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "route",
+          "elementKind": "method",
+          "justification": "Performance improvement on a non externally used method."
         }
       ]
     }

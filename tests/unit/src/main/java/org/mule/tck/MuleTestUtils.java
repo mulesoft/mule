@@ -7,6 +7,7 @@
 package org.mule.tck;
 
 import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -16,6 +17,8 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -84,9 +87,13 @@ public final class MuleTestUtils {
    * Creates an empty flow with the provided name.
    */
   public static Flow createFlow(MuleContext context, String flowName) throws MuleException {
-    final Flow flow = builder(flowName, context).processingStrategyFactory((muleContext, schedulersNamePrefix) -> {
-      return withContextClassLoader(MuleTestUtils.class.getClassLoader(), () -> spy(new TestDirectProcessingStrategy()));
-    }).build();
+    FlowExceptionHandler defaultErrorHandler = context.getDefaultErrorHandler(empty());
+    initialiseIfNeeded(defaultErrorHandler, context);
+    startIfNeeded(defaultErrorHandler);
+    final Flow flow = builder(flowName, context)
+        .processingStrategyFactory((muleContext, schedulersNamePrefix) -> withContextClassLoader(MuleTestUtils.class
+            .getClassLoader(), () -> spy(new TestDirectProcessingStrategy())))
+        .messagingExceptionHandler(defaultErrorHandler).build();
     flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent(flowName)));
     return flow;
   }
