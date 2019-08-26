@@ -94,7 +94,7 @@ public class CompositeSourcePolicy
               .doOnNext(result -> {
                 logSourcePolicySuccessfullResult(result.getRight());
 
-                commonPolicy.finishFlowProcessing(result.getRight().getEvent(), result);
+                commonPolicy.finishFlowProcessing(result.getRight().getResult(), result);
               })
               .doOnError(e -> !(e instanceof MessagingException), e -> LOGGER.error(e.getMessage(), e))
               .onErrorContinue(MessagingException.class, (t, e) -> {
@@ -237,8 +237,8 @@ public class CompositeSourcePolicy
 
   private void logSourcePolicySuccessfullResult(SourcePolicySuccessResult result) {
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("Event id: " + result.getEvent().getContext().getId() + "\nFinished processing. \n" +
-          getCoreEventAttributesAsString(result.getEvent()));
+      LOGGER.trace("Event id: " + result.getResult().getContext().getId() + "\nFinished processing. \n" +
+          getCoreEventAttributesAsString(result.getResult()));
     }
   }
 

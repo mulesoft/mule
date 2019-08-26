@@ -27,7 +27,7 @@ public interface SourcePolicy {
    *                                                 execute the successful or failure response function of the source.
    * @param messageSourceResponseParametersProcessor processor to generate the response and error response parameters of the
    *                                                 source.
-   * @return the result of processing the {@code event} through the policy chain.
+   * @param callback                                 the callback used to signal the result of processing the {@code event} through the policy chain.
    */
   void process(CoreEvent sourceEvent,
                MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor,

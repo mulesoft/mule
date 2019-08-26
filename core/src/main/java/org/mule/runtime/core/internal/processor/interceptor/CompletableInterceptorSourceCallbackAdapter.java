@@ -37,7 +37,7 @@ import org.slf4j.Logger;
  * Hooks the {@link ProcessorInterceptor}s for a {@link MessageSource} callback into the {@code Reactor} response handling
  * pipeline.
  *
- * @since 4.0
+ * @since 4.3.0
  */
 public class CompletableInterceptorSourceCallbackAdapter extends AbstractInterceptorAdapter implements
     BiFunction<MessageSource, BiConsumer<SourcePolicySuccessResult, CompletableCallback<Void>>, BiConsumer<SourcePolicySuccessResult, CompletableCallback<Void>>> {
@@ -68,14 +68,14 @@ public class CompletableInterceptorSourceCallbackAdapter extends AbstractInterce
 
     return (result, callback) -> {
       SourcePolicySuccessResult interceptedBeforeResult =
-          new SourcePolicySuccessResult(doBefore(interceptor, source, dslParameters).apply((InternalEvent) result.getEvent()),
+          new SourcePolicySuccessResult(doBefore(interceptor, source, dslParameters).apply((InternalEvent) result.getResult()),
                                         result.getResponseParameters(), result.getMessageSourceResponseParametersProcessor());
 
       try {
         next.accept(interceptedBeforeResult, callback);
-        doAfter(interceptor, source, empty()).apply((InternalEvent) interceptedBeforeResult.getEvent());
+        doAfter(interceptor, source, empty()).apply((InternalEvent) interceptedBeforeResult.getResult());
       } catch (Throwable t) {
-        doAfter(interceptor, source, of(t)).apply((InternalEvent) interceptedBeforeResult.getEvent());
+        doAfter(interceptor, source, of(t)).apply((InternalEvent) interceptedBeforeResult.getResult());
         callback.error(t);
       }
     };

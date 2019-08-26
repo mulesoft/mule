@@ -49,7 +49,7 @@ public class SourcePolicyFailureResult implements SourcePolicyResult {
   }
 
   @Override
-  public CoreEvent getEvent() {
+  public CoreEvent getResult() {
     return messagingException.getEvent();
   }
 }

@@ -14,10 +14,27 @@ import java.util.function.Consumer;
 
 import org.mockito.stubbing.Answer;
 
+/**
+ * Utilities for testing policies applied to message sources
+ *
+ * @since 4.3.0
+ */
 public final class SourcePolicyTestUtils {
 
   private SourcePolicyTestUtils() {}
 
+  /**
+   * Generates a {@link CompletableCallback} that will block execution until it is completed and feeds it into the
+   * provided {@code callbackConsumer}.
+   * <p>
+   * If the callback completes normally, this method returns the completion value. If it completes exceptionally, then the
+   * obtained {@link Throwable} is thrown
+   *
+   * @param callbackConsumer a consumer that will use the generated callback
+   * @param <T>              the callback's generic type
+   * @return the completion value
+   * @throws Throwable if the callback completes exceptionally
+   */
   public static <T> T block(Consumer<CompletableCallback<T>> callbackConsumer) throws Throwable {
     Reference<T> valueReference = new Reference<>();
     Reference<Throwable> exceptionReference = new Reference<>();
@@ -48,10 +65,25 @@ public final class SourcePolicyTestUtils {
     return valueReference.get();
   }
 
+  /**
+   * Returns a Mockito {@link Answer} that operates into a {@link CompletableCallback} argument assumed to be on arg index 2.
+   *
+   * @param callbackConsumer the consumer that will process the callback
+   * @param <T>              the generic type of the answer
+   * @return a Mockito {@link Answer}
+   */
   public static <T> Answer<T> onCallback(Consumer<CompletableCallback<T>> callbackConsumer) {
     return onCallback(callbackConsumer, 2);
   }
 
+  /**
+   * Returns a Mockito {@link Answer} that operates into a {@link CompletableCallback} argument, which will be located on the
+   * given {@code argIndex}.
+   *
+   * @param callbackConsumer the consumer that will process the callback
+   * @param <T>              the generic type of the answer
+   * @return a Mockito {@link Answer}
+   */
   public static <T> Answer<T> onCallback(Consumer<CompletableCallback<T>> callbackConsumer, int argIndex) {
     return inv -> {
       callbackConsumer.accept(inv.getArgument(argIndex));

@@ -44,7 +44,7 @@ public class SourcePolicySuccessResult implements SourcePolicyResult {
    * @return the result of the flow execution.
    */
   @Override
-  public CoreEvent getEvent() {
+  public CoreEvent getResult() {
     return result;
   }
 

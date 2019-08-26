@@ -66,6 +66,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -231,7 +232,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         // This accept/emit choice is made because there's a backpressure check done in the #emit sink message, which can be done
         // preemptively as the maxConcurrency one, before policies execution. As previous implementation, use WAIT strategy as
         // default. This check may not be needed anymore for ProactorStreamProcessingStrategy. See MULE-16988.
-
         if (getSource() == null || getSource().getBackPressureStrategy() == WAIT) {
           sink.accept(event);
         } else {
@@ -240,9 +240,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             notifyBackpressureException(event, createFlowBackPressureException(this.getName(), emitFailReason));
           }
         }
-
-        //TODO: REMOVE THIS> JUST FOR TROUBLESHOOTING
-        //notifyBackpressureException(event, createFlowBackPressureException(this.getName(), EVENTS_ACCUMULATED));
       } catch (RejectedExecutionException e) {
         // Handle the case in which the event execution is rejected from the scheduler.
         FlowBackPressureException wrappedException = createFlowBackPressureException(this.getName(), REQUIRED_SCHEDULER_BUSY, e);

@@ -23,9 +23,6 @@ public class NullSourceCallbackExecutor implements SourceCallbackExecutor {
 
   private NullSourceCallbackExecutor() {}
 
-  /**
-   * @return {@code null}
-   */
   @Override
   public void execute(CoreEvent event,
                       Map<String, Object> parameters,
