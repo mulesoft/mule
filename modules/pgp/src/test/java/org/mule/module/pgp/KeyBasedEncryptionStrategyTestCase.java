@@ -55,7 +55,7 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
         in.close();
 
         PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
-                "Mule client <mule_client@mule.com>"), true);
+                "Mule client <mule_client@mule.com>"), false);
 
         kbStrategy.initialise();
         String result = new String(kbStrategy.decrypt(msg, cryptInfo));
@@ -67,7 +67,7 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
     {
         String msg = "Test Message";
         PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
-            "Mule client <mule_client@mule.com>"), true);
+            "Mule client <mule_client@mule.com>"), false);
 
         kbStrategy.setEncryptionAlgorithm(EncryptionAlgorithm.AES_256.toString());
         kbStrategy.initialise();
@@ -80,7 +80,7 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
     {
         String msg = "Test Message";
         PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
-                "Mule client <mule_client@mule.com>"), true);
+                "Mule client <mule_client@mule.com>"), false);
 
         kbStrategy.initialise();
         String result = new String(kbStrategy.encrypt(msg.getBytes(), cryptInfo));
@@ -92,7 +92,7 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
     {
         String msg = "Test Message";
         PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
-                "Mule client <mule_client@mule.com>"), true);
+                "Mule client <mule_client@mule.com>"), false);
 
         kbStrategy.setEncryptionAlgorithm("invalid algorithm");
         kbStrategy.initialise();
