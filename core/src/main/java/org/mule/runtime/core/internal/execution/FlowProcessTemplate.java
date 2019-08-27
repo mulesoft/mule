@@ -13,7 +13,6 @@ import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
-import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 
 import java.util.List;
 import java.util.Map;
@@ -23,7 +22,7 @@ import org.reactivestreams.Publisher;
 /**
  * Template methods for {@link MessageSource} specific behavior during flow execution.
  */
-public interface ModuleFlowProcessingPhaseTemplate extends MessageProcessTemplate, MessageSourceResponseParametersProcessor {
+public interface FlowProcessTemplate extends MessageSourceResponseParametersProcessor {
 
   /**
    * @return a {@link SourceResultAdapter} created from the original message

@@ -18,7 +18,6 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.privileged.routing.OutboundRouter;
-import org.mule.runtime.core.privileged.transport.LegacyConnector;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationMetaData;
 import org.mule.runtime.core.privileged.util.annotation.AnnotationUtils;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -57,7 +56,6 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase {
 
     setOrderedLifecycleTypes(new Class<?>[] {
         FlowConstruct.class,
-        LegacyConnector.class,
         ConfigurationProvider.class,
         Config.class,
         Disposable.class,

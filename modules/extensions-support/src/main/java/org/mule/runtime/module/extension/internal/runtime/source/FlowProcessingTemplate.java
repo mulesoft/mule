@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.execution.ModuleFlowProcessingPhaseTemplate;
+import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
 import org.mule.runtime.core.internal.execution.NotificationFunction;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
 
@@ -27,16 +27,16 @@ import java.util.Map;
 
 import org.reactivestreams.Publisher;
 
-final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTemplate {
+final class FlowProcessingTemplate implements FlowProcessTemplate {
 
   private final SourceResultAdapter sourceMessage;
   private final Processor messageProcessor;
   private final List<NotificationFunction> notificationFunctions;
   private final SourceCompletionHandler completionHandler;
 
-  ModuleFlowProcessingTemplate(SourceResultAdapter sourceMessage,
-                               Processor messageProcessor,
-                               List<NotificationFunction> notificationFunctions, SourceCompletionHandler completionHandler) {
+  FlowProcessingTemplate(SourceResultAdapter sourceMessage,
+                         Processor messageProcessor,
+                         List<NotificationFunction> notificationFunctions, SourceCompletionHandler completionHandler) {
     this.sourceMessage = sourceMessage;
     this.messageProcessor = messageProcessor;
     this.notificationFunctions = notificationFunctions;

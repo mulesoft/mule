@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.execution;
+package org.mule.runtime.core.internal.execution;
 
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -15,9 +15,9 @@ import java.util.Optional;
 import java.util.concurrent.Executor;
 
 /**
- * Context for processing one message from a {@link org.mule.runtime.core.api.source.MessageSource}.
+ * Context for processing one message from a {@link MessageSource}.
  *
- * Mule {@link org.mule.runtime.core.api.source.MessageSource} implementations should create one instance of MessageProcessContext
+ * Mule {@link MessageSource} implementations should create one instance of MessageProcessContext
  * per message that generates.
  *
  * MessageProcessContext is responsible for - Define if the incoming message can be processed in a separate thread - Provide
@@ -28,20 +28,9 @@ import java.util.concurrent.Executor;
 public interface MessageProcessContext {
 
   /**
-   * @return true if the message can be processed in a different thread than the one it was acquired, false otherwise
-   */
-  boolean supportsAsynchronousProcessing();
-
-  /**
    * @return the {@link MessageSource} that retrieve the message. Can not be null
    */
   MessageSource getMessageSource();
-
-  /**
-   * @return the {@link Executor} were the incoming message must be processed. If null it will be executed in the same thread were
-   *         the message was received
-   */
-  Executor getFlowExecutionExecutor();
 
   /**
    * @return the {@link TransactionConfig} associated to the {@link MessageSource} that received the message. If
@@ -58,4 +47,6 @@ public interface MessageProcessContext {
    * @return the {@link ErrorTypeLocator} for this context
    */
   ErrorTypeLocator getErrorTypeLocator();
+
+  FlowConstruct getFlowConstruct();
 }
