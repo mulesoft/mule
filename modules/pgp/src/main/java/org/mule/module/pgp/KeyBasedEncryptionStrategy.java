@@ -88,7 +88,6 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
             if (pgpCryptInfo.isSignRequested())
             {
                 PGPPrivateKey signerPrivateKey = pgpCryptInfo.getSignerPrivateKey();
-                // String signerUserId = keyManager.getPublicKeys().getPublicKey(signerPrivateKey.getKeyID()).getUserIDs().next();
                 encryptStreamTransformer.signContentsWith(signerPrivateKey, pgpCryptInfo.getSignerPrincipal());
             }
             return encryptStreamTransformer.process(data);

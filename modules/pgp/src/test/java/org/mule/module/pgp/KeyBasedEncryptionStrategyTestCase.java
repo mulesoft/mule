@@ -7,6 +7,7 @@
 package org.mule.module.pgp;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -23,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 
+import org.bouncycastle.openpgp.PGPException;
 import org.junit.Test;
 
 public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrategyTestCase
@@ -118,15 +120,34 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
     }
 
     @Test
-    public void test() throws Exception
+    public void testEncryptAndSignWithAllCredentialsWorksCorrectly() throws Exception
     {
         String msg = "Test Message";
 
-        PGPEncryptAndSignInfo encryptAndSignInfo = new PGPEncryptAndSignInfo("Mule client <mule_client@mule.com>");
+        PGPEncryptAndSignInfo encryptAndSignInfo = new PGPEncryptAndSignInfo("Mule server <mule_server@mule.com>");
         kbStrategy.setCredentialsAccessor(new FakeCredentialAccessor("Mule client <mule_client@mule.com>"));
         kbStrategy.initialise();
         String result = new String(kbStrategy.encrypt(msg.getBytes(), encryptAndSignInfo));
         assertNotNull(result);
+    }
+
+    @Test
+    public void testEncryptAndSignWithoutSignerSecretKey() throws Exception
+    {
+        String msg = "Test Message";
+
+        PGPEncryptAndSignInfo encryptAndSignInfo = new PGPEncryptAndSignInfo("Robert Plant <robert@cambridge.edu.uk>");
+        kbStrategy.setCredentialsAccessor(new FakeCredentialAccessor("Mule client <mule_client@mule.com>"));
+        kbStrategy.initialise();
+        try
+        {
+            kbStrategy.encrypt(msg.getBytes(), encryptAndSignInfo);
+            fail("CryptoFailureException should be triggered because signer private key is not present");
+        }
+        catch (CryptoFailureException e)
+        {
+            assertThat(e.getMessage(), startsWith("Crypto Failure: Signer private key not found for principal:"));
+        }
     }
 
     @Test
