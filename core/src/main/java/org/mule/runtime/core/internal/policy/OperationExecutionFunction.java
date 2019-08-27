@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
 import java.util.Map;
 
@@ -27,6 +28,6 @@ public interface OperationExecutionFunction {
    * @param operationEvent the event to use for executing the operation.
    * @param sink a {@link MonoSink} on which the operation result is to be notified on
    */
-  void execute(Map<String, Object> parameters, CoreEvent operationEvent, MonoSink<CoreEvent> sink);
+  void execute(Map<String, Object> parameters, CoreEvent operationEvent, ExecutorCallback callback);
 
 }

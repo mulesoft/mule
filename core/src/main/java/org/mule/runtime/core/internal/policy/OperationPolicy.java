@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
 import reactor.core.publisher.MonoSink;
 
@@ -28,6 +29,6 @@ public interface OperationPolicy {
                OperationExecutionFunction operationExecutionFunction,
                OperationParametersProcessor parametersProcessor,
                ComponentLocation componentLocation,
-               MonoSink<CoreEvent> sink);
+               ExecutorCallback callback);
 
 }

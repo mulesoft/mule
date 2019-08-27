@@ -63,6 +63,11 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   }
 
   @Override
+  protected boolean isBlocking() {
+    return componentModel.isBlocking();
+  }
+
+  @Override
   public MetadataResult<MetadataKeysContainer> getEntityKeys() throws MetadataResolvingException {
     try {
       return runWithMetadataContext(

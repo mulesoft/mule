@@ -11,6 +11,7 @@ import static org.mule.runtime.api.notification.FlowConstructNotification.FLOW_C
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.internal.policy.PolicyPointcutParametersManager.POLICY_SOURCE_POINTCUT_PARAMETERS;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -33,9 +34,6 @@ import org.mule.runtime.policy.api.OperationPolicyPointcutParametersFactory;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executor;
@@ -43,6 +41,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,8 +56,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultPolicyManager.class);
 
   private static final OperationPolicy NO_POLICY_OPERATION =
-      (operationEvent, operationExecutionFunction, opParamProcessor, componentLocation, sink) -> operationExecutionFunction
-          .execute(opParamProcessor.getOperationParameters(), operationEvent, sink);
+      (operationEvent, operationExecutionFunction, opParamProcessor, componentLocation, callback) -> operationExecutionFunction
+          .execute(opParamProcessor.getOperationParameters(), operationEvent, callback);
 
   private MuleContext muleContext;
 
