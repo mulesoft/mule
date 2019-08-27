@@ -17,6 +17,7 @@ import static org.mule.module.pgp.util.ValidatorUtil.validateNotNull;
 
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.security.CryptoFailureException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.pgp.exception.MissingPGPKeyException;
 import org.mule.util.IOUtils;
@@ -61,7 +62,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 
     private PGPPublicKeyRingCollection publicKeys;
 
-    private boolean readSecretKey ;
+    private boolean readSecretKey;
 
     public void initialise() throws InitialisationException
     {
@@ -107,7 +108,9 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
                     principalsKeyBundleMap.put(userID, publicKey);
                 }
             }
-        } catch (IOException | PGPException e) {
+        }
+        catch (IOException | PGPException e)
+        {
             throw new MissingPGPKeyException(e);
         }
     }
@@ -125,13 +128,37 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
             String secretAliasId = getSecretAliasId();
             if (secretAliasId != null)
             {
-                secretKey = secretKeys.getSecretKey(parseSecretAliasId(secretAliasId));
+                Long parsedAliasId = parseSecretAliasId(secretAliasId);
+                secretKey = secretKeys.getSecretKey(parsedAliasId);
                 validateNotNull(secretKey, noKeyIdFound(getSecretAliasId()));
             }
             readSecretKey = true;
-        } catch (IOException | PGPException e) {
+        }
+        catch (IOException | PGPException e)
+        {
             throw new MissingPGPKeyException(e);
         }
+    }
+
+    /**
+     * Converts the string representation of a key alias Id into its long key ID counterpart. Handles both cases in
+     * which the string is a decimal or hexadecimal number.
+     *
+     * @param secretAliasId the string representation of an alias id, be it decimal or hexadecimal
+     * @return the {@link Long} representation of the same alias id.
+     */
+    private Long parseSecretAliasId(String secretAliasId)
+    {
+        Long parsedAliasId;
+        try
+        {
+            parsedAliasId = new BigInteger(secretAliasId).longValue();
+        }
+        catch (NumberFormatException e)
+        {
+            parsedAliasId = new BigInteger(secretAliasId, 16).longValue();
+        }
+        return parsedAliasId;
     }
 
     public String getSecretKeyRingFileName()
@@ -175,16 +202,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         return secretKey;
     }
 
-    /**
-     * @param secretAliasId: the keyID to use for decryption. It must be a hexadecimal value.
-     * @return the same keyID but as a decimal value.
-     */
-    private Long parseSecretAliasId(String secretAliasId)
-    {
-        return new BigInteger(secretAliasId, 16).longValue();
-    }
-
-    public PGPSecretKeyRingCollection getSecretKeys ()
+    public PGPSecretKeyRingCollection getSecretKeys()
     {
         return secretKeys;
     }
