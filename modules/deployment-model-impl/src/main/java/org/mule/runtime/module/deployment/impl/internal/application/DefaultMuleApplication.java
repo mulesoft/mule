@@ -23,6 +23,7 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import org.mule.runtime.api.artifact.Registry;
@@ -55,8 +56,10 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifact;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
+import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
@@ -65,6 +68,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -151,7 +155,11 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
 
   @Override
   public Domain getDomain() {
-    return domainRepository.getDomain(descriptor.getDomainName());
+    try {
+      return getApplicationDomain(domainRepository, descriptor);
+    } catch (DomainNotFoundException e) {
+      return null;
+    }
   }
 
   @Override
@@ -211,7 +219,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
               .setPolicyProvider(policyManager)
               .setRuntimeComponentBuildingDefinitionProvider(runtimeComponentBuildingDefinitionProvider);
 
-      Domain domain = domainRepository.getDomain(descriptor.getDomainName());
+      Domain domain = getApplicationDomain(domainRepository, descriptor);
       if (domain.getRegistry() != null) {
         artifactBuilder.setParentArtifact(domain);
       }
@@ -381,6 +389,21 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   @Override
   public String toString() {
     return format("%s[%s]@%s", getClass().getName(), descriptor.getName(), Integer.toHexString(System.identityHashCode(this)));
+  }
+
+  static Domain getApplicationDomain(DomainRepository domainRepository, ApplicationDescriptor descriptor)
+      throws DomainNotFoundException {
+    String configuredDomainName = descriptor.getDomainName();
+    if (configuredDomainName != null) {
+      return domainRepository.getDomain(configuredDomainName);
+    } else {
+      Optional<BundleDescriptor> domainBundleDescriptor = descriptor.getDomainDescriptor();
+      if (domainBundleDescriptor.isPresent()) {
+        return domainRepository.getCompatibleDomain(domainBundleDescriptor.get());
+      } else {
+        return domainRepository.getDomain(DEFAULT_DOMAIN_NAME);
+      }
+    }
   }
 
 }

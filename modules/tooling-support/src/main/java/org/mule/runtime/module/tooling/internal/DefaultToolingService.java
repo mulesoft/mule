@@ -40,6 +40,7 @@ import org.mule.runtime.module.deployment.impl.internal.application.DefaultAppli
 import org.mule.runtime.module.deployment.impl.internal.application.ToolingApplicationDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DeployableArtifactWrapper;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
+import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingServiceBuilder;
@@ -140,9 +141,11 @@ public class DefaultToolingService implements ToolingService {
         applicationDescriptorFactory.createArtifactModelBuilder(toolingApplicationContent);
     String domainName = mergedDeploymentProperties.get().getProperty(DEPLOYMENT_DOMAIN_NAME_REF);
     if (domainName != null) {
-      Domain domain = domainRepository.getDomain(domainName);
-      if (domain == null) {
-        throw new IllegalArgumentException(format("Domain '%s' is expected to be deployed", domainName));
+      Domain domain;
+      try {
+        domain = domainRepository.getDomain(domainName);
+      } catch (DomainNotFoundException e) {
+        throw new IllegalArgumentException(format("Domain '%s' is expected to be deployed", domainName), e);
       }
 
       MuleArtifactLoaderDescriptor classLoaderModelDescriptorLoader =

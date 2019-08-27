@@ -124,7 +124,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
   }
 
   public void dispose(DomainWrapper domain) {
-    domainManager.removeDomain(domain.getArtifactName());
+    domainManager.removeDomain(domain);
   }
 
   public void start(DomainWrapper domainWrapper) {
@@ -134,8 +134,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
   @Override
   protected Domain doCreateArtifact(File domainLocation, Optional<Properties> deploymentProperties) throws IOException {
     String domainName = domainLocation.getName();
-    Domain domain = domainManager.getDomain(domainName);
-    if (domain != null) {
+    if (domainManager.contains(domainName)) {
       throw new IllegalArgumentException(format("Domain '%s'  already exists", domainName));
     }
     if (domainName.contains(" ")) {

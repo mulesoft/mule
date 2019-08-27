@@ -20,7 +20,6 @@ import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefi
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 import org.mule.runtime.api.service.ServiceRepository;
-import org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -37,6 +36,7 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
+import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
@@ -149,7 +149,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     return new ClassLoaderModel.ClassLoaderModelBuilder().dependingOn(domainDependency).build();
   }
 
-  private Domain createDomain(String name) {
+  private Domain createDomain(String name) throws DomainNotFoundException {
     final Domain domain = mock(Domain.class);
     final ArtifactClassLoader domainArtifactClassLoader = mock(ArtifactClassLoader.class);
     when(domainArtifactClassLoader.getClassLoader()).thenReturn(mock(ClassLoader.class));

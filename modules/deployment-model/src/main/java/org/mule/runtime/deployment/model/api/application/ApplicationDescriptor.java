@@ -8,9 +8,6 @@
 package org.mule.runtime.deployment.model.api.application;
 
 import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
-
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -67,10 +64,7 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
   }
 
   public String getDomainName() {
-    if (domainName != null) {
-      return domainName;
-    }
-    return getDomainDescriptor().map(bundleDescriptor -> bundleDescriptor.getArtifactFileName()).orElse(DEFAULT_DOMAIN_NAME);
+    return domainName;
   }
 
   /**
@@ -82,12 +76,8 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
         if (domainDescriptor == null) {
           Optional<BundleDependency> domain =
               getClassLoaderModel().getDependencies().stream().filter(d -> d.getDescriptor().getClassifier().isPresent()
-                  ? d.getDescriptor().getClassifier().get().equals(MULE_DOMAIN_CLASSIFIER) : false).findFirst();
-          if (domain.isPresent()) {
-            domainDescriptor = ofNullable(domain.get().getDescriptor());
-          } else {
-            domainDescriptor = Optional.empty();
-          }
+                  && d.getDescriptor().getClassifier().get().equals(MULE_DOMAIN_CLASSIFIER)).findFirst();
+          domainDescriptor = domain.map(BundleDependency::getDescriptor);
         }
       }
     }

@@ -169,7 +169,8 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
   }
 
   private File getClassLoaderModelFile() {
-    ArtifactCoordinates artifactCoordinates = new ArtifactCoordinates(getGroupId(), getArtifactId(), getVersion());
+    ArtifactCoordinates artifactCoordinates =
+        new ArtifactCoordinates(getGroupId(), getArtifactId(), getVersion(), getType(), getClassifier());
     ClassLoaderModel classLoaderModel = new ClassLoaderModel(classloaderModelVersion, artifactCoordinates);
 
     List<Artifact> artifactDependencies = new LinkedList<>();
