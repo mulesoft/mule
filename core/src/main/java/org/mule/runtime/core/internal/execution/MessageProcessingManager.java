@@ -10,6 +10,8 @@ import org.mule.runtime.core.api.source.MessageSource;
 
 /**
  * In charge of processing messages through mule.
+ *
+ * @since 4.3.0
  */
 public interface MessageProcessingManager {
 
