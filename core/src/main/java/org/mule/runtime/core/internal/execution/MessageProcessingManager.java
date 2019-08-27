@@ -21,6 +21,6 @@ public interface MessageProcessingManager {
    *        message will participate only on those phases were the template defines the required template methods
    * @param messageProcessContext defines the context of execution of the message
    */
-  void processMessage(ModuleFlowProcessingPhaseTemplate messageProcessTemplate, MessageProcessContext messageProcessContext);
+  void processMessage(FlowProcessTemplate messageProcessTemplate, MessageProcessContext messageProcessContext);
 
 }

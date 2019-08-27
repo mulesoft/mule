@@ -46,7 +46,6 @@ import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.routing.OutboundRouter;
-import org.mule.runtime.core.privileged.transport.LegacyConnector;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.util.Map;
@@ -92,7 +91,6 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
           StreamingManager.class,
           ConfigurationProvider.class,
           Config.class,
-          LegacyConnector.class,
           SecurityManager.class,
           FlowConstruct.class,
           MuleConfiguration.class,

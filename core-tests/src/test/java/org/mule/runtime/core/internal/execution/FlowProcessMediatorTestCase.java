@@ -78,7 +78,7 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 @SmallTest
-public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
+public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
 
   private static final ErrorType ERROR_FROM_FLOW =
       ErrorTypeBuilder.builder().parentErrorType(mock(ErrorType.class)).namespace("TEST").identifier("FLOW_FAILED").build();
@@ -86,7 +86,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   private FlowConstruct flow;
   private MessageProcessContext context;
   private SourceResultAdapter resultAdapter;
-  private ModuleFlowProcessingPhaseTemplate template;
+  private FlowProcessTemplate template;
   private PhaseResultNotifier notifier;
 
   private SourcePolicy sourcePolicy;
@@ -96,7 +96,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   private MessagingException messagingException;
   private RuntimeException mockException;
 
-  private ModuleFlowProcessingPhase moduleFlowProcessingPhase;
+  private FlowProcessMediator flowProcessMediator;
   private final Supplier<Map<String, Object>> failingParameterSupplier = () -> {
     throw mockException;
   };
@@ -142,10 +142,10 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
       return null;
     }).when(sourcePolicy).process(any(), any(), any());
 
-    moduleFlowProcessingPhase = new ModuleFlowProcessingPhase(policyManager);
-    moduleFlowProcessingPhase.setMuleContext(muleContext);
-    initialiseIfNeeded(moduleFlowProcessingPhase, muleContext);
-    startIfNeeded(moduleFlowProcessingPhase);
+    flowProcessMediator = new FlowProcessMediator(policyManager);
+    flowProcessMediator.setMuleContext(muleContext);
+    initialiseIfNeeded(flowProcessMediator, muleContext);
+    startIfNeeded(flowProcessMediator);
 
     flow = mock(FlowConstruct.class, withSettings().extraInterfaces(Component.class));
     final FlowExceptionHandler exceptionHandler = mock(FlowExceptionHandler.class);
@@ -162,7 +162,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     when(context.getTransactionConfig()).thenReturn(empty());
     when(context.getFlowConstruct()).thenReturn(flow);
 
-    template = mock(ModuleFlowProcessingPhaseTemplate.class);
+    template = mock(FlowProcessTemplate.class);
     resultAdapter = mock(SourceResultAdapter.class);
     when(resultAdapter.getResult()).thenReturn(Result.builder().build());
     when(resultAdapter.getMediaType()).thenReturn(ANY);
@@ -180,7 +180,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
   @Test
   public void success() throws Exception {
-    moduleFlowProcessingPhase.runPhase(template, context, notifier);
+    flowProcessMediator.process(template, context, notifier);
 
     verifySuccess();
   }
@@ -190,7 +190,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     Reference<CompletableCallback<Void>> callbackReference = new Reference<>();
     doAnswer(onCallback(callbackReference::set)).when(template).sendResponseToClient(any(), any(), any());
 
-    moduleFlowProcessingPhase.runPhase(template, context, notifier);
+    flowProcessMediator.process(template, context, notifier);
 
     callbackReference.get().complete(null);
     verifySuccess();
@@ -200,7 +200,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   public void successResponseParametersError() throws Exception {
     when(successResult.getResponseParameters()).thenReturn(failingParameterSupplier);
 
-    moduleFlowProcessingPhase.runPhase(template, context, notifier);
+    flowProcessMediator.process(template, context, notifier);
 
     verifyFlowErrorHandler(isErrorTypeSourceResponseGenerate());
     verify(template, never()).sendResponseToClient(any(), any(), any());
@@ -217,7 +217,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   public void successResponseSendError() throws Exception {
     doAnswer(onCallback(callback -> callback.error(mockException))).when(template).sendResponseToClient(any(), any(), any());
 
-    moduleFlowProcessingPhase.runPhase(template, context, notifier);
+    flowProcessMediator.process(template, context, notifier);
 
     verifyFlowErrorHandler(isErrorTypeSourceResponseSend());
     verify(template).sendResponseToClient(any(), any(), any());
@@ -235,7 +235,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     when(successResult.getResponseParameters()).thenReturn(failingParameterSupplier);
     when(successResult.createErrorResponseParameters()).thenReturn(failingParameterFunction);
 
-    moduleFlowProcessingPhase.runPhase(template, context, notifier);
+    flowProcessMediator.process(template, context, notifier);
 
     verifyFlowErrorHandler(isErrorTypeSourceResponseGenerate());
     verify(template, never()).sendResponseToClient(any(), any(), any());
@@ -254,7 +254,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     doAnswer(onCallback(callback -> callback.error(mockException)))
         .when(template).sendFailureResponseToClient(any(), any(), any());
 
-    moduleFlowProcessingPhase.runPhase(template, context, notifier);
+    flowProcessMediator.process(template, context, notifier);
 
     verifyFlowErrorHandler(isErrorTypeSourceResponseGenerate());
     verify(template, never()).sendResponseToClient(any(), any(), any());
@@ -270,7 +270,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   public void failure() throws Exception {
     configureFailingFlow(mockException);
 
-    moduleFlowProcessingPhase.runPhase(template, context, notifier);
+    flowProcessMediator.process(template, context, notifier);
 
     verifyFlowError();
   }
@@ -279,7 +279,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
   public void failureInErrorHandler() throws Exception {
     configureErrorHandlingFailingFlow(mockException);
 
-    moduleFlowProcessingPhase.runPhase(template, context, notifier);
+    flowProcessMediator.process(template, context, notifier);
 
     verifyFlowError();
   }
@@ -295,7 +295,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
     configureFailingFlow(mockException);
 
-    moduleFlowProcessingPhase.runPhase(template, context, notifier);
+    flowProcessMediator.process(template, context, notifier);
 
     callbackReference.get().complete(null);
     verifyFlowError();
@@ -308,7 +308,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     configureFailingFlow(mockException);
     doAnswer(onCallback(callbackReference::set)).when(template).sendFailureResponseToClient(any(), any(), any());
 
-    moduleFlowProcessingPhase.runPhase(template, context, notifier);
+    flowProcessMediator.process(template, context, notifier);
 
     verify(template, never()).afterPhaseExecution(any());
 
@@ -325,7 +325,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     configureFailingFlow(mockException);
     when(failureResult.getErrorResponseParameters()).thenReturn(failingParameterSupplier);
 
-    moduleFlowProcessingPhase.runPhase(template, context, notifier);
+    flowProcessMediator.process(template, context, notifier);
 
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any());
@@ -341,7 +341,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     doAnswer(onCallback(callback -> callback.error(mockException))).when(template)
         .sendFailureResponseToClient(any(), any(), any());
 
-    moduleFlowProcessingPhase.runPhase(template, context, notifier);
+    flowProcessMediator.process(template, context, notifier);
 
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any());
@@ -357,7 +357,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
                                                   any(MessageSourceResponseParametersProcessor.class))).thenThrow(mockException);
     when(template.getFailedExecutionResponseParametersFunction()).thenReturn(coreEvent -> emptyMap());
 
-    moduleFlowProcessingPhase.runPhase(template, context, notifier);
+    flowProcessMediator.process(template, context, notifier);
 
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any());

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -22,20 +24,20 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, I
   private PolicyManager policyManager;
   private MuleContext muleContext;
 
-  private ModuleFlowProcessingPhase delegate;
+  private FlowProcessMediator mediator;
   private SystemExceptionHandler exceptionListener;
 
   @Override
   public void initialise() throws InitialisationException {
     exceptionListener = muleContext.getExceptionListener();
-    delegate = new ModuleFlowProcessingPhase(policyManager);
-    delegate.initialise();
+    mediator = new FlowProcessMediator(policyManager);
+    initialiseIfNeeded(mediator, true, muleContext);
   }
 
   @Override
-  public void processMessage(ModuleFlowProcessingPhaseTemplate messageProcessTemplate,
+  public void processMessage(FlowProcessTemplate messageProcessTemplate,
                              MessageProcessContext messageProcessContext) {
-    delegate.runPhase(messageProcessTemplate, messageProcessContext, this);
+    mediator.process(messageProcessTemplate, messageProcessContext, this);
   }
 
   @Override

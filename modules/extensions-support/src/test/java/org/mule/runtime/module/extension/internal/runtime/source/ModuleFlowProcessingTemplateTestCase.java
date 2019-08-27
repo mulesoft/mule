@@ -65,11 +65,11 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleTestCase {
 
   private final RuntimeException runtimeException = new RuntimeException();
 
-  private ModuleFlowProcessingTemplate template;
+  private FlowProcessingTemplate template;
 
   @Before
   public void before() throws Exception {
-    template = new ModuleFlowProcessingTemplate(message, messageProcessor, emptyList(), completionHandler);
+    template = new FlowProcessingTemplate(message, messageProcessor, emptyList(), completionHandler);
     doAnswer(onCallback(callback -> callback.complete(null))).when(completionHandler).onCompletion(any(), any(), any());
     doAnswer(onCallback(callback -> callback.complete(null))).when(completionHandler).onFailure(any(), any(), any());
   }

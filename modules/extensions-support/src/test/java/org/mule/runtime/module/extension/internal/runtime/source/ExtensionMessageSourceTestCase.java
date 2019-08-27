@@ -31,6 +31,22 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.exception.DefaultMuleException;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
+import org.mule.runtime.core.api.util.ExceptionUtils;
+import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
+import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
+import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -44,22 +60,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.InOrder;
-import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.exception.DefaultMuleException;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.LifecycleException;
-import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.core.api.Injector;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
-import org.mule.runtime.core.api.util.ExceptionUtils;
-import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
-import org.mule.runtime.extension.api.runtime.source.Source;
-import org.mule.runtime.extension.api.runtime.source.SourceCallback;
-import org.mule.tck.probe.JUnitLambdaProbe;
-import org.mule.tck.probe.PollingProber;
-import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 
 @RunWith(Parameterized.class)
 public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
@@ -258,22 +258,9 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     Exception e = new RuntimeException();
 
     SchedulerService schedulerService = muleContext.getSchedulerService();
-    doThrow(e).when(schedulerService).cpuLightScheduler();
+    doThrow(e).when(schedulerService).ioScheduler();
 
     final Throwable throwable = catchThrowable(messageSource::start);
-    assertThat(throwable.getCause(), is(sameInstance(e)));
-  }
-
-  @Test
-  public void failedToCreateFlowTrigger() throws Exception {
-    Exception e = new RuntimeException();
-
-    SchedulerService schedulerService = muleContext.getSchedulerService();
-    doThrow(e).when(schedulerService).cpuLightScheduler();
-
-    messageSource.initialise();
-    final Throwable throwable = catchThrowable(messageSource::start);
-    assertThat(throwable, is(instanceOf(LifecycleException.class)));
     assertThat(throwable.getCause(), is(sameInstance(e)));
   }
 

@@ -22,7 +22,7 @@ import org.reactivestreams.Publisher;
 /**
  * Template methods for {@link MessageSource} specific behavior during flow execution.
  */
-public interface ModuleFlowProcessingPhaseTemplate extends MessageSourceResponseParametersProcessor {
+public interface FlowProcessTemplate extends MessageSourceResponseParametersProcessor {
 
   /**
    * @return a {@link SourceResultAdapter} created from the original message

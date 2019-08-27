@@ -10,6 +10,7 @@ import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
+import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
@@ -91,13 +92,13 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 /**
- * This phase routes the message through the flow.
- * <p>
- * This implementation will know how to process messages from extension's sources
+ * Routes a message through a Flow and coordinates error handling and response emitting.
+ *
+ * @since 4.3.0
  */
-public class ModuleFlowProcessingPhase implements Initialisable {
+public class FlowProcessMediator implements Initialisable {
 
-  private static final Logger LOGGER = getLogger(ModuleFlowProcessingPhase.class);
+  private static final Logger LOGGER = getLogger(FlowProcessMediator.class);
 
   @Inject
   private InterceptorManager processorInterceptorManager;
@@ -113,7 +114,7 @@ public class ModuleFlowProcessingPhase implements Initialisable {
   private NotificationHelper notificationHelper;
   private MuleContext muleContext;
 
-  public ModuleFlowProcessingPhase(PolicyManager policyManager) {
+  public FlowProcessMediator(PolicyManager policyManager) {
     this.policyManager = policyManager;
   }
 
@@ -141,8 +142,9 @@ public class ModuleFlowProcessingPhase implements Initialisable {
     }
   }
 
-  public void runPhase(final ModuleFlowProcessingPhaseTemplate template, final MessageProcessContext messageProcessContext,
-                       final PhaseResultNotifier phaseResultNotifier) {
+  public void process(FlowProcessTemplate template,
+                      MessageProcessContext messageProcessContext,
+                      PhaseResultNotifier phaseResultNotifier) {
     try {
 
       final MessageSource messageSource = messageProcessContext.getMessageSource();
@@ -179,6 +181,7 @@ public class ModuleFlowProcessingPhase implements Initialisable {
 
   private void dispatch(PhaseContext ctx) throws Exception {
     try {
+      onMessageReceived(ctx);
       ctx.flowConstruct.checkBackpressure(ctx.event);
       ctx.template.getNotificationFunctions().forEach(notificationFunction -> muleContext.getNotificationManager()
           .fireNotification(notificationFunction.apply(ctx.event, ctx.messageProcessContext.getMessageSource())));
@@ -244,7 +247,7 @@ public class ModuleFlowProcessingPhase implements Initialisable {
    * @return an exception mapper that notifies the {@link FlowConstruct} response listener of the backpressure signal
    */
   protected Either<SourcePolicyFailureResult, SourcePolicySuccessResult> mapBackPressureExceptionToPolicyFailureResult(
-                                                                                                                       ModuleFlowProcessingPhaseTemplate template,
+                                                                                                                       FlowProcessTemplate template,
                                                                                                                        CoreEvent event,
                                                                                                                        FlowBackPressureException exception) {
 
@@ -413,7 +416,7 @@ public class ModuleFlowProcessingPhase implements Initialisable {
   }
 
   private Consumer<Either<MessagingException, CoreEvent>> getTerminateConsumer(MessageSource messageSource,
-                                                                               ModuleFlowProcessingPhaseTemplate template) {
+                                                                               FlowProcessTemplate template) {
     return eventOrException -> template.afterPhaseExecution(eventOrException.mapLeft(messagingException -> {
       messagingException.setProcessedEvent(createErrorEvent(messagingException.getEvent(), messageSource, messagingException,
                                                             ((PrivilegedMuleContext) muleContext).getErrorTypeLocator()));
@@ -421,7 +424,16 @@ public class ModuleFlowProcessingPhase implements Initialisable {
     }));
   }
 
-  private CoreEvent createEvent(ModuleFlowProcessingPhaseTemplate template, MessageSource source,
+  /*
+   * Consumer invoked for each new execution of this processing phase.
+   */
+  private void onMessageReceived(PhaseContext ctx) {
+    fireNotification(ctx.messageProcessContext.getMessageSource(), ctx.event, ctx.flowConstruct, MESSAGE_RECEIVED);
+    ctx.template.getNotificationFunctions().forEach(notificationFunction -> muleContext.getNotificationManager()
+        .fireNotification(notificationFunction.apply(ctx.event, ctx.messageProcessContext.getMessageSource())));
+  }
+
+  private CoreEvent createEvent(FlowProcessTemplate template, MessageSource source,
                                 CompletableFuture<Void> responseCompletion, FlowConstruct flowConstruct) {
 
     SourceResultAdapter adapter = template.getSourceMessage();
@@ -509,10 +521,10 @@ public class ModuleFlowProcessingPhase implements Initialisable {
 
   private class FlowProcessor implements Processor, Component {
 
-    private final ModuleFlowProcessingPhaseTemplate template;
+    private final FlowProcessTemplate template;
     private final FlowConstruct flowConstruct;
 
-    public FlowProcessor(ModuleFlowProcessingPhaseTemplate template, FlowConstruct flowConstruct) {
+    public FlowProcessor(FlowProcessTemplate template, FlowConstruct flowConstruct) {
       this.template = template;
       this.flowConstruct = flowConstruct;
     }
@@ -562,7 +574,7 @@ public class ModuleFlowProcessingPhase implements Initialisable {
    */
   private static final class PhaseContext {
 
-    private final ModuleFlowProcessingPhaseTemplate template;
+    private final FlowProcessTemplate template;
     private final MessageSource messageSource;
     private final MessageProcessContext messageProcessContext;
     private final PhaseResultNotifier phaseResultNotifier;
@@ -574,7 +586,7 @@ public class ModuleFlowProcessingPhase implements Initialisable {
     private Either<SourcePolicyFailureResult, SourcePolicySuccessResult> result;
     private Throwable exception;
 
-    private PhaseContext(ModuleFlowProcessingPhaseTemplate template,
+    private PhaseContext(FlowProcessTemplate template,
                          MessageSource messageSource,
                          MessageProcessContext messageProcessContext,
                          PhaseResultNotifier phaseResultNotifier,
