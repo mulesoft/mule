@@ -73,11 +73,11 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     ExecutionTemplate<CoreEvent> executionTemplate =
         createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
     ExecutionCallback<CoreEvent> processingCallback = () -> {
-      Transaction newTx = TransactionCoordination.getInstance().getTransaction();
+      Transaction currentTx = TransactionCoordination.getInstance().getTransaction();
       // Whether there wasn't a tx and now there is, or if there is a newer one (if we have a nested tx, using xa)
       // we must set the component location of this try scope
-      if ((!txPrevoiuslyActive && isTransactionActive()) || (txPrevoiuslyActive && previousTx != newTx)) {
-        TransactionAdapter transaction = (TransactionAdapter) newTx;
+      if ((!txPrevoiuslyActive && isTransactionActive()) || (txPrevoiuslyActive && previousTx != currentTx)) {
+        TransactionAdapter transaction = (TransactionAdapter) currentTx;
         transaction.setComponentLocation(getLocation());
         return processWithChildContextBlocking(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler);
       } else {
