@@ -67,7 +67,9 @@ import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -105,6 +107,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   private ExtendedExpressionManager expressionManager;
   private MuleContext mockMuleContext;
 
+  private ArrayList<String> mockedFlowSubflowNames;
+
   @Inject
   private ConfigurationComponentLocator locator;
 
@@ -115,6 +119,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     result = testEvent();
     mockMuleContext = mockContextWithServices();
     expressionManager = mockMuleContext.getExpressionManager();
+    mockedFlowSubflowNames = new ArrayList<>();
     doReturn(true).when(expressionManager).isExpression(anyString());
     when(targetFlow.apply(any(Publisher.class))).thenReturn(just(result));
     when(targetFlow.referenced()).thenReturn((ReactiveProcessor) (pub -> just(result)));
@@ -257,6 +262,14 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     flowRefFactoryBean.setName(name);
     flowRefFactoryBean.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     flowRefFactoryBean.setApplicationContext(applicationContext);
+
+    String[] mockedFlowNamesAsArray = new String[mockedFlowSubflowNames.size()];
+    mockedFlowNamesAsArray = mockedFlowSubflowNames.stream().map(flowName -> "&" + flowName).collect(Collectors.toList())
+        .toArray(mockedFlowNamesAsArray);
+
+    when(applicationContext.getBeanNamesForType(SubflowMessageProcessorChainFactoryBean.class))
+        .thenReturn(mockedFlowNamesAsArray);
+
     try {
       mockMuleContext.getInjector().inject(flowRefFactoryBean);
     } catch (MuleException e) {
@@ -294,6 +307,10 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
       when(applicationContext.getBean(eq(PARSED_DYNAMIC_REFERENCED_FLOW))).thenReturn(targetBuilder);
     } else {
       when(applicationContext.getBean(eq(PARSED_DYNAMIC_REFERENCED_FLOW))).thenReturn(target);
+    }
+
+    if (targetBuilder != null) {
+        mockedFlowSubflowNames.add(PARSED_DYNAMIC_REFERENCED_FLOW);
     }
 
     if (target instanceof MessageProcessorChain) {

@@ -301,6 +301,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
       subFlowNames.stream().forEach(subFlowName -> {
         try {
+          // TODO: The referenced subflows are fetched one time for each apply call. Add a cache?
           Processor subFlowProcessor = getReferencedFlow(subFlowName, this);
           subFlowRouter.put(subFlowName, new ExecutableSubFlow(subFlowProcessor, getLocation()));
         } catch (MuleException e) {
