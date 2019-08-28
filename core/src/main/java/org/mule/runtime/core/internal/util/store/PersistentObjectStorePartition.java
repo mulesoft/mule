@@ -23,6 +23,7 @@ import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 import org.mule.runtime.api.store.ExpirableObjectStore;
 import org.mule.runtime.core.api.util.UUID;
@@ -252,7 +253,8 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
     Path relativePath = workingDirectory.relativize(absoluteFilePath);
     File corruptedFile = new File(muleContext.getConfiguration().getWorkingDirectory()
         + File.separator + CORRUPTED_FOLDER + File.separator + relativePath.toString());
-    Files.move(file.toPath(), corruptedFile.getParentFile().toPath());
+    FileUtils.openDirectory(corruptedFile.getParentFile().getAbsolutePath());
+    Files.move(file.toPath(), corruptedFile.toPath());
   }
 
   private void loadStoredKeysAndFileNames() throws ObjectStoreException {

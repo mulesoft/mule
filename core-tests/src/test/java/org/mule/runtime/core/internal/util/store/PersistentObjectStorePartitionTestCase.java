@@ -13,7 +13,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.util.FileUtils.openDirectory;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 
@@ -21,6 +20,7 @@ import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -79,16 +79,23 @@ public class PersistentObjectStorePartitionTestCase extends AbstractMuleTestCase
     final String VALUE = "value";
     try {
       File.createTempFile("temp", ".obj", objectStoreFolder.getRoot());
-      File corruptedFolder = openDirectory(workingDirectory.getAbsolutePath()
+      File corruptedFolder = new File(workingDirectory.getAbsolutePath()
           + File.separator + PersistentObjectStorePartition.CORRUPTED_FOLDER);
-      int corruptedBefore = corruptedFolder.list().length;
+      FileUtils.deleteTree(corruptedFolder);
 
       partition.store(KEY, VALUE);
       // Expect the new stored object, and the partition-descriptor file
       assertEquals(2, objectStoreFolder.getRoot().listFiles().length);
 
-      // Expect to have one more corrupted file in the corrupted folder
-      assertEquals(corruptedBefore + 1, corruptedFolder.list().length);
+      // Expect to have one new folder in the corrupted folder
+      File[] corruptedFolderEntries = corruptedFolder.listFiles();
+      assertEquals(1, corruptedFolderEntries.length);
+
+      // Expect to have the corrupted file nested within the new folder for the object store
+      File corruptedFolderEntry = corruptedFolderEntries[0];
+      assertTrue(corruptedFolderEntry.isDirectory());
+      assertEquals(1, corruptedFolderEntry.listFiles().length);
+      assertTrue(corruptedFolderEntry.listFiles()[0].isFile());
     } catch (Exception e) {
       fail("Supposed to have skipped corrupted or unreadable files");
     }
