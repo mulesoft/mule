@@ -74,7 +74,8 @@ public class EncryptStreamTransformer implements StreamTransformer
         outputStream = new ByteArrayOutputStream();
     }
 
-    public EncryptStreamTransformer signContentsWith(PGPPrivateKey signerPrivateKey, String signerId) {
+    public EncryptStreamTransformer signContentsWith(PGPPrivateKey signerPrivateKey, String signerId)
+    {
         this.signerPrivateKey = signerPrivateKey;
         this.signerId = signerId;
         signatureEnabled = true;
@@ -109,7 +110,8 @@ public class EncryptStreamTransformer implements StreamTransformer
         PGPCompressedDataGenerator comprDataGen = new PGPCompressedDataGenerator(PGPCompressedData.ZIP);
         compressedEncryptedOutputStream = comprDataGen.open(encryptedOutputStream, new byte[1 << 16]);
 
-        if (signatureEnabled) {
+        if (signatureEnabled)
+        {
             PGPContentSignerBuilder signerBuilder = new BcPGPContentSignerBuilder(signerPrivateKey.getPublicKeyPacket().getAlgorithm(), HashAlgorithmTags.SHA1);
             signatureGenerator = new PGPSignatureGenerator(signerBuilder);
             signatureGenerator.init(PGPSignature.BINARY_DOCUMENT, signerPrivateKey);
@@ -134,13 +136,17 @@ public class EncryptStreamTransformer implements StreamTransformer
     {
         try
         {
-            if (!signatureEnabled) {
+            if (!signatureEnabled)
+            {
                 copy(toBeEncrypted, pgpOutputStream);
-            } else {
+            }
+            else
+            {
                 // By hand literal data generation stream handling
                 byte[] buf = new byte[1 << 16];
                 int readBytesLength;
-                while ((readBytesLength = toBeEncrypted.read(buf)) > 0) {
+                while ((readBytesLength = toBeEncrypted.read(buf)) > 0)
+                {
                     pgpOutputStream.write(buf, 0, readBytesLength);
                     signatureGenerator.update(buf, 0, readBytesLength);
                 }
@@ -149,7 +155,8 @@ public class EncryptStreamTransformer implements StreamTransformer
         finally
         {
             pgpOutputStream.close();
-            if (signatureEnabled) {
+            if (signatureEnabled)
+            {
                 signatureGenerator.generate().encode(compressedEncryptedOutputStream);
             }
             compressedEncryptedOutputStream.close();
