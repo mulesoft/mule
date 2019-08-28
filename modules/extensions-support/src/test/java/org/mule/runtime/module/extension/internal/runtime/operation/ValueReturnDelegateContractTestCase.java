@@ -21,6 +21,7 @@ import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.MediaType;
@@ -136,7 +137,8 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
     assertThat(message.getPayload().getDataType().getMediaType().toRfcString(), containsString(APPLICATION_JSON.toRfcString()));
   }
 
-  protected abstract ReturnDelegate createReturnDelegate();
+  // protected abstract ReturnDelegate createReturnDelegate();
+  protected abstract ReturnDelegate createReturnDelegate() throws InitialisationException;
 
   protected abstract Message getOutputMessage(CoreEvent result);
 }
