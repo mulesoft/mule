@@ -93,6 +93,10 @@ public class CompositeOperationPolicy
     this.operationPolicyProcessorFactory = operationPolicyProcessorFactory;
     this.disposed = new AtomicBoolean(false);
     this.readWriteLock = readWriteLock();
+
+    responseFlux = Flux.create(responseSink)
+        .map(response -> quickCopy(response, singletonMap(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)));
+
     this.policySinks = newBuilder()
         .removalListener((String key, FluxSinkSupplier<CoreEvent> value, RemovalCause cause) -> {
           value.dispose();
@@ -104,8 +108,6 @@ public class CompositeOperationPolicy
                                                                                          factory));
         });
 
-    responseFlux = Flux.create(responseSink)
-        .map(response -> quickCopy(response, singletonMap(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)));
   }
 
   private final class OperationWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
@@ -163,7 +165,7 @@ public class CompositeOperationPolicy
           OperationExecutionFunction operationExecutionFunction =
               ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_OPERATION_EXEC_FUNCTION);
           operationExecutionFunction.execute(parametersMap, event, new FluxSinkRecorderExecutorCallback(responseSink));
-        })
+        })                              
         .transform(p -> responseFlux);
   }
 

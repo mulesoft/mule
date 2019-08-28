@@ -52,7 +52,6 @@ import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.MonoSink;
 import reactor.core.scheduler.Schedulers;
 
 public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTestCase {
@@ -86,17 +85,17 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     when(operationPolicyParametersTransformer.get().fromParametersToMessage(any())).thenReturn(Message.of(null));
     doAnswer(invocation -> {
 
-      MonoSink<CoreEvent> sink = invocation.getArgument(2);
+      ExecutorCallback callback = invocation.getArgument(2);
 
       Mono<CoreEvent> mono = Mono.from(processor().apply(just(invocation.getArgument(1))));
       if (processChangeThread || policyChangeThread) {
         mono.publishOn(Schedulers.single())
-            .subscribe(sink::success, sink::error);
+            .subscribe(callback::complete, callback::error);
       } else {
         try {
-          sink.success(mono.block());
+          callback.complete(mono.block());
         } catch (Throwable t) {
-          sink.error(t);
+          callback.error(t);
         }
       }
 
@@ -199,15 +198,15 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     doAnswer(inv -> {
       CoreEvent event = inv.getArgument(1);
       Mono<CoreEvent> baseMono = just(event);
-      MonoSink<CoreEvent> sink = inv.getArgument(2);
+      ExecutorCallback callback = inv.getArgument(2);
 
       if (processChangeThread) {
         baseMono
-            .doOnNext(ev -> sink.error(new MessagingException(ev, policyException)))
+            .doOnNext(ev -> callback.error(new MessagingException(ev, policyException)))
             .publishOn(Schedulers.single())
             .subscribe();
       } else {
-        sink.error(new MessagingException(event, policyException));
+        callback.error(new MessagingException(event, policyException));
       }
 
       return null;
