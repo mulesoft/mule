@@ -27,6 +27,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -45,12 +46,12 @@ import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.api.util.NameUtils;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeHandlerManagerFactory;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 
 import java.util.List;
@@ -80,6 +81,7 @@ import com.google.common.collect.ImmutableList;
 public class ExtensionModelHelper {
 
   private final Set<ExtensionModel> extensionsModels;
+  private final DslResolvingContext dslResolvingCtx;
   private final Cache<ComponentIdentifier, Optional<? extends org.mule.runtime.api.meta.model.ComponentModel>> extensionComponentModelByComponentIdentifier =
       CacheBuilder.newBuilder().build();
   private final Cache<ComponentIdentifier, Optional<? extends ConnectionProviderModel>> extensionConnectionProviderModelByComponentIdentifier =
@@ -98,6 +100,7 @@ public class ExtensionModelHelper {
    */
   public ExtensionModelHelper(Set<ExtensionModel> extensionModels) {
     this.extensionsModels = extensionModels;
+    this.dslResolvingCtx = DslResolvingContext.getDefault(extensionsModels);
   }
 
   /**
@@ -197,10 +200,13 @@ public class ExtensionModelHelper {
   }
 
   public Optional<? extends ConnectionProviderModel> findConnectionProviderModel(ComponentIdentifier componentIdentifier) {
+
     try {
       return extensionConnectionProviderModelByComponentIdentifier.get(componentIdentifier, () -> {
         return lookupExtensionModelFor(componentIdentifier)
             .flatMap(currentExtension -> {
+              DslSyntaxResolver dslSyntaxResolver = DslSyntaxResolver.getDefault(currentExtension, dslResolvingCtx);
+
               AtomicReference<ConnectionProviderModel> modelRef = new AtomicReference<>();
 
               new ExtensionWalker() {
@@ -208,7 +214,7 @@ public class ExtensionModelHelper {
                 @Override
                 protected void onConnectionProvider(org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels owner,
                                                     ConnectionProviderModel model) {
-                  if ((model.getName() + "Connection").equals(NameUtils.toCamelCase(componentIdentifier.getName(), "-"))) {
+                  if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                     modelRef.set(model);
                   }
                 };
@@ -228,13 +234,15 @@ public class ExtensionModelHelper {
       return extensionConfigurationModelByComponentIdentifier.get(componentIdentifier, () -> {
         return lookupExtensionModelFor(componentIdentifier)
             .flatMap(currentExtension -> {
+              DslSyntaxResolver dslSyntaxResolver = DslSyntaxResolver.getDefault(currentExtension, dslResolvingCtx);
+
               AtomicReference<ConfigurationModel> modelRef = new AtomicReference<>();
 
               new ExtensionWalker() {
 
                 @Override
                 protected void onConfiguration(ConfigurationModel model) {
-                  if (model.getName().equals(NameUtils.toCamelCase(componentIdentifier.getName(), "-"))) {
+                  if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                     modelRef.set(model);
                   }
                 }
