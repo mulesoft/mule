@@ -237,6 +237,26 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
     });
   }
 
+  @Test
+  public void operationWithResultInputStreamOutputReleasesConnection() throws Exception {
+    when(outputModel.getType()).thenReturn(typeLoader.load(InputStream.class));
+    when(componentModel.supportsStreaming()).thenReturn(true);
+
+    delegate = createReturnDelegate();
+
+    Result<InputStream, Void> inputStreamResult =
+        Result.<InputStream, Void>builder().output(new ByteArrayInputStream(HELLO_WORLD_MSG.getBytes(UTF_8))).build();
+
+    CoreEvent result = delegate.asReturnValue(inputStreamResult, operationContext);
+
+    Message message = getOutputMessage(result);
+
+    ManagedCursorStreamProvider cursorStreamProvider = (ManagedCursorStreamProvider) message.getPayload().getValue();
+    InputStream resultingStream = cursorStreamProvider.openCursor();
+    assertThat(IOUtils.toString(resultingStream), is(HELLO_WORLD_MSG));
+    verify(connectionHandler, atLeastOnce()).release();
+  }
+
   private void assertStreamIsWrapped(Object value) throws InitialisationException, IOException {
     delegate = createReturnDelegate();
     CoreEvent result = delegate.asReturnValue(value, operationContext);
