@@ -189,12 +189,25 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     Flux<CoreEvent> flux = from(publisher)
         .flatMap(event -> subscriberContext().map(ctx -> addContextToEvent(event, ctx)));
 
-    if (isBlocking()) {
-      return flux.handle((event, sink) -> xxx(event, new SynchronousSinkExecutorCallback(sink)));
-    } else {
+    if (isAsync()) {
       return flux
           .doOnNext(event -> xxx(event, new FluxSinkRecorderExecutorCallback(asyncFluxSink)))
-          .transform(f -> asyncFlux);
+          .filter(event -> false)
+          .mergeWith(asyncFlux);
+    } else {
+      return flux.handle((event, sink) -> xxx(event, new SynchronousSinkExecutorCallback(sink)));
+
+      //.transform(f -> asyncFlux);
+      //.transform(f -> {
+      //  RxUtils.subscribeFluxOnPublisherSubscription(f, asyncFlux);
+      //  return asyncFlux;
+      //});
+      //;
+      //return Flux.concat(flux, asyncFlux);
+      //return flux.transform(f -> asyncFlux);
+      //RxUtils.subscribeFluxOnPublisherSubscription(asyncFlux, flux);
+      //return Flux.merge(asyncFlux, flux);
+      //return flux;
     }
   }
 
@@ -218,17 +231,17 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       } else {
         operationExecutionFunction = (parameters, operationEvent, callback) -> {
           ExecutionContextAdapter<T> operationContext = createExecutionContext(
-              configuration,
-              parameters,
-              operationEvent,
-              currentScheduler != null ? currentScheduler
-                  : IMMEDIATE_SCHEDULER);
+                                                                               configuration,
+                                                                               parameters,
+                                                                               operationEvent,
+                                                                               currentScheduler != null ? currentScheduler
+                                                                                   : IMMEDIATE_SCHEDULER);
 
           executeOperation(operationContext, mapped(callback, operationContext, operationEvent));
         };
       }
 
-      
+
       if (getLocation() != null) {
         ((DefaultFlowCallStack) event.getFlowCallStack())
             .setCurrentProcessorPath(resolvedProcessorRepresentation);
@@ -339,15 +352,15 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
             resolveProcessorRepresentation(muleContext.getConfiguration().getId(), getLocation().getLocation(), this);
       }
 
-      if (!isBlocking()) {
-        asyncFlux = Flux.create(asyncFluxSink);
+      if (isAsync()) {
+        asyncFlux = Flux.create(asyncFluxSink).doOnComplete(() -> System.out.println("COMPLETE"));
       }
 
       initialised = true;
     }
   }
 
-  private RetryPolicyTemplate getRetryPolicyTemplate(Optional<ConfigurationInstance> configuration) {
+  protected RetryPolicyTemplate getRetryPolicyTemplate(Optional<ConfigurationInstance> configuration) {
     RetryPolicyTemplate delegate = null;
     if (retryPolicyTemplate != null) {
       delegate = configuration
@@ -493,7 +506,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return true;
   }
 
-  protected boolean isBlocking() {
+  protected boolean isAsync() {
     return false;
   }
 
@@ -504,6 +517,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Override
   public void doStop() throws MuleException {
+    if (asyncFluxSink != null) {
+      asyncFluxSink.complete();
+    }
     stopIfNeeded(componentExecutor);
   }
 

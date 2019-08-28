@@ -165,7 +165,7 @@ public class CompositeOperationPolicy
           OperationExecutionFunction operationExecutionFunction =
               ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_OPERATION_EXEC_FUNCTION);
           operationExecutionFunction.execute(parametersMap, event, new FluxSinkRecorderExecutorCallback(responseSink));
-        })                              
+        })
         .transform(p -> responseFlux);
   }
 
@@ -209,12 +209,12 @@ public class CompositeOperationPolicy
                                             OperationParametersProcessor parametersProcessor, ExecutorCallback callback) {
     return getParametersTransformer().isPresent()
         ? InternalEvent.builder(operationEvent)
-        .message(getParametersTransformer().get().fromParametersToMessage(parametersProcessor.getOperationParameters()))
-        .addInternalParameter(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor)
-        .addInternalParameter(POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction)
-        .addInternalParameter(POLICY_OPERATION_CHILD_CTX, operationEvent.getContext())
-        .addInternalParameter(POLICY_OPERATION_CALLER_CALLBACK, callback)
-        .build()
+            .message(getParametersTransformer().get().fromParametersToMessage(parametersProcessor.getOperationParameters()))
+            .addInternalParameter(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor)
+            .addInternalParameter(POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction)
+            .addInternalParameter(POLICY_OPERATION_CHILD_CTX, operationEvent.getContext())
+            .addInternalParameter(POLICY_OPERATION_CALLER_CALLBACK, callback)
+            .build()
         : quickCopy(operationEvent, of(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor,
                                        POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction,
                                        POLICY_OPERATION_CHILD_CTX, operationEvent.getContext(),

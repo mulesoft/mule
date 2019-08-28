@@ -7,11 +7,13 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
 
 import org.mule.runtime.api.connection.ConnectionException;
@@ -63,8 +65,23 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   }
 
   @Override
-  protected boolean isBlocking() {
-    return componentModel.isBlocking();
+  protected boolean isAsync() {
+    if (!componentModel.isBlocking()) {
+      return true;
+    }
+
+    if (!requiresConfig()) {
+      return false;
+    }
+
+    ConfigurationProvider configurationProvider = this.configurationProvider.get();
+    if (configurationProvider.isDynamic()) {
+      return true;
+    } else {
+      RetryPolicyTemplate retryPolicy =
+          getRetryPolicyTemplate(ofNullable(configurationProvider.get(getInitialiserEvent(muleContext))));
+      return retryPolicy != null && retryPolicy.isEnabled();
+    }
   }
 
   @Override

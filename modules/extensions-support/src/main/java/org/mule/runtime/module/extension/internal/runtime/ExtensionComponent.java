@@ -19,7 +19,6 @@ import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
-import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresConfig;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -70,6 +69,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.extension.api.values.ComponentValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
@@ -110,7 +110,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   private final TemplateParser expressionParser = createMuleStyleParser();
   private final ExtensionModel extensionModel;
-  private final AtomicReference<ConfigurationProvider> configurationProvider = new AtomicReference<>();
+  protected final AtomicReference<ConfigurationProvider> configurationProvider = new AtomicReference<>();
   private final MetadataMediator<T> metadataMediator;
   private final ValueProviderMediator<T> valueProviderMediator;
   private final ClassTypeLoader typeLoader;
@@ -450,7 +450,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    * @return a configuration instance for the current component with a given {@link CoreEvent}
    */
   protected Optional<ConfigurationInstance> getConfiguration(CoreEvent event) {
-    if (!requiresConfig.get()) {
+    if (!requiresConfig()) {
       return empty();
     }
 
@@ -464,6 +464,10 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }
 
     return getDefaultConfiguraiton(event);
+  }
+
+  protected boolean requiresConfig() {
+    return requiresConfig.get();
   }
 
   private Optional<ConfigurationInstance> getDefaultConfiguraiton(CoreEvent event) {
@@ -483,7 +487,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    * returns an empty value.
    */
   protected Optional<ConfigurationInstance> getStaticConfiguration() {
-    if (!requiresConfig.get() || (isConfigurationSpecified() && configurationProvider.get().isDynamic())) {
+    if (!requiresConfig() || (isConfigurationSpecified() && configurationProvider.get().isDynamic())) {
       return empty();
     }
 
@@ -515,7 +519,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   private boolean computeRequiresConfig() {
-    return requiresConfig(extensionModel, componentModel);
+    return ExtensionModelUtils.requiresConfig(extensionModel, componentModel);
   }
 
   private void validateConfigurationProviderIsNotExpression() throws InitialisationException {

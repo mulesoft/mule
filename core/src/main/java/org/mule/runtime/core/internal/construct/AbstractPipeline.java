@@ -421,9 +421,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     stopSafely(() -> stopIfStoppable(source));
     canProcessMessage = false;
 
+    stopIfStoppable(pipeline);
     stopSafely(() -> disposeIfDisposable(sink));
     sink = null;
-    stopIfStoppable(pipeline);
     super.doStop();
   }
 

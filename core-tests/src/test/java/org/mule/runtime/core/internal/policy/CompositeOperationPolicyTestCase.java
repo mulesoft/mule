@@ -103,13 +103,13 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     }).when(operationExecutionFunction).execute(any(), any(), any());
 
     when(operationPolicyProcessorFactory.createOperationPolicy(same(firstPolicy), any())).thenAnswer(
-        policyFactoryInvocation -> firstPolicyProcessor(policyFactoryInvocation,
-                                                        e -> e,
-                                                        e -> e));
+                                                                                                     policyFactoryInvocation -> firstPolicyProcessor(policyFactoryInvocation,
+                                                                                                                                                     e -> e,
+                                                                                                                                                     e -> e));
     when(operationPolicyProcessorFactory.createOperationPolicy(same(secondPolicy), any())).thenAnswer(
-        policyFactoryInvocation -> secondPolicyProcessor(policyFactoryInvocation,
-                                                         e -> e,
-                                                         e -> e));
+                                                                                                      policyFactoryInvocation -> secondPolicyProcessor(policyFactoryInvocation,
+                                                                                                                                                       e -> e,
+                                                                                                                                                       e -> e));
   }
 
   protected ReactiveProcessor processor() {
