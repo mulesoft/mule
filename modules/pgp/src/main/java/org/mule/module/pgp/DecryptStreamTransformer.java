@@ -8,10 +8,12 @@ package org.mule.module.pgp;
 
 import static java.lang.Long.toHexString;
 import static java.lang.String.format;
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.module.pgp.util.BouncyCastleUtil.PBE_SECRET_KEY_DECRYPTOR_BUILDER;
 
 import org.mule.api.security.CryptoFailureException;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.module.pgp.exception.MissingPGPKeyException;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -190,9 +192,8 @@ public class DecryptStreamTransformer implements StreamTransformer
     private PGPPrivateKey getPrivateKey(long keyID, String passPhrase) throws PGPException, NoSuchProviderException
     {
         PGPSecretKey pgpSecKey;
-        PGPPrivateKey pgpPrivateKey;
 
-        if(configuredSecretKey)
+        if (configuredSecretKey)
         {
             pgpSecKey = this.secretKey;
         }
@@ -208,8 +209,9 @@ public class DecryptStreamTransformer implements StreamTransformer
 
         try
         {
-            pgpPrivateKey = pgpSecKey.extractPrivateKey(PBE_SECRET_KEY_DECRYPTOR_BUILDER.build(passPhrase.toCharArray()));
-            return pgpPrivateKey;
+            return pgpSecKey != null ?
+                   pgpSecKey.extractPrivateKey(PBE_SECRET_KEY_DECRYPTOR_BUILDER.build(passPhrase.toCharArray())) :
+                   null;
         }
         catch (PGPException e)
         {
@@ -223,11 +225,11 @@ public class DecryptStreamTransformer implements StreamTransformer
         return format(INVALID_KEY_ERROR_MESSAGE, toHexString(configuredKeyId).toUpperCase(), toHexString(validKeyId).toUpperCase());
     }
 
-    private PGPException wrapWrongPassPhraseException (PGPException pgpException, String invalidPassPhrase, Long keyId)
+    private PGPException wrapWrongPassPhraseException(PGPException pgpException, String invalidPassPhrase, Long keyId)
     {
-        if(pgpException.getMessage().contains(CHECKSUM_MESSAGE))
+        if (pgpException.getMessage().contains(CHECKSUM_MESSAGE))
         {
-            return  new PGPException(createInvalidPassPhraseErrorMessage(invalidPassPhrase, keyId));
+            return new PGPException(createInvalidPassPhraseErrorMessage(invalidPassPhrase, keyId));
         }
         else
         {
@@ -235,7 +237,7 @@ public class DecryptStreamTransformer implements StreamTransformer
         }
     }
 
-    private String createInvalidPassPhraseErrorMessage (String invalidPassPhrase, long keyId)
+    private String createInvalidPassPhraseErrorMessage(String invalidPassPhrase, long keyId)
     {
         return format(INVALID_PASS_PHRASE_ERROR_MESSAGE, invalidPassPhrase, toHexString(keyId).toUpperCase());
     }
