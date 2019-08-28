@@ -221,6 +221,8 @@ public class DefaultFlowBuilder implements Builder {
     public ReactiveProcessor referenced() {
       return pub -> from(pub)
           .doOnNext(assertStarted())
+          // Insert the incoming event into the flow, routing it through the processing strategy
+          .flatMap(routeThroughProcessingStrategy())
           // Don't propagate errors, these will be handled by parent flow through the EventContext hierarchy mechanism
           .onErrorResume(e -> Mono.empty());
     }
