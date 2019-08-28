@@ -35,6 +35,7 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
@@ -68,11 +69,15 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
       return event;
     }
     final boolean txPrevoiuslyActive = isTransactionActive();
+    Transaction previousTx = TransactionCoordination.getInstance().getTransaction();
     ExecutionTemplate<CoreEvent> executionTemplate =
         createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
     ExecutionCallback<CoreEvent> processingCallback = () -> {
-      if (!txPrevoiuslyActive && isTransactionActive()) {
-        TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
+      Transaction newTx = TransactionCoordination.getInstance().getTransaction();
+      // Whether there wasn't a tx and now there is, or if there is a newer one (if we have a nested tx, using xa)
+      // we must set the component location of this try scope
+      if ((!txPrevoiuslyActive && isTransactionActive()) || (txPrevoiuslyActive && previousTx != newTx)) {
+        TransactionAdapter transaction = (TransactionAdapter) newTx;
         transaction.setComponentLocation(getLocation());
         return processWithChildContextBlocking(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler);
       } else {
