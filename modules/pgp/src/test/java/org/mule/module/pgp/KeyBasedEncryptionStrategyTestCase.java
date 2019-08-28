@@ -30,6 +30,8 @@ import org.junit.Test;
 public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrategyTestCase
 {
 
+    private static final String EXPECTED_NO_SIGNER_PRIVATE_KEY_ERROR_MESSAGE = "Crypto Failure: Signer private key not found for principal: ";
+
     @Test
     public void testDecryptCompressedSigned() throws Exception
     {
@@ -146,7 +148,7 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
         }
         catch (CryptoFailureException e)
         {
-            assertThat(e.getMessage(), startsWith("Crypto Failure: Signer private key not found for principal:"));
+            assertThat(e.getMessage(), startsWith(EXPECTED_NO_SIGNER_PRIVATE_KEY_ERROR_MESSAGE));
         }
     }
 

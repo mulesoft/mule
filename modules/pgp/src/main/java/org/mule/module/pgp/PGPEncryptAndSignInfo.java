@@ -6,8 +6,13 @@
  */
 package org.mule.module.pgp;
 
+/**
+ * Atomic encrypt and sign procedure information. Used for communication between mule-module-security and mule's
+ * PGP-module.
+ */
 public class PGPEncryptAndSignInfo
 {
+
     private final String signerPrincipal;
 
     public PGPEncryptAndSignInfo(String signerPrincipal)
