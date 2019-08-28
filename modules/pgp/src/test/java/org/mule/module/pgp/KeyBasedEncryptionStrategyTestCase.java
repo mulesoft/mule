@@ -7,6 +7,7 @@
 package org.mule.module.pgp;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -14,6 +15,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mule.module.pgp.i18n.PGPMessages.noPublicKeyForPrincipal;
 import static org.mule.module.pgp.i18n.PGPMessages.noSecretPassPhrase;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.CredentialsAccessor;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.util.IOUtils;
@@ -22,10 +24,13 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 
+import org.bouncycastle.openpgp.PGPException;
 import org.junit.Test;
 
 public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrategyTestCase
 {
+
+    private static final String EXPECTED_NO_SIGNER_PRIVATE_KEY_ERROR_MESSAGE = "Crypto Failure: Signer private key not found for principal: ";
 
     @Test
     public void testDecryptCompressedSigned() throws Exception
@@ -55,7 +60,7 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
         in.close();
 
         PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
-                "Mule client <mule_client@mule.com>"), true);
+                "Mule client <mule_client@mule.com>"), false);
 
         kbStrategy.initialise();
         String result = new String(kbStrategy.decrypt(msg, cryptInfo));
@@ -67,7 +72,7 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
     {
         String msg = "Test Message";
         PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
-            "Mule client <mule_client@mule.com>"), true);
+                "Mule client <mule_client@mule.com>"), false);
 
         kbStrategy.setEncryptionAlgorithm(EncryptionAlgorithm.AES_256.toString());
         kbStrategy.initialise();
@@ -80,7 +85,7 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
     {
         String msg = "Test Message";
         PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
-                "Mule client <mule_client@mule.com>"), true);
+                "Mule client <mule_client@mule.com>"), false);
 
         kbStrategy.initialise();
         String result = new String(kbStrategy.encrypt(msg.getBytes(), cryptInfo));
@@ -92,7 +97,7 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
     {
         String msg = "Test Message";
         PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
-                "Mule client <mule_client@mule.com>"), true);
+                "Mule client <mule_client@mule.com>"), false);
 
         kbStrategy.setEncryptionAlgorithm("invalid algorithm");
         kbStrategy.initialise();
@@ -117,11 +122,42 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
     }
 
     @Test
+    public void testEncryptAndSignWithAllCredentialsWorksCorrectly() throws Exception
+    {
+        String msg = "Test Message";
+
+        PGPEncryptAndSignInfo encryptAndSignInfo = new PGPEncryptAndSignInfo("Mule server <mule_server@mule.com>");
+        kbStrategy.setCredentialsAccessor(new FakeCredentialAccessor("Mule client <mule_client@mule.com>"));
+        kbStrategy.initialise();
+        String result = new String(kbStrategy.encrypt(msg.getBytes(), encryptAndSignInfo));
+        assertNotNull(result);
+    }
+
+    @Test
+    public void testEncryptAndSignWithoutSignerSecretKey() throws Exception
+    {
+        String msg = "Test Message";
+
+        PGPEncryptAndSignInfo encryptAndSignInfo = new PGPEncryptAndSignInfo("Robert Plant <robert@cambridge.edu.uk>");
+        kbStrategy.setCredentialsAccessor(new FakeCredentialAccessor("Mule client <mule_client@mule.com>"));
+        kbStrategy.initialise();
+        try
+        {
+            kbStrategy.encrypt(msg.getBytes(), encryptAndSignInfo);
+            fail("CryptoFailureException should be triggered because signer private key is not present");
+        }
+        catch (CryptoFailureException e)
+        {
+            assertThat(e.getMessage(), startsWith(EXPECTED_NO_SIGNER_PRIVATE_KEY_ERROR_MESSAGE));
+        }
+    }
+
+    @Test
     public void testNoDefinedSecretPassPhrase() throws Exception
     {
         InputStream inputStream = mock(InputStream.class);
         PGPCryptInfo pgpCryptInfo = mock(PGPCryptInfo.class);
-        PGPKeyRing keyManager = mock (PGPKeyRing.class);
+        PGPKeyRing keyManager = mock(PGPKeyRing.class);
         CredentialsAccessor credentialsAccessor = mock(CredentialsAccessor.class);
         kbStrategy.setCredentialsAccessor(credentialsAccessor);
         kbStrategy.setKeyManager(keyManager);

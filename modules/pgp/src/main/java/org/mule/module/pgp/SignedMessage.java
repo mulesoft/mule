@@ -23,7 +23,7 @@ public class SignedMessage implements Message
                          String password, PGPSecretKeyRingCollection secretKeys) throws Exception
     {
         this.encryptedMessage = new DecryptStreamTransformer(secretKey, secretKeys,
-                                                             password).process(toBeDecrypted);
+                                                             null, password).process(toBeDecrypted);
     }
 
     public boolean verify()
