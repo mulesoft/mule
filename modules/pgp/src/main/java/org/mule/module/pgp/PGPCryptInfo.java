@@ -6,11 +6,15 @@
  */
 package org.mule.module.pgp;
 
+import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
 
 public class PGPCryptInfo
 {
+
+    private String signerPrincipal;
     private PGPPublicKey publicKey;
+    private PGPPrivateKey signerKey;
     private boolean signRequested;
 
     public PGPCryptInfo(PGPPublicKey publicKey, boolean signRequested)
@@ -19,6 +23,16 @@ public class PGPCryptInfo
 
         this.setPublicKey(publicKey);
         this.setSignRequested(signRequested);
+    }
+
+    public PGPCryptInfo(PGPPublicKey publicKey, PGPPrivateKey signerKey, String signerPrincipal)
+    {
+        super();
+
+        this.publicKey = publicKey;
+        this.signerKey = signerKey;
+        this.signerPrincipal = signerPrincipal;
+        this.signRequested = true;
     }
 
     public PGPPublicKey getPublicKey()
@@ -31,6 +45,11 @@ public class PGPCryptInfo
         this.publicKey = publicKey;
     }
 
+    public void setSignerKey(PGPPrivateKey signerKey)
+    {
+        this.signerKey = signerKey;
+    }
+
     public boolean isSignRequested()
     {
         return signRequested;
@@ -39,5 +58,15 @@ public class PGPCryptInfo
     public void setSignRequested(boolean signRequested)
     {
         this.signRequested = signRequested;
+    }
+
+    public PGPPrivateKey getSignerPrivateKey()
+    {
+        return signerKey;
+    }
+
+    public String getSignerPrincipal()
+    {
+        return signerPrincipal;
     }
 }
