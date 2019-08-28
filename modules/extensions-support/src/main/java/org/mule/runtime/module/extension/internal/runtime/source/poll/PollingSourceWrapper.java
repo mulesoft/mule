@@ -25,7 +25,8 @@ import static org.mule.runtime.extension.api.runtime.source.PollingSource.UPDATE
 import static org.mule.runtime.extension.api.runtime.source.PollingSource.WATERMARK_ITEM_OS_KEY;
 import static org.mule.runtime.extension.api.runtime.source.PollingSource.WATERMARK_OS_NAME_SUFFIX;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Mono.fromRunnable;
+
+import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
@@ -62,7 +63,6 @@ import java.util.function.Consumer;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 /**
@@ -153,17 +153,22 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   }
 
   @Override
-  public Publisher<Void> onTerminate(CoreEvent event, Map<String, Object> parameters, SourceCallbackContext context) {
-    return releaseOnCallback(context);
+  public void onTerminate(CoreEvent event, Map<String, Object> parameters, SourceCallbackContext context,
+                          CompletableCallback<Void> callback) {
+    releaseOnCallback(context, callback);
   }
 
   @Override
-  public Publisher<Void> onBackPressure(CoreEvent event, Map<String, Object> parameters, SourceCallbackContext context) {
-    return releaseOnCallback(context);
+  public void onBackPressure(CoreEvent event,
+                             Map<String, Object> parameters,
+                             SourceCallbackContext context,
+                             CompletableCallback<Void> callback) {
+    releaseOnCallback(context, callback);
   }
 
-  private Publisher<Void> releaseOnCallback(SourceCallbackContext context) {
-    return fromRunnable(() -> release(context));
+  private void releaseOnCallback(SourceCallbackContext context, CompletableCallback<Void> callback) {
+    release(context);
+    callback.complete(null);
   }
 
   private void poll(SourceCallback<T, A> sourceCallback) {

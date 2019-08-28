@@ -8,12 +8,13 @@
 package org.foo.echo;
 
 import org.mule.functional.api.component.EventCallback;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.MuleContext;
 
 import org.foo.EchoTest;
 
-public class Plugin3Echo implements EventCallback {
+public class Plugin3Echo extends AbstractComponent implements EventCallback {
 
   public void eventReceived(CoreEvent event, Object component, MuleContext muleContext) throws Exception {
     new EchoTest().echo(event.getMessage().getPayload().getValue().toString());

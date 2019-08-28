@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -79,6 +80,10 @@ final class LoggerContextCache implements Disposable {
         }).build();
 
     executorService = newScheduledThreadPool(1, new LoggerContextReaperThreadFactory(reaperContextClassLoader));
+    int threads = ((ThreadPoolExecutor) executorService).prestartAllCoreThreads();
+    if (threads != 1) {
+      throw new MuleRuntimeException(createStaticMessage("Could not init logger context repeater thread pool"));
+    }
   }
 
   private void stop(LoggerContext loggerContext) {

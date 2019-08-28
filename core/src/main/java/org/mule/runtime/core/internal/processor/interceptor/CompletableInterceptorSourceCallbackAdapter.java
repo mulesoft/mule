@@ -10,10 +10,11 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
-import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.interception.SourceInterceptor;
@@ -24,59 +25,58 @@ import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
+import org.slf4j.Logger;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link MessageSource} callback into the {@code Reactor} response handling
  * pipeline.
  *
- * @since 4.0
+ * @since 4.3.0
  */
-public class ReactiveInterceptorSourceCallbackAdapter extends AbstractInterceptorAdapter implements
-    BiFunction<MessageSource, Function<SourcePolicySuccessResult, Publisher<Void>>, Function<SourcePolicySuccessResult, Publisher<Void>>> {
+public class CompletableInterceptorSourceCallbackAdapter extends AbstractInterceptorAdapter implements
+    BiFunction<MessageSource, BiConsumer<SourcePolicySuccessResult, CompletableCallback<Void>>, BiConsumer<SourcePolicySuccessResult, CompletableCallback<Void>>> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveInterceptorSourceCallbackAdapter.class);
+  private static final Logger LOGGER = getLogger(CompletableInterceptorSourceCallbackAdapter.class);
 
   private SourceInterceptorFactory interceptorFactory;
 
-  public ReactiveInterceptorSourceCallbackAdapter(SourceInterceptorFactory interceptorFactory) {
+  public CompletableInterceptorSourceCallbackAdapter(SourceInterceptorFactory interceptorFactory) {
     this.interceptorFactory = interceptorFactory;
   }
 
   @Override
-  public Function<SourcePolicySuccessResult, Publisher<Void>> apply(MessageSource source,
-                                                                    Function<SourcePolicySuccessResult, Publisher<Void>> next) {
+  public BiConsumer<SourcePolicySuccessResult, CompletableCallback<Void>> apply(MessageSource source,
+                                                                                BiConsumer<SourcePolicySuccessResult, CompletableCallback<Void>> next) {
+
     if (!isInterceptable(source)) {
       return next;
     }
 
-    final ComponentLocation componentLocation = ((Component) source).getLocation();
+    final ComponentLocation componentLocation = source.getLocation();
     if (!interceptorFactory.intercept(componentLocation)) {
       return next;
     }
 
-    return result -> {
-      final SourceInterceptor interceptor = interceptorFactory.get();
-      Map<String, String> dslParameters = (Map<String, String>) (source).getAnnotation(ANNOTATION_PARAMETERS);
+    final SourceInterceptor interceptor = interceptorFactory.get();
+    Map<String, String> dslParameters = (Map<String, String>) (source).getAnnotation(ANNOTATION_PARAMETERS);
 
+    return (result, callback) -> {
       SourcePolicySuccessResult interceptedBeforeResult =
           new SourcePolicySuccessResult(doBefore(interceptor, source, dslParameters).apply((InternalEvent) result.getResult()),
                                         result.getResponseParameters(), result.getMessageSourceResponseParametersProcessor());
 
       try {
-        Publisher<Void> publisher = next.apply(interceptedBeforeResult);
+        next.accept(interceptedBeforeResult, callback);
         doAfter(interceptor, source, empty()).apply((InternalEvent) interceptedBeforeResult.getResult());
-        return publisher;
       } catch (Throwable t) {
         doAfter(interceptor, source, of(t)).apply((InternalEvent) interceptedBeforeResult.getResult());
-        return error(t);
+        callback.error(t);
       }
     };
   }
@@ -128,5 +128,4 @@ public class ReactiveInterceptorSourceCallbackAdapter extends AbstractIntercepto
   private boolean isInterceptable(Component component) {
     return component.getLocation() != null;
   }
-
 }

@@ -11,10 +11,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static reactor.core.publisher.Flux.just;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -23,8 +24,9 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import reactor.core.publisher.Flux;
 
-public class OnErrorCheckLogHandlerTestCase extends AbstractMuleTestCase {
+public class OnErrorCheckLogHandlerTestCase extends AbstractMuleContextTestCase {
 
   private static final LogChecker successfulChecker = mock(LogChecker.class);
   private static final LogChecker failingChecker = mock(LogChecker.class);
@@ -44,6 +46,7 @@ public class OnErrorCheckLogHandlerTestCase extends AbstractMuleTestCase {
   public void resetLogHandler() throws Exception {
     checkLogHandler = new OnErrorCheckLogHandler();
     checkLogHandler.setAnnotations(ImmutableMap.of(ROOT_CONTAINER_NAME_KEY, "someContainerName"));
+    initialiseIfNeeded(checkLogHandler, muleContext);
     checkLogHandler.start();
   }
 
@@ -100,8 +103,9 @@ public class OnErrorCheckLogHandlerTestCase extends AbstractMuleTestCase {
   }
 
   private void handleException() {
-    Exception exception = spy(MuleException.class);
-    checkLogHandler.route(exception);
+    Flux.from(checkLogHandler.route(just(mock(CoreEvent.class)))).subscribe(e -> {
+    }, e -> {
+    });
   }
 
 }

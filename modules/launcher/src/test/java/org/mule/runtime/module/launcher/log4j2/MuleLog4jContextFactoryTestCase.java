@@ -51,17 +51,19 @@ public class MuleLog4jContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void systemProperties() {
-    new MuleLog4jContextFactory();
+    MuleLog4jContextFactory factory = new MuleLog4jContextFactory();
     assertThat(XmlConfigurationFactory.class.getName(), equalTo(getProperty(LOG_CONFIGURATION_FACTORY_PROPERTY)));
     assertThat(AsyncLoggerExceptionHandler.class.getName(), equalTo(getProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY)));
+    factory.dispose();
   }
 
   @Test
   public void customExceptionHandler() {
     final String customHandler = "custom";
     System.setProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY, customHandler);
-    new MuleLog4jContextFactory();
+    MuleLog4jContextFactory factory = new MuleLog4jContextFactory();
     assertThat(customHandler, equalTo(getProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY)));
+    factory.dispose();
   }
 
   @Test

@@ -42,6 +42,7 @@ import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -137,7 +138,9 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
   }
 
   private void processAnnotations(ComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder) {
-    if (Component.class.isAssignableFrom(componentModel.getType())) {
+    if (Component.class.isAssignableFrom(componentModel.getType())
+        // ValueResolver end up generating pojos from the extension whose class is enhanced to have annotations
+        || ValueResolver.class.isAssignableFrom(componentModel.getType())) {
       Map<QName, Object> annotations =
           processMetadataAnnotationsHelper(beanDefinitionBuilder, componentModel);
       processNestedAnnotations(componentModel, annotations);
@@ -177,7 +180,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
       if (Component.class.isAssignableFrom(builder.getBeanDefinition().getBeanClass())) {
         addMetadataAnnotationsFromDocAttributes(annotations, componentModel.getSourceCode(),
                                                 componentModel.getMetadata().getDocAttributes());
-        builder.getBeanDefinition().getPropertyValues().addPropertyValue("annotations", annotations);
+        builder.getBeanDefinition().getPropertyValues().addPropertyValue(ANNOTATIONS_PROPERTY_NAME, annotations);
       }
 
       return annotations;

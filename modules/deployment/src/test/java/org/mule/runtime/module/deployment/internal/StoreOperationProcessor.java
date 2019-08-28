@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreManager;
@@ -20,7 +21,7 @@ import javax.inject.Inject;
  * <p/>
  * Static state must be reset before each test is executed
  */
-public class StoreOperationProcessor implements org.mule.runtime.core.api.processor.Processor {
+public class StoreOperationProcessor extends AbstractComponent implements org.mule.runtime.core.api.processor.Processor {
 
   @Inject
   ObjectStoreManager objectStoreManager;

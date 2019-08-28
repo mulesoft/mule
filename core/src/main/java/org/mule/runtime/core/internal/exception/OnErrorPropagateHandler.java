@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
@@ -17,8 +16,6 @@ import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Handler that will propagate errors and rollback transactions. Replaces the rollback-exception-strategy from Mule 3.
@@ -32,10 +29,19 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     return errorTypeMatcher == null && when == null;
   }
 
+  /**
+   * @param errorType an {@link ErrorType}
+   * @return whether this handler accepts the provided type
+   */
+  boolean acceptsErrorType(ErrorType errorType) {
+    return acceptsAll() || (errorTypeMatcher != null && errorTypeMatcher.match(errorType));
+  }
+
   @Override
-  protected Function<CoreEvent, CoreEvent> beforeRouting(Exception exception) {
+  protected Function<CoreEvent, CoreEvent> beforeRouting() {
     return event -> {
-      event = super.beforeRouting(exception).apply(event);
+      Exception exception = getException(event);
+      event = super.beforeRouting().apply(event);
       if (!isRedeliveryExhausted(exception) && isOwnedTransaction()) {
         rollback(exception);
       }
@@ -68,16 +74,6 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
   private boolean isRedeliveryExhausted(Exception exception) {
     return (exception instanceof MessageRedeliveredException);
-  }
-
-  @Override
-  protected Function<CoreEvent, Publisher<CoreEvent>> route(Exception exception) {
-    if (isRedeliveryExhausted(exception)) {
-      logger.info("Message redelivery exhausted. No redelivery exhausted actions configured. Message consumed.");
-    } else {
-      return super.route(exception);
-    }
-    return event -> just(event);
   }
 
 }

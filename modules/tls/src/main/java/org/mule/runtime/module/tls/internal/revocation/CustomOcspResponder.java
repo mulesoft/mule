@@ -8,6 +8,7 @@ package org.mule.runtime.module.tls.internal.revocation;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.privileged.security.RevocationCheck;
 
 import java.net.URI;
@@ -33,7 +34,7 @@ import javax.net.ssl.ManagerFactoryParameters;
  *
  * @since 4.1
  */
-public class CustomOcspResponder implements RevocationCheck {
+public class CustomOcspResponder extends AbstractComponent implements RevocationCheck {
 
   private String url;
   private String certAlias;

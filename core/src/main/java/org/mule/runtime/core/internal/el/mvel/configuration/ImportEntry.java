@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.internal.el.mvel.configuration;
 
+import org.mule.runtime.api.component.AbstractComponent;
+
 /**
  * POJO to parse "import" map entry element.
  *
  * @since 4.0
  */
-public class ImportEntry {
+public class ImportEntry extends AbstractComponent {
 
   String key;
   Class<?> value;

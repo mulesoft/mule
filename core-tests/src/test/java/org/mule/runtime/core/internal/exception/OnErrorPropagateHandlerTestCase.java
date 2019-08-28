@@ -20,6 +20,7 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_PROPAGATE;
@@ -92,6 +93,8 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
     when(mockException.getEvent()).thenReturn(muleEvent);
     when(mockTransaction.getComponentLocation()).thenReturn(ofNullable(onErrorPropagateHandler.getLocation()));
+    initialiseIfNeeded(onErrorPropagateHandler, muleContext);
+    startIfNeeded(onErrorPropagateHandler);
 
     expectedException.expectCause(sameInstance(mockException));
 
@@ -114,6 +117,8 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     ComponentLocation location = mock(ComponentLocation.class);
     when(location.getRootContainerName()).thenReturn("");
     when(mockTransaction.getComponentLocation()).thenReturn(ofNullable(location));
+    initialiseIfNeeded(onErrorPropagateHandler, muleContext);
+    startIfNeeded(onErrorPropagateHandler);
 
     expectedException.expectCause(sameInstance(mockException));
 
@@ -132,6 +137,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     onErrorPropagateHandler
         .setMessageProcessors(asList(createSetStringMessageProcessor("A"), createSetStringMessageProcessor("B")));
     initialiseIfNeeded(onErrorPropagateHandler, muleContext);
+    startIfNeeded(onErrorPropagateHandler);
     when(mockException.handled()).thenReturn(false);
     when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
     when(mockException.getEvent()).thenReturn(muleEvent);
@@ -155,6 +161,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
                                      createChagingEventMessageProcessor(lastEventCreated)));
     onErrorPropagateHandler.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(onErrorPropagateHandler, muleContext);
+    startIfNeeded(onErrorPropagateHandler);
     when(mockException.handled()).thenReturn(false);
     when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
     when(mockException.getEvent()).thenReturn(muleEvent);
@@ -174,6 +181,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     final NullPointerException innerException = new NullPointerException();
     onErrorPropagateHandler.setMessageProcessors(asList(createFailingEventMessageProcessor(innerException)));
     initialiseIfNeeded(onErrorPropagateHandler, muleContext);
+    startIfNeeded(onErrorPropagateHandler);
 
     when(mockException.handled()).thenReturn(false);
     when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);

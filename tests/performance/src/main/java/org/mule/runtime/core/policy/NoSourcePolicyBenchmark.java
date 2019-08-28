@@ -9,7 +9,7 @@ package org.mule.runtime.core.policy;
 import static java.util.Collections.emptyMap;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static reactor.core.publisher.Mono.from;
+import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.block;
 
 import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.message.Message;
@@ -23,6 +23,8 @@ import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 
+import java.util.Map;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
@@ -30,9 +32,6 @@ import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.Threads;
-
-import java.util.Map;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -64,14 +63,14 @@ public class NoSourcePolicyBenchmark extends AbstractBenchmark {
 
   @Benchmark
   @Threads(Threads.MAX)
-  public Either<SourcePolicyFailureResult, SourcePolicySuccessResult> source() {
+  public Either<SourcePolicyFailureResult, SourcePolicySuccessResult> source() throws Throwable {
     CoreEvent event;
     Message.Builder messageBuilder = Message.builder().value(PAYLOAD);
     CoreEvent.Builder eventBuilder =
         CoreEvent.builder(create("", "", CONNECTOR_LOCATION, NullExceptionHandler.getInstance())).message(messageBuilder.build());
     event = eventBuilder.build();
 
-    return from(handler.process(event, sourceRpp)).block();
+    return block(callback -> handler.process(event, sourceRpp, callback));
   }
 
 }

@@ -24,13 +24,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.from;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
-
-import javax.inject.Inject;
-
 import org.mule.runtime.api.cluster.ClusterService;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -46,6 +39,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -69,8 +63,8 @@ import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
-import org.mule.runtime.core.privileged.execution.MessageProcessContext;
-import org.mule.runtime.core.privileged.execution.MessageProcessingManager;
+import org.mule.runtime.core.internal.execution.MessageProcessContext;
+import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
@@ -86,8 +80,15 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValu
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-import org.slf4j.Logger;
 
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -135,7 +136,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private SourceAdapter sourceAdapter;
   private RetryPolicyTemplate retryPolicyTemplate;
   private Scheduler retryScheduler;
-  private Scheduler flowTriggerScheduler;
+  private FlowConstruct flowConstruct;
+  private MessageProcessContext messageProcessContext;
 
   private AtomicBoolean started = new AtomicBoolean(false);
 
@@ -246,7 +248,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         .setListener(messageProcessor)
         .setProcessingManager(messageProcessingManager)
         .setMuleContext(muleContext)
-        .setProcessContextSupplier(this::createProcessingContext)
+        .setProcessContext(messageProcessContext)
         .setCursorStreamProviderFactory(getCursorProviderFactory())
         .setCompletionHandlerFactory(completionHandlerFactory)
         .build();
@@ -327,9 +329,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
       if (retryScheduler == null) {
         retryScheduler = schedulerService.ioScheduler();
-      }
-      if (flowTriggerScheduler == null) {
-        flowTriggerScheduler = schedulerService.cpuLightScheduler();
       }
 
       synchronized (started) {
@@ -420,13 +419,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         retryScheduler = null;
       }
     }
-    if (flowTriggerScheduler != null) {
-      try {
-        flowTriggerScheduler.stop();
-      } finally {
-        flowTriggerScheduler = null;
-      }
-    }
   }
 
   private void disposeSource() {
@@ -456,18 +448,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     return new MessageProcessContext() {
 
       @Override
-      public boolean supportsAsynchronousProcessing() {
-        return true;
-      }
-
-      @Override
       public MessageSource getMessageSource() {
         return ExtensionMessageSource.this;
-      }
-
-      @Override
-      public Scheduler getFlowExecutionExecutor() {
-        return flowTriggerScheduler;
       }
 
       @Override
@@ -483,6 +465,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       @Override
       public ErrorTypeLocator getErrorTypeLocator() {
         return ((PrivilegedMuleContext) muleContext).getErrorTypeLocator();
+      }
+
+      @Override
+      public FlowConstruct getFlowConstruct() {
+        return flowConstruct;
       }
     };
   }
@@ -562,6 +549,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   protected void doInitialise() throws InitialisationException {
+    flowConstruct = (FlowConstruct) componentLocator.find(getRootContainerLocation()).get();
+    messageProcessContext = createProcessingContext();
     if (shouldRunOnThisNode()) {
       reallyDoInitialise();
     } else {

@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.functional.Either.left;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
@@ -17,7 +18,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.execution.ModuleFlowProcessingPhaseTemplate;
+import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
 import org.mule.runtime.core.internal.execution.NotificationFunction;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
 
@@ -26,16 +27,16 @@ import java.util.Map;
 
 import org.reactivestreams.Publisher;
 
-final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTemplate {
+final class FlowProcessingTemplate implements FlowProcessTemplate {
 
   private final SourceResultAdapter sourceMessage;
   private final Processor messageProcessor;
   private final List<NotificationFunction> notificationFunctions;
   private final SourceCompletionHandler completionHandler;
 
-  ModuleFlowProcessingTemplate(SourceResultAdapter sourceMessage,
-                               Processor messageProcessor,
-                               List<NotificationFunction> notificationFunctions, SourceCompletionHandler completionHandler) {
+  FlowProcessingTemplate(SourceResultAdapter sourceMessage,
+                         Processor messageProcessor,
+                         List<NotificationFunction> notificationFunctions, SourceCompletionHandler completionHandler) {
     this.sourceMessage = sourceMessage;
     this.messageProcessor = messageProcessor;
     this.notificationFunctions = notificationFunctions;
@@ -78,14 +79,15 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
   }
 
   @Override
-  public Publisher<Void> sendResponseToClient(CoreEvent response, Map<String, Object> parameters) {
-    return completionHandler.onCompletion(response, parameters);
+  public void sendResponseToClient(CoreEvent response, Map<String, Object> parameters, CompletableCallback<Void> callback) {
+    completionHandler.onCompletion(response, parameters, callback);
   }
 
   @Override
-  public Publisher<Void> sendFailureResponseToClient(MessagingException messagingException,
-                                                     Map<String, Object> parameters) {
-    return completionHandler.onFailure(messagingException, parameters);
+  public void sendFailureResponseToClient(MessagingException exception,
+                                          Map<String, Object> parameters,
+                                          CompletableCallback<Void> callback) {
+    completionHandler.onFailure(exception, parameters, callback);
   }
 
   @Override

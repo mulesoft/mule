@@ -8,6 +8,7 @@ package org.mule.runtime.module.tls.internal.revocation;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.privileged.security.RevocationCheck;
 
@@ -42,7 +43,7 @@ import javax.net.ssl.ManagerFactoryParameters;
  *
  * @since 4.1
  */
-public class CrlFile implements RevocationCheck {
+public class CrlFile extends AbstractComponent implements RevocationCheck {
 
   private String path;
 

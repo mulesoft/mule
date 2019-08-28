@@ -16,6 +16,8 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 
+import org.mule.runtime.api.component.AbstractComponent;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,7 +114,7 @@ public class SummaryLogChecker extends AbstractLogChecker {
     this.expectedInfo = expectedInfo;
   }
 
-  public static class SummaryInfo {
+  public static class SummaryInfo extends AbstractComponent {
 
     private String key;
     private String value = null;

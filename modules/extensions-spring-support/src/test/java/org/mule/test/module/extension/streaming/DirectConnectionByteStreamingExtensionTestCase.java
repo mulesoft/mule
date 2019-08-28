@@ -4,16 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.transport;
+package org.mule.test.module.extension.streaming;
 
-/**
- * @deprecated Transport infrastructure is deprecated.
- */
-@Deprecated
-public interface LegacyInboundEndpoint {
+public class DirectConnectionByteStreamingExtensionTestCase extends AbstractBytesStreamingExtensionTestCase {
 
-  boolean isCompatibleWithAsync();
-
-  String getCanonicalURI();
+  public DirectConnectionByteStreamingExtensionTestCase() {
+    super("drStrange");
+  }
 
 }

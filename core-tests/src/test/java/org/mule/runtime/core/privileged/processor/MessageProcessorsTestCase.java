@@ -34,7 +34,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -58,14 +57,13 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
+import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
-
-import io.qameta.allure.Issue;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SynchronousSink;
@@ -93,6 +91,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     exceptionHandler
         .setNotificationFirer(((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class));
     exceptionHandler.initialise();
+    exceptionHandler.start();
     when(flow.getExceptionListener()).thenReturn(exceptionHandler);
     eventContext = (BaseEventContext) create(flow, TEST_CONNECTOR_LOCATION);
     input = builder(eventContext).message(of(TEST_MESSAGE)).build();

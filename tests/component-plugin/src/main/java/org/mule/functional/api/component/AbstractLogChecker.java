@@ -13,12 +13,14 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.exception.MuleException.EXCEPTION_MESSAGE_SECTION_DELIMITER;
 
-import org.hamcrest.Matcher;
+import org.mule.runtime.api.component.AbstractComponent;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
-public abstract class AbstractLogChecker implements LogChecker {
+import org.hamcrest.Matcher;
+
+public abstract class AbstractLogChecker extends AbstractComponent implements LogChecker {
 
   protected static final Pattern STACKTRACE_METHOD_CALL_REGEX_PATTERN =
       compile("^.*at ([^A-Z]*)\\.([0-9A-Z]+[^\\.]*)\\.([^\\(]*)\\([^):]*[:]?([0-9]*).*");

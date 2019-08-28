@@ -17,12 +17,6 @@ public interface PhaseResultNotifier {
   void phaseSuccessfully();
 
   /**
-   * This method must be called when the phase consume the message and the chain should not continue processing the message. If
-   * this method is called then phaseSuccessfully must not be called
-   */
-  void phaseConsumedMessage();
-
-  /**
    * This message must be called when a phase execution throw an exception
    *
    * @param reason exception that represents the failure in the phase

@@ -6,12 +6,14 @@
  */
 package org.mule.tests.parsers.api;
 
+import org.mule.runtime.api.component.AbstractComponent;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ParsersTestObject {
+public class ParsersTestObject extends AbstractComponent {
 
   private Map<String, List<String>> simpleListTypeMap;
   private List<String> simpleTypeList;

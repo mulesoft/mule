@@ -7,15 +7,9 @@
 package org.mule.test.module.extension.connector;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.module.extension.internal.runtime.exception.RequiredParameterNotSetException;
 import org.mule.test.module.extension.InvalidExtensionConfigTestCase;
-
-import org.junit.rules.ExpectedException;
 
 public class PetStoreMissingRequiredParameterInsidePojoTestCase extends InvalidExtensionConfigTestCase {
 
@@ -26,6 +20,7 @@ public class PetStoreMissingRequiredParameterInsidePojoTestCase extends InvalidE
 
   @Override
   protected void doSetUpBeforeMuleContextCreation() throws Exception {
-    expectedException.expectMessage(is(containsString("Parameter 'area-codes' is required but was not found")));
+    expectedException
+        .expectMessage(is(containsString("Element <petstore:phone-number> in line 17 of file petstore-missing-required-parameter.xml is missing required parameter 'area-codes'")));
   }
 }

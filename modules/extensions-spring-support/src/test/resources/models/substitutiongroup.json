@@ -364,6 +364,14 @@
         },
         "typeAlias": {
           "value": "SomeExportedPojo"
+        },
+        "stereotype": {
+          "allowedStereotypes": [
+            {
+              "type": "SOME_EXPORTED_POJO",
+              "namespace": "SG"
+            }
+          ]
         }
       },
       "fields": [

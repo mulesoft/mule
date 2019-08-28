@@ -17,8 +17,8 @@ import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.probe.PollingProber.check;
 
-import org.junit.Before;
 import org.mule.functional.api.flow.FlowRunner;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.metadata.DataType;
@@ -32,6 +32,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -215,7 +216,7 @@ public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTest
     return runner.buildEvent().getMessage().getPayload().getDataType();
   }
 
-  private static class MediaTypeCollectorProcessor implements Processor {
+  private static class MediaTypeCollectorProcessor extends AbstractComponent implements Processor {
 
     private static List<MediaType> MEDIA_TYPES = new LinkedList<>();
 

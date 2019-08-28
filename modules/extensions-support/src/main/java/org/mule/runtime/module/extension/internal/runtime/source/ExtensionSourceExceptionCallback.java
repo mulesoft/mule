@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.execution.ResponseCompletionCallback;
-import org.mule.runtime.core.privileged.execution.MessageProcessContext;
+import org.mule.runtime.core.internal.execution.MessageProcessContext;
 
 import java.util.function.Consumer;
 

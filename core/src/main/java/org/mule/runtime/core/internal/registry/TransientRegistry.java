@@ -25,7 +25,6 @@ import org.mule.runtime.core.privileged.registry.InjectProcessor;
 import org.mule.runtime.core.privileged.registry.ObjectProcessor;
 import org.mule.runtime.core.privileged.registry.PreInitProcessor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
-import org.mule.runtime.core.privileged.transport.LegacyConnector;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -61,7 +60,6 @@ public abstract class TransientRegistry extends AbstractRegistry {
 
   @Override
   protected void doInitialise() throws InitialisationException {
-    applyProcessors(lookupObjects(LegacyConnector.class), null);
     applyProcessors(lookupObjects(Transformer.class), null);
     applyProcessors(lookupObjects(LegacyImmutableEndpoint.class), null);
     applyProcessors(lookupObjects(Object.class), null);

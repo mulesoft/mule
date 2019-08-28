@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.deployment.internal;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 
@@ -15,7 +16,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
  * <p/>
  * Static state must be reset before each test is executed
  */
-public class TestPolicyProcessor implements org.mule.runtime.core.api.processor.Processor {
+public class TestPolicyProcessor extends AbstractComponent implements org.mule.runtime.core.api.processor.Processor {
 
   public static volatile int invocationCount;
   public static volatile String policyParametrization = "";

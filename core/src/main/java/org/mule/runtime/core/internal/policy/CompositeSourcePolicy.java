@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.functional.Either.right;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
+import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -191,14 +192,13 @@ public class CompositeSourcePolicy
    * {@link SourcePolicyParametersTransformer} then those parameters will be exactly the one defined by the message source.
    *
    * @param sourceEvent the event generated from the source.
-   * @return a {@link Publisher} that emits {@link SourcePolicySuccessResult} which contains the response parameters and the
-   *         result event of the execution or a {@link SourcePolicyFailureResult} which contains the failure response parameters
-   *         and the {@link MessagingException} thrown by the policy chain execution when processing completes.
    */
   @Override
-  public Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(CoreEvent sourceEvent,
-                                                                                         MessageSourceResponseParametersProcessor respParamProcessor) {
-    return commonPolicy.process(sourceEvent, respParamProcessor);
+  public void process(CoreEvent sourceEvent,
+                      MessageSourceResponseParametersProcessor respParamProcessor,
+                      CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> callback) {
+    commonPolicy.process(sourceEvent, respParamProcessor, callback);
+
   }
 
   private Map<String, Object> concatMaps(Map<String, Object> originalResponseParameters,

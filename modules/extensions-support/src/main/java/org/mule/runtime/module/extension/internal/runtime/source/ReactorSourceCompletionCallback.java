@@ -6,27 +6,26 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.MonoSink;
+import java.util.concurrent.CompletableFuture;
 
 /**
- * Implementation of {@link SourceCompletionCallback} which works using
- * project Reactor.
+ * Implementation of {@link SourceCompletionCallback} which works using a supplied {@link CompletableCallback}
  *
- * @since 4.0
+ * @since 4.3.0
  */
-final class ReactorSourceCompletionCallback implements SourceCompletionCallback {
+final class CompletableSourceCompletionCallback implements SourceCompletionCallback {
 
-  private final MonoSink<Void> sink;
+  private final CompletableCallback<Void> callback;
 
   /**
    * Creates a new instance
-   * @param sink a {@link MonoSink} used to complete the underlying {@link Publisher}
+   * @param callback a {@link CompletableFuture} to be completed through this callback
    */
-  public ReactorSourceCompletionCallback(MonoSink<Void> sink) {
-    this.sink = sink;
+  public CompletableSourceCompletionCallback(CompletableCallback<Void> callback) {
+    this.callback = callback;
   }
 
   /**
@@ -34,7 +33,7 @@ final class ReactorSourceCompletionCallback implements SourceCompletionCallback 
    */
   @Override
   public void success() {
-    sink.success();
+    callback.complete(null);
   }
 
   /**
@@ -42,6 +41,6 @@ final class ReactorSourceCompletionCallback implements SourceCompletionCallback 
    */
   @Override
   public void error(Throwable t) {
-    sink.error(t);
+    callback.error(t);
   }
 }

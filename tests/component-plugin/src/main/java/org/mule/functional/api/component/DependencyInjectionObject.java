@@ -6,6 +6,7 @@
  */
 package org.mule.functional.api.component;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
@@ -18,9 +19,8 @@ import org.mule.runtime.extension.api.client.ExtensionsClient;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.transaction.TransactionManager;
 
-public class DependencyInjectionObject {
+public class DependencyInjectionObject extends AbstractComponent {
 
   @Inject
   private ConfigurationComponentLocator configurationComponentLocator;

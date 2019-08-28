@@ -9,22 +9,26 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static reactor.core.publisher.Mono.error;
-import static reactor.core.publisher.Mono.from;
+import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.onCallback;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
+import org.mule.runtime.core.internal.execution.SourcePolicyTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -36,8 +40,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.reactivestreams.Publisher;
-
-import reactor.core.publisher.Mono;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -63,13 +65,13 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleTestCase {
 
   private final RuntimeException runtimeException = new RuntimeException();
 
-  private ModuleFlowProcessingTemplate template;
+  private FlowProcessingTemplate template;
 
   @Before
   public void before() throws Exception {
-    template = new ModuleFlowProcessingTemplate(message, messageProcessor, emptyList(), completionHandler);
-    when(completionHandler.onCompletion(any(), any())).thenReturn(Mono.empty());
-    when(completionHandler.onFailure(any(), any())).thenReturn(Mono.empty());
+    template = new FlowProcessingTemplate(message, messageProcessor, emptyList(), completionHandler);
+    doAnswer(onCallback(callback -> callback.complete(null))).when(completionHandler).onCompletion(any(), any(), any());
+    doAnswer(onCallback(callback -> callback.complete(null))).when(completionHandler).onFailure(any(), any(), any());
   }
 
   @Test
@@ -91,33 +93,93 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void sendResponseToClient() throws Exception {
-    from(template.sendResponseToClient(event, mockParameters)).block();
-    verify(completionHandler).onCompletion(same(event), same(mockParameters));
+  public void sendResponseToClient() throws Throwable {
+    Reference<CompletableCallback<Void>> callbackReference = new Reference<>();
+    SourcePolicyTestUtils.<Void>block(callback -> {
+      callbackReference.set(callback);
+      template.sendResponseToClient(event, mockParameters, callback);
+    });
+
+    assertThat(callbackReference, is(notNullValue()));
+    verify(completionHandler).onCompletion(same(event), same(mockParameters), same(callbackReference.get()));
   }
 
   @Test
-  public void failedToSendResponseToClient() throws Exception {
+  public void failedToSendResponseToClient() throws Throwable {
     Reference<Throwable> exceptionReference = new Reference<>();
-    when(completionHandler.onCompletion(same(event), same(mockParameters))).thenReturn(error(runtimeException));
-    from(template.sendResponseToClient(event, mockParameters)).doOnError(exceptionReference::set).subscribe();
+    Reference<CompletableCallback<Void>> callbackReference = new Reference<>();
+    doAnswer(SourcePolicyTestUtils.<Void>onCallback(callback -> {
+      callbackReference.set(callback);
+      callback.error(runtimeException);
+    })).when(completionHandler).onCompletion(same(event), same(mockParameters), any());
 
-    verify(completionHandler, never()).onFailure(any(MessagingException.class), same(mockParameters));
+    try {
+      SourcePolicyTestUtils.<Void>block(callback -> {
+        callback = callback.before(new CompletableCallback<Void>() {
+
+          @Override
+          public void complete(Void value) {
+
+          }
+
+          @Override
+          public void error(Throwable e) {
+            exceptionReference.set(e);
+          }
+        });
+
+        template.sendResponseToClient(event, mockParameters, callback);
+      });
+      fail("This should have failed");
+    } catch (Exception e) {
+      assertThat(e, is(sameInstance(runtimeException)));
+    }
+
+    verify(completionHandler, never()).onFailure(any(MessagingException.class), same(mockParameters), any());
     assertThat(exceptionReference.get(), equalTo(runtimeException));
   }
 
   @Test
-  public void sendFailureResponseToClient() throws Exception {
-    from(template.sendFailureResponseToClient(messagingException, mockParameters)).block();
-    verify(completionHandler).onFailure(messagingException, mockParameters);
+  public void sendFailureResponseToClient() throws Throwable {
+    Reference<CompletableCallback<Void>> callbackReference = new Reference<>();
+    SourcePolicyTestUtils.<Void>block(callback -> {
+      callbackReference.set(callback);
+      template.sendFailureResponseToClient(messagingException, mockParameters, callback);
+    });
+
+    assertThat(callbackReference.get(), is(notNullValue()));
+    verify(completionHandler).onFailure(messagingException, mockParameters, callbackReference.get());
   }
 
   @Test
-  public void failedToSendFailureResponseToClient() throws Exception {
+  public void failedToSendFailureResponseToClient() throws Throwable {
     Reference<Throwable> exceptionReference = new Reference<>();
     when(messagingException.getEvent()).thenReturn(event);
-    when(completionHandler.onFailure(messagingException, mockParameters)).thenReturn(error(runtimeException));
-    from(template.sendFailureResponseToClient(messagingException, mockParameters)).doOnError(exceptionReference::set).subscribe();
+    doAnswer(onCallback(callback -> callback.error(runtimeException))).when(completionHandler)
+        .onFailure(same(messagingException), same(mockParameters), any());
+
+    try {
+      SourcePolicyTestUtils.<Void>block(callback -> {
+        callback = callback.before(new CompletableCallback<Void>() {
+
+          @Override
+          public void complete(Void value) {
+
+          }
+
+          @Override
+          public void error(Throwable e) {
+            exceptionReference.set(e);
+          }
+        });
+
+        template.sendFailureResponseToClient(messagingException, mockParameters, callback);
+      });
+      fail("This should have failed");
+    } catch (Exception e) {
+      assertThat(e, is(sameInstance(runtimeException)));
+    }
+
     assertThat(exceptionReference.get(), equalTo(runtimeException));
   }
 }

@@ -17,15 +17,20 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.EXPRESSION;
 import static org.mule.runtime.core.internal.exception.DefaultErrorTypeRepository.CRITICAL_ERROR_TYPE;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_HANDLER;
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
@@ -112,7 +117,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     when(mockTestExceptionStrategy2.acceptsAll()).thenReturn(false);
     errorHandler.setRootContainerName("root");
     expectedException
-        .expectMessage(containsString("Only last exception strategy inside <error-handler> can accept any message."));
+        .expectMessage(containsString("Only last <on-error> inside <error-handler> can accept any errors."));
     errorHandler.initialise();
   }
 
@@ -140,9 +145,52 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void ifUserDefaultIsMissingCatchAllThenGetsInjectedOurDefault() throws Exception {
+    verifyInjectionWithConfiguredOnError(mockTestExceptionStrategy1);
+  }
+
+  @Test
+  public void ifUserDefaultHasPropagateSpecificThenGetsInjectedOurDefault() throws Exception {
+    OnErrorPropagateHandler onError = new OnErrorPropagateHandler();
+    onError.setErrorType("EXPRESSION");
+
+    verifyInjectionWithConfiguredOnError(onError);
+  }
+
+  @Test
+  public void ifUserDefaultHasPropagateAnyThenOurDefaultIsNotInjected() throws Exception {
+    OnErrorPropagateHandler onError = new OnErrorPropagateHandler();
+    onError.setErrorType("ANY");
+
+    verifyNoInjectionWithConfiguredOnError(onError);
+  }
+
+  @Test
+  public void ifUserDefaultHasEmptyPropagateThenOurDefaultIsNotInjected() throws Exception {
+    verifyNoInjectionWithConfiguredOnError(new OnErrorPropagateHandler());
+  }
+
+  private void verifyInjectionWithConfiguredOnError(MessagingExceptionHandlerAcceptor onError) throws InitialisationException {
+    ErrorHandler errorHandler = prepareErrorHandler(onError);
+
+    assertThat(errorHandler.getExceptionListeners(), hasSize(3));
+    assertThat(errorHandler.getExceptionListeners().get(0), is(instanceOf(OnCriticalErrorHandler.class)));
+    assertThat(errorHandler.getExceptionListeners().get(1), is(onError));
+    MessagingExceptionHandlerAcceptor injected = errorHandler.getExceptionListeners().get(2);
+    assertThat(injected, is(instanceOf(OnErrorPropagateHandler.class)));
+  }
+
+  private void verifyNoInjectionWithConfiguredOnError(MessagingExceptionHandlerAcceptor onError) throws InitialisationException {
+    ErrorHandler errorHandler = prepareErrorHandler(onError);
+
+    assertThat(errorHandler.getExceptionListeners(), hasSize(2));
+    assertThat(errorHandler.getExceptionListeners().get(0), is(instanceOf(OnCriticalErrorHandler.class)));
+    assertThat(errorHandler.getExceptionListeners().get(1), is(onError));
+  }
+
+  private ErrorHandler prepareErrorHandler(MessagingExceptionHandlerAcceptor onError) throws InitialisationException {
     ErrorHandler errorHandler = new ErrorHandler();
     List<MessagingExceptionHandlerAcceptor> handlerList = new LinkedList<>();
-    handlerList.add(mockTestExceptionStrategy1);
+    handlerList.add(onError);
     errorHandler.setExceptionListeners(handlerList);
     errorHandler.setMuleContext(mockMuleContext);
     errorHandler.setRootContainerName("root");
@@ -150,13 +198,19 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
 
     when(mockMuleContext.getConfiguration().getDefaultErrorHandlerName()).thenReturn("myDefault");
     when(mockMuleContext.getDefaultErrorHandler(of("root"))).thenReturn(errorHandler);
+    mockErrorRepository();
     errorHandler.initialise();
+    return errorHandler;
+  }
 
-    assertThat(errorHandler.getExceptionListeners(), hasSize(3));
-    assertThat(errorHandler.getExceptionListeners().get(0), is(instanceOf(OnCriticalErrorHandler.class)));
-    assertThat(errorHandler.getExceptionListeners().get(1), is(mockTestExceptionStrategy1));
-    MessagingExceptionHandlerAcceptor injected = errorHandler.getExceptionListeners().get(2);
-    assertThat(injected, is(instanceOf(OnErrorPropagateHandler.class)));
+  private void mockErrorRepository() {
+    ErrorTypeRepository errorTypeRepository = mock(ErrorTypeRepository.class, RETURNS_DEEP_STUBS);
+    when(mockMuleContext.getErrorTypeRepository()).thenReturn(errorTypeRepository);
+    ErrorType anyErrorType = mock(ErrorType.class);
+    when(errorTypeRepository.lookupErrorType(ANY)).thenReturn(of(anyErrorType));
+    when(errorTypeRepository.lookupErrorType(EXPRESSION)).thenReturn(of(mock(ErrorType.class)));
+    when(errorTypeRepository.getErrorType(any(ComponentIdentifier.class))).thenReturn(of(mock(ErrorType.class)));
+    when(errorTypeRepository.getAnyErrorType()).thenReturn(anyErrorType);
   }
 
   class DefaultMessagingExceptionHandlerAcceptor implements MessagingExceptionHandlerAcceptor {
