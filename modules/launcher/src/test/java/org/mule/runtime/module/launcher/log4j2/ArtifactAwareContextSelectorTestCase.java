@@ -49,6 +49,7 @@ import java.net.URLClassLoader;
 
 import org.apache.logging.log4j.core.LifeCycle;
 import org.apache.logging.log4j.core.LoggerContext;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -88,6 +89,11 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
     when(regionClassLoader.getArtifactId()).thenReturn(getClass().getName());
     when(regionClassLoader.findLocalResource("log4j2.xml")).thenReturn(CONFIG_LOCATION.toURI().toURL());
     when(regionClassLoader.getArtifactDescriptor()).thenReturn(artifactDescriptor);
+  }
+
+  @After
+  public void after() throws Exception {
+    dispose();
   }
 
   @Test
@@ -141,8 +147,12 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void usesLoggerContextReaperThread() {
+  public void usesLoggerContextReaperThread() throws Exception {
+    // make sure that selector is disposed therefore the reaper thread is stopped
+    dispose();
     assertReaperThreadNotRunning();
+    // call again the before process to intialize the selector and reaper thread
+    before();
 
     MuleLoggerContext context = getContext();
     selector.removeContext(context);
