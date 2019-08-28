@@ -310,7 +310,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     }
 
     if (targetBuilder != null) {
-        mockedFlowSubflowNames.add(PARSED_DYNAMIC_REFERENCED_FLOW);
+      mockedFlowSubflowNames.add(PARSED_DYNAMIC_REFERENCED_FLOW);
     }
 
     if (target instanceof MessageProcessorChain) {
