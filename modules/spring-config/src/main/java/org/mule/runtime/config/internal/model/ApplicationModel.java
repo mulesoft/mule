@@ -287,7 +287,7 @@ public class ApplicationModel implements ArtifactAst {
           .build();
 
   private final Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry;
-  private final ArtifactConfig artifactConfig;
+  private final ExtensionModelHelper extensionModelHelper;
   private final List<ComponentModel> muleComponentModels = new LinkedList<>();
   private PropertiesResolverConfigurationProperties configurationProperties;
   private final ResourceProvider externalResourceProvider;
@@ -338,7 +338,6 @@ public class ApplicationModel implements ArtifactAst {
 
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.externalResourceProvider = externalResourceProvider;
-    this.artifactConfig = artifactConfig;
     createConfigurationAttributeResolver(artifactConfig, parentConfigurationProperties, deploymentProperties);
     convertConfigFileToComponentModel(artifactConfig);
     convertArtifactDeclarationToComponentModel(extensionModels, artifactDeclaration);
@@ -346,7 +345,7 @@ public class ApplicationModel implements ArtifactAst {
     createEffectiveModel();
     indexComponentModels();
     validateModel(componentBuildingDefinitionRegistry);
-    ExtensionModelHelper extensionModelHelper = new ExtensionModelHelper(extensionModels);
+    this.extensionModelHelper = new ExtensionModelHelper(extensionModels);
     if (runtimeMode) {
       expandModules(extensionModels);
       // Have to index again the component models with macro expanded ones
@@ -375,11 +374,6 @@ public class ApplicationModel implements ArtifactAst {
 
   private void resolveTypedComponentIdentifier(ExtensionModelHelper extensionModelHelper) {
     executeOnEveryComponentTree(componentModel -> {
-      Optional<TypedComponentIdentifier> typedComponentIdentifier =
-          of(TypedComponentIdentifier.builder().identifier(componentModel.getIdentifier())
-              .type(resolveComponentType(componentModel, extensionModelHelper))
-              .build());
-
       extensionModelHelper.findComponentModel(componentModel.getIdentifier())
           .ifPresent(componentModel::setComponentModel);
       if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
@@ -395,6 +389,11 @@ public class ApplicationModel implements ArtifactAst {
             .flatMap(t -> createMetadataTypeModelAdapter(t))
             .ifPresent(componentModel::setMetadataTypeModelAdapter);
       }
+
+      Optional<TypedComponentIdentifier> typedComponentIdentifier =
+          of(TypedComponentIdentifier.builder().identifier(componentModel.getIdentifier())
+              .type(resolveComponentType(componentModel, extensionModelHelper))
+              .build());
 
       componentModel.setComponentType(typedComponentIdentifier.map(typedIdentifier -> typedIdentifier.getType())
           .orElse(TypedComponentIdentifier.ComponentType.UNKNOWN));
