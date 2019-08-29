@@ -47,6 +47,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
@@ -120,6 +121,8 @@ public class FlowProcessMediator implements Initialisable {
 
   @Override
   public void initialise() throws InitialisationException {
+    this.notificationHelper =
+        new NotificationHelper(muleContext.getNotificationManager(), ConnectorMessageNotification.class, false);
     final ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
 
     sourceResponseGenerateErrorType = errorTypeRepository.getErrorType(SOURCE_RESPONSE_GENERATE).get();
