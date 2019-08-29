@@ -24,6 +24,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleBundle;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import org.mule.runtime.api.artifact.Registry;
@@ -61,6 +62,7 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeploya
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
+import org.mule.runtime.module.deployment.impl.internal.domain.IncompatibleDomainException;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
 import java.io.File;
@@ -157,7 +159,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   public Domain getDomain() {
     try {
       return getApplicationDomain(domainRepository, descriptor);
-    } catch (DomainNotFoundException e) {
+    } catch (DomainNotFoundException | IncompatibleDomainException e) {
       return null;
     }
   }
@@ -392,12 +394,22 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   }
 
   static Domain getApplicationDomain(DomainRepository domainRepository, ApplicationDescriptor descriptor)
-      throws DomainNotFoundException {
+      throws DomainNotFoundException, IncompatibleDomainException {
     String configuredDomainName = descriptor.getDomainName();
+    Optional<BundleDescriptor> domainBundleDescriptor = descriptor.getDomainDescriptor();
+
     if (configuredDomainName != null) {
-      return domainRepository.getDomain(configuredDomainName);
+      Domain foundDomain = domainRepository.getDomain(configuredDomainName);
+      if (domainBundleDescriptor.isPresent()) {
+        if (isCompatibleBundle(foundDomain.getDescriptor().getBundleDescriptor(), domainBundleDescriptor.get())) {
+          return foundDomain;
+        } else {
+          throw new IncompatibleDomainException(configuredDomainName, foundDomain);
+        }
+      } else {
+        return foundDomain;
+      }
     } else {
-      Optional<BundleDescriptor> domainBundleDescriptor = descriptor.getDomainDescriptor();
       if (domainBundleDescriptor.isPresent()) {
         return domainRepository.getCompatibleDomain(domainBundleDescriptor.get());
       } else {

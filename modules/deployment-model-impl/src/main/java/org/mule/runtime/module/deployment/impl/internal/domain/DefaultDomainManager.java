@@ -8,22 +8,17 @@
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
 import static java.lang.String.format;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
-import static org.slf4j.LoggerFactory.getLogger;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleBundle;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-
 /**
  * Manages {@link Domain} instances created on the container.
  */
 public class DefaultDomainManager implements DomainRepository, DomainManager {
-
-  private static final Logger LOGGER = getLogger(DefaultDomainManager.class);
 
   private Map<String, Domain> domainsByName = new HashMap<>();
 
@@ -35,22 +30,12 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
     }
 
     domainsByName.put(domainName, domain);
-
-    LOGGER.error("Domain " + domainName + " added");
   }
 
   @Override
   public void removeDomain(Domain domain) {
-    // TODO: Should check existence?
     String domainName = getDomainName(domain);
-    //if (!domainsByName.containsKey(domainName)) {
-    //  // TODO: Use specific exception
-    //  throw new IllegalArgumentException(format("Domain '%s' doesn't exist", domainName));
-    //}
-
     domainsByName.remove(domainName);
-
-    LOGGER.error("Domain " + domainName + " removed");
   }
 
   @Override
@@ -78,7 +63,7 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
         continue;
       }
 
-      if (areCompatible(currentDescriptor, wantedDescriptor)) {
+      if (isCompatibleBundle(currentDescriptor, wantedDescriptor)) {
         if (foundDomain != null) {
           // TODO: Use specific exception
           throw new IllegalArgumentException("More than one compatible domain were found");
@@ -94,26 +79,10 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
     return foundDomain;
   }
 
-  public boolean areCompatible(BundleDescriptor available, BundleDescriptor expected) {
-    if (!available.getClassifier().equals(expected.getClassifier())) {
-      return false;
-    }
-
-    if (!available.getGroupId().equals(expected.getGroupId())) {
-      return false;
-    }
-
-    if (!available.getArtifactId().equals(expected.getArtifactId())) {
-      return false;
-    }
-
-    return isCompatibleVersion(available.getVersion(), expected.getVersion());
-  }
-
   @Override
   public boolean containsCompatible(BundleDescriptor descriptor) {
     for (Domain domain : domainsByName.values()) {
-      if (areCompatible(domain.getDescriptor().getBundleDescriptor(), descriptor)) {
+      if (isCompatibleBundle(domain.getDescriptor().getBundleDescriptor(), descriptor)) {
         return true;
       }
     }

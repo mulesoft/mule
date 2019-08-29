@@ -10,10 +10,6 @@ import static org.mockito.Mockito.reset;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.Properties;
-
 import org.junit.Test;
 
 public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDeploymentTestCase {
@@ -34,6 +30,11 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
   private final ApplicationFileBuilder appReferencingDomain100FileBuilder = new ApplicationFileBuilder("dummy-domain100-app-ref")
       .definedBy("empty-config.xml").dependingOn(emptyDomain100FileBuilder)
       .deployedWith("domain", "empty-domain-1.0.0-mule-domain");
+
+  private final ApplicationFileBuilder incompatibleDomainNameAppFileBuilder = new ApplicationFileBuilder("bad-domain-app-ref")
+      .definedBy("empty-config.xml").dependingOn(emptyDomain101FileBuilder)
+      .deployedWith("domain", "empty-domain-1.0.0-mule-domain");
+
 
   public ApplicationDependingOnDomainDeploymentTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
@@ -126,17 +127,18 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
     assertDeploymentSuccess(applicationDeploymentListener, appDependingOnDomain101FileBuilder.getId());
   }
 
-  @Override
-  protected void deployURI(URI uri, Properties deploymentProperties) throws IOException {
-    deploymentService.deployDomain(uri, deploymentProperties);
-  }
+  @Test
+  public void appPointingToIncompatibleDomain() throws Exception {
+    startDeployment();
 
-  @Override
-  protected void redeployId(String id, Properties deploymentProperties) {
-    if (deploymentProperties == null) {
-      deploymentService.redeployDomain(id);
-    } else {
-      deploymentService.redeployDomain(id, deploymentProperties);
-    }
+    // Deploy both versions to ensure that there is one compatible domain and a name-matching domain
+    addExplodedDomainFromBuilder(emptyDomain100FileBuilder, emptyDomain100FileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomain100FileBuilder.getId());
+    addExplodedDomainFromBuilder(emptyDomain101FileBuilder, emptyDomain101FileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomain101FileBuilder.getId());
+
+    // The app depends on 1.0.1 but references the domain 1.0.0 by name, so it must fail
+    addExplodedAppFromBuilder(incompatibleDomainNameAppFileBuilder, incompatibleDomainNameAppFileBuilder.getId());
+    assertDeploymentFailure(applicationDeploymentListener, incompatibleDomainNameAppFileBuilder.getId());
   }
 }
