@@ -236,6 +236,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     public void setIsHandlingException(boolean handlingException)
     {
+        logger.debug("Setting isHandlingException flag to: " + handlingException );
         isHandlingException.set(handlingException);
     }
 
@@ -605,8 +606,10 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             shouldRetryBrokerConnection.set(true);
         }
 
-        if (!disconnecting && isHandlingException.compareAndSet(false, true) && !shouldRetryBrokerConnection.get())
+        logger.debug("About to CAS isHandlingException with current value " + isHandlingException.get());
+        if (!disconnecting && !shouldRetryBrokerConnection.get() && isHandlingException.compareAndSet(false, true))
         {
+            logger.debug("Started exception handling, disabling receivers if there are any");
             Map<Object, MessageReceiver> receivers = getReceivers();
             boolean isMultiConsumerReceiver = false;
 
@@ -1791,8 +1794,4 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         return true;
     }
 
-    public void setHandlingException(boolean isHandling)
-    {
-        isHandlingException.set(isHandling);
-    }
 }

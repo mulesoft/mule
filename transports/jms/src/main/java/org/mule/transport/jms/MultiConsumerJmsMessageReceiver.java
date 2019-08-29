@@ -47,11 +47,12 @@ import org.springframework.jms.connection.CachingConnectionFactory;
 
 /**
  * In Mule an endpoint corresponds to a single receiver. It's up to the receiver to do multithreaded consumption and
- * resource allocation, if needed. This class honors the <code>numberOfConcurrentTransactedReceivers</code> strictly
- * and will create exactly this number of consumers.
+ * resource allocation, if needed. This class honors the <code>numberOfConcurrentTransactedReceivers</code> strictly and
+ * will create exactly this number of consumers.
  */
 public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 {
+
     protected final List<SubReceiver> consumers;
 
     protected final int receiversCount;
@@ -77,7 +78,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             if (logger.isInfoEnabled())
             {
                 logger.info("Destination " + getEndpoint().getEndpointURI() + " is a topic, but " + jmsConnector.getNumberOfConsumers() +
-                                " receivers have been requested. Will configure only 1.");
+                            " receivers have been requested. Will configure only 1.");
             }
             receiversCount = 1;
         }
@@ -127,7 +128,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         if (consumers != null)
         {
             SubReceiver sub;
-            for (Iterator<SubReceiver> it = consumers.iterator(); it.hasNext();)
+            for (Iterator<SubReceiver> it = consumers.iterator(); it.hasNext(); )
             {
                 sub = it.next();
                 sub.doStop(true);
@@ -238,7 +239,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         logger.debug("doDisconnect()");
 
         SubReceiver sub;
-        for (Iterator<SubReceiver> it = consumers.iterator(); it.hasNext();)
+        for (Iterator<SubReceiver> it = consumers.iterator(); it.hasNext(); )
         {
             sub = it.next();
             try
@@ -277,6 +278,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
     protected class SubReceiver implements MessageListener
     {
+
         private final Log subLogger = LogFactory.getLog(getClass());
 
         private volatile Session session;
@@ -363,7 +365,9 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
         /**
          * Stop the subreceiver.
-         * @param force - if true, any exceptions will be logged but the subreceiver will be considered stopped regardless
+         *
+         * @param force - if true, any exceptions will be logged but the subreceiver will be considered stopped
+         *              regardless
          * @throws MuleException only if force = false
          */
         protected void doStop(boolean force) throws MuleException
@@ -374,7 +378,12 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             {
                 try
                 {
-                    consumer.close();
+                    // TODO: Check this. It used to be used when the setMessageListener was used. Think is not needed anymore.
+                    // That would mean org.mule.transport.jms.MultiConsumerJmsMessageReceiverTest#messageListenerIsNotRecycledAccordingToConnector is not needed anymore.
+                    if (jmsConnector.mustRecycleReceivers())
+                    {
+                        consumer.close();
+                    }
                     consumerClosed = true;
                 }
                 catch (Exception e)
@@ -535,6 +544,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
     protected class JmsWorker extends AbstractReceiverWorker
     {
+
         private final SubReceiver subReceiver;
 
         public JmsWorker(Message message, AbstractMessageReceiver receiver, SubReceiver subReceiver)
