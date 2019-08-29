@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
@@ -24,6 +23,7 @@ import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProce
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
@@ -193,27 +193,20 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     if (isAsync()) {
       return flux
-          .doOnNext(event -> xxx(event, new FluxSinkRecorderExecutorCallback(asyncFluxSink)))
-          .filter(event -> false)
-          .mergeWith(asyncFlux);
-    } else {
-      return flux.handle((event, sink) -> xxx(event, new SynchronousSinkExecutorCallback(sink)));
+          .doOnNext(event -> onEvent(event, new FluxSinkRecorderExecutorCallback(asyncFluxSink) {
 
-      //.transform(f -> asyncFlux);
-      //.transform(f -> {
-      //  RxUtils.subscribeFluxOnPublisherSubscription(f, asyncFlux);
-      //  return asyncFlux;
-      //});
-      //;
-      //return Flux.concat(flux, asyncFlux);
-      //return flux.transform(f -> asyncFlux);
-      //RxUtils.subscribeFluxOnPublisherSubscription(asyncFlux, flux);
-      //return Flux.merge(asyncFlux, flux);
-      //return flux;
+            @Override
+            public void error(Throwable e) {
+              complete(quickCopy(event, singletonMap("LALA", e)));
+            }
+          }))
+          .transform(p -> subscribeFluxOnPublisherSubscription(asyncFlux, p));
+    } else {
+      return flux.handle((event, sink) -> onEvent(event, new SynchronousSinkExecutorCallback(sink)));
     }
   }
 
-  private void xxx(CoreEvent event, ExecutorCallback executorCallback) {
+  private void onEvent(CoreEvent event, ExecutorCallback executorCallback) {
     try {
 
       final Optional<ConfigurationInstance> configuration = resolveConfiguration(event);
@@ -356,7 +349,15 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       }
 
       if (isAsync()) {
-        asyncFlux = Flux.create(asyncFluxSink).doOnComplete(() -> System.out.println("COMPLETE"));
+        asyncFlux = Flux.create(asyncFluxSink)
+            .handle((event, sink) -> {
+              Throwable t = ((InternalEvent) event).getInternalParameter("LALA");
+              if (t != null) {
+                sink.error(t);
+              } else {
+                sink.next(event);
+              }
+            });
       }
 
       initialised = true;
@@ -366,10 +367,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private void initRetryPolicyResolver() {
     Optional<ConfigurationInstance> staticConfig = getStaticConfiguration();
     if (staticConfig.isPresent() || !requiresConfig()) {
-      RetryPolicyTemplate staticPolicy = getRetryPolicyTemplate(staticConfig);
+      RetryPolicyTemplate staticPolicy = fetchRetryPolicyTemplate(staticConfig);
       retryPolicyResolver = config -> staticPolicy;
     } else {
-      retryPolicyResolver = this::getRetryPolicyTemplate;
+      retryPolicyResolver = this::fetchRetryPolicyTemplate;
     }
   }
 
@@ -531,16 +532,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     if (usesDynamicConfiguration()) {
       return true;
     } else {
-      Optional<>
+      Optional<ConfigurationInstance> staticConfig = getStaticConfiguration();
+      if (staticConfig.isPresent()) {
+        return getRetryPolicyTemplate(staticConfig).isEnabled();
+      }
     }
-    ConfigurationProvider configurationProvider = getConfigurationProvider();
-    if (configurationProvider.isDynamic()) {
-      return true;
-    } else {
-      RetryPolicyTemplate retryPolicy =
-          getRetryPolicyTemplate(ofNullable(configurationProvider.get(getInitialiserEvent(muleContext))));
-      return retryPolicy != null && retryPolicy.isEnabled();
-    }
+
+    return true;
   }
 
   @Override
