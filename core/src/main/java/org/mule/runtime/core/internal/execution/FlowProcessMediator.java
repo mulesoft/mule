@@ -103,16 +103,17 @@ public class FlowProcessMediator implements Initialisable {
   @Inject
   private InterceptorManager processorInterceptorManager;
 
+  @Inject
+  private MuleContext muleContext;
+
   private final PolicyManager policyManager;
   private final List<CompletableInterceptorSourceCallbackAdapter> additionalInterceptors = new LinkedList<>();
-
   private ErrorType sourceResponseGenerateErrorType;
   private ErrorType sourceResponseSendErrorType;
   private ErrorType sourceErrorResponseGenerateErrorType;
   private ErrorType sourceErrorResponseSendErrorType;
   private ErrorType flowBackPressureErrorType;
   private NotificationHelper notificationHelper;
-  private MuleContext muleContext;
 
   public FlowProcessMediator(PolicyManager policyManager) {
     this.policyManager = policyManager;
@@ -120,6 +121,8 @@ public class FlowProcessMediator implements Initialisable {
 
   @Override
   public void initialise() throws InitialisationException {
+    this.notificationHelper =
+        new NotificationHelper(muleContext.getNotificationManager(), ConnectorMessageNotification.class, false);
     final ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
 
     sourceResponseGenerateErrorType = errorTypeRepository.getErrorType(SOURCE_RESPONSE_GENERATE).get();
@@ -512,11 +515,8 @@ public class FlowProcessMediator implements Initialisable {
     }
   }
 
-  @Inject
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
-    this.notificationHelper =
-        new NotificationHelper(muleContext.getNotificationManager(), ConnectorMessageNotification.class, false);
   }
 
   private class FlowProcessor implements Processor, Component {
