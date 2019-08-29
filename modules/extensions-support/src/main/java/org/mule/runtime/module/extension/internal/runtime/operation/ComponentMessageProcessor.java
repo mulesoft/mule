@@ -23,7 +23,6 @@ import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProce
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
-import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
@@ -36,6 +35,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
@@ -62,13 +62,12 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.internal.policy.FluxSinkRecorderExecutorCallback;
+import org.mule.runtime.core.internal.policy.DeferredMonoSinkExecutorCallback;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SynchronousSinkExecutorCallback;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
-import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -150,8 +149,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
 
   private Function<Optional<ConfigurationInstance>, RetryPolicyTemplate> retryPolicyResolver;
-  private Flux<CoreEvent> asyncFlux;
-  private FluxSinkRecorder<CoreEvent> asyncFluxSink = new FluxSinkRecorder<>();
   private String resolvedProcessorRepresentation;
   private boolean initialised = false;
 
@@ -193,14 +190,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     if (isAsync()) {
       return flux
-          .doOnNext(event -> onEvent(event, new FluxSinkRecorderExecutorCallback(asyncFluxSink) {
+          .flatMap(event -> {
+            DeferredMonoSinkExecutorCallback callback = new DeferredMonoSinkExecutorCallback();
+            onEvent(event, callback);
 
-            @Override
-            public void error(Throwable e) {
-              complete(quickCopy(event, singletonMap("LALA", e)));
-            }
-          }))
-          .transform(p -> subscribeFluxOnPublisherSubscription(asyncFlux, p));
+            return create(callback::setSink);
+          });
     } else {
       return flux.handle((event, sink) -> onEvent(event, new SynchronousSinkExecutorCallback(sink)));
     }
@@ -346,18 +341,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       if (getLocation() != null) {
         resolvedProcessorRepresentation =
             resolveProcessorRepresentation(muleContext.getConfiguration().getId(), getLocation().getLocation(), this);
-      }
-
-      if (isAsync()) {
-        asyncFlux = Flux.create(asyncFluxSink)
-            .handle((event, sink) -> {
-              Throwable t = ((InternalEvent) event).getInternalParameter("LALA");
-              if (t != null) {
-                sink.error(t);
-              } else {
-                sink.next(event);
-              }
-            });
       }
 
       initialised = true;
@@ -548,9 +531,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Override
   public void doStop() throws MuleException {
-    if (asyncFluxSink != null) {
-      asyncFluxSink.complete();
-    }
     stopIfNeeded(componentExecutor);
   }
 
