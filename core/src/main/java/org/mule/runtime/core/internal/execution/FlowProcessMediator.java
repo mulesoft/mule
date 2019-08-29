@@ -47,7 +47,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
@@ -103,16 +102,17 @@ public class FlowProcessMediator implements Initialisable {
   @Inject
   private InterceptorManager processorInterceptorManager;
 
+  @Inject
+  private MuleContext muleContext;
+
   private final PolicyManager policyManager;
   private final List<CompletableInterceptorSourceCallbackAdapter> additionalInterceptors = new LinkedList<>();
-
   private ErrorType sourceResponseGenerateErrorType;
   private ErrorType sourceResponseSendErrorType;
   private ErrorType sourceErrorResponseGenerateErrorType;
   private ErrorType sourceErrorResponseSendErrorType;
   private ErrorType flowBackPressureErrorType;
   private NotificationHelper notificationHelper;
-  private MuleContext muleContext;
 
   public FlowProcessMediator(PolicyManager policyManager) {
     this.policyManager = policyManager;
@@ -512,11 +512,8 @@ public class FlowProcessMediator implements Initialisable {
     }
   }
 
-  @Inject
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
-    this.notificationHelper =
-        new NotificationHelper(muleContext.getNotificationManager(), ConnectorMessageNotification.class, false);
   }
 
   private class FlowProcessor implements Processor, Component {
