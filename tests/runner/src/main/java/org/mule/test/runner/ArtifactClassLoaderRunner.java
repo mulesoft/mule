@@ -11,8 +11,6 @@ import static java.lang.Thread.currentThread;
 import static java.util.Optional.of;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
-import static org.mule.maven.client.api.model.RepositoryPolicy.CHECKSUM_POLICY_FAIL;
-import static org.mule.maven.client.api.model.RepositoryPolicy.CHECKSUM_POLICY_WARN;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.test.runner.RunnerConfiguration.readConfiguration;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
@@ -20,12 +18,10 @@ import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_ARTIFACTS;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_PROPERTIES_FILE;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXTRA_BOOT_PACKAGES;
 import static org.mule.test.runner.utils.RunnerModuleUtils.getExcludedProperties;
+
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.MavenConfiguration;
-import org.mule.maven.client.internal.MavenCommandLineParser;
-import org.mule.maven.client.internal.MavenCommandLineParser.MavenArguments;
-import org.mule.maven.client.internal.MavenEnvironmentVariables;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.test.runner.api.AetherClassPathClassifier;
 import org.mule.test.runner.api.ArtifactClassLoaderHolder;
@@ -37,6 +33,20 @@ import org.mule.test.runner.api.DependencyResolver;
 import org.mule.test.runner.api.WorkspaceLocationResolver;
 import org.mule.test.runner.classification.DefaultWorkspaceReader;
 import org.mule.test.runner.maven.AutoDiscoverWorkspaceLocationResolver;
+
+import org.junit.internal.builders.AnnotatedBuilder;
+import org.junit.runner.Description;
+import org.junit.runner.Runner;
+import org.junit.runner.manipulation.Filter;
+import org.junit.runner.manipulation.Filterable;
+import org.junit.runner.manipulation.NoTestsRemainException;
+import org.junit.runner.notification.RunNotifier;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.RunnerBuilder;
+import org.junit.runners.model.TestClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
@@ -52,20 +62,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Supplier;
-
-import org.junit.internal.builders.AnnotatedBuilder;
-import org.junit.runner.Description;
-import org.junit.runner.Runner;
-import org.junit.runner.manipulation.Filter;
-import org.junit.runner.manipulation.Filterable;
-import org.junit.runner.manipulation.NoTestsRemainException;
-import org.junit.runner.notification.RunNotifier;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.InitializationError;
-import org.junit.runners.model.RunnerBuilder;
-import org.junit.runners.model.TestClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link org.junit.runner.Runner} that mimics the class loading model used in a Mule Standalone distribution. In order to
@@ -269,15 +265,6 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
       mavenConfigurationBuilder.settingsSecurityLocation(settingsSecurity.get());
     } else {
       LOGGER.info("Maven settings security couldn't be found");
-    }
-
-    MavenArguments mavenArguments = MavenCommandLineParser.parseMavenArguments(new MavenEnvironmentVariables());
-    if (mavenArguments.isStrictChecksums()) {
-      mavenConfigurationBuilder.globalChecksumPolicy(CHECKSUM_POLICY_FAIL);
-    }
-
-    if (mavenArguments.isLaxChecksums()) {
-      mavenConfigurationBuilder.globalChecksumPolicy(CHECKSUM_POLICY_WARN);
     }
 
     final MavenConfiguration mavenConfiguration = mavenConfigurationBuilder.build();
