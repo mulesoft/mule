@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
@@ -138,25 +139,26 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   static final String INVALID_TARGET_MESSAGE =
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
 
+  private final ReflectionCache reflectionCache;
+  private final RetryPolicyTemplate fallbackRetryPolicyTemplate = new NoRetryPolicyTemplate();
+
   protected final ExtensionModel extensionModel;
   protected final ResolverSet resolverSet;
   protected final String target;
   protected final String targetValue;
   protected final RetryPolicyTemplate retryPolicyTemplate;
 
-  private final ReflectionCache reflectionCache;
-  private final RetryPolicyTemplate fallbackRetryPolicyTemplate = new NoRetryPolicyTemplate();
+
+  private Function<Optional<ConfigurationInstance>, RetryPolicyTemplate> retryPolicyResolver;
+  private Flux<CoreEvent> asyncFlux;
+  private FluxSinkRecorder<CoreEvent> asyncFluxSink = new FluxSinkRecorder<>();
+  private String resolvedProcessorRepresentation;
+  private boolean initialised = false;
 
   protected ExecutionMediator executionMediator;
   protected CompletableComponentExecutor componentExecutor;
   protected ReturnDelegate returnDelegate;
   protected PolicyManager policyManager;
-
-  private Flux<CoreEvent> asyncFlux;
-  private FluxSinkRecorder<CoreEvent> asyncFluxSink = new FluxSinkRecorder<>();
-
-  private String resolvedProcessorRepresentation;
-  private boolean initialised = false;
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
                                    T componentModel,
@@ -341,6 +343,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Override
   protected void doInitialise() throws InitialisationException {
     if (!initialised) {
+      initRetryPolicyResolver();
       returnDelegate = createReturnDelegate();
       initialiseIfNeeded(resolverSet, muleContext);
       componentExecutor = createComponentExecutor();
@@ -360,7 +363,21 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
   }
 
-  protected RetryPolicyTemplate getRetryPolicyTemplate(Optional<ConfigurationInstance> configuration) {
+  private void initRetryPolicyResolver() {
+    Optional<ConfigurationInstance> staticConfig = getStaticConfiguration();
+    if (staticConfig.isPresent() || !requiresConfig()) {
+      RetryPolicyTemplate staticPolicy = getRetryPolicyTemplate(staticConfig);
+      retryPolicyResolver = config -> staticPolicy;
+    } else {
+      retryPolicyResolver = this::getRetryPolicyTemplate;
+    }
+  }
+
+  private RetryPolicyTemplate getRetryPolicyTemplate(Optional<ConfigurationInstance> configuration) {
+    return retryPolicyResolver.apply(configuration);
+  }
+
+  private RetryPolicyTemplate fetchRetryPolicyTemplate(Optional<ConfigurationInstance> configuration) {
     RetryPolicyTemplate delegate = null;
     if (retryPolicyTemplate != null) {
       delegate = configuration
@@ -507,7 +524,23 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   protected boolean isAsync() {
-    return false;
+    if (!requiresConfig()) {
+      return false;
+    }
+
+    if (usesDynamicConfiguration()) {
+      return true;
+    } else {
+      Optional<>
+    }
+    ConfigurationProvider configurationProvider = getConfigurationProvider();
+    if (configurationProvider.isDynamic()) {
+      return true;
+    } else {
+      RetryPolicyTemplate retryPolicy =
+          getRetryPolicyTemplate(ofNullable(configurationProvider.get(getInitialiserEvent(muleContext))));
+      return retryPolicy != null && retryPolicy.isEnabled();
+    }
   }
 
   @Override
