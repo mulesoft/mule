@@ -185,6 +185,14 @@ public class ExtensionModelHelper {
     });
   }
 
+  /**
+   * Finds a {@link org.mule.runtime.api.meta.model.ConnectionProviderModel} within the provided set of {@link ExtensionModel}s by
+   * a {@link ComponentIdentifier}.
+   *
+   * @param componentIdentifier the identifier to use for the search.
+   * @return the found {@link org.mule.runtime.api.meta.model.ConnectionProviderModel} or {@link Optional#empty()} if it couldn't
+   *         be found.
+   */
   public Optional<? extends ConnectionProviderModel> findConnectionProviderModel(ComponentIdentifier componentId) {
 
     return extensionConnectionProviderModelByComponentIdentifier.get(componentId, componentIdentifier -> {
@@ -210,6 +218,14 @@ public class ExtensionModelHelper {
     });
   }
 
+  /**
+   * Finds a {@link org.mule.runtime.api.meta.model.ConfigurationModel} within the provided set of {@link ExtensionModel}s by a
+   * {@link ComponentIdentifier}.
+   *
+   * @param componentIdentifier the identifier to use for the search.
+   * @return the found {@link org.mule.runtime.api.meta.model.ConfigurationModel} or {@link Optional#empty()} if it couldn't be
+   *         found.
+   */
   public Optional<? extends ConfigurationModel> findConfigurationModel(ComponentIdentifier componentId) {
     return extensionConfigurationModelByComponentIdentifier.get(componentId, componentIdentifier -> {
       return lookupExtensionModelFor(componentIdentifier)
@@ -233,6 +249,60 @@ public class ExtensionModelHelper {
     });
   }
 
+  /**
+   * Navigates the extension model for the provided {@code componentIdentifier} and calls the corresponding method on the provided
+   * {@code delegate} when found.
+   *
+   * @param componentIdentifier the identifier to use for the search.
+   * @param delegate the callback to execute on the found model.
+   */
+  public void walkToComponent(ComponentIdentifier componentIdentifier, ExtensionWalkerModelDelegate delegate) {
+    lookupExtensionModelFor(componentIdentifier)
+        .ifPresent(currentExtension -> {
+          new ExtensionWalker() {
+
+            final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(currentExtension);
+
+            @Override
+            protected void onConfiguration(ConfigurationModel model) {
+              if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
+                delegate.onConfiguration(model);
+              }
+            }
+
+            @Override
+            protected void onConnectionProvider(org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels owner,
+                                                ConnectionProviderModel model) {
+              if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
+                delegate.onConnectionProvider(model);
+              }
+            };
+
+            @Override
+            protected void onOperation(HasOperationModels owner, OperationModel model) {
+              if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
+                delegate.onOperation(model);
+              }
+            }
+
+            @Override
+            protected void onSource(HasSourceModels owner, SourceModel model) {
+              if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
+                delegate.onSource(model);
+              }
+            }
+
+            @Override
+            protected void onConstruct(HasConstructModels owner, ConstructModel model) {
+              if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
+                delegate.onConstruct(model);
+              }
+            }
+
+          }.walk(currentExtension);
+        });
+  }
+
   public Optional<? extends MetadataType> findMetadataType(Class<?> type) {
     if (type != null
         // workaround for test components with no extension model
@@ -247,6 +317,26 @@ public class ExtensionModelHelper {
     return extensionsModels.stream()
         .filter(e -> e.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace()))
         .findFirst();
+  }
+
+  /**
+   * This interface is used along with an ExtensionWalker. The {@link ExtensionWalker} makes same validation/filter and then calls
+   * the appropriate method form this interface if applicable.
+   *
+   * @since 4.3
+   */
+  public static interface ExtensionWalkerModelDelegate {
+
+    void onConfiguration(ConfigurationModel model);
+
+    void onConnectionProvider(ConnectionProviderModel model);
+
+    void onOperation(OperationModel model);
+
+    void onSource(SourceModel model);
+
+    void onConstruct(ConstructModel model);
+
   }
 
   static class IsRouteVisitor implements NestableElementModelVisitor {
