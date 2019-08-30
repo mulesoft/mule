@@ -13,7 +13,6 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
@@ -40,15 +39,13 @@ final class SchedulerFlowProcessingTemplate implements FlowProcessTemplate {
   private final Processor messageProcessor;
   private List<NotificationFunction> notificationFunctions;
   private DefaultSchedulerMessageSource defaultSchedulerMessageSource;
-  private Message message;
 
   SchedulerFlowProcessingTemplate(Processor messageProcessor,
                                   List<NotificationFunction> notificationFunctions,
-                                  DefaultSchedulerMessageSource defaultSchedulerMessageSource, Message message) {
+                                  DefaultSchedulerMessageSource defaultSchedulerMessageSource) {
     this.messageProcessor = messageProcessor;
     this.notificationFunctions = notificationFunctions;
     this.defaultSchedulerMessageSource = defaultSchedulerMessageSource;
-    this.message = message;
   }
 
   @Override

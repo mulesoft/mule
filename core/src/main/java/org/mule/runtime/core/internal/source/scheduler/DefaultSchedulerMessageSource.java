@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.source.scheduler;
 
 import static java.util.Optional.empty;
-import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
 import static org.mule.runtime.core.api.context.notification.NotificationHelper.createConnectorMessageNotification;
@@ -22,7 +21,6 @@ import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.source.SchedulerConfiguration;
 import org.mule.runtime.api.source.SchedulerMessageSource;
@@ -77,7 +75,8 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
   private boolean started;
   private volatile boolean executing = false;
-  private final List<NotificationFunction> notificationFunctions;
+  private SchedulerFlowProcessingTemplate messageProcessTemplate;
+  private DefaultSchedulerMessageSource.SchedulerProcessContext messageProcessContext;
 
   /**
    * @param muleContext application's context
@@ -88,10 +87,13 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     this.muleContext = muleContext;
     this.scheduler = scheduler;
     this.disallowConcurrentExecution = disallowConcurrentExecution;
-    notificationFunctions = new LinkedList<>();
+
+    List<NotificationFunction> notificationFunctions = new LinkedList<>();
     // Add message received notification
     notificationFunctions
         .add((event, component) -> createConnectorMessageNotification(this, event, component.getLocation(), MESSAGE_RECEIVED));
+    messageProcessTemplate = new SchedulerFlowProcessingTemplate(listener, notificationFunctions, this);
+    messageProcessContext = new SchedulerProcessContext();
   }
 
   @Override
@@ -165,19 +167,18 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     }
 
     if (execute) {
-      Message request = of(null);
-      pollWith(request);
+      doPoll();
     } else {
       LOGGER.info("Flow '{}' is already running and 'disallowConcurrentExecution' is set to 'true'. Execution skipped.",
                   flowConstruct.getRootContainerLocation().getGlobalName());
     }
   }
 
-  private void pollWith(final Message request) {
+  private void doPoll() {
     try {
       messageProcessingManager
-          .processMessage(new SchedulerFlowProcessingTemplate(listener, notificationFunctions, this, request),
-                          new SchedulerProcessContext());
+          .processMessage(messageProcessTemplate,
+                          messageProcessContext);
     } catch (Exception e) {
       muleContext.getExceptionListener().handleException(e);
     }
