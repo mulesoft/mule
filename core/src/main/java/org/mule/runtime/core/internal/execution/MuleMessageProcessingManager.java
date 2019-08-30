@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.execution;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -37,7 +38,8 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, I
   @Override
   public void processMessage(FlowProcessTemplate messageProcessTemplate,
                              MessageProcessContext messageProcessContext) {
-    mediator.process(messageProcessTemplate, messageProcessContext, this);
+    withContextClassLoader(messageProcessContext.getExecutionClassLoader(),
+                           () -> mediator.process(messageProcessTemplate, messageProcessContext, this));
   }
 
   @Override

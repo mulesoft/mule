@@ -6,6 +6,13 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import static java.lang.Thread.currentThread;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -15,6 +22,9 @@ import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +42,12 @@ public class MuleMessageProcessingManagerTestCase extends AbstractMuleContextTes
   @Mock
   private PolicyManager policyManager;
 
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private FlowProcessTemplate template;
+
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private MessageProcessContext messageProcessContext;
+
   private MuleContext spyContext;
 
   private MuleMessageProcessingManager processingManager;
@@ -46,6 +62,19 @@ public class MuleMessageProcessingManagerTestCase extends AbstractMuleContextTes
     processingManager.setPolicyManager(policyManager);
 
     processingManager.initialise();
+  }
+
+  @Test
+  public void processesWithClassLoader() throws Exception {
+    ClassLoader classLoader = new URLClassLoader(new URL[]{}, currentThread().getContextClassLoader());
+    when(messageProcessContext.getExecutionClassLoader()).thenReturn(classLoader);
+    doAnswer(inv -> {
+      assertThat(currentThread().getContextClassLoader(), is(sameInstance(classLoader)));
+      return null;
+    }).when(exceptionHandler).handleException(any());
+
+    processingManager.processMessage(template, messageProcessContext);
+    verify(exceptionHandler).handleException(any());
   }
 
   @Test
