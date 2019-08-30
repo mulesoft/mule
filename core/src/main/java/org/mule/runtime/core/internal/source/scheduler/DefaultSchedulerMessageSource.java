@@ -77,6 +77,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   private volatile boolean executing = false;
   private SchedulerFlowProcessingTemplate messageProcessTemplate;
   private DefaultSchedulerMessageSource.SchedulerProcessContext messageProcessContext;
+  private final List<NotificationFunction> notificationFunctions;
 
   /**
    * @param muleContext application's context
@@ -88,12 +89,10 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     this.scheduler = scheduler;
     this.disallowConcurrentExecution = disallowConcurrentExecution;
 
-    List<NotificationFunction> notificationFunctions = new LinkedList<>();
+    notificationFunctions = new LinkedList<>();
     // Add message received notification
     notificationFunctions
         .add((event, component) -> createConnectorMessageNotification(this, event, component.getLocation(), MESSAGE_RECEIVED));
-    messageProcessTemplate = new SchedulerFlowProcessingTemplate(listener, notificationFunctions, this);
-    messageProcessContext = new SchedulerProcessContext();
   }
 
   @Override
@@ -177,8 +176,8 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   private void doPoll() {
     try {
       messageProcessingManager
-          .processMessage(messageProcessTemplate,
-                          messageProcessContext);
+          .processMessage(new SchedulerFlowProcessingTemplate(listener, notificationFunctions, this),
+                          new SchedulerProcessContext());
     } catch (Exception e) {
       muleContext.getExceptionListener().handleException(e);
     }
