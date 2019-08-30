@@ -17,7 +17,6 @@ import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.CreateException;
@@ -41,9 +40,9 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
-import org.slf4j.Logger;
-
 import java.util.concurrent.ScheduledFuture;
+
+import org.slf4j.Logger;
 
 /**
  * <p>
@@ -173,6 +172,8 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
           .doOnNext(event -> setCurrentEvent(event))
           .doOnNext(event -> notificationHelper.fireNotification(this, event, getLocation(), MESSAGE_RECEIVED))
           .cast(CoreEvent.class)
+          // Adding backpressure check call from inside the Scheduler, since the event is not dispatched from FlowProcessMediator
+          .doOnNext(event -> flowConstruct.checkBackpressure(event))
           .transform(listener)
           .doOnError(MessagingException.class,
                      me -> ((BaseEventContext) me.getEvent().getContext()).error(me))
