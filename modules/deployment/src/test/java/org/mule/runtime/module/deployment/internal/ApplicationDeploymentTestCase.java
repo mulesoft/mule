@@ -1070,18 +1070,6 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
-  public void deployApplicationUsingSemverToPointDomain() throws Exception {
-    startDeployment();
-
-    addExplodedAppFromBuilder(dummyDomainFileBuilder, dummyDomainFileBuilder.getId() + "-old");
-    assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId() + "-old");
-
-    dummyDomainFileBuilder.withVersion("1.0.1");
-    addExplodedAppFromBuilder(dummyDomainFileBuilder, dummyDomainFileBuilder.getId() + "-new");
-    assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId() + "-new");
-  }
-
-  @Test
   public void deploymentSuccessWhenUsingDefaultDomain() throws Exception {
     final DefaultDomainManager domainManager = new DefaultDomainManager();
     TestApplicationFactory appFactory =
@@ -2203,7 +2191,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     final ApplicationFileBuilder applicationFileBuilder = appFileBuilder("privilegedPluginApp")
         .definedBy(APP_WITH_PRIVILEGED_EXTENSION_PLUGIN_CONFIG)
         .dependingOn(createPrivilegedExtensionPlugin())
-        .dependingOnSharedLibrary(new JarFileBuilder("mule-extensions-api", new File(getProperty(extensionsApiLib)))
+        .dependingOnSharedLibrary(new JarFileBuilder("mule-extensions-api", new File(extensionsApiLib))
             .withGroupId("org.mule.runtime")
             .withVersion("1.1.6"));
     addPackedAppFromBuilder(applicationFileBuilder);

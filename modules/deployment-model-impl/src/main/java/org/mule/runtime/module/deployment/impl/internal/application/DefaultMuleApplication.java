@@ -399,24 +399,24 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     String configuredDomainName = descriptor.getDomainName();
     Optional<BundleDescriptor> domainBundleDescriptor = descriptor.getDomainDescriptor();
 
+    if (configuredDomainName != null && !domainBundleDescriptor.isPresent()) {
+      throw new IllegalStateException(format("Dependency for domain '%s' was not declared", configuredDomainName));
+    }
+
+    if (!domainBundleDescriptor.isPresent()) {
+      return domainRepository.getDomain(DEFAULT_DOMAIN_NAME);
+    }
+
     if (configuredDomainName != null) {
       Domain foundDomain = domainRepository.getDomain(configuredDomainName);
-      if (domainBundleDescriptor.isPresent()) {
-        if (isCompatibleBundle(foundDomain.getDescriptor().getBundleDescriptor(), domainBundleDescriptor.get())) {
-          return foundDomain;
-        } else {
-          throw new IncompatibleDomainException(configuredDomainName, foundDomain);
-        }
-      } else {
+      if (isCompatibleBundle(foundDomain.getDescriptor().getBundleDescriptor(), domainBundleDescriptor.get())) {
         return foundDomain;
-      }
-    } else {
-      if (domainBundleDescriptor.isPresent()) {
-        return domainRepository.getCompatibleDomain(domainBundleDescriptor.get());
       } else {
-        return domainRepository.getDomain(DEFAULT_DOMAIN_NAME);
+        throw new IncompatibleDomainException(configuredDomainName, foundDomain);
       }
     }
+
+    return domainRepository.getCompatibleDomain(domainBundleDescriptor.get());
   }
 
 }

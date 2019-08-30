@@ -35,6 +35,9 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
       .definedBy("empty-config.xml").dependingOn(emptyDomain101FileBuilder)
       .deployedWith("domain", "empty-domain-1.0.0-mule-domain");
 
+  private final ApplicationFileBuilder appWithDomainNameButMissingBundleDescriptor =
+      new ApplicationFileBuilder("dummy-domain101-app-ref")
+          .definedBy("empty-config.xml").deployedWith("domain", "empty-domain-1.0.1-mule-domain");
 
   public ApplicationDependingOnDomainDeploymentTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
@@ -140,5 +143,13 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
     // The app depends on 1.0.1 but references the domain 1.0.0 by name, so it must fail
     addExplodedAppFromBuilder(incompatibleDomainNameAppFileBuilder, incompatibleDomainNameAppFileBuilder.getId());
     assertDeploymentFailure(applicationDeploymentListener, incompatibleDomainNameAppFileBuilder.getId());
+  }
+
+  @Test
+  public void failToDeployAppWithDomainNameButMissingBundleDescriptor() throws Exception {
+    startDeployment();
+
+    addExplodedAppFromBuilder(appWithDomainNameButMissingBundleDescriptor, appWithDomainNameButMissingBundleDescriptor.getId());
+    assertDeploymentFailure(applicationDeploymentListener, appWithDomainNameButMissingBundleDescriptor.getId());
   }
 }

@@ -313,6 +313,6 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
     // Cannot retrieve the domain using the descriptor that we have
     expectedException.expect(DomainNotFoundException.class);
     domainManager.getCompatibleDomain(bundleDescriptor);
-  }                                                                                                                 
+  }
 
 }
