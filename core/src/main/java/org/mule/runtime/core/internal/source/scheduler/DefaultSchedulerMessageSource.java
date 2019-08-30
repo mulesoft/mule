@@ -75,8 +75,6 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
   private boolean started;
   private volatile boolean executing = false;
-  private SchedulerFlowProcessingTemplate messageProcessTemplate;
-  private DefaultSchedulerMessageSource.SchedulerProcessContext messageProcessContext;
   private final List<NotificationFunction> notificationFunctions;
 
   /**
