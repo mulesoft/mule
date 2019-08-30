@@ -33,6 +33,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
+import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapter;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -43,6 +44,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -86,6 +88,7 @@ import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfi
 import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
+import org.mule.runtime.config.internal.dsl.spring.DefaultValueVisitor;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -94,6 +97,7 @@ import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -623,7 +627,23 @@ public class ApplicationModel implements ArtifactAst {
         buildingDefinition.map(definition -> {
           ObjectTypeVisitor typeDefinitionVisitor = new ObjectTypeVisitor(componentModel);
           definition.getTypeDefinition().visit(typeDefinitionVisitor);
-          componentModel.setType(typeDefinitionVisitor.getType());
+
+          final Class<?> type = typeDefinitionVisitor.getType();
+          componentModel.setType(type);
+
+          if (ValueResolver.class.isAssignableFrom(type)) {
+            definition.getConstructorAttributeDefinition().get(0).accept(new DefaultValueVisitor() {
+
+              @Override
+              public void onFixedValue(Object value) {
+                if (value instanceof MetadataType) {
+                  createMetadataTypeModelAdapter((MetadataType) value)
+                      .ifPresent(componentModel::setMetadataTypeModelAdapter);
+                }
+              }
+            });
+          }
+
           return definition;
         }).orElseGet(() -> {
           String classParameter = componentModel.getParameters().get(CLASS_ATTRIBUTE);
