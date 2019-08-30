@@ -53,7 +53,8 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
   }
 
   @Override
-  public Domain getCompatibleDomain(BundleDescriptor wantedDescriptor) throws DomainNotFoundException {
+  public Domain getCompatibleDomain(BundleDescriptor wantedDescriptor)
+      throws DomainNotFoundException, AmbiguousDomainReferenceException {
     Domain foundDomain = null;
 
     for (Domain domain : domainsByName.values()) {
@@ -65,8 +66,7 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
 
       if (isCompatibleBundle(currentDescriptor, wantedDescriptor)) {
         if (foundDomain != null) {
-          // TODO: Use specific exception
-          throw new IllegalArgumentException("More than one compatible domain were found");
+          throw new AmbiguousDomainReferenceException(wantedDescriptor);
         }
         foundDomain = domain;
       }

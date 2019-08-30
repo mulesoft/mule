@@ -28,8 +28,10 @@ import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactCl
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
+import org.mule.runtime.module.deployment.impl.internal.domain.AmbiguousDomainReferenceException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
+import org.mule.runtime.module.deployment.impl.internal.domain.IncompatibleDomainException;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyInstanceProviderFactory;
@@ -172,6 +174,10 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
       throw new DeploymentException(createStaticMessage(format("Domain '%s' has to be deployed in order to deploy Application '%s'",
                                                                e.getDomainName(), descriptor.getName())),
                                     e);
+    } catch (IncompatibleDomainException e) {
+      throw new DeploymentException(createStaticMessage("Domain was found, but the bundle descriptor is incompatible"), e);
+    } catch (AmbiguousDomainReferenceException e) {
+      throw new DeploymentException(createStaticMessage("Multiple domains were found"), e);
     }
   }
 

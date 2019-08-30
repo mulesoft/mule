@@ -26,12 +26,14 @@ public interface DomainRepository {
    */
   Domain getDomain(String name) throws DomainNotFoundException;
 
+  /**
+   * Checks if exists a domain with the given name.
+   *
+   * @param name The name of the domain to search.
+   * @return <tt>true</tt> if this repository contains a domain with the specified name, or <tt>false</tt> otherwise.
+   */
   boolean contains(String name);
 
-
-  // TODO: Add exceptions:
-  //  - Ambiguous
-  //  - Incompatible?
   /**
    * Gets a domain compatible with the given bundle descriptor. The version must be compatible
    * (see {@link BundleDescriptorUtils#isCompatibleVersion(String, String)} for more information).
@@ -40,8 +42,9 @@ public interface DomainRepository {
    * @return a {@link Domain} corresponding to the given descriptor or null is no such domain exists.
    * 
    * @throws DomainNotFoundException if didn't find any compatible domain.
+   * @throws AmbiguousDomainReferenceException if multiple compatible domains were found for given descriptor.
    */
-  Domain getCompatibleDomain(BundleDescriptor descriptor) throws DomainNotFoundException;
+  Domain getCompatibleDomain(BundleDescriptor descriptor) throws DomainNotFoundException, AmbiguousDomainReferenceException;
 
   /**
    * Checks if exists a domain compatible with the given bundle descriptor. The version must be compatible

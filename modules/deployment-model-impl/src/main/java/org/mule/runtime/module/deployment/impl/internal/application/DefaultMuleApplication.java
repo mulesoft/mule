@@ -60,6 +60,7 @@ import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifact;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
+import org.mule.runtime.module.deployment.impl.internal.domain.AmbiguousDomainReferenceException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
 import org.mule.runtime.module.deployment.impl.internal.domain.IncompatibleDomainException;
@@ -159,7 +160,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   public Domain getDomain() {
     try {
       return getApplicationDomain(domainRepository, descriptor);
-    } catch (DomainNotFoundException | IncompatibleDomainException e) {
+    } catch (DomainNotFoundException | IncompatibleDomainException | AmbiguousDomainReferenceException e) {
       return null;
     }
   }
@@ -394,7 +395,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   }
 
   static Domain getApplicationDomain(DomainRepository domainRepository, ApplicationDescriptor descriptor)
-      throws DomainNotFoundException, IncompatibleDomainException {
+      throws DomainNotFoundException, IncompatibleDomainException, AmbiguousDomainReferenceException {
     String configuredDomainName = descriptor.getDomainName();
     Optional<BundleDescriptor> domainBundleDescriptor = descriptor.getDomainDescriptor();
 

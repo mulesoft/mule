@@ -186,9 +186,9 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
     assertThat(domainManager.getDomain(domainName2), is(domain2));
   }
 
-  //TODO: What should happen here?
   @Test
-  public void getIdenticalDomainsByBundleDescriptorThrowsException() throws IOException, DomainNotFoundException {
+  public void getIdenticalDomainsByBundleDescriptorThrowsException()
+      throws IOException, DomainNotFoundException, AmbiguousDomainReferenceException {
     String domainId = "custom-domain";
     String version = "1.1.0";
     String domainName1 = domainId + "-one-" + version + "-mule-domain";
@@ -199,7 +199,7 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
     domainManager.addDomain(domain1);
     domainManager.addDomain(domain2);
 
-    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expect(AmbiguousDomainReferenceException.class);
     domainManager.getCompatibleDomain(domain1.getDescriptor().getBundleDescriptor());
     domainManager.getCompatibleDomain(domain2.getDescriptor().getBundleDescriptor());
   }
@@ -228,7 +228,8 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
   }
 
   @Test
-  public void applicationWorksIfTheDomainHasAHigherMinor() throws IOException, DomainNotFoundException {
+  public void applicationWorksIfTheDomainHasAHigherMinor()
+      throws IOException, DomainNotFoundException, AmbiguousDomainReferenceException {
     // The app references to the old domain
     BundleDescriptor oldBundleDescriptor = createBundleDescriptor("custom-domain", "1.1.0");
 
@@ -241,7 +242,8 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
   }
 
   @Test
-  public void applicationWorksIfTheDomainHasAHigherPatch() throws IOException, DomainNotFoundException {
+  public void applicationWorksIfTheDomainHasAHigherPatch()
+      throws IOException, DomainNotFoundException, AmbiguousDomainReferenceException {
     // The app references to the old domain
     BundleDescriptor oldBundleDescriptor = createBundleDescriptor("custom-domain", "1.1.0");
 
@@ -254,7 +256,8 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
   }
 
   @Test
-  public void applicationDoesNotWorkIfTheDomainHasAHigherMajor() throws IOException, DomainNotFoundException {
+  public void applicationDoesNotWorkIfTheDomainHasAHigherMajor()
+      throws IOException, DomainNotFoundException, AmbiguousDomainReferenceException {
     // The app references to the old domain
     BundleDescriptor oldBundleDescriptor = createBundleDescriptor("custom-domain", "1.1.0");
 
@@ -268,7 +271,8 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
   }
 
   @Test
-  public void applicationDoesNotWorkIfTheDomainHasALowerMajor() throws IOException, DomainNotFoundException {
+  public void applicationDoesNotWorkIfTheDomainHasALowerMajor()
+      throws IOException, DomainNotFoundException, AmbiguousDomainReferenceException {
     // The app references to a domain
     BundleDescriptor bundleDescriptor = createBundleDescriptor("custom-domain", "2.1.0");
 
@@ -282,7 +286,8 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
   }
 
   @Test
-  public void applicationDoesNotWorkIfTheDomainHasALowerMinor() throws IOException, DomainNotFoundException {
+  public void applicationDoesNotWorkIfTheDomainHasALowerMinor()
+      throws IOException, DomainNotFoundException, AmbiguousDomainReferenceException {
     // The app references to a domain
     BundleDescriptor bundleDescriptor = createBundleDescriptor("custom-domain", "1.2.0");
 
@@ -296,7 +301,8 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
   }
 
   @Test
-  public void applicationDoesNotWorkIfTheDomainHasALowerPatch() throws IOException, DomainNotFoundException {
+  public void applicationDoesNotWorkIfTheDomainHasALowerPatch()
+      throws IOException, DomainNotFoundException, AmbiguousDomainReferenceException {
     // The app references to a domain
     BundleDescriptor bundleDescriptor = createBundleDescriptor("custom-domain", "1.1.1");
 
@@ -307,6 +313,6 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
     // Cannot retrieve the domain using the descriptor that we have
     expectedException.expect(DomainNotFoundException.class);
     domainManager.getCompatibleDomain(bundleDescriptor);
-  }
+  }                                                                                                                 
 
 }
