@@ -17,7 +17,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
@@ -93,24 +92,18 @@ final class SchedulerFlowProcessingTemplate implements FlowProcessTemplate {
 
   @Override
   public void sendResponseToClient(CoreEvent response, Map<String, Object> parameters, CompletableCallback<Void> callback) {
-    // TODO
-    // Do nothing.
+    ((BaseEventContext) response.getContext()).success();
   }
 
   @Override
   public void sendFailureResponseToClient(MessagingException exception,
                                           Map<String, Object> parameters,
                                           CompletableCallback<Void> callback) {
-    // TODO
-    // Do nothing.
+    ((BaseEventContext) exception.getEvent().getContext()).error(exception);
   }
 
   @Override
   public void afterPhaseExecution(Either<MessagingException, CoreEvent> either) {
     defaultSchedulerMessageSource.clearIsExecuting();
-    either.apply(
-                 (CheckedConsumer<MessagingException>) messagingException -> ((BaseEventContext) messagingException.getEvent()
-                     .getContext()).error(messagingException),
-                 (CheckedConsumer<CoreEvent>) event -> ((BaseEventContext) event.getContext()).success());
   }
 }
