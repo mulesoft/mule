@@ -59,6 +59,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -410,6 +411,11 @@ public class ApplicationModel implements ArtifactAst {
         }
 
       });
+      if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
+        extensionModelHelper.findMetadataType(componentModel.getType())
+            .flatMap(t -> createMetadataTypeModelAdapter(t))
+            .ifPresent(componentModel::setMetadataTypeModelAdapter);
+      }
 
       componentModel.setComponentType(resolveComponentType(componentModel, extensionModelHelper));
     });
