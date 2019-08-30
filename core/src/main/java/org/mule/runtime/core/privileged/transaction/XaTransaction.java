@@ -49,6 +49,7 @@ import org.slf4j.Logger;
 public class XaTransaction extends AbstractTransaction {
 
   private static final Logger LOGGER = getLogger(XaTransaction.class);
+  private final boolean debugLogEnabled = LOGGER.isDebugEnabled();
 
   /**
    * The inner JTA transaction
@@ -355,7 +356,9 @@ public class XaTransaction extends AbstractTransaction {
   }
 
   protected synchronized void closeResources() {
-    LOGGER.debug("About to close {} resources for XA tx {}...", resources.size(), toString());
+    if (debugLogEnabled) {
+      LOGGER.debug("About to close {} resources for XA tx {}...", resources.size(), toString());
+    }
 
     Iterator i = resources.entrySet().iterator();
     while (i.hasNext()) {
@@ -364,7 +367,9 @@ public class XaTransaction extends AbstractTransaction {
       if (value instanceof MuleXaObject) {
         MuleXaObject xaObject = (MuleXaObject) value;
         if (!xaObject.isReuseObject()) {
-          LOGGER.debug("About to close resource {}...", xaObject);
+          if (debugLogEnabled) {
+            LOGGER.debug("About to close resource {}...", xaObject);
+          }
           try {
             xaObject.close();
             i.remove();
@@ -372,10 +377,14 @@ public class XaTransaction extends AbstractTransaction {
             LOGGER.error("Failed to close resource " + xaObject, e);
           }
         } else {
-          LOGGER.debug("Not closing reusable object {}", xaObject);
+          if (debugLogEnabled) {
+            LOGGER.debug("Not closing reusable object {}", xaObject);
+          }
         }
       } else {
-        LOGGER.debug("Not closing non-MuleXaObject object {}", value);
+        if (debugLogEnabled) {
+          LOGGER.debug("Not closing non-MuleXaObject object {}", value);
+        }
       }
     }
   }

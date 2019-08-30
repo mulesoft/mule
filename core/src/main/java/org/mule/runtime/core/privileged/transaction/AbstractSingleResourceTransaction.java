@@ -130,7 +130,9 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
       throw new IllegalTransactionStateException(transactionSingleResourceOnly());
     }
 
-    LOGGER.debug("Binding {} to {}", resource, key);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Binding {} to {}", resource, key);
+    }
 
     this.key = key;
     this.resource = resource;
