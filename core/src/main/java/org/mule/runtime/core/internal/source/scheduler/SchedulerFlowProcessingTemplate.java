@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.internal.source.scheduler;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.component.execution.CompletableCallback;
@@ -29,6 +31,11 @@ import java.util.Map;
 
 import org.reactivestreams.Publisher;
 
+/**
+ * Custom scheduler's flow processing template.
+ *
+ * @since 4.3.0
+ */
 final class SchedulerFlowProcessingTemplate implements FlowProcessTemplate {
 
   private final Processor messageProcessor;
@@ -47,24 +54,20 @@ final class SchedulerFlowProcessingTemplate implements FlowProcessTemplate {
 
   @Override
   public CheckedFunction<CoreEvent, Map<String, Object>> getSuccessfulExecutionResponseParametersFunction() {
-    return null;
+    return event -> emptyMap();
   }
 
   @Override
   public CheckedFunction<CoreEvent, Map<String, Object>> getFailedExecutionResponseParametersFunction() {
-    return null;
+    return event -> emptyMap();
   }
 
   @Override
   public SourceResultAdapter getSourceMessage() {
-    Result.Builder resultBuilder = Result.builder();
-    resultBuilder
-        .output(message.getPayload().getValue())
-        .mediaType(message.getPayload().getDataType().getMediaType())
-        .attributesMediaType(message.getAttributes().getDataType().getMediaType())
-        .attributes(message.getAttributes());
-    message.getPayload().getByteLength().ifPresent(length -> resultBuilder.length(length));
-    return new SourceResultAdapter(resultBuilder.build(), null, message.getPayload().getDataType().getMediaType(), false,
+    // payloadMediaTypeResolver is not needed since transmitted results is not a collection. Also, the cursorProviderFactory isn't
+    // needed either since no value is being communicated bu the ResultAdapter. This implies that no content is needed to be
+    // streamed.
+    return new SourceResultAdapter(Result.builder().build(), null, ANY, false,
                                    empty(), null);
   }
 
@@ -90,6 +93,7 @@ final class SchedulerFlowProcessingTemplate implements FlowProcessTemplate {
 
   @Override
   public void sendResponseToClient(CoreEvent response, Map<String, Object> parameters, CompletableCallback<Void> callback) {
+    // TODO
     // Do nothing.
   }
 
@@ -97,6 +101,7 @@ final class SchedulerFlowProcessingTemplate implements FlowProcessTemplate {
   public void sendFailureResponseToClient(MessagingException exception,
                                           Map<String, Object> parameters,
                                           CompletableCallback<Void> callback) {
+    // TODO
     // Do nothing.
   }
 
