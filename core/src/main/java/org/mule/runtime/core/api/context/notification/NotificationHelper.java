@@ -10,6 +10,7 @@ import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createI
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -68,11 +69,25 @@ public final class NotificationHelper {
     try {
       if (defaultNotificationHandler.isNotificationEnabled(notificationClass)) {
         defaultNotificationHandler
-            .fireNotification(new ConnectorMessageNotification(createInfo(event, null, source), location, action));
+            .fireNotification(createConnectorMessageNotification(source, event, location, action));
       }
     } catch (Exception e) {
       logger.warn("Could not fire notification. Action: " + action, e);
     }
+  }
+
+    /**
+     * Creates {@link ConnectorMessageNotification} to be fired.
+     *
+     * @param source
+     * @param event {@link CoreEvent}
+     * @param location the location of the component that generated the notification
+     * @param action the action code for the notification
+     * @return
+     */
+  public static ConnectorMessageNotification createConnectorMessageNotification(Component source, Event event,
+                                                                         ComponentLocation location, int action) {
+    return new ConnectorMessageNotification(createInfo(event, null, source), location, action);
   }
 
   /**
