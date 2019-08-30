@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal;
 
 import static com.google.common.collect.ImmutableList.copyOf;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toCollection;
@@ -65,6 +66,7 @@ import org.mule.runtime.dsl.api.component.TypeDefinitionVisitor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -72,9 +74,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
+import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -100,6 +104,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private Optional<ComponentModelInitializer> parentComponentModelInitializer;
 
   private ConfigurationDependencyResolver dependencyResolver;
+  private Set<String> applicationComponentNamesCreated = new HashSet<>();
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -317,13 +322,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                         Optional<ComponentModelInitializerAdapter> parentComponentModelInitializerAdapter) {
     checkState(predicateOptional.isPresent() != locationOptional.isPresent(), "predicate or location has to be passed");
     return withContextClassLoader(muleContext.getExecutionClassLoader(), () -> {
-      // First unregister any already initialized/started component
-      unregisterBeans(beansCreated);
-      // Clean up resources...
-      beansCreated.clear();
-      objectProviders.clear();
-      resetMuleSecurityManager();
-
       applicationModel.executeOnEveryMuleComponentTree(componentModel -> componentModel.setEnabled(false));
 
       MinimalApplicationModelGenerator minimalApplicationModelGenerator =
@@ -357,8 +355,29 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         });
       }
 
+      Set<String> applicationComponentNames = new HashSet<>();
+      minimalApplicationModel.get().executeOnEveryMuleComponentTree(componentModel -> {
+        if (componentModel.isEnabled() && componentModel.getNameAttribute() != null) {
+          applicationComponentNames.add(componentModel.getNameAttribute());
+        }
+      });
+
+      if (ImmutableSet.copyOf(applicationComponentNamesCreated).equals(ImmutableSet.copyOf(applicationComponentNames))) {
+        // Same minimalApplication has been requested, so we don't need to recreate the same beans.
+        return emptyList();
+      }
+      // First unregister any already initialized/started component
+      unregisterBeans(beansCreated);
+      // Clean up resources...
+      applicationComponentNamesCreated.clear();
+      beansCreated.clear();
+      objectProviders.clear();
+      resetMuleSecurityManager();
+
+      // Creates and registers beanDefinitions
       List<String> applicationComponents =
           createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel.get(), false);
+      applicationComponentNamesCreated.addAll(applicationComponentNames);
 
       super.prepareObjectProviders();
 
