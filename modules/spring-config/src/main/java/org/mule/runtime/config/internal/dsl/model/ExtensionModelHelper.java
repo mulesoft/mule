@@ -16,6 +16,8 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
+import static org.mule.runtime.api.util.NameUtils.COMPONENT_NAME_SEPARATOR;
+import static org.mule.runtime.api.util.NameUtils.toCamelCase;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;
@@ -39,6 +41,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
+import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
@@ -75,6 +78,8 @@ public class ExtensionModelHelper {
       Caffeine.newBuilder().build();
   private final Cache<ComponentIdentifier, Optional<? extends ConfigurationModel>> extensionConfigurationModelByComponentIdentifier =
       Caffeine.newBuilder().build();
+  private final Cache<ComponentIdentifier, Optional<NestableElementModel>> extensionNestableElementModelByComponentIdentifier =
+      Caffeine.newBuilder().build();
   private final LoadingCache<ExtensionModel, DslSyntaxResolver> dslSyntaxResolversByExtension;
 
   private final JavaTypeLoader javaTypeLoader = new JavaTypeLoader(ExtensionModelHelper.class.getClassLoader(),
@@ -100,7 +105,16 @@ public class ExtensionModelHelper {
   public ComponentType findComponentType(ComponentIdentifier componentIdentifier) {
     return findComponentModel(componentIdentifier)
         .map(extensionComponentModel -> findComponentType(extensionComponentModel))
-        .orElse(UNKNOWN);
+        .orElseGet(() -> {
+          // If there was no ComponentModel found, search for nestable elements, we might be talking about a ROUTE and we need to
+          // return it's ComponentType as well
+          Optional<? extends NestableElementModel> nestableElementModelOptional = findNestableElementModel(componentIdentifier);
+          return nestableElementModelOptional.map(nestableElementModel -> {
+            Reference<ComponentType> componentTypeReference = new Reference<>();
+            nestableElementModel.accept(new IsRouteVisitor(componentTypeReference));
+            return componentTypeReference.get() == null ? UNKNOWN : componentTypeReference.get();
+          }).orElse(UNKNOWN);
+        });
   }
 
   public ComponentType findComponentType(org.mule.runtime.api.meta.model.ComponentModel extensionComponentModel) {
@@ -137,6 +151,39 @@ public class ExtensionModelHelper {
       }
     });
     return componentTypeReference.get() == null ? UNKNOWN : componentTypeReference.get();
+  }
+
+  private Optional<NestableElementModel> findNestableElementModel(ComponentIdentifier componentId) {
+    return extensionNestableElementModelByComponentIdentifier.get(componentId, componentIdentifier -> {
+
+      return lookupExtensionModelFor(componentIdentifier).flatMap(extensionModel -> {
+        String componentName = toCamelCase(componentIdentifier.getName(), COMPONENT_NAME_SEPARATOR);
+        Optional<NestableElementModel> elementModelOptional = searchNestableElementModel(extensionModel, componentName);
+        if (elementModelOptional.isPresent()) {
+          return elementModelOptional;
+        }
+        return searchNestableElementModel(extensionModel, componentIdentifier.getName());
+      });
+    });
+  }
+
+  private Optional<NestableElementModel> searchNestableElementModel(ExtensionModel extensionModel, String componentName) {
+    Reference<NestableElementModel> reference = new Reference<>();
+    IdempotentExtensionWalker walker = new IdempotentExtensionWalker() {
+
+      @Override
+      protected void onConstruct(ConstructModel model) {
+        model.getNestedComponents().stream()
+            .filter(nestedComponent -> nestedComponent.getName().equals(componentName))
+            .findFirst()
+            .ifPresent((foundComponent) -> {
+              reference.set(foundComponent);
+              stop();
+            });
+      }
+    };
+    walker.walk(extensionModel);
+    return ofNullable(reference.get());
   }
 
   /**
