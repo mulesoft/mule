@@ -66,7 +66,7 @@ public class MuleMessageProcessingManagerTestCase extends AbstractMuleContextTes
 
   @Test
   public void processesWithClassLoader() throws Exception {
-    ClassLoader classLoader = new URLClassLoader(new URL[]{}, currentThread().getContextClassLoader());
+    ClassLoader classLoader = new URLClassLoader(new URL[] {}, currentThread().getContextClassLoader());
     when(messageProcessContext.getExecutionClassLoader()).thenReturn(classLoader);
     doAnswer(inv -> {
       assertThat(currentThread().getContextClassLoader(), is(sameInstance(classLoader)));
