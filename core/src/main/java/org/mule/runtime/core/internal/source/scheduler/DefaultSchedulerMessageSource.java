@@ -172,9 +172,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     try {
       setCurrentEvent(InternalEvent.builder(EventContextFactory.create(flowConstruct, getLocation())).message(Message.of(null))
           .build());
-      messageProcessingManager
-          .processMessage(flowProcessingTemplate,
-                          flowProcessContext);
+      messageProcessingManager.processMessage(flowProcessingTemplate, flowProcessContext);
     } catch (Exception e) {
       muleContext.getExceptionListener().handleException(e);
     }
