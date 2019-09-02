@@ -10,6 +10,16 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 
 import reactor.core.publisher.MonoSink;
 
+/**
+ * {@link ExecutorCallback} implementation which propagates the completion signals to a {@link MonoSink} which will be provided
+ * asynchronously through the {@link #setSink(MonoSink)} method.
+ * <p>
+ * If the completion signals arrive before {@link #setSink(MonoSink)} is invoked, then the result is stored an applied immediately
+ * after obtaining the sink.
+ *
+ * @param <T> the generic type of the completion value
+ * @since 4.3.0
+ */
 public class DeferredMonoSinkExecutorCallback<T> implements ExecutorCallback {
 
   private MonoSink sink;
