@@ -10,19 +10,20 @@ import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.TOP_LEVEL;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.config.api.LazyComponentInitializer;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Generates the minimal required component set to create a configuration component (i.e.: file:config, ftp:connection, a flow
@@ -62,16 +63,13 @@ public class MinimalApplicationModelGenerator {
   }
 
   /**
-   * Resolves the minimal set of {@link ComponentModel componentModels} for the components that pass the
-   * {@link LazyComponentInitializer.ComponentLocationFilter}.
+   * Resolves the minimal set of {@link ComponentModel componentModels} for the components requested.
    *
-   * @param predicate to select the {@link ComponentModel componentModels} to be enabled.
+   * @param componentModels list of {@link ComponentModel componentModels} to be enabled.
    * @return the generated {@link ApplicationModel} with the minimal set of {@link ComponentModel}s required.
    */
-  public ApplicationModel getMinimalModel(Predicate<ComponentModel> predicate) {
-    List<ComponentModel> required = dependencyResolver.findRequiredComponentModels(predicate);
-
-    required.stream().forEach(componentModel -> {
+  public ApplicationModel getMinimalModel(List<ComponentModel> componentModels) {
+    componentModels.stream().forEach(componentModel -> {
       final DefaultComponentLocation componentLocation = componentModel.getComponentLocation();
       if (componentLocation != null) {
         enableComponentDependencies(componentModel);
@@ -81,16 +79,17 @@ public class MinimalApplicationModelGenerator {
   }
 
   /**
-   * Resolves the minimal set of {@link ComponentModel componentModels} for the component.
+   * Resolves list of {@link ComponentModel componentModels} for {@link LazyComponentInitializer.ComponentLocationFilter} given.
    *
-   * @param location {@link Location} for the requested component to be enabled.
-   * @return the generated {@link ApplicationModel} with the minimal set of {@link ComponentModel}s required.
-   * @throws NoSuchComponentModelException if the location doesn't match to a component.
+   * @param predicate to select the {@link ComponentModel componentModels} to be enabled.
+   * @return the filtered {@link ComponentModel} with the minimal set of {@link ComponentModel}s required.
    */
-  public ApplicationModel getMinimalModel(Location location) {
-    ComponentModel requestedComponentModel = dependencyResolver.findRequiredComponentModel(location);
-    enableComponentDependencies(requestedComponentModel);
-    return dependencyResolver.getApplicationModel();
+  public List<ComponentModel> getComponentModels(Predicate<ComponentModel> predicate) {
+    return dependencyResolver.findRequiredComponentModels(predicate);
+  }
+
+  public ComponentModel findComponentModel(Location location) {
+    return dependencyResolver.findRequiredComponentModel(location);
   }
 
   /**
