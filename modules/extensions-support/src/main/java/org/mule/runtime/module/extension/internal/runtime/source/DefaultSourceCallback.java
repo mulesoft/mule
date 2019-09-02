@@ -49,6 +49,8 @@ import java.util.function.Supplier;
 
 import javax.transaction.TransactionManager;
 
+import javax.transaction.TransactionManager;
+
 /**
  * Default implementation of {@link SourceCallback}. Instances are to be created through the {@link #builder()} method.
  *

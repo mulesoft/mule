@@ -7,19 +7,21 @@
 package org.mule.runtime.core.internal.processor;
 
 import static java.util.Optional.empty;
+
+import java.util.Optional;
+
+import javax.transaction.TransactionManager;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.privileged.transaction.AbstractTransaction;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
-
-import java.util.Optional;
-
-import javax.transaction.TransactionManager;
 
 /**
  * Transaction placeholder to replace with proper transaction once transactional resource is discovered by mule
@@ -28,8 +30,19 @@ public class DelegateTransaction extends AbstractTransaction {
 
   private Transaction delegate = new NullTransaction(timeout);
 
-  private SingleResourceTransactionFactoryManager transactionFactoryManager;
+
   private TransactionManager transactionManager;
+
+
+  private SingleResourceTransactionFactoryManager transactionFactoryManager;
+
+  /**
+   * @deprecated since 4.3.0. Use {@link #DelegateTransaction(String, NotificationDispatcher, SingleResourceTransactionFactoryManager, TransactionManager, int)} instead
+   */
+  @Deprecated
+  public DelegateTransaction(MuleContext muleContext) {
+    super(muleContext);
+  }
 
   public DelegateTransaction(String applicationName, NotificationDispatcher notificationFirer,
                              SingleResourceTransactionFactoryManager transactionFactoryManager,

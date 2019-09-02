@@ -20,6 +20,10 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+<<<<<<< HEAD
+=======
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+>>>>>>> 466e32f763e... MULE-17078: Remove dependency of transactions infrastructure on the MuleContext (#8136)
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;

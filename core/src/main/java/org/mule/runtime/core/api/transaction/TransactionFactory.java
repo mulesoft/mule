@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.api.transaction;
 
+import javax.transaction.TransactionManager;
+
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
-
-import javax.transaction.TransactionManager;
 
 /**
  * <code>TransactionFactory</code> creates a transaction.
@@ -20,14 +20,15 @@ import javax.transaction.TransactionManager;
 public interface TransactionFactory {
 
   /**
-   * Create and begins a new transaction.
-   * If you use this method please set the timeout in the next step.
+   * Create and begins a new transaction. If you use this method please set the timeout in the next step.
    * 
    * @return a new Transaction
    * @throws TransactionException if the transaction cannot be created or begun
    * @param muleContext
    *
-   * @deprecated since 4.2.3. Use {@link #beginTransaction(String, NotificationDispatcher, SingleResourceTransactionFactoryManager, TransactionManager, int)} instead
+   * @deprecated since 4.3.0. Use
+   *             {@link #beginTransaction(String, NotificationDispatcher, SingleResourceTransactionFactoryManager, TransactionManager, int)}
+   *             instead
    */
   @Deprecated
   Transaction beginTransaction(MuleContext muleContext) throws TransactionException;
