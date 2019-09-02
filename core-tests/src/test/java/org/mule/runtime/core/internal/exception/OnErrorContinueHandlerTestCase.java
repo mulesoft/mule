@@ -121,7 +121,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
   }
 
   @Test
-  public void testHandleExceptionWithMessageProcessorsChangingEvent() throws Exception {
+  public void handleExceptionWithMessageProcessorsChangingEvent() throws Exception {
     CoreEvent lastEventCreated = InternalEvent.builder(context).message(of("")).build();
     onErrorContinueHandler
         .setMessageProcessors(asList(createChagingEventMessageProcessor(InternalEvent.builder(context).message(of(""))
