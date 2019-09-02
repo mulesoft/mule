@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import static org.mule.runtime.core.api.context.notification.NotificationUtils.createConnectorMessageNotification;
+import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.notification.ConnectorMessageNotification;
@@ -67,7 +68,7 @@ public final class NotificationHelper {
     try {
       if (defaultNotificationHandler.isNotificationEnabled(notificationClass)) {
         defaultNotificationHandler
-            .fireNotification(createConnectorMessageNotification(source, event, location, action));
+            .fireNotification(new ConnectorMessageNotification(createInfo(event, null, source), location, action));
       }
     } catch (Exception e) {
       logger.warn("Could not fire notification. Action: " + action, e);

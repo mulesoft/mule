@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.source.scheduler;
 
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
@@ -35,9 +36,9 @@ import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
-import java.util.LinkedList;
 import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 
@@ -76,7 +77,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   private boolean started;
   private volatile boolean executing = false;
   private FlowProcessTemplate flowProcessingTemplate;
-  private DefaultSchedulerMessageSource.SchedulerProcessContext flowProcessContext;
+  private SchedulerProcessContext flowProcessContext;
 
   /**
    * @param muleContext application's context
@@ -169,9 +170,8 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
   private void doPoll() {
     try {
-      InternalEvent internalEvent =
-          InternalEvent.builder(EventContextFactory.create(flowConstruct, getLocation())).message(Message.of(null)).build();
-      setCurrentEvent(internalEvent);
+      setCurrentEvent(InternalEvent.builder(EventContextFactory.create(flowConstruct, getLocation())).message(Message.of(null))
+          .build());
       messageProcessingManager
           .processMessage(flowProcessingTemplate,
                           flowProcessContext);
@@ -181,7 +181,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   }
 
   protected void setIsExecuting(boolean value) {
-    synchronized (DefaultSchedulerMessageSource.this) {
+    synchronized (this) {
       executing = value;
     }
   }
@@ -202,7 +202,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     this.flowConstruct = getFromAnnotatedObjectOrFail(muleContext.getConfigurationComponentLocator(), this);
 
     // Flow execution configurations
-    this.flowProcessingTemplate = new SchedulerFlowProcessingTemplate(listener, new LinkedList<>(), this);
+    this.flowProcessingTemplate = new SchedulerFlowProcessingTemplate(listener, emptyList(), this);
     this.flowProcessContext = new SchedulerProcessContext();
 
     createScheduler();
@@ -259,7 +259,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
     @Override
     public ErrorTypeLocator getErrorTypeLocator() {
-      return ErrorTypeLocator.builder(muleContext.getErrorTypeRepository()).build();
+      return ((PrivilegedMuleContext) muleContext).getErrorTypeLocator();
     }
 
     @Override
