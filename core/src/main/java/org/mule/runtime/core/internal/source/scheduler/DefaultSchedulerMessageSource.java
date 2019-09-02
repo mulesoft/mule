@@ -7,9 +7,7 @@
 package org.mule.runtime.core.internal.source.scheduler;
 
 import static java.util.Optional.empty;
-import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
-import static org.mule.runtime.core.api.context.notification.NotificationHelper.createConnectorMessageNotification;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObjectOrFail;
@@ -21,23 +19,25 @@ import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.source.SchedulerConfiguration;
 import org.mule.runtime.api.source.SchedulerMessageSource;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.event.EventContextFactory;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.scheduler.PeriodicScheduler;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
-import org.mule.runtime.core.internal.execution.NotificationFunction;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 
@@ -75,7 +75,8 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
   private boolean started;
   private volatile boolean executing = false;
-  private final List<NotificationFunction> notificationFunctions;
+  private FlowProcessTemplate flowProcessingTemplate;
+  private DefaultSchedulerMessageSource.SchedulerProcessContext flowProcessContext;
 
   /**
    * @param muleContext application's context
@@ -86,11 +87,6 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     this.muleContext = muleContext;
     this.scheduler = scheduler;
     this.disallowConcurrentExecution = disallowConcurrentExecution;
-
-    notificationFunctions = new LinkedList<>();
-    // Add message received notification
-    notificationFunctions
-        .add((event, component) -> createConnectorMessageNotification(this, event, component.getLocation(), MESSAGE_RECEIVED));
   }
 
   @Override
@@ -173,17 +169,20 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
   private void doPoll() {
     try {
+      InternalEvent internalEvent =
+          InternalEvent.builder(EventContextFactory.create(flowConstruct, getLocation())).message(Message.of(null)).build();
+      setCurrentEvent(internalEvent);
       messageProcessingManager
-          .processMessage(new SchedulerFlowProcessingTemplate(listener, notificationFunctions, this),
-                          new SchedulerProcessContext());
+          .processMessage(flowProcessingTemplate,
+                          flowProcessContext);
     } catch (Exception e) {
       muleContext.getExceptionListener().handleException(e);
     }
   }
 
-  protected void clearIsExecuting() {
+  protected void setIsExecuting(boolean value) {
     synchronized (DefaultSchedulerMessageSource.this) {
-      executing = false;
+      executing = value;
     }
   }
 
@@ -201,6 +200,11 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   @Override
   public void initialise() throws InitialisationException {
     this.flowConstruct = getFromAnnotatedObjectOrFail(muleContext.getConfigurationComponentLocator(), this);
+
+    // Flow execution configurations
+    this.flowProcessingTemplate = new SchedulerFlowProcessingTemplate(listener, new LinkedList<>(), this);
+    this.flowProcessContext = new SchedulerProcessContext();
+
     createScheduler();
   }
 
