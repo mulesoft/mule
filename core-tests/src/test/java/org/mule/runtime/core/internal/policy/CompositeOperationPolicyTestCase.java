@@ -103,13 +103,13 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     }).when(operationExecutionFunction).execute(any(), any(), any());
 
     when(operationPolicyProcessorFactory.createOperationPolicy(same(firstPolicy), any())).thenAnswer(
-                                                                                                     policyFactoryInvocation -> firstPolicyProcessor(policyFactoryInvocation,
-                                                                                                                                                     e -> e,
-                                                                                                                                                     e -> e));
+        policyFactoryInvocation -> firstPolicyProcessor(policyFactoryInvocation,
+                                                        e -> e,
+                                                        e -> e));
     when(operationPolicyProcessorFactory.createOperationPolicy(same(secondPolicy), any())).thenAnswer(
-                                                                                                      policyFactoryInvocation -> secondPolicyProcessor(policyFactoryInvocation,
-                                                                                                                                                       e -> e,
-                                                                                                                                                       e -> e));
+        policyFactoryInvocation -> secondPolicyProcessor(policyFactoryInvocation,
+                                                         e -> e,
+                                                         e -> e));
   }
 
   protected ReactiveProcessor processor() {
@@ -124,7 +124,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
   }
 
   @Test
-  public void singlePolicy() {
+  public void singlePolicy() throws Throwable {
     compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy),
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory);
@@ -140,7 +140,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
   }
 
   @Test
-  public void compositePolicy() {
+  public void compositePolicy() throws Throwable {
     compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory);
@@ -227,7 +227,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
   }
 
   @Test
-  public void reactorPipelinesReused() {
+  public void reactorPipelinesReused() throws Throwable {
     InvocationsRecordingCompositeOperationPolicy.reset();
     final InvocationsRecordingCompositeOperationPolicy operationPolicy =
         new InvocationsRecordingCompositeOperationPolicy(asList(firstPolicy),
@@ -247,7 +247,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
   }
 
   @Test
-  public void processAfterPolicyDispose() throws MuleException {
+  public void processAfterPolicyDispose() throws Throwable {
     expectedException.expect(MessagingException.class);
 
     compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
@@ -301,24 +301,18 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     }
   }
 
-  private CoreEvent block(Consumer<ExecutorCallback> consumer) {
-    try {
-      return SourcePolicyTestUtils.block(callback -> consumer.accept(new ExecutorCallback() {
+  private CoreEvent block(Consumer<ExecutorCallback> consumer) throws Throwable {
+    return SourcePolicyTestUtils.block(callback -> consumer.accept(new ExecutorCallback() {
 
-        @Override
-        public void complete(Object value) {
-          callback.complete((CoreEvent) value);
-        }
+      @Override
+      public void complete(Object value) {
+        callback.complete((CoreEvent) value);
+      }
 
-        @Override
-        public void error(Throwable e) {
-          callback.error(e);
-        }
-      }));
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (Throwable t) {
-      throw new RuntimeException(t);
-    }
+      @Override
+      public void error(Throwable e) {
+        callback.error(e);
+      }
+    }));
   }
 }
