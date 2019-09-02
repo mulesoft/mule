@@ -81,11 +81,11 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
   protected ProcessingStrategy createProcessingStrategy(MuleContext muleContext, String schedulersNamePrefix,
                                                         int maxConcurrency) {
     return new TransactionAwareProactorStreamEmitterProcessingStrategy(XS_BUFFER_SIZE,
-            2,
-            () -> cpuLight,
-            () -> blocking,
-            () -> cpuIntensive,
-            maxConcurrency, true, muleContext.getSchedulerService());
+                                                                       2,
+                                                                       () -> cpuLight,
+                                                                       () -> blocking,
+                                                                       () -> cpuIntensive,
+                                                                       maxConcurrency, true, muleContext.getSchedulerService());
   }
 
   @Override
