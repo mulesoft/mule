@@ -44,6 +44,7 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
+import reactor.core.publisher.Mono;
 
 /**
  * {@link OperationPolicy} created from a list of {@link Policy}.
@@ -65,8 +66,6 @@ public class CompositeOperationPolicy
   private final OperationPolicyProcessorFactory operationPolicyProcessorFactory;
 
   private final LoadingCache<String, FluxSinkSupplier<CoreEvent>> policySinks;
-  private final Flux<CoreEvent> responseFlux;
-  private final FluxSinkRecorder<CoreEvent> responseSink = new FluxSinkRecorder<>();
 
   private final AtomicBoolean disposed;
   private final FunctionalReadWriteLock readWriteLock;
@@ -80,23 +79,17 @@ public class CompositeOperationPolicy
    * won't be able to change the response parameters of the source and the original response parameters generated from the source
    * will be used.
    *
-   * @param parameterizedPolicies                list of {@link Policy} to chain together.
+   * @param parameterizedPolicies list of {@link Policy} to chain together.
    * @param operationPolicyParametersTransformer transformer from the operation parameters to a message and vice versa.
-   * @param operationPolicyProcessorFactory      factory for creating each {@link OperationPolicy} from a {@link Policy}
+   * @param operationPolicyProcessorFactory factory for creating each {@link OperationPolicy} from a {@link Policy}
    */
   public CompositeOperationPolicy(List<Policy> parameterizedPolicies,
                                   Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
                                   OperationPolicyProcessorFactory operationPolicyProcessorFactory) {
     super(parameterizedPolicies, operationPolicyParametersTransformer);
-    int roundRobinSize = getRuntime().availableProcessors();
-
     this.operationPolicyProcessorFactory = operationPolicyProcessorFactory;
     this.disposed = new AtomicBoolean(false);
     this.readWriteLock = readWriteLock();
-
-    responseFlux = Flux.create(responseSink)
-        .map(response -> quickCopy(response, singletonMap(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)));
-
     this.policySinks = newBuilder()
         .removalListener((String key, FluxSinkSupplier<CoreEvent> value, RemovalCause cause) -> {
           value.dispose();
@@ -104,10 +97,9 @@ public class CompositeOperationPolicy
         .build(componentLocation -> {
           Supplier<FluxSink<CoreEvent>> factory = new OperationWithPoliciesFluxObjectFactory();
           return new TransactionAwareFluxSinkSupplier<>(factory,
-                                                        new RoundRobinFluxSinkSupplier<>(roundRobinSize,
+                                                        new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(),
                                                                                          factory));
         });
-
   }
 
   private final class OperationWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
@@ -153,7 +145,7 @@ public class CompositeOperationPolicy
   @Override
   protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy lastPolicy) {
     return Flux.from(eventPub)
-        .doOnNext(event -> {
+        .flatMap(event -> {
           OperationParametersProcessor parametersProcessor =
               ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_PARAMETERS_PROCESSOR);
           Map<String, Object> parametersMap = new HashMap<>(parametersProcessor.getOperationParameters());
@@ -164,9 +156,13 @@ public class CompositeOperationPolicy
 
           OperationExecutionFunction operationExecutionFunction =
               ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_OPERATION_EXEC_FUNCTION);
-          operationExecutionFunction.execute(parametersMap, event, new FluxSinkRecorderExecutorCallback(responseSink));
+
+          DeferredMonoSinkExecutorCallback<CoreEvent> callback = new DeferredMonoSinkExecutorCallback();
+          operationExecutionFunction.execute(parametersMap, event, callback);
+
+          return Mono.<CoreEvent>create(callback::setSink);
         })
-        .transform(p -> responseFlux);
+        .map(response -> quickCopy(response, singletonMap(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)));
   }
 
   /**
@@ -229,7 +225,6 @@ public class CompositeOperationPolicy
   public void dispose() {
     readWriteLock.withWriteLock(() -> {
       policySinks.invalidateAll();
-      responseSink.complete();
       disposed.set(true);
     });
   }

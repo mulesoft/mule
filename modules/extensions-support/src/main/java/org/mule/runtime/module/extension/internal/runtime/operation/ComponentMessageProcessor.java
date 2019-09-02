@@ -197,7 +197,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
             return create(callback::setSink);
           });
     } else {
-      return flux.handle((event, sink) -> onEvent(event, new SynchronousSinkExecutorCallback(sink)));
+      return flux.handle((event, sink) -> {
+        try {
+          onEvent(event, new SynchronousSinkExecutorCallback(sink));
+        } catch (Throwable t) {
+          sink.error(t);
+        }
+      });
     }
   }
 
