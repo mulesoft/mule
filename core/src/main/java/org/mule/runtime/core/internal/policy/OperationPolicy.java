@@ -10,8 +10,6 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
-import reactor.core.publisher.MonoSink;
-
 public interface OperationPolicy {
 
   /**
@@ -22,7 +20,7 @@ public interface OperationPolicy {
    * @param operationExecutionFunction the function that executes the operation.
    * @param parametersProcessor        the {@link OperationParametersProcessor} to apply
    * @param componentLocation          the location of the component on which the policy has been applied on
-   * @param sink                       the {@link MonoSink} on which the result of processing the {@code event} through the
+   * @param callback                   the {@link ExecutorCallback} on which the result of processing the {@code event} through the
    *                                   policy chain will be notified on
    */
   void process(CoreEvent operationEvent,
