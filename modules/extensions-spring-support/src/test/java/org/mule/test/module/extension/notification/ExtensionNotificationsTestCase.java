@@ -243,23 +243,30 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
     }
 
     @Override
-    public synchronized void onNotification(ExtensionNotification notification) {
-      notifications.put(notification.getAction().getIdentifier(), notification);
+    public void onNotification(ExtensionNotification notification) {
+      synchronized (notifications) {
+        notifications.put(notification.getAction().getIdentifier(), notification);
+      }
+
       if (correlationCount != null) {
-        String correlationId = notification.getEvent().getCorrelationId();
-        correlationCount.put(correlationId, correlationCount.computeIfAbsent(correlationId, correlation -> 0) + 1);
+        synchronized (correlationCount) {
+          String correlationId = notification.getEvent().getCorrelationId();
+          correlationCount.put(correlationId, correlationCount.computeIfAbsent(correlationId, correlation -> 0) + 1);
+        }
       }
       onNotification.accept(notification);
     }
 
     public MultiMap<String, ExtensionNotification> getNotifications() {
-      return notifications;
+      synchronized (notifications) {
+        return new MultiMap<>(notifications);
+      }
     }
 
     public synchronized Integer getCorrelationCount(String correlationId) {
-      return correlationCount.get(correlationId);
+      synchronized (correlationCount) {
+        return correlationCount.get(correlationId);
+      }
     }
-
   }
-
 }
