@@ -6,11 +6,8 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
-import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Stream.of;
-import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ERROR_HANDLER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
@@ -21,13 +18,13 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.util.NameUtils.COMPONENT_NAME_SEPARATOR;
 import static org.mule.runtime.api.util.NameUtils.toCamelCase;
-import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.ORIGINAL_IDENTIFIER;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -45,25 +42,21 @@ import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.api.util.NameUtils;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeHandlerManagerFactory;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.ImmutableList;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
 /**
  * Helper class to work with a set of {@link ExtensionModel}s
@@ -75,19 +68,19 @@ import com.google.common.collect.ImmutableList;
  * <p>
  * since 4.0
  */
-// TODO MULE-15143 Support a lightweight implementation of DslElementModelFactory to only identify the model from
-// ComponentIdentifier
 public class ExtensionModelHelper {
 
   private final Set<ExtensionModel> extensionsModels;
+  private final DslResolvingContext dslResolvingCtx;
   private final Cache<ComponentIdentifier, Optional<? extends org.mule.runtime.api.meta.model.ComponentModel>> extensionComponentModelByComponentIdentifier =
-      CacheBuilder.newBuilder().build();
+      Caffeine.newBuilder().build();
   private final Cache<ComponentIdentifier, Optional<? extends ConnectionProviderModel>> extensionConnectionProviderModelByComponentIdentifier =
-      CacheBuilder.newBuilder().build();
+      Caffeine.newBuilder().build();
   private final Cache<ComponentIdentifier, Optional<? extends ConfigurationModel>> extensionConfigurationModelByComponentIdentifier =
-      CacheBuilder.newBuilder().build();
+      Caffeine.newBuilder().build();
   private final Cache<ComponentIdentifier, Optional<NestableElementModel>> extensionNestableElementModelByComponentIdentifier =
-      CacheBuilder.newBuilder().build();
+      Caffeine.newBuilder().build();
+  private final LoadingCache<ExtensionModel, DslSyntaxResolver> dslSyntaxResolversByExtension;
 
   private final JavaTypeLoader javaTypeLoader = new JavaTypeLoader(ExtensionModelHelper.class.getClassLoader(),
                                                                    new ExtensionsTypeHandlerManagerFactory());
@@ -98,189 +91,80 @@ public class ExtensionModelHelper {
    */
   public ExtensionModelHelper(Set<ExtensionModel> extensionModels) {
     this.extensionsModels = extensionModels;
+    this.dslResolvingCtx = DslResolvingContext.getDefault(extensionsModels);
+    this.dslSyntaxResolversByExtension =
+        Caffeine.newBuilder().build(key -> DslSyntaxResolver.getDefault(key, dslResolvingCtx));
   }
 
   /**
    * Find a {@link DslElementModel} for a given {@link ComponentModel}
    *
-   * @param componentModel the component model from the configuration.
+   * @param componentIdentifier the identifier to use for the search.
    * @return the {@link DslElementModel} associated with the configuration or an {@link Optional#empty()} if there isn't one.
    */
-  public TypedComponentIdentifier.ComponentType findComponentType(ComponentModel componentModel) {
-    ComponentIdentifier componentId = componentModel.getMetadata().getParserAttributes().containsKey(ORIGINAL_IDENTIFIER)
-        ? (ComponentIdentifier) componentModel.getMetadata().getParserAttributes().get(ORIGINAL_IDENTIFIER)
-        : componentModel.getIdentifier();
-    Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> extensionComponentModelOptional =
-        findComponentModel(componentId);
+  public ComponentType findComponentType(ComponentIdentifier componentIdentifier) {
+    return findComponentModel(componentIdentifier)
+        .map(extensionComponentModel -> findComponentType(extensionComponentModel))
+        .orElseGet(() -> {
+          // If there was no ComponentModel found, search for nestable elements, we might be talking about a ROUTE and we need to
+          // return it's ComponentType as well
+          Optional<? extends NestableElementModel> nestableElementModelOptional = findNestableElementModel(componentIdentifier);
+          return nestableElementModelOptional.map(nestableElementModel -> {
+            Reference<ComponentType> componentTypeReference = new Reference<>();
+            nestableElementModel.accept(new IsRouteVisitor(componentTypeReference));
+            return componentTypeReference.get() == null ? UNKNOWN : componentTypeReference.get();
+          }).orElse(UNKNOWN);
+        });
+  }
 
-    return extensionComponentModelOptional.map(extensionComponentModel -> {
-      Reference<TypedComponentIdentifier.ComponentType> componentTypeReference = new Reference<>();
-      extensionComponentModel.accept(new ComponentModelVisitor() {
+  public ComponentType findComponentType(org.mule.runtime.api.meta.model.ComponentModel extensionComponentModel) {
+    Reference<TypedComponentIdentifier.ComponentType> componentTypeReference = new Reference<>();
+    extensionComponentModel.accept(new ComponentModelVisitor() {
 
-        @Override
-        public void visit(OperationModel model) {
-          componentTypeReference.set(OPERATION);
+      @Override
+      public void visit(OperationModel model) {
+        componentTypeReference.set(OPERATION);
+      }
+
+      @Override
+      public void visit(SourceModel model) {
+        componentTypeReference.set(SOURCE);
+      }
+
+      @Override
+      public void visit(ConstructModel model) {
+        if (model.getStereotype().equals(MuleStereotypes.ERROR_HANDLER)) {
+          componentTypeReference.set(ERROR_HANDLER);
+          return;
         }
-
-        @Override
-        public void visit(SourceModel model) {
-          componentTypeReference.set(SOURCE);
+        if (model.getStereotype().equals(MuleStereotypes.FLOW)) {
+          componentTypeReference.set(FLOW);
+          return;
         }
-
-        @Override
-        public void visit(ConstructModel model) {
-          if (model.getStereotype().equals(MuleStereotypes.ERROR_HANDLER)) {
-            componentTypeReference.set(ERROR_HANDLER);
+        NestedComponentVisitor nestedComponentVisitor = new NestedComponentVisitor(componentTypeReference);
+        for (NestableElementModel nestableElementModel : model.getNestedComponents()) {
+          nestableElementModel.accept(nestedComponentVisitor);
+          if (componentTypeReference.get() != null) {
             return;
           }
-          if (model.getStereotype().equals(MuleStereotypes.FLOW)) {
-            componentTypeReference.set(FLOW);
-            return;
-          }
-          NestedComponentVisitor nestedComponentVisitor = new NestedComponentVisitor(componentTypeReference);
-          for (NestableElementModel nestableElementModel : model.getNestedComponents()) {
-            nestableElementModel.accept(nestedComponentVisitor);
-            if (componentTypeReference.get() != null) {
-              return;
-            }
-          }
         }
-      });
-      return componentTypeReference.get() == null ? UNKNOWN : componentTypeReference.get();
-    }).orElseGet(() -> {
-      // If there was no ComponentModel found, search for nestable elements, we might be talking about a ROUTE and we need to
-      // return it's ComponentType as well
-      Optional<? extends NestableElementModel> nestableElementModelOptional = findNestableElementModel(componentId);
-      return nestableElementModelOptional.map(nestableElementModel -> {
-        Reference<TypedComponentIdentifier.ComponentType> componentTypeReference = new Reference<>();
-        nestableElementModel.accept(new IsRouteVisitor(componentTypeReference));
-        return componentTypeReference.get() == null ? UNKNOWN : componentTypeReference.get();
-      }).orElse(UNKNOWN);
+      }
     });
+    return componentTypeReference.get() == null ? UNKNOWN : componentTypeReference.get();
   }
 
-  /**
-   * Finds a {@link org.mule.runtime.api.meta.model.ComponentModel} within the provided set of {@link ExtensionModel}s by a
-   * {@link ComponentIdentifier}.
-   *
-   * @param componentIdentifier the identifier to use for the search.
-   * @return the found {@link org.mule.runtime.api.meta.model.ComponentModel} or {@link Optional#empty()} if it couldn't be found.
-   */
-  public Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> findComponentModel(ComponentIdentifier componentIdentifier) {
-    try {
-      return extensionComponentModelByComponentIdentifier.get(componentIdentifier, () -> {
-        return lookupExtensionModelFor(componentIdentifier).flatMap(extensionModel -> {
-          List<HasOperationModels> operationModelsProviders = ImmutableList.<HasOperationModels>builder()
-              .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
-          List<HasSourceModels> sourceModelsProviders = ImmutableList.<HasSourceModels>builder()
-              .add(extensionModel).addAll(extensionModel.getConfigurationModels()).build();
-          List<HasConstructModels> constructModelsProviders = singletonList(extensionModel);
+  private Optional<NestableElementModel> findNestableElementModel(ComponentIdentifier componentId) {
+    return extensionNestableElementModelByComponentIdentifier.get(componentId, componentIdentifier -> {
 
-          String componentName = toCamelCase(componentIdentifier.getName(), COMPONENT_NAME_SEPARATOR);
-          Stream<Supplier<Optional<? extends org.mule.runtime.api.meta.model.ComponentModel>>> stream =
-              of(() -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders, componentName),
-                 () -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders,
-                                    componentIdentifier.getName()),
-                 () -> resolveModel(operationModelsProviders, sourceModelsProviders, constructModelsProviders,
-                                    capitalize(componentName)));
-
-          return stream
-              .map(Supplier::get)
-              .filter(Optional::isPresent)
-              .map(Optional::get)
-              .findFirst();
-        });
+      return lookupExtensionModelFor(componentIdentifier).flatMap(extensionModel -> {
+        String componentName = toCamelCase(componentIdentifier.getName(), COMPONENT_NAME_SEPARATOR);
+        Optional<NestableElementModel> elementModelOptional = searchNestableElementModel(extensionModel, componentName);
+        if (elementModelOptional.isPresent()) {
+          return elementModelOptional;
+        }
+        return searchNestableElementModel(extensionModel, componentIdentifier.getName());
       });
-    } catch (ExecutionException e) {
-      throw new MuleRuntimeException(e);
-    }
-  }
-
-  public Optional<? extends ConnectionProviderModel> findConnectionProviderModel(ComponentIdentifier componentIdentifier) {
-    try {
-      return extensionConnectionProviderModelByComponentIdentifier.get(componentIdentifier, () -> {
-        return lookupExtensionModelFor(componentIdentifier)
-            .flatMap(currentExtension -> {
-              AtomicReference<ConnectionProviderModel> modelRef = new AtomicReference<>();
-
-              new ExtensionWalker() {
-
-                @Override
-                protected void onConnectionProvider(org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels owner,
-                                                    ConnectionProviderModel model) {
-                  if ((model.getName() + "Connection").equals(NameUtils.toCamelCase(componentIdentifier.getName(), "-"))) {
-                    modelRef.set(model);
-                  }
-                };
-
-              }.walk(currentExtension);
-
-              return ofNullable(modelRef.get());
-            });
-      });
-    } catch (ExecutionException e) {
-      throw new MuleRuntimeException(e);
-    }
-  }
-
-  public Optional<? extends ConfigurationModel> findConfigurationModel(ComponentIdentifier componentIdentifier) {
-    try {
-      return extensionConfigurationModelByComponentIdentifier.get(componentIdentifier, () -> {
-        return lookupExtensionModelFor(componentIdentifier)
-            .flatMap(currentExtension -> {
-              AtomicReference<ConfigurationModel> modelRef = new AtomicReference<>();
-
-              new ExtensionWalker() {
-
-                @Override
-                protected void onConfiguration(ConfigurationModel model) {
-                  if (model.getName().equals(NameUtils.toCamelCase(componentIdentifier.getName(), "-"))) {
-                    modelRef.set(model);
-                  }
-                }
-
-              }.walk(currentExtension);
-
-              return ofNullable(modelRef.get());
-            });
-      });
-    } catch (ExecutionException e) {
-      throw new MuleRuntimeException(e);
-    }
-  }
-
-  public Optional<? extends MetadataType> findMetadataType(Class<?> type) {
-    if (type != null
-        // workaround for test components with no extension model
-        && !Processor.class.isAssignableFrom(type)) {
-      return Optional.of(javaTypeLoader.load(type));
-    } else {
-      return empty();
-    }
-  }
-
-  private Optional<NestableElementModel> findNestableElementModel(ComponentIdentifier componentIdentifier) {
-    try {
-      return extensionNestableElementModelByComponentIdentifier.get(componentIdentifier, () -> {
-
-        return lookupExtensionModelFor(componentIdentifier).flatMap(extensionModel -> {
-          String componentName = toCamelCase(componentIdentifier.getName(), COMPONENT_NAME_SEPARATOR);
-          Optional<NestableElementModel> elementModelOptional = searchNestableElementModel(extensionModel, componentName);
-          if (elementModelOptional.isPresent()) {
-            return elementModelOptional;
-          }
-          return searchNestableElementModel(extensionModel, componentIdentifier.getName());
-        });
-      });
-    } catch (ExecutionException e) {
-      throw new MuleRuntimeException(e);
-    }
-  }
-
-  private Optional<ExtensionModel> lookupExtensionModelFor(ComponentIdentifier componentIdentifier) {
-    return extensionsModels.stream()
-        .filter(e -> e.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace()))
-        .findFirst();
+    });
   }
 
   private Optional<NestableElementModel> searchNestableElementModel(ExtensionModel extensionModel, String componentName) {
@@ -302,30 +186,204 @@ public class ExtensionModelHelper {
     return ofNullable(reference.get());
   }
 
+  /**
+   * Finds a {@link org.mule.runtime.api.meta.model.ComponentModel} within the provided set of {@link ExtensionModel}s by a
+   * {@link ComponentIdentifier}.
+   *
+   * @param componentIdentifier the identifier to use for the search.
+   * @return the found {@link org.mule.runtime.api.meta.model.ComponentModel} or {@link Optional#empty()} if it couldn't be found.
+   */
+  public Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> findComponentModel(ComponentIdentifier componentId) {
+    return extensionComponentModelByComponentIdentifier.get(componentId, componentIdentifier -> {
+      return lookupExtensionModelFor(componentIdentifier)
+          .flatMap(extensionModel -> {
+            AtomicReference<org.mule.runtime.api.meta.model.ComponentModel> modelRef = new AtomicReference<>();
 
-  private Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> resolveModel(List<HasOperationModels> operationModelsProviders,
-                                                                                          List<HasSourceModels> sourceModelsProviders,
-                                                                                          List<HasConstructModels> constructModelsProviders,
-                                                                                          String componentName) {
-    for (HasOperationModels operationModelsProvider : operationModelsProviders) {
-      Optional<OperationModel> operationModel = operationModelsProvider.getOperationModel(componentName);
-      if (operationModel.isPresent()) {
-        return operationModel;
-      }
+            new ExtensionWalker() {
+
+              @Override
+              protected void onOperation(HasOperationModels owner, OperationModel model) {
+                if (dslSyntaxResolversByExtension.get(extensionModel).resolve(model).getElementName()
+                    .equals(componentIdentifier.getName())) {
+                  modelRef.set(model);
+                }
+              }
+
+              @Override
+              protected void onSource(HasSourceModels owner, SourceModel model) {
+                if (dslSyntaxResolversByExtension.get(extensionModel).resolve(model).getElementName()
+                    .equals(componentIdentifier.getName())) {
+                  modelRef.set(model);
+                }
+              }
+
+              @Override
+              protected void onConstruct(HasConstructModels owner, ConstructModel model) {
+                if (dslSyntaxResolversByExtension.get(extensionModel).resolve(model).getElementName()
+                    .equals(componentIdentifier.getName())) {
+                  modelRef.set(model);
+                }
+              }
+
+            }.walk(extensionModel);
+
+            return ofNullable(modelRef.get());
+          });
+    });
+  }
+
+  /**
+   * Finds a {@link org.mule.runtime.api.meta.model.ConnectionProviderModel} within the provided set of {@link ExtensionModel}s by
+   * a {@link ComponentIdentifier}.
+   *
+   * @param componentIdentifier the identifier to use for the search.
+   * @return the found {@link org.mule.runtime.api.meta.model.ConnectionProviderModel} or {@link Optional#empty()} if it couldn't
+   *         be found.
+   */
+  public Optional<? extends ConnectionProviderModel> findConnectionProviderModel(ComponentIdentifier componentId) {
+
+    return extensionConnectionProviderModelByComponentIdentifier.get(componentId, componentIdentifier -> {
+      return lookupExtensionModelFor(componentIdentifier)
+          .flatMap(currentExtension -> {
+            AtomicReference<ConnectionProviderModel> modelRef = new AtomicReference<>();
+
+            new ExtensionWalker() {
+
+              @Override
+              protected void onConnectionProvider(org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels owner,
+                                                  ConnectionProviderModel model) {
+                if (dslSyntaxResolversByExtension.get(currentExtension).resolve(model).getElementName()
+                    .equals(componentIdentifier.getName())) {
+                  modelRef.set(model);
+                }
+              };
+
+            }.walk(currentExtension);
+
+            return ofNullable(modelRef.get());
+          });
+    });
+  }
+
+  /**
+   * Finds a {@link org.mule.runtime.api.meta.model.ConfigurationModel} within the provided set of {@link ExtensionModel}s by a
+   * {@link ComponentIdentifier}.
+   *
+   * @param componentIdentifier the identifier to use for the search.
+   * @return the found {@link org.mule.runtime.api.meta.model.ConfigurationModel} or {@link Optional#empty()} if it couldn't be
+   *         found.
+   */
+  public Optional<? extends ConfigurationModel> findConfigurationModel(ComponentIdentifier componentId) {
+    return extensionConfigurationModelByComponentIdentifier.get(componentId, componentIdentifier -> {
+      return lookupExtensionModelFor(componentIdentifier)
+          .flatMap(currentExtension -> {
+            AtomicReference<ConfigurationModel> modelRef = new AtomicReference<>();
+
+            new ExtensionWalker() {
+
+              @Override
+              protected void onConfiguration(ConfigurationModel model) {
+                if (dslSyntaxResolversByExtension.get(currentExtension).resolve(model).getElementName()
+                    .equals(componentIdentifier.getName())) {
+                  modelRef.set(model);
+                }
+              }
+
+            }.walk(currentExtension);
+
+            return ofNullable(modelRef.get());
+          });
+    });
+  }
+
+  /**
+   * Navigates the extension model for the provided {@code componentIdentifier} and calls the corresponding method on the provided
+   * {@code delegate} when found.
+   *
+   * @param componentIdentifier the identifier to use for the search.
+   * @param delegate the callback to execute on the found model.
+   */
+  public void walkToComponent(ComponentIdentifier componentIdentifier, ExtensionWalkerModelDelegate delegate) {
+    lookupExtensionModelFor(componentIdentifier)
+        .ifPresent(currentExtension -> {
+          new ExtensionWalker() {
+
+            final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(currentExtension);
+
+            @Override
+            protected void onConfiguration(ConfigurationModel model) {
+              if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
+                delegate.onConfiguration(model);
+              }
+            }
+
+            @Override
+            protected void onConnectionProvider(org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels owner,
+                                                ConnectionProviderModel model) {
+              if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
+                delegate.onConnectionProvider(model);
+              }
+            };
+
+            @Override
+            protected void onOperation(HasOperationModels owner, OperationModel model) {
+              if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
+                delegate.onOperation(model);
+              }
+            }
+
+            @Override
+            protected void onSource(HasSourceModels owner, SourceModel model) {
+              if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
+                delegate.onSource(model);
+              }
+            }
+
+            @Override
+            protected void onConstruct(HasConstructModels owner, ConstructModel model) {
+              if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
+                delegate.onConstruct(model);
+              }
+            }
+
+          }.walk(currentExtension);
+        });
+  }
+
+  public Optional<? extends MetadataType> findMetadataType(Class<?> type) {
+    if (type != null
+        // workaround for test components with no extension model
+        && !Processor.class.isAssignableFrom(type)) {
+      return Optional.of(javaTypeLoader.load(type));
+    } else {
+      return empty();
     }
-    for (HasSourceModels sourceModelsProvider : sourceModelsProviders) {
-      Optional<SourceModel> sourceModel = sourceModelsProvider.getSourceModel(componentName);
-      if (sourceModel.isPresent()) {
-        return sourceModel;
-      }
-    }
-    for (HasConstructModels constructModelsProvider : constructModelsProviders) {
-      Optional<ConstructModel> constructModel = constructModelsProvider.getConstructModel(componentName);
-      if (constructModel.isPresent()) {
-        return constructModel;
-      }
-    }
-    return empty();
+  }
+
+  private Optional<ExtensionModel> lookupExtensionModelFor(ComponentIdentifier componentIdentifier) {
+    return extensionsModels.stream()
+        .filter(e -> e.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace()))
+        .findFirst();
+  }
+
+  /**
+   * This interface is used along with an ExtensionWalker. The {@link ExtensionWalker} makes same validation/filter and then calls
+   * the appropriate method form this interface if applicable.
+   *
+   * @since 4.3
+   */
+  public static interface ExtensionWalkerModelDelegate {
+
+    void onConfiguration(ConfigurationModel model);
+
+    void onConnectionProvider(ConnectionProviderModel model);
+
+    void onOperation(OperationModel model);
+
+    void onSource(SourceModel model);
+
+    void onConstruct(ConstructModel model);
+
   }
 
   static class IsRouteVisitor implements NestableElementModelVisitor {

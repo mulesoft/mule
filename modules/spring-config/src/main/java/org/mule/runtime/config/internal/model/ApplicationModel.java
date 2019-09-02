@@ -44,6 +44,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -53,6 +54,11 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
@@ -70,6 +76,7 @@ import org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
 import org.mule.runtime.config.internal.dsl.model.DefaultConfigurationParameters;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
+import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper.ExtensionWalkerModelDelegate;
 import org.mule.runtime.config.internal.dsl.model.config.CompositeConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
@@ -82,6 +89,7 @@ import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfi
 import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
+import org.mule.runtime.config.internal.dsl.spring.DefaultValueVisitor;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -90,6 +98,7 @@ import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -287,7 +296,7 @@ public class ApplicationModel implements ArtifactAst {
           .build();
 
   private final Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry;
-  private final ArtifactConfig artifactConfig;
+  private final ExtensionModelHelper extensionModelHelper;
   private final List<ComponentModel> muleComponentModels = new LinkedList<>();
   private PropertiesResolverConfigurationProperties configurationProperties;
   private final ResourceProvider externalResourceProvider;
@@ -338,7 +347,6 @@ public class ApplicationModel implements ArtifactAst {
 
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.externalResourceProvider = externalResourceProvider;
-    this.artifactConfig = artifactConfig;
     createConfigurationAttributeResolver(artifactConfig, parentConfigurationProperties, deploymentProperties);
     convertConfigFileToComponentModel(artifactConfig);
     convertArtifactDeclarationToComponentModel(extensionModels, artifactDeclaration);
@@ -346,7 +354,7 @@ public class ApplicationModel implements ArtifactAst {
     createEffectiveModel();
     indexComponentModels();
     validateModel(componentBuildingDefinitionRegistry);
-    ExtensionModelHelper extensionModelHelper = new ExtensionModelHelper(extensionModels);
+    this.extensionModelHelper = new ExtensionModelHelper(extensionModels);
     if (runtimeMode) {
       expandModules(extensionModels);
       // Have to index again the component models with macro expanded ones
@@ -375,29 +383,41 @@ public class ApplicationModel implements ArtifactAst {
 
   private void resolveTypedComponentIdentifier(ExtensionModelHelper extensionModelHelper) {
     executeOnEveryComponentTree(componentModel -> {
-      Optional<TypedComponentIdentifier> typedComponentIdentifier =
-          of(TypedComponentIdentifier.builder().identifier(componentModel.getIdentifier())
-              .type(resolveComponentType(componentModel, extensionModelHelper))
-              .build());
+      extensionModelHelper.walkToComponent(componentModel.getIdentifier(), new ExtensionWalkerModelDelegate() {
 
-      extensionModelHelper.findComponentModel(componentModel.getIdentifier())
-          .ifPresent(componentModel::setComponentModel);
-      if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
-        extensionModelHelper.findConfigurationModel(componentModel.getIdentifier())
-            .ifPresent(componentModel::setConfigurationModel);
-      }
-      if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
-        extensionModelHelper.findConnectionProviderModel(componentModel.getIdentifier())
-            .ifPresent(componentModel::setConnectionProviderModel);
-      }
+        @Override
+        public void onConfiguration(ConfigurationModel model) {
+          componentModel.setConfigurationModel(model);
+        }
+
+        @Override
+        public void onConnectionProvider(ConnectionProviderModel model) {
+          componentModel.setConnectionProviderModel(model);
+        };
+
+        @Override
+        public void onOperation(OperationModel model) {
+          componentModel.setComponentModel(model);
+        }
+
+        @Override
+        public void onSource(SourceModel model) {
+          componentModel.setComponentModel(model);
+        }
+
+        @Override
+        public void onConstruct(ConstructModel model) {
+          componentModel.setComponentModel(model);
+        }
+
+      });
       if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
         extensionModelHelper.findMetadataType(componentModel.getType())
             .flatMap(t -> createMetadataTypeModelAdapter(t))
             .ifPresent(componentModel::setMetadataTypeModelAdapter);
       }
 
-      componentModel.setComponentType(typedComponentIdentifier.map(typedIdentifier -> typedIdentifier.getType())
-          .orElse(TypedComponentIdentifier.ComponentType.UNKNOWN));
+      componentModel.setComponentType(resolveComponentType(componentModel, extensionModelHelper));
     });
   }
 
@@ -613,7 +633,23 @@ public class ApplicationModel implements ArtifactAst {
         buildingDefinition.map(definition -> {
           ObjectTypeVisitor typeDefinitionVisitor = new ObjectTypeVisitor(componentModel);
           definition.getTypeDefinition().visit(typeDefinitionVisitor);
-          componentModel.setType(typeDefinitionVisitor.getType());
+
+          final Class<?> type = typeDefinitionVisitor.getType();
+          componentModel.setType(type);
+
+          if (ValueResolver.class.isAssignableFrom(type)) {
+            definition.getConstructorAttributeDefinition().get(0).accept(new DefaultValueVisitor() {
+
+              @Override
+              public void onFixedValue(Object value) {
+                if (value instanceof MetadataType) {
+                  createMetadataTypeModelAdapter((MetadataType) value)
+                      .ifPresent(componentModel::setMetadataTypeModelAdapter);
+                }
+              }
+            });
+          }
+
           return definition;
         }).orElseGet(() -> {
           String classParameter = componentModel.getParameters().get(CLASS_ATTRIBUTE);
