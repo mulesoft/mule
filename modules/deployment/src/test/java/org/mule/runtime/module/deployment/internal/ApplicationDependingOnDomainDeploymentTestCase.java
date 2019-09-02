@@ -149,6 +149,9 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
   public void failToDeployAppWithDomainNameButMissingBundleDescriptor() throws Exception {
     startDeployment();
 
+    addExplodedDomainFromBuilder(emptyDomain101FileBuilder, emptyDomain101FileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomain101FileBuilder.getId());
+
     addExplodedAppFromBuilder(appWithDomainNameButMissingBundleDescriptor, appWithDomainNameButMissingBundleDescriptor.getId());
     assertDeploymentFailure(applicationDeploymentListener, appWithDomainNameButMissingBundleDescriptor.getId());
   }
