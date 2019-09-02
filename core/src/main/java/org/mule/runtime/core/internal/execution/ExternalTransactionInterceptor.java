@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.execution;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -14,17 +14,24 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 
+import javax.transaction.TransactionManager;
+
 public class ExternalTransactionInterceptor<T> implements ExecutionInterceptor<T> {
 
   private final ExecutionInterceptor<T> next;
   private TransactionConfig transactionConfig;
-  private MuleContext muleContext;
+  private String appName;
+  private NotificationDispatcher notificationDispatcher;
+  private TransactionManager transactionManager;
 
   public ExternalTransactionInterceptor(ExecutionInterceptor<T> next, TransactionConfig transactionConfig,
-                                        MuleContext muleContext) {
+                                        String appName, NotificationDispatcher notificationDispatcher,
+                                        TransactionManager transactionManager) {
     this.next = next;
     this.transactionConfig = transactionConfig;
-    this.muleContext = muleContext;
+    this.appName = appName;
+    this.notificationDispatcher = notificationDispatcher;
+    this.transactionManager = transactionManager;
   }
 
   @Override
@@ -32,13 +39,15 @@ public class ExternalTransactionInterceptor<T> implements ExecutionInterceptor<T
     Transaction joinedExternal = null;
     Transaction tx = TransactionCoordination.getInstance().getTransaction();
     try {
-      if (tx == null && muleContext != null && transactionConfig != null && transactionConfig.isInteractWithExternal()) {
+      if (tx == null && transactionManager != null && transactionConfig != null && transactionConfig.isInteractWithExternal()) {
 
         TransactionFactory tmFactory = transactionConfig.getFactory();
         if (tmFactory instanceof ExternalTransactionAwareTransactionFactory) {
           ExternalTransactionAwareTransactionFactory externalTransactionFactory =
               (ExternalTransactionAwareTransactionFactory) tmFactory;
-          joinedExternal = externalTransactionFactory.joinExternalTransaction(muleContext);
+          joinedExternal = externalTransactionFactory.joinExternalTransaction(appName, transactionManager,
+                                                                              notificationDispatcher,
+                                                                              transactionConfig.getTimeout());
         }
       }
       return next.execute(callback, executionContext);

@@ -8,13 +8,15 @@ package org.mule.runtime.core.api.transaction;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
+import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
+
+import javax.transaction.TransactionManager;
 
 import org.junit.Test;
 
@@ -23,7 +25,7 @@ public class IsTransactedTestCase extends AbstractMuleTestCase {
   @Test
   public void testIsTransacted() throws Exception {
     MuleTransactionConfig cfg = new MuleTransactionConfig();
-    TestTransaction testTx = new TestTransaction(mockMuleContext());
+    TestTransaction testTx = new TestTransaction("appName", new DefaultNotificationDispatcher(), 5);
 
     cfg.setAction(TransactionConfig.ACTION_NEVER);
     assertFalse(cfg.isTransacted());
@@ -83,7 +85,14 @@ public class IsTransactedTestCase extends AbstractMuleTestCase {
   public static class TransactedFactory implements TransactionFactory {
 
     @Override
-    public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
+    public Transaction beginTransaction(MuleContext muleContext) {
+      return null;
+    }
+
+    @Override
+    public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
+                                        SingleResourceTransactionFactoryManager transactionFactoryManager,
+                                        TransactionManager transactionManager, int timeout) {
       return null;
     }
 
@@ -96,7 +105,14 @@ public class IsTransactedTestCase extends AbstractMuleTestCase {
   public static class NonTransactedFactory implements TransactionFactory {
 
     @Override
-    public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
+    public Transaction beginTransaction(MuleContext muleContext) {
+      return null;
+    }
+
+    @Override
+    public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
+                                        SingleResourceTransactionFactoryManager transactionFactoryManager,
+                                        TransactionManager transactionManager, int timeout) {
       return null;
     }
 
