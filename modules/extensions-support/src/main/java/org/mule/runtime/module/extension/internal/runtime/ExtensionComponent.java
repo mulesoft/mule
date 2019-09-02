@@ -214,9 +214,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
         ConfigurationInstance instance = configurationProvider.get().get(event);
         if (instance == null) {
           throw new IllegalModelDefinitionException(format(
-                                                           "Root component '%s' contains a reference to config '%s' but it doesn't exists",
-                                                           getLocation().getRootContainerName(),
-                                                           configurationProvider));
+              "Root component '%s' contains a reference to config '%s' but it doesn't exists",
+              getLocation().getRootContainerName(),
+              configurationProvider));
         }
 
         return of(instance);
@@ -318,10 +318,10 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   public MetadataResult<MetadataKeysContainer> getMetadataKeys() throws MetadataResolvingException {
     try {
       return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader,
-                                                                      () -> metadataMediator.getMetadataKeys(context,
-                                                                                                             getParameterValueResolver(),
-                                                                                                             reflectionCache)));
+          context -> withContextClassLoader(classLoader,
+                                            () -> metadataMediator.getMetadataKeys(context,
+                                                                                   getParameterValueResolver(),
+                                                                                   reflectionCache)));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onKeys());
     }
@@ -334,9 +334,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata() throws MetadataResolvingException {
     try {
       return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader, () -> metadataMediator
-                                        .getMetadata(context, getParameterValueResolver(),
-                                                     reflectionCache)));
+          context -> withContextClassLoader(classLoader, () -> metadataMediator
+              .getMetadata(context, getParameterValueResolver(),
+                           reflectionCache)));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }
@@ -349,8 +349,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata(MetadataKey key) throws MetadataResolvingException {
     try {
       return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader,
-                                                                      () -> metadataMediator.getMetadata(context, key)));
+          context -> withContextClassLoader(classLoader,
+                                            () -> metadataMediator.getMetadata(context, key)));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }
@@ -422,10 +422,10 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
           return id;
         })
         .orElseThrow(() -> new IllegalStateException(
-                                                     format("Missing information to obtain the MetadataCache for the component '%s'. "
-                                                         +
-                                                         "Expected to have the ComponentAst information in the '%s' annotation but none was found.",
-                                                            this.getLocation().toString(), ANNOTATION_COMPONENT_CONFIG)));
+            format("Missing information to obtain the MetadataCache for the component '%s'. "
+                       +
+                       "Expected to have the ComponentAst information in the '%s' annotation but none was found.",
+                   this.getLocation().toString(), ANNOTATION_COMPONENT_CONFIG)));
   }
 
   private <R> R runWithValueProvidersContext(Function<ExtensionResolvingContext, R> valueProviderFunction) {
@@ -450,8 +450,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       if (configuration.isPresent()) {
         ConfigurationProvider configurationProvider = findConfigurationProvider()
             .orElseThrow(
-                         () -> new MetadataResolvingException("Failed to create the required configuration for Metadata retrieval",
-                                                              INVALID_CONFIGURATION));
+                () -> new MetadataResolvingException("Failed to create the required configuration for Metadata retrieval",
+                                                     INVALID_CONFIGURATION));
 
         if (configurationProvider instanceof DynamicConfigurationProvider) {
           throw new MetadataResolvingException("Configuration used for Metadata fetch cannot be dynamic", INVALID_CONFIGURATION);
@@ -507,7 +507,11 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    * returns an empty value.
    */
   protected Optional<ConfigurationInstance> getStaticConfiguration() {
-    if (!requiresConfig() || (isConfigurationSpecified() && configurationProvider.get().isDynamic())) {
+    if (!requiresConfig()) {
+      return empty();
+    }
+
+    if (!isConfigurationSpecified() || configurationProvider.get().isDynamic()) {
       return empty();
     }
 
@@ -545,13 +549,13 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   private void validateConfigurationProviderIsNotExpression() throws InitialisationException {
     if (isConfigurationSpecified() && expressionParser.isContainsTemplate(configurationProvider.get().getName())) {
       throw new InitialisationException(
-                                        createStaticMessage(
-                                                            format("Root component '%s' defines component '%s' which specifies the expression '%s' as a config-ref. "
-                                                                + "Expressions are not allowed as config references",
-                                                                   getLocation().getRootContainerName(),
-                                                                   hyphenize(componentModel.getName()),
-                                                                   configurationProvider)),
-                                        this);
+          createStaticMessage(
+              format("Root component '%s' defines component '%s' which specifies the expression '%s' as a config-ref. "
+                         + "Expressions are not allowed as config references",
+                     getLocation().getRootContainerName(),
+                     hyphenize(componentModel.getName()),
+                     configurationProvider)),
+          this);
     }
   }
 
