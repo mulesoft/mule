@@ -40,7 +40,7 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
   protected static final String SYSTEM_PROPERTY_PREFIX = AbstractStreamProcessingStrategyFactory.class.getName() + ".";
   protected static final int CORES = getInteger(SYSTEM_PROPERTY_PREFIX + "AVAILABLE_CORES", getRuntime().availableProcessors());
 
-  protected static final int DEFAULT_BUFFER_SIZE = getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_BUFFER_SIZE", 768);
+  protected static final int DEFAULT_BUFFER_SIZE = getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_BUFFER_SIZE", 1024);
 
   // Use one subscriber for every two cores available, or 1 subscriber for 1 core. This value is high for most scenarios but
   // required to achieve absolute minimum latency for the scenarios where this is important.
