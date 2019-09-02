@@ -54,7 +54,7 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Obj
   }
 
   @Override
-  public void onStart(SourceCallback<TestTransactionalConnection, Object> sourceCallback) throws MuleException {
+  public void onStart(SourceCallback<TestTransactionalConnection, Object> sourceCallback) {
     connectExecutor = newFixedThreadPool(1, new NamedThreadFactory(TransactionalSource.class.getName()));
     connectExecutor.execute(() -> {
       SourceCallbackContext ctx = sourceCallback.createContext();
@@ -102,7 +102,7 @@ public class TransactionalSource extends Source<TestTransactionalConnection, Obj
 
   @OnSuccess
   public void onSuccess(SourceCallbackContext ctx)
-      throws InterruptedException, TransactionException {
+      throws TransactionException {
     ctx.getTransactionHandle().commit();
     isSuccess = true;
   }

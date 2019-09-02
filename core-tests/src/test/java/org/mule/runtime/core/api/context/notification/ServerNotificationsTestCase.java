@@ -19,12 +19,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPED;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationsTestCase.DummyNotification.EVENT_RECEIVED;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 
 import org.mule.runtime.api.notification.CustomNotification;
 import org.mule.runtime.api.notification.CustomNotificationListener;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.Notification;
-import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -112,8 +112,8 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
       }
     });
 
-    getNotificationDispatcher().dispatch(new DummyNotification("hello", EVENT_RECEIVED));
-    getNotificationDispatcher().dispatch(new DummyNotification("hello", EVENT_RECEIVED));
+    getNotificationDispatcher(muleContext).dispatch(new DummyNotification("hello", EVENT_RECEIVED));
+    getNotificationDispatcher(muleContext).dispatch(new DummyNotification("hello", EVENT_RECEIVED));
 
     // Wait for the notifcation event to be fired as they are queued
     latch.await(2000, MILLISECONDS);
@@ -179,10 +179,6 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
 
   private NotificationListenerRegistry getNotificationListenerRegistry() throws RegistrationException {
     return getResgistry().lookupObject(NotificationListenerRegistry.class);
-  }
-
-  private NotificationDispatcher getNotificationDispatcher() throws RegistrationException {
-    return ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
   }
 
   private MuleRegistry getResgistry() {

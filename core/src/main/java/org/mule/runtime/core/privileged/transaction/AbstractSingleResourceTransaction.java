@@ -11,8 +11,8 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionCann
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionCannotBindToNullKey;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionSingleResourceOnly;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
@@ -66,6 +66,11 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
 
   protected AbstractSingleResourceTransaction(MuleContext muleContext) {
     super(muleContext);
+  }
+
+  protected AbstractSingleResourceTransaction(String applicationName,
+                                              NotificationDispatcher notificationFirer, int timeout) {
+    super(applicationName, notificationFirer, timeout);
   }
 
   @Override
@@ -125,7 +130,9 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
       throw new IllegalTransactionStateException(transactionSingleResourceOnly());
     }
 
-    LOGGER.debug("Binding {} to {}", resource, key);
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Binding {} to {}", resource, key);
+    }
 
     this.key = key;
     this.resource = resource;

@@ -62,10 +62,12 @@ public class MuleMessageProcessingManagerTestCase extends AbstractMuleContextTes
     processingManager.setPolicyManager(policyManager);
 
     processingManager.initialise();
+
+    when(spyContext.getTransactionManager()).thenReturn(null);
   }
 
   @Test
-  public void processesWithClassLoader() throws Exception {
+  public void processesWithClassLoader() {
     ClassLoader classLoader = new URLClassLoader(new URL[] {}, currentThread().getContextClassLoader());
     when(messageProcessContext.getExecutionClassLoader()).thenReturn(classLoader);
     doAnswer(inv -> {
@@ -78,7 +80,7 @@ public class MuleMessageProcessingManagerTestCase extends AbstractMuleContextTes
   }
 
   @Test
-  public void exceptionHandlerInvoked() throws Exception {
+  public void exceptionHandlerInvoked() {
     Exception e = new Exception();
     processingManager.phaseFailure(e);
     verify(exceptionHandler).handleException(e);

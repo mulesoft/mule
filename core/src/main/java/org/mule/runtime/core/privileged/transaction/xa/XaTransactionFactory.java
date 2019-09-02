@@ -7,13 +7,18 @@
 package org.mule.runtime.core.privileged.transaction.xa;
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotStartTransaction;
-
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transaction.XaTransaction;
+
+import javax.transaction.TransactionManager;
 
 /**
  * <code>XaTransactionFactory</code> Is used to create/retrieve a Transaction from a transaction manager configured on the
@@ -25,13 +30,29 @@ public class XaTransactionFactory implements TransactionFactory {
   private int timeout;
 
   @Override
-  public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
+  public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
+                                      SingleResourceTransactionFactoryManager transactionFactoryManager,
+                                      TransactionManager transactionManager, int timeout)
+      throws TransactionException {
+    this.timeout = timeout;
     try {
-      XaTransaction xat = new XaTransaction(muleContext);
-      xat.setTimeout(timeout);
+      XaTransaction xat = new XaTransaction(applicationName, transactionManager, notificationFirer, timeout);
       xat.begin();
       return xat;
     } catch (Exception e) {
+      throw new TransactionException(cannotStartTransaction("XA"), e);
+    }
+  }
+
+  @Override
+  public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
+    try {
+      return this.beginTransaction(muleContext.getConfiguration().getId(),
+                                   ((MuleContextWithRegistry) muleContext).getRegistry()
+                                       .lookupObject(NotificationDispatcher.class),
+                                   muleContext.getTransactionFactoryManager(), muleContext.getTransactionManager(),
+                                   10000);
+    } catch (RegistrationException e) {
       throw new TransactionException(cannotStartTransaction("XA"), e);
     }
   }

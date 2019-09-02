@@ -9,8 +9,9 @@ package org.mule.runtime.module.extension.internal.runtime.transaction;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionCanOnlyBindToResources;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.privileged.transaction.AbstractSingleResourceTransaction;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 
@@ -27,10 +28,14 @@ public class ExtensionTransaction extends AbstractSingleResourceTransaction {
   private Optional<ExtensionTransactionalResource> boundResource = empty();
 
   /**
-   * {@inheritDoc}
+   * @deprecated since 4.3.0. Use {@link #ExtensionTransaction(String, NotificationDispatcher, int)} instead
    */
   public ExtensionTransaction(MuleContext muleContext) {
     super(muleContext);
+  }
+
+  public ExtensionTransaction(String applicationName, NotificationDispatcher notificationFirer, int timeout) {
+    super(applicationName, notificationFirer, timeout);
   }
 
   /**

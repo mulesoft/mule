@@ -34,12 +34,14 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -139,6 +141,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private FlowConstruct flowConstruct;
   private MessageProcessContext messageProcessContext;
 
+  private NotificationDispatcher notificationDispatcher;
+  private SingleResourceTransactionFactoryManager transactionFactoryManager;
+  private String applicationName;
+
   private AtomicBoolean started = new AtomicBoolean(false);
 
   public ExtensionMessageSource(ExtensionModel extensionModel,
@@ -149,13 +155,17 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                                 RetryPolicyTemplate retryPolicyTemplate,
                                 CursorProviderFactory cursorProviderFactory,
                                 BackPressureStrategy backPressureStrategy,
-                                ExtensionManager managerAdapter) {
+                                ExtensionManager managerAdapter, NotificationDispatcher notificationDispatcher,
+                                SingleResourceTransactionFactoryManager transactionFactoryManager, String applicationName) {
     super(extensionModel, sourceModel, configurationProvider, cursorProviderFactory, managerAdapter);
     this.sourceModel = sourceModel;
     this.sourceAdapterFactory = sourceAdapterFactory;
     this.customRetryPolicyTemplate = retryPolicyTemplate;
     this.primaryNodeOnly = primaryNodeOnly;
     this.backPressureStrategy = backPressureStrategy;
+    this.notificationDispatcher = notificationDispatcher;
+    this.transactionFactoryManager = transactionFactoryManager;
+    this.applicationName = applicationName;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, sourceModel);
     this.lifecycleManager = new DefaultLifecycleManager<>(sourceModel.getName(), this);
   }
@@ -245,10 +255,13 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         .setConfigurationInstance(getConfigurationInstance().orElse(null))
         .setTransactionConfig(transactionConfig.get())
         .setSource(this)
+        .setMuleContext(muleContext)
         .setListener(messageProcessor)
         .setProcessingManager(messageProcessingManager)
-        .setMuleContext(muleContext)
         .setProcessContext(messageProcessContext)
+        .setApplicationName(applicationName)
+        .setNotificationDispatcher(notificationDispatcher)
+        .setTransactionFactoryManager(transactionFactoryManager)
         .setCursorStreamProviderFactory(getCursorProviderFactory())
         .setCompletionHandlerFactory(completionHandlerFactory)
         .build();
