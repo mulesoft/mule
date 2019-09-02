@@ -38,7 +38,6 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.metadata.MetadataService;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
@@ -104,7 +103,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private Optional<ComponentModelInitializer> parentComponentModelInitializer;
 
   private ConfigurationDependencyResolver dependencyResolver;
-  private Set<String> applicationComponentNamesCreated = new HashSet<>();
+  private Set<String> applicationComponentLocationsCreated = new HashSet<>();
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -177,8 +176,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private void enableMuleObjects() {
     ConfigurationDependencyResolver dependencyResolver = new ConfigurationDependencyResolver(this.applicationModel,
                                                                                              componentBuildingDefinitionRegistry);
-    new MinimalApplicationModelGenerator(dependencyResolver, true)
-        .getMinimalModel(componentModel -> {
+    MinimalApplicationModelGenerator minimalApplicationModelGenerator =
+        new MinimalApplicationModelGenerator(dependencyResolver, true);
+    minimalApplicationModelGenerator
+        .getMinimalModel(minimalApplicationModelGenerator.getComponentModels(componentModel -> {
           AtomicBoolean transactionFactoryType = new AtomicBoolean(false);
           TypeDefinitionVisitor visitor = new TypeDefinitionVisitor() {
 
@@ -198,7 +199,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                 componentBuildingDefinition.getTypeDefinition().visit(visitor);
                 return transactionFactoryType.get();
               }).orElse(false);
-        });
+        }));
   }
 
   private static Map<String, String> extendArtifactProperties(Map<String, String> artifactProperties) {
@@ -328,13 +329,29 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           new MinimalApplicationModelGenerator(dependencyResolver);
       // Force initialization of configuration component...
       resetMuleConfiguration(minimalApplicationModelGenerator);
-      // User input components to be initialized...
-      Reference<ApplicationModel> minimalApplicationModel = new Reference<>();
-      predicateOptional
-          .ifPresent(predicate -> minimalApplicationModel.set(minimalApplicationModelGenerator.getMinimalModel(predicate)));
-      locationOptional
-          .ifPresent(location -> minimalApplicationModel.set(minimalApplicationModelGenerator.getMinimalModel(location)));
 
+      // User input components to be initialized...
+      List<ComponentModel> componentModelsToBuildMinimalModel = new ArrayList<>();
+      predicateOptional
+          .ifPresent(predicate -> componentModelsToBuildMinimalModel
+              .addAll(minimalApplicationModelGenerator.getComponentModels(predicate)));
+      locationOptional
+          .ifPresent(location -> componentModelsToBuildMinimalModel
+              .add(minimalApplicationModelGenerator.findComponentModel(location)));
+
+      Set<String> applicationComponentLocations = new HashSet<>();
+      componentModelsToBuildMinimalModel.stream().forEach(componentModel -> {
+        if (componentModel.getComponentLocation() != null) {
+          applicationComponentLocations.add(componentModel.getComponentLocation().getLocation());
+        }
+      });
+
+      if (ImmutableSet.copyOf(applicationComponentLocationsCreated).equals(ImmutableSet.copyOf(applicationComponentLocations))) {
+        // Same minimalApplication has been requested, so we don't need to recreate the same beans.
+        return emptyList();
+      }
+      ApplicationModel minimalApplicationModel =
+          minimalApplicationModelGenerator.getMinimalModel(componentModelsToBuildMinimalModel);
 
       if (parentComponentModelInitializerAdapter.isPresent()) {
         List<String> missingComponentNames = dependencyResolver.getMissingDependencies().stream()
@@ -355,29 +372,18 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         });
       }
 
-      Set<String> applicationComponentNames = new HashSet<>();
-      minimalApplicationModel.get().executeOnEveryMuleComponentTree(componentModel -> {
-        if (componentModel.isEnabled() && componentModel.getNameAttribute() != null) {
-          applicationComponentNames.add(componentModel.getNameAttribute());
-        }
-      });
-
-      if (ImmutableSet.copyOf(applicationComponentNamesCreated).equals(ImmutableSet.copyOf(applicationComponentNames))) {
-        // Same minimalApplication has been requested, so we don't need to recreate the same beans.
-        return emptyList();
-      }
       // First unregister any already initialized/started component
       unregisterBeans(beansCreated);
       // Clean up resources...
-      applicationComponentNamesCreated.clear();
+      applicationComponentLocationsCreated.clear();
       beansCreated.clear();
       objectProviders.clear();
       resetMuleSecurityManager();
 
       // Creates and registers beanDefinitions
       List<String> applicationComponents =
-          createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel.get(), false);
-      applicationComponentNamesCreated.addAll(applicationComponentNames);
+          createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
+      applicationComponentLocationsCreated.addAll(applicationComponentLocations);
 
       super.prepareObjectProviders();
 
@@ -480,7 +486,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       }
     }
     minimalApplicationModelGenerator
-        .getMinimalModel(componentModel -> componentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER));
+        .getMinimalModel(minimalApplicationModelGenerator
+            .getComponentModels(componentModel -> componentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER)));
   }
 
   @Override
