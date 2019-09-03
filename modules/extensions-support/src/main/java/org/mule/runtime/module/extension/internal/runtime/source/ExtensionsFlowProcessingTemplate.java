@@ -7,39 +7,30 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.core.api.functional.Either.left;
-import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.component.execution.CompletableCallback;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
 import org.mule.runtime.core.internal.execution.NotificationFunction;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
+import org.mule.runtime.core.internal.source.scheduler.FlowProcessingTemplate;
 
 import java.util.List;
 import java.util.Map;
 
-import org.reactivestreams.Publisher;
-
-final class FlowProcessingTemplate implements FlowProcessTemplate {
+final class ExtensionsFlowProcessingTemplate extends FlowProcessingTemplate {
 
   private final SourceResultAdapter sourceMessage;
-  private final Processor messageProcessor;
-  private final List<NotificationFunction> notificationFunctions;
   private final SourceCompletionHandler completionHandler;
 
-  FlowProcessingTemplate(SourceResultAdapter sourceMessage,
-                         Processor messageProcessor,
-                         List<NotificationFunction> notificationFunctions, SourceCompletionHandler completionHandler) {
+  ExtensionsFlowProcessingTemplate(SourceResultAdapter sourceMessage,
+                                   Processor messageProcessor,
+                                   List<NotificationFunction> notificationFunctions, SourceCompletionHandler completionHandler) {
+    super(messageProcessor, notificationFunctions);
     this.sourceMessage = sourceMessage;
-    this.messageProcessor = messageProcessor;
-    this.notificationFunctions = notificationFunctions;
     this.completionHandler = completionHandler;
   }
 
@@ -56,26 +47,6 @@ final class FlowProcessingTemplate implements FlowProcessTemplate {
   @Override
   public SourceResultAdapter getSourceMessage() {
     return sourceMessage;
-  }
-
-  @Override
-  public List<NotificationFunction> getNotificationFunctions() {
-    return notificationFunctions;
-  }
-
-  @Override
-  public CoreEvent routeEvent(CoreEvent muleEvent) throws MuleException {
-    return messageProcessor.process(muleEvent);
-  }
-
-  @Override
-  public Publisher<CoreEvent> routeEventAsync(CoreEvent event) {
-    return just(event).transform(messageProcessor);
-  }
-
-  @Override
-  public Publisher<CoreEvent> routeEventAsync(Publisher<CoreEvent> eventPub) {
-    return from(eventPub).transform(messageProcessor);
   }
 
   @Override
