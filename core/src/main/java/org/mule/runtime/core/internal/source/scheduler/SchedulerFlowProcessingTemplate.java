@@ -7,9 +7,9 @@
 package org.mule.runtime.core.internal.source.scheduler;
 
 import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -24,9 +24,9 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 /**
  * Custom scheduler's flow processing template.
@@ -63,7 +63,7 @@ final class SchedulerFlowProcessingTemplate implements ModuleFlowProcessingPhase
     // needed either since no value is being communicated bu the ResultAdapter. This implies that no content is needed to be
     // streamed.
     return new SourceResultAdapter(Result.builder().build(), null, ANY, false,
-                                   empty(), null);
+                                   Optional.empty(), null);
   }
 
   @Override
@@ -88,12 +88,12 @@ final class SchedulerFlowProcessingTemplate implements ModuleFlowProcessingPhase
 
   @Override
   public Publisher<Void> sendResponseToClient(CoreEvent response, Map<String, Object> parameters) {
-    return Mono.empty();
+    return empty();
   }
 
   @Override
   public Publisher<Void> sendFailureResponseToClient(MessagingException exception, Map<String, Object> parameters) {
-    return Mono.empty();
+    return empty();
   }
 
   @Override
