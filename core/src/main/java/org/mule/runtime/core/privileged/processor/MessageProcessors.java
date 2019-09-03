@@ -292,7 +292,7 @@ public class MessageProcessors {
 
   private static Publisher<CoreEvent> internalProcessWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                                       EventContext child, boolean completeParentOnEmpty,
-                                                                      boolean completeOnError,
+                                                                      boolean completeChildOnError,
                                                                       Publisher<CoreEvent> responsePublisher) {
     return just(quickCopy(child, event))
         .transform(processor)
@@ -301,8 +301,8 @@ public class MessageProcessors {
         .map(result -> quickCopy(event.getContext(), result))
         .doOnError(MessagingException.class,
                    me -> {
-                     if (completeOnError) {
-                       ((BaseEventContext) event.getContext()).error(me);
+                     if (completeChildOnError) {
+                       ((BaseEventContext) child).error(me);
                      }
                      me.setProcessedEvent(quickCopy(event.getContext(), me.getEvent()));
                    })

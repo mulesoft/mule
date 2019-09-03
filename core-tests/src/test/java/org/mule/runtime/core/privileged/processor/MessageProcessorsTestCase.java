@@ -26,6 +26,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.newCh
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApplyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextAlwaysComplete;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -277,16 +278,17 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   public void processWithChildContextAlwaysCompleteProcessErrorCompletesChild() {
     final NullPointerException expected = new NullPointerException();
 
-    CoreEvent event = from(processWithChildContext(input, eventPub -> Flux.from(eventPub)
+    CoreEvent event = from(processWithChildContextAlwaysComplete(input, eventPub -> Flux.from(eventPub)
         .handle(failWithExpected(expected)),
-                                                   Optional.empty()))
-                                                       .onErrorResume(MessagingException.class, throwable -> {
-                                                         ((BaseEventContext) throwable.getEvent().getContext()).error(throwable);
-                                                         return just(throwable.getEvent());
-                                                       })
-                                                       .block();
+                                                                 Optional.empty()))
+                                                                     .onErrorResume(MessagingException.class, throwable -> {
+                                                                       ((BaseEventContext) throwable.getEvent().getContext())
+                                                                           .error(throwable);
+                                                                       return just(throwable.getEvent());
+                                                                     })
+                                                                     .block();
 
-    assertThat(((DefaultEventContext) event.getContext()).isComplete(), is(false));
+    assertThat(((DefaultEventContext) event.getContext()).isComplete(), is(true));
   }
 
   @Test
