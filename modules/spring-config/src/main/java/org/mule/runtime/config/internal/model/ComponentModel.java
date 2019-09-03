@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -556,22 +557,21 @@ public abstract class ComponentModel {
     if (root != that.root) {
       return false;
     }
+    if (!Objects.equals(componentLocation, that.componentLocation)) {
+      return false;
+    }
     if (!identifier.equals(that.identifier)) {
       return false;
     }
-    if (!parameters.equals(that.parameters)) {
-      return false;
-    }
-    return innerComponents.equals(that.innerComponents);
-
+    return parameters.equals(that.parameters);
   }
 
   @Override
   public int hashCode() {
     int result = (root ? 1 : 0);
+    result = 31 * result + Objects.hashCode(componentLocation);
     result = 31 * result + identifier.hashCode();
     result = 31 * result + parameters.hashCode();
-    result = 31 * result + innerComponents.hashCode();
     return result;
   }
 
