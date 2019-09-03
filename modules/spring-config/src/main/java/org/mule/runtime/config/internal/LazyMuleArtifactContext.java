@@ -12,9 +12,9 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.exception.ExceptionUtils.hasCause;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -23,6 +23,7 @@ import static org.mule.runtime.api.metadata.MetadataService.NON_LAZY_METADATA_SE
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.resolveOrphanComponents;
 import static org.mule.runtime.ast.graph.api.ArtifactAstGraphFactory.generateFor;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
@@ -37,6 +38,7 @@ import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unre
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -147,31 +149,31 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     this.parentComponentModelInitializer = parentComponentModelInitializer;
 
-    muleContext.getCustomizationService().overrideDefaultServiceImpl(CONNECTIVITY_TESTING_SERVICE_KEY,
-                                                                     new LazyConnectivityTestingService(this, () -> getRegistry()
-                                                                         .<ConnectivityTestingService>lookupByName(NON_LAZY_CONNECTIVITY_TESTING_SERVICE)
-                                                                         .get()));
-    muleContext.getCustomizationService().registerCustomServiceClass(NON_LAZY_CONNECTIVITY_TESTING_SERVICE,
-                                                                     DefaultConnectivityTestingService.class);
-    muleContext.getCustomizationService().overrideDefaultServiceImpl(METADATA_SERVICE_KEY,
-                                                                     new LazyMetadataService(this, () -> getRegistry()
-                                                                         .<MetadataService>lookupByName(NON_LAZY_METADATA_SERVICE_KEY)
-                                                                         .get()));
-    muleContext.getCustomizationService().registerCustomServiceClass(NON_LAZY_METADATA_SERVICE_KEY, MuleMetadataService.class);
-    muleContext.getCustomizationService().overrideDefaultServiceImpl(VALUE_PROVIDER_SERVICE_KEY,
-                                                                     new LazyValueProviderService(this, () -> getRegistry()
-                                                                         .<ValueProviderService>lookupByName(NON_LAZY_VALUE_PROVIDER_SERVICE)
-                                                                         .get(),
-                                                                                                  muleContext::getConfigurationComponentLocator));
-    muleContext.getCustomizationService().registerCustomServiceClass(NON_LAZY_VALUE_PROVIDER_SERVICE,
-                                                                     MuleValueProviderService.class);
+    final CustomizationService customizationService = muleContext.getCustomizationService();
+    customizationService.overrideDefaultServiceImpl(CONNECTIVITY_TESTING_SERVICE_KEY,
+                                                    new LazyConnectivityTestingService(this, () -> getRegistry()
+                                                        .<ConnectivityTestingService>lookupByName(NON_LAZY_CONNECTIVITY_TESTING_SERVICE)
+                                                        .get()));
+    customizationService.registerCustomServiceClass(NON_LAZY_CONNECTIVITY_TESTING_SERVICE,
+                                                    DefaultConnectivityTestingService.class);
+    customizationService.overrideDefaultServiceImpl(METADATA_SERVICE_KEY,
+                                                    new LazyMetadataService(this, () -> getRegistry()
+                                                        .<MetadataService>lookupByName(NON_LAZY_METADATA_SERVICE_KEY)
+                                                        .get()));
+    customizationService.registerCustomServiceClass(NON_LAZY_METADATA_SERVICE_KEY, MuleMetadataService.class);
+    customizationService.overrideDefaultServiceImpl(VALUE_PROVIDER_SERVICE_KEY,
+                                                    new LazyValueProviderService(this, () -> getRegistry()
+                                                        .<ValueProviderService>lookupByName(NON_LAZY_VALUE_PROVIDER_SERVICE)
+                                                        .get(), muleContext::getConfigurationComponentLocator));
+    customizationService.registerCustomServiceClass(NON_LAZY_VALUE_PROVIDER_SERVICE,
+                                                    MuleValueProviderService.class);
 
-    muleContext.getCustomizationService().overrideDefaultServiceImpl(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, this);
+    customizationService.overrideDefaultServiceImpl(LAZY_COMPONENT_INITIALIZER_SERVICE_KEY, this);
 
     String sharedPartitionatedPersistentObjectStorePath = artifactProperties.get(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH);
     if (sharedPartitionatedPersistentObjectStorePath != null) {
-      muleContext.getCustomizationService().overrideDefaultServiceImpl(BASE_PERSISTENT_OBJECT_STORE_KEY,
-                                                                       new SharedPartitionedPersistentObjectStore<>(new File(sharedPartitionatedPersistentObjectStorePath)));
+      customizationService.overrideDefaultServiceImpl(BASE_PERSISTENT_OBJECT_STORE_KEY,
+                                                      new SharedPartitionedPersistentObjectStore<>(new File(sharedPartitionatedPersistentObjectStorePath)));
 
     }
   }
@@ -185,34 +187,42 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private void applyLifecycle(List<Object> components, boolean applyStartPhase) {
     muleContext.withLifecycleLock(() -> {
       if (muleContext.isInitialised()) {
-        for (Object object : components) {
-          LOGGER.debug("Initializing component '{}'...", object.toString());
-          try {
-            if (object instanceof MessageProcessorChain) {
-              // When created it will be initialized
-            } else {
-              muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME);
-            }
-          } catch (MuleException e) {
-            throw new RuntimeException(e);
-          }
-        }
+        initializeComponents(components);
       }
       if (applyStartPhase && muleContext.isStarted()) {
-        for (Object object : components) {
-          LOGGER.debug("Starting component '{}'...", object.toString());
-          try {
-            if (object instanceof MessageProcessorChain) {
-              // Has to be ignored as when it is registered it will be started too
-            } else {
-              muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
-            }
-          } catch (MuleException e) {
-            throw new RuntimeException(e);
-          }
-        }
+        startComponent(components);
       }
     });
+  }
+
+  private void initializeComponents(List<Object> components) {
+    for (Object object : components) {
+      LOGGER.debug("Initializing component '{}'...", object.toString());
+      try {
+        if (object instanceof MessageProcessorChain) {
+          // When created it will be initialized
+        } else {
+          muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME);
+        }
+      } catch (MuleException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
+  private void startComponent(List<Object> components) {
+    for (Object object : components) {
+      LOGGER.debug("Starting component '{}'...", object.toString());
+      try {
+        if (object instanceof MessageProcessorChain) {
+          // Has to be ignored as when it is registered it will be started too
+        } else {
+          muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
+        }
+      } catch (MuleException e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
 
   private static BeanDependencyResolver getBeanDependencyResolver(ConfigurationDependencyResolver configurationDependencyResolver,
@@ -376,12 +386,14 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                                      boolean mustBeRoot) {
     final List<String> applicationComponents = super.createApplicationComponents(beanFactory, minimalAppModel, mustBeRoot);
 
+    final Set<ComponentAst> orphanComponents = resolveOrphanComponents(minimalAppModel);
+    LOGGER.debug("orphanComponents found: {}", orphanComponents.toString());
+
     // Handle orphan named components...
-    minimalAppModel.recursiveStream()
+    orphanComponents.stream()
+        .filter(cm -> asList(SOURCE, OPERATION, SCOPE).contains(cm.getComponentType()))
         .filter(cm -> ((ComponentModel) cm).isEnabled())
-        .filter(cm -> asList(SOURCE, OPERATION).contains(cm.getComponentType()))
         .filter(cm -> cm.getName().isPresent())
-        .filter(cm -> !applicationComponents.contains(cm.getName().get()))
         .forEach(cm -> {
           final String nameAttribute = cm.getName().get();
           LOGGER.debug("Registering orphan named component '{}'...", nameAttribute);
@@ -395,12 +407,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         });
 
     // Handle orphan components without name, rely on the location.
-    final Set<String> rootContainerNames = minimalAppModel.topLevelComponentsStream()
+    orphanComponents.stream()
         .filter(cm -> ((ComponentModel) cm).isEnabled())
-        .map(cm -> cm.getLocation().getRootContainerName())
-        .collect(toSet());
-    minimalAppModel.recursiveStream()
-        .filter(cm -> !rootContainerNames.contains(cm.getLocation().getRootContainerName()))
         .forEach(cm -> {
           final BeanDefinition beanDef = ((SpringComponentModel) cm).getBeanDefinition();
           if (beanDef != null) {
