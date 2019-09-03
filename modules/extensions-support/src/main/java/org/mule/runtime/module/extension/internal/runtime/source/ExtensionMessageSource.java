@@ -562,7 +562,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   protected void doInitialise() throws InitialisationException {
-    flowConstruct = (FlowConstruct) componentLocator.find(getRootContainerLocation()).get();
+    componentLocator.find(getRootContainerLocation())
+        .ifPresent(comp -> flowConstruct = (FlowConstruct) comp);
     messageProcessContext = createProcessingContext();
     if (shouldRunOnThisNode()) {
       reallyDoInitialise();

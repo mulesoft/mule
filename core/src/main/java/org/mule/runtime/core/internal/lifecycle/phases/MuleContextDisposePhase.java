@@ -14,7 +14,6 @@ import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.privileged.routing.OutboundRouter;
@@ -65,15 +64,25 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase {
     // Can call dispose from all lifecycle Phases
     registerSupportedPhase(LifecyclePhase.ALL_PHASES);
     /*
-     * Ignored objects - -Component is ignored because the FlowConstruct will manage the components lifecycle -MessageSource
-     * disposal is managed by the connector it is associated with -RouterCollection is ignored because the FlowConstruct will
-     * manage the lifecycle -Router is ignored since its lifecycle is managed by the associated router collection -Transformer is
-     * ignored since the Dispose lifecycle is managed by the base {@link AbstractTransformer} by receiving a ARTIFACT_DISPOSING
-     * event and calling dispose on the transformer. This is necessary since transformers are prototype objects and not managed by
-     * DI containers such as Spring after the creation of the object
+     * Ignored objects:
+     *
+     * * Component is ignored because the FlowConstruct will manage the components lifecycle
+     *
+     * * RouterCollection is ignored because the FlowConstruct will manage the lifecycle
+     *
+     * * Router is ignored since its lifecycle is managed by the associated router collection
+     *
+     * * Transformer is ignored since the Dispose lifecycle is managed by the base {@link AbstractTransformer} by receiving a
+     * ARTIFACT_DISPOSING event and calling dispose on the transformer. This is necessary since transformers are prototype objects
+     * and not managed by DI containers such as Spring after the creation of the object
      */
-    setIgnoredObjectTypes(new Class[] {Component.class, MessageSource.class, InterceptingMessageProcessor.class,
-        OutboundRouter.class, Transformer.class, MuleContext.class});
+    setIgnoredObjectTypes(new Class[] {
+        Component.class,
+        InterceptingMessageProcessor.class,
+        OutboundRouter.class,
+        Transformer.class,
+        MuleContext.class
+    });
   }
 
   @Override
