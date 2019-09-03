@@ -242,7 +242,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
                                             new ModuleFlowExtensionsProcessingTemplate(resultAdapter, listener,
                                                                                        contextAdapter.getNotificationsFunctions(),
                                                                                        completionHandlerFactory
-                                                                                 .createCompletionHandler(contextAdapter)),
+                                                                                           .createCompletionHandler(contextAdapter)),
                                             messageProcessContext);
   }
 
