@@ -89,7 +89,7 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
     }).when(sourcePolicy).process(any(CoreEvent.class), any(), any());
 
     schedulerMessageSource.trigger();
-    new PollingProber(120000, 100).check(new Probe() {
+    new PollingProber(RECEIVE_TIMEOUT, 100).check(new Probe() {
 
       @Override
       public boolean isSatisfied() {
