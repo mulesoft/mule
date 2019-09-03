@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
+import static org.mule.tck.junit4.matcher.metadata.MetadataKeyResultSuccessMatcher.isSuccess;
 import static org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver.CIRCLE;
 import static org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver.SQUARE;
 import static org.mule.test.metadata.extension.query.NativeQueryOutputResolver.NATIVE_QUERY;
@@ -55,7 +56,7 @@ public class QueryMetadataTestCase extends AbstractMetadataOperationTestCase {
   @Test
   public void getEntityKeys() throws Exception {
     MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService.getEntityKeys(QUERY_LOCATION);
-    assertThat(metadataKeysResult.isSuccess(), is(true));
+    assertThat(metadataKeysResult, isSuccess());
     MetadataKeysContainer container = metadataKeysResult.get();
     Set<MetadataKey> metadataKeys = container.getKeys(container.getCategories().iterator().next()).get();
     assertThat(metadataKeys.size(), is(2));
@@ -66,7 +67,7 @@ public class QueryMetadataTestCase extends AbstractMetadataOperationTestCase {
   public void getEntityMetadata() throws Exception {
     MetadataResult<TypeMetadataDescriptor> entityMetadata =
         metadataService.getEntityMetadata(QUERY_LOCATION, CIRCLE_METADATA_KEY);
-    assertThat(entityMetadata.isSuccess(), is(true));
+    assertThat(entityMetadata, isSuccess());
     TypeMetadataDescriptor descriptor = entityMetadata.get();
     assertThat(descriptor.getType(), is(toMetadataType(Circle.class)));
   }
@@ -76,7 +77,7 @@ public class QueryMetadataTestCase extends AbstractMetadataOperationTestCase {
     location = QUERY_LOCATION;
     MetadataKey dsqlKey = newKey(DSQL_QUERY).build();
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> entityMetadata = getComponentDynamicMetadata(dsqlKey);
-    assertThat(entityMetadata.isSuccess(), is(true));
+    assertThat(entityMetadata, isSuccess());
 
     MetadataType generatedType = entityMetadata.get().getModel().getOutput().getType();
     assertThat(generatedType, is(instanceOf(ArrayType.class)));
@@ -88,7 +89,7 @@ public class QueryMetadataTestCase extends AbstractMetadataOperationTestCase {
     location = builder().globalName(NATIVE_QUERY_LIST_FLOW).addProcessorsPart().addIndexPart(0).build();
     MetadataKey nativeKey = newKey(NATIVE_QUERY).build();
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> entityMetadata = getComponentDynamicMetadata(nativeKey);
-    assertThat(entityMetadata.isSuccess(), is(true));
+    assertThat(entityMetadata, isSuccess());
     MetadataType generatedType = entityMetadata.get().getModel().getOutput().getType();
     assertThat(generatedType, is(instanceOf(ArrayType.class)));
     assertCircleType((ObjectType) ((ArrayType) generatedType).getType());
@@ -99,7 +100,7 @@ public class QueryMetadataTestCase extends AbstractMetadataOperationTestCase {
     location = builder().globalName(NATIVE_QUERY_FLOW).addProcessorsPart().addIndexPart(0).build();
     MetadataKey nativeKey = newKey(NATIVE_QUERY).build();
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> entityMetadata = getComponentDynamicMetadata(nativeKey);
-    assertThat(entityMetadata.isSuccess(), is(true));
+    assertThat(entityMetadata, isSuccess());
     MetadataType generatedType = entityMetadata.get().getModel().getOutput().getType();
     assertCircleType((ObjectType) generatedType);
   }

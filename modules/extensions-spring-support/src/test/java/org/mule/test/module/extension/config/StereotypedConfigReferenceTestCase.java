@@ -6,10 +6,11 @@
  */
 package org.mule.test.module.extension.config;
 
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
+import static org.mule.tck.junit4.matcher.metadata.MetadataKeyResultSuccessMatcher.isSuccess;
+
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
@@ -59,6 +60,6 @@ public class StereotypedConfigReferenceTestCase extends AbstractExtensionFunctio
   public void applicationInitialisesBothBeans() {
     final MetadataResult<MetadataKeysContainer> metadataKeysResult =
         metadataService.getMetadataKeys(builder().globalName("drStrange").build());
-    assertThat(metadataKeysResult.isSuccess(), is(true));
+    assertThat(metadataKeysResult, isSuccess());
   }
 }

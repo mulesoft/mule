@@ -6,9 +6,9 @@
  */
 package org.mule.test.module.extension.metadata;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.component.location.Location.builder;
+import static org.mule.tck.junit4.matcher.metadata.MetadataKeyResultSuccessMatcher.isSuccess;
 import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.EXPLICIT_RESOLUTION;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -38,7 +38,7 @@ public class SourceWithCallbackParametersMetadataTest extends MetadataExtensionF
   @Test
   public void getSourceDynamicInputMetadataFromCallbackParameters() throws Exception {
     final MetadataResult<ComponentMetadataDescriptor<SourceModel>> result = getComponentDynamicMetadata(PERSON_METADATA_KEY);
-    assertThat(result.isSuccess(), is(true));
+    assertThat(result, isSuccess());
     ComponentMetadataDescriptor<SourceModel> componentMetadata = result.get();
     SourceModel sourceModel = componentMetadata.getModel();
 
