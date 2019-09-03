@@ -2,9 +2,11 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <configuration defaultProcessingStrategy="non-blocking">
         <expression-language>
@@ -283,6 +285,21 @@
             <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
             <test:non-blocking-processor/>
             <test:assert count="1" expression="#[Thread.currentThread()!=beforeThread  and assertPayload()]"/>
+        </catch-exception-strategy>
+    </flow>
+
+    <http:request-config name="HTTP_Request_Configuration" host="www.google.com" port="443" protocol="HTTPS"/>
+
+    <flow name="asyncThrowsErrorInsideErrorHandler" processingStrategy="non-blocking">
+        <test:component throwException="true"/>
+        <catch-exception-strategy>
+            <async>
+                <http:request config-ref="HTTP_Request_Configuration" path="/some/path/that/will/generate/error" method="POST">
+                    <http:request-builder>
+                        <http:header headerName="Content-Type" value="application/json"/>
+                    </http:request-builder>
+                </http:request>
+            </async>
         </catch-exception-strategy>
     </flow>
 

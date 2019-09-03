@@ -146,14 +146,17 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
             // Clone event, make it async and put an empty ReplyToHandler. If null is set, then the flow error handler
             // could be called in case of error, which makes no sense in async scenario. E.g. with non-blocking PS
             MuleEvent newEvent = new DefaultMuleEvent((MuleMessage) ((ThreadSafeAccess) message).newThreadCopy(),
-                    event, false, false, MessageExchangePattern.ONE_WAY, new ReplyToHandler() {
+                    event, false, false, MessageExchangePattern.ONE_WAY, new ReplyToHandler()
+            {
                 @Override
-                public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+                public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
+                {
 
                 }
 
                 @Override
-                public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
+                public void processExceptionReplyTo(MessagingException exception, Object replyTo)
+                {
 
                 }
             });
