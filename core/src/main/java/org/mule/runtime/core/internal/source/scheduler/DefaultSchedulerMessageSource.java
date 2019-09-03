@@ -11,23 +11,23 @@ import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObjectOrFail;
+import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.source.SchedulerConfiguration;
 import org.mule.runtime.api.source.SchedulerMessageSource;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.EventContextFactory;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.scheduler.PeriodicScheduler;
@@ -35,7 +35,6 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
@@ -70,6 +69,9 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   private Processor listener;
   private FlowConstruct flowConstruct;
   private MuleContext muleContext;
+
+  @Inject
+  private ConfigurationComponentLocator componentLocator;
 
   @Inject
   private MessageProcessingManager messageProcessingManager;
@@ -164,14 +166,14 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
       doPoll();
     } else {
       LOGGER.info("Flow '{}' is already running and 'disallowConcurrentExecution' is set to 'true'. Execution skipped.",
-                  flowConstruct.getRootContainerLocation().getGlobalName());
+                  getLocation().getRootContainerName());
     }
   }
 
   private void doPoll() {
     try {
-      setCurrentEvent(InternalEvent.builder(EventContextFactory.create(flowConstruct, getLocation())).message(Message.of(null))
-          .build());
+      // setCurrentEvent(InternalEvent.builder(EventContextFactory.create(flowConstruct, getLocation())).message(Message.of(null))
+      // .build());
       messageProcessingManager.processMessage(flowProcessingTemplate, flowProcessContext);
     } catch (Exception e) {
       muleContext.getExceptionListener().handleException(e);
@@ -197,7 +199,8 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
    */
   @Override
   public void initialise() throws InitialisationException {
-    this.flowConstruct = getFromAnnotatedObjectOrFail(muleContext.getConfigurationComponentLocator(), this);
+    getFromAnnotatedObject(componentLocator, this)
+        .ifPresent(flow -> this.flowConstruct = flow);
 
     // Flow execution configurations
     this.flowProcessingTemplate = new SchedulerFlowProcessingTemplate(listener, emptyList(), this);
