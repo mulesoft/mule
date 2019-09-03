@@ -6,40 +6,76 @@
  */
 package org.mule.runtime.core.internal.source.polling;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
+import static java.util.Optional.of;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
+import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
-import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
+import static org.mule.tck.MuleTestUtils.createFlowWithSource;
 import static org.slf4j.LoggerFactory.getLogger;
-
+import static reactor.core.publisher.Mono.just;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.core.internal.execution.MuleMessageProcessingManager;
+import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
+import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.internal.policy.SourcePolicy;
+import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
-import org.junit.After;
-import org.junit.Test;
-import org.slf4j.Logger;
-
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
 
 public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTestCase {
 
   private static final Logger LOGGER = getLogger(DefaultSchedulerMessageSourceTestCase.class);
+  private PolicyManager policyManager;
+  private SourcePolicy sourcePolicy;
+  private final String MESSAGE_PROCESSING_MANAGER_REGISTRY_KEY = "_muleMessageProcessingManager";
+  private final String POLICY_MANAGER_REGISTRY_KEY = "_policyManager";
+
+  @Before
+  public void setUp() throws Exception {
+    policyManager = mock(PolicyManager.class);
+    sourcePolicy = mock(SourcePolicy.class);
+    when(policyManager.createSourcePolicyInstance(any(), any(), any(), any())).thenReturn(sourcePolicy);
+    ((DefaultMuleContext) muleContext).getRegistry().registerObject(POLICY_MANAGER_REGISTRY_KEY,
+                                                                    policyManager);
+
+    MuleMessageProcessingManager processingManager = new MuleMessageProcessingManager();
+    processingManager.setMuleContext(muleContext);
+
+    muleContext.getInjector().inject(processingManager);
+
+    ((DefaultMuleContext) muleContext).getRegistry().unregisterObject(MESSAGE_PROCESSING_MANAGER_REGISTRY_KEY);
+    ((DefaultMuleContext) muleContext).getRegistry().registerObject(MESSAGE_PROCESSING_MANAGER_REGISTRY_KEY, processingManager);
+  }
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
@@ -53,7 +89,12 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
 
     SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
     schedulerMessageSource.setListener(flow);
-    schedulerMessageSource.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
+
+    doAnswer(invocationOnMock -> {
+      CoreEvent inputEvent = invocationOnMock.getArgument(0);
+      return just(right(new SourcePolicySuccessResult(flow.process(inputEvent), () -> emptyMap(),
+                                                      new TestMessageSourceResponseParametersProcessor())));
+    }).when(sourcePolicy).process(any(CoreEvent.class), any());
 
     schedulerMessageSource.trigger();
     new PollingProber(RECEIVE_TIMEOUT, 100).check(new Probe() {
@@ -105,11 +146,18 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
   }
 
   private DefaultSchedulerMessageSource createMessageSource() throws Exception {
-    createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
     schedulerMessageSource =
         new DefaultSchedulerMessageSource(muleContext, scheduler(), false);
     schedulerMessageSource.setAnnotations(getAppleFlowComponentLocationAnnotations());
-    schedulerMessageSource.initialise();
+
+    // Manually create and register flow
+    Flow flow = createFlowWithSource(muleContext, APPLE_FLOW, schedulerMessageSource);
+    when(componentLocator.find(Location.builder().globalName(APPLE_FLOW).build())).thenReturn(of(flow));
+    // scheduler source is initialized when it's registered as the flow's source in the registry
+    ((DefaultMuleContext) muleContext).getRegistry().registerFlowConstruct(flow);
+
+    // Injecting processing manager dependency
+    muleContext.getInjector().inject(schedulerMessageSource);
     return schedulerMessageSource;
   }
 
@@ -118,5 +166,18 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
     factory.setFrequency(1000);
     return factory;
   }
+
+  private class TestMessageSourceResponseParametersProcessor implements MessageSourceResponseParametersProcessor {
+
+    @Override
+    public CheckedFunction<CoreEvent, Map<String, Object>> getSuccessfulExecutionResponseParametersFunction() {
+      return event -> emptyMap();
+    }
+
+    @Override
+    public CheckedFunction<CoreEvent, Map<String, Object>> getFailedExecutionResponseParametersFunction() {
+      return event -> emptyMap();
+    }
+  };
 
 }
