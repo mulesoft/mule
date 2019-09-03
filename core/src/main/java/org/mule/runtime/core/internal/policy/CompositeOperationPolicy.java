@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.policy;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextAlwaysComplete;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -146,7 +147,7 @@ public class CompositeOperationPolicy extends
   public Publisher<CoreEvent> process(CoreEvent operationEvent, OperationParametersProcessor parametersProcessor) {
     try {
       if (getParametersTransformer().isPresent()) {
-        return processWithChildContext(CoreEvent.builder(operationEvent)
+        return processWithChildContextAlwaysComplete(CoreEvent.builder(operationEvent)
             .message(getParametersTransformer().get().fromParametersToMessage(parametersProcessor.getOperationParameters()))
             .build(), getPolicyProcessor(), empty());
       } else {
