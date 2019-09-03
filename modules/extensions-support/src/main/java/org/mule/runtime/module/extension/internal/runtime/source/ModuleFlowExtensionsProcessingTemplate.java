@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.reactivestreams.Publisher;
 
-public class ModuleFlowExtensionsProcessingTemplate extends ModuleFlowProcessingTemplate {
+final class ModuleFlowExtensionsProcessingTemplate extends ModuleFlowProcessingTemplate {
 
   private final SourceResultAdapter sourceMessage;
   private final SourceCompletionHandler completionHandler;
