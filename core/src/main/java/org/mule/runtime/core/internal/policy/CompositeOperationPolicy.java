@@ -15,6 +15,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock.readWriteLock;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -29,9 +30,7 @@ import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.TransactionAwareFluxSinkSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-
-import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.github.benmanes.caffeine.cache.RemovalCause;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,11 +39,12 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.MonoSink;
 
 /**
  * {@link OperationPolicy} created from a list of {@link Policy}.
@@ -61,7 +61,7 @@ public class CompositeOperationPolicy
   public static final String POLICY_OPERATION_PARAMETERS_PROCESSOR = "policy.operation.parametersProcessor";
   public static final String POLICY_OPERATION_OPERATION_EXEC_FUNCTION = "policy.operation.operationExecutionFunction";
   private static final String POLICY_OPERATION_CHILD_CTX = "policy.operation.childContext";
-  private static final String POLICY_OPERATION_CALLER_SINK = "policy.operation.callerSink";
+  private static final String POLICY_OPERATION_CALLER_CALLBACK = "policy.operation.callerCallback";
 
   private final OperationPolicyProcessorFactory operationPolicyProcessorFactory;
 
@@ -116,21 +116,24 @@ public class CompositeOperationPolicy
                 if (!childContext.isComplete()) {
                   childContext.success(result);
                 }
-                ((MonoSink<CoreEvent>) ((InternalEvent) result).getInternalParameter(POLICY_OPERATION_CALLER_SINK))
-                    .success(quickCopy(childContext.getParentContext().get(), result));
+                recoverCallback((InternalEvent) result).complete(quickCopy(childContext.getParentContext().get(), result));
               })
               .onErrorContinue(MessagingException.class, (t, e) -> {
                 final MessagingException me = (MessagingException) t;
 
                 me.setProcessedEvent(quickCopy(getStoredChildContext(me.getEvent()).getParentContext().get(),
                                                me.getEvent()));
-                ((MonoSink<CoreEvent>) ((InternalEvent) me.getEvent()).getInternalParameter(POLICY_OPERATION_CALLER_SINK))
-                    .error(me);
+
+                recoverCallback((InternalEvent) me.getEvent()).error(me);
               });
 
       policyFlux.subscribe();
       return sinkRef.getFluxSink();
     }
+  }
+
+  private ExecutorCallback recoverCallback(InternalEvent result) {
+    return (ExecutorCallback) result.getInternalParameter(POLICY_OPERATION_CALLER_CALLBACK);
   }
 
   /**
@@ -153,7 +156,11 @@ public class CompositeOperationPolicy
 
           OperationExecutionFunction operationExecutionFunction =
               ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_OPERATION_EXEC_FUNCTION);
-          return Mono.<CoreEvent>create(sink -> operationExecutionFunction.execute(parametersMap, event, sink));
+
+          DeferredMonoSinkExecutorCallback<CoreEvent> callback = new DeferredMonoSinkExecutorCallback();
+          operationExecutionFunction.execute(parametersMap, event, callback);
+
+          return Mono.<CoreEvent>create(callback::setSink);
         })
         .map(response -> quickCopy(response, singletonMap(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)));
   }
@@ -162,9 +169,9 @@ public class CompositeOperationPolicy
    * Always uses the stored result of {@code processNextOperation} so all the chains after the operation execution are executed
    * with the actual operation result and not a modified version from another policy.
    *
-   * @param policy the policy to execute.
+   * @param policy        the policy to execute.
    * @param nextProcessor the processor to execute when the policy next-processor gets executed
-   * @param eventPub the event to use to execute the policy chain.
+   * @param eventPub      the event to use to execute the policy chain.
    */
   @Override
   protected Publisher<CoreEvent> applyPolicy(Policy policy, ReactiveProcessor nextProcessor, Publisher<CoreEvent> eventPub) {
@@ -177,7 +184,7 @@ public class CompositeOperationPolicy
                       OperationExecutionFunction operationExecutionFunction,
                       OperationParametersProcessor parametersProcessor,
                       ComponentLocation operationLocation,
-                      MonoSink<CoreEvent> sink) {
+                      ExecutorCallback callback) {
 
     readWriteLock.withReadLock(lockReleaser -> {
       if (!disposed.get()) {
@@ -185,9 +192,9 @@ public class CompositeOperationPolicy
 
         policySink.next(operationEventForPolicy(quickCopy(newChildContext(operationEvent, of(operationLocation)), operationEvent),
                                                 operationExecutionFunction,
-                                                parametersProcessor, sink));
+                                                parametersProcessor, callback));
       } else {
-        sink.error(new MessagingException(createStaticMessage("Operation policy already disposed"), operationEvent));
+        callback.error(new MessagingException(createStaticMessage("Operation policy already disposed"), operationEvent));
       }
 
       return null;
@@ -195,19 +202,19 @@ public class CompositeOperationPolicy
   }
 
   private CoreEvent operationEventForPolicy(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
-                                            OperationParametersProcessor parametersProcessor, MonoSink<CoreEvent> callerSink) {
+                                            OperationParametersProcessor parametersProcessor, ExecutorCallback callback) {
     return getParametersTransformer().isPresent()
         ? InternalEvent.builder(operationEvent)
             .message(getParametersTransformer().get().fromParametersToMessage(parametersProcessor.getOperationParameters()))
             .addInternalParameter(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor)
             .addInternalParameter(POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction)
             .addInternalParameter(POLICY_OPERATION_CHILD_CTX, operationEvent.getContext())
-            .addInternalParameter(POLICY_OPERATION_CALLER_SINK, callerSink)
+            .addInternalParameter(POLICY_OPERATION_CALLER_CALLBACK, callback)
             .build()
         : quickCopy(operationEvent, of(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor,
                                        POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction,
                                        POLICY_OPERATION_CHILD_CTX, operationEvent.getContext(),
-                                       POLICY_OPERATION_CALLER_SINK, callerSink));
+                                       POLICY_OPERATION_CALLER_CALLBACK, callback));
   }
 
   private static BaseEventContext getStoredChildContext(CoreEvent event) {

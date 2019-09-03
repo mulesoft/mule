@@ -8,8 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
@@ -38,7 +36,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.create;
-import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
@@ -65,9 +62,11 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.policy.DeferredMonoSinkExecutorCallback;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.internal.policy.SynchronousSinkExecutorCallback;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -85,7 +84,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
-import org.mule.runtime.module.extension.internal.runtime.execution.CoreEventSinkExecutorCallback;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
@@ -107,7 +105,7 @@ import java.util.function.Supplier;
 import com.google.common.collect.ImmutableMap;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-import reactor.core.publisher.MonoSink;
+import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
 /**
@@ -140,22 +138,24 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   static final String INVALID_TARGET_MESSAGE =
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
 
+  private final ReflectionCache reflectionCache;
+  private final RetryPolicyTemplate fallbackRetryPolicyTemplate = new NoRetryPolicyTemplate();
+
   protected final ExtensionModel extensionModel;
   protected final ResolverSet resolverSet;
   protected final String target;
   protected final String targetValue;
   protected final RetryPolicyTemplate retryPolicyTemplate;
 
-  private final ReflectionCache reflectionCache;
-  private final RetryPolicyTemplate fallbackRetryPolicyTemplate = new NoRetryPolicyTemplate();
+
+  private Function<Optional<ConfigurationInstance>, RetryPolicyTemplate> retryPolicyResolver;
+  private String resolvedProcessorRepresentation;
+  private boolean initialised = false;
 
   protected ExecutionMediator executionMediator;
   protected CompletableComponentExecutor componentExecutor;
   protected ReturnDelegate returnDelegate;
   protected PolicyManager policyManager;
-
-  private String resolvedProcessorRepresentation;
-  private boolean initialised = false;
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
                                    T componentModel,
@@ -185,52 +185,86 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return from(publisher)
-        .flatMap(event -> subscriberContext().map(ctx -> addContextToEvent(event, ctx)))
-        .flatMap(event -> {
-          try {
+    Flux<CoreEvent> flux = from(publisher)
+        .flatMap(event -> subscriberContext().map(ctx -> addContextToEvent(event, ctx)));
 
-            final Optional<ConfigurationInstance> configuration = resolveConfiguration(event);
-            final Map<String, Object> resolutionResult = getResolutionResult(event, configuration);
-            final Scheduler currentScheduler = ((InternalEvent) event).getInternalParameter(PROCESSOR_SCHEDULER_CONTEXT_KEY);
+    if (isAsync()) {
+      return flux
+          .flatMap(event -> {
+            DeferredMonoSinkExecutorCallback callback = new DeferredMonoSinkExecutorCallback();
+            onEvent(event, callback);
 
-            OperationExecutionFunction operationExecutionFunction;
+            return create(callback::setSink);
+          });
+    } else {
+      return flux.handle((event, sink) -> {
+        try {
+          onEvent(event, new SynchronousSinkExecutorCallback(sink));
+        } catch (Throwable t) {
+          sink.error(t);
+        }
+      });
+    }
+  }
 
-            if (shouldUsePrecalculatedContext(event)) {
-              ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
+  private void onEvent(CoreEvent event, ExecutorCallback executorCallback) {
+    try {
 
-              operationExecutionFunction = (parameters, operationEvent, sink) -> {
-                operationContext.setCurrentScheduler(currentScheduler != null ? currentScheduler : IMMEDIATE_SCHEDULER);
-                executeOperation(operationEvent, operationContext, sink);
-              };
-            } else {
-              operationExecutionFunction = (parameters, operationEvent, sink) -> {
-                ExecutionContextAdapter<T> operationContext = createExecutionContext(
-                                                                                     configuration,
-                                                                                     parameters,
-                                                                                     operationEvent,
-                                                                                     currentScheduler != null ? currentScheduler
-                                                                                         : IMMEDIATE_SCHEDULER);
+      final Optional<ConfigurationInstance> configuration = resolveConfiguration(event);
+      final Map<String, Object> resolutionResult = getResolutionResult(event, configuration);
+      final Scheduler currentScheduler = ((InternalEvent) event).getInternalParameter(PROCESSOR_SCHEDULER_CONTEXT_KEY);
 
-                executeOperation(operationEvent, operationContext, sink);
-              };
-            }
+      OperationExecutionFunction operationExecutionFunction;
 
-            if (getLocation() != null) {
-              ((DefaultFlowCallStack) event.getFlowCallStack())
-                  .setCurrentProcessorPath(resolvedProcessorRepresentation);
-              return create(sink -> policyManager
-                  .createOperationPolicy(this, event, () -> resolutionResult)
-                  .process(event, operationExecutionFunction, () -> resolutionResult, getLocation(), sink));
-            } else {
-              // If this operation has no component location then it is internal. Don't apply policies on internal operations.
+      if (shouldUsePrecalculatedContext(event)) {
+        ExecutionContextAdapter<T> operationContext = getPrecalculatedContext(event);
 
-              return create(sink -> operationExecutionFunction.execute(resolutionResult, event, sink));
-            }
-          } catch (Throwable t) {
-            return error(t);
-          }
-        });
+        operationExecutionFunction = (parameters, operationEvent, callback) -> {
+          operationContext.setCurrentScheduler(currentScheduler != null ? currentScheduler : IMMEDIATE_SCHEDULER);
+
+          executeOperation(operationContext, mapped(callback, operationContext, operationEvent));
+        };
+      } else {
+        operationExecutionFunction = (parameters, operationEvent, callback) -> {
+          ExecutionContextAdapter<T> operationContext = createExecutionContext(
+                                                                               configuration,
+                                                                               parameters,
+                                                                               operationEvent,
+                                                                               currentScheduler != null ? currentScheduler
+                                                                                   : IMMEDIATE_SCHEDULER);
+
+          executeOperation(operationContext, mapped(callback, operationContext, operationEvent));
+        };
+      }
+
+
+      if (getLocation() != null) {
+        ((DefaultFlowCallStack) event.getFlowCallStack())
+            .setCurrentProcessorPath(resolvedProcessorRepresentation);
+        policyManager.createOperationPolicy(this, event, () -> resolutionResult)
+            .process(event, operationExecutionFunction, () -> resolutionResult, getLocation(), executorCallback);
+      } else {
+        // If this operation has no component location then it is internal. Don't apply policies on internal operations.
+        operationExecutionFunction.execute(resolutionResult, event, executorCallback);
+      }
+    } catch (Throwable t) {
+      executorCallback.error(t);
+    }
+  }
+
+  private ExecutorCallback mapped(ExecutorCallback callback, ExecutionContextAdapter<T> operationContext, CoreEvent event) {
+    return new ExecutorCallback() {
+
+      @Override
+      public void complete(Object value) {
+        callback.complete(returnDelegate.asReturnValue(value, operationContext));
+      }
+
+      @Override
+      public void error(Throwable t) {
+        callback.error(mapError(t, event));
+      }
+    };
   }
 
   private CoreEvent addContextToEvent(CoreEvent event, Context ctx) {
@@ -279,15 +313,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return ((InternalEvent) event).getInternalParameter(INTERCEPTION_RESOLVED_CONTEXT);
   }
 
-  protected void executeOperation(CoreEvent event,
-                                  ExecutionContextAdapter<T> operationContext,
-                                  MonoSink<CoreEvent> sink) {
-
-    ExecutorCallback callback =
-        new CoreEventSinkExecutorCallback(sink,
-                                          result -> returnDelegate.asReturnValue(result, operationContext),
-                                          t -> mapError(t, event));
-
+  protected void executeOperation(ExecutionContextAdapter<T> operationContext, ExecutorCallback callback) {
     executionMediator.execute(componentExecutor, operationContext, callback);
   }
 
@@ -311,6 +337,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Override
   protected void doInitialise() throws InitialisationException {
     if (!initialised) {
+      initRetryPolicyResolver();
       returnDelegate = createReturnDelegate();
       initialiseIfNeeded(resolverSet, muleContext);
       componentExecutor = createComponentExecutor();
@@ -326,7 +353,21 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
   }
 
+  private void initRetryPolicyResolver() {
+    Optional<ConfigurationInstance> staticConfig = getStaticConfiguration();
+    if (staticConfig.isPresent() || !requiresConfig()) {
+      RetryPolicyTemplate staticPolicy = fetchRetryPolicyTemplate(staticConfig);
+      retryPolicyResolver = config -> staticPolicy;
+    } else {
+      retryPolicyResolver = this::fetchRetryPolicyTemplate;
+    }
+  }
+
   private RetryPolicyTemplate getRetryPolicyTemplate(Optional<ConfigurationInstance> configuration) {
+    return retryPolicyResolver.apply(configuration);
+  }
+
+  private RetryPolicyTemplate fetchRetryPolicyTemplate(Optional<ConfigurationInstance> configuration) {
     RetryPolicyTemplate delegate = null;
     if (retryPolicyTemplate != null) {
       delegate = configuration
@@ -472,8 +513,21 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return true;
   }
 
-  protected Optional<String> getTarget() {
-    return isTargetPresent() ? of(target) : empty();
+  protected boolean isAsync() {
+    if (!requiresConfig()) {
+      return false;
+    }
+
+    if (usesDynamicConfiguration()) {
+      return true;
+    } else {
+      Optional<ConfigurationInstance> staticConfig = getStaticConfiguration();
+      if (staticConfig.isPresent()) {
+        return getRetryPolicyTemplate(staticConfig).isEnabled();
+      }
+    }
+
+    return true;
   }
 
   @Override

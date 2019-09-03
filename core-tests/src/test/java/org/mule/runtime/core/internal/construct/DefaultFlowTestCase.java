@@ -353,9 +353,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
 
       @Override
       protected Supplier<Scheduler> getRingBufferSchedulerSupplier(MuleContext muleContext, String schedulersNamePrefix) {
-        return () -> {
-          return rejectingScheduler;
-        };
+        return () -> rejectingScheduler;
       }
     }.create(muleContext, FLOW_NAME);
 
