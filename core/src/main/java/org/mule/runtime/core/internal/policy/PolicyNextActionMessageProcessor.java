@@ -10,7 +10,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextAlwaysComplete;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
@@ -36,13 +36,13 @@ import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 /**
  * Next-operation message processor implementation.
@@ -102,7 +102,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
           popBeforeNextFlowFlowStackElement().accept(event);
           notificationHelper.notification(BEFORE_NEXT).accept(event);
 
-          return from(processWithChildContext(event, nextOperation, ofNullable(getLocation())))
+          return from(processWithChildContextAlwaysComplete(event, nextOperation, ofNullable(getLocation())))
               .doOnSuccessOrError(notificationHelper.successOrErrorNotification(AFTER_NEXT)
                   .andThen((ev, t) -> pushAfterNextFlowStackElement().accept(event)))
               .onErrorResume(MessagingException.class, t -> {
@@ -113,7 +113,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
 
                 // Given we've used child context to ensure AFTER_NEXT notifications are fired at exactly the right time we need
                 // to propagate the error to parent context manually.
-                ((BaseEventContext) event.getContext())
+                ((BaseEventContext) t.getEvent().getContext())
                     .error(resolveMessagingException(t.getFailingComponent(), muleContext).apply(t));
                 return empty();
               })

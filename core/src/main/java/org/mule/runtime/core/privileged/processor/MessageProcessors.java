@@ -34,14 +34,13 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
-import org.reactivestreams.Publisher;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 /**
@@ -235,6 +234,21 @@ public class MessageProcessors {
   }
 
   /**
+   * Process a {@link ReactiveProcessor} using a child {@link BaseEventContext}. The returned {@link CoreEvent} will be always
+   * completed in case of success, error or empty result.
+   *
+   * @param event the event to process.
+   * @param processor the processor to process.
+   * @param componentLocation
+   * @return the future result of processing processor.
+   */
+  public static Publisher<CoreEvent> processWithChildContextAlwaysComplete(CoreEvent event, ReactiveProcessor processor,
+                                                                           Optional<ComponentLocation> componentLocation) {
+    BaseEventContext childContext = newChildContext(event, componentLocation);
+    return internalProcessWithChildContext(event, processor, childContext, true, true, childContext.getResponsePublisher());
+  }
+
+  /**
    * Creates a new {@link BaseEventContext} which is child of the one in the given {@code event}
    *
    * @param event the parent event
@@ -273,13 +287,25 @@ public class MessageProcessors {
   private static Publisher<CoreEvent> internalProcessWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                                       EventContext child, boolean completeParentOnEmpty,
                                                                       Publisher<CoreEvent> responsePublisher) {
+    return internalProcessWithChildContext(event, processor, child, completeParentOnEmpty, false, responsePublisher);
+  }
+
+  private static Publisher<CoreEvent> internalProcessWithChildContext(CoreEvent event, ReactiveProcessor processor,
+                                                                      EventContext child, boolean completeParentOnEmpty,
+                                                                      boolean completeOnError,
+                                                                      Publisher<CoreEvent> responsePublisher) {
     return just(quickCopy(child, event))
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded(child, true))
         .switchIfEmpty(from(responsePublisher))
         .map(result -> quickCopy(event.getContext(), result))
         .doOnError(MessagingException.class,
-                   me -> me.setProcessedEvent(quickCopy(event.getContext(), me.getEvent())))
+                   me -> {
+                     if (completeOnError) {
+                       ((BaseEventContext) event.getContext()).error(me);
+                     }
+                     me.setProcessedEvent(quickCopy(event.getContext(), me.getEvent()));
+                   })
         .doOnSuccess(result -> {
           if (result == null && completeParentOnEmpty) {
             ((BaseEventContext) event.getContext()).success();

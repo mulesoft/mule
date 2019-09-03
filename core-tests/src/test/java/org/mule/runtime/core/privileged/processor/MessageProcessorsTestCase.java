@@ -28,6 +28,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -37,6 +38,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
+import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -56,7 +58,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SynchronousSink;
@@ -254,6 +255,38 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
     assertThat(((BaseEventContext) result.getContext()).isComplete(), is(true));
     assertThat(completed.get(), is(true));
+  }
+
+  @Test
+  public void processWithChildContextProcessErrorDoesNotCompleteChild() {
+    final NullPointerException expected = new NullPointerException();
+
+    CoreEvent event = from(processWithChildContext(input, eventPub -> Flux.from(eventPub)
+        .handle(failWithExpected(expected)),
+                                                   Optional.empty()))
+                                                       .onErrorResume(MessagingException.class, throwable -> {
+                                                         ((BaseEventContext) throwable.getEvent().getContext()).error(throwable);
+                                                         return just(throwable.getEvent());
+                                                       })
+                                                       .block();
+
+    assertThat(((DefaultEventContext) event.getContext()).isComplete(), is(false));
+  }
+
+  @Test
+  public void processWithChildContextAlwaysCompleteProcessErrorCompletesChild() {
+    final NullPointerException expected = new NullPointerException();
+
+    CoreEvent event = from(processWithChildContext(input, eventPub -> Flux.from(eventPub)
+        .handle(failWithExpected(expected)),
+                                                   Optional.empty()))
+                                                       .onErrorResume(MessagingException.class, throwable -> {
+                                                         ((BaseEventContext) throwable.getEvent().getContext()).error(throwable);
+                                                         return just(throwable.getEvent());
+                                                       })
+                                                       .block();
+
+    assertThat(((DefaultEventContext) event.getContext()).isComplete(), is(false));
   }
 
   @Test
