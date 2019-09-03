@@ -14,9 +14,9 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.execution.FlowProcessingTemplate;
 import org.mule.runtime.core.internal.execution.NotificationFunction;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
-import org.mule.runtime.core.internal.source.scheduler.FlowProcessingTemplate;
 
 import java.util.List;
 import java.util.Map;
