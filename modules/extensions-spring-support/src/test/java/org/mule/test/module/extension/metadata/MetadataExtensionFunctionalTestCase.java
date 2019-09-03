@@ -6,10 +6,8 @@
  */
 package org.mule.test.module.extension.metadata;
 
-import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -18,6 +16,8 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.tck.junit4.matcher.metadata.MetadataKeyResultFailureMatcher.isFailure;
+import static org.mule.tck.junit4.matcher.metadata.MetadataKeyResultSuccessMatcher.isSuccess;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.getCarMetadata;
@@ -61,6 +61,7 @@ import java.util.function.BiConsumer;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.junit.Before;
 import org.junit.runners.Parameterized;
 
@@ -212,8 +213,7 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   private ComponentMetadataDescriptor<T> getSuccessComponentDynamicMetadata(MetadataKey key,
                                                                             BiConsumer<MetadataResult<ComponentMetadataDescriptor<T>>, MetadataKey> assertKeys) {
     MetadataResult<ComponentMetadataDescriptor<T>> componentMetadata = getComponentDynamicMetadata(key);
-    String msg = componentMetadata.getFailures().stream().map(f -> "Failure: " + f.getMessage()).collect(joining(", "));
-    assertThat(msg, componentMetadata.isSuccess(), is(true));
+    assertThat(componentMetadata, isSuccess());
     assertKeys.accept(componentMetadata, key);
     return componentMetadata.get();
   }
@@ -303,14 +303,11 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   }
 
   public void assertSuccessResult(MetadataResult<?> result) {
-    assertThat(result.getFailures(), is(empty()));
-    String failures = result.getFailures().stream().map(Object::toString).collect(joining(", "));
-    assertThat("Expecting success but this failure/s result/s found:\n " + failures, result.isSuccess(), is(true));
+    assertThat(result, isSuccess());
   }
 
   void assertFailureResult(MetadataResult<?> result, int failureNumber) {
-    assertThat(result.getFailures(), hasSize(failureNumber));
-    assertThat("Expecting failure but a success result found", result.isSuccess(), is(false));
+    assertThat(result, isFailure(hasSize(failureNumber)));
   }
 
   interface MetadataComponentDescriptorProvider<T extends ComponentModel> {

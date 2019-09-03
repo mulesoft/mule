@@ -10,6 +10,7 @@ import static java.lang.Integer.valueOf;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assume.assumeThat;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
@@ -22,12 +23,13 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.COMPONENT;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.INPUT;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.KEYS;
-import static org.mule.runtime.api.metadata.resolving.MetadataComponent.OUTPUT_ATTRIBUTES;
 import static org.mule.runtime.api.metadata.resolving.MetadataComponent.OUTPUT_PAYLOAD;
 import static org.mule.runtime.module.extension.api.metadata.MultilevelMetadataKeyBuilder.newKey;
+import static org.mule.tck.junit4.matcher.metadata.MetadataKeyResultSuccessMatcher.isSuccess;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
+
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -73,7 +75,7 @@ public class MetadataNegativeTestCase extends AbstractMetadataOperationTestCase 
   public void getOperationMetadataWithResolvingException() throws Exception {
     location = builder().globalName(FAIL_WITH_RESOLVING_EXCEPTION).addProcessorsPart().addIndexPart(0).build();
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> metadata = getComponentDynamicMetadata(PERSON_METADATA_KEY);
-    assertThat(metadata.isSuccess(), is(false));
+    assertThat(metadata, not(isSuccess()));
     assertFailureResult(metadata, 2);
     List<MetadataFailure> failures = metadata.getFailures();
     assertMetadataFailure(failures.get(0), "", CONNECTION_FAILURE, "", OUTPUT_PAYLOAD, "");
