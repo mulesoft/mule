@@ -35,6 +35,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.processor.strategy.StreamPerEventSink;
@@ -84,18 +85,30 @@ public final class MuleTestUtils {
   }
 
   /**
-   * Creates an empty flow with the provided name.
+   * Creates an empty flow with the provided name and source, if it's not null.
    */
-  public static Flow createFlow(MuleContext context, String flowName) throws MuleException {
+  public static Flow createFlowWithSource(MuleContext context, String flowName, MessageSource source)
+      throws MuleException {
     FlowExceptionHandler defaultErrorHandler = context.getDefaultErrorHandler(empty());
     initialiseIfNeeded(defaultErrorHandler, context);
     startIfNeeded(defaultErrorHandler);
-    final Flow flow = builder(flowName, context)
+    final Flow.Builder flowBuilder = builder(flowName, context)
         .processingStrategyFactory((muleContext, schedulersNamePrefix) -> withContextClassLoader(MuleTestUtils.class
             .getClassLoader(), () -> spy(new TestDirectProcessingStrategy())))
-        .messagingExceptionHandler(defaultErrorHandler).build();
+        .messagingExceptionHandler(defaultErrorHandler);
+    if (source != null) {
+      flowBuilder.source(source);
+    }
+    final Flow flow = flowBuilder.build();
     flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent(flowName)));
     return flow;
+  }
+
+  /**
+   * Creates an empty flow with the provided name.
+   */
+  public static Flow createFlow(MuleContext context, String flowName) throws MuleException {
+    return createFlowWithSource(context, flowName, null);
   }
 
   /**
@@ -119,9 +132,9 @@ public final class MuleTestUtils {
    * Executes callback with a given system property set and replaces the system property with it's original value once done.
    * Useful for asserting behaviour that is dependent on the presence of a system property.
    *
-   * @param propertyName  Name of system property to set
+   * @param propertyName Name of system property to set
    * @param propertyValue Value of system property
-   * @param callback      Callback implementing the the test code and assertions to be run with system property set.
+   * @param callback Callback implementing the the test code and assertions to be run with system property set.
    * @throws Exception any exception thrown by the execution of callback
    */
   public static void testWithSystemProperty(String propertyName, String propertyValue, TestCallback callback)
@@ -149,7 +162,7 @@ public final class MuleTestUtils {
    * Useful for asserting behaviour that is dependent on the presence of a system property.
    *
    * @param properties {@link Map} of property name and property value to be set.
-   * @param callback   Callback implementing the the test code and assertions to be run with system property set.
+   * @param callback Callback implementing the the test code and assertions to be run with system property set.
    * @throws Exception any exception thrown by the execution of callback
    */
   public static void testWithSystemProperties(Map<String, String> properties, TestCallback callback)
