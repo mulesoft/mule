@@ -174,8 +174,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
                                 RetryPolicyTemplate retryPolicy,
                                 List<Interceptor> executedInterceptors,
                                 Consumer<ExecutorCallback> executeCommand,
-                                //BiConsumer<ExecutorCallback, Object> onSuccess,
-                                //BiConsumer<ExecutorCallback, Throwable> onError,
                                 ExecutorCallback callback) {
 
     retryPolicy.applyPolicy(() -> {
