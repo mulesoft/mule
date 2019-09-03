@@ -4,57 +4,60 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.source;
+package org.mule.runtime.core.internal.execution;
 
-import static org.mule.runtime.core.api.functional.Either.left;
+import static java.util.Collections.emptyMap;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.execution.ModuleFlowProcessingPhaseTemplate;
-import org.mule.runtime.core.internal.execution.NotificationFunction;
-import org.mule.runtime.core.internal.execution.SourceResultAdapter;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.reactivestreams.Publisher;
 
-final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTemplate {
+/**
+ * Abstract {@link ModuleFlowProcessingPhaseTemplate} implementation, with shared logic between all implementations.
+ *
+ * @since 4.2.2
+ */
+public abstract class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTemplate {
 
-  private final SourceResultAdapter sourceMessage;
   private final Processor messageProcessor;
   private final List<NotificationFunction> notificationFunctions;
-  private final SourceCompletionHandler completionHandler;
 
-  ModuleFlowProcessingTemplate(SourceResultAdapter sourceMessage,
-                               Processor messageProcessor,
-                               List<NotificationFunction> notificationFunctions, SourceCompletionHandler completionHandler) {
-    this.sourceMessage = sourceMessage;
+  protected ModuleFlowProcessingTemplate(Processor messageProcessor,
+                                         List<NotificationFunction> notificationFunctions) {
     this.messageProcessor = messageProcessor;
     this.notificationFunctions = notificationFunctions;
-    this.completionHandler = completionHandler;
   }
 
   @Override
   public CheckedFunction<CoreEvent, Map<String, Object>> getSuccessfulExecutionResponseParametersFunction() {
-    return completionHandler::createResponseParameters;
+    return event -> emptyMap();
   }
 
   @Override
   public CheckedFunction<CoreEvent, Map<String, Object>> getFailedExecutionResponseParametersFunction() {
-    return completionHandler::createFailureResponseParameters;
+    return event -> emptyMap();
   }
 
   @Override
   public SourceResultAdapter getSourceMessage() {
-    return sourceMessage;
+    // payloadMediaTypeResolver is not needed since transmitted results is not a collection. Also, the cursorProviderFactory isn't
+    // needed either since no value is being communicated bu the ResultAdapter. This implies that no content is needed to be
+    // streamed.
+    return new SourceResultAdapter(Result.builder().build(), null, ANY, false,
+                                   Optional.empty(), null);
   }
 
   @Override
@@ -79,20 +82,17 @@ final class ModuleFlowProcessingTemplate implements ModuleFlowProcessingPhaseTem
 
   @Override
   public Publisher<Void> sendResponseToClient(CoreEvent response, Map<String, Object> parameters) {
-    return completionHandler.onCompletion(response, parameters);
+    return empty();
   }
 
   @Override
   public Publisher<Void> sendFailureResponseToClient(MessagingException messagingException,
                                                      Map<String, Object> parameters) {
-    return completionHandler.onFailure(messagingException, parameters);
+    return empty();
   }
 
   @Override
   public void afterPhaseExecution(Either<MessagingException, CoreEvent> either) {
-    either.apply((CheckedConsumer<MessagingException>) messagingException -> completionHandler
-        .onTerminate(left(messagingException)),
-                 (CheckedConsumer<CoreEvent>) event -> completionHandler.onTerminate(either));
+    // Do nothing.
   }
-
 }

@@ -41,7 +41,7 @@ import reactor.core.publisher.Mono;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleTestCase {
+public class ModuleFlowExtensionsProcessingTemplateTestCase extends AbstractMuleTestCase {
 
   @Mock
   private SourceResultAdapter message;
@@ -63,11 +63,11 @@ public class ModuleFlowProcessingTemplateTestCase extends AbstractMuleTestCase {
 
   private final RuntimeException runtimeException = new RuntimeException();
 
-  private ModuleFlowProcessingTemplate template;
+  private ModuleFlowExtensionsProcessingTemplate template;
 
   @Before
   public void before() throws Exception {
-    template = new ModuleFlowProcessingTemplate(message, messageProcessor, emptyList(), completionHandler);
+    template = new ModuleFlowExtensionsProcessingTemplate(message, messageProcessor, emptyList(), completionHandler);
     when(completionHandler.onCompletion(any(), any())).thenReturn(Mono.empty());
     when(completionHandler.onFailure(any(), any())).thenReturn(Mono.empty());
   }
