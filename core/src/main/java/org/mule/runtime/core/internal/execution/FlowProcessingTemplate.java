@@ -1,4 +1,4 @@
-package org.mule.runtime.core.internal.source.scheduler;
+package org.mule.runtime.core.internal.execution;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
@@ -12,9 +12,6 @@ import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
-import org.mule.runtime.core.internal.execution.NotificationFunction;
-import org.mule.runtime.core.internal.execution.SourceResultAdapter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.List;
@@ -33,7 +30,7 @@ public abstract class FlowProcessingTemplate implements FlowProcessTemplate {
   private List<NotificationFunction> notificationFunctions;
 
   protected FlowProcessingTemplate(Processor messageProcessor,
-                         List<NotificationFunction> notificationFunctions) {
+                                   List<NotificationFunction> notificationFunctions) {
     this.messageProcessor = messageProcessor;
     this.notificationFunctions = notificationFunctions;
   }
