@@ -48,9 +48,11 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   protected MuleContext muleContext;
   protected final NotificationDispatcher notificationFirer;
 
+  @Deprecated
   protected AbstractTransaction(MuleContext muleContext) {
     this.muleContext = muleContext;
     try {
+      applicationName = muleContext.getConfiguration().getId();
       notificationFirer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);

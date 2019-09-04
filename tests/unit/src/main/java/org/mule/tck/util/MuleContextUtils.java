@@ -221,8 +221,7 @@ public class MuleContextUtils {
       injectableObjects.put(ExtendedExpressionManager.class, muleContext.getExpressionManager());
       injectableObjects.put(StreamingManager.class, muleContext.getRegistry().lookupObject(StreamingManager.class));
       injectableObjects.put(ObjectStoreManager.class, muleContext.getRegistry().lookupObject(OBJECT_STORE_MANAGER));
-      injectableObjects.put(NotificationDispatcher.class,
-                            muleContext.getRegistry().lookupObject(NotificationDispatcher.class));
+      injectableObjects.put(NotificationDispatcher.class, getNotificationDispatcher(muleContext));
       injectableObjects.put(NotificationListenerRegistry.class, notificationListenerRegistry);
       injectableObjects.put(ConfigurationComponentLocator.class, configurationComponentLocator);
       injectableObjects.put(ConfigurationProperties.class, configProps);

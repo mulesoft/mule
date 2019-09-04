@@ -12,6 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
@@ -36,6 +37,7 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.transaction.TransactionTemplateTestUtils;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
@@ -51,8 +53,9 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import javax.transaction.TransactionManager;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -60,19 +63,17 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
 
   protected static MuleContext mockMuleContext = mockContextWithServices();
   private static NotificationDispatcher notificationDispatcher;
-  private static final int DEFAULT_TIMEOUT = 5;
+  private static final int DEFAULT_TIMEOUT = 10000;
 
   @Mock
   protected CoreEvent RETURN_VALUE;
 
   private final String applicationName = "appName";
-  @Spy
-  protected TestTransaction mockTransaction =
-      new TestTransaction(applicationName, notificationDispatcher, DEFAULT_TIMEOUT);
+  private TransactionManager transactionManager = mock(TransactionManager.class);
 
-  @Spy
-  protected TestTransaction mockNewTransaction =
-      new TestTransaction(applicationName, notificationDispatcher, DEFAULT_TIMEOUT);
+  protected TestTransaction mockTransaction;
+
+  protected TestTransaction mockNewTransaction;
 
   @Mock
   protected ExternalTransactionAwareTransactionFactory mockExternalTransactionFactory;
@@ -90,6 +91,14 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
   public void prepareEvent() throws RegistrationException {
     when(mockEvent.getMessage()).thenReturn(of(""));
     notificationDispatcher = getNotificationDispatcher(mockMuleContext);
+    String applicationName = "appName";
+    mockTransaction =
+            spy(new TestTransaction(applicationName, notificationDispatcher, DEFAULT_TIMEOUT));
+    mockNewTransaction =
+            spy(new TestTransaction(applicationName, notificationDispatcher, DEFAULT_TIMEOUT));
+    when(mockMuleContext.getConfiguration().getId()).thenReturn(applicationName);
+    when(mockMuleContext.getTransactionManager()).thenReturn(transactionManager);
+    when(((MuleContextWithRegistry) mockMuleContext).getRegistry().lookupObject(NotificationDispatcher.class)).thenReturn(notificationDispatcher);
   }
 
   @Before
@@ -173,11 +182,12 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
 
   @Test
   public void testActionNoneAndWithExternalTransactionWithNoTx() throws Exception {
-    MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
+      MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
+    config.setTimeout(DEFAULT_TIMEOUT);
     config.setInteractWithExternal(true);
     mockExternalTransactionFactory = mock(ExternalTransactionAwareTransactionFactory.class);
     config.setFactory(mockExternalTransactionFactory);
-    when(mockExternalTransactionFactory.joinExternalTransaction(mockMuleContext)).thenAnswer(invocationOnMock -> {
+    when(mockExternalTransactionFactory.joinExternalTransaction(applicationName, notificationDispatcher, transactionManager, DEFAULT_TIMEOUT)).thenAnswer(invocationOnMock -> {
       TransactionCoordination.getInstance().bindTransaction(mockTransaction);
       return mockTransaction;
     });
@@ -200,7 +210,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     mockExternalTransactionFactory = mock(ExternalTransactionAwareTransactionFactory.class);
     config.setFactory(mockExternalTransactionFactory);
     Transaction externalTransaction = mock(Transaction.class);
-    when(mockExternalTransactionFactory.joinExternalTransaction(mockMuleContext)).thenReturn(externalTransaction);
+    when(mockExternalTransactionFactory.joinExternalTransaction(applicationName, notificationDispatcher, transactionManager, DEFAULT_TIMEOUT)).thenReturn(externalTransaction);
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
     assertThat(result, is(RETURN_VALUE));

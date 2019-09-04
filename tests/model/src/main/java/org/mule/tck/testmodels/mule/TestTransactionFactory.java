@@ -52,7 +52,7 @@ public class TestTransactionFactory implements TransactionFactory {
     if (mockTransaction != null) {
       testTransaction = mockTransaction;
     } else {
-      testTransaction = new TestTransaction(applicationName, notificationFirer, timeout);
+      testTransaction = new TestTransaction(applicationName, notificationFirer, false, timeout);
     }
 
     testTransaction.begin();

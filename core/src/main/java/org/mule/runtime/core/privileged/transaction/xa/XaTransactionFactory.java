@@ -72,6 +72,7 @@ public class XaTransactionFactory implements ExternalTransactionAwareTransaction
   /**
    * Create a Mule transaction that represents a transaction started outside of Mule
    */
+  @Override
   public Transaction joinExternalTransaction(String applicationName, NotificationDispatcher notificationFirer,
                                              TransactionManager transactionManager, int timeout)
       throws TransactionException {

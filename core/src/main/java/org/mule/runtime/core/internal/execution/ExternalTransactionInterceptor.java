@@ -45,8 +45,8 @@ public class ExternalTransactionInterceptor<T> implements ExecutionInterceptor<T
         if (tmFactory instanceof ExternalTransactionAwareTransactionFactory) {
           ExternalTransactionAwareTransactionFactory externalTransactionFactory =
               (ExternalTransactionAwareTransactionFactory) tmFactory;
-          joinedExternal = externalTransactionFactory.joinExternalTransaction(appName, transactionManager,
-                                                                              notificationDispatcher,
+          joinedExternal = externalTransactionFactory.joinExternalTransaction(appName, notificationDispatcher,
+                                                                  transactionManager,
                                                                               transactionConfig.getTimeout());
         }
       }

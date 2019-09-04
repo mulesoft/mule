@@ -31,7 +31,7 @@ public interface ExternalTransactionAwareTransactionFactory extends TransactionF
    * @throws TransactionException if the transaction cannot be created or begun
    * @param muleContext
    *
-   * @deprecated since 4.2.3. Use {@link #joinExternalTransaction(String, TransactionManager, NotificationDispatcher, int)} instead
+   * @deprecated since 4.2.3. Use {@link #joinExternalTransaction(String, NotificationDispatcher,TransactionManager,  int)} instead
    *
    */
   @Deprecated
@@ -43,8 +43,8 @@ public interface ExternalTransactionAwareTransactionFactory extends TransactionF
    * @return a new Transaction representing an existing external transaction
    * @throws TransactionException if the transaction cannot be created or begun
    */
-  default Transaction joinExternalTransaction(String applicationName, TransactionManager transactionManager,
-                                              NotificationDispatcher notificationFirer,
+  default Transaction joinExternalTransaction(String applicationName, NotificationDispatcher notificationFirer,
+                                              TransactionManager transactionManager,
                                               int timeout)
       throws TransactionException {
     try {
