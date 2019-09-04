@@ -23,7 +23,7 @@ public class MuleBeanExpressionResolver extends StandardBeanExpressionResolver
         but no occurrence of }, which is the expression suffix.
         */
         Pattern nonClosedExpressionSuffixCase = Pattern.compile("^.*#\\{[^}]*$");
-        if (nonClosedExpressionSuffixCase.matcher(value).matches())
+        if (value != null && nonClosedExpressionSuffixCase.matcher(value).matches())
         {
             // Directly return value, since LiteralExpression(value).getValue() does that.
             return value;
