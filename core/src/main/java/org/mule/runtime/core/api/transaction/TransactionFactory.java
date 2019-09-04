@@ -29,6 +29,7 @@ public interface TransactionFactory {
    *
    * @deprecated since 4.3.0. Use {@link #beginTransaction(String, NotificationDispatcher, SingleResourceTransactionFactoryManager, TransactionManager, int)} instead
    */
+  @Deprecated
   Transaction beginTransaction(MuleContext muleContext) throws TransactionException;
 
   /**
