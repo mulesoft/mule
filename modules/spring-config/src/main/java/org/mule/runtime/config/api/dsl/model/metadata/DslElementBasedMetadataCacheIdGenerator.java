@@ -177,6 +177,10 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
       }
     } else {
       resolveDslTagId(component).ifPresent(keyParts::add);
+      if (component.getModel() instanceof ConfigurationModel) {
+        resolveGlobalElement(component)
+            .ifPresent(keyParts::add);
+      }
     }
 
     keyParts.add(typeInformation.getComponentTypeMetadataCacheId());
