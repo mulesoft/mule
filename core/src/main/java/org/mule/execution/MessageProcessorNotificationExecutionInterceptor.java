@@ -21,6 +21,7 @@ import org.mule.api.transport.NonBlockingReplyToHandler;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.context.notification.MessageProcessorNotification;
 import org.mule.context.notification.ServerNotificationManager;
+import org.mule.processor.AsyncReplyToHandler;
 import org.mule.processor.NonBlockingMessageProcessor;
 
 /**
@@ -59,7 +60,7 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
         MuleEvent result = null;
         MessagingException exceptionThrown = null;
 
-        boolean nonBlocking = event.isAllowNonBlocking() && event.getReplyToHandler() != null;
+        boolean nonBlocking = event.isAllowNonBlocking() && event.getReplyToHandler() != null && !(event.getReplyToHandler() instanceof AsyncReplyToHandler);
         boolean responseProcessing = messageProcessor instanceof InterceptingMessageProcessor ||
                                      messageProcessor instanceof NonBlockingMessageProcessor;
 

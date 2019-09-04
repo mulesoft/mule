@@ -30,6 +30,7 @@ import org.mule.api.processor.MessageProcessorPathElement;
 import org.mule.api.processor.ProcessingStrategy;
 import org.mule.api.processor.StageNameSource;
 import org.mule.api.processor.StageNameSourceProvider;
+import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.util.NotificationUtils;
@@ -142,9 +143,11 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
         if (target != null)
         {
-            // Clone event, make it async and remove ReplyToHandler
+            // Clone event, make it async and put an empty ReplyToHandler. If null is set, then the flow error handler
+            // could be called in case of error, which makes no sense in async scenario. E.g. with non-blocking PS
+            ReplyToHandler handler = (event.isAllowNonBlocking()) ? new AsyncReplyToHandler() : null;
             MuleEvent newEvent = new DefaultMuleEvent((MuleMessage) ((ThreadSafeAccess) message).newThreadCopy(),
-                                                      event, false, false, MessageExchangePattern.ONE_WAY, null);
+                    event, false, false, MessageExchangePattern.ONE_WAY, handler);
             // Update RequestContext ThreadLocal for backwards compatibility
             OptimizedRequestContext.unsafeSetEvent(newEvent);
             target.process(newEvent);
