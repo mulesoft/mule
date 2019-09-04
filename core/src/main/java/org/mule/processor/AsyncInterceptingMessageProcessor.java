@@ -25,7 +25,6 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.NonBlockingReplyToHandler;
-import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.AsyncMessageNotification;
 import org.mule.execution.TransactionalErrorHandlingExecutionTemplate;
@@ -161,8 +160,8 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
     protected boolean canProcessAsync(MuleEvent event) throws MessagingException
     {
-        ReplyToHandler handler = event.getReplyToHandler();
-        return !(event.isSynchronous() || event.isTransacted() || (event.getReplyToHandler() instanceof NonBlockingReplyToHandler));
+        return !(event.isSynchronous() || event.isTransacted() || (event.getReplyToHandler() instanceof
+                NonBlockingReplyToHandler));
     }
 
     protected void processNextAsync(MuleEvent event) throws MuleException
