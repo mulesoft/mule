@@ -294,6 +294,7 @@
         <test:component throwException="true"/>
         <catch-exception-strategy>
             <async>
+                <test:assert count="1"/>
                 <http:request config-ref="HTTP_Request_Configuration" path="/some/path/that/will/generate/error" method="POST">
                     <http:request-builder>
                         <http:header headerName="Content-Type" value="application/json"/>
