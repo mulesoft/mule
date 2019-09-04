@@ -230,15 +230,15 @@
         <muleMvelVersion>2.1.9-MULE-018</muleMvelVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <muleDslApiVersion>1.2.1-SNAPSHOT</muleDslApiVersion>
-        <muleExtensionsApiVersion>1.2.2-SNAPSHOT</muleExtensionsApiVersion>
-        <muleHttpPolicyApiVersion>1.2.1-SNAPSHOT</muleHttpPolicyApiVersion>
-        <muleMavenClientApi>1.4.2-SNAPSHOT</muleMavenClientApi>
-        <muleMavenClientImpl>1.4.2-SNAPSHOT</muleMavenClientImpl>
-        <muleMavenClientTest>1.4.2-SNAPSHOT</muleMavenClientTest>
-        <mulePolicyApiVersion>1.2.1-SNAPSHOT</mulePolicyApiVersion>
-        <muleApiVersion>1.2.2-SNAPSHOT</muleApiVersion>
-        <muleMetadataModelVersion>1.2.2-SNAPSHOT</muleMetadataModelVersion>
+        <muleDslApiVersion>1.2.2-SNAPSHOT</muleDslApiVersion>
+        <muleExtensionsApiVersion>1.2.3-SNAPSHOT</muleExtensionsApiVersion>
+        <muleHttpPolicyApiVersion>1.2.2-SNAPSHOT</muleHttpPolicyApiVersion>
+        <muleMavenClientApi>1.4.3-SNAPSHOT</muleMavenClientApi>
+        <muleMavenClientImpl>1.4.3-SNAPSHOT</muleMavenClientImpl>
+        <muleMavenClientTest>1.4.3-SNAPSHOT</muleMavenClientTest>
+        <mulePolicyApiVersion>1.2.2-SNAPSHOT</mulePolicyApiVersion>
+        <muleApiVersion>1.2.3-SNAPSHOT</muleApiVersion>
+        <muleMetadataModelVersion>1.2.3-SNAPSHOT</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <!-- Test Extensions -->
@@ -274,11 +274,11 @@
         <maven.surefire.plugin.version>2.21.0</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
-        <mule.module.maven.plugin.version>1.1.1-SNAPSHOT</mule.module.maven.plugin.version>
+        <mule.module.maven.plugin.version>1.1.2-SNAPSHOT</mule.module.maven.plugin.version>
         <revapi-maven-plugin.version>0.9.5</revapi-maven-plugin.version>
-        <muleRevapiExtensionVersion>1.2.1-SNAPSHOT</muleRevapiExtensionVersion>
-        <mule.extensions.maven.plugin.version>1.2.2-SNAPSHOT</mule.extensions.maven.plugin.version>
-        <mule.app.plugins.maven.plugin.version>1.2.2-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <muleRevapiExtensionVersion>1.2.2-SNAPSHOT</muleRevapiExtensionVersion>
+        <mule.extensions.maven.plugin.version>1.2.3-SNAPSHOT</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.2.3-SNAPSHOT</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
         <mule.classloader.model.version>3.3.3-SNAPSHOT</mule.classloader.model.version>
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
@@ -297,7 +297,7 @@
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>validate</formatterGoal>
-        <oldMuleArtifactVersion>4.2.1</oldMuleArtifactVersion>
+        <oldMuleArtifactVersion>4.2.2-SNAPSHOT</oldMuleArtifactVersion>
     </properties>
 
     <dependencies>
