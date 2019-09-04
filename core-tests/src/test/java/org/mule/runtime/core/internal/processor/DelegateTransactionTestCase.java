@@ -8,30 +8,44 @@ package org.mule.runtime.core.internal.processor;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
 import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import org.junit.Test;
+import javax.transaction.TransactionManager;
+import org.junit.Before;
+import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 
+import org.junit.Test;
+import org.mule.tck.util.MuleContextUtils;
 
 public class DelegateTransactionTestCase extends AbstractMuleTestCase {
 
-  private static final int DEFAULT_TX_TIMEOUT = 2;
-  private MuleContext mockMuleContext = mockMuleContext();
+  private static final int DEFAULT_TX_TIMEOUT = 20;
+
+  private NotificationDispatcher notificationDispatcher;
+
+  @Before
+  public void detUp() throws RegistrationException {
+    notificationDispatcher = MuleContextUtils.getNotificationDispatcher(mockMuleContext());
+  }
 
   @Test
   public void defaultTxTimeout() {
-    when(mockMuleContext.getConfiguration().getDefaultTransactionTimeout()).thenReturn(DEFAULT_TX_TIMEOUT);
-    DelegateTransaction delegateTransaction = new DelegateTransaction(mockMuleContext);
+    DelegateTransaction delegateTransaction = new DelegateTransaction("appName", notificationDispatcher,
+                                                                      new SingleResourceTransactionFactoryManager(),
+                                                                      mock(TransactionManager.class), DEFAULT_TX_TIMEOUT);
     assertThat(delegateTransaction.getTimeout(), is(DEFAULT_TX_TIMEOUT));
   }
 
   @Test
   public void changeTxTimeout() {
-    DelegateTransaction delegateTransaction = new DelegateTransaction(mockMuleContext);
+    DelegateTransaction delegateTransaction = new DelegateTransaction("appName", notificationDispatcher,
+                                                                      new SingleResourceTransactionFactoryManager(),
+                                                                      mock(TransactionManager.class), DEFAULT_TX_TIMEOUT);
     int newTimeout = 10;
     delegateTransaction.setTimeout(newTimeout);
     assertThat(delegateTransaction.getTimeout(), is(newTimeout));

@@ -6,8 +6,8 @@
  */
 package org.mule.tck.testmodels.mule;
 
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.privileged.transaction.AbstractSingleResourceTransaction;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -26,8 +26,8 @@ public class TestTransaction extends AbstractSingleResourceTransaction {
   private String testProperty;
   private boolean isXA;
 
-  public TestTransaction(MuleContext muleContext) {
-    super(muleContext);
+  public TestTransaction(String applicationName, NotificationDispatcher notificationFirer, int timeout) {
+    super(applicationName, notificationFirer, timeout);
   }
 
   @Override
@@ -40,8 +40,8 @@ public class TestTransaction extends AbstractSingleResourceTransaction {
     return null; // To change body of implemented methods use File | Settings | File Templates.
   }
 
-  public TestTransaction(MuleContext mockMuleContext, boolean isXa) {
-    super(mockMuleContext);
+  public TestTransaction(String applicationName, NotificationDispatcher notificationFirer, boolean isXa, int timeout) {
+    super(applicationName, notificationFirer, timeout);
     this.isXA = isXa;
   }
 

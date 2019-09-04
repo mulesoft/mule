@@ -29,6 +29,10 @@ public class DefaultNotificationDispatcher implements NotificationDispatcher {
   @Inject
   private MuleContext context;
 
+  public MuleContext getContext() {
+    return context;
+  }
+
   @Override
   public void dispatch(Notification notification) {
     ServerNotificationManager notificationManager = context.getNotificationManager();

@@ -6,14 +6,18 @@
  */
 package org.mule.tck.testmodels.mule;
 
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+
+import javax.transaction.TransactionManager;
 
 /**
  * <code>TestTransactionFactory</code> creates a {@link org.mule.tck.testmodels.mule.TestTransaction}
- * 
  */
 
 public class TestTransactionFactory implements TransactionFactory {
@@ -28,12 +32,27 @@ public class TestTransactionFactory implements TransactionFactory {
     this.mockTransaction = mockTransaction;
   }
 
-  public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
+  @Override
+  public Transaction beginTransaction(MuleContext muleContext) {
+    try {
+      return beginTransaction(muleContext.getConfiguration().getId(),
+                              ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class),
+                              muleContext.getTransactionFactoryManager(), muleContext.getTransactionManager(),
+                              mockTransaction.getTimeout());
+    } catch (Exception e) {
+      throw new RuntimeException();
+    }
+  }
+
+  public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
+                                      SingleResourceTransactionFactoryManager transactionFactoryManager,
+                                      TransactionManager transactionManager, int timeout)
+      throws TransactionException {
     Transaction testTransaction;
     if (mockTransaction != null) {
       testTransaction = mockTransaction;
     } else {
-      testTransaction = new TestTransaction(muleContext);
+      testTransaction = new TestTransaction(applicationName, notificationFirer, false, timeout);
     }
 
     testTransaction.begin();
