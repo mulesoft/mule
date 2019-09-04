@@ -6,11 +6,14 @@
  */
 package org.mule.config.spring;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.*;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 public class MuleBeanExpressionResolverTest extends AbstractMuleTestCase
 {
@@ -20,10 +23,21 @@ public class MuleBeanExpressionResolverTest extends AbstractMuleTestCase
     @Test
     public void expressionWithNoSuffixIsParsedAsLiteral()
     {
-        String expressionWithoutSuffix = "$kasdoawac$@&^#{";
-        Object resolvedExpression = muleBeanExpressionResolver.evaluate(expressionWithoutSuffix, null);
-
+        Object resolvedExpression = resolveExpression("$kasdoawac$@&^#{");
         assertThat(resolvedExpression, instanceOf(String.class));
-        assertEquals(expressionWithoutSuffix, resolvedExpression.toString());
+        assertThat(resolvedExpression.toString(), equalTo("$kasdoawac$@&^#{"));
+    }
+
+    @Test
+    public void nullExpressionSuccessfullyResolved()
+    {
+        Object resolvedExpression = resolveExpression(null);
+        assertThat(resolvedExpression, is(nullValue()));
+    }
+
+    protected Object resolveExpression(String expressionWithoutSuffix)
+    {
+        Object resolvedExpression = muleBeanExpressionResolver.evaluate(expressionWithoutSuffix, null);
+        return resolvedExpression;
     }
 }
