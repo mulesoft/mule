@@ -13,6 +13,15 @@
         },
         {
           "code": "java.method.added",
+          "new": "method org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent> org.mule.runtime.core.privileged.processor.MessageProcessors::processWithChildContextAlwaysComplete(org.mule.runtime.core.api.event.CoreEvent, org.mule.runtime.core.api.processor.ReactiveProcessor, java.util.Optional<org.mule.runtime.api.component.location.ComponentLocation>)",
+          "package": "org.mule.runtime.core.privileged.processor",
+          "classSimpleName": "MessageProcessors",
+          "methodName": "processWithChildContextAlwaysComplete",
+          "elementKind": "method",
+          "justification": "MULE-17403: Fix Child context not completed when an error is thrown in Operation policies"
+        },
+        {
+          "code": "java.method.added",
           "new": "method org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>)",
           "package": "org.mule.runtime.core.privileged.processor",
           "classSimpleName": "MessageProcessors",
