@@ -274,7 +274,7 @@
         <maven.surefire.plugin.version>2.21.0</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
-        <mule.module.maven.plugin.version>1.1.1-SNAPSHOT</mule.module.maven.plugin.version>
+        <mule.module.maven.plugin.version>1.1.2-SNAPSHOT</mule.module.maven.plugin.version>
         <revapi-maven-plugin.version>0.9.5</revapi-maven-plugin.version>
         <muleRevapiExtensionVersion>1.2.2-SNAPSHOT</muleRevapiExtensionVersion>
         <mule.extensions.maven.plugin.version>1.2.2-SNAPSHOT</mule.extensions.maven.plugin.version>
