@@ -49,7 +49,7 @@ public class XaTransactionFactory implements ExternalTransactionAwareTransaction
   /**
    * Create a Mule transaction that represents a transaction started outside of Mule
    *
-   * @deprecated since 4.2.3. Use {@link #joinExternalTransaction(String, TransactionManager, NotificationDispatcher, int)} instead
+   * @deprecated since 4.2.3. Use {@link #joinExternalTransaction(String, NotificationDispatcher, TransactionManager, int)} instead
    */
   @Deprecated
   public Transaction joinExternalTransaction(MuleContext muleContext) throws TransactionException {

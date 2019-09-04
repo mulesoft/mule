@@ -13,7 +13,7 @@
         },
         {
           "code": "java.method.defaultMethodAddedToInterface",
-          "new": "method org.mule.runtime.core.api.transaction.Transaction org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransactionFactory::joinExternalTransaction(java.lang.String, javax.transaction.TransactionManager, org.mule.runtime.api.notification.NotificationDispatcher, int) throws org.mule.runtime.api.tx.TransactionException",
+          "new": "method org.mule.runtime.core.api.transaction.Transaction org.mule.runtime.core.api.transaction.ExternalTransactionAwareTransactionFactory::joinExternalTransaction(java.lang.String, org.mule.runtime.api.notification.NotificationDispatcher, javax.transaction.TransactionManager, int) throws org.mule.runtime.api.tx.TransactionException",
           "package": "org.mule.runtime.core.api.transaction",
           "classSimpleName": "ExternalTransactionAwareTransactionFactory",
           "methodName": "joinExternalTransaction",

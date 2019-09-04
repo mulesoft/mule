@@ -46,7 +46,7 @@ public class ExternalTransactionInterceptor<T> implements ExecutionInterceptor<T
           ExternalTransactionAwareTransactionFactory externalTransactionFactory =
               (ExternalTransactionAwareTransactionFactory) tmFactory;
           joinedExternal = externalTransactionFactory.joinExternalTransaction(appName, notificationDispatcher,
-                                                                  transactionManager,
+                                                                              transactionManager,
                                                                               transactionConfig.getTimeout());
         }
       }
