@@ -12,15 +12,18 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.ReplyToHandler;
 
-public class AsyncReplyToHandler implements ReplyToHandler {
+public class AsyncReplyToHandler implements ReplyToHandler
+{
 
     @Override
-    public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+    public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException
+    {
 
     }
 
     @Override
-    public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
+    public void processExceptionReplyTo(MessagingException exception, Object replyTo)
+    {
 
     }
 }

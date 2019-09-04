@@ -60,7 +60,7 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
         MuleEvent result = null;
         MessagingException exceptionThrown = null;
 
-        boolean nonBlocking = event.isAllowNonBlocking() && (event.getReplyToHandler() != null && !(event.getReplyToHandler() instanceof AsyncReplyToHandler));
+        boolean nonBlocking = event.isAllowNonBlocking() && event.getReplyToHandler() != null && !(event.getReplyToHandler() instanceof AsyncReplyToHandler);
         boolean responseProcessing = messageProcessor instanceof InterceptingMessageProcessor ||
                                      messageProcessor instanceof NonBlockingMessageProcessor;
 
