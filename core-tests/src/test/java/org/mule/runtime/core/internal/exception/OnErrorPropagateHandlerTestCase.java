@@ -20,6 +20,7 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_PROPAGATE;
@@ -35,6 +36,7 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.rule.VerboseExceptions;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -48,24 +50,26 @@ import io.qameta.allure.Story;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
 
-
 @Feature(ERROR_HANDLING)
 @Story(ON_ERROR_PROPAGATE)
 public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCase {
 
   protected MuleContext muleContext = mockContextWithServices();
   private static final String DEFAULT_LOG_MESSAGE = "LOG";
+  private static final int DEFAULT_TIMEOUT = 5;
 
   @Rule
   public ExpectedException expectedException = none();
 
-  private final TestTransaction mockTransaction = spy(new TestTransaction(muleContext));
-  private final TestTransaction mockXaTransaction = spy(new TestTransaction(muleContext, true));
-
+  private final NotificationDispatcher notificationDispatcher = getNotificationDispatcher(muleContext);
+  private final TestTransaction mockTransaction =
+      spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
+  private final TestTransaction mockXaTransaction =
+      spy(new TestTransaction("appNAme", notificationDispatcher, true, DEFAULT_TIMEOUT));
 
   private OnErrorPropagateHandler onErrorPropagateHandler;
 
-  public OnErrorPropagateHandlerTestCase(VerboseExceptions verbose) {
+  public OnErrorPropagateHandlerTestCase(VerboseExceptions verbose) throws RegistrationException {
     super(verbose);
   }
 

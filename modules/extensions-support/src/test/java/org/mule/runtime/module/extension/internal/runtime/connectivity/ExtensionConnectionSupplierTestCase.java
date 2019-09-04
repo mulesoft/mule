@@ -14,7 +14,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
-
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.tx.TransactionException;
@@ -30,11 +30,11 @@ import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionCon
 import org.mule.runtime.module.extension.internal.runtime.transaction.XAExtensionTransactionalResource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import javax.inject.Inject;
 import javax.transaction.TransactionManager;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTestCase {
 
@@ -61,8 +61,9 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
 
   @Before
   public void before() throws Exception {
-    muleContext.setTransactionManager(mock(TransactionManager.class, RETURNS_DEEP_STUBS));
-    transaction = spy(new XaTransaction(muleContext));
+    TransactionManager transactionManager = mock(TransactionManager.class, RETURNS_DEEP_STUBS);
+    muleContext.setTransactionManager(transactionManager);
+    transaction = spy(new XaTransaction("appName", transactionManager, getNotificationDispatcher(muleContext), 20));
     XATransactionalConnection connection = mock(XATransactionalConnection.class, RETURNS_DEEP_STUBS);
     config = new Object();
 

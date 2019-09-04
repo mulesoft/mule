@@ -71,9 +71,9 @@ public interface MuleContext extends Lifecycle {
   void setTransactionManager(TransactionManager manager) throws Exception;
 
   /**
-   * Returns the Jta transaction manager used by this Mule server instance. or null if a transaction manager has not been set
+   * Returns the Jta transaction manager used by this Mule server instance, or null if a transaction manager has not been set
    *
-   * @return the Jta transaction manager used by this Mule server instance. or null if a transaction manager has not been set
+   * @return the Jta transaction manager used by this Mule server instance, or null if a transaction manager has not been set
    */
   TransactionManager getTransactionManager();
 

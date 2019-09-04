@@ -88,6 +88,7 @@ public class MuleMessageProcessingManagerTestCase extends AbstractMuleTestCase {
   @Test
   public void nullMessageProcessPhaseInRegistry() throws Exception {
     processAndVerifyDefaultPhasesUsingRegistryPhases(null);
+    when(mockMuleContext.getTransactionManager()).thenReturn(null);
   }
 
   @Test

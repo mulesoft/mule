@@ -16,6 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.tck.junit4.matcher.Eventually.eventually;
 import static org.mule.tck.util.CollectableReference.collectedByGc;
@@ -28,12 +29,13 @@ import io.qameta.allure.Issue;
 import org.junit.Test;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.concurrent.Latch;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.TransactionAwareProcessingStragyTestCase;
+import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.TransactionAwareProcessingStrategyTestCase;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory.TransactionAwareProactorStreamEmitterProcessingStrategy;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.testmodels.mule.TestTransaction;
@@ -41,21 +43,20 @@ import org.mule.tck.util.CollectableReference;
 
 import java.util.Collection;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 @RunWith(Parameterized.class)
 @Feature(PROCESSING_STRATEGIES)
 @Story(DEFAULT)
 public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
     extends ProactorStreamEmitterProcessingStrategyTestCase
-    implements TransactionAwareProcessingStragyTestCase {
+    implements TransactionAwareProcessingStrategyTestCase {
 
   @Rule
   public SystemProperty lazyTxCheck;
@@ -75,7 +76,7 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
 
   @After
   public void cleanUpTx() {
-    TransactionCoordination.getInstance().rollbackCurrentTransaction();
+    getInstance().rollbackCurrentTransaction();
   }
 
   @Override
@@ -107,7 +108,8 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
     flow.initialise();
     flow.start();
 
-    TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
+    getInstance()
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), 5));
 
     processFlow(testEvent());
 
@@ -131,7 +133,8 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
 
     asyncExecutor.submit(() -> {
       try {
-        TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
+        TransactionCoordination.getInstance()
+            .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), 5));
         processFlow(testEvent());
         threads.clear();
         latch.release();

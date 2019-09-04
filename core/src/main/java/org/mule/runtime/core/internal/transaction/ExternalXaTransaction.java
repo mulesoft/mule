@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.transaction;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
@@ -18,6 +19,7 @@ import java.text.MessageFormat;
 
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
+import javax.transaction.TransactionManager;
 
 import org.slf4j.Logger;
 
@@ -28,8 +30,10 @@ public class ExternalXaTransaction extends XaTransaction {
 
   private static final Logger LOGGER = getLogger(ExternalXaTransaction.class);
 
-  public ExternalXaTransaction(MuleContext muleContext) {
-    super(muleContext);
+  public ExternalXaTransaction(String applicationName, TransactionManager transactionManager,
+                               NotificationDispatcher notificationFirer,
+                               int timeout) {
+    super(applicationName, transactionManager, notificationFirer, timeout);
   }
 
   @Override

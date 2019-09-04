@@ -141,7 +141,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private Scheduler retryScheduler;
   private Scheduler flowTriggerScheduler;
 
-  private final AtomicBoolean started = new AtomicBoolean(false);
+  private NotificationDispatcher notificationDispatcher;
+  private SingleResourceTransactionFactoryManager transactionFactoryManager;
+  private String applicationName;
+
+  private AtomicBoolean started = new AtomicBoolean(false);
 
   public ExtensionMessageSource(ExtensionModel extensionModel,
                                 SourceModel sourceModel,
@@ -151,13 +155,17 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                                 RetryPolicyTemplate retryPolicyTemplate,
                                 CursorProviderFactory cursorProviderFactory,
                                 BackPressureStrategy backPressureStrategy,
-                                ExtensionManager managerAdapter) {
+                                ExtensionManager managerAdapter, NotificationDispatcher notificationDispatcher,
+                                SingleResourceTransactionFactoryManager transactionFactoryManager, String applicationName) {
     super(extensionModel, sourceModel, configurationProvider, cursorProviderFactory, managerAdapter);
     this.sourceModel = sourceModel;
     this.sourceAdapterFactory = sourceAdapterFactory;
     this.customRetryPolicyTemplate = retryPolicyTemplate;
     this.primaryNodeOnly = primaryNodeOnly;
     this.backPressureStrategy = backPressureStrategy;
+    this.notificationDispatcher = notificationDispatcher;
+    this.transactionFactoryManager = transactionFactoryManager;
+    this.applicationName = applicationName;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, sourceModel);
     this.lifecycleManager = new DefaultLifecycleManager<>(sourceModel.getName(), this);
   }
@@ -252,10 +260,13 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         .setConfigurationInstance(getConfigurationInstance().orElse(null))
         .setTransactionConfig(transactionConfig.get())
         .setSource(this)
+        .setMuleContext(muleContext)
         .setListener(messageProcessor)
         .setProcessingManager(messageProcessingManager)
-        .setMuleContext(muleContext)
         .setProcessContextSupplier(this::createProcessingContext)
+        .setApplicationName(applicationName)
+        .setNotificationDispatcher(notificationDispatcher)
+        .setTransactionFactoryManager(transactionFactoryManager)
         .setCursorStreamProviderFactory(getCursorProviderFactory())
         .setCompletionHandlerFactory(completionHandlerFactory)
         .build();

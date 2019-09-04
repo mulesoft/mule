@@ -12,16 +12,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -37,15 +37,18 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
 
-  private MuleContext muleContext;
+  private static final int DEFAULT_TIMEOUT = 20;
+
+  private NotificationDispatcher notificationDispatcher;
 
   private TransactionCoordination tc;
 
   @Before
-  public void setUpTransaction() throws Exception {
+  public void setUpTransaction() {
     tc = TransactionCoordination.getInstance();
-    muleContext = mockContextWithServices();
-    when(muleContext.getConfiguration().getId()).thenReturn("appName");
+
+    notificationDispatcher = mock(DefaultNotificationDispatcher.class);
+    doNothing().when(notificationDispatcher).dispatch(any());
   }
 
   @After
@@ -104,7 +107,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   public void testCommitCurrentTransaction() throws Exception {
     assertThat(tc.getTransaction(), nullValue());
     tc.commitCurrentTransaction();
-    TestTransaction testTransaction = spy(new TestTransaction(muleContext));
+    TestTransaction testTransaction = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
 
     tc.bindTransaction(testTransaction);
     tc.commitCurrentTransaction();
@@ -115,9 +118,9 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   @Test
   public void testCommitCurrentTransactionWithSuspendedTransaction() throws Exception {
     assertThat(tc.getTransaction(), nullValue());
-    TestTransaction xaTx = spy(new TestTransaction(muleContext));
+    TestTransaction xaTx = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
     xaTx.setXA(true);
-    Transaction tx = spy(new TestTransaction(muleContext));
+    Transaction tx = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
 
     tc.bindTransaction(xaTx);
     tc.suspendCurrentTransaction();
@@ -125,7 +128,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
     tc.commitCurrentTransaction();
     tc.resumeSuspendedTransaction();
 
-    assertThat((TestTransaction) tc.getTransaction(), is(xaTx));
+    assertThat(tc.getTransaction(), is(xaTx));
     verify(xaTx, times(1)).suspend();
     verify(xaTx, times(1)).resume();
     verify(tx, times(1)).commit();
@@ -143,7 +146,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   public void testRollbackCurrentTransaction() throws Exception {
     assertThat(tc.getTransaction(), nullValue());
     tc.commitCurrentTransaction();
-    TestTransaction testTransaction = spy(new TestTransaction(muleContext));
+    TestTransaction testTransaction = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
 
     tc.bindTransaction(testTransaction);
     tc.rollbackCurrentTransaction();
@@ -154,9 +157,9 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   @Test
   public void testRollbackCurrentTransactionWithSuspendedTransaction() throws Exception {
     assertThat(tc.getTransaction(), nullValue());
-    TestTransaction xaTx = spy(new TestTransaction(muleContext));
+    TestTransaction xaTx = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
     xaTx.setXA(true);
-    Transaction tx = spy(new TestTransaction(muleContext));
+    Transaction tx = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
 
     tc.bindTransaction(xaTx);
     tc.suspendCurrentTransaction();
@@ -164,7 +167,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
     tc.rollbackCurrentTransaction();
     tc.resumeSuspendedTransaction();
 
-    assertThat((TestTransaction) tc.getTransaction(), is(xaTx));
+    assertThat(tc.getTransaction(), is(xaTx));
     verify(xaTx, times(1)).suspend();
     verify(xaTx, times(1)).resume();
     verify(tx, times(1)).rollback();
@@ -196,7 +199,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
     assertThat(tc.getTransaction(), nullValue());
     tc.resumeXaTransactionIfAvailable();
 
-    Transaction tx = spy(new TestTransaction(muleContext));
+    Transaction tx = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
     tc.bindTransaction(tx);
     tc.resumeXaTransactionIfAvailable();
     verify(tx, times(0)).resume();
@@ -207,7 +210,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
     assertThat(tc.getTransaction(), nullValue());
     tc.resumeXaTransactionIfAvailable();
 
-    TestTransaction tx = spy(new TestTransaction(muleContext));
+    TestTransaction tx = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
     tx.setXA(true);
     tc.bindTransaction(tx);
     tc.suspendCurrentTransaction();
@@ -219,7 +222,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   @Test(expected = IllegalTransactionStateException.class)
   public void testResumeXaTransactionTwice() throws Exception {
     assertThat(tc.getTransaction(), nullValue());
-    TestTransaction tx = spy(new TestTransaction(muleContext));
+    TestTransaction tx = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
     tx.setXA(true);
     tc.bindTransaction(tx);
     tc.resumeSuspendedTransaction();
@@ -229,7 +232,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   @Test
   public void testResolveTransactionForRollback() throws Exception {
     assertThat(tc.getTransaction(), nullValue());
-    TestTransaction tx = spy(new TestTransaction(muleContext));
+    TestTransaction tx = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
     tx.setXA(true);
     tc.bindTransaction(tx);
     tx.setRollbackOnly();
@@ -241,7 +244,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   @Test
   public void testResolveTransactionForCommit() throws Exception {
     assertThat(tc.getTransaction(), nullValue());
-    TestTransaction tx = spy(new TestTransaction(muleContext));
+    TestTransaction tx = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
     tx.setXA(true);
     tc.bindTransaction(tx);
     tc.resolveTransaction();

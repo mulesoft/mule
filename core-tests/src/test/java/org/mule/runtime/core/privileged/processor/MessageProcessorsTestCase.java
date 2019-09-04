@@ -32,29 +32,11 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextBlocking;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static org.mule.tck.probe.PollingProber.probe;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.single;
-
-import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.notification.NotificationDispatcher;
-import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
-import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.size.SmallTest;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -65,6 +47,22 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.size.SmallTest;
 import org.reactivestreams.Publisher;
 
 import io.qameta.allure.Issue;
@@ -94,7 +92,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     exceptionHandler = new OnErrorPropagateHandler();
     exceptionHandler.setMuleContext(muleContext);
     exceptionHandler
-        .setNotificationFirer(((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class));
+        .setNotificationFirer(getNotificationDispatcher(muleContext));
     exceptionHandler.initialise();
     when(flow.getExceptionListener()).thenReturn(exceptionHandler);
     eventContext = (BaseEventContext) create(flow, TEST_CONNECTOR_LOCATION);

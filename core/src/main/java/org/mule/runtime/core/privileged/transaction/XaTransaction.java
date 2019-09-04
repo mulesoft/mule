@@ -6,20 +6,21 @@
  */
 package org.mule.runtime.core.privileged.transaction;
 
+import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotStartTransaction;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noJtaTransactionAvailable;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotRegistered;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionCommitFailed;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionResourceAlreadyListedForKey;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.MuleXaObject;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.TransactionRollbackException;
 import org.mule.runtime.core.api.transaction.TransactionStatusException;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
@@ -61,16 +62,26 @@ public class XaTransaction extends AbstractTransaction {
 
   protected TransactionManager txManager;
 
-  public XaTransaction(MuleContext context) {
-    super(context);
-    this.txManager = context.getTransactionManager();
+  public XaTransaction(String applicationName, TransactionManager transactionManager, NotificationDispatcher notificationFirer,
+                       int timeout) {
+    super(applicationName, notificationFirer, timeout);
+    this.txManager = transactionManager;
+  }
+
+  /**
+   * @deprecated since 4.2.3. Use {@link #XaTransaction(String, TransactionManager, NotificationDispatcher, int)} instead
+   */
+  @Deprecated
+  public XaTransaction(MuleContext muleContext) {
+    super(muleContext);
+    this.txManager = muleContext.getTransactionManager();
   }
 
   @Override
   protected void doBegin() throws TransactionException {
     if (txManager == null) {
-      throw new IllegalStateException(CoreMessages
-          .objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager").getMessage());
+      throw new IllegalStateException(objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager")
+          .getMessage());
     }
 
     try {
@@ -257,7 +268,6 @@ public class XaTransaction extends AbstractTransaction {
 
   // moved here from connection wrapper
   public boolean enlistResource(XAResource resource) throws TransactionException {
-    TransactionManager txManager = muleContext.getTransactionManager();
     try {
       Transaction jtaTransaction = txManager.getTransaction();
       if (jtaTransaction == null) {
@@ -276,11 +286,10 @@ public class XaTransaction extends AbstractTransaction {
   }
 
   public boolean delistResource(XAResource resource, int tmflag) throws TransactionException {
-    TransactionManager txManager = muleContext.getTransactionManager();
     try {
       Transaction jtaTransaction = txManager.getTransaction();
       if (jtaTransaction == null) {
-        throw new TransactionException(noJtaTransactionAvailable(Thread.currentThread()));
+        throw new TransactionException(noJtaTransactionAvailable(currentThread()));
       }
       return jtaTransaction.delistResource(resource, tmflag);
     } catch (SystemException e) {
@@ -305,11 +314,9 @@ public class XaTransaction extends AbstractTransaction {
 
   @Override
   public void resume() throws TransactionException {
-    TransactionManager txManager = muleContext.getTransactionManager();
-
     if (txManager == null) {
-      throw new IllegalStateException(CoreMessages
-          .objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager").getMessage());
+      throw new IllegalStateException(objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager")
+          .getMessage());
     }
     try {
       txManager.resume(transaction);
@@ -320,11 +327,9 @@ public class XaTransaction extends AbstractTransaction {
 
   @Override
   public Transaction suspend() throws TransactionException {
-    TransactionManager txManager = muleContext.getTransactionManager();
-
     if (txManager == null) {
-      throw new IllegalStateException(CoreMessages
-          .objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager").getMessage());
+      throw new IllegalStateException(objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager")
+          .getMessage());
     }
     try {
       transaction = txManager.suspend();
@@ -350,7 +355,9 @@ public class XaTransaction extends AbstractTransaction {
   }
 
   protected synchronized void closeResources() {
-    LOGGER.debug("About to close {} resources for XA tx {}...", resources.size(), toString());
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("About to close {} resources for XA tx {}...", resources.size(), toString());
+    }
 
     Iterator i = resources.entrySet().iterator();
     while (i.hasNext()) {
@@ -359,7 +366,9 @@ public class XaTransaction extends AbstractTransaction {
       if (value instanceof MuleXaObject) {
         MuleXaObject xaObject = (MuleXaObject) value;
         if (!xaObject.isReuseObject()) {
-          LOGGER.debug("About to close resource {}...", xaObject);
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("About to close resource {}...", xaObject);
+          }
           try {
             xaObject.close();
             i.remove();
@@ -367,10 +376,14 @@ public class XaTransaction extends AbstractTransaction {
             LOGGER.error("Failed to close resource " + xaObject, e);
           }
         } else {
-          LOGGER.debug("Not closing reusable object {}", xaObject);
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Not closing reusable object {}", xaObject);
+          }
         }
       } else {
-        LOGGER.debug("Not closing non-MuleXaObject object {}", value);
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Not closing non-MuleXaObject object {}", value);
+        }
       }
     }
   }
@@ -402,7 +415,7 @@ public class XaTransaction extends AbstractTransaction {
     private Object resource;
 
     public ResourceKey(Object resourceFactory) {
-      Preconditions.checkArgument(resourceFactory != null, "resourceFactory cannot be null");
+      checkArgument(resourceFactory != null, "resourceFactory cannot be null");
       this.resourceFactory = resourceFactory;
       this.resource = null;
     }

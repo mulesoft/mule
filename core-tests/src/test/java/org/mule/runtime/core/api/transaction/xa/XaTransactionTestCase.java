@@ -14,7 +14,10 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -38,6 +41,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class XaTransactionTestCase extends AbstractMuleTestCase {
 
   private MuleContext mockMuleContext = mockContextWithServices();
+  private NotificationDispatcher notificationDispatcher;
+  private static final int DEFAULT_TIMEOUT = 20;
 
   @Mock
   private TransactionManager mockTransactionManager;
@@ -52,14 +57,16 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
   private XAResource mockXaResource;
 
   @Before
-  public void setUpMuleContext() throws RegistrationException {
-    when(mockMuleContext.getTransactionManager()).thenReturn(mockTransactionManager);
+  public void setUpMuleContext() throws Exception {
+    mockMuleContext.setTransactionManager(mockTransactionManager);
     when(mockMuleContext.getConfiguration().getId()).thenReturn("appName");
+    notificationDispatcher = getNotificationDispatcher(mockMuleContext);
   }
 
   @Test
   public void recognizeDifferentWrappersOfSameResource() throws Exception {
-    XaTransaction xaTransaction = new XaTransaction(mockMuleContext);
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher, DEFAULT_TIMEOUT);
     Object resourceFactory = new Object();
     Object resource = new Object();
     when(mockXaResourceFactoryHolder1.getHoldObject()).thenReturn(resourceFactory);
@@ -79,7 +86,8 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
 
     when(mockTransactionManager.getTransaction()).thenReturn(tx);
 
-    XaTransaction xaTransaction = new XaTransaction(mockMuleContext);
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher, DEFAULT_TIMEOUT);
     xaTransaction.begin();
 
     assertFalse(xaTransaction.isRollbackOnly());
@@ -93,9 +101,10 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
   public void setTxTimeoutWhenEnlistingResource() throws Exception {
     javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
     when(mockTransactionManager.getTransaction()).thenReturn(tx);
-    XaTransaction xaTransaction = new XaTransaction(mockMuleContext);
     int timeoutValue = 1500;
     int timeoutValueInSeconds = 1500 / 1000;
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher, timeoutValueInSeconds);
     xaTransaction.setTimeout(timeoutValue);
     xaTransaction.begin();
     xaTransaction.enlistResource(mockXaResource);
@@ -107,8 +116,8 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
     final int timeoutMillis = 5000;
     final int timeoutSecs = timeoutMillis / 1000;
 
-    XaTransaction xaTransaction = new XaTransaction(mockMuleContext);
-    xaTransaction.setTimeout(timeoutMillis);
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher, timeoutMillis);
     xaTransaction.begin();
 
     final InOrder inOrder = inOrder(mockTransactionManager);

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.transaction;
 
 import static java.lang.System.identityHashCode;
+import static java.text.MessageFormat.format;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_BEGAN;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_COMMITTED;
@@ -14,7 +15,6 @@ import static org.mule.runtime.api.notification.TransactionNotification.TRANSACT
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.notMuleXaTransaction;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
@@ -28,7 +28,6 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 
-import java.text.MessageFormat;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -45,16 +44,25 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   protected int timeout;
   protected ComponentLocation componentLocation;
 
+  protected String applicationName;
   protected MuleContext muleContext;
-  private final NotificationDispatcher notificationFirer;
+  protected final NotificationDispatcher notificationFirer;
 
+  @Deprecated
   protected AbstractTransaction(MuleContext muleContext) {
     this.muleContext = muleContext;
     try {
+      applicationName = muleContext.getConfiguration().getId();
       notificationFirer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }
+  }
+
+  protected AbstractTransaction(String applicationName, NotificationDispatcher notificationFirer, int timeout) {
+    this.applicationName = applicationName;
+    this.notificationFirer = notificationFirer;
+    this.timeout = timeout;
   }
 
   @Override
@@ -81,7 +89,9 @@ public abstract class AbstractTransaction implements TransactionAdapter {
 
   @Override
   public void begin() throws TransactionException {
-    LOGGER.debug("Beginning transaction {}@{}", this.getClass().getName(), identityHashCode(this));
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Beginning transaction {}@{}", this.getClass().getName(), identityHashCode(this));
+    }
     doBegin();
     TransactionCoordination.getInstance().bindTransaction(this);
     fireNotification(new TransactionNotification(getId(), TRANSACTION_BEGAN, getApplicationName()));
@@ -90,8 +100,9 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   @Override
   public void commit() throws TransactionException {
     try {
-      LOGGER.debug("Committing transaction {}@{}", this.getClass().getName(), identityHashCode(this));
-
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Committing transaction {}@{}", this.getClass().getName(), identityHashCode(this));
+      }
       if (isRollbackOnly()) {
         throw new IllegalTransactionStateException(transactionMarkedForRollback());
       }
@@ -106,7 +117,9 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   @Override
   public void rollback() throws TransactionException {
     try {
-      LOGGER.debug("Rolling back transaction {}@{}", this.getClass().getName(), identityHashCode(this));
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Rolling back transaction {}@{}", this.getClass().getName(), identityHashCode(this));
+      }
       setRollbackOnly();
       doRollback();
       fireNotification(new TransactionNotification(getId(), TRANSACTION_ROLLEDBACK, getApplicationName()));
@@ -121,7 +134,6 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   protected void unbindTransaction() throws TransactionException {
     TransactionCoordination.getInstance().unbindTransaction(this);
   }
-
 
   /**
    * Really begin the transaction. Note that resources are enlisted yet.
@@ -182,11 +194,11 @@ public abstract class AbstractTransaction implements TransactionAdapter {
     } catch (TransactionException e) {
       status = -1;
     }
-    return MessageFormat.format("{0}[id={1} , status={2}]", getClass().getName(), id, status);
+    return format("{0}[id={1} , status={2}]", getClass().getName(), id, status);
   }
 
   private String getApplicationName() {
-    return muleContext.getConfiguration().getId();
+    return applicationName;
   }
 
   @Override
