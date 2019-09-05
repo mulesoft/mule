@@ -11,7 +11,6 @@ import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 import static reactor.core.publisher.Flux.from;
 
-import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.routing.RoutingException;
 
@@ -60,8 +59,7 @@ abstract class AbstractSinkRouter {
   }
 
   /**
-   * Decides which route should execute for an incoming event and executes it, purposely separating those actions so that a single
-   * {@link ExpressionManagerSession} can be used for all routes decision process.
+   * Decides which route should execute for an incoming event and executes it.
    *
    * @param event the incoming event
    */

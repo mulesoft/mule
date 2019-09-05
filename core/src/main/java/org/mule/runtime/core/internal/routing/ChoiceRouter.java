@@ -148,6 +148,12 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
       super(publisher, routes);
     }
 
+    /**
+     * Decides which route should execute for an incoming event and executes it, purposely separating those actions so that a
+     * single {@link ExpressionManagerSession} can be used for all routes decision process.
+     *
+     * @param event the incoming event
+     */
     @Override
     protected void route(CoreEvent event) {
       ExecutableRoute selectedRoute;
