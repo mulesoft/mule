@@ -7,14 +7,11 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
-import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
-import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -30,13 +27,13 @@ import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.routing.RouterStatisticsRecorder;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Flux;
 
 /**
@@ -145,21 +142,10 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
     return format("%s [flow=%s, started=%s]", getClass().getSimpleName(), getLocation().getRootContainerName(), started);
   }
 
-  /**
-   * Router that generates executable routes for each one configured and handles the logic of deciding which one will be executed
-   * when an event arrives. It also provides access to the routes publishers so they can be merged together.
-   */
-  private class SinkRouter {
-
-    private final Flux<CoreEvent> router;
-    private final List<ExecutableRoute> routes;
+  private class SinkRouter extends AbstractSinkRouter {
 
     SinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
-      this.routes = routes.stream().map(ProcessorRoute::toExecutableRoute).collect(toList());
-      router = from(publisher)
-          .doOnNext(checkedConsumer(this::route))
-          .doOnComplete(() -> this.routes.stream()
-              .forEach(executableRoute -> executableRoute.complete()));
+      super(publisher, routes);
     }
 
     /**
@@ -168,32 +154,14 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
      *
      * @param event the incoming event
      */
-    private void route(CoreEvent event) {
+    @Override
+    protected void route(CoreEvent event) {
       ExecutableRoute selectedRoute;
       try (ExpressionManagerSession session = expressionManager.openSession(getLocation(), event, NULL_BINDING_CONTEXT)) {
-        selectedRoute = routes.stream().filter(route -> route.shouldExecute(session)).findFirst().get();
+        selectedRoute = getRoutes().stream().filter(route -> route.shouldExecute(session)).findFirst().get();
       }
       selectedRoute.execute(event);
       updateStatistics(selectedRoute.getProcessor());
-    }
-
-    /**
-     * @return the publishers of all routes so they can be merged and subscribed, including a phantom one to guarantee the
-     *         subscription of the router occurs after all routes and with the general context.
-     */
-    private List<Flux<CoreEvent>> collectPublishers() {
-      List<Flux<CoreEvent>> routes = new ArrayList<>();
-      for (Iterator routesIterator = this.routes.iterator(); routesIterator.hasNext();) {
-        ExecutableRoute nextRoute = (ExecutableRoute) routesIterator.next();
-        if (routesIterator.hasNext()) {
-          routes.add(nextRoute.getPublisher());
-        } else {
-          // If it's the last route, this will be trigger for the whole inbound chain of the router to be subscribed.
-          // Since there's always at least one route, the default one, one route will always be decorated.
-          routes.add(subscribeFluxOnPublisherSubscription(nextRoute.getPublisher(), router));
-        }
-      }
-      return routes;
     }
 
   }
