@@ -10,17 +10,18 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -39,15 +40,14 @@ import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.reactivestreams.Publisher;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
@@ -67,7 +67,8 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
   }
 
   @After
-  public void after() {
+  public void after() throws MuleException {
+    stopIfNeeded(roundRobin);
     disposeIfNeeded(roundRobin, getLogger(getClass()));
   }
 
@@ -88,8 +89,9 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
     for (int i = 0; i < NUMBER_OF_ROUTES; i++) {
       routes.add(new TestProcessor());
     }
-    roundRobin.setRoutes(new ArrayList<>(routes));
+    routes.forEach(r -> roundRobin.addRoute(r));
     initialiseIfNeeded(roundRobin, muleContext);
+    startIfNeeded(roundRobin);
 
     List<Thread> threads = new ArrayList<>(NUMBER_OF_ROUTES);
     for (int i = 0; i < NUMBER_OF_ROUTES; i++) {
@@ -101,8 +103,9 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
     for (Thread t : threads) {
       t.join();
     }
+
     for (TestProcessor route : routes) {
-      assertEquals(NUMBER_OF_MESSAGES, route.getCount());
+      assertThat(route.getCount(), is(NUMBER_OF_MESSAGES));
     }
   }
 
@@ -110,30 +113,29 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
   public void usesFirstRouteOnFirstRequest() throws Exception {
     roundRobin.setAnnotations(getAppleFlowComponentLocationAnnotations());
     List<Processor> routes = new ArrayList<>(2);
-    Processor route1 = mock(Processor.class, "route1");
-    when(route1.apply(any(Publisher.class))).then(invocation -> invocation.getArguments()[0]);
+    TestProcessor route1 = new TestProcessor();
     routes.add(route1);
-    Processor route2 = mock(Processor.class, "route2");
-    when(route2.apply(any(Publisher.class))).then(invocation -> invocation.getArguments()[0]);
+    TestProcessor route2 = new TestProcessor();
     routes.add(route2);
-    roundRobin.setRoutes(new ArrayList<>(routes));
+    routes.forEach(r -> roundRobin.addRoute(r));
 
     initialiseIfNeeded(roundRobin, muleContext);
+    startIfNeeded(roundRobin);
 
     Message message = of(singletonList(TEST_MESSAGE));
 
     roundRobin.process(eventBuilder(muleContext).message(message).build());
 
-    verify(route1).apply(any(Publisher.class));
-    verify(route2, never()).apply(any(Publisher.class));
+    assertThat(route2.getCount(), is(0));
+    assertThat(route1.getCount(), is(1));
   }
 
   class TestDriver implements Runnable {
 
-    private Processor target;
-    private int numMessages;
-    private MuleSession session;
-    private FlowConstruct flowConstruct;
+    private final Processor target;
+    private final int numMessages;
+    private final MuleSession session;
+    private final FlowConstruct flowConstruct;
 
     TestDriver(MuleSession session, Processor target, int numMessages, FlowConstruct flowConstruct) {
       this.target = target;
@@ -159,8 +161,8 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
   static class TestProcessor implements Processor {
 
-    private AtomicInteger count = new AtomicInteger(0);
-    private List<Object> payloads = new ArrayList<>();
+    private final AtomicInteger count = new AtomicInteger(0);
+    private final List<Object> payloads = new ArrayList<>();
 
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {

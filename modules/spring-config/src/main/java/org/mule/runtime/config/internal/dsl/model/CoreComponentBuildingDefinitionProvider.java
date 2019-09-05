@@ -65,6 +65,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.AbstractServerNotification;
@@ -459,11 +460,10 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition(MESSAGE_PROCESSORS,
                                            fromChildCollectionConfiguration(MessageProcessorChain.class).build())
             .build());
-    componentBuildingDefinitions
-        .add(baseDefinition.withIdentifier(ROUND_ROBIN).withTypeDefinition(fromType(RoundRobin.class))
-            .withSetterParameterDefinition(MESSAGE_PROCESSORS,
-                                           fromChildCollectionConfiguration(MessageProcessorChain.class).build())
-            .build());
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier(ROUND_ROBIN)
+        .withTypeDefinition(fromType(RoundRobin.class))
+        .withSetterParameterDefinition("routes", fromChildCollectionConfiguration(MessageProcessorChain.class).build())
+        .build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(CHOICE).withTypeDefinition(fromType(ChoiceRouter.class))
         .withObjectFactoryType(ChoiceRouterObjectFactory.class)
         .withSetterParameterDefinition("routes", fromChildCollectionConfiguration(MessageProcessorExpressionPair.class).build())
