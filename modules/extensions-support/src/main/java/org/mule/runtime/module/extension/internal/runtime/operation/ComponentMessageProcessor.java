@@ -201,7 +201,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         try {
           onEvent(event, new SynchronousSinkExecutorCallback(sink));
         } catch (Throwable t) {
-          sink.error(t);
+          sink.error(mapError(t, event));
         }
       });
     }
@@ -248,7 +248,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         operationExecutionFunction.execute(resolutionResult, event, executorCallback);
       }
     } catch (Throwable t) {
-      executorCallback.error(t);
+      executorCallback.error(mapError(t, event));
     }
   }
 
