@@ -25,7 +25,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -102,7 +101,6 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
           SpringRegistryBootstrap.class,
           Component.class,
           InterceptingMessageProcessor.class,
-          AbstractMessageProcessorOwner.class,
           FlowExceptionHandler.class,
           OutboundRouter.class,
           MessageProcessorChain.class,
