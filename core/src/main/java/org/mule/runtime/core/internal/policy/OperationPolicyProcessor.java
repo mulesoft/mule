@@ -23,12 +23,11 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -63,6 +62,7 @@ public class OperationPolicyProcessor implements Processor {
     this.policyStateHandler = policyStateHandler;
     this.nextProcessor = nextProcessor;
     this.stateIdFactory = new PolicyStateIdFactory(policy.getPolicyId());
+    this.policy.getPolicyChain().onChainError(t -> manageError((MessagingException) t));
   }
 
   /**
@@ -91,23 +91,23 @@ public class OperationPolicyProcessor implements Processor {
         });
   }
 
-  private void manageError(PolicyStateId policyStateId, PrivilegedEvent operationEvent, MessagingException messagingException) {
-    policyStateHandler.updateState(policyStateId, messagingException.getEvent());
-    PrivilegedEvent newEvent = policyEventConverter.createEvent((PrivilegedEvent) messagingException.getEvent(), operationEvent);
+  private void manageError(MessagingException messagingException) {
+    PolicyStateId identifier = stateIdFactory.create(messagingException.getEvent());
+    PrivilegedEvent varsProviderEvent = variablesProvider(messagingException.getEvent(), identifier);
+    policyStateHandler.updateState(identifier, messagingException.getEvent());
+    PrivilegedEvent newEvent =
+        policyEventConverter.createEvent((PrivilegedEvent) messagingException.getEvent(), varsProviderEvent);
     messagingException.setProcessedEvent(newEvent);
   }
 
   private Mono<PrivilegedEvent> executePolicyChain(PrivilegedEvent operationEvent, PolicyStateId policyStateId,
                                                    PrivilegedEvent policyEvent, Processor nextProcessor) {
 
-    PolicyChain policyChain = policy.getPolicyChain();
-    policyChain.onChainError(t -> manageError(policyStateId, operationEvent, (MessagingException) t));
-
     return just(policyEvent)
         .doOnNext(event -> logPolicy(event.getContext().getCorrelationId(), policyStateId.getPolicyId(),
                                      () -> getMessageAttributesAsString(event), "Before operation"))
         .cast(CoreEvent.class)
-        .transform(policyChain)
+        .transform(policy.getPolicyChain())
         .cast(PrivilegedEvent.class)
         .doOnNext(policyChainResult -> policyStateHandler.updateState(policyStateId, policyChainResult))
         .map(policyChainResult -> policyEventConverter.createEvent(policyChainResult, operationEvent))
@@ -136,7 +136,11 @@ public class OperationPolicyProcessor implements Processor {
                   .cast(CoreEvent.class)
                   .transform(nextOperation)
                   .cast(PrivilegedEvent.class)
-                  .map(operationResult -> policyEventConverter.createEvent(operationResult, policyExecuteNextEvent));
+                  .map(operationResult -> policyEventConverter.createEvent(operationResult, policyExecuteNextEvent))
+                  .onErrorMap(MessagingException.class,
+                              me -> new MessagingException(policyEventConverter.createEvent((PrivilegedEvent) me.getEvent(),
+                                                                                            policyExecuteNextEvent),
+                                                           me));
             });
       }
     };
