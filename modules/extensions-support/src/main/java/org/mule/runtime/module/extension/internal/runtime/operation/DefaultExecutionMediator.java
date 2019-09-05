@@ -47,7 +47,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -147,27 +146,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     public void error(Throwable e) {
       future.completeExceptionally(e);
     }
-  }
-
-  private void executeWithoutRetry(Consumer<ExecutorCallback> executeCommand,
-                                   BiConsumer<ExecutorCallback, Object> onSuccess,
-                                   BiConsumer<ExecutorCallback, Throwable> onError,
-                                   ExecutorCallback callback) {
-
-    ExecutorCallback callbackDecorator = new ExecutorCallback() {
-
-      @Override
-      public void complete(Object value) {
-        onSuccess.accept(callback, value);
-      }
-
-      @Override
-      public void error(Throwable e) {
-        onError.accept(callback, e);
-      }
-    };
-
-    executeCommand.accept(callbackDecorator);
   }
 
   private void executeWithRetry(ExecutionContextAdapter<M> context,
