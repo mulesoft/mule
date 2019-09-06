@@ -399,7 +399,8 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     String configuredDomainName = descriptor.getDomainName();
     Optional<BundleDescriptor> domainBundleDescriptor = descriptor.getDomainDescriptor();
 
-    if (configuredDomainName != null && !domainBundleDescriptor.isPresent()) {
+    boolean shouldUseDefaultDomain = (configuredDomainName == null) || DEFAULT_DOMAIN_NAME.equals(configuredDomainName);
+    if (!shouldUseDefaultDomain && !domainBundleDescriptor.isPresent()) {
       throw new IllegalStateException(format("Dependency for domain '%s' was not declared", configuredDomainName));
     }
 
