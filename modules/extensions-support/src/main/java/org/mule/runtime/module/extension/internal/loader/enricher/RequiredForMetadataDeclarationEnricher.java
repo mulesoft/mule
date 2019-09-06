@@ -14,16 +14,19 @@ import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithParametersDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.util.DeclarationWalker;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.annotation.metadata.RequiredForMetadata;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -59,20 +62,40 @@ public class RequiredForMetadataDeclarationEnricher implements DeclarationEnrich
   private <T extends BaseDeclaration & WithParametersDeclaration> void registerRequiredParametersForMetadata(T declaration) {
     List<String> parametersRequiredForMetadata = getParametersNameRequiredForMetadata(declaration);
     if (!parametersRequiredForMetadata.isEmpty()) {
-      declaration.addModelProperty(new RequiredForMetadataModelProperty(getParametersNameRequiredForMetadata(declaration)));
+      declaration.addModelProperty(new RequiredForMetadataModelProperty(parametersRequiredForMetadata));
     }
   }
 
   /**
    * Filters the parameters of the given declaration and retrieves the ones that are required for Metadata Resolution.
+   *
+   * In case the annotation {@link RequiredForMetadata} is not present in any parameter, then, all will be considered as
+   * required for metadata (Except from the Infrastructure parameters, which are never required for metadata).
    */
   private List<String> getParametersNameRequiredForMetadata(WithParametersDeclaration declaration) {
-    return declaration.getAllParameters()
+    List<ParameterDeclaration> nonInfrastructureParameters = getNonInfrastructureParameterNames(declaration.getAllParameters());
+    List<String> nonInfrastructureParameterNames = new ArrayList<>();
+    List<String> parametersRequiredForMetadata =
+        nonInfrastructureParameters
+            .stream()
+            .peek(pd -> nonInfrastructureParameterNames.add(pd.getName())) //Add now in case this list is empty
+            .filter(p -> p.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
+                .map(
+                     mp -> mp.getExtensionParameter().isAnnotatedWith(RequiredForMetadata.class))
+                .orElse(false))
+            .map(NamedDeclaration::getName)
+            .collect(toList());
+    if (parametersRequiredForMetadata.isEmpty()) {
+      return nonInfrastructureParameterNames;
+    }
+    return parametersRequiredForMetadata;
+  }
+
+  private List<ParameterDeclaration> getNonInfrastructureParameterNames(List<ParameterDeclaration> parametersDeclaration) {
+    return parametersDeclaration
         .stream()
-        .filter(p -> p.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
-            .map(mp -> mp.getExtensionParameter().isAnnotatedWith(RequiredForMetadata.class))
-            .orElse(false))
-        .map(NamedObject::getName)
+        .filter(
+                pd -> !pd.getModelProperty(InfrastructureParameterModelProperty.class).isPresent())
         .collect(toList());
   }
 }
