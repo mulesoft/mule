@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -28,9 +29,9 @@ import com.google.common.util.concurrent.MoreExecutors;
  * executor service if a transaction is active, instead a {@link MoreExecutors#newDirectExecutorService()} is used and the task is
  * run on the current thread.
  */
-public class RejectionCallbackExecutorServiceDecorator implements ExecutorService {
+public class RejectionCallbackExecutorServiceDecorator implements ScheduledExecutorService {
 
-  private final ExecutorService delegate;
+  private final ScheduledExecutorService delegate;
   private final ScheduledExecutorService retryScheduler;
   private final Runnable onRejected;
   private final Runnable onRetrySuccessful;
@@ -44,7 +45,8 @@ public class RejectionCallbackExecutorServiceDecorator implements ExecutorServic
    * @param retryScheduler the executor service to use for scheduling the retries.
    * @param retryInterval
    */
-  public RejectionCallbackExecutorServiceDecorator(ExecutorService executorService, ScheduledExecutorService retryScheduler,
+  public RejectionCallbackExecutorServiceDecorator(ScheduledExecutorService executorService,
+                                                   ScheduledExecutorService retryScheduler,
                                                    Runnable onRejected, Runnable onRetrySuccessful, Duration retryInterval) {
     this.delegate = executorService;
     this.retryScheduler = retryScheduler;
@@ -177,39 +179,29 @@ public class RejectionCallbackExecutorServiceDecorator implements ExecutorServic
       onRejected.run();
     }
   }
-  //
-  // @Override
-  // public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
-  // return delegate.schedule(command, delay, unit);
-  // }
-  //
-  // @Override
-  // public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
-  // return delegate.schedule(callable, delay, unit);
-  // }
-  //
-  // // private <V> ScheduledFuture<V> synchronousSchedule(Callable<V> callable, long delay, TimeUnit unit) {
-  // // try {
-  // // sleep(unit.toMillis(delay));
-  // // } catch (InterruptedException e) {
-  // // currentThread().interrupt();
-  // // return new SynchronousScheduledFuture<>(true);
-  // // }
-  // // try {
-  // // return new SynchronousScheduledFuture<>(callable.call());
-  // // } catch (Exception e) {
-  // // return new SynchronousScheduledFuture<>(e);
-  // // }
-  // // }
-  //
-  // @Override
-  // public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
-  // return delegate.scheduleAtFixedRate(command, initialDelay, period, unit);
-  // }
-  //
-  // @Override
-  // public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
-  // return delegate.scheduleWithFixedDelay(command, initialDelay, delay, unit);
-  // }
+
+  /////////
+  // For the schedule methods, nothing to do in particular.
+  /////////
+
+  @Override
+  public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
+    return delegate.schedule(command, delay, unit);
+  }
+
+  @Override
+  public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
+    return delegate.schedule(callable, delay, unit);
+  }
+
+  @Override
+  public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
+    return delegate.scheduleAtFixedRate(command, initialDelay, period, unit);
+  }
+
+  @Override
+  public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
+    return delegate.scheduleWithFixedDelay(command, initialDelay, delay, unit);
+  }
 
 }

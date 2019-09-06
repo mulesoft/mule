@@ -28,6 +28,7 @@ import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.construct.FromFlowRejectedExecutionException;
+import org.mule.runtime.core.internal.util.rx.RejectionCallbackExecutorServiceDecorator;
 import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
@@ -106,23 +107,24 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
   }
 
   protected ReactiveProcessor proactor(ReactiveProcessor processor, ScheduledExecutorService scheduler) {
-    // final ExecutorService retryScheduler = new RejectionCallbackExecutorServiceDecorator(scheduler, getCpuLightScheduler(),
-    // () -> {
-    // LOGGER
-    // .trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
-    // (scheduler instanceof Scheduler
-    // ? ((Scheduler) scheduler)
-    // .getName()
-    // : scheduler.toString()),
-    // SCHEDULER_BUSY_RETRY_INTERVAL_MS);
-    // lastRetryTimestamp.set(nanoTime());
-    // },
-    // () -> lastRetryTimestamp.set(MIN_VALUE),
-    // ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS));
+    final ScheduledExecutorService retryScheduler =
+        new RejectionCallbackExecutorServiceDecorator(scheduler, getCpuLightScheduler(),
+                                                      () -> {
+                                                        LOGGER
+                                                            .trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
+                                                                   (scheduler instanceof Scheduler
+                                                                       ? ((Scheduler) scheduler)
+                                                                           .getName()
+                                                                       : scheduler.toString()),
+                                                                   SCHEDULER_BUSY_RETRY_INTERVAL_MS);
+                                                        lastRetryTimestamp.set(nanoTime());
+                                                      },
+                                                      () -> lastRetryTimestamp.set(MIN_VALUE),
+                                                      ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS));
 
 
-    return publisher -> withRetry(scheduleProcessor(processor, scheduler, from(publisher))
-        .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)), scheduler);
+    return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
+        .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
   }
 
   protected abstract Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
