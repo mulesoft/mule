@@ -107,7 +107,7 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
     }
   }
 
-  private ReactiveProcessor proactor(ReactiveProcessor processor, Scheduler scheduler) {
+  protected ReactiveProcessor proactor(ReactiveProcessor processor, Scheduler scheduler) {
     // TODO MULE-17079 Remove this policyMode flag.
     // This is to avoid the performance degradation introduced by MULE-17060 when using CPU_INTENSIVE processors in policies,
     // until MULE-17079 is done.
