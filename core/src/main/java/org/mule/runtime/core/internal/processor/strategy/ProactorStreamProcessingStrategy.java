@@ -55,7 +55,7 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
   private Scheduler blockingScheduler;
   private Scheduler cpuIntensiveScheduler;
 
-  private final AtomicLong lastRetryTimestamp = new AtomicLong(MIN_VALUE);
+  protected final AtomicLong lastRetryTimestamp = new AtomicLong(MIN_VALUE);
 
   private boolean policyMode;
 
