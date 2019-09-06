@@ -219,6 +219,14 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="lifecycle-tracker-scope" substitutionGroup="mule:abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Stores the lifecycle method calls received by this scope.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:element name="non-blocking-processor" substitutionGroup="mule:abstract-message-processor">
         <xsd:complexType>
             <xsd:complexContent>
@@ -255,6 +263,21 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="lifecycle-tracker-source" type="lifecycleTrackerSourceType" substitutionGroup="mule:abstract-message-source">
+        <xsd:annotation>
+            <xsd:documentation>
+                Mock message source that records lifecycle method invocations
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="lifecycleTrackerSourceType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageSourceType">
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
