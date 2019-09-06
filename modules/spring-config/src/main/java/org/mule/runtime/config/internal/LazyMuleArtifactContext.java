@@ -327,9 +327,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
       MinimalApplicationModelGenerator minimalApplicationModelGenerator =
           new MinimalApplicationModelGenerator(dependencyResolver);
-      // Force initialization of configuration component...
-      resetMuleConfiguration(minimalApplicationModelGenerator);
-
       // User input components to be initialized...
       List<ComponentModel> componentModelsToBuildMinimalModel = new ArrayList<>();
       predicateOptional
@@ -371,6 +368,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           }
         });
       }
+
+      // Force initialization of configuration component...
+      resetMuleConfiguration(minimalApplicationModelGenerator);
 
       // First unregister any already initialized/started component
       unregisterBeans(beansCreated);
@@ -485,6 +485,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                        e);
       }
     }
+    // Just enable the MuleConfiguration componentModel so it values will be applied on this initialization
     minimalApplicationModelGenerator
         .getMinimalModel(minimalApplicationModelGenerator
             .getComponentModels(componentModel -> componentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER)));
