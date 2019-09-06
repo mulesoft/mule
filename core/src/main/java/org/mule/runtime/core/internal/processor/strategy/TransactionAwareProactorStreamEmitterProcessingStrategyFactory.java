@@ -37,44 +37,27 @@ import java.util.function.Supplier;
 public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory extends ReactorStreamProcessingStrategyFactory
     implements TransactionAwareProcessingStrategyFactory {
 
-  private final boolean policyMode;
-
-
-  public TransactionAwareProactorStreamEmitterProcessingStrategyFactory() {
-    this(false);
-  }
-
-  // TODO MULE-17079 Remove this policyMode flag.
-  public TransactionAwareProactorStreamEmitterProcessingStrategyFactory(boolean policyMode) {
-    this.policyMode = policyMode;
-  }
-
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
-    final TransactionAwareProactorStreamEmitterProcessingStrategy ps =
-        new TransactionAwareProactorStreamEmitterProcessingStrategy(getBufferSize(),
-                                                                    getSubscriberCount(),
-                                                                    () -> muleContext.getSchedulerService()
-                                                                        .cpuLightScheduler(muleContext.getSchedulerBaseConfig()
-                                                                            .withName(schedulersNamePrefix + "."
-                                                                                + CPU_LITE.name())),
-                                                                    () -> muleContext.getSchedulerService()
-                                                                        .ioScheduler(muleContext.getSchedulerBaseConfig()
-                                                                            .withName(schedulersNamePrefix + "."
-                                                                                + BLOCKING.name())),
-                                                                    () -> muleContext.getSchedulerService()
-                                                                        .cpuIntensiveScheduler(muleContext
-                                                                            .getSchedulerBaseConfig()
-                                                                            .withName(schedulersNamePrefix + "."
-                                                                                + CPU_INTENSIVE.name())),
-                                                                    resolveParallelism(),
-                                                                    getMaxConcurrency(),
-                                                                    isMaxConcurrencyEagerCheck(),
-                                                                    muleContext.getConfiguration().isThreadLoggingEnabled());
-
-    // TODO MULE-17079 Remove this policyMode flag.
-    ps.setPolicyMode(policyMode);
-    return ps;
+    return new TransactionAwareProactorStreamEmitterProcessingStrategy(getBufferSize(),
+                                                                       getSubscriberCount(),
+                                                                       () -> muleContext.getSchedulerService()
+                                                                           .cpuLightScheduler(muleContext.getSchedulerBaseConfig()
+                                                                               .withName(schedulersNamePrefix + "."
+                                                                                   + CPU_LITE.name())),
+                                                                       () -> muleContext.getSchedulerService()
+                                                                           .ioScheduler(muleContext.getSchedulerBaseConfig()
+                                                                               .withName(schedulersNamePrefix + "."
+                                                                                   + BLOCKING.name())),
+                                                                       () -> muleContext.getSchedulerService()
+                                                                           .cpuIntensiveScheduler(muleContext
+                                                                               .getSchedulerBaseConfig()
+                                                                               .withName(schedulersNamePrefix + "."
+                                                                                   + CPU_INTENSIVE.name())),
+                                                                       resolveParallelism(),
+                                                                       getMaxConcurrency(),
+                                                                       isMaxConcurrencyEagerCheck(),
+                                                                       muleContext.getConfiguration().isThreadLoggingEnabled());
   }
 
   @Override

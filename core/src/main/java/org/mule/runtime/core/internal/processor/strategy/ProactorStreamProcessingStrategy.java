@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Long.MIN_VALUE;
-import static java.lang.Math.max;
 import static java.lang.System.nanoTime;
 import static java.time.Duration.ofMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -56,8 +55,6 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
   private Scheduler cpuIntensiveScheduler;
 
   protected final AtomicLong lastRetryTimestamp = new AtomicLong(MIN_VALUE);
-
-  private boolean policyMode;
 
   public ProactorStreamProcessingStrategy(int subscriberCount,
                                           Supplier<Scheduler> cpuLightSchedulerSupplier,
@@ -108,24 +105,8 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
   }
 
   protected ReactiveProcessor proactor(ReactiveProcessor processor, Scheduler scheduler) {
-    // TODO MULE-17079 Remove this policyMode flag.
-    // This is to avoid the performance degradation introduced by MULE-17060 when using CPU_INTENSIVE processors in policies,
-    // until MULE-17079 is done.
-    if (policyMode) {
-      return publisher -> withRetry(scheduleProcessor(processor, scheduler, from(publisher))
-          .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)), scheduler);
-    } else {
-      return publisher -> from(publisher)
-          .flatMap(event -> withRetry(scheduleProcessor(processor, scheduler, Flux.just(event))
-              .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)), scheduler),
-                   // no concurrency on FlatMap, breaks async (AsyncTestCase in integration-tests)
-                   max(maxConcurrency / (getParallelism() * subscribers), 1));
-    }
-  }
-
-  // TODO MULE-17079 Remove this policyMode flag.
-  public void setPolicyMode(boolean policyMode) {
-    this.policyMode = policyMode;
+    return publisher -> withRetry(scheduleProcessor(processor, scheduler, from(publisher))
+        .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)), scheduler);
   }
 
   protected abstract Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler,
