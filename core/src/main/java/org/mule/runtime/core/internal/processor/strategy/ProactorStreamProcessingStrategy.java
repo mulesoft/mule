@@ -32,6 +32,7 @@ import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
@@ -104,20 +105,38 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
     }
   }
 
-  protected ReactiveProcessor proactor(ReactiveProcessor processor, Scheduler scheduler) {
+  protected ReactiveProcessor proactor(ReactiveProcessor processor, ScheduledExecutorService scheduler) {
+    // final ExecutorService retryScheduler = new RejectionCallbackExecutorServiceDecorator(scheduler, getCpuLightScheduler(),
+    // () -> {
+    // LOGGER
+    // .trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
+    // (scheduler instanceof Scheduler
+    // ? ((Scheduler) scheduler)
+    // .getName()
+    // : scheduler.toString()),
+    // SCHEDULER_BUSY_RETRY_INTERVAL_MS);
+    // lastRetryTimestamp.set(nanoTime());
+    // },
+    // () -> lastRetryTimestamp.set(MIN_VALUE),
+    // ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS));
+
+
     return publisher -> withRetry(scheduleProcessor(processor, scheduler, from(publisher))
         .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)), scheduler);
   }
 
-  protected abstract Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler,
+  protected abstract Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
                                                        Flux<CoreEvent> eventFlux);
 
-  private Flux<CoreEvent> withRetry(Flux<CoreEvent> scheduledFlux, Scheduler processorScheduler) {
+  private Flux<CoreEvent> withRetry(Flux<CoreEvent> scheduledFlux, ScheduledExecutorService processorScheduler) {
     return scheduledFlux.retryWhen(onlyIf(ctx -> {
       final boolean schedulerBusy = isSchedulerBusy(ctx.exception());
       if (schedulerBusy) {
         LOGGER.trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
-                     processorScheduler.getName(), SCHEDULER_BUSY_RETRY_INTERVAL_MS);
+                     (processorScheduler instanceof Scheduler
+                         ? ((Scheduler) processorScheduler).getName()
+                         : processorScheduler.toString()),
+                     SCHEDULER_BUSY_RETRY_INTERVAL_MS);
         lastRetryTimestamp.set(nanoTime());
       }
       return schedulerBusy;

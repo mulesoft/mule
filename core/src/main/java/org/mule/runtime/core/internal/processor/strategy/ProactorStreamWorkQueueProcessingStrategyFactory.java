@@ -32,6 +32,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingExecutorServiceDecorator;
 import org.mule.runtime.core.internal.processor.strategy.WorkQueueStreamProcessingStrategyFactory.WorkQueueStreamProcessingStrategy;
 
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -177,7 +178,7 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
     }
 
     @Override
-    protected ReactiveProcessor proactor(ReactiveProcessor processor, Scheduler scheduler) {
+    protected ReactiveProcessor proactor(ReactiveProcessor processor, ScheduledExecutorService scheduler) {
       return publisher -> from(publisher)
           .flatMap(event -> withRetry(scheduleProcessor(processor, scheduler, Flux.just(event))
               .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)), scheduler),
@@ -186,18 +187,21 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
     }
 
     @Override
-    protected Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler,
+    protected Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
                                                 Flux<CoreEvent> eventFlux) {
       reactor.core.scheduler.Scheduler eventLoopScheduler = fromExecutorService(decorateScheduler(getCpuLightScheduler()));
       return scheduleWithLogging(processor, eventLoopScheduler, processorScheduler, eventFlux);
     }
 
-    private Flux<CoreEvent> withRetry(Flux<CoreEvent> scheduledFlux, Scheduler processorScheduler) {
+    private Flux<CoreEvent> withRetry(Flux<CoreEvent> scheduledFlux, ScheduledExecutorService processorScheduler) {
       return scheduledFlux.retryWhen(onlyIf(ctx -> {
         final boolean schedulerBusy = isSchedulerBusy(ctx.exception());
         if (schedulerBusy) {
           LOGGER.trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
-                       processorScheduler.getName(), SCHEDULER_BUSY_RETRY_INTERVAL_MS);
+                       (processorScheduler instanceof Scheduler
+                           ? ((Scheduler) processorScheduler).getName()
+                           : processorScheduler.toString()),
+                       SCHEDULER_BUSY_RETRY_INTERVAL_MS);
           lastRetryTimestamp.set(nanoTime());
         }
         return schedulerBusy;
@@ -207,7 +211,7 @@ public class ProactorStreamWorkQueueProcessingStrategyFactory extends ReactorStr
     }
 
     private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, reactor.core.scheduler.Scheduler eventLoopScheduler,
-                                                Scheduler processorScheduler, Flux<CoreEvent> eventFlux) {
+                                                ScheduledExecutorService processorScheduler, Flux<CoreEvent> eventFlux) {
       if (isThreadLoggingEnabled) {
         return eventFlux
             .flatMap(e -> Mono.subscriberContext()
