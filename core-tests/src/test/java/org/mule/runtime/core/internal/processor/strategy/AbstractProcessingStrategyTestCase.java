@@ -300,7 +300,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       asyncExecutor.submit(() -> processFlow(newEvent()));
     }
 
-    latchedProcessor.getAllLatchedLatch().await();
+    assertThat("Processors not executed in time",
+               latchedProcessor.getAllLatchedLatch().await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
 
     asyncExecutor.submit(() -> processFlow(newEvent()));
 
@@ -793,7 +794,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   static class RejectingScheduler extends TestScheduler {
 
     static int REJECTION_COUNT = 10;
-    private int rejections;
+    private final AtomicInteger rejections = new AtomicInteger();
+    private final AtomicInteger accepted = new AtomicInteger();
     private final Scheduler delegate;
 
     public RejectingScheduler(Scheduler delegate) {
@@ -803,20 +805,35 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
     @Override
     public Future<?> submit(Runnable task) {
-      if (rejections++ < REJECTION_COUNT) {
+      if (rejections.getAndUpdate(r -> r < REJECTION_COUNT ? r + 1 : r) < REJECTION_COUNT) {
         throw new RejectedExecutionException();
       } else {
+        accepted.incrementAndGet();
         return delegate.submit(task);
       }
     }
 
     @Override
     public Future<?> submit(Callable task) {
-      if (rejections++ < REJECTION_COUNT) {
+      if (rejections.getAndUpdate(r -> r < REJECTION_COUNT ? r + 1 : r) < REJECTION_COUNT) {
         throw new RejectedExecutionException();
       } else {
+        accepted.incrementAndGet();
         return delegate.submit(task);
       }
+    }
+
+    public int getRejections() {
+      return rejections.get();
+    }
+
+    public int getAccepted() {
+      return accepted.get();
+    }
+
+    public void reset() {
+      rejections.set(0);
+      accepted.set(0);
     }
   }
 
