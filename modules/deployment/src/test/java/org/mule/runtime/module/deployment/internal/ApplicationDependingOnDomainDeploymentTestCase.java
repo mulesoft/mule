@@ -31,6 +31,9 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
       .definedBy("empty-config.xml").dependingOn(emptyDomain100FileBuilder)
       .deployedWith("domain", "empty-domain-1.0.0-mule-domain");
 
+  private final ApplicationFileBuilder appReferencingDefaultDomainFileBuilder = new ApplicationFileBuilder("app-with-default-ref")
+      .definedBy("empty-config.xml").deployedWith("domain", "default");
+
   private final ApplicationFileBuilder incompatibleDomainNameAppFileBuilder = new ApplicationFileBuilder("bad-domain-app-ref")
       .definedBy("empty-config.xml").dependingOn(emptyDomain101FileBuilder)
       .deployedWith("domain", "empty-domain-1.0.0-mule-domain");
@@ -93,6 +96,14 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
 
     addExplodedAppFromBuilder(appReferencingDomain101FileBuilder, appReferencingDomain101FileBuilder.getId());
     assertDeploymentSuccess(applicationDeploymentListener, appReferencingDomain101FileBuilder.getId());
+  }
+
+  @Test
+  public void referenceDefaultDomainByName() throws Exception {
+    startDeployment();
+
+    addExplodedAppFromBuilder(appReferencingDefaultDomainFileBuilder, appReferencingDefaultDomainFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, appReferencingDefaultDomainFileBuilder.getId());
   }
 
   @Test

@@ -153,6 +153,8 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
 
     assertThat(domainManager.contains(domainNotAddedName), is(false));
     expectedException.expect(DomainNotFoundException.class);
+    expectedException
+        .expectMessage("The domain '" + domainNotAddedName + "' was not found. Available domains: [[" + domainAddedName + "]]");
     domainManager.getDomain(domainNotAddedName);
   }
 
@@ -200,6 +202,14 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
     domainManager.addDomain(domain2);
 
     expectedException.expect(AmbiguousDomainReferenceException.class);
+
+    String expectedMessage = "More than one compatible domain were found for bundle descriptor "
+        + domain1.getDescriptor().getBundleDescriptor()
+        + ". Found domains were: ["
+        + domainName1 + ", "
+        + domainName2 + "]";
+
+    expectedException.expectMessage(expectedMessage);
     domainManager.getCompatibleDomain(domain1.getDescriptor().getBundleDescriptor());
     domainManager.getCompatibleDomain(domain2.getDescriptor().getBundleDescriptor());
   }
@@ -267,6 +277,8 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
 
     // Cannot retrieve the domain using the descriptor that we have
     expectedException.expect(DomainNotFoundException.class);
+    expectedException
+        .expectMessage("The domain 'custom-domain-1.1.0-mule-domain' was not found. Available domains: [[custom-domain-2.1.0-mule-domain]]");
     domainManager.getCompatibleDomain(oldBundleDescriptor);
   }
 
@@ -282,6 +294,8 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
 
     // Cannot retrieve the domain using the descriptor that we have
     expectedException.expect(DomainNotFoundException.class);
+    expectedException
+        .expectMessage("The domain 'custom-domain-2.1.0-mule-domain' was not found. Available domains: [[custom-domain-1.1.0-mule-domain]]");
     domainManager.getCompatibleDomain(bundleDescriptor);
   }
 
@@ -312,6 +326,8 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
 
     // Cannot retrieve the domain using the descriptor that we have
     expectedException.expect(DomainNotFoundException.class);
+    expectedException
+        .expectMessage("The domain 'custom-domain-1.1.1-mule-domain' was not found. Available domains: [[custom-domain-1.1.0-mule-domain]]");
     domainManager.getCompatibleDomain(bundleDescriptor);
   }
 

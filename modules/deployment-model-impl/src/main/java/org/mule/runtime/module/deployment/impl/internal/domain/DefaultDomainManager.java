@@ -13,7 +13,9 @@ import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Manages {@link Domain} instances created on the container.
@@ -55,7 +57,8 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
   @Override
   public Domain getCompatibleDomain(BundleDescriptor wantedDescriptor)
       throws DomainNotFoundException, AmbiguousDomainReferenceException {
-    Domain foundDomain = null;
+    Set<String> foundDomainNames = new HashSet<>();
+    Domain lastFoundDomain = null;
 
     for (Domain domain : domainsByName.values()) {
       BundleDescriptor currentDescriptor = domain.getDescriptor().getBundleDescriptor();
@@ -65,18 +68,20 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
       }
 
       if (isCompatibleBundle(currentDescriptor, wantedDescriptor)) {
-        if (foundDomain != null) {
-          throw new AmbiguousDomainReferenceException(wantedDescriptor);
-        }
-        foundDomain = domain;
+        foundDomainNames.add(domain.getDescriptor().getName());
+        lastFoundDomain = domain;
       }
     }
 
-    if (foundDomain == null) {
+    if (foundDomainNames.size() < 1) {
       throw new DomainNotFoundException(wantedDescriptor.getArtifactFileName(), domainsByName.keySet());
     }
 
-    return foundDomain;
+    if (foundDomainNames.size() > 1) {
+      throw new AmbiguousDomainReferenceException(wantedDescriptor, foundDomainNames);
+    }
+
+    return lastFoundDomain;
   }
 
   @Override
