@@ -158,22 +158,44 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     }
 
     @Override
+    protected Mono<CoreEvent> scheduleProcessor(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
+                                                Mono<CoreEvent> eventFlux) {
+      return scheduleWithLogging(processor, processorScheduler, eventFlux);
+    }
+
+    @Override
     protected Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
                                                 Flux<CoreEvent> eventFlux) {
       return scheduleWithLogging(processor, processorScheduler, eventFlux);
     }
 
-    private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
-                                                Flux<CoreEvent> eventFlux) {
+    private Mono<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
+                                                Mono<CoreEvent> eventFlux) {
       if (isThreadLoggingEnabled) {
-        return eventFlux
+        return Mono.from(eventFlux)
             .flatMap(e -> subscriberContext()
                 .flatMap(ctx -> Mono.just(e).transform(processor)
                     .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
                         .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(processorScheduler),
                                                                                                e.getContext().getId())))));
       } else {
-        return eventFlux
+        return Mono.from(eventFlux)
+            .publishOn(fromExecutorService(decorateScheduler(processorScheduler)))
+            .transform(processor);
+      }
+    }
+
+    private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
+                                                Flux<CoreEvent> eventFlux) {
+      if (isThreadLoggingEnabled) {
+        return Flux.from(eventFlux)
+            .flatMap(e -> subscriberContext()
+                .flatMap(ctx -> Mono.just(e).transform(processor)
+                    .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
+                        .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(processorScheduler),
+                                                                                               e.getContext().getId())))));
+      } else {
+        return Flux.from(eventFlux)
             .publishOn(fromExecutorService(decorateScheduler(processorScheduler)))
             .transform(processor);
       }

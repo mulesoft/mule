@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Long.MIN_VALUE;
+import static java.lang.Math.max;
 import static java.lang.System.nanoTime;
 import static java.time.Duration.ofMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -19,8 +21,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
-import static reactor.retry.Retry.onlyIf;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -43,7 +43,7 @@ import java.util.function.Supplier;
 import org.slf4j.Logger;
 
 import reactor.core.publisher.Flux;
-import reactor.retry.BackoffDelay;
+import reactor.core.publisher.Mono;
 
 public abstract class ProactorStreamProcessingStrategy extends AbstractReactorStreamProcessingStrategy {
 
@@ -122,30 +122,35 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
                                                       () -> lastRetryTimestamp.set(MIN_VALUE),
                                                       ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS));
 
-
-    return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
-        .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
+    // FlatMap is the way reactor has to do parallel processing. Since this proactor method is used for the processors that are
+    // not CPU_LITE, parallelism is wanted when the processor is blocked to do IO or doing long CPU work.
+    if (maxConcurrency == 1) {
+      // If no concurrency needed, execute directly on the same Flux
+      return publisher -> from(publisher)
+          .compose(eventP -> scheduleProcessor(processor, retryScheduler, eventP)
+              .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)));
+    } else if (maxConcurrency == MAX_VALUE) {
+      // For no limit, pass through the no limit meaning to Reactor's flatMap
+      return publisher -> from(publisher)
+          .flatMap(event -> scheduleProcessor(processor, retryScheduler, Mono.just(event))
+              .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)),
+                   MAX_VALUE);
+    } else {
+      // Otherwise, enforce the concurrency limit from the config,
+      return publisher -> from(publisher)
+          .flatMap(event -> scheduleProcessor(processor, retryScheduler, Mono.just(event))
+              .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)),
+                   max(maxConcurrency / (getParallelism() * subscribers), 1));
+    }
   }
 
-  protected abstract Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
+  protected abstract Mono<CoreEvent> scheduleProcessor(ReactiveProcessor processor,
+                                                       ScheduledExecutorService processorScheduler,
+                                                       Mono<CoreEvent> eventFlux);
+
+  protected abstract Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor,
+                                                       ScheduledExecutorService processorScheduler,
                                                        Flux<CoreEvent> eventFlux);
-
-  private Flux<CoreEvent> withRetry(Flux<CoreEvent> scheduledFlux, ScheduledExecutorService processorScheduler) {
-    return scheduledFlux.retryWhen(onlyIf(ctx -> {
-      final boolean schedulerBusy = isSchedulerBusy(ctx.exception());
-      if (schedulerBusy) {
-        LOGGER.trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
-                     (processorScheduler instanceof Scheduler
-                         ? ((Scheduler) processorScheduler).getName()
-                         : processorScheduler.toString()),
-                     SCHEDULER_BUSY_RETRY_INTERVAL_MS);
-        lastRetryTimestamp.set(nanoTime());
-      }
-      return schedulerBusy;
-    }).backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
-        .withBackoffScheduler(fromExecutorService(decorateScheduler(getCpuLightScheduler()))))
-        .doOnNext(e -> lastRetryTimestamp.set(MIN_VALUE));
-  }
 
   protected Scheduler getBlockingScheduler() {
     return this.blockingScheduler;
