@@ -53,7 +53,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   }
 
   @Test
-  public void notAugmentedInvocation() throws Exception {
+  public void notAugmentedInvocation() {
     BaseService service = new BasicService();
 
     final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
@@ -64,7 +64,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   }
 
   @Test
-  public void augmentedInvocation() throws Exception {
+  public void augmentedInvocation() {
     BaseService service = new AugmentedMethodService();
 
     final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
@@ -75,7 +75,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   }
 
   @Test
-  public void augmentedSubclassInvocation() throws Exception {
+  public void augmentedSubclassInvocation() {
     BaseService service = new AugmentedSubclassMethodService();
 
     final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
@@ -86,7 +86,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   }
 
   @Test
-  public void augmentedSubclassOverridesInvocation() throws Exception {
+  public void augmentedSubclassOverridesInvocation() {
     BaseService service = new AugmentedSubclassOverridesMethodService();
 
     final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
@@ -112,7 +112,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   }
 
   @Test
-  public void namedAugmentedInvocation() throws Exception {
+  public void namedAugmentedInvocation() {
     BaseService service = new NamedAugmentedMethodService();
 
     final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
@@ -123,7 +123,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   }
 
   @Test
-  public void invalidNamedAugmentedInvocation() throws Exception {
+  public void invalidNamedAugmentedInvocation() {
     BaseService service = new InvalidNamedAugmentedMethodService();
 
     final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
@@ -135,7 +135,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   }
 
   @Test
-  public void hiddenAugmentedInvocation() throws Exception {
+  public void hiddenAugmentedInvocation() {
     BaseService service = new HiddenAugmentedMethodService();
 
     final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
@@ -146,7 +146,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   }
 
   @Test
-  public void overloadedAugmentedInvocation() throws Exception {
+  public void overloadedAugmentedInvocation() {
     BaseOverloadedService service = new OverloadedAugmentedMethodService();
 
     final BaseOverloadedService serviceProxy =
@@ -158,7 +158,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   }
 
   @Test
-  public void overloadedAugmentedInvocation2() throws Exception {
+  public void overloadedAugmentedInvocation2() {
     BaseOverloadedService service = new OverloadedAugmentedMethodService();
 
     final BaseOverloadedService serviceProxy =
@@ -170,7 +170,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   }
 
   @Test
-  public void overloadedAugmentedInvocation3() throws Exception {
+  public void overloadedAugmentedInvocation3() {
     BaseOverloadedService2 service = new OverloadedAugmentedMethodService2();
 
     final BaseOverloadedService2 serviceProxy =
@@ -182,7 +182,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   }
 
   @Test
-  public void ambiguousAugmentedInvocation() throws Exception {
+  public void ambiguousAugmentedInvocation() {
     BaseService service = new AmbiguousAugmetedMethodService();
 
     final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
@@ -195,7 +195,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   }
 
   @Test
-  public void invalidAugmentedInvocation() throws Exception {
+  public void invalidAugmentedInvocation() {
     BaseService service = new InvalidAugmetedMethodService();
 
     final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
@@ -206,7 +206,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   }
 
   @Test
-  public void throughProxyAugmentedInvocation() throws Exception {
+  public void throughProxyAugmentedInvocation() {
     BaseService service = new AugmentedMethodService();
 
     final MetadataInvocationHandler noOpHandler = new MetadataInvocationHandler(service) {
