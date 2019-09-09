@@ -10,7 +10,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.privileged.transaction.AbstractTransaction;
 import org.mule.runtime.core.privileged.transaction.XaTransaction;
@@ -46,7 +45,7 @@ public class ExternalXaTransaction extends XaTransaction {
     try {
       synchronized (this) {
         transaction = txManager.getTransaction();
-        transaction.registerSynchronization(new ExternalTransaction(muleContext));
+        transaction.registerSynchronization(new ExternalTransaction(applicationName, notificationFirer, timeout));
       }
     } catch (Exception e) {
       throw new TransactionException(CoreMessages.cannotStartTransaction("XA"), e);
@@ -58,8 +57,8 @@ public class ExternalXaTransaction extends XaTransaction {
    */
   class ExternalTransaction extends AbstractTransaction implements Synchronization {
 
-    ExternalTransaction(MuleContext muleContext) {
-      super(muleContext);
+    public ExternalTransaction(String applicationName, NotificationDispatcher notificationFirer, int timeout) {
+      super(applicationName, notificationFirer, timeout);
     }
 
     /** Nothing to do */
