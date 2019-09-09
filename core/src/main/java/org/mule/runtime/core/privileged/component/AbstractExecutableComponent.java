@@ -25,6 +25,7 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -33,6 +34,7 @@ import org.mule.runtime.core.privileged.processor.MessageProcessors;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
@@ -75,6 +77,38 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
           .build();
     }
     return doProcess(internalEvent)
+        .map(r -> quickCopy(event.getContext(), r))
+        .cast(Event.class)
+        .toFuture();
+  }
+
+  /**
+   * Executes the component based on a {@link Event} that may have been provided by another component execution.
+   * <p>
+   * Streams will be closed and resources cleaned up when when the existing root {@link org.mule.runtime.api.event.EventContext}
+   * completes.
+   *
+   * @param event the input to execute the component
+   * @param childEventContributor allows to perform any modifications on the event to be built right before executing this
+   *        component with it.
+   * @return a {@link Event} with the content of the result
+   * @throws ComponentExecutionException if there is an unhandled error within the execution
+   */
+  public final CompletableFuture<Event> execute(Event event, Consumer<CoreEvent.Builder> childEventContributor) {
+    EventContext child;
+    if (event instanceof CoreEvent) {
+      child = createChildEventContext(event.getContext());
+    } else {
+      child = createEventContext(null);
+    }
+
+    final Builder internalEventBuilder = CoreEvent.builder(child)
+        .message(event.getMessage())
+        .error(event.getError().orElse(null))
+        .variables(event.getVariables());
+    childEventContributor.accept(internalEventBuilder);
+
+    return doProcess(internalEventBuilder.build())
         .map(r -> quickCopy(event.getContext(), r))
         .cast(Event.class)
         .toFuture();
