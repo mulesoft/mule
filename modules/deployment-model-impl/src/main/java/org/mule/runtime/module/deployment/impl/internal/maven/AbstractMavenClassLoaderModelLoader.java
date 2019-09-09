@@ -32,7 +32,6 @@ import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.PROVID
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -76,8 +75,6 @@ import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.io.PatternFilenameFilter;
 
 /**
  * Abstract implementation of {@link ClassLoaderModelLoader} that resolves the dependencies for all the mule artifacts and create
@@ -462,16 +459,22 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
         throw new MuleRuntimeException(e);
       }
 
-      final JarInfo exploredJar = jarExplorerFactory.get().explore(dependencyArtifactUri);
+      try {
+        final JarInfo exploredJar = jarExplorerFactory.get().explore(dependencyArtifactUri);
 
-      final Set<String> localPackages = new HashSet<>(exploredJar.getPackages());
-      localPackages.removeAll(exportedPackages);
+        final Set<String> localPackages = new HashSet<>(exploredJar.getPackages());
+        localPackages.removeAll(exportedPackages);
 
-      final Set<String> localResources = new HashSet<>(exploredJar.getResources());
-      localResources.removeAll(exportedResources);
+        final Set<String> localResources = new HashSet<>(exploredJar.getResources());
+        localResources.removeAll(exportedResources);
 
-      classLoaderModelBuilder.withLocalPackages(localPackages);
-      classLoaderModelBuilder.withLocalResources(localResources);
+        classLoaderModelBuilder.withLocalPackages(localPackages);
+        classLoaderModelBuilder.withLocalResources(localResources);
+      } catch (IllegalArgumentException e) {
+        // Workaround for MMP-499
+        LOGGER.warn("File for dependency artifact not found: '{}'. Skipped localPackages scanning for that artifact.",
+                    dependencyArtifactUri);
+      }
     }
   }
 
