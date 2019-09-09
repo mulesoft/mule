@@ -184,7 +184,7 @@
         <javax.transaction.version>1.2</javax.transaction.version>
         <jerseyVersion>2.11</jerseyVersion>
         <javassistVersion>3.7.ga</javassistVersion>
-        <jakartaMailVersion>1.6.3</jakartaMailVersion>
+        <jakartaMailVersion>1.6.4</jakartaMailVersion>
         <javaXmlBindVersion>2.3.1-MULE-001</javaXmlBindVersion>
         <javaXmlWsVersion>2.2.1</javaXmlWsVersion>
         <jaxenVersion>1.1.1</jaxenVersion>
