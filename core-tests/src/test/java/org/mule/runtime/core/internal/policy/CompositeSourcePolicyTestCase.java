@@ -9,8 +9,11 @@ package org.mule.runtime.core.internal.policy;
 import static java.lang.Runtime.getRuntime;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -35,7 +38,10 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.event.DefaultEventBuilder;
+import org.mule.runtime.core.internal.exception.DefaultErrorTypeRepository;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import com.google.common.collect.ImmutableMap;
@@ -263,7 +269,12 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
         from(compositeSourcePolicy.process(initialEvent, sourceParametersProcessor)).block();
 
     assertThat(sourcePolicyResult.getRight(), nullValue());
-    assertThat(sourcePolicyResult.getLeft().getMessagingException().getEvent(), is(initialEvent));
+    assertThat(sourcePolicyResult.getLeft().getMessagingException().getEvent().getMessage(), is(initialEvent.getMessage()));
+    assertThat(sourcePolicyResult.getLeft().getMessagingException().getEvent().getContext(), is(initialEvent.getContext()));
+    assertThat(sourcePolicyResult.getLeft().getMessagingException().getEvent().getVariables(), is(initialEvent.getVariables()));
+    assertThat(sourcePolicyResult.getLeft().getMessagingException().getEvent().getSecurityContext(),
+               is(initialEvent.getSecurityContext()));
+    assertThat(sourcePolicyResult.getLeft().getMessagingException().getEvent().getError(), not(is(empty())));
     assertThat(sourcePolicyResult.getLeft().getErrorResponseParameters().get(), is(errorParameters));
   }
 
