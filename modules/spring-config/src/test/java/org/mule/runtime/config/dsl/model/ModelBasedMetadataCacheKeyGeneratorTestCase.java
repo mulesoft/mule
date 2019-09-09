@@ -261,48 +261,6 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
   }
 
   @Test
-  public void allParametersAsRequiredForMetadataDoesNotModifyHash() throws Exception {
-
-    mockRequiredForMetadataModelProperty(configuration, null);
-    mockRequiredForMetadataModelProperty(connectionProvider, null);
-
-    MetadataCacheId keyParts = getIdForComponent(getBaseApp());
-    LOGGER.debug(keyParts.toString());
-
-    List<String> parameterNames = parameterGroupModel.getParameterModels().stream()
-        .map(parameterModel -> parameterModel.getName()).collect(Collectors.toList());
-
-    mockRequiredForMetadataModelProperty(configuration, parameterNames);
-    mockRequiredForMetadataModelProperty(connectionProvider, parameterNames);
-
-    MetadataCacheId otherKeyParts = getIdForComponent(getBaseApp());
-    LOGGER.debug(otherKeyParts.toString());
-
-    assertThat(keyParts, is(otherKeyParts));
-  }
-
-  @Test
-  public void allParametersInConnectionAsRequiredForMetadataDoesNotModifyHash() throws Exception {
-
-    mockRequiredForMetadataModelProperty(configuration, null);
-    mockRequiredForMetadataModelProperty(connectionProvider, null);
-
-    MetadataCacheId keyParts = getIdForComponent(getBaseApp());
-    LOGGER.debug(keyParts.toString());
-
-    List<String> parameterNames = parameterGroupModel.getParameterModels().stream()
-        .map(parameterModel -> parameterModel.getName()).collect(Collectors.toList());
-
-    mockRequiredForMetadataModelProperty(configuration, null);
-    mockRequiredForMetadataModelProperty(connectionProvider, parameterNames);
-
-    MetadataCacheId otherKeyParts = getIdForComponent(getBaseApp());
-    LOGGER.debug(otherKeyParts.toString());
-
-    assertThat(keyParts, is(otherKeyParts));
-  }
-
-  @Test
   public void configurationParametersAsRequireForMetadataModifiesHash() throws Exception {
 
     mockRequiredForMetadataModelProperty(configuration, null);
@@ -738,8 +696,10 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
   private void mockRequiredForMetadataModelProperty(EnrichableModel model, List<String> parameterNames) {
     if (parameterNames == null) {
+      List<String> allParameterNames = parameterGroupModel.getParameterModels().stream()
+          .map(parameterModel -> parameterModel.getName()).collect(Collectors.toList());
       when(model.getModelProperty(RequiredForMetadataModelProperty.class))
-          .thenReturn(empty());
+          .thenReturn(of(new RequiredForMetadataModelProperty(allParameterNames)));
     } else {
       RequiredForMetadataModelProperty requiredForMetadataModelProperty = new RequiredForMetadataModelProperty(parameterNames);
 
