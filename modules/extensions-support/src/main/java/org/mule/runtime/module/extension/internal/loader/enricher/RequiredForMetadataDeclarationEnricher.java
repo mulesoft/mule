@@ -73,11 +73,11 @@ public class RequiredForMetadataDeclarationEnricher implements DeclarationEnrich
    * required for metadata (Except from the Infrastructure parameters, which are never required for metadata).
    */
   private List<String> getParametersNameRequiredForMetadata(WithParametersDeclaration declaration) {
-    List<ParameterDeclaration> nonInfrastructureParameters = getNonInfrastructureParameterNames(declaration.getAllParameters());
     List<String> nonInfrastructureParameterNames = new ArrayList<>();
     List<String> parametersRequiredForMetadata =
-        nonInfrastructureParameters
+        declaration.getAllParameters()
             .stream()
+            .filter(pd -> !pd.getModelProperty(InfrastructureParameterModelProperty.class).isPresent())
             .peek(pd -> nonInfrastructureParameterNames.add(pd.getName())) //Add now in case this list is empty
             .filter(p -> p.getModelProperty(ExtensionParameterDescriptorModelProperty.class)
                 .map(
@@ -89,13 +89,5 @@ public class RequiredForMetadataDeclarationEnricher implements DeclarationEnrich
       return nonInfrastructureParameterNames;
     }
     return parametersRequiredForMetadata;
-  }
-
-  private List<ParameterDeclaration> getNonInfrastructureParameterNames(List<ParameterDeclaration> parametersDeclaration) {
-    return parametersDeclaration
-        .stream()
-        .filter(
-                pd -> !pd.getModelProperty(InfrastructureParameterModelProperty.class).isPresent())
-        .collect(toList());
   }
 }
