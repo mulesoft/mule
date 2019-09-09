@@ -27,11 +27,11 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.PROVIDED;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
+
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
@@ -47,10 +47,7 @@ import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
-import com.google.common.io.PatternFilenameFilter;
-
 import java.io.File;
-import java.io.FilenameFilter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -426,16 +423,22 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
         throw new MuleRuntimeException(e);
       }
 
-      final JarInfo exploredJar = jarExplorerFactory.get().explore(dependencyArtifactUri);
+      try {
+        final JarInfo exploredJar = jarExplorerFactory.get().explore(dependencyArtifactUri);
 
-      final Set<String> localPackages = new HashSet<>(exploredJar.getPackages());
-      localPackages.removeAll(exportedPackages);
+        final Set<String> localPackages = new HashSet<>(exploredJar.getPackages());
+        localPackages.removeAll(exportedPackages);
 
-      final Set<String> localResources = new HashSet<>(exploredJar.getResources());
-      localResources.removeAll(exportedResources);
+        final Set<String> localResources = new HashSet<>(exploredJar.getResources());
+        localResources.removeAll(exportedResources);
 
-      classLoaderModelBuilder.withLocalPackages(localPackages);
-      classLoaderModelBuilder.withLocalResources(localResources);
+        classLoaderModelBuilder.withLocalPackages(localPackages);
+        classLoaderModelBuilder.withLocalResources(localResources);
+      } catch (IllegalArgumentException e) {
+        // Workaround for MMP-499
+        LOGGER.warn("File for dependency artifact not found: '{}'. Skipped localPackages scanning for that artifact.",
+                    dependencyArtifactUri);
+      }
     }
   }
 
