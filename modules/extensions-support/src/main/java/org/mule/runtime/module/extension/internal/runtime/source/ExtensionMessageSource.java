@@ -10,6 +10,7 @@ import static com.google.common.collect.ImmutableMap.copyOf;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -481,8 +482,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       }
 
       @Override
-      public FlowConstruct getFlowConstruct() {
-        return flowConstruct;
+      public Optional<FlowConstruct> getFlowConstruct() {
+        return ofNullable(flowConstruct);
       }
     };
   }
@@ -563,6 +564,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   @Override
   protected void doInitialise() throws InitialisationException {
     componentLocator.find(getRootContainerLocation())
+        .filter(comp -> comp instanceof FlowConstruct)
         .ifPresent(comp -> flowConstruct = (FlowConstruct) comp);
     messageProcessContext = createProcessingContext();
     if (shouldRunOnThisNode()) {

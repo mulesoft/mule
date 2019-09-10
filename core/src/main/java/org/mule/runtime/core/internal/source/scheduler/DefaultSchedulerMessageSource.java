@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.source.scheduler;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -261,8 +262,8 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     }
 
     @Override
-    public FlowConstruct getFlowConstruct() {
-      return flowConstruct;
+    public Optional<FlowConstruct> getFlowConstruct() {
+      return ofNullable(flowConstruct);
     }
   }
 }

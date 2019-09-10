@@ -48,5 +48,5 @@ public interface MessageProcessContext {
    */
   ErrorTypeLocator getErrorTypeLocator();
 
-  FlowConstruct getFlowConstruct();
+  Optional<FlowConstruct> getFlowConstruct();
 }

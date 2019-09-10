@@ -151,7 +151,7 @@ public class FlowProcessMediator implements Initialisable {
     try {
 
       final MessageSource messageSource = messageProcessContext.getMessageSource();
-      final FlowConstruct flowConstruct = messageProcessContext.getFlowConstruct();
+      final FlowConstruct flowConstruct = messageProcessContext.getFlowConstruct().get();
       final CompletableFuture<Void> responseCompletion = new CompletableFuture<>();
       final FlowProcessor flowExecutionProcessor = new FlowProcessor(template, flowConstruct);
       final CoreEvent event = createEvent(template, messageSource, responseCompletion, flowConstruct);
