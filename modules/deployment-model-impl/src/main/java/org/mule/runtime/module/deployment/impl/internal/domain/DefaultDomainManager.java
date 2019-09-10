@@ -8,7 +8,7 @@
 package org.mule.runtime.module.deployment.impl.internal.domain;
 
 import static java.lang.String.format;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleBundle;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
@@ -97,6 +97,29 @@ public class DefaultDomainManager implements DomainRepository, DomainManager {
 
   private static String getDomainName(Domain domain) {
     return domain.getDescriptor().getName();
+  }
+
+  /**
+   * Determines if a bundle descriptor is compatible with another one.
+   *
+   * @param available bundle descriptor that is available to use.
+   * @param expected bundle descriptor that is expected.
+   * @return true if match in group and artifact id, have the same classifier and the versions are compatible, false otherwise.
+   */
+  public static boolean isCompatibleBundle(BundleDescriptor available, BundleDescriptor expected) {
+    if (!available.getClassifier().equals(expected.getClassifier())) {
+      return false;
+    }
+
+    if (!available.getGroupId().equals(expected.getGroupId())) {
+      return false;
+    }
+
+    if (!available.getArtifactId().equals(expected.getArtifactId())) {
+      return false;
+    }
+
+    return isCompatibleVersion(available.getVersion(), expected.getVersion());
   }
 
 }
