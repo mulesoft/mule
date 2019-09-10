@@ -7,6 +7,7 @@
 package org.mule.runtime.config.api.dsl.model.metadata;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -242,11 +243,10 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
 
   private Optional<MetadataCacheId> resolveGlobalElement(DslElementModel<?> elementModel) {
     List<MetadataCacheId> parts = new ArrayList<>();
-    Predicate isRequiredForMetadata = parameterNamesRequiredForMetadataCacheId(elementModel.getModel())
-        .map((names) -> (Predicate) ((model) -> isRequiredForMetadata(names, model))).orElse((model) -> true);
+    List<String> parameterNamesRequiredForMetadata = parameterNamesRequiredForMetadataCacheId(elementModel.getModel());
     elementModel.getContainedElements().stream()
         .filter(containedElement -> containedElement.getModel() != null)
-        .filter(containedElement -> isRequiredForMetadata.test(containedElement.getModel()))
+        .filter(containedElement -> isRequiredForMetadata(parameterNamesRequiredForMetadata, containedElement.getModel()))
         .forEach(containedElement -> {
           if (containedElement.getValue().isPresent()) {
             resolveKeyFromSimpleValue(containedElement).ifPresent(parts::add);
@@ -263,19 +263,19 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
   }
 
   private boolean isRequiredForMetadata(List<String> parameterNamesRequiredForMetadataCacheId, Object model) {
-    if (model instanceof ParameterModel && parameterNamesRequiredForMetadataCacheId != null) {
+    if (model instanceof ParameterModel) {
       return parameterNamesRequiredForMetadataCacheId.contains(((ParameterModel) model).getName());
     } else {
       return true;
     }
   }
 
-  private Optional<List<String>> parameterNamesRequiredForMetadataCacheId(Object model) {
+  private List<String> parameterNamesRequiredForMetadataCacheId(Object model) {
     if (model instanceof EnrichableModel) {
       return ((EnrichableModel) model).getModelProperty(RequiredForMetadataModelProperty.class)
-          .map(RequiredForMetadataModelProperty::getRequiredParameters);
+          .map(RequiredForMetadataModelProperty::getRequiredParameters).orElse(emptyList());
     }
-    return empty();
+    return emptyList();
   }
 
   private Optional<MetadataCacheId> resolveMetadataKeyParts(DslElementModel<?> elementModel,
