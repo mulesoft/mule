@@ -107,28 +107,21 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
   }
 
   protected ReactiveProcessor proactor(ReactiveProcessor processor, ScheduledExecutorService scheduler) {
+    LOGGER.debug("Doing proactor() for {} on {}. maxConcurrency={}, parallelism={}, subscribers={}", processor, scheduler,
+                 maxConcurrency, getParallelism(), subscribers);
+
     final ScheduledExecutorService retryScheduler =
         new RejectionCallbackExecutorServiceDecorator(scheduler, getCpuLightScheduler(),
-                                                      () -> {
-                                                        LOGGER
-                                                            .trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
-                                                                   (scheduler instanceof Scheduler
-                                                                       ? ((Scheduler) scheduler)
-                                                                           .getName()
-                                                                       : scheduler.toString()),
-                                                                   SCHEDULER_BUSY_RETRY_INTERVAL_MS);
-                                                        lastRetryTimestamp.set(nanoTime());
-                                                      },
+                                                      () -> onRejected(scheduler),
                                                       () -> lastRetryTimestamp.set(MIN_VALUE),
                                                       ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS));
 
     // FlatMap is the way reactor has to do parallel processing. Since this proactor method is used for the processors that are
     // not CPU_LITE, parallelism is wanted when the processor is blocked to do IO or doing long CPU work.
-    if (maxConcurrency == 1) {
+    if (maxConcurrency <= getParallelism() * subscribers) {
       // If no concurrency needed, execute directly on the same Flux
-      return publisher -> from(publisher)
-          .compose(eventP -> scheduleProcessor(processor, retryScheduler, eventP)
-              .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)));
+      return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
+          .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
     } else if (maxConcurrency == MAX_VALUE) {
       // For no limit, pass through the no limit meaning to Reactor's flatMap
       return publisher -> from(publisher)
@@ -142,6 +135,15 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
               .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)),
                    max(maxConcurrency / (getParallelism() * subscribers), 1));
     }
+  }
+
+  private void onRejected(ScheduledExecutorService scheduler) {
+    LOGGER.trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
+                 (scheduler instanceof Scheduler
+                     ? ((Scheduler) scheduler).getName()
+                     : scheduler.toString()),
+                 SCHEDULER_BUSY_RETRY_INTERVAL_MS);
+    lastRetryTimestamp.set(nanoTime());
   }
 
   protected abstract Mono<CoreEvent> scheduleProcessor(ReactiveProcessor processor,
