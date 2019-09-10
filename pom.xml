@@ -255,7 +255,7 @@
         <rar.plugin.version>2.4</rar.plugin.version>
         <release.plugin.version>2.5.3</release.plugin.version>
         <resources.plugin.version>3.0.2</resources.plugin.version>
-        <site.plugin.version>3.6</site.plugin.version>
+        <site.plugin.version>3.8.2</site.plugin.version>
         <source.plugin.version>3.0.1</source.plugin.version>
         <war.plugin.version>3.2.0</war.plugin.version>
         <shade.plugin.version>3.1.0</shade.plugin.version>
@@ -269,7 +269,7 @@
         <license.maven.plugin.version>2.11</license.maven.plugin.version>
         <gpg.plugin.version>1.6</gpg.plugin.version>
         <gmavenPluginVersion>1.5</gmavenPluginVersion>
-        <javadocPluginVersion>3.0.0</javadocPluginVersion>
+        <javadocPluginVersion>3.1.0</javadocPluginVersion>
         <mavenCompilerVersion>3.7.0</mavenCompilerVersion>
         <eclipsePluginVersion>2.10</eclipsePluginVersion>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
@@ -1938,6 +1938,7 @@
                     <encoding>ISO-8859-1</encoding>
                     <source>${javaVersion}</source>
                     <configuration>
+                        <doclint>none</doclint>
                         <additionalparam>${xDocLint}</additionalparam>
                     </configuration>
                     <!-- Link to the external online JavaDoc -->
@@ -1999,21 +2000,6 @@
             <build>
                 <defaultGoal>deploy</defaultGoal>
                 <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <additionalparam>${xDocLint}</additionalparam>
-                        </configuration>
-                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
