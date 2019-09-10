@@ -398,7 +398,7 @@
 /mule-standalone-${productVersion}/lib/opt/signpost-core-1.2.1.2.jar
 /mule-standalone-${productVersion}/lib/opt/smack-3.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/smackx-3.4.1.jar
-/mule-standalone-${productVersion}/lib/opt/snakeyaml-1.15.jar
+/mule-standalone-${productVersion}/lib/opt/snakeyaml-1.23.jar
 /mule-standalone-${productVersion}/lib/opt/spring-aop-4.1.9.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-beans-4.1.9.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-context-4.1.9.RELEASE.jar
