@@ -48,7 +48,6 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainMana
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
-import org.mule.runtime.module.deployment.impl.internal.domain.ToolingDomainDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.BundlePluginDependenciesResolver;
@@ -75,7 +74,6 @@ public class MuleArtifactResourcesRegistry {
   private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
   private final DefaultDomainManager domainManager;
   private final DefaultDomainFactory domainFactory;
-  private final DefaultDomainFactory toolingDomainFactory;
   private final DefaultApplicationFactory applicationFactory;
   private final DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory;
   private final ArtifactClassLoader containerClassLoader;
@@ -86,7 +84,6 @@ public class MuleArtifactResourcesRegistry {
   private final ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory;
   private final DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory;
   private final DomainDescriptorFactory domainDescriptorFactory;
-  private final ToolingDomainDescriptorFactory toolingDomainDescriptorFactory;
   private final ApplicationDescriptorFactory applicationDescriptorFactory;
   private final PluginDependenciesResolver pluginDependenciesResolver;
   private final ServiceRegistryDescriptorLoaderRepository descriptorLoaderRepository;
@@ -152,9 +149,6 @@ public class MuleArtifactResourcesRegistry {
 
     domainDescriptorFactory = new DomainDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
                                                           artifactDescriptorValidatorBuilder);
-    toolingDomainDescriptorFactory = new ToolingDomainDescriptorFactory(artifactPluginDescriptorLoader,
-                                                                        descriptorLoaderRepository,
-                                                                        artifactDescriptorValidatorBuilder);
     applicationDescriptorFactory = new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
                                                                     artifactDescriptorValidatorBuilder);
     DeployableArtifactClassLoaderFactory<ApplicationDescriptor> applicationClassLoaderFactory =
@@ -180,11 +174,6 @@ public class MuleArtifactResourcesRegistry {
         getRuntimeComponentBuildingDefinitionProvider();
     domainFactory =
         new DefaultDomainFactory(domainDescriptorFactory, domainManager,
-                                 artifactClassLoaderManager, serviceManager,
-                                 pluginDependenciesResolver, domainClassLoaderBuilderFactory,
-                                 extensionModelLoaderManager, licenseValidator, runtimeComponentBuildingDefinitionProvider);
-    toolingDomainFactory =
-        new DefaultDomainFactory(toolingDomainDescriptorFactory, domainManager,
                                  artifactClassLoaderManager, serviceManager,
                                  pluginDependenciesResolver, domainClassLoaderBuilderFactory,
                                  extensionModelLoaderManager, licenseValidator, runtimeComponentBuildingDefinitionProvider);
@@ -305,12 +294,5 @@ public class MuleArtifactResourcesRegistry {
    */
   public PluginDependenciesResolver getPluginDependenciesResolver() {
     return pluginDependenciesResolver;
-  }
-
-  /**
-   * @return the tooling specific {@link DefaultDomainFactory}
-   */
-  public DefaultDomainFactory getToolingDomainFactory() {
-    return toolingDomainFactory;
   }
 }
