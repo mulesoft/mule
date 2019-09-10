@@ -297,12 +297,7 @@
 /mule-standalone-${productVersion}/lib/opt/javax.servlet-api-3.1.0.jar
 /mule-standalone-${productVersion}/lib/opt/javax.transaction-api-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/javax.ws.rs-api-2.0.jar
-<<<<<<< HEAD
-/mule-standalone-${productVersion}/lib/opt/jakarta.mail-1.6.3.jar
-=======
 /mule-standalone-${productVersion}/lib/opt/jakarta.mail-1.6.4.jar
-/mule-standalone-${productVersion}/lib/opt/jaxb-api-2.3.1.jar
->>>>>>> f444707026... MULE-17433: Update raml-parser and dependencies in whitelist (#8204)
 /mule-standalone-${productVersion}/lib/opt/jaxb-runtime-2.3.1-MULE-001.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-xjc-2.3.1-MULE-001.jar
 /mule-standalone-${productVersion}/lib/opt/jaxb-core-2.3.0.1.jar
@@ -403,7 +398,6 @@
 /mule-standalone-${productVersion}/lib/opt/signpost-core-1.2.1.2.jar
 /mule-standalone-${productVersion}/lib/opt/smack-3.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/smackx-3.4.1.jar
-<<<<<<< HEAD
 /mule-standalone-${productVersion}/lib/opt/snakeyaml-1.15.jar
 /mule-standalone-${productVersion}/lib/opt/spring-aop-4.1.9.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-beans-4.1.9.RELEASE.jar
@@ -414,18 +408,6 @@
 /mule-standalone-${productVersion}/lib/opt/spring-jdbc-4.1.9.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-jms-4.1.9.RELEASE-MULE-001.jar
 /mule-standalone-${productVersion}/lib/opt/spring-messaging-4.3.17.RELEASE.jar
-=======
-/mule-standalone-${productVersion}/lib/opt/snakeyaml-1.23.jar
-/mule-standalone-${productVersion}/lib/opt/spring-aop-4.3.19.RELEASE.jar
-/mule-standalone-${productVersion}/lib/opt/spring-beans-4.3.19.RELEASE.jar
-/mule-standalone-${productVersion}/lib/opt/spring-context-4.3.19.RELEASE.jar
-/mule-standalone-${productVersion}/lib/opt/spring-context-support-4.3.19.RELEASE.jar
-/mule-standalone-${productVersion}/lib/opt/spring-core-4.3.19.RELEASE.jar
-/mule-standalone-${productVersion}/lib/opt/spring-expression-4.3.19.RELEASE.jar
-/mule-standalone-${productVersion}/lib/opt/spring-jdbc-4.3.19.RELEASE.jar
-/mule-standalone-${productVersion}/lib/opt/spring-jms-4.3.19.RELEASE.jar
-/mule-standalone-${productVersion}/lib/opt/spring-messaging-4.3.19.RELEASE.jar
->>>>>>> f444707026... MULE-17433: Update raml-parser and dependencies in whitelist (#8204)
 /mule-standalone-${productVersion}/lib/opt/spring-security-config-4.2.12.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-security-core-4.2.12.RELEASE.jar
 /mule-standalone-${productVersion}/lib/opt/spring-security-web-4.2.12.RELEASE.jar
