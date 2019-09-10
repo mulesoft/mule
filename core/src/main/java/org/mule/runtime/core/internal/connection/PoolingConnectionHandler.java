@@ -12,6 +12,8 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.runtime.api.exception.MuleException;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.pool.ObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +32,7 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
   private final ObjectPool<C> pool;
   private final PoolingListener poolingListener;
   private final ConnectionProvider connectionProvider;
+  private final AtomicBoolean released = new AtomicBoolean(false);
 
   /**
    * Creates a new instance
@@ -59,7 +62,7 @@ final class PoolingConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
    */
   @Override
   public void release() {
-    if (connection == null) {
+    if (connection == null || released.getAndSet(true)) {
       return;
     }
 

@@ -12,6 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
@@ -34,6 +35,8 @@ import java.io.IOException;
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
+
+  private static int DELAY = 1000;
 
   @Mock
   private ObjectPool<Object> pool;
@@ -85,6 +88,21 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
     managedConnection.invalidate();
     verify(pool).invalidateObject(connection);
     assertDisconnected();
+  }
+
+  @Test
+  public void releaseConnectionTwice() throws Exception {
+    when(connectionProvider.validate(connection)).thenAnswer((invocation) -> {
+      Thread.sleep((int) (Math.random() * DELAY));
+      return success();
+    });
+
+    Runnable release = () -> managedConnection.release();
+    new Thread(release).start();
+    new Thread(release).start();
+
+    Thread.sleep(DELAY);
+    verify(pool, times(0)).returnObject(null);
   }
 
   private void assertDisconnected() throws org.mule.runtime.api.connection.ConnectionException {
