@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.finalMethodAddedToNonFinalClass",
+          "new": "method java.util.concurrent.CompletableFuture<org.mule.runtime.api.event.Event> org.mule.runtime.core.privileged.component.AbstractExecutableComponent::execute(org.mule.runtime.api.event.Event, java.util.function.Consumer<org.mule.runtime.core.api.event.CoreEvent.Builder>)",
+          "package": "org.mule.runtime.core.privileged.component",
+          "classSimpleName": "AbstractExecutableComponent",
+          "methodName": "execute",
+          "elementKind": "method",
+          "justification": "No implementors of this API implement a method with this signature."
+        },
+        {
           "code": "java.method.added",
           "new": "method org.mule.runtime.core.api.transaction.Transaction org.mule.runtime.core.api.transaction.DelegateTransactionFactory::beginTransaction(java.lang.String, org.mule.runtime.api.notification.NotificationDispatcher, org.mule.runtime.core.api.SingleResourceTransactionFactoryManager, javax.transaction.TransactionManager, int) throws org.mule.runtime.api.tx.TransactionException",
           "package": "org.mule.runtime.core.api.transaction",

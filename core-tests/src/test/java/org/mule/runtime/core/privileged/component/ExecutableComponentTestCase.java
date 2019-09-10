@@ -22,6 +22,7 @@ import org.mule.runtime.api.component.execution.ComponentExecutionException;
 import org.mule.runtime.api.component.execution.ExecutionResult;
 import org.mule.runtime.api.component.execution.InputEvent;
 import org.mule.runtime.api.event.Event;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -48,7 +49,7 @@ public class ExecutableComponentTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void testExecuteWithInputEvent() throws Exception {
+  public void executeWithInputEvent() throws Exception {
     ExecutionResult executionResult = executableComponent.execute(InputEvent.create().message(requestMessage)).get();
     Event response = executionResult.getEvent();
 
@@ -65,7 +66,7 @@ public class ExecutableComponentTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void testExecuteWithEvent() throws Exception {
+  public void executeWithEvent() throws Exception {
     Event response = executableComponent.execute(testEvent()).get();
 
     assertThat(componentInEvent.get().getMessage(), equalTo(requestMessage));
@@ -86,7 +87,7 @@ public class ExecutableComponentTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void testExecuteWithInputEventError() throws Exception {
+  public void executeWithInputEventError() throws Exception {
     executableComponent.setToThrow(new IllegalStateException("Expected"));
 
     try {
@@ -108,7 +109,7 @@ public class ExecutableComponentTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void testExecuteWithEventError() throws Exception {
+  public void executeWithEventError() throws Exception {
     executableComponent.setToThrow(new IllegalStateException("Expected"));
 
     try {
@@ -133,6 +134,12 @@ public class ExecutableComponentTestCase extends AbstractMuleContextTestCase {
       ((BaseEventContext) testEvent().getContext()).success();
       assertThat(parentContext.isTerminated(), is(true));
     }
+  }
+
+  @Test
+  public void executeWithContributor() throws MuleException {
+    executableComponent.execute(testEvent(), eb -> eb.addVariable("its_me", "Mario!"));
+    assertThat(componentInEvent.get().getVariables().get("its_me").getValue(), is("Mario!"));
   }
 
   final class TestExecutableComponent extends AbstractExecutableComponent implements ReactiveProcessor {
