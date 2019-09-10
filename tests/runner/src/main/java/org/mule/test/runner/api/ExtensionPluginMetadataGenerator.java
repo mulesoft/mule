@@ -160,7 +160,8 @@ class ExtensionPluginMetadataGenerator {
         try {
           return Class.forName(extensionClassName);
         } catch (ClassNotFoundException e) {
-          throw new IllegalArgumentException("Cannot load Extension class '" + extensionClassName + "'", e);
+          throw new IllegalArgumentException("Cannot load Extension class '" + extensionClassName + " obtained from: '" + firstURL
+              + "' using classpath: " + new ClassPathUrlProvider().getURLs(), e);
         }
       }
       logger.debug("No class found annotated with {}", Extension.class.getName());
