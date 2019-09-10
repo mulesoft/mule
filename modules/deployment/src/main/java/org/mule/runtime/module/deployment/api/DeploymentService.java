@@ -103,8 +103,24 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
    * Undeploys and redeploys an application including the provided appProperties.
    *
    * @param artifactName then name of the application to redeploy
+   * @param appProperties map of properties to include
    */
   void redeploy(String artifactName, Properties appProperties);
+
+  /**
+   * Undeploys and redeploys an application using a new artifact URI and including the provided appProperties.
+   *
+   * @param archiveUri location of the application file
+   * @param appProperties map of properties to include
+   */
+  void redeploy(URI archiveUri, Properties appProperties) throws IOException;
+
+  /**
+   * Undeploys and redeploys an application using a new artifact URI.
+   *
+   * @param archiveUri location of the application file
+   */
+  void redeploy(URI archiveUri) throws IOException;
 
   /**
    * Undeploys a domain from the mule container

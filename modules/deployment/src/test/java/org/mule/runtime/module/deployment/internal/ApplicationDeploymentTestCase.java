@@ -2351,6 +2351,50 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
+  public void redeployMethodRedeploysIfApplicationIsAlreadyDeployedPacked() throws Exception {
+    DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
+    deploymentService.addDeploymentListener(mockDeploymentListener);
+
+    // Deploy an application (packed)
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    startDeployment();
+
+    // Application was deployed
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(1)).onDeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+
+    reset(mockDeploymentListener);
+
+    // Redeploy by using redeploy method
+    deploymentService.redeploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+
+    // Application was redeployed
+    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+  }
+
+  @Test
+  public void redeployMethodRedeploysIfApplicationIsAlreadyDeployedExploded() throws Exception {
+    DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
+    deploymentService.addDeploymentListener(mockDeploymentListener);
+
+    // Deploy an application (exploded)
+    addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    startDeployment();
+
+    // Application was deployed
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(1)).onDeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+
+    // Redeploy by using redeploy method
+    deploymentService.redeploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+
+    // Application was redeployed
+    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+  }
+
+  @Test
   public void deployMethodRedeploysIfApplicationIsAlreadyDeployedPacked() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     deploymentService.addDeploymentListener(mockDeploymentListener);
@@ -2365,6 +2409,8 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
                                                                  dummyAppDescriptorFileBuilder.getId());
     verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(
                                                                    dummyAppDescriptorFileBuilder.getId());
+
+    reset(mockDeploymentListener);
 
     // Redeploy by using deploy method
     deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
