@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -160,7 +161,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
     when(source.getLocation()).thenReturn(mock(ComponentLocation.class));
     when(context.getMessageSource()).thenReturn(source);
     when(context.getTransactionConfig()).thenReturn(empty());
-    when(context.getFlowConstruct()).thenReturn(flow);
+    when(context.getFlowConstruct()).thenReturn(of(flow));
 
     template = mock(FlowProcessTemplate.class);
     resultAdapter = mock(SourceResultAdapter.class);
