@@ -120,7 +120,7 @@ public class FakeMuleServer {
     repositoryService = new RepositoryServiceFactory().createRepositoryService();
 
     toolingService = new DefaultToolingService(muleArtifactResourcesRegistry.getDomainRepository(),
-                                               muleArtifactResourcesRegistry.getToolingDomainFactory(),
+                                               muleArtifactResourcesRegistry.getDomainFactory(),
                                                muleArtifactResourcesRegistry.getApplicationFactory(),
                                                muleArtifactResourcesRegistry.getToolingApplicationDescriptorFactory());
     deploymentService = new MuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),

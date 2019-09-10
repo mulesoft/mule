@@ -19,7 +19,7 @@ public final class DomainNotFoundException extends MuleException {
 
   private final String domainName;
 
-  public DomainNotFoundException(String domainName, Set<SemVerBundleDescriptorWrapper> availableDomains) {
+  public DomainNotFoundException(String domainName, Set<String> availableDomains) {
     super(createStaticMessage(format("The domain '%s' was not found. Available domains: [%s]", domainName,
                                      availableDomains.toString())));
     this.domainName = domainName;

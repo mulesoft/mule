@@ -44,6 +44,7 @@ public class ApplicationDescriptorFactory
   protected void doDescriptorConfig(MuleApplicationModel artifactModel, ApplicationDescriptor descriptor,
                                     File artifactLocation) {
     super.doDescriptorConfig(artifactModel, descriptor, artifactLocation);
+    artifactModel.getDomain().ifPresent(descriptor::setDomainName);
   }
 
   @Override

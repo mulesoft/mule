@@ -57,7 +57,6 @@ import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWat
 import static org.mule.runtime.module.deployment.internal.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -94,6 +93,9 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Flaky;
+import io.qameta.allure.Issue;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Matcher;
@@ -103,10 +105,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import io.qameta.allure.Description;
-import io.qameta.allure.Flaky;
-import io.qameta.allure.Issue;
 
 /**
  * Contains test for application deployment on the default domain
@@ -1049,6 +1047,48 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
 
     assertAppFolderIsDeleted(emptyAppFileBuilder.getId());
     assertStatus(app, DESTROYED);
+  }
+
+  @Test
+  public void deploymentFailureWhenDomainNotFound() throws Exception {
+    final DefaultDomainManager emptyDomainManager = new DefaultDomainManager();
+    TestApplicationFactory appFactory =
+        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
+                                     emptyDomainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+                                     createDescriptorLoaderRepository());
+    appFactory.setFailOnStopApplication(true);
+    deploymentService.setAppFactory(appFactory);
+
+    addPackedAppFromBuilder(emptyAppFileBuilder);
+    startDeployment();
+    assertDeploymentFailure(applicationDeploymentListener, emptyAppFileBuilder.getId());
+
+    reset(applicationDeploymentListener);
+    emptyDomainManager.addDomain(createDefaultDomain());
+    addPackedAppFromBuilder(emptyAppFileBuilder);
+    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+  }
+
+  @Test
+  public void deploymentSuccessWhenUsingDefaultDomain() throws Exception {
+    final DefaultDomainManager domainManager = new DefaultDomainManager();
+    TestApplicationFactory appFactory =
+        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
+                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+                                     createDescriptorLoaderRepository());
+    appFactory.setFailOnStopApplication(true);
+    deploymentService.setAppFactory(appFactory);
+
+    domainManager.addDomain(createDefaultDomain());
+    addPackedAppFromBuilder(emptyAppFileBuilder);
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+  }
+
+  @Test
+  public void zaraza() {
+
   }
 
   @Test
@@ -2145,10 +2185,13 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   @Issue("MULE-16995")
   @Description("This test covers an scenario where an app declares extensions-api as a shared library while using a privileged extension.")
   public void appWithUnneededExtensionsApiDepDeploys() throws Exception {
+    String extensionsApiLib = getProperty("extensionsApiLib");
+    assumeThat(extensionsApiLib == null, is(false));
+
     final ApplicationFileBuilder applicationFileBuilder = appFileBuilder("privilegedPluginApp")
         .definedBy(APP_WITH_PRIVILEGED_EXTENSION_PLUGIN_CONFIG)
         .dependingOn(createPrivilegedExtensionPlugin())
-        .dependingOnSharedLibrary(new JarFileBuilder("mule-extensions-api", new File(getProperty("extensionsApiLib")))
+        .dependingOnSharedLibrary(new JarFileBuilder("mule-extensions-api", new File(extensionsApiLib))
             .withGroupId("org.mule.runtime")
             .withVersion("1.1.6"));
     addPackedAppFromBuilder(applicationFileBuilder);

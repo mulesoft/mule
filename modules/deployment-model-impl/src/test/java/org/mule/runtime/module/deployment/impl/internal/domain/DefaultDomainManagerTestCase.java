@@ -40,6 +40,10 @@ import org.junit.rules.ExpectedException;
 
 public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
 
+  public DefaultDomainManagerTestCase() throws IOException {
+    super();
+  }
+
   private final ServiceRepository serviceRepository = mock(ServiceRepository.class);
   private final DomainDescriptorFactory domainDescriptorFactory = mock(DomainDescriptorFactory.class);
   private final PluginDependenciesResolver pluginDependenciesResolver = mock(PluginDependenciesResolver.class);
@@ -72,8 +76,12 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
     return builder.build();
   }
 
+
   private Domain createDomain(String artifactId, String version) throws IOException {
-    String artifactName = artifactId + "-" + version + "-mule-domain";
+    return createDomain(artifactId, version, artifactId + "-" + version + "-mule-domain");
+  }
+
+  private Domain createDomain(String artifactId, String version, String artifactName) throws IOException {
     final DomainDescriptor descriptor = new DomainDescriptor(artifactName);
     descriptor.setBundleDescriptor(createBundleDescriptor(artifactId, version));
     when(domainDescriptorFactory.create(any(), any())).thenReturn(descriptor);
@@ -98,18 +106,13 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
     return domain;
   }
 
-  public DefaultDomainManagerTestCase() throws IOException {
-    super();
-  }
-
   @Test
-  public void additionsAndDeletions() throws IOException, DomainNotFoundException, IncompatibleDomainVersionException {
+  public void simpleAdditionsAndDeletions() throws IOException, DomainNotFoundException {
     String domainName1 = "custom-domain-one";
     String domainName2 = "custom-domain-two";
     String version = "1.1.0";
     Domain domain1 = createDomain(domainName1, version);
     Domain domain2 = createDomain(domainName2, version);
-
 
     BundleDescriptor descriptor1 = domain1.getDescriptor().getBundleDescriptor();
     BundleDescriptor descriptor2 = domain2.getDescriptor().getBundleDescriptor();
@@ -119,34 +122,109 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
     assertThat(domainCompleteName2, is(domainName2 + "-" + version + "-mule-domain"));
 
     domainManager.addDomain(domain1);
-    assertThat(domainManager.contains(descriptor1), is(true));
-    assertThat(domainManager.getDomain(descriptor1), is(domain1));
-    assertThat(domainManager.contains(descriptor2), is(false));
+    assertThat(domainManager.contains(domainCompleteName1), is(true));
+    assertThat(domainManager.getDomain(domainCompleteName1), is(domain1));
+    assertThat(domainManager.contains(domainCompleteName2), is(false));
 
     domainManager.addDomain(domain2);
-    assertThat(domainManager.getDomain(descriptor1), is(domain1));
-    assertThat(domainManager.getDomain(descriptor2), is(domain2));
+    assertThat(domainManager.getDomain(domainCompleteName1), is(domain1));
+    assertThat(domainManager.getDomain(domainCompleteName2), is(domain2));
 
     domainManager.removeDomain(domain1);
-    assertThat(domainManager.contains(descriptor1), is(false));
-    assertThat(domainManager.getDomain(descriptor2), is(domain2));
+    assertThat(domainManager.contains(domainCompleteName1), is(false));
+    assertThat(domainManager.getDomain(domainCompleteName2), is(domain2));
 
     domainManager.removeDomain(domain2);
-    assertThat(domainManager.contains(descriptor1), is(false));
-    assertThat(domainManager.contains(descriptor2), is(false));
+    assertThat(domainManager.contains(domainCompleteName1), is(false));
+    assertThat(domainManager.contains(domainCompleteName2), is(false));
   }
 
   @Test
-  public void invalidAdditionThrowsException() throws IOException {
-    Domain domain = createDomain("custom-domain", "1.1.0");
-    // first addition is ok
-    domainManager.addDomain(domain);
+  public void domainNotFound() throws IOException, DomainNotFoundException {
+    Domain domainAdded = createDomain("domain-added", "1.0.0");
+    String domainAddedName = domainAdded.getDescriptor().getName();
 
-    // second is not
-    expectedException.expect(IllegalArgumentException.class);
+    Domain domainNotAdded = createDomain("domain-not-added", "1.0.0");
+    String domainNotAddedName = domainNotAdded.getDescriptor().getName();
+
+    domainManager.addDomain(domainAdded);
+    assertThat(domainManager.contains(domainAddedName), is(true));
+    assertThat(domainManager.getDomain(domainAddedName), is(domainAdded));
+
+    assertThat(domainManager.contains(domainNotAddedName), is(false));
+    expectedException.expect(DomainNotFoundException.class);
     expectedException
-        .expectMessage("Trying to add domain 'custom-domain-1.1.0-mule-domain', but a domain named 'custom-domain-1.1.0-mule-domain' was found");
-    domainManager.addDomain(domain);
+        .expectMessage("The domain '" + domainNotAddedName + "' was not found. Available domains: [[" + domainAddedName + "]]");
+    domainManager.getDomain(domainNotAddedName);
+  }
+
+  @Test
+  public void addTwoIdenticalDomainsWithDifferentNames() throws IOException {
+    String domainId = "custom-domain";
+    String version = "1.1.0";
+    String domainName1 = domainId + "-one-" + version + "-mule-domain";
+    String domainName2 = domainId + "-two-" + version + "-mule-domain";
+    Domain domain1 = createDomain(domainId, version, domainName1);
+    Domain domain2 = createDomain(domainId, version, domainName2);
+
+    domainManager.addDomain(domain1);
+    domainManager.addDomain(domain2);
+  }
+
+  @Test
+  public void getIdenticalDomainsByName() throws IOException, DomainNotFoundException {
+    String domainId = "custom-domain";
+    String version = "1.1.0";
+    String domainName1 = domainId + "-one-" + version + "-mule-domain";
+    String domainName2 = domainId + "-two-" + version + "-mule-domain";
+    Domain domain1 = createDomain(domainId, version, domainName1);
+    Domain domain2 = createDomain(domainId, version, domainName2);
+
+    domainManager.addDomain(domain1);
+    domainManager.addDomain(domain2);
+
+    // It is supported to get them by name
+    assertThat(domainManager.getDomain(domainName1), is(domain1));
+    assertThat(domainManager.getDomain(domainName2), is(domain2));
+  }
+
+  @Test
+  public void getIdenticalDomainsByBundleDescriptorThrowsException()
+      throws IOException, DomainNotFoundException, AmbiguousDomainReferenceException {
+    String domainId = "custom-domain";
+    String version = "1.1.0";
+    String domainName1 = domainId + "-one-" + version + "-mule-domain";
+    String domainName2 = domainId + "-two-" + version + "-mule-domain";
+    Domain domain1 = createDomain(domainId, version, domainName1);
+    Domain domain2 = createDomain(domainId, version, domainName2);
+
+    domainManager.addDomain(domain1);
+    domainManager.addDomain(domain2);
+
+    expectedException.expect(AmbiguousDomainReferenceException.class);
+
+    String expectedMessage = "More than one compatible domain were found for bundle descriptor "
+        + domain1.getDescriptor().getBundleDescriptor()
+        + ". Found domains were: ["
+        + domainName1 + ", "
+        + domainName2 + "]";
+
+    expectedException.expectMessage(expectedMessage);
+    domainManager.getCompatibleDomain(domain1.getDescriptor().getBundleDescriptor());
+    domainManager.getCompatibleDomain(domain2.getDescriptor().getBundleDescriptor());
+  }
+
+  @Test
+  public void cannotAddTwoDomainsWithTheSameArtifactName() throws IOException {
+    String domainName = "custom-domain";
+    String version = "1.1.0";
+
+    // First addition is ok
+    domainManager.addDomain(createDomain("one-id", version, domainName));
+
+    // Second is not
+    expectedException.expect(IllegalArgumentException.class);
+    domainManager.addDomain(createDomain("another-id", version, domainName));
   }
 
   @Test
@@ -161,153 +239,96 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
 
   @Test
   public void applicationWorksIfTheDomainHasAHigherMinor()
-      throws IOException, IncompatibleDomainVersionException, DomainNotFoundException {
-    // the app references to the old domain
+      throws IOException, DomainNotFoundException, AmbiguousDomainReferenceException {
+    // The app references to the old domain
     BundleDescriptor oldBundleDescriptor = createBundleDescriptor("custom-domain", "1.1.0");
 
-    // we upgrade the domain minor
+    // Upgrade the domain minor
     Domain upgradedDomain = createDomain("custom-domain", "1.2.0");
     domainManager.addDomain(upgradedDomain);
 
-    // we retrieve the domain using the descriptor that we have
-    assertThat(domainManager.getDomain(oldBundleDescriptor), is(upgradedDomain));
+    // Retrieve the domain using the descriptor that we have
+    assertThat(domainManager.getCompatibleDomain(oldBundleDescriptor), is(upgradedDomain));
   }
 
   @Test
   public void applicationWorksIfTheDomainHasAHigherPatch()
-      throws IOException, IncompatibleDomainVersionException, DomainNotFoundException {
-    // the app references to the old domain
+      throws IOException, DomainNotFoundException, AmbiguousDomainReferenceException {
+    // The app references to the old domain
     BundleDescriptor oldBundleDescriptor = createBundleDescriptor("custom-domain", "1.1.0");
 
-    // we upgrade the domain minor
+    // Upgrade the domain minor
     Domain upgradedDomain = createDomain("custom-domain", "1.1.1");
     domainManager.addDomain(upgradedDomain);
 
-    // we retrieve the domain using the descriptor that we have
-    assertThat(domainManager.getDomain(oldBundleDescriptor), is(upgradedDomain));
+    // Retrieve the domain using the descriptor that we have
+    assertThat(domainManager.getCompatibleDomain(oldBundleDescriptor), is(upgradedDomain));
   }
 
   @Test
   public void applicationDoesNotWorkIfTheDomainHasAHigherMajor()
-      throws IOException, IncompatibleDomainVersionException, DomainNotFoundException {
-    // the app references to the old domain
+      throws IOException, DomainNotFoundException, AmbiguousDomainReferenceException {
+    // The app references to the old domain
     BundleDescriptor oldBundleDescriptor = createBundleDescriptor("custom-domain", "1.1.0");
 
-    // we upgrade the domain major
+    // Upgrade the domain major
     Domain upgradedDomain = createDomain("custom-domain", "2.1.0");
     domainManager.addDomain(upgradedDomain);
 
-    // we cannot retrieve the domain using the descriptor that we have
+    // Cannot retrieve the domain using the descriptor that we have
     expectedException.expect(DomainNotFoundException.class);
-    expectedException.expectMessage("The domain 'custom-domain-1.1.0-mule-domain' was not found");
-    domainManager.getDomain(oldBundleDescriptor);
+    expectedException
+        .expectMessage("The domain 'custom-domain-1.1.0-mule-domain' was not found. Available domains: [[custom-domain-2.1.0-mule-domain]]");
+    domainManager.getCompatibleDomain(oldBundleDescriptor);
   }
 
   @Test
   public void applicationDoesNotWorkIfTheDomainHasALowerMajor()
-      throws IOException, IncompatibleDomainVersionException, DomainNotFoundException {
-    // the app references to a domain
+      throws IOException, DomainNotFoundException, AmbiguousDomainReferenceException {
+    // The app references to a domain
     BundleDescriptor bundleDescriptor = createBundleDescriptor("custom-domain", "2.1.0");
 
-    // we downgrade the domain major
+    // Downgrade the domain major
     Domain downgradedDomain = createDomain("custom-domain", "1.1.0");
     domainManager.addDomain(downgradedDomain);
 
-    // we cannot retrieve the domain using the descriptor that we have
+    // Cannot retrieve the domain using the descriptor that we have
     expectedException.expect(DomainNotFoundException.class);
-    expectedException.expectMessage("The domain 'custom-domain-2.1.0-mule-domain' was not found");
-    domainManager.getDomain(bundleDescriptor);
+    expectedException
+        .expectMessage("The domain 'custom-domain-2.1.0-mule-domain' was not found. Available domains: [[custom-domain-1.1.0-mule-domain]]");
+    domainManager.getCompatibleDomain(bundleDescriptor);
   }
 
   @Test
   public void applicationDoesNotWorkIfTheDomainHasALowerMinor()
-      throws IOException, IncompatibleDomainVersionException, DomainNotFoundException {
-    // the app references to a domain
+      throws IOException, DomainNotFoundException, AmbiguousDomainReferenceException {
+    // The app references to a domain
     BundleDescriptor bundleDescriptor = createBundleDescriptor("custom-domain", "1.2.0");
 
-    // we downgrade the domain major
+    // Downgrade the domain major
     Domain downgradedDomain = createDomain("custom-domain", "1.1.0");
     domainManager.addDomain(downgradedDomain);
 
-    // we cannot retrieve the domain using the descriptor that we have
-    expectedException.expect(IncompatibleDomainVersionException.class);
-    expectedException
-        .expectMessage("Expected domain 'custom-domain-1.2.0-mule-domain' couldn't be retrieved. It is available the '1.1.0' version");
-    domainManager.getDomain(bundleDescriptor);
+    // Cannot retrieve the domain using the descriptor that we have
+    expectedException.expect(DomainNotFoundException.class);
+    domainManager.getCompatibleDomain(bundleDescriptor);
   }
 
   @Test
   public void applicationDoesNotWorkIfTheDomainHasALowerPatch()
-      throws IOException, IncompatibleDomainVersionException, DomainNotFoundException {
-    // the app references to a domain
+      throws IOException, DomainNotFoundException, AmbiguousDomainReferenceException {
+    // The app references to a domain
     BundleDescriptor bundleDescriptor = createBundleDescriptor("custom-domain", "1.1.1");
 
-    // we downgrade the domain major
+    // Downgrade the domain major
     Domain downgradedDomain = createDomain("custom-domain", "1.1.0");
     domainManager.addDomain(downgradedDomain);
 
-    // we cannot retrieve the domain using the descriptor that we have
-    expectedException.expect(IncompatibleDomainVersionException.class);
+    // Cannot retrieve the domain using the descriptor that we have
+    expectedException.expect(DomainNotFoundException.class);
     expectedException
-        .expectMessage("Expected domain 'custom-domain-1.1.1-mule-domain' couldn't be retrieved. It is available the '1.1.0' version");
-    domainManager.getDomain(bundleDescriptor);
+        .expectMessage("The domain 'custom-domain-1.1.1-mule-domain' was not found. Available domains: [[custom-domain-1.1.0-mule-domain]]");
+    domainManager.getCompatibleDomain(bundleDescriptor);
   }
 
-  @Test
-  public void cannotAddDomainWithSameArtifactId() throws IOException {
-    domainManager.addDomain(createDomain("custom-domain", "1.1.0"));
-
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException
-        .expectMessage("Trying to add domain 'custom-domain-1.1.1-mule-domain', but a domain named 'custom-domain-1.1.0-mule-domain' was found");
-    domainManager.addDomain(createDomain("custom-domain", "1.1.1"));
-
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException
-        .expectMessage("Trying to add domain 'custom-domain-1.2.0-mule-domain', but a domain named 'custom-domain-1.1.0-mule-domain' was found");
-    domainManager.addDomain(createDomain("custom-domain", "1.2.0"));
-
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException
-        .expectMessage("Trying to add domain 'custom-domain-2.1.0-mule-domain', but a domain named 'custom-domain-1.1.0-mule-domain' was found");
-    domainManager.addDomain(createDomain("custom-domain", "2.1.0"));
-  }
-
-  @Test
-  public void domainUpgradeShouldBeDoneByRemovingThePreviousOne() throws IOException {
-    BundleDescriptor customDomainDescriptor1 = createBundleDescriptor("custom-domain", "1.1.0");
-    BundleDescriptor customDomainDescriptor2 = createBundleDescriptor("custom-domain", "1.2.0");
-    BundleDescriptor customDomainDescriptor3 = createBundleDescriptor("custom-domain", "1.3.0");
-
-    Domain domain = createDomain("custom-domain", "1.1.0");
-    domainManager.addDomain(domain);
-    assertThat(domainManager.contains(customDomainDescriptor1), is(true));
-    assertThat(domainManager.contains(customDomainDescriptor2), is(false));
-    assertThat(domainManager.contains(customDomainDescriptor3), is(false));
-
-    domain.dispose();
-    domainManager.removeDomain(domain);
-    assertThat(domainManager.contains(customDomainDescriptor1), is(false));
-    assertThat(domainManager.contains(customDomainDescriptor2), is(false));
-    assertThat(domainManager.contains(customDomainDescriptor3), is(false));
-
-    domainManager.addDomain(createDomain("custom-domain", "1.2.0"));
-    assertThat(domainManager.contains(customDomainDescriptor1), is(true));
-    assertThat(domainManager.contains(customDomainDescriptor2), is(true));
-    assertThat(domainManager.contains(customDomainDescriptor3), is(false));
-  }
-
-  @Test
-  public void addTheSameDomainWithDifferentBundleDescriptors() throws IOException {
-    Domain aDomain = createDomain("custom-domain", "1.1.0");
-    BundleDescriptor originalBundleDescriptor = aDomain.getDescriptor().getBundleDescriptor();
-    BundleDescriptor otherBundleDescriptor = createBundleDescriptor("other-name", "1.1.0");
-
-    domainManager.addDomain(aDomain);
-    domainManager.contains(originalBundleDescriptor);
-
-    aDomain.getDescriptor().setBundleDescriptor(otherBundleDescriptor);
-    domainManager.addDomain(aDomain);
-    domainManager.contains(otherBundleDescriptor);
-  }
 }
