@@ -71,7 +71,6 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 public class ExtensionModelHelper {
 
   private final Set<ExtensionModel> extensionsModels;
-  private final DslResolvingContext dslResolvingCtx;
   private final Cache<ComponentIdentifier, Optional<? extends org.mule.runtime.api.meta.model.ComponentModel>> extensionComponentModelByComponentIdentifier =
       Caffeine.newBuilder().build();
   private final Cache<ComponentIdentifier, Optional<? extends ConnectionProviderModel>> extensionConnectionProviderModelByComponentIdentifier =
@@ -90,8 +89,11 @@ public class ExtensionModelHelper {
    *        mule artifact.
    */
   public ExtensionModelHelper(Set<ExtensionModel> extensionModels) {
+    this(extensionModels, DslResolvingContext.getDefault(extensionModels));
+  }
+
+  public ExtensionModelHelper(Set<ExtensionModel> extensionModels, DslResolvingContext dslResolvingCtx) {
     this.extensionsModels = extensionModels;
-    this.dslResolvingCtx = DslResolvingContext.getDefault(extensionsModels);
     this.dslSyntaxResolversByExtension =
         Caffeine.newBuilder().build(key -> DslSyntaxResolver.getDefault(key, dslResolvingCtx));
   }
@@ -433,4 +435,7 @@ public class ExtensionModelHelper {
     }
   }
 
+  public Set<ExtensionModel> getExtensionsModels() {
+    return extensionsModels;
+  }
 }

@@ -8,6 +8,8 @@ package org.mule.runtime.config.internal.dsl.model.extension.xml;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 import static org.apache.commons.lang3.StringUtils.repeat;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.ComponentModelReaderHelper.toXml;
@@ -23,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 
@@ -71,7 +72,12 @@ public class MacroExpansionModulesModel {
    * Goes through the entire xml mule application looking for the message processors that can be expanded, and then takes care of
    * the global elements if there are at least one {@link ExtensionModel} to macro expand.
    */
-  public void expand() {
+  public void expand(Runnable postProcess) {
+    if (sortedExtensions.isEmpty()) {
+      postProcess.run();
+      return;
+    }
+
     for (ExtensionModel sortedExtension : sortedExtensions) {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug(String.format("macro expanding '%s' connector, xmlns:%s=\"%s\"",
@@ -80,6 +86,7 @@ public class MacroExpansionModulesModel {
                                    sortedExtension.getXmlDslModel().getNamespace()));
       }
       new MacroExpansionModuleModel(applicationModel, sortedExtension).expand();
+      postProcess.run();
     }
     if (LOGGER.isDebugEnabled()) {
       //only log the macro expanded app if there are smart connectors in it
@@ -120,7 +127,7 @@ public class MacroExpansionModulesModel {
     final List<ExtensionModel> result = new ArrayList<>();
     final Map<String, ExtensionModel> allExtensionsByNamespace = extensions.stream()
         .filter(extensionModel -> extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent())
-        .collect(Collectors.toMap(extModel -> extModel.getXmlDslModel().getNamespace(), Function.identity()));
+        .collect(toMap(extModel -> extModel.getXmlDslModel().getNamespace(), Function.identity()));
 
     // we first check there are at least one extension to macro expand
     if (!allExtensionsByNamespace.isEmpty()) {
@@ -179,7 +186,7 @@ public class MacroExpansionModulesModel {
                                                                Set<String> namespacesExtensions) {
     return getUsedNamespaces(rootComponentModel).stream()
         .filter(namespacesExtensions::contains)
-        .collect(Collectors.toSet());
+        .collect(toSet());
   }
 
   /**
@@ -193,6 +200,6 @@ public class MacroExpansionModulesModel {
     return rootComponentModel.getParameters().entrySet().stream()
         .filter(parameter -> parameter.getKey().startsWith(XMLNS_ATTRIBUTE + ":"))
         .map(Map.Entry::getValue)
-        .collect(Collectors.toSet());
+        .collect(toSet());
   }
 }

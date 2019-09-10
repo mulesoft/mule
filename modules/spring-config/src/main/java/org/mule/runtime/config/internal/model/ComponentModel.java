@@ -11,13 +11,22 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
+import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapter;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
+import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
+import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper.ExtensionWalkerModelDelegate;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
@@ -211,6 +220,54 @@ public abstract class ComponentModel {
     }
 
     return empty();
+  }
+
+  public void resolveTypedComponentIdentifier(ExtensionModelHelper extensionModelHelper) {
+    executeOnComponentTree(this, componentModel -> {
+      extensionModelHelper.walkToComponent(componentModel.getIdentifier(), new ExtensionWalkerModelDelegate() {
+
+        @Override
+        public void onConfiguration(ConfigurationModel model) {
+          componentModel.setConfigurationModel(model);
+        }
+
+        @Override
+        public void onConnectionProvider(ConnectionProviderModel model) {
+          componentModel.setConnectionProviderModel(model);
+        };
+
+        @Override
+        public void onOperation(OperationModel model) {
+          componentModel.setComponentModel(model);
+        }
+
+        @Override
+        public void onSource(SourceModel model) {
+          componentModel.setComponentModel(model);
+        }
+
+        @Override
+        public void onConstruct(ConstructModel model) {
+          componentModel.setComponentModel(model);
+        }
+
+      });
+      if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
+        extensionModelHelper.findMetadataType(componentModel.getType())
+            .flatMap(t -> createMetadataTypeModelAdapter(t))
+            .ifPresent(componentModel::setMetadataTypeModelAdapter);
+      }
+
+      componentModel.setComponentType(resolveComponentType(componentModel, extensionModelHelper));
+    });
+  }
+
+  private void executeOnComponentTree(final ComponentModel component, final Consumer<ComponentModel> task)
+      throws MuleRuntimeException {
+    task.accept(component);
+    component.getInnerComponents().forEach((innerComponent) -> {
+      executeOnComponentTree(innerComponent, task);
+    });
   }
 
   public void setComponentModel(org.mule.runtime.api.meta.model.ComponentModel model) {
