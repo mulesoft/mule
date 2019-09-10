@@ -58,6 +58,8 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
 
   protected final AtomicLong lastRetryTimestamp = new AtomicLong(MIN_VALUE);
 
+  private boolean policyMode;
+
   public ProactorStreamProcessingStrategy(int subscriberCount,
                                           Supplier<Scheduler> cpuLightSchedulerSupplier,
                                           Supplier<Scheduler> blockingSchedulerSupplier,
@@ -116,24 +118,29 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
                                                       () -> lastRetryTimestamp.set(MIN_VALUE),
                                                       ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS));
 
-    // FlatMap is the way reactor has to do parallel processing. Since this proactor method is used for the processors that are
-    // not CPU_LITE, parallelism is wanted when the processor is blocked to do IO or doing long CPU work.
-    if (maxConcurrency <= getParallelism() * subscribers) {
-      // If no concurrency needed, execute directly on the same Flux
+    if (policyMode) {
       return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
           .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
-    } else if (maxConcurrency == MAX_VALUE) {
-      // For no limit, pass through the no limit meaning to Reactor's flatMap
-      return publisher -> from(publisher)
-          .flatMap(event -> scheduleProcessor(processor, retryScheduler, Mono.just(event))
-              .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)),
-                   MAX_VALUE);
     } else {
-      // Otherwise, enforce the concurrency limit from the config,
-      return publisher -> from(publisher)
-          .flatMap(event -> scheduleProcessor(processor, retryScheduler, Mono.just(event))
-              .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)),
-                   max(maxConcurrency / (getParallelism() * subscribers), 1));
+      // FlatMap is the way reactor has to do parallel processing. Since this proactor method is used for the processors that are
+      // not CPU_LITE, parallelism is wanted when the processor is blocked to do IO or doing long CPU work.
+      if (maxConcurrency <= getParallelism() * subscribers) {
+        // If no concurrency needed, execute directly on the same Flux
+        return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
+            .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
+      } else if (maxConcurrency == MAX_VALUE) {
+        // For no limit, pass through the no limit meaning to Reactor's flatMap
+        return publisher -> from(publisher)
+            .flatMap(event -> scheduleProcessor(processor, retryScheduler, Mono.just(event))
+                .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)),
+                     MAX_VALUE);
+      } else {
+        // Otherwise, enforce the concurrency limit from the config,
+        return publisher -> from(publisher)
+            .flatMap(event -> scheduleProcessor(processor, retryScheduler, Mono.just(event))
+                .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)),
+                     max(maxConcurrency / (getParallelism() * subscribers), 1));
+      }
     }
   }
 
@@ -144,6 +151,11 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
                      : scheduler.toString()),
                  SCHEDULER_BUSY_RETRY_INTERVAL_MS);
     lastRetryTimestamp.set(nanoTime());
+  }
+
+  // TODO MULE-17079 Remove this policyMode flag.
+  public void setPolicyMode(boolean policyMode) {
+    this.policyMode = policyMode;
   }
 
   protected abstract Mono<CoreEvent> scheduleProcessor(ReactiveProcessor processor,
