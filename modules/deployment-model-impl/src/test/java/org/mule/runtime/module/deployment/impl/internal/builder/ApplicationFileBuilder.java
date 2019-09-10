@@ -158,7 +158,8 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
 
     Object redeploymentEnabled = deployProperties.get(PROPERTY_REDEPLOYMENT_ENABLED);
     Object configResources = deployProperties.get(PROPERTY_CONFIG_RESOURCES);
-    File applicationDescriptor = createApplicationJsonDescriptorFile(minMuleVersion,
+    File applicationDescriptor = createApplicationJsonDescriptorFile(ofNullable(((String) deployProperties.get("domain"))),
+                                                                     minMuleVersion,
                                                                      redeploymentEnabled == null
                                                                          ? empty()
                                                                          : ofNullable(Boolean
@@ -170,7 +171,7 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
     return customResources;
   }
 
-  private File createApplicationJsonDescriptorFile(String minMuleVersion,
+  private File createApplicationJsonDescriptorFile(Optional<String> domain, String minMuleVersion,
                                                    Optional<Boolean> redeploymentEnabled, Optional<String> configResources,
                                                    Optional<String> exportedPackages, Optional<String> exportedResources) {
     File applicationDescriptor = new File(getTempFolder(), getArtifactId() + "application.json");
@@ -181,6 +182,7 @@ public class ApplicationFileBuilder extends DeployableFileBuilder<ApplicationFil
         .setName(getArtifactId())
         .setMinMuleVersion(minMuleVersion)
         .setRequiredProduct(MULE);
+    domain.ifPresent(muleApplicationModelBuilder::setDomain);
     redeploymentEnabled.ifPresent(muleApplicationModelBuilder::setRedeploymentEnabled);
     configResources.ifPresent(configs -> {
       String[] configFiles = configs.split(",");

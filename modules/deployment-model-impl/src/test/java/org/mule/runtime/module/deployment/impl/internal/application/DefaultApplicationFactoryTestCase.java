@@ -38,7 +38,6 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
-import org.mule.runtime.module.deployment.impl.internal.domain.IncompatibleDomainVersionException;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
@@ -47,7 +46,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -135,7 +133,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     assertThat(application.getArtifactName(), is(APP_NAME));
     assertThat(application.getResourceFiles(), is(resourceFiles));
 
-    verify(domainRepository, times(2)).getDomain(any(BundleDescriptor.class));
+    verify(domainRepository, times(2)).getDomain(DOMAIN_ARTIFACT_FILE_NAME);
     verify(applicationClassLoaderBuilderMock).setDomain(domain);
     verify(applicationClassLoaderBuilderMock)
         .addArtifactPluginDescriptors(descriptor.getPlugins().toArray(new ArtifactPluginDescriptor[0]));
@@ -151,14 +149,14 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     return new ClassLoaderModel.ClassLoaderModelBuilder().dependingOn(domainDependency).build();
   }
 
-  private Domain createDomain(String name) throws IncompatibleDomainVersionException, DomainNotFoundException {
+  private Domain createDomain(String name) throws DomainNotFoundException {
     final Domain domain = mock(Domain.class);
     final ArtifactClassLoader domainArtifactClassLoader = mock(ArtifactClassLoader.class);
     when(domainArtifactClassLoader.getClassLoader()).thenReturn(mock(ClassLoader.class));
 
     final ClassLoaderLookupPolicy domainLookupPolicy = mock(ClassLoaderLookupPolicy.class);
     when(domainArtifactClassLoader.getClassLoaderLookupPolicy()).thenReturn(domainLookupPolicy);
-    when(domainRepository.getDomain(any(BundleDescriptor.class))).thenReturn(domain);
+    when(domainRepository.getDomain(DOMAIN_ARTIFACT_FILE_NAME)).thenReturn(domain);
     when(domain.getArtifactClassLoader()).thenReturn(domainArtifactClassLoader);
     when(domain.getDescriptor()).thenReturn(new DomainDescriptor(name));
 
@@ -170,8 +168,6 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     final ApplicationDescriptor descriptor = new ApplicationDescriptor(APP_NAME);
     descriptor.setClassLoaderModel(createClassLoaderModelWithDomain());
     when(applicationDescriptorFactory.create(any(), any())).thenReturn(descriptor);
-    when(domainRepository.getDomain(any(BundleDescriptor.class)))
-        .thenThrow(new DomainNotFoundException(DOMAIN_NAME, new HashSet<>()));
     expectedException.expect(DeploymentException.class);
     applicationFactory.createArtifact(new File(APP_NAME), empty());
   }
