@@ -102,9 +102,11 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import com.google.common.collect.ImmutableMap;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
+import com.google.common.collect.ImmutableMap;
+
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
@@ -190,6 +192,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     if (isAsync()) {
       return flux
+          // This flatMap allows the operation to run in parallel. The processing strategy relies on this
+          // (ProactorStreamProcessingStrategy#proactor) to do some performance optimizations.
           .flatMap(event -> {
             DeferredMonoSinkExecutorCallback callback = new DeferredMonoSinkExecutorCallback();
             onEvent(event, callback);

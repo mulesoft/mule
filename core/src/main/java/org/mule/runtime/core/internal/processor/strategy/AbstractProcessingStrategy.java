@@ -16,7 +16,6 @@ import static reactor.util.concurrent.Queues.SMALL_BUFFER_SIZE;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -26,8 +25,8 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 
 import reactor.core.publisher.FluxSink;
@@ -57,7 +56,7 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategy {
     };
   }
 
-  protected ExecutorService decorateScheduler(Scheduler scheduler) {
+  protected ScheduledExecutorService decorateScheduler(ScheduledExecutorService scheduler) {
     return scheduler;
   }
 
