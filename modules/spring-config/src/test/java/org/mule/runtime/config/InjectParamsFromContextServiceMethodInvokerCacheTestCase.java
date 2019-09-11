@@ -17,6 +17,7 @@ import java.lang.reflect.Method;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,7 +35,7 @@ public class InjectParamsFromContextServiceMethodInvokerCacheTestCase {
     injectParamsFromContextServiceMethodInvoker.invoke(service, method, null);
     injectParamsFromContextServiceMethodInvoker.invoke(service, method, null);
 
-    verify(registry).lookupByName(any());
+    verify(registry, times(1)).lookupByName(any());
   }
 
   @Test
@@ -44,7 +45,7 @@ public class InjectParamsFromContextServiceMethodInvokerCacheTestCase {
     injectParamsFromContextServiceMethodInvoker.invoke(service, method, null);
     injectParamsFromContextServiceMethodInvoker.invoke(service, method, null);
 
-    verify(registry).lookupAllByType(any());
+    verify(registry, times(1)).lookupAllByType(any());
   }
 
 }
