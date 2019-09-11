@@ -81,8 +81,7 @@ public class DefaultPolicyInstance extends AbstractComponent
     final ProcessingStrategyFactory defaultProcessingStrategyFactory =
         getMuleContext().getConfiguration().getDefaultProcessingStrategyFactory();
     if (defaultProcessingStrategyFactory == null) {
-      // TODO MULE-17079 Remove this policyMode flag.
-      return new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(true);
+      return new TransactionAwareProactorStreamEmitterProcessingStrategyFactory();
     } else {
       return defaultProcessingStrategyFactory;
     }

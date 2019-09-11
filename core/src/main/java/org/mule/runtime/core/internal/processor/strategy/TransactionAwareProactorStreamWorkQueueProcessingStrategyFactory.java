@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamWorkQueueProcessingStrategyFactory.ProactorStreamWorkQueueProcessingStrategy;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -114,8 +114,9 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory ex
     }
 
     @Override
-    protected ExecutorService decorateScheduler(Scheduler scheduler) {
-      return new ConditionalExecutorServiceDecorator(scheduler, currentScheduler -> isTransactionActive());
+    protected ScheduledExecutorService decorateScheduler(ScheduledExecutorService scheduler) {
+      return new ConditionalExecutorServiceDecorator(super.decorateScheduler(scheduler),
+                                                     currentScheduler -> isTransactionActive());
     }
 
     @Override
