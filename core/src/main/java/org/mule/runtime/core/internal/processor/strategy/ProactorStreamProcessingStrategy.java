@@ -59,7 +59,7 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
       sdkOperationClass = (Class<ClassLoader>) ProactorStreamProcessingStrategy.class.getClassLoader()
           .loadClass("org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor");
     } catch (ClassNotFoundException e) {
-      LOGGER.debug("ApplicationClassLoader interface not available in current context", e);
+      LOGGER.debug("OperationMessageProcessor interface not available in current context", e);
     }
 
   }
@@ -137,6 +137,7 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
           .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
     } else if (maxConcurrency == MAX_VALUE) {
       if ((processor instanceof InterceptedReactiveProcessor)
+          && sdkOperationClass != null
           && sdkOperationClass.isAssignableFrom(((InterceptedReactiveProcessor) processor).getProcessor().getClass())) {
         // For no limit, the java SDK already does a flatMap internally, so no need to do an additional one here
         return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
