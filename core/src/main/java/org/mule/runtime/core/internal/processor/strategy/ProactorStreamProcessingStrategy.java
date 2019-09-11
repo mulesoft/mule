@@ -131,7 +131,7 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
 
     // FlatMap is the way reactor has to do parallel processing. Since this proactor method is used for the processors that are
     // not CPU_LITE, parallelism is wanted when the processor is blocked to do IO or doing long CPU work.
-    if (maxConcurrency <= getParallelism() * subscribers) {
+    if (maxConcurrency == 1) {
       // If no concurrency needed, execute directly on the same Flux
       return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
           .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));

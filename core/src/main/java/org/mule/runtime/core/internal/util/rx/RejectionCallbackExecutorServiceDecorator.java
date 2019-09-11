@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -22,12 +21,16 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.google.common.util.concurrent.MoreExecutors;
+import javax.management.RuntimeErrorException;
 
 /**
- * Transaction aware {@link ExecutorService} decorator that does not scheduler tasks for async processing using the delegate
- * executor service if a transaction is active, instead a {@link MoreExecutors#newDirectExecutorService()} is used and the task is
- * run on the current thread.
+ * Decorator for {@link ScheduledExecutorService} that will schedule many retries when a {@link RejectedExecutionException} is
+ * thrown.
+ * <p>
+ * Retries will be done every time a {@link RuntimeErrorException} is thrown. If for one task, {@link RejectedExecutionException}
+ * is consistently thrown, retries will be scheduled indefinitely until the task is finally accepted.
+ *
+ * @since 4.3, 4.2.3
  */
 public class RejectionCallbackExecutorServiceDecorator implements ScheduledExecutorService {
 
@@ -38,12 +41,13 @@ public class RejectionCallbackExecutorServiceDecorator implements ScheduledExecu
   private final Duration retryInterval;
 
   /**
-   * Create a new executor service decorator that delegates to the provided executor service if no transaction is active and runs
-   * tasks on the same thread otherwise.
    *
-   * @param executorService the delegate executor service to use when no transaction is active.
-   * @param retryScheduler the executor service to use for scheduling the retries.
-   * @param retryInterval
+   * @param executorService the executors service to decorate
+   * @param retryScheduler the executor to use for scheduling the retries
+   * @param onRejected callback to be executed when a {@link RejectedExecutionException} is thrown by {@code executorService},
+   *        before scheduling the retry.
+   * @param onRetrySuccessful callback to be executed after a retry has been successful.
+   * @param retryInterval the delay for the scheduled retries.
    */
   public RejectionCallbackExecutorServiceDecorator(ScheduledExecutorService executorService,
                                                    ScheduledExecutorService retryScheduler,

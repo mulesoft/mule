@@ -23,8 +23,11 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assume.assumeThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
@@ -35,6 +38,7 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.RejectingScheduler.REJECTION_COUNT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
 import static org.mule.tck.probe.PollingProber.probe;
@@ -289,10 +293,11 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     processFlow(testEvent());
 
+    verify(blockingSchedulerSpy, times(1)).submit(any(Callable.class));
     // Reactor dispatches different tasks to the scheduler for processing the task, so we cannot assume a 1-1 ratio between events
     // and calls to the scheduler, or that they happen all in a predictable order (threading, ya know...).
     probe(() -> {
-      assertThat(rejectingSchedulerSpy.getRejections(), is(greaterThanOrEqualTo(10)));
+      assertThat(rejectingSchedulerSpy.getRejections(), is(greaterThanOrEqualTo(REJECTION_COUNT)));
       return true;
     });
 
@@ -324,10 +329,11 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     processFlow(testEvent());
 
+    verify(cpuIntensiveSchedulerSpy, times(1)).submit(any(Callable.class));
     // Reactor dispatches different tasks to the scheduler for processing the task, so we cannot assume a 1-1 ratio between events
     // and calls to the scheduler, or that they happen all in a predictable order (threading, ya know...).
     probe(() -> {
-      assertThat(rejectingSchedulerSpy.getRejections(), is(greaterThanOrEqualTo(10)));
+      assertThat(rejectingSchedulerSpy.getRejections(), is(greaterThanOrEqualTo(REJECTION_COUNT)));
       return true;
     });
 
