@@ -24449,6 +24449,7 @@
       "type": "Object",
       "annotations": {
         "typeId": "http://example.com/example.json",
+        "label": "Person",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -24462,8 +24463,7 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        },
-        "label": "Person"
+        }
       },
       "open": {
         "type": "Any"
