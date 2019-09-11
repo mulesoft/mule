@@ -28,6 +28,7 @@ import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.construct.FromFlowRejectedExecutionException;
+import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
 import org.mule.runtime.core.internal.util.rx.RejectionCallbackExecutorServiceDecorator;
 import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -50,6 +51,18 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
   private static final Logger LOGGER = getLogger(ProactorStreamProcessingStrategy.class);
 
   private static final long SCHEDULER_BUSY_RETRY_INTERVAL_NS = MILLISECONDS.toNanos(SCHEDULER_BUSY_RETRY_INTERVAL_MS);
+
+  private static Class<ClassLoader> sdkOperationClass;
+
+  static {
+    try {
+      sdkOperationClass = (Class<ClassLoader>) ProactorStreamProcessingStrategy.class.getClassLoader()
+          .loadClass("org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor");
+    } catch (ClassNotFoundException e) {
+      LOGGER.debug("ApplicationClassLoader interface not available in current context", e);
+    }
+
+  }
 
   private final Supplier<Scheduler> blockingSchedulerSupplier;
   private final Supplier<Scheduler> cpuIntensiveSchedulerSupplier;
@@ -123,11 +136,18 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
       return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
           .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
     } else if (maxConcurrency == MAX_VALUE) {
-      // For no limit, pass through the no limit meaning to Reactor's flatMap
-      return publisher -> from(publisher)
-          .flatMap(event -> scheduleProcessor(processor, retryScheduler, Mono.just(event))
-              .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)),
-                   MAX_VALUE);
+      if ((processor instanceof InterceptedReactiveProcessor)
+          && sdkOperationClass.isAssignableFrom(((InterceptedReactiveProcessor) processor).getProcessor().getClass())) {
+        // For no limit, the java SDK already does a flatMap internally, so no need to do an additional one here
+        return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
+            .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
+      } else {
+        // For no limit, pass through the no limit meaning to Reactor's flatMap
+        return publisher -> from(publisher)
+            .flatMap(event -> scheduleProcessor(processor, retryScheduler, Mono.just(event))
+                .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)),
+                     MAX_VALUE);
+      }
     } else {
       // Otherwise, enforce the concurrency limit from the config,
       return publisher -> from(publisher)
