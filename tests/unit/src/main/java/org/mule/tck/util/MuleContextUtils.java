@@ -24,6 +24,7 @@ import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withAnnotation;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -77,7 +78,7 @@ public class MuleContextUtils {
 
   private static final class MocksInjector implements Injector {
 
-    private Map<Class, Object> objects;
+    private final Map<Class, Object> objects;
 
     private MocksInjector(Map<Class, Object> objects) {
       this.objects = objects;
@@ -179,6 +180,10 @@ public class MuleContextUtils {
     }
 
     return muleContext;
+  }
+
+  public static NotificationDispatcher getNotificationDispatcher(MuleContext muleContext) throws RegistrationException {
+    return ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
   }
 
   /**

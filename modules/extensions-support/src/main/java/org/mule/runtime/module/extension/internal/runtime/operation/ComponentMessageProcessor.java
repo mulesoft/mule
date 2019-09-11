@@ -187,6 +187,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return from(publisher)
         .flatMap(event -> subscriberContext()
             .map(ctx -> addContextToEvent(event, ctx)))
+        // This flatMap allows the operation to run in parallel. The processing strategy relies on this
+        // (ProactorStreamProcessingStrategy#proactor) to do some performance optimizations.
         .flatMap(checkedFunction(event -> {
           final Optional<ConfigurationInstance> configuration = resolveConfiguration(event);
           final Map<String, Object> resolutionResult = getResolutionResult(event, configuration);

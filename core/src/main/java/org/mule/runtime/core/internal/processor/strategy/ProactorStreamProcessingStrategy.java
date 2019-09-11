@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Long.MIN_VALUE;
 import static java.lang.Math.max;
 import static java.lang.System.nanoTime;
@@ -20,8 +21,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
-import static reactor.retry.Retry.onlyIf;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -29,10 +28,13 @@ import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.construct.FromFlowRejectedExecutionException;
+import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
+import org.mule.runtime.core.internal.util.rx.RejectionCallbackExecutorServiceDecorator;
 import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
@@ -42,7 +44,7 @@ import java.util.function.Supplier;
 import org.slf4j.Logger;
 
 import reactor.core.publisher.Flux;
-import reactor.retry.BackoffDelay;
+import reactor.core.publisher.Mono;
 
 public abstract class ProactorStreamProcessingStrategy extends AbstractReactorStreamProcessingStrategy {
 
@@ -50,14 +52,24 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
 
   private static final long SCHEDULER_BUSY_RETRY_INTERVAL_NS = MILLISECONDS.toNanos(SCHEDULER_BUSY_RETRY_INTERVAL_MS);
 
+  private static Class<ClassLoader> sdkOperationClass;
+
+  static {
+    try {
+      sdkOperationClass = (Class<ClassLoader>) ProactorStreamProcessingStrategy.class.getClassLoader()
+          .loadClass("org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor");
+    } catch (ClassNotFoundException e) {
+      LOGGER.debug("OperationMessageProcessor interface not available in current context", e);
+    }
+
+  }
+
   private final Supplier<Scheduler> blockingSchedulerSupplier;
   private final Supplier<Scheduler> cpuIntensiveSchedulerSupplier;
   private Scheduler blockingScheduler;
   private Scheduler cpuIntensiveScheduler;
 
-  private final AtomicLong lastRetryTimestamp = new AtomicLong(MIN_VALUE);
-
-  private boolean policyMode;
+  protected final AtomicLong lastRetryTimestamp = new AtomicLong(MIN_VALUE);
 
   public ProactorStreamProcessingStrategy(int subscriberCount,
                                           Supplier<Scheduler> cpuLightSchedulerSupplier,
@@ -107,43 +119,61 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
     }
   }
 
-  private ReactiveProcessor proactor(ReactiveProcessor processor, Scheduler scheduler) {
-    // TODO MULE-17079 Remove this policyMode flag.
-    // This is to avoid the performance degradation introduced by MULE-17060 when using CPU_INTENSIVE processors in policies,
-    // until MULE-17079 is done.
-    if (policyMode) {
-      return publisher -> withRetry(scheduleProcessor(processor, scheduler, from(publisher))
-          .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)), scheduler);
+  protected ReactiveProcessor proactor(ReactiveProcessor processor, ScheduledExecutorService scheduler) {
+    LOGGER.debug("Doing proactor() for {} on {}. maxConcurrency={}, parallelism={}, subscribers={}", processor, scheduler,
+                 maxConcurrency, getParallelism(), subscribers);
+
+    final ScheduledExecutorService retryScheduler =
+        new RejectionCallbackExecutorServiceDecorator(scheduler, getCpuLightScheduler(),
+                                                      () -> onRejected(scheduler),
+                                                      () -> lastRetryTimestamp.set(MIN_VALUE),
+                                                      ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS));
+
+    // FlatMap is the way reactor has to do parallel processing. Since this proactor method is used for the processors that are
+    // not CPU_LITE, parallelism is wanted when the processor is blocked to do IO or doing long CPU work.
+    if (maxConcurrency == 1) {
+      // If no concurrency needed, execute directly on the same Flux
+      return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
+          .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
+    } else if (maxConcurrency == MAX_VALUE) {
+      if ((processor instanceof InterceptedReactiveProcessor)
+          && sdkOperationClass != null
+          && sdkOperationClass.isAssignableFrom(((InterceptedReactiveProcessor) processor).getProcessor().getClass())) {
+        // For no limit, the java SDK already does a flatMap internally, so no need to do an additional one here
+        return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
+            .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
+      } else {
+        // For no limit, pass through the no limit meaning to Reactor's flatMap
+        return publisher -> from(publisher)
+            .flatMap(event -> scheduleProcessor(processor, retryScheduler, Mono.just(event))
+                .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)),
+                     MAX_VALUE);
+      }
     } else {
+      // Otherwise, enforce the concurrency limit from the config,
       return publisher -> from(publisher)
-          .flatMap(event -> withRetry(scheduleProcessor(processor, scheduler, Flux.just(event))
-              .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)), scheduler),
-                   // no concurrency on FlatMap, breaks async (AsyncTestCase in integration-tests)
+          .flatMap(event -> scheduleProcessor(processor, retryScheduler, Mono.just(event))
+              .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler)),
                    max(maxConcurrency / (getParallelism() * subscribers), 1));
     }
   }
 
-  // TODO MULE-17079 Remove this policyMode flag.
-  public void setPolicyMode(boolean policyMode) {
-    this.policyMode = policyMode;
+  private void onRejected(ScheduledExecutorService scheduler) {
+    LOGGER.trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
+                 (scheduler instanceof Scheduler
+                     ? ((Scheduler) scheduler).getName()
+                     : scheduler.toString()),
+                 SCHEDULER_BUSY_RETRY_INTERVAL_MS);
+    lastRetryTimestamp.set(nanoTime());
   }
 
-  protected abstract Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler,
+  protected abstract Mono<CoreEvent> scheduleProcessor(ReactiveProcessor processor,
+                                                       ScheduledExecutorService processorScheduler,
+                                                       Mono<CoreEvent> eventFlux);
+
+  protected abstract Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor,
+                                                       ScheduledExecutorService processorScheduler,
                                                        Flux<CoreEvent> eventFlux);
-
-  private Flux<CoreEvent> withRetry(Flux<CoreEvent> scheduledFlux, Scheduler processorScheduler) {
-    return scheduledFlux.retryWhen(onlyIf(ctx -> {
-      final boolean schedulerBusy = isSchedulerBusy(ctx.exception());
-      if (schedulerBusy) {
-        LOGGER.trace("Shared scheduler {} is busy. Scheduling of the current event will be retried after {}ms.",
-                     processorScheduler.getName(), SCHEDULER_BUSY_RETRY_INTERVAL_MS);
-        lastRetryTimestamp.set(nanoTime());
-      }
-      return schedulerBusy;
-    }).backoff(ctx -> new BackoffDelay(ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS)))
-        .withBackoffScheduler(fromExecutorService(decorateScheduler(getCpuLightScheduler()))))
-        .doOnNext(e -> lastRetryTimestamp.set(MIN_VALUE));
-  }
 
   protected Scheduler getBlockingScheduler() {
     return this.blockingScheduler;
