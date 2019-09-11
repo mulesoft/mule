@@ -10,10 +10,6 @@ import static com.google.common.util.concurrent.MoreExecutors.newDirectExecutorS
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 
-import org.mule.runtime.api.scheduler.Scheduler;
-
-import com.google.common.util.concurrent.MoreExecutors;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -27,6 +23,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 
+import com.google.common.util.concurrent.MoreExecutors;
+
 /**
  * Transaction aware {@link ExecutorService} decorator that does not scheduler tasks for async processing using the delegate
  * executor service if a transaction is active, instead a {@link MoreExecutors#newDirectExecutorService()} is used and the task is
@@ -34,9 +32,9 @@ import java.util.function.Predicate;
  */
 public class ConditionalExecutorServiceDecorator implements ScheduledExecutorService {
 
-  private Scheduler delegate;
-  private Predicate<Scheduler> scheduleOverridePredicate;
-  private ExecutorService directExecutor = newDirectExecutorService();
+  private final ScheduledExecutorService delegate;
+  private final Predicate<ScheduledExecutorService> scheduleOverridePredicate;
+  private final ExecutorService directExecutor = newDirectExecutorService();
 
   /**
    * Create a new executor service decorator that delegates to the provided executor service if no transaction is active and runs
@@ -44,7 +42,8 @@ public class ConditionalExecutorServiceDecorator implements ScheduledExecutorSer
    *
    * @param executorService the delegate executor service to use when no transaction is active.
    */
-  public ConditionalExecutorServiceDecorator(Scheduler executorService, Predicate<Scheduler> scheduleOverridePredicate) {
+  public ConditionalExecutorServiceDecorator(ScheduledExecutorService executorService,
+                                             Predicate<ScheduledExecutorService> scheduleOverridePredicate) {
     this.delegate = executorService;
     this.scheduleOverridePredicate = scheduleOverridePredicate;
   }
