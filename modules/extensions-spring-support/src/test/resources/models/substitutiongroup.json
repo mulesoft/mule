@@ -247,7 +247,15 @@
       "messageSources": [],
       "name": "config",
       "description": "Default configuration",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "somePojo",
+            "muleSGPojo",
+            "name"
+          ]
+        }
+      }
     }
   ],
   "operations": [],

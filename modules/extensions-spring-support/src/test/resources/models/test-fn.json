@@ -155,7 +155,13 @@
       "messageSources": [],
       "name": "config",
       "description": "Default configuration",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "name"
+          ]
+        }
+      }
     }
   ],
   "operations": [
