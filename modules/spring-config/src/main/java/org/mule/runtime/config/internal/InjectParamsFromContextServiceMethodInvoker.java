@@ -32,7 +32,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 /**
- * A {@link MethodInvoker} to automatically reroute {@link Service} method invokations to {@link Inject} annotated overloads,
+ * A {@link MethodInvoker} to automatically reroute {@link Service} method invocations to {@link Inject} annotated overloads,
  * similar to {@link InjectParamsFromContextServiceProxy}
  *
  * @since 4.2
@@ -40,7 +40,7 @@ import javax.inject.Named;
 public class InjectParamsFromContextServiceMethodInvoker extends DefaultMethodInvoker {
 
   public static final String MANY_CANDIDATES_ERROR_MSG_TEMPLATE =
-      "More than one invocation candidate for for method '%s' in service '%s'";
+      "More than one invocation candidate for method '%s' in service '%s'";
   public static final String NO_OBJECT_FOUND_FOR_PARAM =
       "No object found in the registry for parameter '%s' of method '%s' in service '%s'";
 
@@ -58,8 +58,8 @@ public class InjectParamsFromContextServiceMethodInvoker extends DefaultMethodIn
     checkArgument(registry != null, "registry cannot be null");
 
     this.registry = registry;
-    lookupAllByTypeCache = Caffeine.newBuilder().weakKeys().build(registry::lookupAllByType);
-    lookupByNameCache = Caffeine.newBuilder().weakKeys().build(registry::lookupByName);
+    lookupAllByTypeCache = Caffeine.newBuilder().build(registry::lookupAllByType);
+    lookupByNameCache = Caffeine.newBuilder().build(registry::lookupByName);
   }
 
   @Override

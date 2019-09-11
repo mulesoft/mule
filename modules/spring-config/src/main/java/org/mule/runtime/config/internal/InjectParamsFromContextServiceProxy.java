@@ -41,7 +41,7 @@ import javax.inject.Named;
 public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandler<Service> {
 
   public static final String MANY_CANDIDATES_ERROR_MSG_TEMPLATE =
-      "More than one invocation candidate for for method '%s' in service '%s'";
+      "More than one invocation candidate for method '%s' in service '%s'";
   public static final String NO_OBJECT_FOUND_FOR_PARAM =
       "No object found in the registry for parameter '%s' of method '%s' in service '%s'";
 
@@ -59,8 +59,8 @@ public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandl
     super(service);
     checkArgument(registry != null, "context cannot be null");
     this.registry = registry;
-    lookupAllByTypeCache = Caffeine.newBuilder().weakKeys().build(registry::lookupAllByType);
-    lookupByNameCache = Caffeine.newBuilder().weakKeys().build(registry::lookupByName);
+    lookupAllByTypeCache = Caffeine.newBuilder().build(registry::lookupAllByType);
+    lookupByNameCache = Caffeine.newBuilder().build(registry::lookupByName);
   }
 
   @Override
