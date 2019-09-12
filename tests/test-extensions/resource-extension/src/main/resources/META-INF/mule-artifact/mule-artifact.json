@@ -3,7 +3,7 @@
     "id": "java",
     "attributes": {
       "type": "org.mule.test.resource.extension.ResourceExtension",
-      "version": "${project.version}"
+      "version": "4.2.0-SNAPSHOT"
     }
   },
   "name": "Resource",
