@@ -1854,13 +1854,39 @@
           ],
           "name": "connection",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "abstractShape",
+                "doorInterface",
+                "doors"
+              ]
+            }
+          }
         }
       ],
       "messageSources": [],
       "name": "config",
       "description": "Default configuration",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "abstractShape",
+            "doorInterface",
+            "explicitSquare",
+            "finalPojo",
+            "ricin",
+            "extensibleWeapon",
+            "triangle",
+            "pojoWithExtension",
+            "onePojos",
+            "twoPojos",
+            "weapons",
+            "weaponMap",
+            "name"
+          ]
+        }
+      }
     }
   ],
   "operations": [
@@ -3388,7 +3414,15 @@
       ],
       "name": "connection",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "abstractShape",
+            "doorInterface",
+            "doors"
+          ]
+        }
+      }
     }
   ],
   "messageSources": [

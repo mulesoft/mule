@@ -119,7 +119,13 @@
       "messageSources": [],
       "name": "PearConfig",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "name"
+          ]
+        }
+      }
     },
     {
       "stereotype": {
@@ -3389,7 +3395,18 @@
       },
       "name": "apple-config",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "timeToPeel",
+            "mainProducers",
+            "sample",
+            "shouldNotOverride",
+            "cookBook",
+            "name"
+          ]
+        }
+      }
     },
     {
       "stereotype": {
@@ -6193,7 +6210,13 @@
           ],
           "name": "BananaPlantain",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "originCountry"
+              ]
+            }
+          }
         }
       ],
       "messageSources": [
@@ -6515,7 +6538,18 @@
       ],
       "name": "banana-config",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "timeToPeel",
+            "mainProducers",
+            "sample",
+            "shouldNotOverride",
+            "healthyFood",
+            "name"
+          ]
+        }
+      }
     },
     {
       "stereotype": {
@@ -7336,13 +7370,25 @@
           ],
           "name": "grape-connection",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "veganPolicy"
+              ]
+            }
+          }
         }
       ],
       "messageSources": [],
       "name": "grape",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "name"
+          ]
+        }
+      }
     },
     {
       "stereotype": {
@@ -8011,7 +8057,13 @@
       "messageSources": [],
       "name": "kiwi-config",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "name"
+          ]
+        }
+      }
     },
     {
       "stereotype": {
@@ -8784,7 +8836,13 @@
       ],
       "name": "peach-config",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "name"
+          ]
+        }
+      }
     }
   ],
   "operations": [

@@ -6725,7 +6725,17 @@
           ],
           "name": "connection",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "username",
+                "password",
+                "openingDate",
+                "closedForHolidays",
+                "discountDates"
+              ]
+            }
+          }
         },
         {
           "connectionManagementType": "NONE",
@@ -7656,7 +7666,17 @@
           ],
           "name": "invalid",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "username",
+                "password",
+                "openingDate",
+                "closedForHolidays",
+                "discountDates"
+              ]
+            }
+          }
         },
         {
           "connectionManagementType": "POOLING",
@@ -8801,7 +8821,17 @@
           ],
           "name": "pooled",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "username",
+                "password",
+                "openingDate",
+                "closedForHolidays",
+                "discountDates"
+              ]
+            }
+          }
         },
         {
           "connectionManagementType": "NONE",
@@ -9732,7 +9762,17 @@
           ],
           "name": "transactional",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "username",
+                "password",
+                "openingDate",
+                "closedForHolidays",
+                "discountDates"
+              ]
+            }
+          }
         },
         {
           "connectionManagementType": "NONE",
@@ -10663,7 +10703,17 @@
           ],
           "name": "valid",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "username",
+                "password",
+                "openingDate",
+                "closedForHolidays",
+                "discountDates"
+              ]
+            }
+          }
         }
       ],
       "messageSources": [
@@ -12421,7 +12471,22 @@
       ],
       "name": "config",
       "description": "Default configuration",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "pets",
+            "cage",
+            "cages",
+            "aquarium",
+            "name",
+            "cashierName",
+            "rothIRA",
+            "pensionPlan",
+            "cash",
+            "debt"
+          ]
+        }
+      }
     }
   ],
   "operations": [
@@ -17041,7 +17106,17 @@
       ],
       "name": "connection",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "username",
+            "password",
+            "openingDate",
+            "closedForHolidays",
+            "discountDates"
+          ]
+        }
+      }
     },
     {
       "connectionManagementType": "NONE",
@@ -17972,7 +18047,17 @@
       ],
       "name": "invalid",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "username",
+            "password",
+            "openingDate",
+            "closedForHolidays",
+            "discountDates"
+          ]
+        }
+      }
     },
     {
       "connectionManagementType": "POOLING",
@@ -19117,7 +19202,17 @@
       ],
       "name": "pooled",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "username",
+            "password",
+            "openingDate",
+            "closedForHolidays",
+            "discountDates"
+          ]
+        }
+      }
     },
     {
       "connectionManagementType": "NONE",
@@ -20048,7 +20143,17 @@
       ],
       "name": "transactional",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "username",
+            "password",
+            "openingDate",
+            "closedForHolidays",
+            "discountDates"
+          ]
+        }
+      }
     },
     {
       "connectionManagementType": "NONE",
@@ -20979,7 +21084,17 @@
       ],
       "name": "valid",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "username",
+            "password",
+            "openingDate",
+            "closedForHolidays",
+            "discountDates"
+          ]
+        }
+      }
     }
   ],
   "messageSources": [

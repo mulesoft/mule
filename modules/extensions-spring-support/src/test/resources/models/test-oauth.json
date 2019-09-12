@@ -2015,6 +2015,27 @@
                   "defaultScope": "defaultScope"
                 }
               ]
+            },
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "apiVersion",
+                "display",
+                "immediate",
+                "prompt",
+                "consumerKey",
+                "consumerSecret",
+                "authorizationUrl",
+                "accessTokenUrl",
+                "scopes",
+                "resourceOwnerId",
+                "before",
+                "after",
+                "listenerConfig",
+                "callbackPath",
+                "authorizePath",
+                "externalCallbackUrl",
+                "objectStore"
+              ]
             }
           }
         },
@@ -2835,6 +2856,27 @@
                   "refreshTokenExpr": "#[payload.refresh_token]"
                 }
               ]
+            },
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "apiVersion",
+                "display",
+                "immediate",
+                "prompt",
+                "consumerKey",
+                "consumerSecret",
+                "authorizationUrl",
+                "accessTokenUrl",
+                "scopes",
+                "resourceOwnerId",
+                "before",
+                "after",
+                "listenerConfig",
+                "callbackPath",
+                "authorizePath",
+                "externalCallbackUrl",
+                "objectStore"
+              ]
             }
           }
         }
@@ -2842,7 +2884,13 @@
       "messageSources": [],
       "name": "auth-code",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "name"
+          ]
+        }
+      }
     },
     {
       "stereotype": {
@@ -4476,6 +4524,21 @@
                   "credentialsPlacement": "QUERY_PARAMS"
                 }
               ]
+            },
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "apiVersion",
+                "display",
+                "immediate",
+                "prompt",
+                "knownCustomHeader",
+                "randomHeaders",
+                "clientId",
+                "clientSecret",
+                "tokenUrl",
+                "scopes",
+                "objectStore"
+              ]
             }
           }
         }
@@ -4483,7 +4546,13 @@
       "messageSources": [],
       "name": "client-credentials",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "name"
+          ]
+        }
+      }
     }
   ],
   "operations": [],
