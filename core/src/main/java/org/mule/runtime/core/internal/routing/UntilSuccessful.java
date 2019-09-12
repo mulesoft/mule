@@ -7,7 +7,8 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.util.Collections.singletonList;
-import static java.util.Optional.ofNullable;
+import static java.util.Optional.*;
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
@@ -17,8 +18,10 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.Processor;
@@ -31,6 +34,7 @@ import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -47,17 +51,20 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   private static final String UNTIL_SUCCESSFUL_MSG_PREFIX =
       "'until-successful' retries exhausted. Last exception message was: %s";
-  private static final long DEFAULT_MILLIS_BETWEEN_RETRIES = 60 * 1000;
-  private static final int DEFAULT_RETRIES = 5;
+  private static final String DEFAULT_MILLIS_BETWEEN_RETRIES = "60000";
+  private static final String DEFAULT_RETRIES = "5";
 
   @Inject
   private SchedulerService schedulerService;
 
-  private int maxRetries = DEFAULT_RETRIES;
-  private Long millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
+  @Inject
+  private ExtendedExpressionManager expressionManager;
+
+  private String maxRetries = DEFAULT_RETRIES;
+  private String millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
   private MessageProcessorChain nestedChain;
   private Predicate<CoreEvent> shouldRetry;
-  private RetryPolicyTemplate policyTemplate;
+  private Optional<RetryPolicyTemplate> policyTemplate;
   private Scheduler timer;
   private List<Processor> processors;
 
@@ -70,8 +77,16 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, getRootContainerLocation()), processors);
     super.initialise();
     timer = schedulerService.cpuLightScheduler();
-    policyTemplate =
-        maxRetries != 0 ? new SimpleRetryPolicyTemplate(millisBetweenRetries, maxRetries) : new NoRetryPolicyTemplate();
+    policyTemplate = empty();
+    if (!expressionManager.isExpression(this.maxRetries)) {
+      int maxRetries = Integer.parseInt(this.maxRetries);
+      if (maxRetries == 0) {
+        policyTemplate = of(new NoRetryPolicyTemplate());
+      } else if (!expressionManager.isExpression(this.millisBetweenRetries)) {
+        long millisBetweenRetries = Long.parseLong(this.millisBetweenRetries);
+        policyTemplate = of(new SimpleRetryPolicyTemplate(millisBetweenRetries, maxRetries));
+      }
+    }
     shouldRetry = event -> event.getError().isPresent();
   }
 
@@ -86,12 +101,23 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
     return processToApply(event, this);
   }
 
+  private RetryPolicyTemplate createRetryPolicyTemplate(CoreEvent event) {
+    Integer maxRetries =
+        (Integer) expressionManager.evaluate(this.maxRetries, DataType.NUMBER, NULL_BINDING_CONTEXT, event).getValue();
+    Integer millisBetweenRetries =
+        (Integer) expressionManager.evaluate(this.millisBetweenRetries, DataType.NUMBER, NULL_BINDING_CONTEXT, event).getValue();
+    return new SimpleRetryPolicyTemplate(millisBetweenRetries, maxRetries);
+  }
+
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
         .flatMap(event -> Mono.from(processWithChildContextDontComplete(event, nestedChain, ofNullable(getLocation())))
-            .transform(p -> policyTemplate.applyPolicy(p, getRetryPredicate(), e -> {
-            }, getThrowableFunction(event), timer)));
+            .transform(p -> policyTemplate.orElseGet(() -> createRetryPolicyTemplate(event)).applyPolicy(p, getRetryPredicate(),
+                                                                                                         e -> {
+                                                                                                         },
+                                                                                                         getThrowableFunction(event),
+                                                                                                         timer)));
   }
 
   private Predicate<Throwable> getRetryPredicate() {
@@ -117,7 +143,15 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
    * @return the number of retries to process the route when failing. Default value is 5.
    */
   public int getMaxRetries() {
-    return maxRetries;
+    return (Integer) expressionManager.evaluate(maxRetries, DataType.NUMBER).getValue();
+  }
+
+  /**
+   *
+   * @param maxRetries the number of retries to process the route when failing. Default value is 5.
+   */
+  public void setMaxRetries(final String maxRetries) {
+    this.maxRetries = maxRetries;
   }
 
   /**
@@ -125,21 +159,28 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
    * @param maxRetries the number of retries to process the route when failing. Default value is 5.
    */
   public void setMaxRetries(final int maxRetries) {
-    this.maxRetries = maxRetries;
+    this.maxRetries = String.valueOf(maxRetries);
   }
 
   /**
    * @return the number of milliseconds between retries. Default value is 60000.
    */
   public long getMillisBetweenRetries() {
-    return millisBetweenRetries;
+    return (Integer) expressionManager.evaluate(millisBetweenRetries, DataType.NUMBER).getValue();
   }
 
   /**
    * @param millisBetweenRetries the number of milliseconds between retries. Default value is 60000.
    */
-  public void setMillisBetweenRetries(long millisBetweenRetries) {
+  public void setMillisBetweenRetries(String millisBetweenRetries) {
     this.millisBetweenRetries = millisBetweenRetries;
+  }
+
+  /**
+   * @param millisBetweenRetries the number of milliseconds between retries. Default value is 60000.
+   */
+  public void setMillisBetweenRetries(Long millisBetweenRetries) {
+    this.millisBetweenRetries = String.valueOf(millisBetweenRetries);
   }
 
   /**
