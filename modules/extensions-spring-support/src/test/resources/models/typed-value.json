@@ -822,7 +822,15 @@
       "messageSources": [],
       "name": "config",
       "description": "Default configuration",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "stringTypedValue",
+            "differedDoor",
+            "name"
+          ]
+        }
+      }
     }
   ],
   "operations": [
