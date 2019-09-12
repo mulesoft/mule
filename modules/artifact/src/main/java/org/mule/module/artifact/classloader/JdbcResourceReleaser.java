@@ -6,13 +6,13 @@
  */
 package org.mule.module.artifact.classloader;
 
-import static java.beans.Introspector.flushCaches;
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
-import static org.mule.module.artifact.classloader.ThreadGroupContextClassLoaderSoftReferenceBuster.bustSoftReferences;
+
+import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -31,18 +30,19 @@ import java.util.concurrent.ThreadPoolExecutor;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default implementation used for every artifact created on the container.
+ * ReousrceReleaser implementation used for every artifact created on the container that is loaded dynamically as it has
+ * to use {@link java.sql.DriverManager} to unregister {@link Driver} registered by the artifact class loader.
+ * <p>
  * <p/>
  * IMPORTANT: this class is on a different package than the rest of the classes in this module. The reason of that is that this
  * class must be loaded by each artifact class loader that is being disposed. So, it cannot contain any of the prefixes that force
  * a class to be loaded from the container.
  */
-public class DefaultResourceReleaser implements ResourceReleaser {
+public class JdbcResourceReleaser implements ResourceReleaser {
 
   public static final String DIAGNOSABILITY_BEAN_NAME = "diagnosability";
   private final transient Logger logger = LoggerFactory.getLogger(getClass());
@@ -52,32 +52,6 @@ public class DefaultResourceReleaser implements ResourceReleaser {
   @Override
   public void release() {
     deregisterJdbcDrivers();
-
-    shutdownAwsIdleConnectionReaperThread();
-
-    cleanUpResourceBundle();
-
-    clearClassLoaderSoftkeys();
-  }
-
-  private void cleanUpResourceBundle() {
-    try {
-      ResourceBundle.clearCache(this.getClass().getClassLoader());
-    } catch (Exception e) {
-      logger.warn("Couldn't clean up ResourceBundle. This can cause a memory leak.", e);
-    }
-  }
-
-  private void clearClassLoaderSoftkeys() {
-    try {
-      flushCaches();
-      bustSoftReferences(getClass().getClassLoader());
-      // This is added to prompt a gc in the JVM if possible
-      // to release the softkeys recently cleared in the caches.
-      System.gc();
-    } catch (Exception e) {
-      logger.warn("Couldn't clear soft keys in caches. This can cause a classloader memory leak.", e);
-    }
   }
 
   private void deregisterJdbcDrivers() {
@@ -101,7 +75,7 @@ public class DefaultResourceReleaser implements ResourceReleaser {
   /**
    * @param driver the JDBC driver to check its {@link ClassLoader} for.
    * @return {@code true} if the {@link ClassLoader} of the driver is a descendant of the {@link ClassLoader} of this releaser,
-   *         {@code false} otherwise.
+   * {@code false} otherwise.
    */
   private boolean isDriverLoadedByThisClassLoader(Driver driver) {
     ClassLoader driverClassLoader = driver.getClass().getClassLoader();
@@ -226,7 +200,7 @@ public class DefaultResourceReleaser implements ResourceReleaser {
   /**
    * Cleans a reference existing from the cleanupThread's class to a lambda-created-threadPoolExecutor, which retains a reference
    * to the DB connector artifact classLoader.
-   * 
+   *
    * @param cleanupThreadsClass The AbandonedConnectionCleanupThread class object
    */
   private void cleanMySqlCleanupThreadsThreadFactory(Class<?> cleanupThreadsClass) {
@@ -257,7 +231,7 @@ public class DefaultResourceReleaser implements ResourceReleaser {
 
   /**
    * Sends a shutdown message to MySql's connection cleanup thread class.
-   * 
+   *
    * @param classAbandonedConnectionCleanupThread
    * @throws IllegalAccessException
    * @throws InvocationTargetException
@@ -276,11 +250,10 @@ public class DefaultResourceReleaser implements ResourceReleaser {
 
   /**
    * Tries to find the MySql driver AbandonedConnectionCleanupThread class, with the known class addresses.
-   * 
+   *
    * @return The MySql driver AbandonedConnectionCleanupThread class object, if found.
    */
   private Class<?> findMySqlDriverClass() throws ClassNotFoundException {
-    Class<?> foundClass = null;
     for (String knownCleanupThreadClassAddress : CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES) {
       try {
         return this.getClass().getClassLoader().loadClass(knownCleanupThreadClassAddress);
@@ -289,46 +262,6 @@ public class DefaultResourceReleaser implements ResourceReleaser {
       }
     }
     throw new ClassNotFoundException("No MySql's AbandonedConnectionCleanupThread class was found");
-  }
-
-  /**
-   * Shutdowns the AWS IdleConnectionReaper Thread if one is present, since it will cause a leak if not closed correctly.
-   */
-  private void shutdownAwsIdleConnectionReaperThread() {
-
-    Class<?> idleConnectionReaperClass;
-    try {
-      idleConnectionReaperClass = this.getClass().getClassLoader().loadClass("com.amazonaws.http.IdleConnectionReaper");
-      try {
-        Method registeredManagersMethod = idleConnectionReaperClass.getMethod("getRegisteredConnectionManagers");
-        List<Object> httpClientConnectionManagers = (List<Object>) registeredManagersMethod.invoke(null);
-        if (httpClientConnectionManagers.isEmpty()) {
-          return;
-        }
-
-        Class<?> httpClientConnectionManagerClass =
-            this.getClass().getClassLoader().loadClass("org.apache.http.conn.HttpClientConnectionManager");
-        Method removeConnectionManager =
-            idleConnectionReaperClass.getMethod("removeConnectionManager", httpClientConnectionManagerClass);
-        for (Object connectionManager : httpClientConnectionManagers) {
-          boolean removed = (boolean) removeConnectionManager.invoke(null, connectionManager);
-          if (!removed && logger.isDebugEnabled()) {
-            logger
-                .debug(format("Unable to unregister HttpClientConnectionManager instance [%s] associated to AWS's IdleConnectionReaperThread",
-                              connectionManager));
-          }
-        }
-
-      } finally {
-        Method shutdown = idleConnectionReaperClass.getMethod("shutdown");
-        shutdown.invoke(null);
-      }
-
-    } catch (ClassNotFoundException | NoSuchMethodException | IllegalArgumentException e) {
-      // If the class or method is not found, there is nothing to dispose
-    } catch (SecurityException | IllegalAccessException | InvocationTargetException e) {
-      logger.warn("Unable to shutdown AWS's IdleConnectionReaperThread, an error occurred: " + e.getMessage(), e);
-    }
   }
 
 }

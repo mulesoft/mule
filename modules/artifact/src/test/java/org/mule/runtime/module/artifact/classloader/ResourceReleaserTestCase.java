@@ -14,6 +14,7 @@ import static java.util.Collections.list;
 import static java.util.Locale.getDefault;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -22,7 +23,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
-import org.mule.module.artifact.classloader.DefaultResourceReleaser;
+import org.mule.module.artifact.classloader.JdbcResourceReleaser;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
@@ -60,6 +61,35 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void jdbcResourceReleaserShouldNotBeCreatedIfDriverIsNotLoaded() {
+    TestArtifactClassLoader testArtifactClassLoader = new TestArtifactClassLoader(currentThread().getContextClassLoader());
+    testArtifactClassLoader.setResourceReleaserClassLocation(TEST_RESOURCE_RELEASER_CLASS_LOCATION);
+    testArtifactClassLoader.dispose();
+
+    // We must call the getClassLoader method from TestResourceReleaser dynamically in order to not load the
+    // class by the current class loader, if not a java.lang.LinkageError is raised.
+    ResourceReleaser jdbcResourceReleaserInstance =
+        ((KeepResourceReleaserInstance) testArtifactClassLoader).getResourceReleaserInstance();
+    assertThat(jdbcResourceReleaserInstance, is(nullValue()));
+  }
+
+  @Test
+  public void jdbcResourceReleaserShouldNotBeCreatedIfDriverInterfaceIsLoaded() throws ClassNotFoundException {
+    TestArtifactClassLoader testArtifactClassLoader = new TestArtifactClassLoader(currentThread().getContextClassLoader());
+    testArtifactClassLoader.setResourceReleaserClassLocation(TEST_RESOURCE_RELEASER_CLASS_LOCATION);
+    // Have to force run the jdbc resource releaser by loading a class that is assignable to Driver
+    testArtifactClassLoader.loadClass(Driver.class.getName());
+
+    testArtifactClassLoader.dispose();
+
+    // We must call the getClassLoader method from TestResourceReleaser dynamically in order to not load the
+    // class by the current class loader, if not a java.lang.LinkageError is raised.
+    ResourceReleaser jdbcResourceReleaserInstance =
+        ((KeepResourceReleaserInstance) testArtifactClassLoader).getResourceReleaserInstance();
+    assertThat(jdbcResourceReleaserInstance, is(nullValue()));
+  }
+
+  @Test
   public void notDeregisterJdbcDriversDifferentClassLoaders() throws Exception {
     Driver jdbcDriver = mock(Driver.class);
     TestArtifactClassLoader classLoader =
@@ -82,13 +112,17 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
     registerDriver(jdbcDriver);
 
     assertThat(list(getDrivers()), hasItem(jdbcDriver));
-    new DefaultResourceReleaser().release();
+    new JdbcResourceReleaser().release();
     assertThat(list(getDrivers()), not(hasItem(jdbcDriver)));
   }
 
   private void ensureResourceReleaserIsCreatedByCorrectClassLoader(MuleArtifactClassLoader classLoader) throws Exception {
     assertThat(classLoader.getClass().getClassLoader(), is(currentThread().getContextClassLoader()));
     classLoader.setResourceReleaserClassLocation(TEST_RESOURCE_RELEASER_CLASS_LOCATION);
+
+    // Have to force run the jdbc resource releaser by loading a class that is assignable to Driver
+    classLoader.loadClass(TestDriver.class.getName());
+
     classLoader.dispose();
 
     // We must call the getClassLoader method from TestResourceReleaser dynamically in order to not load the
@@ -104,7 +138,7 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
   public void cleanUpResourcesBundleFromDisposedClassLoader() throws Exception {
     TestArtifactClassLoader classLoader =
         new TestArtifactClassLoader(new TestArtifactClassLoader(currentThread().getContextClassLoader()));
-    String resourceReleaserClassLocation = "/".concat(DefaultResourceReleaser.class.getName().replace(".", "/")).concat(".class");
+    String resourceReleaserClassLocation = "/".concat(JdbcResourceReleaser.class.getName().replace(".", "/")).concat(".class");
     classLoader.setResourceReleaserClassLocation(resourceReleaserClassLocation);
 
     Field cacheListField = ResourceBundle.class.getDeclaredField("cacheList");

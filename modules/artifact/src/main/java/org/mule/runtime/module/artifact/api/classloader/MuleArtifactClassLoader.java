@@ -15,6 +15,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.sql.Driver;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -47,13 +49,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private static final Logger LOGGER = getLogger(MuleArtifactClassLoader.class);
 
   private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION =
-      "/org/mule/module/artifact/classloader/DefaultResourceReleaser.class";
-
-  private static final String THREAD_GROUP_CONTEXT_CLASSLOADER_SOFT_REFERENCE_BUSTER_CLASS_LOCATION =
-      "/org/mule/module/artifact/classloader/ThreadGroupContextClassLoaderSoftReferenceBuster.class";
-
-  private static final String MULE_SOFT_REFERENCE_BUSTER_EXCEPTION_CLASS_LOCATION =
-      "/org/mule/module/artifact/classloader/MuleSoftReferenceBusterException.class";
+      "/org/mule/module/artifact/classloader/JdbcResourceReleaser.class";
 
   static final Pattern DOT_REPLACEMENT_PATTERN = Pattern.compile("\\.");
   static final String PATH_SEPARATOR = "/";
@@ -98,10 +94,9 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private final Object localResourceLocatorLock = new Object();
   private volatile LocalResourceLocator localResourceLocator;
   private String resourceReleaserClassLocation = DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION;
-  private String threadGroupContextClassLoaderSoftReferenceBusterLocation =
-      THREAD_GROUP_CONTEXT_CLASSLOADER_SOFT_REFERENCE_BUSTER_CLASS_LOCATION;
-  private String muleSoftReferenceBusterExceptionLocation = MULE_SOFT_REFERENCE_BUSTER_EXCEPTION_CLASS_LOCATION;
-  private ResourceReleaser resourceReleaserInstance;
+  private ResourceReleaser classLoaderReferenceReleaser;
+  private volatile boolean shouldReleaseJdbcReferences = false;
+  private ResourceReleaser jdbcResourceReleaserInstance;
   private ArtifactDescriptor artifactDescriptor;
   private final Object descriptorMappingLock = new Object();
   private Map<BundleDescriptor, URLClassLoader> descriptorMapping = new HashMap<>();
@@ -122,6 +117,8 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     checkArgument(artifactDescriptor != null, "artifactDescriptor cannot be null");
     this.artifactId = artifactId;
     this.artifactDescriptor = artifactDescriptor;
+
+    this.classLoaderReferenceReleaser = new ClassLoaderResourceReleaser(this);
   }
 
   @Override
@@ -253,6 +250,15 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   }
 
   @Override
+  protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+    Class<?> clazz = super.loadClass(name, resolve);
+    if (!shouldReleaseJdbcReferences && !clazz.equals(Driver.class) && Driver.class.isAssignableFrom(clazz)) {
+      shouldReleaseJdbcReferences = true;
+    }
+    return clazz;
+  }
+
+  @Override
   public Class<?> loadInternalClass(String name) throws ClassNotFoundException {
     return loadClass(name);
   }
@@ -281,13 +287,26 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
       }
     });
     descriptorMapping.clear();
+
     try {
-      createResourceReleaserInstance().release();
+      clearReferences();
     } catch (Exception e) {
-      LOGGER.error("Cannot create resource releaser instance", e);
+      reportPossibleLeak(e, artifactId);
+    }
+
+    try {
+      if (shouldReleaseJdbcReferences) {
+        createResourceReleaserInstance().release();
+      }
+    } catch (Exception e) {
+      reportPossibleLeak(e, artifactId);
     }
     super.dispose();
     shutdownListeners();
+  }
+
+  private void clearReferences() {
+    classLoaderReferenceReleaser.release();
   }
 
   void reportPossibleLeak(Exception e, String artifactId) {
@@ -312,7 +331,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     shutdownListeners.clear();
   }
 
-  private <T> T createCustomInstance(String classLocation) {
+  private <T> T createInstance(String classLocation) {
     try {
       Class clazz = createClass(classLocation);
       return (T) clazz.newInstance();
@@ -325,14 +344,10 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
    * Creates a {@link ResourceReleaser} using this classloader, only used outside in unit tests.
    */
   protected ResourceReleaser createResourceReleaserInstance() {
-    if (resourceReleaserInstance == null) {
-      // These classes are needed so that the resource releaser finds them in the
-      // classpath.
-      createClass(threadGroupContextClassLoaderSoftReferenceBusterLocation);
-      createClass(muleSoftReferenceBusterExceptionLocation);
-      resourceReleaserInstance = createCustomInstance(resourceReleaserClassLocation);
+    if (jdbcResourceReleaserInstance == null) {
+      jdbcResourceReleaserInstance = createInstance(resourceReleaserClassLocation);
     }
-    return resourceReleaserInstance;
+    return jdbcResourceReleaserInstance;
   }
 
   public void setResourceReleaserClassLocation(String resourceReleaserClassLocation) {
