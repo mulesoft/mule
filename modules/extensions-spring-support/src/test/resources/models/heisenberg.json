@@ -10274,7 +10274,15 @@
           ],
           "name": "connection",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "saulPhoneNumber",
+                "fullyBald",
+                "beardTrimming"
+              ]
+            }
+          }
         },
         {
           "connectionManagementType": "NONE",
@@ -11140,7 +11148,15 @@
           ],
           "name": "secure",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "saulPhoneNumber",
+                "fullyBald",
+                "beardTrimming"
+              ]
+            }
+          }
         }
       ],
       "messageSources": [
@@ -17131,7 +17147,44 @@
       },
       "name": "config",
       "description": "Default configuration",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "familyInformations",
+            "enemies",
+            "monthlyIncomes",
+            "cancer",
+            "recipe",
+            "deathsBySeasons",
+            "money",
+            "weapon",
+            "wildCardWeapons",
+            "wildCards",
+            "weaponValueMap",
+            "candidateDoors",
+            "initialHealth",
+            "finalHealth",
+            "labAddress",
+            "firstEndevour",
+            "healthProgressions",
+            "name",
+            "labeledRicin",
+            "nextDoor",
+            "ricinPacks",
+            "myName",
+            "age",
+            "dateOfConception",
+            "dateOfBirth",
+            "dateOfDeath",
+            "dateOfGraduation",
+            "knownAddresses",
+            "fullyBald",
+            "beardTrimming",
+            "worksAtDEA",
+            "lovesMinerals"
+          ]
+        }
+      }
     }
   ],
   "operations": [
@@ -29605,7 +29658,15 @@
       ],
       "name": "connection",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "saulPhoneNumber",
+            "fullyBald",
+            "beardTrimming"
+          ]
+        }
+      }
     },
     {
       "connectionManagementType": "NONE",
@@ -30471,7 +30532,15 @@
       ],
       "name": "secure",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "saulPhoneNumber",
+            "fullyBald",
+            "beardTrimming"
+          ]
+        }
+      }
     }
   ],
   "messageSources": [

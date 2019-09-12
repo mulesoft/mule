@@ -1734,13 +1734,28 @@
           ],
           "name": "rick-and-morty-connection",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "wsdlUrl",
+                "service",
+                "port",
+                "transport"
+              ]
+            }
+          }
         }
       ],
       "messageSources": [],
       "name": "config",
       "description": "Default configuration",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "name"
+          ]
+        }
+      }
     }
   ],
   "operations": [],

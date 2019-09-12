@@ -15958,7 +15958,15 @@
       ],
       "name": "config",
       "description": "Default configuration",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "data",
+            "dataWithDefault",
+            "name"
+          ]
+        }
+      }
     }
   ],
   "operations": [

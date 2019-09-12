@@ -4107,7 +4107,13 @@
           ],
           "name": "connection",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "useXa"
+              ]
+            }
+          }
         },
         {
           "connectionManagementType": "NONE",
@@ -4391,7 +4397,13 @@
           ],
           "name": "non-pooling",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "useXa"
+              ]
+            }
+          }
         }
       ],
       "messageSources": [
@@ -5567,7 +5579,13 @@
       ],
       "name": "config",
       "description": "Default configuration",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "name"
+          ]
+        }
+      }
     }
   ],
   "operations": [
@@ -6112,7 +6130,13 @@
       ],
       "name": "connection",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "useXa"
+          ]
+        }
+      }
     },
     {
       "connectionManagementType": "NONE",
@@ -6396,7 +6420,13 @@
       ],
       "name": "non-pooling",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "useXa"
+          ]
+        }
+      }
     }
   ],
   "messageSources": [],
