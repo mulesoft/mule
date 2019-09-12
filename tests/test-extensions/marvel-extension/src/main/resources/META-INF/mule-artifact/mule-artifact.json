@@ -2,23 +2,19 @@
   "extensionModelLoaderDescriptor": {
     "id": "java",
     "attributes": {
-      "type": "org.mule.test.resource.extension.ResourceExtension",
+      "type": "org.mule.test.marvel.MarvelExtension",
       "version": "${project.version}"
     }
   },
-  "name": "Resource",
+  "name": "${project.artifactId}",
   "requiredProduct": "MULE",
   "classLoaderModelLoaderDescriptor": {
     "id": "mule",
     "attributes": {
       "privilegedExportedPackages": [],
       "privilegedArtifactIds": [],
-      "exportedPackages": [
-        "org.mule.test.resource.extension"
-      ],
-      "exportedResources": [
-        "stuff.json"
-      ]
+      "exportedPackages": [],
+      "exportedResources": []
     }
   },
   "bundleDescriptorLoader": {
