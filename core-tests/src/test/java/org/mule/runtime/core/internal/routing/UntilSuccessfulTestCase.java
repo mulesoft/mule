@@ -208,6 +208,20 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     assertEquals(60 * 1000, untilSuccessful.getMillisBetweenRetries());
   }
 
+  @Test
+  public void testWithExpressionRetries() throws Exception {
+    targetMessageProcessor.setNumberOfFailuresToSimulate(4);
+    untilSuccessful.setMaxRetries("#[2 + 2]");
+    untilSuccessful.initialise();
+    untilSuccessful.start();
+
+
+    final CoreEvent testEvent = eventBuilder(muleContext).message(of("ERROR")).build();
+    assertSame(testEvent.getMessage(), untilSuccessful.process(testEvent).getMessage());
+    assertTargetEventReceived(testEvent);
+    assertEquals(targetMessageProcessor.getEventCount(), 5);
+  }
+
   private void assertTargetEventReceived(CoreEvent request) throws MuleException {
     assertThat(targetMessageProcessor.getEventReceived(), not(nullValue()));
     assertLogicallyEqualEvents(request, targetMessageProcessor.getEventReceived());
