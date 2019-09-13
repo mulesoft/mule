@@ -138,7 +138,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private SourceAdapter sourceAdapter;
   private RetryPolicyTemplate retryPolicyTemplate;
   private Scheduler retryScheduler;
-  // FlowConstruct is obtained when needed because during MUnit's tooling tests this should never be evaluated.
+  // FlowConstruct is obtained when needed because during MUnit's tooling tests and Lazy Init mode this should never be evaluated.
   private LazyValue<FlowConstruct> flowConstruct;
   private MessageProcessContext messageProcessContext;
 
