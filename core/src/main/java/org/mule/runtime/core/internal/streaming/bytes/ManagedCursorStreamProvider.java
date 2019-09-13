@@ -32,7 +32,6 @@ public class ManagedCursorStreamProvider extends ManagedCursorProvider<CursorStr
    */
   @Override
   protected CursorStream managedCursor(CursorStream cursor) {
-    return new ManagedCursorDecorator(cursor, getJanitor());
+    return new ManagedCursorStreamDecorator(this, cursor, getJanitor());
   }
-
 }
