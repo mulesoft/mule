@@ -10,7 +10,6 @@ import static com.google.common.collect.ImmutableMap.copyOf;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -139,7 +138,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private SourceAdapter sourceAdapter;
   private RetryPolicyTemplate retryPolicyTemplate;
   private Scheduler retryScheduler;
-  private FlowConstruct flowConstruct;
+  // FlowConstruct is obtained when needed because during MUnit's tooling tests this should never be evaluated.
+  private LazyValue<FlowConstruct> flowConstruct;
   private MessageProcessContext messageProcessContext;
 
   private NotificationDispatcher notificationDispatcher;
@@ -482,8 +482,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       }
 
       @Override
-      public Optional<FlowConstruct> getFlowConstruct() {
-        return ofNullable(flowConstruct);
+      public FlowConstruct getFlowConstruct() {
+        return flowConstruct.get();
       }
     };
   }
@@ -563,9 +563,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Override
   protected void doInitialise() throws InitialisationException {
-    componentLocator.find(getRootContainerLocation())
-        .filter(comp -> comp instanceof FlowConstruct)
-        .ifPresent(comp -> flowConstruct = (FlowConstruct) comp);
+    flowConstruct = new LazyValue<>(() -> (FlowConstruct) componentLocator.find(getRootContainerLocation()).orElse(null));
     messageProcessContext = createProcessingContext();
     if (shouldRunOnThisNode()) {
       reallyDoInitialise();
