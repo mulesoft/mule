@@ -225,6 +225,20 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
+  public void testWithExpressionRetriesMultipleExecutions() throws Exception {
+    targetMessageProcessor.setNumberOfFailuresToSimulate(2);
+    untilSuccessful.setMaxRetries("#[payload + 2]");
+    untilSuccessful.initialise();
+    untilSuccessful.start();
+
+
+    final CoreEvent testEvent = eventBuilder(muleContext).message(of(4)).build();
+    assertSame(testEvent.getMessage(), untilSuccessful.process(testEvent).getMessage());
+    assertSame(testEvent.getMessage(), untilSuccessful.process(testEvent).getMessage());
+    assertEquals(targetMessageProcessor.getEventCount(), 4);
+  }
+
+  @Test
   public void testWithExpressionRetriesUsingPayload() throws Exception {
     targetMessageProcessor.setNumberOfFailuresToSimulate(10);
     untilSuccessful.setMaxRetries("#[payload + 2]");

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -18,11 +19,14 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.getPr
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static reactor.core.publisher.Flux.from;
+
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
@@ -67,6 +71,8 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   private MessageProcessorChain nestedChain;
   private Predicate<CoreEvent> shouldRetry;
   private Optional<RetryPolicyTemplate> policyTemplate;
+  private LoadingCache<Pair<Integer, Integer>, RetryPolicyTemplate> policyTemplatesCache =
+      newBuilder().build(p -> new SimpleRetryPolicyTemplate(p.getFirst(), p.getSecond()));
   private Scheduler timer;
   private List<Processor> processors;
 
@@ -108,7 +114,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
         (Integer) expressionManager.evaluate(this.maxRetries, DataType.NUMBER, NULL_BINDING_CONTEXT, event).getValue();
     Integer millisBetweenRetries =
         (Integer) expressionManager.evaluate(this.millisBetweenRetries, DataType.NUMBER, NULL_BINDING_CONTEXT, event).getValue();
-    return new SimpleRetryPolicyTemplate(millisBetweenRetries, maxRetries);
+    return this.policyTemplatesCache.get(new Pair<>(millisBetweenRetries, maxRetries));
   }
 
   @Override
