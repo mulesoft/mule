@@ -94,6 +94,9 @@ public class MySqlDriverLookupTestCase extends AbstractMuleTestCase {
                                     new URL[] {ClassUtils.getResource(mySqlDriverJarname, this.getClass())},
                                     currentThread().getContextClassLoader(), testLookupPolicy)) {
       artifactClassLoader.setResourceReleaserClassLocation(MYSQL_RESOURCE_RELEASER_CLASS_LOCATION);
+      // Force to load a Driver class so the jdbc resource releaser is created and executed
+      artifactClassLoader.loadClass(TestDriver.class.getName());
+
       artifactClassLoader.dispose();
       assertThat(foundClassname, is(classnameBeingTested));
     }
