@@ -10,6 +10,7 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.core.internal.streaming.CursorProviderJanitor;
+import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -25,6 +26,15 @@ class ManagedCursorIterator<T> implements CursorIterator<T> {
   private final CursorIterator<T> delegate;
   private final CursorProviderJanitor janitor;
 
+  /**
+   * Creates a new instance. Notice that it receives a {@code managedCursorProvider} so that a hard reference is kept
+   * during the lifespan of this cursor. This prevents the {@link StreamingGhostBuster} from closing the provider in corner
+   * cases in which this cursor is still referenced but the provider is not.
+   *
+   * @param managedCursorIteratorProvider the managed provider that opened this cursor
+   * @param delegate                      the delegate cursor
+   * @param janitor                       the cursor's janitor object
+   */
   ManagedCursorIterator(ManagedCursorIteratorProvider managedCursorIteratorProvider,
                         CursorIterator<T> delegate,
                         CursorProviderJanitor janitor) {
