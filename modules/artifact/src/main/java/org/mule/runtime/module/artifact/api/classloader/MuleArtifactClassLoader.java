@@ -9,6 +9,7 @@ package org.mule.runtime.module.artifact.api.classloader;
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
+import static java.lang.reflect.Modifier.isAbstract;
 import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -252,7 +253,8 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   @Override
   protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
     Class<?> clazz = super.loadClass(name, resolve);
-    if (!shouldReleaseJdbcReferences && !clazz.equals(Driver.class) && Driver.class.isAssignableFrom(clazz)) {
+    if (!shouldReleaseJdbcReferences && Driver.class.isAssignableFrom(clazz) &&
+        !(clazz.equals(Driver.class) || clazz.isInterface() || isAbstract(clazz.getModifiers()))) {
       shouldReleaseJdbcReferences = true;
     }
     return clazz;

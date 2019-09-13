@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * ReousrceReleaser implementation used for every artifact created on the container that is loaded dynamically as it has
+ * ResourceReleaser implementation used for every artifact created on the container that is loaded dynamically as it has
  * to use {@link java.sql.DriverManager} to unregister {@link Driver} registered by the artifact class loader.
  * <p>
  * <p/>

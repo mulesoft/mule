@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * ResourceReleaser implementation that references to the artifact class laoder to clean up any reference before the class
+ * ResourceReleaser implementation that references to the artifact class loader to clean up any reference before the class
  * loader is disposed in order to prevent leaks.
  */
 public class ClassLoaderResourceReleaser implements ResourceReleaser {

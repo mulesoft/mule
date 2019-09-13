@@ -77,8 +77,10 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
   public void jdbcResourceReleaserShouldNotBeCreatedIfDriverInterfaceIsLoaded() throws ClassNotFoundException {
     TestArtifactClassLoader testArtifactClassLoader = new TestArtifactClassLoader(currentThread().getContextClassLoader());
     testArtifactClassLoader.setResourceReleaserClassLocation(TEST_RESOURCE_RELEASER_CLASS_LOCATION);
-    // Have to force run the jdbc resource releaser by loading a class that is assignable to Driver
+
     testArtifactClassLoader.loadClass(Driver.class.getName());
+    testArtifactClassLoader.loadClass(TestAbstractDriver.class.getName());
+    testArtifactClassLoader.loadClass(TestInterfaceDriver.class.getName());
 
     testArtifactClassLoader.dispose();
 
@@ -131,7 +133,7 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
     Method getClassLoaderMethod = resourceReleaserInstance.getClass().getMethod("getClassLoader");
     ClassLoader resourceReleaserInstanceClassLoader = (ClassLoader) getClassLoaderMethod.invoke(resourceReleaserInstance);
 
-    assertThat(resourceReleaserInstanceClassLoader, is((ClassLoader) classLoader));
+    assertThat(resourceReleaserInstanceClassLoader, is(classLoader));
   }
 
   @Test
