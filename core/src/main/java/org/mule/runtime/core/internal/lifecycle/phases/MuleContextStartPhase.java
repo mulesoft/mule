@@ -10,6 +10,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.service.Service;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
@@ -52,6 +53,7 @@ public class MuleContextStartPhase extends DefaultLifecyclePhase {
     setIgnoredObjectTypes(ignoredObjects);
     setOrderedLifecycleTypes(new Class<?>[] {
         QueueManager.class,
+        ObjectStore.class,
         ConfigurationProvider.class,
         Config.class,
         LegacyConnector.class,
