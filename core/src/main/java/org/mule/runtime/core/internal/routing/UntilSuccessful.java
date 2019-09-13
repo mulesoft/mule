@@ -85,6 +85,10 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, getRootContainerLocation()), processors);
     super.initialise();
     timer = schedulerService.cpuLightScheduler();
+
+    // In case both 'maxRetries' and 'millisBetweenRetries' are not expressions (or just 'maxRetries' is 0), then
+    // there is no need to calculate expressions each time, so we create the (unique) RetryPolicyTemplate here
+    // In other case, then the policy template will be calculated each time (using the policyTemplatesCache)
     policyTemplate = empty();
     if (!expressionManager.isExpression(this.maxRetries)) {
       int maxRetries = Integer.parseInt(this.maxRetries);
