@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.routing;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -29,6 +30,7 @@ import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -171,7 +173,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     try {
       untilSuccessful.process(testEvent);
     } finally {
-      assertEquals(1 + untilSuccessful.getMaxRetries(), targetMessageProcessor.getEventCount());
+      assertEquals(1 + Integer.parseInt(untilSuccessful.getMaxRetries()), targetMessageProcessor.getEventCount());
     }
   }
 
@@ -184,7 +186,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     final CoreEvent testEvent = eventBuilder(muleContext).message(of("ERROR")).build();
     assertSame(testEvent.getMessage(), untilSuccessful.process(testEvent).getMessage());
     assertTargetEventReceived(testEvent);
-    assertEquals(targetMessageProcessor.getEventCount(), untilSuccessful.getMaxRetries() + 1);
+    assertEquals(targetMessageProcessor.getEventCount(), Integer.parseInt(untilSuccessful.getMaxRetries()) + 1);
   }
 
   @Test
@@ -205,7 +207,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful = buildUntilSuccessful(null);
     untilSuccessful.initialise();
     untilSuccessful.start();
-    assertEquals(60 * 1000, untilSuccessful.getMillisBetweenRetries());
+    assertEquals(60 * 1000, Integer.parseInt(untilSuccessful.getMillisBetweenRetries()));
   }
 
   @Test
@@ -236,6 +238,19 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     } finally {
       assertEquals(targetMessageProcessor.getEventCount(), 4);
     }
+  }
+
+  @Test
+  public void testWithWrongExpressionRetry() throws Exception {
+    targetMessageProcessor.setNumberOfFailuresToSimulate(10);
+    untilSuccessful.setMaxRetries("#[payload + 2]");
+    untilSuccessful.initialise();
+    untilSuccessful.start();
+
+    final CoreEvent testEvent = eventBuilder(muleContext).message(of("queso")).build();
+    expected.expect(ExpressionRuntimeException.class);
+    expected.expectMessage(containsString("You called the function '+' with these arguments"));
+    untilSuccessful.process(testEvent);
   }
 
   private void assertTargetEventReceived(CoreEvent request) throws MuleException {
