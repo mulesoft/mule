@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
-import org.mule.module.artifact.classloader.DefaultResourceReleaser;
+import org.mule.module.artifact.classloader.JdbcResourceReleaser;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class MySqlTestResourceReleaser extends DefaultResourceReleaser {
+public class MySqlTestResourceReleaser extends JdbcResourceReleaser {
 
   public MySqlTestResourceReleaser() {}
 
