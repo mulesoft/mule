@@ -396,6 +396,13 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
 
   static Domain getApplicationDomain(DomainRepository domainRepository, ApplicationDescriptor descriptor)
       throws DomainNotFoundException, IncompatibleDomainException, AmbiguousDomainReferenceException {
+    Domain resolvedDomain = resolveApplicationDomain(domainRepository, descriptor);
+    descriptor.setDomainName(resolvedDomain.getDescriptor().getName());
+    return resolvedDomain;
+  }
+
+  private static Domain resolveApplicationDomain(DomainRepository domainRepository, ApplicationDescriptor descriptor)
+      throws DomainNotFoundException, IncompatibleDomainException, AmbiguousDomainReferenceException {
     String configuredDomainName = descriptor.getDomainName();
     Optional<BundleDescriptor> domainBundleDescriptor = descriptor.getDomainDescriptor();
 

@@ -6,7 +6,12 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.reset;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 
@@ -33,6 +38,9 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
 
   private final ApplicationFileBuilder appReferencingDefaultDomainFileBuilder = new ApplicationFileBuilder("app-with-default-ref")
       .definedBy("empty-config.xml").deployedWith("domain", "default");
+
+  private final ApplicationFileBuilder defaultDomainAppFileBuilder = new ApplicationFileBuilder("default-domain-app")
+      .definedBy("empty-config.xml");
 
   private final ApplicationFileBuilder incompatibleDomainNameAppFileBuilder = new ApplicationFileBuilder("bad-domain-app-ref")
       .definedBy("empty-config.xml").dependingOn(emptyDomain101FileBuilder)
@@ -165,5 +173,47 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
 
     addExplodedAppFromBuilder(appWithDomainNameButMissingBundleDescriptor, appWithDomainNameButMissingBundleDescriptor.getId());
     assertDeploymentFailure(applicationDeploymentListener, appWithDomainNameButMissingBundleDescriptor.getId());
+  }
+
+  @Test
+  public void defaultDomainNameIsSetAfterDeployment() throws Exception {
+    startDeployment();
+
+    addExplodedAppFromBuilder(defaultDomainAppFileBuilder, defaultDomainAppFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, defaultDomainAppFileBuilder.getId());
+
+    Application application = findApp(defaultDomainAppFileBuilder.getId(), 1);
+    ApplicationDescriptor applicationDescriptor = application.getDescriptor();
+    assertThat(applicationDescriptor.getDomainName(), is(DEFAULT_DOMAIN_NAME));
+  }
+
+  @Test
+  public void domainNameIsSetAfterDeployment() throws Exception {
+    startDeployment();
+
+    addExplodedDomainFromBuilder(emptyDomain101FileBuilder, emptyDomain101FileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomain101FileBuilder.getId());
+
+    addExplodedAppFromBuilder(appDependingOnDomain101FileBuilder, appDependingOnDomain101FileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, appDependingOnDomain101FileBuilder.getId());
+
+    Application application = findApp(appDependingOnDomain101FileBuilder.getId(), 1);
+    ApplicationDescriptor applicationDescriptor = application.getDescriptor();
+    assertThat(applicationDescriptor.getDomainName(), is(emptyDomain101FileBuilder.getId()));
+  }
+
+  @Test
+  public void compatibleDomainNameIsSetAfterDeployment() throws Exception {
+    startDeployment();
+
+    addExplodedDomainFromBuilder(emptyDomain101FileBuilder, emptyDomain101FileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomain101FileBuilder.getId());
+
+    addExplodedAppFromBuilder(appDependingOnDomain100FileBuilder, appDependingOnDomain100FileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, appDependingOnDomain100FileBuilder.getId());
+
+    Application application = findApp(appDependingOnDomain100FileBuilder.getId(), 1);
+    ApplicationDescriptor applicationDescriptor = application.getDescriptor();
+    assertThat(applicationDescriptor.getDomainName(), is(emptyDomain101FileBuilder.getId()));
   }
 }
