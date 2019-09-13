@@ -21,10 +21,14 @@ import java.util.function.Consumer;
  */
 class ManagedCursorIterator<T> implements CursorIterator<T> {
 
+  private final ManagedCursorIteratorProvider managedCursorIteratorProvider;
   private final CursorIterator<T> delegate;
   private final CursorProviderJanitor janitor;
 
-  ManagedCursorIterator(CursorIterator<T> delegate, CursorProviderJanitor janitor) {
+  ManagedCursorIterator(ManagedCursorIteratorProvider managedCursorIteratorProvider,
+                        CursorIterator<T> delegate,
+                        CursorProviderJanitor janitor) {
+    this.managedCursorIteratorProvider = managedCursorIteratorProvider;
     this.delegate = delegate;
     this.janitor = janitor;
   }
@@ -80,7 +84,7 @@ class ManagedCursorIterator<T> implements CursorIterator<T> {
 
   @Override
   public CursorProvider getProvider() {
-    return delegate.getProvider();
+    return managedCursorIteratorProvider;
   }
 
   @Override

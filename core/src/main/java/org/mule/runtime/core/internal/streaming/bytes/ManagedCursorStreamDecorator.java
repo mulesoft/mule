@@ -17,12 +17,16 @@ import java.io.IOException;
  *
  * @since 4.1.6
  */
-class ManagedCursorDecorator extends CursorStream {
+class ManagedCursorStreamDecorator extends CursorStream {
 
+  private ManagedCursorStreamProvider managedCursorProvider;
   private final CursorStream delegate;
   private final CursorProviderJanitor janitor;
 
-  ManagedCursorDecorator(CursorStream delegate, CursorProviderJanitor janitor) {
+  ManagedCursorStreamDecorator(ManagedCursorStreamProvider managedCursorProvider,
+                               CursorStream delegate,
+                               CursorProviderJanitor janitor) {
+    this.managedCursorProvider = managedCursorProvider;
     this.delegate = delegate;
     this.janitor = janitor;
   }
@@ -58,7 +62,7 @@ class ManagedCursorDecorator extends CursorStream {
 
   @Override
   public CursorProvider getProvider() {
-    return delegate.getProvider();
+    return managedCursorProvider;
   }
 
   @Override
