@@ -31,7 +31,7 @@ public class ManagedCursorIteratorProvider extends ManagedCursorProvider<CursorI
    */
   @Override
   protected CursorIterator managedCursor(CursorIterator cursor) {
-    return new ManagedCursorIterator(cursor, getJanitor());
+    return new ManagedCursorIterator(this, cursor, getJanitor());
   }
 
 }

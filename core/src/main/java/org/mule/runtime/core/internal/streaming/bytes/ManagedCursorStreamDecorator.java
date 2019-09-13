@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.streaming.bytes;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.internal.streaming.CursorProviderJanitor;
+import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 
 import java.io.IOException;
 
@@ -17,12 +18,25 @@ import java.io.IOException;
  *
  * @since 4.1.6
  */
-class ManagedCursorDecorator extends CursorStream {
+class ManagedCursorStreamDecorator extends CursorStream {
 
+  private final ManagedCursorStreamProvider managedCursorProvider;
   private final CursorStream delegate;
   private final CursorProviderJanitor janitor;
 
-  ManagedCursorDecorator(CursorStream delegate, CursorProviderJanitor janitor) {
+  /**
+   * Creates a new instance. Notice that it receives a {@code managedCursorProvider} so that a hard reference is kept
+   * during the lifespan of this cursor. This prevents the {@link StreamingGhostBuster} from closing the provider in corner
+   * cases in which this cursor is still referenced but the provider is not.
+   *
+   * @param managedCursorProvider the managed provider that opened this cursor
+   * @param delegate              the delegate cursor
+   * @param janitor               the cursor's janitor object
+   */
+  ManagedCursorStreamDecorator(ManagedCursorStreamProvider managedCursorProvider,
+                               CursorStream delegate,
+                               CursorProviderJanitor janitor) {
+    this.managedCursorProvider = managedCursorProvider;
     this.delegate = delegate;
     this.janitor = janitor;
   }
@@ -58,7 +72,7 @@ class ManagedCursorDecorator extends CursorStream {
 
   @Override
   public CursorProvider getProvider() {
-    return delegate.getProvider();
+    return managedCursorProvider;
   }
 
   @Override
