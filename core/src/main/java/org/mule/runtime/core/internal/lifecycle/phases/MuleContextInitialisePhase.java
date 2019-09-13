@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.lifecycle.phases;
 import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
@@ -50,6 +51,7 @@ public class MuleContextInitialisePhase extends DefaultLifecyclePhase {
     registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
     setOrderedLifecycleTypes(new Class<?>[] {
         StreamingManager.class,
+        ObjectStore.class,
         ConfigurationProvider.class,
         Config.class,
         LegacyConnector.class,
