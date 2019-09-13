@@ -177,7 +177,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testTemporaryDeliveryFailure() throws Exception {
-    targetMessageProcessor.setNumberOfFailuresToSimulate(untilSuccessful.getMaxRetries());
+    targetMessageProcessor.setNumberOfFailuresToSimulate(Integer.parseInt(untilSuccessful.getMaxRetries()));
     untilSuccessful.initialise();
     untilSuccessful.start();
 
@@ -189,7 +189,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testProcessingStrategyUsage() throws Exception {
-    targetMessageProcessor.setNumberOfFailuresToSimulate(untilSuccessful.getMaxRetries());
+    targetMessageProcessor.setNumberOfFailuresToSimulate(Integer.parseInt(untilSuccessful.getMaxRetries()));
     untilSuccessful.initialise();
     untilSuccessful.start();
 
@@ -220,6 +220,22 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     assertSame(testEvent.getMessage(), untilSuccessful.process(testEvent).getMessage());
     assertTargetEventReceived(testEvent);
     assertEquals(targetMessageProcessor.getEventCount(), 5);
+  }
+
+  @Test
+  public void testWithExpressionRetriesUsingPayload() throws Exception {
+    targetMessageProcessor.setNumberOfFailuresToSimulate(10);
+    untilSuccessful.setMaxRetries("#[payload + 2]");
+    untilSuccessful.initialise();
+    untilSuccessful.start();
+    final CoreEvent testEvent = eventBuilder(muleContext).message(of(1)).build();
+    expected.expect(MessagingException.class);
+    expected.expectCause(instanceOf(RetryPolicyExhaustedException.class));
+    try {
+      untilSuccessful.process(testEvent);
+    } finally {
+      assertEquals(targetMessageProcessor.getEventCount(), 4);
+    }
   }
 
   private void assertTargetEventReceived(CoreEvent request) throws MuleException {

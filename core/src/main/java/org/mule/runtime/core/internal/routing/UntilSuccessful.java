@@ -144,8 +144,8 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   /**
    * @return the number of retries to process the route when failing. Default value is 5.
    */
-  public int getMaxRetries() {
-    return (Integer) expressionManager.evaluate(maxRetries, DataType.NUMBER).getValue();
+  public String getMaxRetries() {
+    return maxRetries;
   }
 
   /**
@@ -167,8 +167,8 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   /**
    * @return the number of milliseconds between retries. Default value is 60000.
    */
-  public long getMillisBetweenRetries() {
-    return (Integer) expressionManager.evaluate(millisBetweenRetries, DataType.NUMBER).getValue();
+  public String getMillisBetweenRetries() {
+    return millisBetweenRetries;
   }
 
   /**
