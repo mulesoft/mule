@@ -27,6 +27,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
@@ -114,10 +115,9 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   }
 
   private RetryPolicyTemplate createRetryPolicyTemplate(CoreEvent event) {
-    Integer maxRetries =
-        (Integer) expressionManager.evaluate(this.maxRetries, DataType.NUMBER, NULL_BINDING_CONTEXT, event).getValue();
-    Integer millisBetweenRetries =
-        (Integer) expressionManager.evaluate(this.millisBetweenRetries, DataType.NUMBER, NULL_BINDING_CONTEXT, event).getValue();
+    ExpressionManagerSession session = expressionManager.openSession(getLocation(), event, NULL_BINDING_CONTEXT);
+    Integer maxRetries = (Integer) session.evaluate(this.maxRetries, DataType.NUMBER).getValue();
+    Integer millisBetweenRetries = (Integer) session.evaluate(this.millisBetweenRetries, DataType.NUMBER).getValue();
     return this.policyTemplatesCache.get(new Pair<>(millisBetweenRetries, maxRetries));
   }
 

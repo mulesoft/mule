@@ -109,7 +109,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   protected void doSetUp() throws Exception {
     super.doSetUp();
     flow = createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
-    untilSuccessful = buildUntilSuccessful(1000L);
+    untilSuccessful = buildUntilSuccessful("1000");
     if (tx) {
       getInstance().bindTransaction(mock(Transaction.class));
     }
@@ -122,9 +122,9 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     super.doTearDown();
   }
 
-  private UntilSuccessful buildUntilSuccessful(Long millisBetweenRetries) throws Exception {
+  private UntilSuccessful buildUntilSuccessful(String millisBetweenRetries) throws Exception {
     UntilSuccessful untilSuccessful = new UntilSuccessful();
-    untilSuccessful.setMaxRetries(2);
+    untilSuccessful.setMaxRetries("2");
     untilSuccessful.setAnnotations(getAppleFlowComponentLocationAnnotations());
     if (millisBetweenRetries != null) {
       untilSuccessful.setMillisBetweenRetries(millisBetweenRetries);
