@@ -121,15 +121,16 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
     return this.policyTemplatesCache.get(new Pair<>(millisBetweenRetries, maxRetries));
   }
 
+  private RetryPolicyTemplate fetchPolicyTemplate(CoreEvent event) {
+    return policyTemplate.orElseGet(() -> createRetryPolicyTemplate(event));
+  }
+
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
         .flatMap(event -> Mono.from(processWithChildContextDontComplete(event, nestedChain, ofNullable(getLocation())))
-            .transform(p -> policyTemplate.orElseGet(() -> createRetryPolicyTemplate(event)).applyPolicy(p, getRetryPredicate(),
-                                                                                                         e -> {
-                                                                                                         },
-                                                                                                         getThrowableFunction(event),
-                                                                                                         timer)));
+            .transform(p -> fetchPolicyTemplate(event).applyPolicy(p, getRetryPredicate(), e -> {
+            }, getThrowableFunction(event), timer)));
   }
 
   private Predicate<Throwable> getRetryPredicate() {
@@ -167,14 +168,6 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   }
 
   /**
-   *
-   * @param maxRetries the number of retries to process the route when failing. Default value is 5.
-   */
-  public void setMaxRetries(final int maxRetries) {
-    this.maxRetries = String.valueOf(maxRetries);
-  }
-
-  /**
    * @return the number of milliseconds between retries. Default value is 60000.
    */
   public String getMillisBetweenRetries() {
@@ -186,13 +179,6 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
    */
   public void setMillisBetweenRetries(String millisBetweenRetries) {
     this.millisBetweenRetries = millisBetweenRetries;
-  }
-
-  /**
-   * @param millisBetweenRetries the number of milliseconds between retries. Default value is 60000.
-   */
-  public void setMillisBetweenRetries(Long millisBetweenRetries) {
-    this.millisBetweenRetries = String.valueOf(millisBetweenRetries);
   }
 
   /**
