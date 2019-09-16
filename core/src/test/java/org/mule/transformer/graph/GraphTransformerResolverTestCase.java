@@ -13,12 +13,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.api.config.MuleProperties.MULE_ENABLE_BYTE_ARRAY_TO_INPUT_STREAM;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -282,8 +284,17 @@ public class GraphTransformerResolverTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void byteArrayToInputStream() throws ResolverException
+    public void byteArrayToInputStreamWithoutProperty() throws ResolverException
     {
+        graphResolver.transformerChange(new ObjectToInputStream(), TransformerResolver.RegistryAction.ADDED);
+        Transformer transformer = graphResolver.resolve(DataTypeFactory.BYTE_ARRAY, DataTypeFactory.INPUT_STREAM);
+        assertThat(transformer, is(nullValue()));
+    }
+
+    @Test
+    public void byteArrayToInputStreamWithProperty() throws ResolverException
+    {
+        System.setProperty(MULE_ENABLE_BYTE_ARRAY_TO_INPUT_STREAM, "true");
         graphResolver.transformerChange(new ObjectToInputStream(), TransformerResolver.RegistryAction.ADDED);
         Transformer transformer = graphResolver.resolve(DataTypeFactory.BYTE_ARRAY, DataTypeFactory.INPUT_STREAM);
         assertThat(transformer, Matchers.<Transformer>instanceOf(ObjectToInputStream.class));

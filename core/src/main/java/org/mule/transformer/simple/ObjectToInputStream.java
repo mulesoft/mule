@@ -6,6 +6,9 @@
  */
 package org.mule.transformer.simple;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
+import static org.mule.api.config.MuleProperties.MULE_ENABLE_BYTE_ARRAY_TO_INPUT_STREAM;
 import org.mule.RequestContext;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
@@ -13,7 +16,6 @@ import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.Serializable;
 
 /**
  * <code>ObjectToInputStream</code> converts Serializable objects to an InputStream
@@ -23,11 +25,14 @@ import java.io.Serializable;
  */
 public class ObjectToInputStream extends SerializableToByteArray
 {
+    private boolean acceptsByteArray = parseBoolean(getProperty(MULE_ENABLE_BYTE_ARRAY_TO_INPUT_STREAM, "false"));
 
     public ObjectToInputStream()
     {
-        this.registerSourceType(DataTypeFactory.create(Serializable.class));
-        this.registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        if (acceptsByteArray)
+        {
+            this.registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        }
         this.registerSourceType(DataTypeFactory.STRING);
         this.registerSourceType(DataTypeFactory.create(OutputHandler.class));
         setReturnDataType(DataTypeFactory.INPUT_STREAM);
