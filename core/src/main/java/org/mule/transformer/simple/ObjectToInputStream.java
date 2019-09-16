@@ -13,6 +13,7 @@ import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
 
 /**
  * <code>ObjectToInputStream</code> converts Serializable objects to an InputStream
@@ -25,6 +26,8 @@ public class ObjectToInputStream extends SerializableToByteArray
 
     public ObjectToInputStream()
     {
+        this.registerSourceType(DataTypeFactory.create(Serializable.class));
+        this.registerSourceType(DataTypeFactory.BYTE_ARRAY);
         this.registerSourceType(DataTypeFactory.STRING);
         this.registerSourceType(DataTypeFactory.create(OutputHandler.class));
         setReturnDataType(DataTypeFactory.INPUT_STREAM);
