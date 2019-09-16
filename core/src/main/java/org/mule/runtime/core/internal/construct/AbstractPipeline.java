@@ -9,11 +9,15 @@ package org.mule.runtime.core.internal.construct;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
+import static org.mule.runtime.core.api.construct.BackPressureReason.EVENTS_ACCUMULATED;
+import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
 import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
+import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
@@ -59,7 +63,9 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Consumer;
@@ -88,6 +94,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   private volatile boolean canProcessMessage = false;
   private Sink sink;
+  private Map<BackPressureReason, FlowBackPressureException> backPressureExceptions;
   private final int maxConcurrency;
   private final ComponentInitialStateManager componentInitialStateManager;
   private final BackPressureStrategySelector backpressureStrategySelector;
@@ -190,6 +197,19 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doInitialise() throws MuleException {
+    final Map<BackPressureReason, FlowBackPressureException> backPressureExceptions = new HashMap<>();
+
+    backPressureExceptions.put(EVENTS_ACCUMULATED,
+                               new FlowBackPressureEventsAccumulatedException(getName(), EVENTS_ACCUMULATED));
+    backPressureExceptions.put(MAX_CONCURRENCY_EXCEEDED,
+                               new FlowBackPressureMaxConcurrencyExceededException(getName(), EVENTS_ACCUMULATED));
+    backPressureExceptions.put(REQUIRED_SCHEDULER_BUSY,
+                               new FlowBackPressureRequiredSchedulerBusyException(getName(), EVENTS_ACCUMULATED));
+    backPressureExceptions.put(REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER,
+                               new FlowBackPressureRequiredSchedulerBusyWithFullBufferException(getName(), EVENTS_ACCUMULATED));
+
+    this.backPressureExceptions = unmodifiableMap(backPressureExceptions);
+
     super.doInitialise();
 
     pipeline = createPipeline();
@@ -237,7 +257,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         } else {
           final BackPressureReason emitFailReason = sink.emit(event);
           if (emitFailReason != null) {
-            notifyBackpressureException(event, createFlowBackPressureException(this.getName(), emitFailReason));
+            notifyBackpressureException(event, backPressureExceptions.get(emitFailReason));
           }
         }
       } catch (RejectedExecutionException e) {
@@ -461,5 +481,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     } catch (FlowBackPressureException e) {
       throw propagate(e);
     }
+  }
+
+  public Map<BackPressureReason, FlowBackPressureException> getBackPressureExceptions() {
+    return backPressureExceptions;
   }
 }
