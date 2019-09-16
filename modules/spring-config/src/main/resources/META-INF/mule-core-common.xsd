@@ -2578,19 +2578,21 @@
             <xsd:complexContent>
                 <xsd:extension base="abstractRoutingMessageProcessorType">
                     <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="1" maxOccurs="unbounded"/>
-                    <xsd:attribute name="maxRetries" type="substitutableInt" use="optional" default="5">
+                    <xsd:attribute name="maxRetries" type="xsd:string" use="optional" default="5">
                         <xsd:annotation>
                             <xsd:documentation>
                                 Specifies the maximum number of processing retries that will be performed.
+                                Embedded expressions can be used to extract value from the current message.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
-                    <xsd:attribute name="millisBetweenRetries" type="substitutableInt" use="optional">
+                    <xsd:attribute name="millisBetweenRetries" type="xsd:string" use="optional">
                         <xsd:annotation>
                             <xsd:documentation>
                                 Specifies the minimum time interval between two process retries in milliseconds.
                                 The actual time interval depends on the previous execution but should not exceed twice this number.
-                                Default value is 60000 (one minute)
+                                Default value is 60000 (one minute).
+                                Embedded expressions can be used to extract value from the current message.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>

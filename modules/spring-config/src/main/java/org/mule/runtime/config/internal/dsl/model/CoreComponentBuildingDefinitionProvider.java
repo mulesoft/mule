@@ -426,9 +426,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(UNTIL_SUCCESSFUL).withTypeDefinition(fromType(UntilSuccessful.class))
-            .withSetterParameterDefinition("maxRetries", fromSimpleParameter("maxRetries").withDefaultValue(5).build())
+            .withSetterParameterDefinition("maxRetries", fromSimpleParameter("maxRetries").withDefaultValue("5").build())
             .withSetterParameterDefinition("millisBetweenRetries",
-                                           fromSimpleParameter("millisBetweenRetries").withDefaultValue(60000).build())
+                                           fromSimpleParameter("millisBetweenRetries").withDefaultValue("60000").build())
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(FOREACH).withTypeDefinition(fromType(Foreach.class))
