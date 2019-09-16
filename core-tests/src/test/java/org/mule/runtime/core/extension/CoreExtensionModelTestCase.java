@@ -520,16 +520,16 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
     ParameterModel action = allParameterModels.get(0);
     assertThat(action.getName(), is("maxRetries"));
-    assertThat(action.getType(), is(instanceOf(DefaultStringType.class)));
+    assertThat(action.getType(), is(instanceOf(DefaultNumberType.class)));
     assertThat(action.getExpressionSupport(), is(SUPPORTED));
-    assertThat(action.getDefaultValue(), is("5"));
+    assertThat(action.getDefaultValue(), is(5));
     assertThat(action.isRequired(), is(false));
 
     ParameterModel type = allParameterModels.get(1);
     assertThat(type.getName(), is("millisBetweenRetries"));
-    assertThat(type.getType(), is(instanceOf(DefaultStringType.class)));
+    assertThat(type.getType(), is(instanceOf(DefaultNumberType.class)));
     assertThat(type.getExpressionSupport(), is(SUPPORTED));
-    assertThat(type.getDefaultValue(), is("60000"));
+    assertThat(type.getDefaultValue(), is(60000));
     assertThat(type.isRequired(), is(false));
   }
 

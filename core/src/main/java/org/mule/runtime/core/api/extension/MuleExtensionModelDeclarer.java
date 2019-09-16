@@ -510,15 +510,15 @@ class MuleExtensionModelDeclarer {
 
     untilSuccessful.onDefaultParameterGroup()
         .withOptionalParameter("maxRetries")
-        .ofType(typeLoader.load(String.class))
-        .defaultingTo("5")
+        .ofType(typeLoader.load(Integer.class))
+        .defaultingTo(5)
         .withExpressionSupport(SUPPORTED)
         .describedAs("Specifies the maximum number of processing retries that will be performed.");
 
     untilSuccessful.onDefaultParameterGroup()
         .withOptionalParameter("millisBetweenRetries")
-        .ofType(typeLoader.load(String.class))
-        .defaultingTo("60000")
+        .ofType(typeLoader.load(Integer.class))
+        .defaultingTo(60000)
         .withExpressionSupport(SUPPORTED)
         .describedAs("Specifies the minimum time interval between two process retries in milliseconds.\n" +
             " The actual time interval depends on the previous execution but should not exceed twice this number.\n" +
