@@ -26,6 +26,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.hamcrest.Matchers;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mule.api.registry.ResolverException;
@@ -38,6 +39,9 @@ import org.mule.tck.size.SmallTest;
 import org.mule.transformer.CompositeConverter;
 import org.mule.transformer.builder.MockConverterBuilder;
 import org.mule.transformer.builder.MockTransformerBuilder;
+import org.mule.transformer.simple.ObjectToInputStream;
+import org.mule.transformer.types.DataTypeFactory;
+
 
 @SmallTest
 public class GraphTransformerResolverTestCase extends AbstractMuleTestCase
@@ -275,6 +279,14 @@ public class GraphTransformerResolverTestCase extends AbstractMuleTestCase
         }
 
         assertConcurrent("Modify transformers while resolving it", runnables, MAX_TIMEOUT_SECONDS);
+    }
+
+    @Test
+    public void byteArrayToInputStream() throws ResolverException
+    {
+        graphResolver.transformerChange(new ObjectToInputStream(), TransformerResolver.RegistryAction.ADDED);
+        Transformer transformer = graphResolver.resolve(DataTypeFactory.BYTE_ARRAY, DataTypeFactory.INPUT_STREAM);
+        assertThat(transformer, Matchers.<Transformer>instanceOf(ObjectToInputStream.class));
     }
 
     public static void assertConcurrent(final String message, final List<? extends Runnable> runnables, final int maxTimeoutSeconds) throws InterruptedException
