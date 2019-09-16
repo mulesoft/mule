@@ -135,7 +135,8 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     assertThat(application.getArtifactName(), is(APP_NAME));
     assertThat(application.getResourceFiles(), is(resourceFiles));
 
-    verify(domainRepository, times(2)).getCompatibleDomain(any());
+    verify(domainRepository, times(1)).getCompatibleDomain(any());
+    verify(domainRepository, times(1)).getDomain(any());
     verify(applicationClassLoaderBuilderMock).setDomain(domain);
     verify(applicationClassLoaderBuilderMock)
         .addArtifactPluginDescriptors(descriptor.getPlugins().toArray(new ArtifactPluginDescriptor[0]));
@@ -164,7 +165,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     when(domainArtifactClassLoader.getClassLoaderLookupPolicy()).thenReturn(domainLookupPolicy);
     when(domain.getArtifactClassLoader()).thenReturn(domainArtifactClassLoader);
 
-    DomainDescriptor descriptor = new DomainDescriptor(name);
+    DomainDescriptor descriptor = new DomainDescriptor(DOMAIN_ARTIFACT_FILE_NAME);
     descriptor.setBundleDescriptor(createDomainBundleDescriptor(name));
     when(domain.getDescriptor()).thenReturn(descriptor);
 
