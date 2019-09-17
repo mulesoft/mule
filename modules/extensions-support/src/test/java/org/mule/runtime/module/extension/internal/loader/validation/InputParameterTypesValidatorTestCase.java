@@ -98,6 +98,7 @@ public class InputParameterTypesValidatorTestCase extends AbstractMuleTestCase {
   public void validModelDueToOperationWithArgumentParameterWithGetter() {
     validateOperationParameterOfType(toMetadataType(PojoWithParameterWithGetter.class));
   }
+
   @Test
   public void validateObjectTypeImplementedInMap() {
     ObjectTypeBuilder object = BaseTypeBuilder.create(JAVA).objectType();
