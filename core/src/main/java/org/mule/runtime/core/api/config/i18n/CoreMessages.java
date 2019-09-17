@@ -14,6 +14,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -966,6 +967,10 @@ public class CoreMessages extends I18nMessageFactory {
 
   public static I18nMessage nullWatermark() {
     return factory.createMessage(BUNDLE_PATH, 350);
+  }
+
+  public static I18nMessage backpressure(String flowName, BackPressureReason reason) {
+    return factory.createMessage(BUNDLE_PATH, 351, flowName, reason.toString());
   }
 
   private CoreMessages() {}
