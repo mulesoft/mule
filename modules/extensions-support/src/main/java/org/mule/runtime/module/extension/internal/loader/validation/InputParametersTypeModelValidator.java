@@ -37,6 +37,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -117,40 +118,47 @@ public final class InputParametersTypeModelValidator implements ExtensionModelVa
                             Set<Class<?>> validatedTypes) {
     ReflectionCache reflectionCache = new ReflectionCache();
 
-    getClassForValidation(type).ifPresent(parameterType -> type.accept(new MetadataTypeVisitor() {
+    getClassForValidation(type).ifPresent(parameterType -> {
 
-      @Override
-      public void visitObject(ObjectType objectType) {
-        if (validatedTypes.add(parameterType)) {
-          Collection<ObjectFieldType> parameters = objectType.getFields();
-          Set<String> fieldsWithGetters = getFieldsWithGetters(parameterType, reflectionCache).stream()
-              .map(TypeUtils::getAlias)
-              .map(String::toLowerCase)
-              .collect(toSet());
-          Set<String> parameterWithoutGetters =
-              parameters.stream()
-                  .filter(p -> {
-                    StereotypeTypeAnnotation stereotypes = p.getAnnotation(StereotypeTypeAnnotation.class).orElse(null);
-                    return stereotypes != null ? stereotypes.getAllowedStereotypes().isEmpty() : true;
-                  })
-                  .map(f -> f.getKey().getName().getLocalPart())
-                  .filter(fieldName -> !fieldsWithGetters.contains(fieldName.toLowerCase()))
-                  .collect(toSet());
-          if (!parameterWithoutGetters.isEmpty()) {
-            problems.addError(new Problem(namedObject,
-                                          format(
-                                                 "%s of type '%s' which contains fields (%s) that doesn't have the corresponding getter methods or getter methods that doesn't correspond to any of the present fields",
-                                                 message, parameterType.getName(),
-                                                 parameterWithoutGetters.stream().collect(joining(", ")))));
+      if (Map.class.isAssignableFrom(parameterType)) {
+        return;
+      }
+
+      type.accept(new MetadataTypeVisitor() {
+
+        @Override
+        public void visitObject(ObjectType objectType) {
+          if (validatedTypes.add(parameterType)) {
+            Collection<ObjectFieldType> parameters = objectType.getFields();
+            Set<String> fieldsWithGetters = getFieldsWithGetters(parameterType, reflectionCache).stream()
+                .map(TypeUtils::getAlias)
+                .map(String::toLowerCase)
+                .collect(toSet());
+            Set<String> parameterWithoutGetters =
+                parameters.stream()
+                    .filter(p -> {
+                      StereotypeTypeAnnotation stereotypes = p.getAnnotation(StereotypeTypeAnnotation.class).orElse(null);
+                      return stereotypes != null ? stereotypes.getAllowedStereotypes().isEmpty() : true;
+                    })
+                    .map(f -> f.getKey().getName().getLocalPart())
+                    .filter(fieldName -> !fieldsWithGetters.contains(fieldName.toLowerCase()))
+                    .collect(toSet());
+            if (!parameterWithoutGetters.isEmpty()) {
+              problems.addError(new Problem(namedObject,
+                                            format(
+                                                   "%s of type '%s' which contains fields (%s) that doesn't have the corresponding getter methods or getter methods that doesn't correspond to any of the present fields",
+                                                   message, parameterType.getName(),
+                                                   parameterWithoutGetters.stream().collect(joining(", ")))));
+            }
           }
         }
-      }
 
-      @Override
-      public void visitArrayType(ArrayType arrayType) {
-        validateType(message, namedObject, arrayType.getType(), problems, validatedTypes);
-      }
-    }));
+        @Override
+        public void visitArrayType(ArrayType arrayType) {
+          validateType(message, namedObject, arrayType.getType(), problems, validatedTypes);
+        }
+      });
+    });
   }
 
   private Optional<Class<Object>> getClassForValidation(MetadataType type) {
