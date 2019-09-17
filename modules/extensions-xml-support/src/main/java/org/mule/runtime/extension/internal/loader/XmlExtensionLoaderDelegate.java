@@ -686,7 +686,7 @@ public final class XmlExtensionLoaderDelegate {
    */
   private Optional<ComponentModel> findTestConnectionGlobalElementFrom(List<ComponentModel> globalElementsComponentModel,
                                                                        ExtensionModelHelper extensionModelHelper) {
-    final List<ComponentModel> testConnectionComponentModels_new = globalElementsComponentModel
+    final List<ComponentModel> testConnectionComponentModels = globalElementsComponentModel
         .stream()
         .filter(globalElementComponentModel -> globalElementComponentModel.getModel(ConfigurationModel.class)
             .map(configurationModel -> configurationModel.getConnectionProviders().stream()
@@ -694,16 +694,16 @@ public final class XmlExtensionLoaderDelegate {
             .orElse(false))
         .collect(toList());
 
-    if (testConnectionComponentModels_new.size() > 1) {
+    if (testConnectionComponentModels.size() > 1) {
       throw new MuleRuntimeException(createStaticMessage(format("There are [%d] global elements that can be potentially used for test connection when it should be just one. Mark any of them with the attribute [%s=\"true\"], offended global elements are: [%s]",
-                                                                testConnectionComponentModels_new.size(),
+                                                                testConnectionComponentModels.size(),
                                                                 MODULE_CONNECTION_MARKER_ATTRIBUTE,
-                                                                testConnectionComponentModels_new.stream()
+                                                                testConnectionComponentModels.stream()
                                                                     .map(ComponentModel::getNameAttribute)
                                                                     .sorted()
                                                                     .collect(joining(", ")))));
     }
-    return testConnectionComponentModels_new.stream().findFirst();
+    return testConnectionComponentModels.stream().findFirst();
   }
 
   private void loadOperationsFrom(HasOperationDeclarer declarer, ComponentModel moduleModel,
