@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.config.internal.dsl.model.extension.xml.property;
 
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toMap;
+
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -20,10 +24,15 @@ import java.util.Optional;
  */
 public class PrivateOperationsModelProperty implements ModelProperty {
 
-  private List<OperationModel> privateOperationsModels;
+  private static final long serialVersionUID = -1574428794005821951L;
+
+  private final Map<String, OperationModel> privateOperationsModels;
 
   public PrivateOperationsModelProperty(List<OperationModel> privateOperationsModels) {
-    this.privateOperationsModels = privateOperationsModels;
+    this.privateOperationsModels = privateOperationsModels
+        .stream()
+        .collect(toMap(opModel -> opModel.getName(),
+                       opModel -> opModel));
   }
 
   /**
@@ -34,10 +43,7 @@ public class PrivateOperationsModelProperty implements ModelProperty {
    * @return an {@link Optional} {@link OperationModel}
    */
   public Optional<OperationModel> getOperationModel(String name) {
-    return privateOperationsModels
-        .stream()
-        .filter(operationModel -> operationModel.getName().equals(name))
-        .findFirst();
+    return ofNullable(privateOperationsModels.get(name));
   }
 
   @Override
