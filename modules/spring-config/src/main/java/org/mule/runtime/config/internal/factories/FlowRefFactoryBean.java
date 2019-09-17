@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.config.internal.factories;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -23,6 +23,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -37,8 +38,10 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
@@ -49,8 +52,9 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
@@ -195,6 +199,8 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
   /**
    * Flow-ref message processor with a statically (constant along the flow execution) defined target route.
+   * 
+   * @since 4.3.0
    */
   private class StaticFlowRefMessageProcessor extends FlowRefMessageProcessor {
 
@@ -219,25 +225,45 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
       Flux<CoreEvent> pub = from(publisher);
 
-      if ((target != null)) {
+      if (target != null) {
         pub = pub.map(event -> quickCopy(event, singletonMap(originalEventKey(event), event)))
             .cast(CoreEvent.class);
       }
 
+      Optional<ComponentLocation> location = ofNullable(StaticFlowRefMessageProcessor.this.getLocation());
+
       if (resolvedReferencedProcessor instanceof Flow) {
-        pub = pub.transform(eventPub -> from(applyWithChildContext(eventPub, ((Flow) resolvedReferencedProcessor).referenced(),
-                                                                   ofNullable(getLocation()),
-                                                                   ((Flow) resolvedReferencedProcessor).getExceptionListener())));
+        return applyForStaticFlow((Flow) resolvedReferencedProcessor, pub, location);
       } else {
-        pub = pub.transform(eventPub -> from(applyWithChildContext(eventPub, resolvedReferencedProcessor,
-                                                                   ofNullable(getLocation()))));
+        return applyForStaticSubFlow(resolvedReferencedProcessor, pub, location);
       }
+
+    }
+
+    private Publisher<CoreEvent> applyForStaticFlow(Flow resolvedTarget, Flux<CoreEvent> pub,
+                                                    Optional<ComponentLocation> location) {
+      pub = pub.transform(eventPub -> from(applyWithChildContext(eventPub, resolvedTarget.referenced(),
+                                                                 location,
+                                                                 resolvedTarget.getExceptionListener())));
 
       return (target != null)
           ? pub.map(eventAfter -> outputToTarget(((InternalEvent) eventAfter)
               .getInternalParameter(originalEventKey(eventAfter)), target, targetValue,
                                                  expressionManager).apply(eventAfter))
           : pub;
+    }
+
+    private Publisher<CoreEvent> applyForStaticSubFlow(ReactiveProcessor resolvedTarget, Flux<CoreEvent> pub,
+                                                       Optional<ComponentLocation> location) {
+      return pub.flatMap(event -> {
+        ReactiveProcessor subFlowProcessor = publisher1 -> Mono.from(publisher1)
+            .transform(resolvedTarget)
+            .onErrorMap(MessagingException.class,
+                        getMessagingExceptionMapper());
+        return Mono
+            .from(processWithChildContext(event, subFlowProcessor, location))
+            .map(outputToTarget(event, target, targetValue, expressionManager));
+      });
     }
 
     protected String originalEventKey(CoreEvent event) {
@@ -269,15 +295,17 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
   /**
    * Flow-ref message processor whose route might change along the flow execution. This means the target route is defined with a
-   * dataweave expression.
+   * data-weave expression.
+   * 
+   * @since 4.3.0
    */
   private class DynamicFlowRefMessageProcessor extends FlowRefMessageProcessor {
 
-    private LoadingCache<String, Processor> cache;
+    private LoadingCache<String, Processor> targetsCache;
 
     public DynamicFlowRefMessageProcessor(FlowRefFactoryBean owner) {
       super(owner);
-      this.cache = CacheBuilder.newBuilder()
+      this.targetsCache = CacheBuilder.newBuilder()
           .maximumSize(20)
           .build(new CacheLoader<String, Processor>() {
 
@@ -290,59 +318,55 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-      // TODO: This is a horrible way of looking for the registered subFlows. CHANGE ME!
-      List<String> subFlowNames =
-          asList(FlowRefFactoryBean.this.applicationContext.getBeanNamesForType(SubflowMessageProcessorChainFactoryBean.class))
-              .stream()
-              .map(aName -> aName.startsWith("&") ? aName.substring(1) : aName)
-              .collect(toList());
-
-      Map<String, ExecutableSubFlow> subFlowRouter = new HashMap<>();
-
-      subFlowNames.stream().forEach(subFlowName -> {
-        try {
-          // TODO: The referenced subflows are fetched one time for each apply call. Add a cache?
-          Processor subFlowProcessor = getReferencedFlow(subFlowName, this);
-          subFlowRouter.put(subFlowName, new ExecutableSubFlow(subFlowProcessor, getLocation()));
-        } catch (MuleException e) {
-          LOGGER.error("An exception was raised while creating subFlow executable routes: ", e);
-        }
-      });
-
       return from(publisher).flatMap(event -> {
-        ReactiveProcessor resolvedReferencedProcessor;
-        Publisher<CoreEvent> pub;
-        String resolvedName = resolveTargetFlowName(event);
+        ReactiveProcessor resolvedTarget;
 
-        if (subFlowRouter.keySet().contains(resolvedName)) {
-          ExecutableSubFlow resolvedPair = subFlowRouter.get(resolvedName);
-          resolvedPair.execute(event);
-          pub = resolvedPair.getPublisher();
-        } else {
-          try {
-            resolvedReferencedProcessor = resolveReferencedProcessor(resolvedName);
-            pub = Mono.from(processWithChildContext(event, ((Flow) resolvedReferencedProcessor).referenced(),
-                                                    ofNullable(getLocation()),
-                                                    ((Flow) resolvedReferencedProcessor).getExceptionListener()));
-          } catch (MuleException e) {
-            return error(e);
-          }
+        try {
+          resolvedTarget = resolveTargetFlowOrSubflow(event);
+        } catch (MuleException e) {
+          return error(e);
         }
 
-        return (target != null)
-            // TODO: If it's a subflow, this is a Mono.from(Flux<CoreEvent>). Opinions?
-            ? Mono.from(pub).map(outputToTarget(event, target, targetValue, expressionManager))
-            : pub;
-      }).doOnComplete(() -> subFlowRouter.values().stream().forEach(executableSubFlow -> executableSubFlow.complete()));
+        ReactiveProcessor decoratedTarget = p -> Mono.from(p)
+            .transform(resolvedTarget)
+            .onErrorMap(MessagingException.class,
+                        getMessagingExceptionMapper());
+
+        Optional<Flow> targetAsFlow = resolvedTarget instanceof Flow ? of((Flow) resolvedTarget) : empty();
+        return Mono
+            .from(processWithChildContextFlowOrSubflow(event, decoratedTarget, targetAsFlow))
+            .map(outputToTarget(event, target, targetValue, expressionManager));
+      });
     }
 
-    protected String resolveTargetFlowName(CoreEvent event) {
-      return (String) expressionManager.evaluate(refName, event, getLocation()).getValue();
+    protected Publisher<CoreEvent> processWithChildContextFlowOrSubflow(CoreEvent event,
+                                                                        ReactiveProcessor decoratedTarget,
+                                                                        Optional<Flow> targetAsFlow) {
+      Optional<ComponentLocation> componentLocation = ofNullable(DynamicFlowRefMessageProcessor.this.getLocation());
+      if (targetAsFlow.isPresent()) {
+        return processWithChildContext(event, decoratedTarget,
+                                       componentLocation,
+                                       targetAsFlow.get().getExceptionListener());
+      } else {
+        // If the resolved target is not a flow, it should be a subflow
+        return processWithChildContext(event, decoratedTarget, componentLocation);
+
+      }
     }
 
-    protected Processor resolveReferencedProcessor(String targetFlowName) throws MuleException {
+    /**
+     * Given the current {@link CoreEvent}, resolved which processor is targeted by it, being this a {@link Flow} or a
+     * {@link org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder.SubFlowMessageProcessorChain}.
+     * Also, caches the fetched {@link Processor} for future calls.
+     * 
+     * @param event the {@link CoreEvent} event
+     * @return the {@link Processor} targeted by the current event
+     * @throws MuleException
+     */
+    protected Processor resolveTargetFlowOrSubflow(CoreEvent event) throws MuleException {
+      String targetFlowName = (String) expressionManager.evaluate(refName, event, getLocation()).getValue();
       try {
-        return cache.getUnchecked(targetFlowName);
+        return targetsCache.getUnchecked(targetFlowName);
 
       } catch (UncheckedExecutionException e) {
         if (e.getCause() instanceof MuleRuntimeException) {
@@ -357,7 +381,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     @Override
     public void doStart() throws MuleException {
-      for (Processor p : cache.asMap().values()) {
+      for (Processor p : targetsCache.asMap().values()) {
         if (!(p instanceof Flow)) {
           startIfNeeded(p);
         }
@@ -366,7 +390,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     @Override
     public void stop() throws MuleException {
-      for (Processor p : cache.asMap().values()) {
+      for (Processor p : targetsCache.asMap().values()) {
         if (!(p instanceof Flow)) {
           stopIfNeeded(p);
         }
@@ -375,14 +399,24 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     @Override
     public void dispose() {
-      for (Processor p : cache.asMap().values()) {
+      for (Processor p : targetsCache.asMap().values()) {
         if (!(p instanceof Flow)) {
           disposeIfNeeded(p, LOGGER);
         }
       }
-      cache.invalidateAll();
-      cache.cleanUp();
+      targetsCache.invalidateAll();
+      targetsCache.cleanUp();
     }
 
+  }
+
+  /**
+   * Commonly used {@link MessagingException} mapper.
+   * 
+   * @return a {@link MessagingException} mapper that maps the input exception to one using the wrapped event's parent context.
+   */
+  private Function<MessagingException, Throwable> getMessagingExceptionMapper() {
+    return me -> new MessagingException(quickCopy(((BaseEventContext) me.getEvent().getContext()).getParentContext()
+        .get(), me.getEvent()), me);
   }
 }
