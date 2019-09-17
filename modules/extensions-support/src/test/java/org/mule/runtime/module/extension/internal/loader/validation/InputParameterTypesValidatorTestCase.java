@@ -12,11 +12,16 @@ import static java.util.Collections.emptySet;
 import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.SubTypesModel;
@@ -30,11 +35,11 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import com.google.common.collect.ImmutableSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -92,6 +97,15 @@ public class InputParameterTypesValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void validModelDueToOperationWithArgumentParameterWithGetter() {
     validateOperationParameterOfType(toMetadataType(PojoWithParameterWithGetter.class));
+  }
+
+  @Test
+  public void validateObjectTypeImplementedInMap() {
+    ObjectTypeBuilder object = BaseTypeBuilder.create(JAVA).objectType();
+    object.id("ObjectAsMap").with(new ClassInformationAnnotation(Map.class));
+    object.addField().key("fieldWithGetter").required().value(TYPE_LOADER.load(String.class));
+
+    validateOperationParameterOfType(object.build());
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
