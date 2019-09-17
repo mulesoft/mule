@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
@@ -31,11 +30,9 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
-import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
@@ -72,10 +69,6 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
 
   private Set<ExtensionModel> extensions = emptySet();
 
-  public void setExtensions(Set<ExtensionModel> extensions) {
-    this.extensions = extensions;
-  }
-
   /**
    * Gets a hold on a {@link ExtensionManager} instance and generates the definitions.
    *
@@ -104,9 +97,7 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
       return;
     }
 
-    if (extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent()) {
-      registerXmlExtensionParsers(definitionBuilder, extensionModel, dslSyntaxResolver);
-    } else {
+    if (!extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent()) {
       final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
       withContextClassLoader(extensionClassLoader, () -> {
         ReflectionCache reflectionCache = new ReflectionCache();
@@ -156,32 +147,6 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
         registerSubTypes(definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext, reflectionCache);
       });
     }
-  }
-
-  /**
-   * Goes over all operations defined within the extension and it will add the expected Java type of the chain that will contain
-   * the macro expanded code, so that
-   * {@link org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper#isProcessor(ComponentAst)} can properly determine
-   * it's a processor. Notice it does not registers sources, neither configurations, parameters, etc. as those will be properly
-   * handled by the {@link ComponentLocationVisitor}.
-   *
-   * @param definitionBuilder builder to generate the {@link ComponentBuildingDefinition} from the operation.
-   * @param extensionModel to introspect
-   * @param dslSyntaxResolver the resolver to obtain the XML name of the operation
-   */
-  private void registerXmlExtensionParsers(Builder definitionBuilder, ExtensionModel extensionModel,
-                                           DslSyntaxResolver dslSyntaxResolver) {
-    new IdempotentExtensionWalker() {
-
-      @Override
-      public void onOperation(OperationModel operationModel) {
-        definitions.add(
-                        definitionBuilder
-                            .withIdentifier(dslSyntaxResolver.resolve(operationModel).getElementName())
-                            .withTypeDefinition(fromType(ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain.class))
-                            .build());
-      }
-    }.walk(extensionModel);
   }
 
   private void registerSubTypes(MetadataType type, Builder definitionBuilder,
