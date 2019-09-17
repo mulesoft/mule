@@ -242,9 +242,9 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     private Publisher<CoreEvent> applyForStaticFlow(Flow resolvedTarget, Flux<CoreEvent> pub,
                                                     Optional<ComponentLocation> location) {
-      pub = pub.transform(eventPub -> from(applyWithChildContext(eventPub, resolvedTarget.referenced(),
+      pub = pub.transform(eventPub -> applyWithChildContext(eventPub, resolvedTarget.referenced(),
                                                                  location,
-                                                                 resolvedTarget.getExceptionListener())));
+                                                                 resolvedTarget.getExceptionListener()));
 
       return (target != null)
           ? pub.map(eventAfter -> outputToTarget(((InternalEvent) eventAfter)
