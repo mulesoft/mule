@@ -30,6 +30,15 @@
           "justification": "Back porting to fix several reconnection issues"
         },
         {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.api.i18n.I18nMessage org.mule.runtime.core.api.config.i18n.CoreMessages::backpressure(java.lang.String, org.mule.runtime.core.api.construct.BackPressureReason)",
+          "package": "org.mule.runtime.core.api.config.i18n",
+          "classSimpleName": "CoreMessages",
+          "methodName": "backpressure",
+          "elementKind": "method",
+          "justification": "MULE-17257: Add more detail to FlowBackpressureException"
+        },
+        {
           "code": "java.class.added",
           "new": "enum org.mule.runtime.core.api.construct.BackPressureReason",
           "package": "org.mule.runtime.core.api.construct",
