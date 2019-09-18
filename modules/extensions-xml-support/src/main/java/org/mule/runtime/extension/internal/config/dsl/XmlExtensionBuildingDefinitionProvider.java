@@ -8,6 +8,7 @@ package org.mule.runtime.extension.internal.config.dsl;
 
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
@@ -26,6 +27,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
+import org.mule.runtime.config.internal.dsl.model.extension.xml.property.PrivateOperationsModelProperty;
 import org.mule.runtime.config.internal.factories.ModuleOperationMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
@@ -69,6 +71,7 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
 
     // final ExtensionParsingContext parsingContext = createParsingContext(extensionModel);
     final Builder definitionBuilder = new Builder().withNamespace(xmlDslModel.getPrefix());
+    final Builder tnsDefinitionBuilder = new Builder().withNamespace(TNS_PREFIX);
     final DslSyntaxResolver dslSyntaxResolver =
         DslSyntaxResolver.getDefault(extensionModel, DslResolvingContext.getDefault(extensions));
 
@@ -77,6 +80,12 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
     }
 
     if (extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent()) {
+      extensionModel.getModelProperty(PrivateOperationsModelProperty.class)
+          .ifPresent(privateOperations -> privateOperations.getOperationNames()
+              .forEach(privateOperationName -> privateOperations.getOperationModel(privateOperationName)
+                  .ifPresent(opModel -> addModuleOperationChainParser(tnsDefinitionBuilder, TNS_PREFIX,
+                                                                      dslSyntaxResolver.resolve(opModel).getElementName()))));
+
       addModuleOperationChainParser();
 
       final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
@@ -108,7 +117,8 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
 
             final List<ComponentModel> innerComponents = modelProperty.get().getBodyComponentModel().getInnerComponents();
 
-            addModuleOperationChainParser(definitionBuilder, xmlDslModel.getPrefix(),
+            addModuleOperationChainParser(definitionBuilder,
+                                          xmlDslModel.getPrefix(),
                                           dslSyntaxResolver.resolve(model).getElementName());
             // parseWith(new OperationDefinitionParser(definitionBuilder, extensionModel,
             // model, dslSyntaxResolver, parsingContext));

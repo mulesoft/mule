@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.toMap;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,6 +45,10 @@ public class PrivateOperationsModelProperty implements ModelProperty {
    */
   public Optional<OperationModel> getOperationModel(String name) {
     return ofNullable(privateOperationsModels.get(name));
+  }
+
+  public Collection<String> getOperationNames() {
+    return privateOperationsModels.keySet();
   }
 
   @Override

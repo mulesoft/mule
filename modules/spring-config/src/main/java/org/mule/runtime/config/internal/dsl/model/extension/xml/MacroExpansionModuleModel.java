@@ -139,11 +139,11 @@ public class MacroExpansionModuleModel {
                   componentModelsToReplaceByIndex.put(i, moduleOperationChain);
                 });
           });
-      for (Map.Entry<Integer, ComponentModel> entry : componentModelsToReplaceByIndex.entrySet()) {
-        entry.getValue().setParent(containerComponentModel);
-        containerComponentModel.getInnerComponents().add(entry.getKey(), entry.getValue());
-        containerComponentModel.getInnerComponents().remove(entry.getKey() + 1);
-      }
+      // for (Map.Entry<Integer, ComponentModel> entry : componentModelsToReplaceByIndex.entrySet()) {
+      // entry.getValue().setParent(containerComponentModel);
+      // containerComponentModel.getInnerComponents().add(entry.getKey(), entry.getValue());
+      // containerComponentModel.getInnerComponents().remove(entry.getKey() + 1);
+      // }
       componentModelsToReplaceByIndex.clear();
     });
   }
@@ -325,6 +325,7 @@ public class MacroExpansionModuleModel {
                                                          getLiteralParameters(propertiesMap, parametersMap),
                                                          containerName)))
         .forEach(processorChainBuilder::addChildComponentModel);
+
     copyErrorMappings(operationRefModel, processorChainBuilder);
 
     for (Map.Entry<String, Object> customAttributeEntry : operationRefModel.getMetadata().getParserAttributes().entrySet()) {
@@ -342,10 +343,12 @@ public class MacroExpansionModuleModel {
 
     ComponentModel processorChainModel = processorChainBuilder.build();
     for (ComponentModel processorChainModelChild : processorChainModel.getInnerComponents()) {
-      processorChainModelChild.setParent(processorChainModel);
+      processorChainModelChild.setParent(operationRefModel);
     }
 
-    return processorChainModel;
+    operationRefModel.getInnerComponents().addAll(processorChainModel.getInnerComponents());
+
+    return operationRefModel;
   }
 
   /**
@@ -627,7 +630,8 @@ public class MacroExpansionModuleModel {
             .orElseGet(() -> copyOperationComponentModel(operationChildModel, configRefName, moduleGlobalElementsNames,
                                                          literalsParameters, containerName)))
         .forEach(operationReplacementModel::addChildComponentModel);
-    return buildFrom(modelToCopy, operationReplacementModel);
+    final ComponentModel buildFrom = buildFrom(modelToCopy, operationReplacementModel);
+    return modelToCopy;
   }
 
   private ComponentModel.Builder getComponentModelBuilderFrom(ComponentModel componentModelOrigin) {

@@ -37,8 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link MacroExpansionModulesModel} goes over all the parametrized {@link ExtensionModel} by filtering them if they have
- * the {@link XmlExtensionModelProperty} (implies that has to be macro expanded).
+ * A {@link MacroExpansionModulesModel} goes over all the parametrized {@link ExtensionModel} by filtering them if they have the
+ * {@link XmlExtensionModelProperty} (implies that has to be macro expanded).
  * <p/>
  * For every occurrence that happens, it will expand the operations/configurations by working with the
  * {@link MacroExpansionModuleModel} passing through just one {@link ExtensionModel} to macro expand in the current Mule
@@ -80,16 +80,16 @@ public class MacroExpansionModulesModel {
 
     for (ExtensionModel sortedExtension : sortedExtensions) {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(String.format("macro expanding '%s' connector, xmlns:%s=\"%s\"",
-                                   sortedExtension.getName(),
-                                   sortedExtension.getXmlDslModel().getPrefix(),
-                                   sortedExtension.getXmlDslModel().getNamespace()));
+        LOGGER.debug(format("macro expanding '%s' connector, xmlns:%s=\"%s\"",
+                            sortedExtension.getName(),
+                            sortedExtension.getXmlDslModel().getPrefix(),
+                            sortedExtension.getXmlDslModel().getNamespace()));
       }
       new MacroExpansionModuleModel(applicationModel, sortedExtension).expand();
       postProcess.run();
     }
     if (LOGGER.isDebugEnabled()) {
-      //only log the macro expanded app if there are smart connectors in it
+      // only log the macro expanded app if there are smart connectors in it
       boolean hasMacroExpansionExtension = sortedExtensions.stream()
           .anyMatch(extensionModel -> extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent());
       if (hasMacroExpansionExtension) {
@@ -109,8 +109,8 @@ public class MacroExpansionModulesModel {
   }
 
   /**
-   * Constructs a Direct Acyclic Graph (DAG) with the dependencies at namespace level of those {@link ExtensionModel} that must
-   * be macro expanded with a topological order.
+   * Constructs a Direct Acyclic Graph (DAG) with the dependencies at namespace level of those {@link ExtensionModel} that must be
+   * macro expanded with a topological order.
    * <p/>
    * It starts by taking the namespaces of macro expandable <module/>s from the Mule Application, to then assembly a DAG using
    * those namespaces as starting point. For each <module/> namespace, it will go over it's dependencies using
@@ -120,7 +120,7 @@ public class MacroExpansionModulesModel {
    * plain it in a simple {@link List} to be later used in the {@link #expand()} method.
    *
    * @param extensions complete set of {@link ExtensionModel}s used in the app that might or might not be macro expandable (it
-   *                   will filter them.
+   *        will filter them.
    * @return a <bold>sorted</bold> collection of {@link ExtensionModel} to macro expand. This order must not be altered.
    */
   private List<ExtensionModel> calculateExtensionByTopologicalOrder(Set<ExtensionModel> extensions) {
