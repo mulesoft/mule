@@ -20,6 +20,7 @@ import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErro
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
@@ -190,12 +191,19 @@ public class MessagingExceptionResolver {
   }
 
   private ErrorType errorTypeFromException(Component failing, ErrorTypeLocator locator, Throwable e) {
+    if (isConnectionExceptionWithError(e)) {
+      return ((ConnectionException) e).getErrorType().get();
+    }
     if (isMessagingExceptionWithError(e)) {
       return ((MessagingException) e).getEvent().getError().map(Error::getErrorType).orElse(locator.lookupErrorType(e));
     } else {
       Optional<ComponentIdentifier> componentIdentifier = getComponentIdentifier(failing);
       return componentIdentifier.map(ci -> locator.lookupComponentErrorType(ci, e)).orElse(locator.lookupErrorType(e));
     }
+  }
+
+  private boolean isConnectionExceptionWithError(Throwable cause) {
+    return cause instanceof ConnectionException && ((ConnectionException) cause).getErrorType().isPresent();
   }
 
   private boolean isMessagingExceptionWithError(Throwable cause) {

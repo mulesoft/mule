@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
+import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractCauseOfType;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 
@@ -13,6 +14,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 
@@ -58,11 +60,26 @@ public final class ExceptionHandlerManager {
   public Throwable handleThrowable(Throwable e) {
     Optional<ConnectionException> connectionException = extractConnectionException(e);
     if (connectionException.isPresent()) {
-      return connectionException.get();
+      return resolveConnectionException(connectionException.get(), e);
     } else {
       // unwraps the exception thrown by the reflective operation if exist any.
       return extractCauseOfType(e, UndeclaredThrowableException.class).orElse(e);
     }
+  }
+
+  private ConnectionException resolveConnectionException(ConnectionException connectionException, Throwable handledThrowable) {
+    if (isMessagingExceptionWithConnectivityError(handledThrowable) && !connectionException.getErrorType().isPresent()) {
+      return new ConnectionException(connectionException.getMessage(), connectionException.getCause(),
+                                     ((MessagingException) handledThrowable).getEvent().getError().get().getErrorType());
+    }
+    return connectionException;
+  }
+
+  private boolean isMessagingExceptionWithConnectivityError(Throwable cause) {
+    return cause instanceof MessagingException &&
+        ((MessagingException) cause).getEvent().getError().isPresent() &&
+        ((MessagingException) cause).getEvent().getError().get().getErrorType().getIdentifier()
+            .equals(CONNECTIVITY_ERROR_IDENTIFIER);
   }
 
   private Throwable enrich(Throwable t) {
