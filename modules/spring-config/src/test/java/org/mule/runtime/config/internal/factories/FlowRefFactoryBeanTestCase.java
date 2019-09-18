@@ -45,10 +45,8 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -67,9 +65,7 @@ import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -107,8 +103,6 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   private ExtendedExpressionManager expressionManager;
   private MuleContext mockMuleContext;
 
-  private ArrayList<String> mockedFlowSubflowNames;
-
   @Inject
   private ConfigurationComponentLocator locator;
 
@@ -119,10 +113,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     result = testEvent();
     mockMuleContext = mockContextWithServices();
     expressionManager = mockMuleContext.getExpressionManager();
-    mockedFlowSubflowNames = new ArrayList<>();
     doReturn(true).when(expressionManager).isExpression(anyString());
     when(targetFlow.apply(any(Publisher.class))).thenReturn(just(result));
-    when(targetFlow.referenced()).thenReturn((ReactiveProcessor) (pub -> just(result)));
 
     List<Processor> targetSubFlowProcessors = singletonList(targetSubFlowChild);
     when(targetSubFlow.getMessageProcessors()).thenReturn(targetSubFlowProcessors);
@@ -147,7 +139,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     assertNotSame(targetFlow, getFlowRefProcessor(flowRefFactoryBean));
     assertNotSame(targetFlow, getFlowRefProcessor(flowRefFactoryBean));
 
-    verifyReferenced(flowRefFactoryBean, targetFlow);
+    verifyProcess(flowRefFactoryBean, targetFlow);
     verifyLifecycle(targetFlow, 0);
   }
 
@@ -257,29 +249,18 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     getFlowRefProcessor(createFlowRefFactoryBean(DYNAMIC_NON_EXISTANT)).process(testEvent());
   }
 
-  private FlowRefFactoryBean createFlowRefFactoryBean(String name) throws InitialisationException {
+  private FlowRefFactoryBean createFlowRefFactoryBean(String name) throws Exception {
     FlowRefFactoryBean flowRefFactoryBean = new FlowRefFactoryBean();
     flowRefFactoryBean.setName(name);
     flowRefFactoryBean.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     flowRefFactoryBean.setApplicationContext(applicationContext);
-
-    String[] mockedFlowNamesAsArray = new String[mockedFlowSubflowNames.size()];
-    mockedFlowNamesAsArray = mockedFlowSubflowNames.stream().map(flowName -> "&" + flowName).collect(Collectors.toList())
-        .toArray(mockedFlowNamesAsArray);
-
-    when(applicationContext.getBeanNamesForType(SubflowMessageProcessorChainFactoryBean.class))
-        .thenReturn(mockedFlowNamesAsArray);
-
-    try {
-      mockMuleContext.getInjector().inject(flowRefFactoryBean);
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(e);
-    }
+    mockMuleContext.getInjector().inject(flowRefFactoryBean);
+    // flowRefFactoryBean.setMuleContext(mockMuleContext);
     return flowRefFactoryBean;
   }
 
   private FlowRefFactoryBean createStaticFlowRefFactoryBean(Processor target, Object targetBuilder)
-      throws InitialisationException {
+      throws Exception {
     doReturn(false).when(expressionManager).isExpression(anyString());
     if (targetBuilder != null) {
       when(applicationContext.getBean(eq(STATIC_REFERENCED_FLOW))).thenReturn(targetBuilder);
@@ -298,7 +279,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   }
 
   private FlowRefFactoryBean createDynamicFlowRefFactoryBean(Processor target, Object targetBuilder)
-      throws InitialisationException {
+      throws Exception {
     doReturn(true).when(expressionManager).isExpression(anyString());
     doReturn(new TypedValue<>(PARSED_DYNAMIC_REFERENCED_FLOW, STRING)).when(expressionManager)
         .evaluate(eq(DYNAMIC_REFERENCED_FLOW), any(CoreEvent.class),
@@ -307,10 +288,6 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
       when(applicationContext.getBean(eq(PARSED_DYNAMIC_REFERENCED_FLOW))).thenReturn(targetBuilder);
     } else {
       when(applicationContext.getBean(eq(PARSED_DYNAMIC_REFERENCED_FLOW))).thenReturn(target);
-    }
-
-    if (targetBuilder != null) {
-      mockedFlowSubflowNames.add(PARSED_DYNAMIC_REFERENCED_FLOW);
     }
 
     if (target instanceof MessageProcessorChain) {
@@ -342,26 +319,9 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     assertSame(result.getMessage(), just(newEvent()).cast(CoreEvent.class).transform(flowRefProcessor).block().getMessage());
     assertSame(result.getMessage(), just(newEvent()).cast(CoreEvent.class).transform(flowRefProcessor).block().getMessage());
 
-    verify(applicationContext, atLeastOnce()).getBean(anyString());
+    verify(applicationContext).getBean(anyString());
 
     verify(target, times(2)).apply(any(Publisher.class));
-
-    stopIfNeeded(flowRefProcessor);
-    disposeIfNeeded(flowRefProcessor, null);
-  }
-
-  private void verifyReferenced(FlowRefFactoryBean flowRefFactoryBean, Flow target)
-      throws Exception {
-    Processor flowRefProcessor = getFlowRefProcessor(flowRefFactoryBean);
-    initialiseIfNeeded(flowRefProcessor);
-    startIfNeeded(flowRefProcessor);
-
-    assertSame(result.getMessage(), just(newEvent()).cast(CoreEvent.class).transform(flowRefProcessor).block().getMessage());
-    assertSame(result.getMessage(), just(newEvent()).cast(CoreEvent.class).transform(flowRefProcessor).block().getMessage());
-
-    verify(applicationContext, atLeastOnce()).getBean(anyString());
-
-    verify(target, times(2)).referenced();
 
     stopIfNeeded(flowRefProcessor);
     disposeIfNeeded(flowRefProcessor, null);
