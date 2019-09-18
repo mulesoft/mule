@@ -26,7 +26,6 @@ import org.mule.test.metadata.extension.resolver.JsonInputStaticTypeResolver;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 
 public class CustomStaticMetadataOperations {
