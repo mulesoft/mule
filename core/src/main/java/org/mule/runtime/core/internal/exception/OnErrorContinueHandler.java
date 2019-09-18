@@ -17,8 +17,9 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.DefaultErrorTypeMatcherFactory;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.core.api.exception.ErrorTypeMatcherFactory;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
 /**
@@ -38,9 +39,10 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
   @Override
   protected void doInitialise(MuleContext muleContext) throws InitialisationException {
     super.doInitialise(muleContext);
+    ErrorTypeMatcherFactory matcherFactory = new DefaultErrorTypeMatcherFactory();
 
     ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
-    sourceErrorMatcher = new SingleErrorTypeMatcher(errorTypeRepository.getSourceResponseErrorType());
+    sourceErrorMatcher = matcherFactory.create(errorTypeRepository.getSourceResponseErrorType());
 
     if (errorType != null) {
       String[] errors = errorType.split(",");
@@ -54,7 +56,7 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
       }
     } else if (when == null) {
       // No error type and no expression, force ANY matcher
-      errorTypeMatcher = new SingleErrorTypeMatcher(errorTypeRepository.getAnyErrorType());
+      errorTypeMatcher = matcherFactory.create(errorTypeRepository.getAnyErrorType());
     }
 
   }

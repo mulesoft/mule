@@ -12,8 +12,8 @@ import static reactor.core.publisher.Mono.error;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.DefaultErrorTypeMatcherFactory;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 
@@ -29,7 +29,7 @@ import org.reactivestreams.Publisher;
  */
 public class OnCriticalErrorHandler extends AbstractExceptionListener implements MessagingExceptionHandlerAcceptor {
 
-  private final ErrorTypeMatcher criticalMatcher = new SingleErrorTypeMatcher(CRITICAL_ERROR_TYPE);
+  private final ErrorTypeMatcher criticalMatcher = new DefaultErrorTypeMatcherFactory().create(CRITICAL_ERROR_TYPE);
   private final ErrorTypeMatcher overloadMatcher;
 
   public OnCriticalErrorHandler(ErrorTypeMatcher overloadMatcher) {

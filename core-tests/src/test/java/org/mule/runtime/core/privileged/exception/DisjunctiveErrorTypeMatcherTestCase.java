@@ -16,9 +16,10 @@ import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HA
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_TYPES;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.exception.AbstractErrorTypeMatcherTestCase;
+import org.mule.runtime.core.api.exception.DefaultErrorTypeMatcherFactory;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.core.api.exception.ErrorTypeMatcherFactory;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -67,7 +68,8 @@ public class DisjunctiveErrorTypeMatcherTestCase extends AbstractErrorTypeMatche
   }
 
   private ErrorTypeMatcher createMatcher(ErrorType... errorTypes) {
-    return new DisjunctiveErrorTypeMatcher(stream(errorTypes).map(SingleErrorTypeMatcher::new).collect(toList()));
+    ErrorTypeMatcherFactory matcherFactory = new DefaultErrorTypeMatcherFactory();
+    return new DisjunctiveErrorTypeMatcher(stream(errorTypes).map(matcherFactory::create).collect(toList()));
   }
 
 }

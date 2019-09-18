@@ -21,7 +21,6 @@ import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createI
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_START;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher.doesErrorTypeContainWildcards;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
@@ -40,15 +39,14 @@ import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.ErrorHandlerNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.DefaultErrorTypeMatcherFactory;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
+import org.mule.runtime.core.api.exception.ErrorTypeMatcherFactory;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
-import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -303,7 +301,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     List<ErrorTypeMatcher> matchers = stream(errorTypeIdentifiers).map((identifier) -> {
       String parsedIdentifier = identifier.trim();
       final ComponentIdentifier errorTypeComponentIdentifier = buildFromStringRepresentation(parsedIdentifier);
-      return createMatcherForErrorType(errorTypeRepository.lookupErrorType(errorTypeComponentIdentifier)
+
+      ErrorTypeMatcherFactory matcherFactory = new DefaultErrorTypeMatcherFactory();
+      return matcherFactory.create(errorTypeRepository.lookupErrorType(errorTypeComponentIdentifier)
           .orElseGet(() -> {
             // When lazy init deployment is used an error-mapping may not be initialized due to the component that declares it
             // could not be part of the minimal application model. So, whenever we found that scenario we have to create the
@@ -316,14 +316,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
           }));
     }).collect(toList());
     return new DisjunctiveErrorTypeMatcher(matchers);
-  }
-
-  private static ErrorTypeMatcher createMatcherForErrorType(ErrorType errorType) {
-    if (doesErrorTypeContainWildcards(errorType)) {
-      return new WildcardErrorTypeMatcher(errorType);
-    } else {
-      return new SingleErrorTypeMatcher(errorType);
-    }
   }
 
   /**

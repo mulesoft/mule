@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.api.exception;
 
-import org.mule.runtime.api.message.ErrorType;
-
 import java.util.Objects;
+
+import org.mule.runtime.api.message.ErrorType;
 
 public final class WildcardErrorTypeMatcher implements ErrorTypeMatcher {
 
@@ -24,10 +24,6 @@ public final class WildcardErrorTypeMatcher implements ErrorTypeMatcher {
     this.errorType = errorType;
     identifierIsWildcard = WILDCARD_TOKEN.equals(errorType.getIdentifier());
     namespaceIsWildcard = WILDCARD_TOKEN.equals(errorType.getNamespace());
-  }
-
-  public static boolean doesErrorTypeContainWildcards(ErrorType errorType) {
-    return Objects.equals(WILDCARD_TOKEN, errorType.getIdentifier()) || Objects.equals(WILDCARD_TOKEN, errorType.getNamespace());
   }
 
   @Override

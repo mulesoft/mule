@@ -29,7 +29,9 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.core.api.exception.DefaultErrorTypeMatcherFactory;
+import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
+import org.mule.runtime.core.api.exception.ErrorTypeMatcherFactory;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -52,9 +54,11 @@ import java.util.Optional;
 public class MessagingExceptionResolver {
 
   private final Component component;
+  private ErrorTypeMatcherFactory matcherFactory;
 
   public MessagingExceptionResolver(Component component) {
     this.component = component;
+    matcherFactory = new DefaultErrorTypeMatcherFactory();
   }
 
   /**
@@ -138,7 +142,7 @@ public class MessagingExceptionResolver {
       return collectCritical(obj, me, locator).stream().findFirst();
     }
     // We look if there is a more specific error in the chain that matches with the root error (is child or has the same error)
-    SingleErrorTypeMatcher matcher = new SingleErrorTypeMatcher(errors.get(0).getSecond());
+    ErrorTypeMatcher matcher = matcherFactory.create(errors.get(0).getSecond());
     Reference<Pair<Throwable, ErrorType>> result = new Reference<>();
     errors.forEach(p -> {
       if (matcher.match(p.getSecond())) {
