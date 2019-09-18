@@ -146,9 +146,9 @@ public final class InputParametersTypeModelValidator implements ExtensionModelVa
             if (!parameterWithoutGetters.isEmpty()) {
               problems.addError(new Problem(namedObject,
                                             format(
-                                                "%s of type '%s' which contains fields (%s) that doesn't have the corresponding getter methods or getter methods that doesn't correspond to any of the present fields",
-                                                message, parameterType.getName(),
-                                                parameterWithoutGetters.stream().collect(joining(", ")))));
+                                                   "%s of type '%s' which contains fields (%s) that doesn't have the corresponding getter methods or getter methods that doesn't correspond to any of the present fields",
+                                                   message, parameterType.getName(),
+                                                   parameterWithoutGetters.stream().collect(joining(", ")))));
             }
           }
         }
