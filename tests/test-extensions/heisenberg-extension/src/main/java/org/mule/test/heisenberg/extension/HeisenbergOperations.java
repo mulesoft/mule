@@ -309,6 +309,7 @@ public class HeisenbergOperations implements Disposable {
     return builder.build();
   }
 
+  @MediaType(ANY)
   public void tapPhones(Chain operations, CompletionCallback<Object, Object> callback) {
     System.out.println("Started tapping phone");
 
