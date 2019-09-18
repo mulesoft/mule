@@ -11,7 +11,7 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
@@ -25,13 +25,12 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor;
+import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.factories.ModuleOperationMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
-import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
@@ -42,15 +41,13 @@ import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingCon
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 
 public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuildingDefinitionProvider {
 
   private static final String MESSAGE_PROCESSORS = "messageProcessors";
-
-  private static ComponentBuildingDefinition.Builder baseDefinition =
-      new ComponentBuildingDefinition.Builder().withNamespace(CORE_PREFIX);
 
   private final List<ComponentBuildingDefinition> definitions = new LinkedList<>();
 
@@ -68,11 +65,9 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
   }
 
   private void registerExtensionParsers(ExtensionModel extensionModel) {
-    System.out.println("lalala");
-
     XmlDslModel xmlDslModel = extensionModel.getXmlDslModel();
 
-    final ExtensionParsingContext parsingContext = createParsingContext(extensionModel);
+    // final ExtensionParsingContext parsingContext = createParsingContext(extensionModel);
     final Builder definitionBuilder = new Builder().withNamespace(xmlDslModel.getPrefix());
     final DslSyntaxResolver dslSyntaxResolver =
         DslSyntaxResolver.getDefault(extensionModel, DslResolvingContext.getDefault(extensions));
@@ -83,8 +78,7 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
 
     if (extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent()) {
       addModuleOperationChainParser();
-      registerXmlExtensionParsers(definitionBuilder, extensionModel, dslSyntaxResolver);
-      // } else {
+
       final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
       withContextClassLoader(extensionClassLoader, () -> {
         // ReflectionCache reflectionCache = new ReflectionCache();
@@ -92,6 +86,9 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
 
           @Override
           public void onConfiguration(ConfigurationModel model) {
+            System.out.println(" -> config: " + extensionModel.getName() + "." + model.getName());
+
+            // addModuleOperationChainParser(model.getName());
             // parseWith(new ConfigurationDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver,
             // parsingContext));
           }
@@ -104,6 +101,15 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
 
           @Override
           public void onOperation(OperationModel model) {
+            System.out.println(" -> operation: " + extensionModel.getName() + "." + model.getName());
+
+            final Optional<OperationComponentModelModelProperty> modelProperty =
+                model.getModelProperty(OperationComponentModelModelProperty.class);
+
+            final List<ComponentModel> innerComponents = modelProperty.get().getBodyComponentModel().getInnerComponents();
+
+            addModuleOperationChainParser(definitionBuilder, xmlDslModel.getPrefix(),
+                                          dslSyntaxResolver.resolve(model).getElementName());
             // parseWith(new OperationDefinitionParser(definitionBuilder, extensionModel,
             // model, dslSyntaxResolver, parsingContext));
           }
@@ -122,6 +128,7 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
 
           @Override
           protected void onParameter(ParameterGroupModel groupModel, ParameterModel model) {
+            System.out.println(" -> param: " + extensionModel.getName() + "." + model.getName());
             // registerTopLevelParameter(model.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver,
             // parsingContext, reflectionCache);
           }
@@ -132,52 +139,37 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
   }
 
   /**
-   * Goes over all operations defined within the extension and it will add the expected Java type of the chain that will contain
-   * the macro expanded code, so that
-   * {@link org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper#isProcessor(ComponentModel)} can properly determine
-   * it's a processor. Notice it does not registers sources, neither configurations, parameters, etc. as those will be properly
-   * handled by the {@link ComponentLocationVisitor}.
-   *
-   * @param definitionBuilder builder to generate the {@link ComponentBuildingDefinition} from the operation.
-   * @param extensionModel to introspect
-   * @param dslSyntaxResolver the resolver to obtain the XML name of the operation
-   */
-  private void registerXmlExtensionParsers(Builder definitionBuilder, ExtensionModel extensionModel,
-                                           DslSyntaxResolver dslSyntaxResolver) {
-    new IdempotentExtensionWalker() {
-
-      @Override
-      public void onOperation(OperationModel operationModel) {
-        definitions.add(
-                        definitionBuilder
-                            .withIdentifier(dslSyntaxResolver.resolve(operationModel).getElementName())
-                            .withTypeDefinition(fromType(ModuleOperationMessageProcessorChainBuilder.ModuleOperationProcessorChain.class))
-                            .build());
-      }
-    }.walk(extensionModel);
-  }
-
-  /**
    * Parser for the expanded operations, generated dynamically by the {@link ApplicationModel} by reading the extensions
    *
    * @param componentBuildingDefinitions
    */
   private void addModuleOperationChainParser() {
-    definitions.add(baseDefinition.withIdentifier("module-operation-chain")
+    addModuleOperationChainParser(new Builder().withNamespace(CORE_PREFIX), CORE_PREFIX, "module-operation-chain");
+  }
+
+  private void addModuleOperationChainParser(final Builder baseDefinition, String namespacePrefix, String elementName) {
+    definitions.add(baseDefinition.withIdentifier(elementName)
         .withTypeDefinition(fromType(AnnotatedProcessor.class))
         .withObjectFactoryType(ModuleOperationMessageProcessorChainFactoryBean.class)
         .withSetterParameterDefinition("properties", fromChildMapConfiguration(String.class, String.class)
             .withWrapperIdentifier("module-operation-properties").build())
         .withSetterParameterDefinition("parameters", fromChildMapConfiguration(String.class, String.class)
             .withWrapperIdentifier("module-operation-parameters").build())
-        .withSetterParameterDefinition("moduleName", fromSimpleParameter("moduleName").build())
-        .withSetterParameterDefinition("moduleOperation", fromSimpleParameter("moduleOperation").build())
+        .withSetterParameterDefinition("moduleName", fromFixedValue(namespacePrefix).build()/*
+                                                                                             * fromSimpleParameter ( "moduleName"
+                                                                                             * ).build ()
+                                                                                             */)
+        .withSetterParameterDefinition("moduleOperation", fromFixedValue(elementName).build()/*
+                                                                                              * fromSimpleParameter (
+                                                                                              * "moduleOperation" ). build( )
+                                                                                              */)
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asPrototype().build());
 
     definitions.add(baseDefinition.withIdentifier("module-operation-properties")
         .withTypeDefinition(fromType(TreeMap.class)).build());
-    definitions.add(baseDefinition.withIdentifier("module-operation-property-entry")
+    definitions.add(baseDefinition
+        .withIdentifier("module-operation-property-entry")
         .withTypeDefinition(fromMapEntryType(String.class, String.class))
         .build());
     definitions.add(baseDefinition.withIdentifier("module-operation-parameters")

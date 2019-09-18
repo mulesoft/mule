@@ -1126,7 +1126,7 @@ public class ApplicationModel implements ArtifactAst {
    * @param postProcess a closure to be executed after the macroexpansion of an extension.
    */
   private void expandModules(Set<ExtensionModel> extensionModels, Runnable postProcess) {
-    new MacroExpansionModulesModel(this, extensionModels).expand(postProcess);
+    // new MacroExpansionModulesModel(this, extensionModels).expand(postProcess);
   }
 
   /**
