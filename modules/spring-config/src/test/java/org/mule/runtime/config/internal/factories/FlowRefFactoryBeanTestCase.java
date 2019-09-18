@@ -159,7 +159,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     assertNotSame(targetFlow, getFlowRefProcessor(flowRefFactoryBean));
     assertNotSame(targetFlow, getFlowRefProcessor(flowRefFactoryBean));
 
-    verifyReferenced(flowRefFactoryBean, targetFlow);
+    verifyProcess(flowRefFactoryBean, targetFlow);
     verifyLifecycle(targetFlow, 0);
   }
 
