@@ -139,11 +139,11 @@ public class MacroExpansionModuleModel {
                   componentModelsToReplaceByIndex.put(i, moduleOperationChain);
                 });
           });
-      // for (Map.Entry<Integer, ComponentModel> entry : componentModelsToReplaceByIndex.entrySet()) {
-      // entry.getValue().setParent(containerComponentModel);
-      // containerComponentModel.getInnerComponents().add(entry.getKey(), entry.getValue());
-      // containerComponentModel.getInnerComponents().remove(entry.getKey() + 1);
-      // }
+      for (Map.Entry<Integer, ComponentModel> entry : componentModelsToReplaceByIndex.entrySet()) {
+        entry.getValue().setParent(containerComponentModel);
+        containerComponentModel.getInnerComponents().add(entry.getKey(), entry.getValue());
+        containerComponentModel.getInnerComponents().remove(entry.getKey() + 1);
+      }
       componentModelsToReplaceByIndex.clear();
     });
   }
@@ -298,14 +298,8 @@ public class MacroExpansionModuleModel {
         referencesOperationsWithinModule((ComponentAst) operationRefModel) ? configRefParentTnsName
             : getConfigRefName(operationRefModel);
     ComponentModel.Builder processorChainBuilder = new ComponentModel.Builder();
-    processorChainBuilder
-        .setIdentifier(builder()
-            .namespace(CORE_PREFIX)
-            .namespaceUri(CORE_NAMESPACE)
-            .name("module-operation-chain").build());
+    processorChainBuilder.setIdentifier(operationRefModel.getIdentifier());
 
-    processorChainBuilder.addParameter("moduleName", extensionModel.getXmlDslModel().getPrefix(), false);
-    processorChainBuilder.addParameter("moduleOperation", operationModel.getName(), false);
     Map<String, String> propertiesMap = extractProperties(configRefName);
     Map<String, String> parametersMap =
         extractParameters((ComponentAst) operationRefModel, operationModel.getAllParameterModels());
@@ -343,12 +337,12 @@ public class MacroExpansionModuleModel {
 
     ComponentModel processorChainModel = processorChainBuilder.build();
     for (ComponentModel processorChainModelChild : processorChainModel.getInnerComponents()) {
-      processorChainModelChild.setParent(operationRefModel);
+      processorChainModelChild.setParent(processorChainModel);
     }
 
-    operationRefModel.getInnerComponents().addAll(processorChainModel.getInnerComponents());
-
-    return operationRefModel;
+    // operationRefModel.getInnerComponents().addAll(processorChainModel.getInnerComponents());
+    // return operationRefModel;
+    return processorChainModel;
   }
 
   /**
@@ -630,8 +624,7 @@ public class MacroExpansionModuleModel {
             .orElseGet(() -> copyOperationComponentModel(operationChildModel, configRefName, moduleGlobalElementsNames,
                                                          literalsParameters, containerName)))
         .forEach(operationReplacementModel::addChildComponentModel);
-    final ComponentModel buildFrom = buildFrom(modelToCopy, operationReplacementModel);
-    return modelToCopy;
+    return buildFrom(modelToCopy, operationReplacementModel);
   }
 
   private ComponentModel.Builder getComponentModelBuilderFrom(ComponentModel componentModelOrigin) {
