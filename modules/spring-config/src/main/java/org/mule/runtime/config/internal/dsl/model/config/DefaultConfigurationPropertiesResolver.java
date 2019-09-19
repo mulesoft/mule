@@ -39,7 +39,6 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
 
   private static final Logger LOGGER = getLogger(DefaultConfigurationPropertiesResolver.class);
   public static final String PLACEHOLDER_PREFIX = "${";
-  public static final String ESCAPED_PLACEHOLDER_PREFIF = "\\" + PLACEHOLDER_PREFIX;
   public static final String PLACEHOLDER_SUFFIX = "}";
   private final Optional<ConfigurationPropertiesResolver> parentResolver;
   private final ConfigurationPropertiesProvider configurationPropertiesProvider;
