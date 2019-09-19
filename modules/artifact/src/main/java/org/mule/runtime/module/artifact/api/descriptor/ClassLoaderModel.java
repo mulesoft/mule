@@ -125,8 +125,8 @@ public final class ClassLoaderModel {
    */
   public static class ClassLoaderModelBuilder {
 
-    private final Set<String> packages = new HashSet<>();
-    private final Set<String> resources = new HashSet<>();
+    protected final Set<String> packages = new HashSet<>();
+    protected final Set<String> resources = new HashSet<>();
     private final Set<String> localPackages = new HashSet<>();
     private final Set<String> localResources = new HashSet<>();
     private List<URL> urls = new ArrayList<>();

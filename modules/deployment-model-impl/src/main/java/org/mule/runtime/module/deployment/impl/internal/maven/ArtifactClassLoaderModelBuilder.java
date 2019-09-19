@@ -265,9 +265,14 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
                                     "Dependency %s:%s could not be found within the artifact %s. It must be declared within the maven dependencies of the artifact.",
                                     groupId,
                                     artifactId, artifactFolder.getName()))));
+    ArtifactAttributes artifactAttributes = collectArtifactAttributesFor(bundleDependency);
+    this.exportingPackages(artifactAttributes.getPackages());
+    this.exportingResources(artifactAttributes.getResources());
+  }
+
+  protected ArtifactAttributes collectArtifactAttributesFor(BundleDependency bundleDependency) {
     JarInfo jarInfo = fileJarExplorer.explore(bundleDependency.getBundleUri());
-    this.exportingPackages(jarInfo.getPackages());
-    this.exportingResources(jarInfo.getResources());
+    return new ArtifactAttributes(jarInfo.getPackages(), jarInfo.getResources());
   }
 
   protected Optional<BundleDependency> findBundleDependency(String groupId, String artifactId,
@@ -311,5 +316,25 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
   }
 
   protected abstract List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency);
+
+  /**
+   * Allows to set local packages by only including those that are not already exported by this class loader model.
+   * Note that the exported packages should be previously set before calling this method.
+   *
+   * @param localPackages all the packages defined by the artifact.
+   */
+  public void withFilteredLocalPackages(Set<String> localPackages) {
+    withLocalPackages(localPackages.stream().filter(localPackage -> !packages.contains(localPackage)).collect(toSet()));
+  }
+
+  /**
+   * Allows to set local resources by only including those that are not already exported by this class loader model.
+   * Note that the exported resources should be previously set before calling this method.
+   *
+   * @param localResources all the resources defined by the artifact.
+   */
+  public void withFilteredLocalResources(Set<String> localResources) {
+    withLocalResources(localResources.stream().filter(localResource -> !resources.contains(localResource)).collect(toSet()));
+  }
 
 }
