@@ -26,8 +26,8 @@ import javax.inject.Inject;
 
 public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProcessorChainObjectFactory {
 
-  private Map<String, String> properties = new HashMap<>();
-  private Map<String, String> parameters = new HashMap<>();
+  private final Map<String, String> properties = new HashMap<>();
+  private final Map<String, String> parameters = new HashMap<>();
 
   private ExtensionModel extensionModel;
   private OperationModel operationModel;
@@ -93,11 +93,11 @@ public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProc
   // }
 
   public void setProperties(Map<String, String> properties) {
-    this.properties = properties;
+    this.properties.putAll(properties);
   }
 
   public void setParameters(Map<String, String> parameters) {
-    this.parameters = parameters;
+    this.parameters.putAll(parameters);
   }
 
   // public void setModuleName(String moduleName) {

@@ -22,7 +22,6 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SUBFLOW_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.ORIGINAL_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isErrorHandler;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isMessageSource;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isProcessor;
@@ -124,10 +123,10 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
       }
 
       DefaultComponentLocation parentComponentLocation = (DefaultComponentLocation) parentComponentModel.getLocation();
-      if (isModuleOperation(componentModel)) {
-        // just point to the correct typed component operation identifier
-        typedComponentIdentifier = getModuleOperationTypeComponentIdentifier(componentModel);
-      }
+      // if (isModuleOperation(componentModel)) {
+      // // just point to the correct typed component operation identifier
+      // typedComponentIdentifier = getModuleOperationTypeComponentIdentifier(componentModel);
+      // }
       if (isHttpProxyPart(componentModel)) {
         componentLocation =
             parentComponentLocation.appendLocationPart(componentModel.getIdentifier().getName(), typedComponentIdentifier,
@@ -252,7 +251,11 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
   }
 
   private boolean isModuleOperation(ComponentAst componentModel) {
-    return componentModel.getIdentifier().equals(MODULE_OPERATION_CHAIN);
+    return componentModel.getModel(OperationModel.class)
+        .flatMap(model -> model.getModelProperty(OperationComponentModelModelProperty.class))
+        .isPresent();
+
+    // return componentModel.getIdentifier().equals(MODULE_OPERATION_CHAIN);
   }
 
   private boolean parentComponentIsRouter(ComponentAst componentModel, List<ComponentAst> hierarchy) {
@@ -325,7 +328,8 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
 
   private Optional<TypedComponentIdentifier> getModuleOperationTypeComponentIdentifier(ComponentAst componentModel) {
     final ComponentIdentifier originalIdentifier =
-        (ComponentIdentifier) componentModel.getMetadata().getParserAttributes().get(ORIGINAL_IDENTIFIER);
+        // (ComponentIdentifier) componentModel.getMetadata().getParserAttributes().get(ORIGINAL_IDENTIFIER);
+        componentModel.getIdentifier();
 
     final String namespace = originalIdentifier.getNamespace();
     final String operationName = originalIdentifier.getName();
