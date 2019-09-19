@@ -69,6 +69,7 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SynchronousSinkExecutorCallback;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
@@ -102,6 +103,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 

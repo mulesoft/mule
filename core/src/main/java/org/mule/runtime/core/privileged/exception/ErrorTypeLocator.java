@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.exception.ExceptionMapper;
@@ -81,6 +82,7 @@ public class ErrorTypeLocator {
    *         related to UNKNOWN will be returned.
    */
   public ErrorType lookupComponentErrorType(ComponentIdentifier componentIdentifier, Class<? extends Throwable> exception) {
+
     ExceptionMapper exceptionMapper = componentExceptionMappers.get(componentIdentifier);
     Optional<ErrorType> errorType = empty();
     if (exceptionMapper != null) {
@@ -101,6 +103,9 @@ public class ErrorTypeLocator {
    *         related to UNKNOWN will be returned.
    */
   public ErrorType lookupComponentErrorType(ComponentIdentifier componentIdentifier, Throwable exception) {
+    if (exception instanceof ConnectionException && ((ConnectionException) exception).getErrorType().isPresent()) {
+      return ((ConnectionException) exception).getErrorType().get();
+    }
     return lookupComponentErrorType(componentIdentifier, exception.getClass());
   }
 

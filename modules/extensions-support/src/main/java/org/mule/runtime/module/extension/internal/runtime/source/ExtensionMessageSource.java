@@ -167,7 +167,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     this.notificationDispatcher = notificationDispatcher;
     this.transactionFactoryManager = transactionFactoryManager;
     this.applicationName = applicationName;
-    this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, sourceModel);
+    this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, sourceModel, muleContext.getErrorTypeRepository());
     this.lifecycleManager = new DefaultLifecycleManager<>(sourceModel.getName(), this);
   }
 

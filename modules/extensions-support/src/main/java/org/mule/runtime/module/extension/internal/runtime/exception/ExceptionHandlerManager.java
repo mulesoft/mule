@@ -10,7 +10,10 @@ import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVIT
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractCauseOfType;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -35,9 +38,25 @@ public final class ExceptionHandlerManager {
 
   private static final ExceptionHandler DEFAULT_EXCEPTION_ENRICHER = new NullExceptionHandler();
   private final ExceptionHandler exceptionHandler;
+  private final ErrorType connectionErrorType;
 
   public ExceptionHandlerManager(ExtensionModel extensionModel, ComponentModel componentModel) {
+    this(extensionModel, componentModel, null);
+  }
+
+  public ExceptionHandlerManager(ExtensionModel extensionModel, ComponentModel componentModel, ErrorTypeRepository errorTypeRepository) {
     exceptionHandler = findExceptionHandler(extensionModel, componentModel);
+    this.connectionErrorType = resolveConnectionErrorType(extensionModel, errorTypeRepository);
+  }
+
+  private ErrorType resolveConnectionErrorType(ExtensionModel extensionModel, ErrorTypeRepository errorTypeRepository) {
+    return extensionModel.getErrorModels().stream().filter(errorModel -> errorModel.getType().equals(CONNECTIVITY_ERROR_IDENTIFIER)).
+            findFirst().
+            map(errorModel -> errorTypeRepository.getErrorType(ComponentIdentifier.builder().
+                    namespace(errorModel.getNamespace()).
+                    name(errorModel.getType()).
+                    build()).orElse(null)).
+            orElse(null);
   }
 
   /**
@@ -60,26 +79,19 @@ public final class ExceptionHandlerManager {
   public Throwable handleThrowable(Throwable e) {
     Optional<ConnectionException> connectionException = extractConnectionException(e);
     if (connectionException.isPresent()) {
-      return resolveConnectionException(connectionException.get(), e);
+      return resolveConnectionException(connectionException.get());
     } else {
       // unwraps the exception thrown by the reflective operation if exist any.
       return extractCauseOfType(e, UndeclaredThrowableException.class).orElse(e);
     }
   }
 
-  private ConnectionException resolveConnectionException(ConnectionException connectionException, Throwable handledThrowable) {
-    if (isMessagingExceptionWithConnectivityError(handledThrowable) && !connectionException.getErrorType().isPresent()) {
+  private Throwable resolveConnectionException(ConnectionException connectionException) {
+    if(!connectionException.getErrorType().isPresent() && connectionErrorType != null) {
       return new ConnectionException(connectionException.getMessage(), connectionException.getCause(),
-                                     ((MessagingException) handledThrowable).getEvent().getError().get().getErrorType());
+              connectionErrorType, connectionException.getConnection().orElse(null));
     }
     return connectionException;
-  }
-
-  private boolean isMessagingExceptionWithConnectivityError(Throwable cause) {
-    return cause instanceof MessagingException &&
-        ((MessagingException) cause).getEvent().getError().isPresent() &&
-        ((MessagingException) cause).getEvent().getError().get().getErrorType().getIdentifier()
-            .equals(CONNECTIVITY_ERROR_IDENTIFIER);
   }
 
   private Throwable enrich(Throwable t) {
