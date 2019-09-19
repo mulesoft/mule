@@ -25,6 +25,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import static org.apache.commons.lang3.SystemUtils.JAVA_VENDOR;
+
 // @ThreadSafe
 
 public class SystemUtils extends org.apache.commons.lang.SystemUtils
@@ -149,26 +151,26 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
 
     public static boolean isSunJDK()
     {
-        return SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("sun")
-               || SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("oracle");
+        return SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("sun") || JAVA_VENDOR.toLowerCase().contains("sun")
+               || SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("oracle")|| JAVA_VENDOR.toLowerCase().contains("oracle");
     }
 
     public static boolean isAppleJDK()
     {
-        return SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("apple");
+        return SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("apple")|| JAVA_VENDOR.toLowerCase().contains("apple");
     }
 
     public static boolean isIbmJDK()
     {
-        return SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("ibm");
+        return SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("ibm")|| JAVA_VENDOR.toLowerCase().contains("ibm");
     }
 
     public static boolean isAdoptOpenJDK() {
-        return JAVA_VM_VENDOR.toLowerCase().contains("adoptopenjdk");
+        return JAVA_VM_VENDOR.toLowerCase().contains("adoptopenjdk") || JAVA_VENDOR.toLowerCase().contains("adoptopenjdk");
     }
 
     public static boolean isOpenJDK() {
-        return JAVA_VM_VENDOR.toLowerCase().contains("openjdk");
+        return JAVA_VM_VENDOR.toLowerCase().contains("openjdk") || JAVA_VENDOR.toLowerCase().contains("openjdk");
     }
     
     public static final boolean IS_JAVA_1_7 = (JAVA_VERSION_TRIMMED != null) 
