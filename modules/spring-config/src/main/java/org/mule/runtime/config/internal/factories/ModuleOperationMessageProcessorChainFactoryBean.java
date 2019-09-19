@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.factories;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
 
@@ -19,15 +20,14 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
 
 public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProcessorChainObjectFactory {
 
-  private final Map<String, String> properties = new HashMap<>();
-  private final Map<String, String> parameters = new HashMap<>();
+  private Map<String, String> properties = emptyMap();
+  private Map<String, String> parameters = emptyMap();
 
   private ExtensionModel extensionModel;
   private OperationModel operationModel;
@@ -93,11 +93,11 @@ public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProc
   // }
 
   public void setProperties(Map<String, String> properties) {
-    this.properties.putAll(properties);
+    this.properties = properties;
   }
 
   public void setParameters(Map<String, String> parameters) {
-    this.parameters.putAll(parameters);
+    this.parameters = parameters;
   }
 
   // public void setModuleName(String moduleName) {

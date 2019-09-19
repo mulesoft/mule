@@ -307,8 +307,8 @@ public class MacroExpansionModuleModel {
         getParameterChild(propertiesMap, "module-operation-properties", "module-operation-property-entry");
     ComponentModel parametersComponentModel =
         getParameterChild(parametersMap, "module-operation-parameters", "module-operation-parameter-entry");
-    processorChainBuilder.addChildComponentModel(propertiesComponentModel);
-    processorChainBuilder.addChildComponentModel(parametersComponentModel);
+    // processorChainBuilder.addChildComponentModel(propertiesComponentModel);
+    // processorChainBuilder.addChildComponentModel(parametersComponentModel);
     processorChainBuilder.setSourceCode(operationRefModel.getSourceCode());
 
     bodyProcessors.stream()
@@ -337,12 +337,12 @@ public class MacroExpansionModuleModel {
 
     ComponentModel processorChainModel = processorChainBuilder.build();
     for (ComponentModel processorChainModelChild : processorChainModel.getInnerComponents()) {
-      processorChainModelChild.setParent(processorChainModel);
+      processorChainModelChild.setParent(operationRefModel);
     }
 
-    // operationRefModel.getInnerComponents().addAll(processorChainModel.getInnerComponents());
-    // return operationRefModel;
-    return processorChainModel;
+    operationRefModel.getInnerComponents().addAll(processorChainModel.getInnerComponents());
+    return operationRefModel;
+    // return processorChainModel;
   }
 
   /**
