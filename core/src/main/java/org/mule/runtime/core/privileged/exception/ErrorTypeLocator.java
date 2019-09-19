@@ -103,11 +103,14 @@ public class ErrorTypeLocator {
    *         related to UNKNOWN will be returned.
    */
   public ErrorType lookupComponentErrorType(ComponentIdentifier componentIdentifier, Throwable exception) {
-    if (exception instanceof ConnectionException && ((ConnectionException) exception).getErrorType().isPresent()) {
-      return ((ConnectionException) exception).getErrorType().get();
-    }
-    return lookupComponentErrorType(componentIdentifier, exception.getClass());
+    return getErrorTypeFromException(exception)
+        .orElseGet(() -> lookupComponentErrorType(componentIdentifier, exception.getClass()));
   }
+
+  private Optional<ErrorType> getErrorTypeFromException(Throwable exception) {
+    return exception instanceof ConnectionException ? ((ConnectionException) exception).getErrorType() : empty();
+  }
+
 
   /**
    * Adds an {@link ExceptionMapper} for a particular component identified by a {@link ComponentIdentifier}.

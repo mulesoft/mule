@@ -44,19 +44,25 @@ public final class ExceptionHandlerManager {
     this(extensionModel, componentModel, null);
   }
 
-  public ExceptionHandlerManager(ExtensionModel extensionModel, ComponentModel componentModel, ErrorTypeRepository errorTypeRepository) {
+  public ExceptionHandlerManager(ExtensionModel extensionModel, ComponentModel componentModel,
+                                 ErrorTypeRepository errorTypeRepository) {
     exceptionHandler = findExceptionHandler(extensionModel, componentModel);
     this.connectionErrorType = resolveConnectionErrorType(extensionModel, errorTypeRepository);
   }
 
   private ErrorType resolveConnectionErrorType(ExtensionModel extensionModel, ErrorTypeRepository errorTypeRepository) {
-    return extensionModel.getErrorModels().stream().filter(errorModel -> errorModel.getType().equals(CONNECTIVITY_ERROR_IDENTIFIER)).
-            findFirst().
-            map(errorModel -> errorTypeRepository.getErrorType(ComponentIdentifier.builder().
-                    namespace(errorModel.getNamespace()).
-                    name(errorModel.getType()).
-                    build()).orElse(null)).
-            orElse(null);
+    return extensionModel.getErrorModels().stream()
+        .filter(errorModel -> errorModel.getType().equals(CONNECTIVITY_ERROR_IDENTIFIER)).findFirst().map(
+                                                                                                          errorModel -> errorTypeRepository
+                                                                                                              .getErrorType(ComponentIdentifier
+                                                                                                                  .builder()
+                                                                                                                  .namespace(errorModel
+                                                                                                                      .getNamespace())
+                                                                                                                  .name(errorModel
+                                                                                                                      .getType())
+                                                                                                                  .build())
+                                                                                                              .orElse(null))
+        .orElse(null);
   }
 
   /**
@@ -87,9 +93,9 @@ public final class ExceptionHandlerManager {
   }
 
   private Throwable resolveConnectionException(ConnectionException connectionException) {
-    if(!connectionException.getErrorType().isPresent() && connectionErrorType != null) {
+    if (!connectionException.getErrorType().isPresent() && connectionErrorType != null) {
       return new ConnectionException(connectionException.getMessage(), connectionException.getCause(),
-              connectionErrorType, connectionException.getConnection().orElse(null));
+                                     connectionErrorType, connectionException.getConnection().orElse(null));
     }
     return connectionException;
   }
