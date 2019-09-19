@@ -97,6 +97,7 @@ public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProc
   }
 
   public void setParameters(Map<String, String> parameters) {
+    System.out.println(parameters);
     this.parameters = parameters;
   }
 
