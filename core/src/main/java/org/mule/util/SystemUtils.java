@@ -151,18 +151,18 @@ public class SystemUtils extends org.apache.commons.lang.SystemUtils
 
     public static boolean isSunJDK()
     {
-        return SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("sun")
-               || SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("oracle");
+        return SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("sun") || JAVA_VENDOR.toLowerCase().contains("sun")
+               || SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("oracle")|| JAVA_VENDOR.toLowerCase().contains("oracle");
     }
 
     public static boolean isAppleJDK()
     {
-        return SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("apple");
+        return SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("apple")|| JAVA_VENDOR.toLowerCase().contains("apple");
     }
 
     public static boolean isIbmJDK()
     {
-        return SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("ibm");
+        return SystemUtils.JAVA_VM_VENDOR.toLowerCase().contains("ibm")|| JAVA_VENDOR.toLowerCase().contains("ibm");
     }
 
     public static boolean isAdoptOpenJDK() {
