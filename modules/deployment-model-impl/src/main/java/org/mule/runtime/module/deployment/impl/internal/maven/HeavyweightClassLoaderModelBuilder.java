@@ -38,7 +38,7 @@ import org.apache.maven.model.Plugin;
  */
 public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModelBuilder {
 
-  private static final Semver CLASS_LOADER_MODEL_VERSION_110 = new Semver("1.1.0", LOOSE);
+  public static final Semver CLASS_LOADER_MODEL_VERSION_110 = new Semver("1.1.0", LOOSE);
 
   private final org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel;
 
@@ -74,19 +74,11 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   }
 
   @Override
-  protected ArtifactAttributes collectArtifactAttributesFor(BundleDependency bundleDependency) {
-    if (isSupportingPackagesResourcesInformation()) {
-      return new ArtifactAttributes(bundleDependency.getPackages(), bundleDependency.getResources());
-    }
-    return super.collectArtifactAttributesFor(bundleDependency);
-  }
-
-  @Override
   protected List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency) {
     return bundleDependency.getAdditionalDependencies().stream().map(additionalDependency -> {
       if (isSupportingPackagesResourcesInformation()) {
-        withFilteredLocalPackages(additionalDependency.getPackages());
-        withFilteredLocalResources(additionalDependency.getResources());
+        withLocalPackages(additionalDependency.getPackages());
+        withLocalResources(additionalDependency.getResources());
       }
       return additionalDependency.getBundleUri();
     }).collect(toList());
@@ -142,8 +134,7 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   }
 
   private boolean isSupportingPackagesResourcesInformation() {
-    return classLoaderModelVersion.isEqualTo(CLASS_LOADER_MODEL_VERSION_120)
-        || classLoaderModelVersion.isGreaterThan(CLASS_LOADER_MODEL_VERSION_120);
+    return !classLoaderModelVersion.isLowerThan(CLASS_LOADER_MODEL_VERSION_120);
   }
 
   /**
@@ -155,7 +146,15 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
         .filter(Artifact::isShared)
         .filter(sharedDep -> !validateMuleRuntimeSharedLibrary(sharedDep.getArtifactCoordinates().getGroupId(),
                                                                sharedDep.getArtifactCoordinates().getArtifactId()))
-        .forEach(sharedDep -> findAndExportSharedLibrary(sharedDep.getArtifactCoordinates().getGroupId(),
-                                                         sharedDep.getArtifactCoordinates().getArtifactId()));
+        .forEach(sharedDep -> {
+          if (isSupportingPackagesResourcesInformation()) {
+            this.exportingPackages(new HashSet<>(asList(sharedDep.getPackages())));
+            this.exportingResources(new HashSet<>(asList(sharedDep.getResources())));
+          } else {
+            findAndExportSharedLibrary(sharedDep.getArtifactCoordinates().getGroupId(),
+                                       sharedDep.getArtifactCoordinates().getArtifactId());
+          }
+        });
   }
+
 }

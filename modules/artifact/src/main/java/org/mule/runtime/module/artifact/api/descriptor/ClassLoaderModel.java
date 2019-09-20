@@ -127,8 +127,8 @@ public final class ClassLoaderModel {
 
     protected final Set<String> packages = new HashSet<>();
     protected final Set<String> resources = new HashSet<>();
-    private final Set<String> localPackages = new HashSet<>();
-    private final Set<String> localResources = new HashSet<>();
+    protected final Set<String> localPackages = new HashSet<>();
+    protected final Set<String> localResources = new HashSet<>();
     private List<URL> urls = new ArrayList<>();
     protected Set<BundleDependency> dependencies = new HashSet<>();
     private final Set<String> privilegedExportedPackages = new HashSet<>();

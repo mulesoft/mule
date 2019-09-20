@@ -91,7 +91,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   public static final String MULE_ARTIFACT_PATCH_JSON_FILE_NAME = "mule-artifact-patch.json";
 
   public static final String CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER = "_classLoaderModelMavenReactorResolver";
-  protected static final String CLASS_LOADER_MODEL_VERSION_120 = "1.2.0";
+  public static final String CLASS_LOADER_MODEL_VERSION_120 = "1.2.0";
 
   protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
   protected MavenClient mavenClient;
@@ -470,8 +470,8 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
 
   protected void populateLocalPackages(ArtifactAttributes artifactAttributes,
                                        ArtifactClassLoaderModelBuilder classLoaderModelBuilder) {
-    classLoaderModelBuilder.withFilteredLocalPackages(new HashSet<>(artifactAttributes.getPackages()));
-    classLoaderModelBuilder.withFilteredLocalResources(new HashSet<>(artifactAttributes.getResources()));
+    classLoaderModelBuilder.withLocalPackages(new HashSet<>(artifactAttributes.getPackages()));
+    classLoaderModelBuilder.withLocalResources(new HashSet<>(artifactAttributes.getResources()));
   }
 
   protected abstract boolean includeProvidedDependencies(ArtifactType artifactType);

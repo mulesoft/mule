@@ -39,6 +39,14 @@ public class ZipUtils {
       this.file = file;
       this.alias = alias;
     }
+
+    public String getFile() {
+      return file;
+    }
+
+    public String getAlias() {
+      return alias;
+    }
   }
 
   /**

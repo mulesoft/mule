@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -15,9 +16,11 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.collection.IsIn.isIn;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.IsNot.not;
@@ -30,6 +33,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.maven.client.api.model.BundleScope.COMPILE;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
+import static org.mule.runtime.core.api.util.FileUtils.copyFile;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 
@@ -40,11 +44,13 @@ import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
+import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import org.mule.runtime.module.deployment.impl.internal.plugin.PluginExtendedClassLoaderModelAttributes;
 import org.mule.runtime.module.deployment.impl.internal.plugin.PluginExtendedDeploymentProperties;
 import org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderModelLoader;
+import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -80,6 +86,7 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
   private static final org.mule.maven.client.api.model.BundleDependency TRAIT_BUNDLE =
       createBundleDependency("some.company", "dummy-trait", "1.0.3", "raml-fragment");
   private static final String POM_FORMAT = "%s-%s.pom";
+  private static final String SOURCE_TEST_CLASSES = "/source-test-classes";
   private final List<org.mule.maven.client.api.model.BundleDependency> BASE_DEPENDENCIES =
       asList(API_BUNDLE, LIB_BUNDLE, TRAIT_BUNDLE);
 
@@ -96,19 +103,18 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
     assertThat(classLoaderModel.getExportedResources(), is(not(empty())));
   }
 
-  @Test
-  public void packagesResourcesLoadedFromClassLoaderModelJson() throws Exception {
-    URL patchedAppUrl = getClass().getClassLoader()
-        .getResource(Paths.get(APPS_FOLDER, "packages-resources-loaded-from-class-loader-model").toString());
-    ClassLoaderModel classLoaderModel = buildClassLoaderModelShouldFailIfJarExplorerIsUsed(toFile(patchedAppUrl), ImmutableMap
-        .of(EXPORTED_PACKAGES, ImmutableList.of("com.mycompany.api"), EXPORTED_RESOURCES, ImmutableList.of("tls.properties")));
+  private void doTestPackagesResourcesLoaded(URL appUrl, boolean useJarExplorer) throws Exception {
+    ClassLoaderModel classLoaderModel = buildClassLoaderModel(toFile(appUrl), ImmutableMap
+        .of(EXPORTED_PACKAGES, ImmutableList.of("com.mycompany.api"), EXPORTED_RESOURCES, ImmutableList.of("tls.properties")),
+                                                              useJarExplorer);
 
-    assertThat(classLoaderModel.getExportedPackages(), hasItem("com.mycompany.api"));
-    assertThat(classLoaderModel.getLocalPackages(), not(hasItem("com.mycompany.api")));
+    assertThat(classLoaderModel.getExportedPackages(), hasItems("com.mycompany.api", "org.apache.commons.csv"));
+    assertThat(classLoaderModel.getLocalPackages(),
+               everyItem(not(isIn(newArrayList("com.mycompany.api", "org.apache.commons.csv")))));
     assertThat(classLoaderModel.getLocalPackages(), hasItems("com.mycompany.internal", "org.apache.commons.io"));
 
     assertThat(classLoaderModel.getExportedResources(), hasItem("tls.properties"));
-    assertThat(classLoaderModel.getLocalResources(), not(hasItem("tls.properties")));
+    assertThat(classLoaderModel.getLocalResources(), everyItem(not(isIn(newArrayList("tls.properties")))));
     assertThat(classLoaderModel.getLocalResources(), hasItem("META-INF/maven/com/mycompany/test/pom.xml"));
 
     Optional<BundleDependency> mulePluginBundleDependency = classLoaderModel.getDependencies().stream().filter(
@@ -131,20 +137,53 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
     pluginExtendedClassLoaderModelAttributes.put(org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.class.getName(),
                                                  bundleDependency.getDescriptor());
 
-    pluginExtendedClassLoaderModelAttributes.put(EXPORTED_PACKAGES, ImmutableList.of("org.mule.tests.empty.plugin.api"));
-    pluginExtendedClassLoaderModelAttributes.put(EXPORTED_RESOURCES, ImmutableList.of("empty-plugin.properties"));
+    pluginExtendedClassLoaderModelAttributes.put(EXPORTED_PACKAGES, ImmutableList.of("org.mule.tests.simple.plugin.api"));
+    pluginExtendedClassLoaderModelAttributes.put(EXPORTED_RESOURCES, ImmutableList.of("simple-plugin.properties"));
 
     ClassLoaderModel pluginClassLoaderModel =
         buildPluginClassLoaderModel(toFile(bundleDependency.getBundleUri().toURL()), pluginExtendedClassLoaderModelAttributes);
-    assertThat(pluginClassLoaderModel.getExportedPackages(), hasItem("org.mule.tests.empty.plugin.api"));
-    assertThat(pluginClassLoaderModel.getLocalPackages(), not(hasItem("org.mule.tests.empty.plugin.api")));
+    assertThat(pluginClassLoaderModel.getExportedPackages(), hasItem("org.mule.tests.simple.plugin.api"));
+    assertThat(pluginClassLoaderModel.getLocalPackages(), everyItem(not(isIn(newArrayList("org.mule.tests.simple.plugin.api")))));
     assertThat(pluginClassLoaderModel.getLocalPackages(),
-               hasItems("org.mule.tests.empty.plugin.internal", "org.apache.commons.collections"));
+               hasItems("org.mule.tests.simple.plugin.internal", "org.apache.commons.collections"));
 
-    assertThat(pluginClassLoaderModel.getExportedResources(), hasItem("empty-plugin.properties"));
-    assertThat(pluginClassLoaderModel.getLocalResources(), not(hasItem("empty-plugin.properties")));
+    assertThat(pluginClassLoaderModel.getExportedResources(), hasItem("simple-plugin.properties"));
+    assertThat(pluginClassLoaderModel.getLocalResources(), everyItem(not(isIn(newArrayList("simple-plugin.properties")))));
     assertThat(pluginClassLoaderModel.getLocalResources(),
-               hasItems("META-INF/empty-plugin/internal.txt", "META-INF/maven/commons-io/commons-io/pom.xml"));
+               hasItems("META-INF/simple-plugin/internal.txt", "META-INF/maven/commons-collections/commons-collections/pom.xml"));
+  }
+
+  @Test
+  public void packagesResourcesLoadedFromClassLoaderModelJson() throws Exception {
+    doTestPackagesResourcesLoaded(getClass().getClassLoader()
+        .getResource(Paths.get(APPS_FOLDER,
+                               "packages-resources-loaded-from-class-loader-model")
+            .toString()), false);
+  }
+
+  @Test
+  public void packagesResourcesNotLoadedFromClassLoaderModelJson() throws Exception {
+    URL appUrl = getClass().getClassLoader().getResource(Paths.get(APPS_FOLDER,
+                                                                   "packages-resources-not-loaded-from-class-loader-model")
+        .toString());
+    File appFolder = toFile(appUrl);
+    File simpleClassApi = new CompilerUtils.SingleClassCompiler()
+        .compile(getResourceFile(SOURCE_TEST_CLASSES + "/com/mycompany/api/SimpleClass.java"));
+    File apiPackageFolder = Paths.get(appFolder.getAbsolutePath(), "com", "mycompany", "api").toFile();
+    if (!apiPackageFolder.exists()) {
+      assertThat(apiPackageFolder.mkdirs(), is(true));
+    }
+    copyFile(simpleClassApi, new File(apiPackageFolder, "SimpleClass.class"), false);
+
+    File simpleClassInternal = new CompilerUtils.SingleClassCompiler()
+        .compile(getResourceFile(SOURCE_TEST_CLASSES + "/com/mycompany/internal/SimpleClass.java"));
+    File internalPackageFolder = Paths.get(appFolder.getAbsolutePath(), "com", "mycompany", "internal").toFile();
+    if (!internalPackageFolder.exists()) {
+      assertThat(internalPackageFolder.mkdirs(), is(true));
+    }
+    copyFile(simpleClassInternal, new File(internalPackageFolder, "SimpleClass.class"), false);
+
+    doTestPackagesResourcesLoaded(appUrl, true);
   }
 
   @Test
@@ -298,10 +337,12 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
     }, emptyMap());
   }
 
-  private ClassLoaderModel buildClassLoaderModelShouldFailIfJarExplorerIsUsed(File rootApplication,
-                                                                              Map<String, Object> attributes)
+  private ClassLoaderModel buildClassLoaderModel(File rootApplication, Map<String, Object> attributes, boolean useJarExplorer)
       throws InvalidDescriptorLoaderException {
     return buildClassLoaderModel(rootApplication, () -> {
+      if (useJarExplorer) {
+        return new FileJarExplorer();
+      }
       throw new AssertionError("JarExplorer should not be used");
     }, attributes);
   }
@@ -335,4 +376,9 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
     return pluginMavenClassLoaderModelLoader.load(pluginLocation, attributes, PLUGIN);
 
   }
+
+  protected static File getResourceFile(String resource) throws URISyntaxException {
+    return new File(DeployableMavenClassLoaderModelLoaderTestCase.class.getResource(resource).toURI());
+  }
+
 }

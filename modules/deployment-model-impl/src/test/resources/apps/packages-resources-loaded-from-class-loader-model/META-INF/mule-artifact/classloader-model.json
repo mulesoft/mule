@@ -10,12 +10,12 @@
     {
       "artifactCoordinates": {
         "groupId": "org.mule.tests",
-        "artifactId": "test-empty-plugin",
+        "artifactId": "test-simple-plugin",
         "version": "1.0.0",
         "type": "jar",
         "classifier": "mule-plugin"
       },
-      "uri": "repository/org/mule/tests/test-empty-plugin/1.0.0/test-empty-plugin-4.2.0-SNAPSHOT-mule-plugin.jar"
+      "uri": "repository/org/mule/tests/test-simple-plugin/1.0.0/test-simple-plugin-1.0-mule-plugin.jar"
     },
     {
       "artifactCoordinates": {
@@ -41,12 +41,32 @@
         "META-INF/MANIFEST.MF",
         "META-INF/NOTICE.txt"
       ]
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-csv",
+        "artifactId": "commons-csv",
+        "version": "1.5",
+        "type": "jar"
+      },
+      "uri": "repository/commons-csv/commons-csv/1.5/commons-csv-1.5.jar",
+      "isShared": true,
+      "packages": [
+        "org.apache.commons.csv"
+      ],
+      "resources": [
+        "META-INF/maven/commons-csv/commons-csv/pom.properties",
+        "META-INF/maven/commons-csv/commons-csv/pom.xml",
+        "META-INF/LICENSE.txt",
+        "META-INF/MANIFEST.MF",
+        "META-INF/NOTICE.txt"
+      ]
     }
   ],
   "additionalPluginDependencies": [
     {
       "groupId": "org.mule.tests",
-      "artifactId": "test-empty-plugin",
+      "artifactId": "test-simple-plugin",
       "additionalDependencies": [
         {
           "artifactCoordinates": {
@@ -71,8 +91,8 @@
             "org.apache.commons.collections.set"
           ],
           "resources": [
-            "META-INF/maven/commons-io/commons-io/pom.properties",
-            "META-INF/maven/commons-io/commons-io/pom.xml",
+            "META-INF/maven/commons-collections/commons-collections/pom.properties",
+            "META-INF/maven/commons-collections/commons-collections/pom.xml",
             "META-INF/LICENSE.txt",
             "META-INF/MANIFEST.MF",
             "META-INF/NOTICE.txt"
