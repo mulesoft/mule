@@ -8,7 +8,10 @@ package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import java.util.Set;
 
-public class ArtifactAttributes {
+/**
+ * Defines the attributes of an artifact. The set of packages and resources.
+ */
+class ArtifactAttributes {
 
   private Set<String> packages;
   private Set<String> resources;

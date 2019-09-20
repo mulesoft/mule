@@ -121,10 +121,6 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
       pluginOptional.ifPresent(this::processAdditionalPluginLibraries);
     }
 
-    // do the filtering of local packages and resources after exported and processed sharedRuntimeLibraries and additionalPluginDependencies
-    localPackages.removeAll(packages);
-    localResources.removeAll(resources);
-
     return super.build();
   }
 
