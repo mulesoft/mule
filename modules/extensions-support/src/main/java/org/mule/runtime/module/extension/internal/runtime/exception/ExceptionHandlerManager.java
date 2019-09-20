@@ -17,7 +17,6 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 
@@ -52,16 +51,13 @@ public final class ExceptionHandlerManager {
 
   private ErrorType resolveConnectionErrorType(ExtensionModel extensionModel, ErrorTypeRepository errorTypeRepository) {
     return extensionModel.getErrorModels().stream()
-        .filter(errorModel -> errorModel.getType().equals(CONNECTIVITY_ERROR_IDENTIFIER)).findFirst().map(
-                                                                                                          errorModel -> errorTypeRepository
-                                                                                                              .getErrorType(ComponentIdentifier
-                                                                                                                  .builder()
-                                                                                                                  .namespace(errorModel
-                                                                                                                      .getNamespace())
-                                                                                                                  .name(errorModel
-                                                                                                                      .getType())
-                                                                                                                  .build())
-                                                                                                              .orElse(null))
+        .filter(errorModel -> errorModel.getType().equals(CONNECTIVITY_ERROR_IDENTIFIER))
+        .findFirst()
+        .map(errorModel -> errorTypeRepository.getErrorType(ComponentIdentifier.builder()
+            .namespace(errorModel.getNamespace())
+            .name(errorModel.getType())
+            .build())
+            .orElse(null))
         .orElse(null);
   }
 
