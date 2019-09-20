@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.streaming.bytes;
 
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.CursorProviderJanitor;
 import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 
@@ -20,7 +21,8 @@ import java.io.IOException;
  */
 class ManagedCursorStreamDecorator extends CursorStream {
 
-  private final ManagedCursorStreamProvider managedCursorProvider;
+  private ManagedCursorStreamProvider managedCursorProvider;
+  private CursorStreamProvider exposedProvider;
   private final CursorStream delegate;
   private final CursorProviderJanitor janitor;
 
@@ -37,6 +39,7 @@ class ManagedCursorStreamDecorator extends CursorStream {
                                CursorStream delegate,
                                CursorProviderJanitor janitor) {
     this.managedCursorProvider = managedCursorProvider;
+    exposedProvider = managedCursorProvider;
     this.delegate = delegate;
     this.janitor = janitor;
   }
@@ -46,6 +49,10 @@ class ManagedCursorStreamDecorator extends CursorStream {
     try {
       delegate.close();
     } finally {
+      if (managedCursorProvider != null) {
+        exposedProvider = (CursorStreamProvider) managedCursorProvider.getDelegate();
+        managedCursorProvider = null;
+      }
       janitor.releaseCursor(delegate);
     }
   }
@@ -72,7 +79,7 @@ class ManagedCursorStreamDecorator extends CursorStream {
 
   @Override
   public CursorProvider getProvider() {
-    return managedCursorProvider;
+    return exposedProvider;
   }
 
   @Override
