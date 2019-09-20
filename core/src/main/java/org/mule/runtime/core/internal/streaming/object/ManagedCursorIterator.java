@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.streaming.object;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.object.CursorIterator;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.internal.streaming.CursorProviderJanitor;
 import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 
@@ -22,7 +23,8 @@ import java.util.function.Consumer;
  */
 class ManagedCursorIterator<T> implements CursorIterator<T> {
 
-  private final ManagedCursorIteratorProvider managedCursorIteratorProvider;
+  private ManagedCursorIteratorProvider managedCursorIteratorProvider;
+  private CursorIteratorProvider exposedProvider;
   private final CursorIterator<T> delegate;
   private final CursorProviderJanitor janitor;
 
@@ -39,6 +41,7 @@ class ManagedCursorIterator<T> implements CursorIterator<T> {
                         CursorIterator<T> delegate,
                         CursorProviderJanitor janitor) {
     this.managedCursorIteratorProvider = managedCursorIteratorProvider;
+    exposedProvider = managedCursorIteratorProvider;
     this.delegate = delegate;
     this.janitor = janitor;
   }
@@ -48,6 +51,10 @@ class ManagedCursorIterator<T> implements CursorIterator<T> {
     try {
       delegate.close();
     } finally {
+      if (managedCursorIteratorProvider != null) {
+        exposedProvider = (CursorIteratorProvider) managedCursorIteratorProvider.getDelegate();
+        managedCursorIteratorProvider = null;
+      }
       janitor.releaseCursor(delegate);
     }
   }
@@ -94,7 +101,7 @@ class ManagedCursorIterator<T> implements CursorIterator<T> {
 
   @Override
   public CursorProvider getProvider() {
-    return managedCursorIteratorProvider;
+    return exposedProvider;
   }
 
   @Override
