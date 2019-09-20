@@ -20,6 +20,14 @@
         <output type="string"/>
     </operation>
 
+    <operation name="set-payload-thru-set-payload-thru-internal-set-payload-hardcoded-value">
+        <body>
+            <mule:set-payload value="doesnt care what I put here, internal operation will override it =^]"/>
+            <tns:set-payload-thru-internal-set-payload-hardcoded-value />
+        </body>
+        <output type="string"/>
+    </operation>
+
     <operation name="set-payload-thru-internal-set-payload-hardcoded-value-two-times">
         <body>
             <mule:set-payload value="doesnt care what I put here, internal operation will override it =^]"/>
@@ -150,7 +158,6 @@
         </body>
         <output type="string"/>
     </operation>
-
 
     <!--
     INTERNAL OPERATIONS BELOW.

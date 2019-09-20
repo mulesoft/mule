@@ -30,6 +30,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
+
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.ObjectType;
@@ -61,8 +62,6 @@ import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.marvel.ironman.IronMan;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -71,10 +70,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import io.qameta.allure.Description;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import com.google.common.collect.ImmutableSet;
+
+import io.qameta.allure.Description;
 
 @RunWith(Parameterized.class)
 public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
@@ -447,7 +449,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(extensionModel.getName(), is("module-calling-operations-within-module"));
     assertThat(extensionModel.getConfigurationModels().size(), is(0));
     assertThat(extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).isPresent(), is(false));
-    assertThat(extensionModel.getOperationModels().size(), is(11));
+    assertThat(extensionModel.getOperationModels().size(), is(12));
   }
 
   @Test

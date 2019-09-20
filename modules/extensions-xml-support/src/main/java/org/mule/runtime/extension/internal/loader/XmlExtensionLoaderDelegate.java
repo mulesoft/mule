@@ -462,24 +462,31 @@ public final class XmlExtensionLoaderDelegate {
         loadPropertiesFrom(declarer, moduleModel, globalElementsComponentModel, extensionModelHelper);
     final HasOperationDeclarer hasOperationDeclarer = configurationDeclarer.isPresent() ? configurationDeclarer.get() : declarer;
 
+    ExtensionDeclarer temporalPublicOpsDeclarer = new ExtensionDeclarer();
+    fillDeclarer(temporalPublicOpsDeclarer, name, version, category, vendor, xmlDslModel, description);
     loadOperationsFrom(hasOperationDeclarer, moduleModel, directedGraph, xmlDslModel, OperationVisibility.PUBLIC);
+    loadOperationsFrom(temporalPublicOpsDeclarer, moduleModel, directedGraph, xmlDslModel, OperationVisibility.PUBLIC);
+    try {
+      enrichModuleModel((ComponentAst) moduleModel, createExtensionModel(temporalPublicOpsDeclarer));
+    } catch (IllegalModelDefinitionException e) {
+      // Nothing to do, this failure will be thrown again when the actual declarer, hasOperationDeclarer, is used to build the
+      // extension model.
+    }
+
     // loading private operations
     if (comesFromTNS) {
       // when parsing for the TNS, we need the <operation/>s to be part of the extension model to validate the XML properly
       loadOperationsFrom(hasOperationDeclarer, moduleModel, directedGraph, xmlDslModel, OperationVisibility.PRIVATE);
     } else {
       // when parsing for the macro expansion, the <operation/>s will be left in the PrivateOperationsModelProperty model property
-      final ExtensionDeclarer temporalDeclarer = new ExtensionDeclarer();
-      fillDeclarer(temporalDeclarer, name, version, category, vendor, xmlDslModel, description);
-      loadOperationsFrom(temporalDeclarer, moduleModel, directedGraph, xmlDslModel, OperationVisibility.PRIVATE);
-      final ExtensionModel result = createExtensionModel(temporalDeclarer);
+      ExtensionDeclarer temporalPrivateOpsDeclarer = new ExtensionDeclarer();
+      fillDeclarer(temporalPrivateOpsDeclarer, name, version, category, vendor, xmlDslModel, description);
+      loadOperationsFrom(temporalPrivateOpsDeclarer, moduleModel, directedGraph, xmlDslModel, OperationVisibility.PRIVATE);
+      final ExtensionModel result = createExtensionModel(temporalPrivateOpsDeclarer);
       final PrivateOperationsModelProperty privateOperations = new PrivateOperationsModelProperty(result.getOperationModels());
       declarer.withModelProperty(privateOperations);
 
-      ((ComponentAst) moduleModel).recursiveStream().forEach(comp -> {
-        privateOperations.getOperationModel(comp.getIdentifier().getName())
-            .ifPresent(model -> ((ComponentModel) comp).setComponentModel(model));
-      });
+      enrichModuleModel((ComponentAst) moduleModel, result);
     }
 
     final CycleDetector<String, DefaultEdge> cycleDetector = new CycleDetector<>(directedGraph);
@@ -487,6 +494,11 @@ public final class XmlExtensionLoaderDelegate {
     if (!cycles.isEmpty()) {
       throw new MuleRuntimeException(createStaticMessage(format(CYCLIC_OPERATIONS_ERROR, new TreeSet<>(cycles))));
     }
+  }
+
+  private void enrichModuleModel(final ComponentAst moduleModel, ExtensionModel result) {
+    moduleModel.recursiveStream().forEach(comp -> result.getOperationModel(comp.getIdentifier().getName())
+        .ifPresent(model -> ((ComponentModel) comp).setComponentModel(model)));
   }
 
   private ExtensionModel createExtensionModel(ExtensionDeclarer declarer) {

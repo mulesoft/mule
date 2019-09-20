@@ -10,6 +10,10 @@
         <module-calling-operations-within-module-proxy:set-payload-thru-internal-set-payload-hardcoded-value />
     </flow>
 
+    <flow name="testSetPayloadThruSetPayloadThruInternalSetPayloadHardcodedValue">
+        <module-calling-operations-within-module-proxy:set-payload-thru-set-payload-thru-internal-set-payload-hardcoded-value />
+    </flow>
+
     <flow name="testSetPayloadThruInternalSetPayloadHardcodedValueTwoTimes">
         <module-calling-operations-within-module-proxy:set-payload-thru-internal-set-payload-hardcoded-value-two-times />
     </flow>
