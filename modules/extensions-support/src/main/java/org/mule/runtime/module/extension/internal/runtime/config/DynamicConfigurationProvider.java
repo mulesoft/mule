@@ -21,7 +21,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
