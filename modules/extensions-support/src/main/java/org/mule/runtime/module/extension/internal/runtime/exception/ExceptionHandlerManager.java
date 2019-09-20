@@ -46,7 +46,8 @@ public final class ExceptionHandlerManager {
   public ExceptionHandlerManager(ExtensionModel extensionModel, ComponentModel componentModel,
                                  ErrorTypeRepository errorTypeRepository) {
     exceptionHandler = findExceptionHandler(extensionModel, componentModel);
-    this.connectionErrorType = resolveConnectionErrorType(extensionModel, errorTypeRepository);
+    this.connectionErrorType =
+        errorTypeRepository == null ? null : resolveConnectionErrorType(extensionModel, errorTypeRepository);
   }
 
   private ErrorType resolveConnectionErrorType(ExtensionModel extensionModel, ErrorTypeRepository errorTypeRepository) {
