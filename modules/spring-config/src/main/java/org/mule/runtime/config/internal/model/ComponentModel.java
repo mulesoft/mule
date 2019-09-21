@@ -258,7 +258,7 @@ public abstract class ComponentModel {
             .ifPresent(componentModel::setMetadataTypeModelAdapter);
       }
 
-      componentModel.setComponentType(resolveComponentType(componentModel, extensionModelHelper));
+      componentModel.setComponentType(resolveComponentType((ComponentAst) componentModel, extensionModelHelper));
     });
   }
 

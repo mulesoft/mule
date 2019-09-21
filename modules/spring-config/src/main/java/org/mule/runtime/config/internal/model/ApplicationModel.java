@@ -53,6 +53,7 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -365,7 +366,9 @@ public class ApplicationModel implements ArtifactAst {
       indexComponentModels();
     }
 
-    executeOnEveryMuleComponentTree(componentModel -> new ComponentLocationVisitor().accept(componentModel));
+    final ComponentLocationVisitor clv = new ComponentLocationVisitor();
+    recursiveStreamWithHierarchy().forEach(clv);
+    // executeOnEveryMuleComponentTree(clv);
   }
 
   private void indexComponentModels() {
@@ -1161,6 +1164,33 @@ public class ApplicationModel implements ArtifactAst {
         .map(cm -> (ComponentAst) cm)
         .flatMap(cm -> cm.recursiveStream());
   }
+
+  public Stream<Pair<ComponentAst, List<ComponentAst>>> recursiveStreamWithHierarchy() {
+    final List<Pair<ComponentAst, List<ComponentAst>>> ret = new ArrayList<>();
+
+    muleComponentModels.forEach(cm -> {
+      final List<ComponentAst> currentContext = new ArrayList<>();
+
+      ret.add(new Pair<>((ComponentAst) cm, new ArrayList<>(currentContext)));
+
+      recursiveStreamWithHierarchy(ret, cm, currentContext);
+    });
+
+    return ret.stream();
+  }
+
+  private void recursiveStreamWithHierarchy(final List<Pair<ComponentAst, List<ComponentAst>>> ret, ComponentModel cm,
+                                            final List<ComponentAst> currentContext) {
+    ((ComponentAst) cm).directChildrenStream().forEach(cmi -> {
+      final List<ComponentAst> currentContextI = new ArrayList<>(currentContext);
+
+      ret.add(new Pair<>(cmi, new ArrayList<>(currentContextI)));
+
+      currentContextI.add(cmi);
+      recursiveStreamWithHierarchy(ret, (ComponentModel) cmi, currentContextI);
+    });
+  }
+
 
   @Override
   public Spliterator<ComponentAst> recursiveSpliterator() {
