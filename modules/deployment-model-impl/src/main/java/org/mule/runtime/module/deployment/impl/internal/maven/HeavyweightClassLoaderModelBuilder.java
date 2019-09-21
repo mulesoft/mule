@@ -7,9 +7,11 @@
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASS_LOADER_MODEL_VERSION_120;
 
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -19,14 +21,14 @@ import org.mule.tools.api.classloader.model.Artifact;
 
 import java.io.File;
 import java.net.URI;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.vdurmont.semver4j.Semver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Plugin;
-
-import com.vdurmont.semver4j.Semver;
 
 /**
  * Builder for a {@link org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel} with information from a
@@ -36,14 +38,17 @@ import com.vdurmont.semver4j.Semver;
  */
 public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModelBuilder {
 
-  private static final Semver CLASS_LOADER_MODEL_VERSION_110 = new Semver("1.1.0", LOOSE);
+  public static final Semver CLASS_LOADER_MODEL_VERSION_110 = new Semver("1.1.0", LOOSE);
 
   private final org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel;
+
+  private Semver classLoaderModelVersion;
 
   public HeavyweightClassLoaderModelBuilder(File applicationFolder, BundleDescriptor artifactBundleDescriptor,
                                             org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel) {
     super(applicationFolder, artifactBundleDescriptor);
     this.packagerClassLoaderModel = packagerClassLoaderModel;
+    this.classLoaderModelVersion = new Semver(packagerClassLoaderModel.getVersion(), LOOSE);
   }
 
   /**
@@ -70,7 +75,13 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
 
   @Override
   protected List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency) {
-    return bundleDependency.getAdditionalDependencies().stream().map(BundleDependency::getBundleUri).collect(toList());
+    return bundleDependency.getAdditionalDependencies().stream().map(additionalDependency -> {
+      if (isSupportingPackagesResourcesInformation()) {
+        withLocalPackages(additionalDependency.getPackages());
+        withLocalResources(additionalDependency.getResources());
+      }
+      return additionalDependency.getBundleUri();
+    }).collect(toList());
   }
 
   private BundleDependency createExtendedBundleDependency(BundleDependency original,
@@ -103,7 +114,8 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
     if (artifact.getArtifactCoordinates().getScope() != null) {
       builder.setScope(BundleScope.valueOf(artifact.getArtifactCoordinates().getScope().toUpperCase()));
     }
-    return builder
+
+    BundleDependency.Builder bundleDependencyBuilder = builder
         .setBundleUri(artifact.getUri().isAbsolute()
             ? artifact.getUri()
             : new File(artifactFolder, artifact.getUri().toString()).toURI())
@@ -113,8 +125,16 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
             .setVersion(artifact.getArtifactCoordinates().getVersion())
             .setClassifier(artifact.getArtifactCoordinates().getClassifier())
             .setType(artifact.getArtifactCoordinates().getType())
-            .build())
-        .build();
+            .build());
+    if (isSupportingPackagesResourcesInformation()) {
+      bundleDependencyBuilder.setPackages(new HashSet<>(asList(artifact.getPackages())));
+      bundleDependencyBuilder.setResources(new HashSet<>(asList(artifact.getResources())));
+    }
+    return bundleDependencyBuilder.build();
+  }
+
+  private boolean isSupportingPackagesResourcesInformation() {
+    return !classLoaderModelVersion.isLowerThan(CLASS_LOADER_MODEL_VERSION_120);
   }
 
   /**
@@ -126,7 +146,15 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
         .filter(Artifact::isShared)
         .filter(sharedDep -> !validateMuleRuntimeSharedLibrary(sharedDep.getArtifactCoordinates().getGroupId(),
                                                                sharedDep.getArtifactCoordinates().getArtifactId()))
-        .forEach(sharedDep -> findAndExportSharedLibrary(sharedDep.getArtifactCoordinates().getGroupId(),
-                                                         sharedDep.getArtifactCoordinates().getArtifactId()));
+        .forEach(sharedDep -> {
+          if (isSupportingPackagesResourcesInformation()) {
+            this.exportingPackages(new HashSet<>(asList(sharedDep.getPackages())));
+            this.exportingResources(new HashSet<>(asList(sharedDep.getResources())));
+          } else {
+            findAndExportSharedLibrary(sharedDep.getArtifactCoordinates().getGroupId(),
+                                       sharedDep.getArtifactCoordinates().getArtifactId());
+          }
+        });
   }
+
 }

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
@@ -16,11 +17,18 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
+import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASS_LOADER_MODEL_VERSION_120;
+import static org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLoaderModelBuilder.CLASS_LOADER_MODEL_VERSION_110;
+import static org.mule.tck.ZipUtils.compress;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.serializeToFile;
 
 import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.runtime.module.artifact.builder.AbstractDependencyFileBuilder;
+import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
+import org.mule.runtime.module.artifact.internal.util.JarExplorer;
+import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import org.mule.tck.ZipUtils;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
@@ -36,6 +44,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import com.vdurmont.semver4j.Semver;
+
 public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> extends AbstractArtifactFileBuilder<T> {
 
   protected Properties deployProperties = new Properties();
@@ -43,6 +53,7 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
 
   private boolean useHeavyPackage = true;
   private String classloaderModelVersion = "1.0";
+  private JarExplorer jarFileExplorer = new FileJarExplorer();
 
   public DeployableFileBuilder(String artifactId, boolean upperCaseInExtension) {
     super(artifactId, upperCaseInExtension);
@@ -156,6 +167,12 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
 
     classLoaderModel.setDependencies(artifactDependencies);
 
+    if (isSupportingPackagesResourcesInformation()) {
+      JarInfo jarInfo = jarFileExplorer.explore(dependencyFileBuilder.getArtifactFile().toURI());
+      classLoaderModel.setPackages(jarInfo.getPackages().toArray(new String[jarInfo.getPackages().size()]));
+      classLoaderModel.setResources(jarInfo.getResources().toArray(new String[jarInfo.getResources().size()]));
+    }
+
     Path repository = Paths.get(getTempFolder(), REPOSITORY_FOLDER, dependencyFileBuilder.getArtifactFileRepositoryFolderPath());
     if (repository.toFile().exists()) {
       repository.toFile().delete();
@@ -166,6 +183,10 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
     }
 
     return serializeToFile(classLoaderModel, repository.toFile());
+  }
+
+  protected boolean isSharedSupportedByClassLoaderVersion() {
+    return !new Semver(classloaderModelVersion, LOOSE).isLowerThan(CLASS_LOADER_MODEL_VERSION_110);
   }
 
   private File getClassLoaderModelFile() {
@@ -180,6 +201,15 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
 
     classLoaderModel.setDependencies(artifactDependencies);
 
+    if (isSupportingPackagesResourcesInformation()) {
+      final File tempFile = new File(getTempFolder(), getArtifactId() + "_" + UUID.getUUID() + ".jar");
+      tempFile.deleteOnExit();
+      compress(tempFile, resources.toArray(new ZipUtils.ZipResource[0]));
+      JarInfo jarInfo = jarFileExplorer.explore(tempFile.toURI());
+      classLoaderModel.setPackages(jarInfo.getPackages().toArray(new String[jarInfo.getPackages().size()]));
+      classLoaderModel.setResources(jarInfo.getResources().toArray(new String[jarInfo.getResources().size()]));
+    }
+
     File destinationFolder = Paths.get(getTempFolder()).resolve(META_INF).resolve(MULE_ARTIFACT).toFile();
 
     if (!destinationFolder.exists()) {
@@ -193,8 +223,19 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
         new ArtifactCoordinates(builder.getGroupId(), builder.getArtifactId(), builder.getVersion(), builder.getType(),
                                 builder.getClassifier());
     final Artifact artifact = new Artifact(artifactCoordinates, builder.getArtifactFile().toURI());
-    artifact.setShared(shared);
+    if (isSupportingPackagesResourcesInformation()) {
+      JarInfo jarInfo = jarFileExplorer.explore(artifact.getUri());
+      artifact.setPackages(jarInfo.getPackages().toArray(new String[jarInfo.getPackages().size()]));
+      artifact.setResources(jarInfo.getResources().toArray(new String[jarInfo.getResources().size()]));
+    }
+    if (isSharedSupportedByClassLoaderVersion()) {
+      artifact.setShared(shared);
+    }
     return artifact;
+  }
+
+  private boolean isSupportingPackagesResourcesInformation() {
+    return !new Semver(classloaderModelVersion, LOOSE).isLowerThan(CLASS_LOADER_MODEL_VERSION_120);
   }
 
   protected abstract List<ZipUtils.ZipResource> doGetCustomResources();

@@ -12,6 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_ARTIFACT_ID;
 import static org.mule.runtime.module.artifact.api.classloader.MuleExtensionsMavenPlugin.MULE_EXTENSIONS_PLUGIN_GROUP_ID;
@@ -27,7 +28,6 @@ import static org.mule.tools.api.classloader.Constants.SHARED_LIBRARY_FIELD;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -120,6 +120,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
     if (processAdditionalPluginLibraries) {
       pluginOptional.ifPresent(this::processAdditionalPluginLibraries);
     }
+
     return super.build();
   }
 
@@ -260,11 +261,12 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
 
   protected void findAndExportSharedLibrary(String groupId, String artifactId) {
     Optional<BundleDependency> bundleDependencyOptional = findBundleDependency(groupId, artifactId, empty());
-    BundleDependency bundleDependency = bundleDependencyOptional.orElseThrow(() -> new MuleRuntimeException(I18nMessageFactory
-        .createStaticMessage(format(
-                                    "Dependency %s:%s could not be found within the artifact %s. It must be declared within the maven dependencies of the artifact.",
-                                    groupId,
-                                    artifactId, artifactFolder.getName()))));
+    BundleDependency bundleDependency =
+        bundleDependencyOptional.orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format(
+                                                                                                       "Dependency %s:%s could not be found within the artifact %s. It must be declared within the maven dependencies of the artifact.",
+                                                                                                       groupId,
+                                                                                                       artifactId, artifactFolder
+                                                                                                           .getName()))));
     JarInfo jarInfo = fileJarExplorer.explore(bundleDependency.getBundleUri());
     this.exportingPackages(jarInfo.getPackages());
     this.exportingResources(jarInfo.getResources());
