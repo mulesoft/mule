@@ -45,6 +45,19 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,25 +68,12 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.reactivestreams.Publisher;
 
-import java.lang.ref.PhantomReference;
-import java.lang.ref.ReferenceQueue;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import reactor.core.publisher.Mono;
-
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * TODO MULE-14000 Create hamcrest matchers to assert EventContext state
@@ -632,7 +632,8 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
         .build();
     ComponentLocation location = mock(ComponentLocation.class);
     when(location.getComponentIdentifier()).thenReturn(typedComponentIdentifier);
-    when(location.getParts()).thenReturn(asList(new DefaultLocationPart("flow", empty(), empty(), empty(), empty())));
+    when(location.getParts())
+        .thenReturn(asList(new DefaultLocationPart("flow", empty(), empty(), OptionalInt.empty(), OptionalInt.empty())));
     BaseEventContext context = contextWithComponentLocation.apply(location);
 
     assertThat(context.getOriginatingLocation().getComponentIdentifier().getIdentifier().getNamespace(), is("http"));

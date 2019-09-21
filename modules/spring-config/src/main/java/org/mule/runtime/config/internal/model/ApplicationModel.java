@@ -99,6 +99,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.Spliterator;
@@ -543,8 +544,8 @@ public class ApplicationModel implements ArtifactAst {
                       new DefaultComponentLocation.DefaultLocationPart(componentIdentifier.getName(),
                                                                        of(typedComponentIdentifier),
                                                                        of(configFile.getFilename()),
-                                                                       of(configLine.getLineNumber()),
-                                                                       of(configLine.getStartColumn()));
+                                                                       OptionalInt.of(configLine.getLineNumber()),
+                                                                       OptionalInt.of(configLine.getStartColumn()));
                   providerComponent.setAnnotations(ImmutableMap.<QName, Object>builder()
                       .put(AbstractComponent.LOCATION_KEY,
                            new DefaultComponentLocation(of(componentIdentifier.getName()),
