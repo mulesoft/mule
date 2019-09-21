@@ -26,6 +26,9 @@ public final class BundleDependency {
   private Set<BundleDependency> additionalDependencies;
   private Set<BundleDependency> transitiveDependencies;
 
+  private Set<String> packages;
+  private Set<String> resources;
+
   private BundleDependency() {}
 
   public BundleScope getScope() {
@@ -48,6 +51,14 @@ public final class BundleDependency {
     return transitiveDependencies;
   }
 
+  public Set<String> getPackages() {
+    return packages;
+  }
+
+  public Set<String> getResources() {
+    return resources;
+  }
+
   @Override
   public String toString() {
     return "BundleDependency{" +
@@ -55,6 +66,8 @@ public final class BundleDependency {
         ", scope=" + scope +
         ", bundleUri=" + bundleUri +
         ", additionalDependencies=" + additionalDependencies +
+        ", packages=" + packages +
+        ", resources=" + resources +
         '}';
   }
 
@@ -77,6 +90,8 @@ public final class BundleDependency {
       bundleDependency.scope = template.scope;
       bundleDependency.additionalDependencies = template.additionalDependencies;
       bundleDependency.transitiveDependencies = template.transitiveDependencies;
+      bundleDependency.packages = template.packages;
+      bundleDependency.resources = template.resources;
     }
 
     /**
@@ -117,6 +132,16 @@ public final class BundleDependency {
 
     public Builder setTransitiveDependencies(Set<BundleDependency> transitiveDependencies) {
       this.bundleDependency.transitiveDependencies = transitiveDependencies;
+      return this;
+    }
+
+    public Builder setPackages(Set<String> packages) {
+      this.bundleDependency.packages = packages;
+      return this;
+    }
+
+    public Builder setResources(Set<String> resources) {
+      this.bundleDependency.resources = resources;
       return this;
     }
 

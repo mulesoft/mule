@@ -56,7 +56,6 @@ public class MavenClassLoaderModelLoaderConfigurationTestCase extends MavenClass
   @Test
   public void noMavenConfiguration() throws Exception {
     Map<String, String> properties = getMuleFreeSystemProperties();
-    properties.put(repositoryLocation.getName(), repositoryLocation.getValue());
     expectedException.expect(RuntimeException.class);
     expectedException.expectCause(instanceOf(DependencyResolutionException.class));
     testWithSystemProperties(properties, () -> {
