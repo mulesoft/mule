@@ -1,0 +1,25 @@
+{
+  "domain": "default",
+  "configs": [
+    "test.xml"
+  ],
+  "redeploymentEnabled": true,
+  "name": "test",
+  "minMuleVersion": "4.0.0",
+  "requiredProduct": "MULE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [
+        "com.mycompany.api"
+      ],
+      "exportedResources": [
+        "tls.properties"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

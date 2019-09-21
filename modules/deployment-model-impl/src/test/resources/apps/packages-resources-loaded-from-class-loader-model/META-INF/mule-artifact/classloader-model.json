@@ -1,0 +1,115 @@
+{
+  "version": "1.2.0",
+  "artifactCoordinates": {
+    "groupId": "com.mycompany",
+    "artifactId": "packagesResourcesLoadedFromClassLoaderModel",
+    "version": "1.0.0-SNAPSHOT",
+    "type": "jar"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.tests",
+        "artifactId": "test-simple-plugin",
+        "version": "1.0.0",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/tests/test-simple-plugin/1.0.0/test-simple-plugin-1.0-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-io",
+        "artifactId": "commons-io",
+        "version": "2.6",
+        "type": "jar"
+      },
+      "uri": "repository/commons-io/commons-io/2.6/commons-io-2.6.jar",
+      "packages": [
+        "org.apache.commons.io",
+        "org.apache.commons.io.filefilter",
+        "org.apache.commons.io.comparator",
+        "org.apache.commons.io.input",
+        "org.apache.commons.io.monitor",
+        "org.apache.commons.io.output",
+        "org.apache.commons.io.serialization"
+      ],
+      "resources": [
+        "META-INF/maven/commons-io/commons-io/pom.properties",
+        "META-INF/maven/commons-io/commons-io/pom.xml",
+        "META-INF/LICENSE.txt",
+        "META-INF/MANIFEST.MF",
+        "META-INF/NOTICE.txt"
+      ]
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-csv",
+        "artifactId": "commons-csv",
+        "version": "1.5",
+        "type": "jar"
+      },
+      "uri": "repository/commons-csv/commons-csv/1.5/commons-csv-1.5.jar",
+      "isShared": true,
+      "packages": [
+        "org.apache.commons.csv"
+      ],
+      "resources": [
+        "META-INF/maven/commons-csv/commons-csv/pom.properties",
+        "META-INF/maven/commons-csv/commons-csv/pom.xml",
+        "META-INF/LICENSE.txt",
+        "META-INF/MANIFEST.MF",
+        "META-INF/NOTICE.txt"
+      ]
+    }
+  ],
+  "additionalPluginDependencies": [
+    {
+      "groupId": "org.mule.tests",
+      "artifactId": "test-simple-plugin",
+      "additionalDependencies": [
+        {
+          "artifactCoordinates": {
+            "groupId": "commons-collections",
+            "artifactId": "commons-collections",
+            "version": "3.2.1",
+            "type": "jar"
+          },
+          "uri": "repository/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar",
+          "packages": [
+            "org.apache.commons.collections",
+            "org.apache.commons.collections.bag",
+            "org.apache.commons.collections.bidimap",
+            "org.apache.commons.collections.buffer",
+            "org.apache.commons.collections.collection",
+            "org.apache.commons.collections.comparators",
+            "org.apache.commons.collections.functors",
+            "org.apache.commons.collections.iterators",
+            "org.apache.commons.collections.keyvalue",
+            "org.apache.commons.collections.list",
+            "org.apache.commons.collections.map",
+            "org.apache.commons.collections.set"
+          ],
+          "resources": [
+            "META-INF/maven/commons-collections/commons-collections/pom.properties",
+            "META-INF/maven/commons-collections/commons-collections/pom.xml",
+            "META-INF/LICENSE.txt",
+            "META-INF/MANIFEST.MF",
+            "META-INF/NOTICE.txt"
+          ]
+        }
+      ]
+    }
+  ],
+  "packages": [
+    "com.mycompany.api",
+    "com.mycompany.internal"
+  ],
+  "resources": [
+    "META-INF/maven/com/mycompany/test/pom.properties",
+    "META-INF/maven/com/mycompany/test/pom.xml",
+    "META-INF/mule-artifact/classloader-model.json",
+    "META-INF/mule-artifact/mule-artifact.json",
+    "tls.properties"
+  ]
+}

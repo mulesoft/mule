@@ -1,0 +1,57 @@
+{
+  "version": "1.1.0",
+  "artifactCoordinates": {
+    "groupId": "com.mycompany",
+    "artifactId": "packagesResourcesLoadedFromClassLoaderModel",
+    "version": "1.0.0-SNAPSHOT",
+    "type": "jar"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.tests",
+        "artifactId": "test-simple-plugin",
+        "version": "1.0.0",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/tests/test-simple-plugin/1.0.0/test-simple-plugin-1.0.0-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-io",
+        "artifactId": "commons-io",
+        "version": "2.6",
+        "type": "jar"
+      },
+      "uri": "repository/commons-io/commons-io/2.6/commons-io-2.6.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-csv",
+        "artifactId": "commons-csv",
+        "version": "1.5",
+        "type": "jar"
+      },
+      "uri": "repository/commons-csv/commons-csv/1.5/commons-csv-1.5.jar",
+      "isShared": true
+    }
+  ],
+  "additionalPluginDependencies": [
+    {
+      "groupId": "org.mule.tests",
+      "artifactId": "test-simple-plugin",
+      "additionalDependencies": [
+        {
+          "artifactCoordinates": {
+            "groupId": "commons-collections",
+            "artifactId": "commons-collections",
+            "version": "3.2.1",
+            "type": "jar"
+          },
+          "uri": "repository/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar"
+        }
+      ]
+    }
+  ]
+}
