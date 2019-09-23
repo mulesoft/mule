@@ -19,8 +19,9 @@ import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKN
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.valuesWithClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalListener;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -43,6 +44,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.config.ExpirableConfigurationProvider;
 import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
+import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -52,6 +54,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -78,9 +81,10 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   private final ConnectionProviderValueResolver connectionProviderResolver;
   private final ExpirationPolicy expirationPolicy;
 
-  private final Cache<Pair<ResolverSetResult, ResolverSetResult>, ConfigurationInstance> cache;
+  private final com.github.benmanes.caffeine.cache.LoadingCache<ResolverResultAndEvent, ConfigurationInstance> cache;
   private final ReflectionCache reflectionCache;
   private final ExpressionManager expressionManager;
+  private final DefaultExtensionManager extensionManager;
 
   /**
    * Creates a new instance
@@ -112,7 +116,22 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     this.resolverSet = resolverSet;
     this.connectionProviderResolver = connectionProviderResolver;
     this.expirationPolicy = expirationPolicy;
-    cache = Caffeine.newBuilder().expireAfterWrite(expirationPolicy.getMaxIdleTime(), expirationPolicy.getTimeUnit()).build();
+    this.extensionManager = (DefaultExtensionManager) muleContext.getExtensionManager();
+
+    CacheLoader<ResolverResultAndEvent, ConfigurationInstance> loader =
+        new CacheLoader<ResolverResultAndEvent, ConfigurationInstance>() {
+
+          @Override
+          public ConfigurationInstance load(ResolverResultAndEvent key) throws Exception {
+            return createConfiguration(key.getResolverSetResult(), key.getEvent());
+          }
+        };
+
+    RemovalListener<ResolverResultAndEvent, ConfigurationInstance> removalListener =
+        (key, value, cause) -> extensionManager.disposeConfiguration(key.getResolverSetResult().toString(), value);
+
+    cache = Caffeine.newBuilder().expireAfterAccess(expirationPolicy.getMaxIdleTime(), expirationPolicy.getTimeUnit())
+        .removalListener(removalListener).build(loader);
   }
 
   /**
@@ -137,31 +156,8 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     });
   }
 
-  private ConfigurationInstance getConfiguration(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult, CoreEvent event)
-      throws Exception {
-
-    ConfigurationInstance configuration = cache.getIfPresent(resolverSetResult);
-    if (configuration != null) {
-      // important to account between the boundaries of the lock to prevent race condition
-      updateUsageStatistic(configuration);
-      return configuration;
-    }
-
-    // re-check in case some other thread beat us to it...
-    configuration = cache.getIfPresent(resolverSetResult);
-    if (configuration == null) {
-      configuration = createConfiguration(resolverSetResult, event);
-      cache.put(resolverSetResult, configuration);
-    }
-
-    // accounting here for the same reasons as above
-    updateUsageStatistic(configuration);
-    return configuration;
-  }
-
-  private void updateUsageStatistic(ConfigurationInstance configuration) {
-    MutableConfigurationStats stats = (MutableConfigurationStats) configuration.getStatistics();
-    stats.updateLastUsed();
+  private ConfigurationInstance getConfiguration(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult, CoreEvent event) {
+    return cache.get(new ResolverResultAndEvent(resolverSetResult, event));
   }
 
   private ConfigurationInstance createConfiguration(Pair<ResolverSetResult, ResolverSetResult> values, CoreEvent event)
@@ -310,6 +306,40 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     return this.connectionProviderResolver.getObjectBuilder()
         .filter(ob -> ob instanceof ConnectionProviderObjectBuilder)
         .map(ob -> ((ConnectionProviderObjectBuilder) ob).providerModel);
+  }
+
+  private static class ResolverResultAndEvent {
+
+    private Pair<ResolverSetResult, ResolverSetResult> resolverSetResult;
+    private CoreEvent event;
+
+    ResolverResultAndEvent(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult, CoreEvent event) {
+      this.resolverSetResult = resolverSetResult;
+      this.event = event;
+    }
+
+    Pair<ResolverSetResult, ResolverSetResult> getResolverSetResult() {
+      return resolverSetResult;
+    }
+
+    public CoreEvent getEvent() {
+      return event;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o)
+        return true;
+      if (!(o instanceof ResolverResultAndEvent))
+        return false;
+      ResolverResultAndEvent that = (ResolverResultAndEvent) o;
+      return resolverSetResult.equals(that.resolverSetResult);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(resolverSetResult);
+    }
   }
 
 }
