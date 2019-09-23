@@ -99,7 +99,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
                                   ErrorTypeRepository typeRepository,
                                   ValueTransformer... valueTransformers) {
     this.connectionManager = connectionManager;
-    this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel);
+    this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel, typeRepository);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     this.valueTransformers = valueTransformers != null ? asList(valueTransformers) : emptyList();
   }

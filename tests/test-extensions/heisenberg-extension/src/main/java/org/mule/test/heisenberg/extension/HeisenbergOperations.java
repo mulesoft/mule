@@ -33,6 +33,7 @@ import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
+import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
@@ -56,6 +57,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
@@ -307,6 +309,18 @@ public class HeisenbergOperations implements Disposable {
     return builder.build();
   }
 
+  @MediaType(ANY)
+  public void tapPhones(Chain operations, CompletionCallback<Object, Object> callback) {
+    System.out.println("Started tapping phone");
+
+    operations.process(result -> {
+      System.out.println("Finished tapping phone successfully");
+      callback.success(result);
+    }, (error, previous) -> {
+      System.out.println("Finished tapping phone with error with message: " + error.getMessage());
+      callback.error(error);
+    });
+  }
 
   @Deprecated(message = "The usage of this operation must be replaced by the knock operation.", since = "1.5.0",
       toRemoveIn = "2.0.0")

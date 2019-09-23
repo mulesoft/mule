@@ -37,6 +37,13 @@
         <heisenberg:inline-barber-preferences beardTrimming="MUSTACHE"/>
     </heisenberg:config>
 
+    <petstore:config name="config" cashierName="cashierName">
+        <petstore:connection username="john" password="doe"/>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
+    </petstore:config>
+
     <flow name="executeAnything">
         <heisenberg:execute-anything>
             <try>
@@ -67,6 +74,18 @@
         <heisenberg:always-fails-wrapper>
             <logger message="#[payload]"/>
         </heisenberg:always-fails-wrapper>
+    </flow>
+
+    <flow name="failWithConnectivityErrorFromOtherExtension">
+        <heisenberg:tap-phones>
+            <petstore:fail petNames="#[{'name' : 'Pino'}]" />
+        </heisenberg:tap-phones>
+    </flow>
+
+    <flow name="failWithCustomErrorFromOtherExtension">
+        <heisenberg:tap-phones>
+            <petstore:fails-to-read-stream config-ref="config"/>
+        </heisenberg:tap-phones>
     </flow>
 
     <flow name="alwaysFailsWrapperFailure">

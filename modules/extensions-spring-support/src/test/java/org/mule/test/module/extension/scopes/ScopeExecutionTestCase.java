@@ -16,60 +16,17 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.SchedulerConfig;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import javax.inject.Inject;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase {
-
-  private static final String KILL_REASON = "I'm the one who knocks";
-
-  @Inject
-  private SchedulerService schedulerService;
-
-  private Scheduler cpuLightScheduler;
-  private Scheduler testScheduler;
-
-  @Rule
-  public SystemProperty maxRedelivery = new SystemProperty("killingReason", KILL_REASON);
+public class ScopeExecutionTestCase extends AbstractScopeExecutionTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
-
-  @Override
-  protected String[] getConfigFiles() {
-    return new String[] {"scopes/heisenberg-scope-config.xml"};
-  }
-
-  @Override
-  protected boolean isDisposeContextPerClass() {
-    return true;
-  }
-
-  @Before
-  public void setUp() {
-    cpuLightScheduler = schedulerService.cpuLightScheduler();
-    testScheduler = schedulerService.customScheduler(SchedulerConfig.config().withName("SCOPE-TEST")
-        .withMaxConcurrentTasks(2 + getRuntime().availableProcessors() * 2));
-  }
-
-  @After
-  public void tearDown() {
-    cpuLightScheduler.stop();
-    testScheduler.stop();
-  }
 
   @Test
   public void fieldParameterInjection() throws Exception {
@@ -116,7 +73,6 @@ public class ScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase 
 
   @Test
   public void alwaysFailsWrapperSuccess() throws Exception {
-    // Exceptions are converted in the extension's exception enricher
     expectedException.expectCause(instanceOf(ConnectionException.class));
     expectedException.expectMessage("ON_SUCCESS_ERROR");
     runFlow("alwaysFailsWrapperSuccess");
