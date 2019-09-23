@@ -19,9 +19,7 @@ import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKN
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.valuesWithClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.RemovalListener;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -118,20 +116,11 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     this.expirationPolicy = expirationPolicy;
     this.extensionManager = (DefaultExtensionManager) muleContext.getExtensionManager();
 
-    CacheLoader<ResolverResultAndEvent, ConfigurationInstance> loader =
-        new CacheLoader<ResolverResultAndEvent, ConfigurationInstance>() {
-
-          @Override
-          public ConfigurationInstance load(ResolverResultAndEvent key) throws Exception {
-            return createConfiguration(key.getResolverSetResult(), key.getEvent());
-          }
-        };
-
-    RemovalListener<ResolverResultAndEvent, ConfigurationInstance> removalListener =
-        (key, value, cause) -> extensionManager.disposeConfiguration(key.getResolverSetResult().toString(), value);
-
     cache = Caffeine.newBuilder().expireAfterAccess(expirationPolicy.getMaxIdleTime(), expirationPolicy.getTimeUnit())
-        .removalListener(removalListener).build(loader);
+        .removalListener((key, value, cause) -> extensionManager
+            .disposeConfiguration(((ResolverResultAndEvent) key).getResolverSetResult().toString(),
+                                  (ConfigurationInstance) value))
+        .build(key -> createConfiguration(key.getResolverSetResult(), key.getEvent()));
   }
 
   /**
