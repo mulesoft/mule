@@ -52,6 +52,23 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
     this.configurationPropertiesProvider = configurationPropertiesProvider;
   }
 
+  private int findPrefixIndex(String value, int offset) {
+    int prefixIndex = value.indexOf(PLACEHOLDER_PREFIX);
+    if (prefixIndex == -1) {
+      return -1;
+    }
+    if (prefixIndex != 0 && value.charAt(prefixIndex - 1) == '\\') {
+      int relativeOffset = prefixIndex + PLACEHOLDER_PREFIX.length();
+      return findPrefixIndex(value.substring(relativeOffset), offset + relativeOffset);
+    } else {
+      return prefixIndex + offset;
+    }
+  }
+
+  private int findPrefixIndex(String value) {
+    return findPrefixIndex(value, 0);
+  }
+
   /**
    * Resolves a value by searching and replacing placeholders on it.
    *
@@ -65,9 +82,9 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
     }
     try {
       return this.resolutionCache.get(value, () -> {
-        int prefixIndex = value.indexOf(PLACEHOLDER_PREFIX);
+        int prefixIndex = findPrefixIndex(value);
         if (prefixIndex == -1) {
-          return value;
+          return value.replace("\\" + PLACEHOLDER_PREFIX, PLACEHOLDER_PREFIX);
         }
         return replaceAllPlaceholders(value);
       });
@@ -126,7 +143,7 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
   private Object replaceAllPlaceholders(String value) {
     String innerPlaceholderKey;
     String testValue = value;
-    int prefixIndex = testValue.indexOf(PLACEHOLDER_PREFIX);
+    int prefixIndex = findPrefixIndex(value);
     while (prefixIndex != -1) {
       int suffixIndex = testValue.indexOf(PLACEHOLDER_SUFFIX, prefixIndex + PLACEHOLDER_PREFIX.length());
       innerPlaceholderKey = testValue.substring(prefixIndex + PLACEHOLDER_PREFIX.length(), suffixIndex);
@@ -137,9 +154,9 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
       }
       testValue = testValue.replace(PLACEHOLDER_PREFIX + innerPlaceholderKey + PLACEHOLDER_SUFFIX,
                                     objectValueFound.toString());
-      prefixIndex = testValue.indexOf(PLACEHOLDER_PREFIX);
+      prefixIndex = findPrefixIndex(testValue);
     }
-    return testValue;
+    return testValue.replace("\\" + PLACEHOLDER_PREFIX, PLACEHOLDER_PREFIX);
   }
 
   private void propagateRootResolver(ConfigurationPropertiesResolver rootResolver) {
