@@ -13,6 +13,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromMultipleDefinitions;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
@@ -31,7 +32,6 @@ import org.mule.runtime.config.internal.factories.ModuleOperationMessageProcesso
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
-import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
@@ -77,6 +77,7 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
     }
 
     if (extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent()) {
+      // For private operations, register its parser for use from within its same extensions
       extensionModel.getModelProperty(PrivateOperationsModelProperty.class)
           .ifPresent(privateOperations -> privateOperations.getOperationNames()
               .forEach(privateOperationName -> privateOperations.getOperationModel(privateOperationName)
@@ -97,11 +98,14 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
 
         @Override
         public void onOperation(OperationModel model) {
-          // final Optional<OperationComponentModelModelProperty> modelProperty =
-          // model.getModelProperty(OperationComponentModelModelProperty.class);
-          // final List<ComponentModel> innerComponents = modelProperty.get().getBodyComponentModel().getInnerComponents();
+          // For public operations, register them with the extension namespace for external use, as well as with the `tns`
+          // namespace for internal use
 
           addModuleOperationChainParser(definitionBuilder,
+                                        xmlDslModel.getPrefix(),
+                                        dslSyntaxResolver,
+                                        extensionModel, model);
+          addModuleOperationChainParser(tnsDefinitionBuilder,
                                         xmlDslModel.getPrefix(),
                                         dslSyntaxResolver,
                                         extensionModel, model);
@@ -145,13 +149,11 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
         .withTypeDefinition(fromType(AnnotatedProcessor.class))
         .withObjectFactoryType(ModuleOperationMessageProcessorChainFactoryBean.class)
         .withSetterParameterDefinition("parameters",
-                                       AttributeDefinition.Builder.fromMultipleDefinitions(paramsDefinitions
+                                       fromMultipleDefinitions(paramsDefinitions
                                            .toArray(new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
-                                           .build())
+                                               .build())
         .withSetterParameterDefinition("properties", fromChildMapConfiguration(String.class, String.class)
             .withWrapperIdentifier("module-operation-properties").build())
-        // .withSetterParameterDefinition("parameters", fromChildMapConfiguration(String.class, String.class)
-        // .withWrapperIdentifier("module-operation-parameters").build())
         .withSetterParameterDefinition("extensionModel", fromFixedValue(extensionModel).build())
         .withSetterParameterDefinition("operationModel", fromFixedValue(operationModel).build())
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
@@ -163,11 +165,6 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
         .withTypeDefinition(fromType(TreeMap.class)).build());
     definitions.add(baseCoreDefinition
         .withIdentifier("module-operation-property-entry")
-        .withTypeDefinition(fromMapEntryType(String.class, String.class))
-        .build());
-    definitions.add(baseCoreDefinition.withIdentifier("module-operation-parameters")
-        .withTypeDefinition(fromType(TreeMap.class)).build());
-    definitions.add(baseCoreDefinition.withIdentifier("module-operation-parameter-entry")
         .withTypeDefinition(fromMapEntryType(String.class, String.class))
         .build());
   }
