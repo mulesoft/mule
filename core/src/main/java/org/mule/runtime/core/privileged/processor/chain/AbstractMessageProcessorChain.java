@@ -30,6 +30,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.MuleContext;
@@ -42,6 +43,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.exception.RecursiveSubFlowException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveAroundInterceptorAdapter;
@@ -142,7 +144,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           // #1 Register local error hook to wrap exceptions in a MessagingException maintaining failed event.
           .subscriberContext(context -> context.put(REACTOR_ON_OPERATOR_ERROR_LOCAL, getLocalOperatorErrorHook(processor)))
           // #2 Register continue error strategy to handle errors without stopping the stream.
-          .onErrorContinue(getContinueStrategyErrorHandler(processor));
+          .onErrorContinue(exception -> !(exception instanceof LifecycleException),
+                           getContinueStrategyErrorHandler(processor));
     }
     return stream.subscriberContext(ctx -> {
       ClassLoader tccl = currentThread().getContextClassLoader();
@@ -187,6 +190,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       if (object == null && !(throwable instanceof MessagingException)) {
         LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE, throwable);
         throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
+      } else if (throwable instanceof RecursiveSubFlowException) {
+        throw new IllegalStateException(throwable);
       }
 
       if (object != null && !(object instanceof CoreEvent) && throwable instanceof MessagingException) {

@@ -21,6 +21,7 @@ import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.component.Component;
@@ -42,6 +43,7 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.exception.RecursiveSubFlowException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -55,6 +57,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -74,6 +77,8 @@ import reactor.core.publisher.Mono;
 public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> implements ApplicationContextAware {
 
   private static final Logger LOGGER = getLogger(FlowRefFactoryBean.class);
+
+  private static final String APPLIED_FLOWREFS_KEY = "mule.flowref.appliedFlowrefsInReactorChain";
 
   private String refName;
   private String target;
@@ -226,7 +231,12 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       final ReactiveProcessor resolvedReferencedProcessor = resolvedReferencedProcessorSupplier.get();
 
-      Flux<CoreEvent> pub = from(publisher);
+      Flux<CoreEvent> pub = from(publisher)
+          .subscriberContext(context -> {
+            HashSet<String> currentAppliedFlowrefs = context.getOrDefault(APPLIED_FLOWREFS_KEY, new HashSet<>());
+            currentAppliedFlowrefs.remove(refName);
+            return context.put(APPLIED_FLOWREFS_KEY, currentAppliedFlowrefs);
+          });
 
       if (target != null) {
         pub = pub.map(event -> quickCopy(event, singletonMap(originalEventKey(event), event)))
@@ -255,7 +265,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     private Publisher<CoreEvent> applyForStaticSubFlow(ReactiveProcessor resolvedTarget, Flux<CoreEvent> pub,
                                                        Optional<ComponentLocation> location) {
 
-      pub = pub.transform(eventPub -> applyWithChildContext(eventPub, resolvedTarget, location));
+      pub = pub.transform(eventPub -> applyWithChildContext(eventPub, resolvedTarget, location, popSubFlowFlowStackElement()));
 
       return decoratePublisherWithTargetVariableIfNecessary(pub);
     }
@@ -270,6 +280,14 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     }
 
     private Publisher<CoreEvent> decoratePublisherWithTargetVariableIfNecessary(Flux<CoreEvent> pub) {
+      pub = pub.subscriberContext(context -> {
+        HashSet<String> currentAppliedFlowrefs = context.getOrDefault(APPLIED_FLOWREFS_KEY, new HashSet<>());
+        if (currentAppliedFlowrefs.contains(refName)) {
+          throw propagate(new RecursiveSubFlowException(refName, StaticFlowRefMessageProcessor.this));
+        }
+        currentAppliedFlowrefs.add(refName);
+        return context.put(APPLIED_FLOWREFS_KEY, currentAppliedFlowrefs);
+      });
       return (target != null)
           ? pub.map(eventAfter -> outputToTarget(((InternalEvent) eventAfter)
               .getInternalParameter(originalEventKey(eventAfter)), target, targetValue,

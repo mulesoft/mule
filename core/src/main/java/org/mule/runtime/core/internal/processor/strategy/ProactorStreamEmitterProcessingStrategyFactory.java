@@ -18,8 +18,8 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -36,11 +36,11 @@ import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingE
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.IntUnaryOperator;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
-
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -132,7 +132,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
       for (int i = 0; i < sinksCount; i++) {
         Latch completionLatch = new Latch();
         EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(getBufferQueueSize());
-        processor.transform(function).subscribe(null, e -> completionLatch.release(), () -> completionLatch.release());
+        processor.transform(function).subscribe(null, getThrowableConsumer(completionLatch), () -> completionLatch.release());
 
         if (!processor.hasDownstreams()) {
           throw new MuleRuntimeException(createStaticMessage("No subscriptions active for processor."));
@@ -147,6 +147,15 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
       }
 
       return new RoundRobinReactorSink<>(sinks);
+    }
+
+    protected Consumer<Throwable> getThrowableConsumer(Latch completionLatch) {
+      return e -> {
+        if (e instanceof LifecycleException) {
+          throw new MuleRuntimeException(e);
+        }
+        completionLatch.release();
+      };
     }
 
     @Override
