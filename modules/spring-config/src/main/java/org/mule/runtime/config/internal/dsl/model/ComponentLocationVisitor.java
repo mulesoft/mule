@@ -45,7 +45,6 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
@@ -254,7 +253,7 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
 
   private boolean isModuleOperation(ComponentAst componentModel) {
     return componentModel.getModel(OperationModel.class)
-        .flatMap(model -> model.getModelProperty(OperationComponentModelModelProperty.class))
+        // .flatMap(model -> model.getModelProperty(OperationComponentModelModelProperty.class))
         .isPresent();
 
     // return componentModel.getIdentifier().equals(MODULE_OPERATION_CHAIN);

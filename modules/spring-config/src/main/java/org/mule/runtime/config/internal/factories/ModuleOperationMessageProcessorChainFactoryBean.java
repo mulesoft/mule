@@ -31,10 +31,6 @@ public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProc
 
   private ExtensionModel extensionModel;
   private OperationModel operationModel;
-  // private String moduleName;
-  // private String moduleOperation;
-  // @Inject
-  // private ExtensionManager extensionManager;
 
   @Inject
   protected ConfigurationComponentLocator locator;
@@ -64,33 +60,7 @@ public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProc
     return new ModuleOperationMessageProcessorChainBuilder(properties, parameters, extensionModel,
                                                            operationModel,
                                                            muleContext.getExpressionManager());
-    // final ExtensionModel extensionModel = getExtensionModelOrFail();
-    // return new ModuleOperationMessageProcessorChainBuilder(properties, parameters, extensionModel,
-    // getOperationModelOrFail(extensionModel),
-    // muleContext.getExpressionManager());
   }
-
-  // private ExtensionModel getExtensionModelOrFail() {
-  // return extensionManager.getExtensions().stream()
-  // .filter(em -> em.getXmlDslModel().getPrefix().equals(moduleName))
-  // .findFirst()
-  // .orElseThrow(() -> new IllegalArgumentException(format("Could not find any extension under the name of [%s]",
-  // moduleName)));
-  // }
-  //
-  // private OperationModel getOperationModelOrFail(ExtensionModel extensionModel) {
-  // OperationSeeker operationSeeker = new OperationSeeker();
-  // operationSeeker.walk(extensionModel);
-  // final OperationModel operationModel =
-  // operationSeeker.operationModel
-  // .orElseGet(
-  // () -> extensionModel.getModelProperty(PrivateOperationsModelProperty.class).get()
-  // .getOperationModel(moduleOperation)
-  // .orElseThrow(() -> new IllegalArgumentException(format("Could not find any operation under the name of [%s] for the extension
-  // [%s]",
-  // moduleOperation, moduleName))));
-  // return operationModel;
-  // }
 
   public void setProperties(Map<String, String> properties) {
     this.properties = properties;
@@ -101,14 +71,6 @@ public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProc
     this.parameters = parameters;
   }
 
-  // public void setModuleName(String moduleName) {
-  // this.moduleName = moduleName;
-  // }
-  //
-  // public void setModuleOperation(String moduleOperation) {
-  // this.moduleOperation = moduleOperation;
-  // }
-
   public void setExtensionModel(ExtensionModel extensionModel) {
     this.extensionModel = extensionModel;
   }
@@ -116,20 +78,4 @@ public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProc
   public void setOperationModel(OperationModel operationModel) {
     this.operationModel = operationModel;
   }
-
-  // /**
-  // * Internal class used only as a helper to find the only occurrence of an operation under the same name.
-  // */
-  // private class OperationSeeker extends IdempotentExtensionWalker {
-  //
-  // Optional<OperationModel> operationModel = Optional.empty();
-  //
-  // @Override
-  // protected void onOperation(OperationModel operationModel) {
-  // if (operationModel.getName().equals(moduleOperation)) {
-  // this.operationModel = Optional.of(operationModel);
-  // stop();
-  // }
-  // }
-  // }
 }
