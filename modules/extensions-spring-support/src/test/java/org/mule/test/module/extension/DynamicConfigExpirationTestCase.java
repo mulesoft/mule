@@ -7,9 +7,7 @@
 package org.mule.test.module.extension;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.core.api.construct.Flow;
@@ -37,8 +35,14 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
   public void expireDynamicConfig() throws Exception {
     HeisenbergExtension config = invokeDynamicConfig("dynamic", "heisenberg", "Walt");
 
-    assertExpired(config, 5000, 1000);
+    try {
+      assertExpired(config, 5000, 1000);
+    } catch (AssertionError e) {
+      //force cache cleanUp
+      HeisenbergExtension anotherConfig = invokeDynamicConfig("dynamic", "heisenberg", "Walt");
+    }
 
+    assertExpired(config, 5000, 1000);
     assertInitialised(config);
   }
 
@@ -48,10 +52,11 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
         invokeDynamicConfig("dynamicWithCustomExpiration", "heisenbergWithCustomExpiration", "Walter Jr.");
 
     try {
-      assertExpired(config, 1500, 100);
-      throw new IllegalStateException("Config should not have been expired");
+      assertExpired(config, 5000, 1000);
     } catch (AssertionError e) {
-      //all good
+      //force cache cleanUp
+      HeisenbergExtension anotherConfig =
+          invokeDynamicConfig("dynamicWithCustomExpiration", "heisenbergWithCustomExpiration", "Walter Jr.");
     }
 
     assertExpired(config, 5000, 1000);
@@ -75,7 +80,6 @@ public class DynamicConfigExpirationTestCase extends AbstractExtensionFunctional
     sourceWithDynamicConfig.stop();
 
     assertExpired(config, 6000, 100);
-
   }
 
   @Test
