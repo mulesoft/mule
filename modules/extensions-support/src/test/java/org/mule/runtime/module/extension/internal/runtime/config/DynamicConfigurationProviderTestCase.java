@@ -44,6 +44,7 @@ import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -89,9 +90,6 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
   private ConnectionProviderResolver connectionProviderResolver;
 
   @Mock
-  private ConnectionProvider connectionProvider;
-
-  @Mock
   private ExpressionManager expressionManager;
 
   private ExpirationPolicy expirationPolicy;
@@ -119,11 +117,12 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     when(resolverSetResult.asMap()).thenReturn(new HashMap<>());
     visitableMock(operationModel);
 
-
     expirationPolicy = new ImmutableExpirationPolicy(5, MINUTES, timeSupplier);
 
     when(connectionProviderResolver.getResolverSet()).thenReturn(empty());
     when(connectionProviderResolver.resolve(any())).thenReturn(null);
+
+    muleContext.setExtensionManager(new DefaultExtensionManager());
     provider = new DynamicConfigurationProvider(CONFIG_NAME, extensionModel, configurationModel, resolverSet,
                                                 connectionProviderResolver, expirationPolicy, new ReflectionCache(),
                                                 expressionManager, muleContext);
@@ -231,7 +230,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     expired = provider.getExpired();
     assertThat(expired.isEmpty(), is(false));
 
-    List<Object> configs = expired.stream().map(config -> config.getValue()).collect(toImmutableList());
+    List<Object> configs = expired.stream().map(ConfigurationInstance::getValue).collect(toImmutableList());
     assertThat(configs, containsInAnyOrder(instance1, instance2));
   }
 
