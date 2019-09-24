@@ -368,7 +368,6 @@ public class ApplicationModel implements ArtifactAst {
 
     final ComponentLocationVisitor clv = new ComponentLocationVisitor();
     recursiveStreamWithHierarchy().forEach(clv);
-    // executeOnEveryMuleComponentTree(clv);
   }
 
   private void indexComponentModels() {

@@ -165,7 +165,6 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
    * @param annotations to alter by adding the {@link AbstractComponent#ROOT_CONTAINER_NAME_KEY} if the component model has the
    *        name of the flow.
    */
-  // TODO
   private void processMacroExpandedAnnotations(ComponentModel componentModel, Map<QName, Object> annotations) {
     if (componentModel.getMetadata().getParserAttributes().containsKey(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME)) {
       final Object flowName = componentModel.getMetadata().getParserAttributes().get(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME);
