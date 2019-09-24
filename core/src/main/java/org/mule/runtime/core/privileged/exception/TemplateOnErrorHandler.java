@@ -90,7 +90,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   protected ConfigurationComponentLocator locator;
 
   @Inject
-  protected ConfigurationProperties configurationProperties;
+  private ConfigurationProperties configurationProperties;
 
   protected Optional<Location> flowLocation = empty();
   private MessageProcessorChain configuredMessageProcessors;
@@ -324,7 +324,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     return new DisjunctiveErrorTypeMatcher(matchers);
   }
 
-  protected static boolean doesErrorTypeContainWildcards(ComponentIdentifier errorTypeIdentifier) {
+  private static boolean doesErrorTypeContainWildcards(ComponentIdentifier errorTypeIdentifier) {
     if (errorTypeIdentifier == null) {
       return false;
     }
