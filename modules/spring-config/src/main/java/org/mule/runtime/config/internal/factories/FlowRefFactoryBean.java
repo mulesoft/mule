@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.DefaultMuleConfiguration.isFlowTrace;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -34,10 +35,12 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
@@ -246,24 +249,32 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
                                                             location,
                                                             resolvedTarget.getExceptionListener()));
 
+      return decoratePublisherWithTargetVariableIfNecessary(pub);
+    }
+
+    private Publisher<CoreEvent> applyForStaticSubFlow(ReactiveProcessor resolvedTarget, Flux<CoreEvent> pub,
+                                                       Optional<ComponentLocation> location) {
+
+      pub = pub.transform(eventPub -> applyWithChildContext(eventPub, resolvedTarget, location, popSubFlowFlowStackElement()));
+
+      return decoratePublisherWithTargetVariableIfNecessary(pub);
+    }
+
+    private FlowExceptionHandler popSubFlowFlowStackElement() {
+      return (exception, event) -> {
+        if (isFlowTrace()) {
+          ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
+        }
+        return event;
+      };
+    }
+
+    private Publisher<CoreEvent> decoratePublisherWithTargetVariableIfNecessary(Flux<CoreEvent> pub) {
       return (target != null)
           ? pub.map(eventAfter -> outputToTarget(((InternalEvent) eventAfter)
               .getInternalParameter(originalEventKey(eventAfter)), target, targetValue,
                                                  expressionManager).apply(eventAfter))
           : pub;
-    }
-
-    private Publisher<CoreEvent> applyForStaticSubFlow(ReactiveProcessor resolvedTarget, Flux<CoreEvent> pub,
-                                                       Optional<ComponentLocation> location) {
-      return pub.flatMap(event -> {
-        ReactiveProcessor subFlowProcessor = publisher1 -> Mono.from(publisher1)
-            .transform(resolvedTarget)
-            .onErrorMap(MessagingException.class,
-                        getMessagingExceptionMapper());
-        return Mono
-            .from(processWithChildContext(event, subFlowProcessor, location))
-            .map(outputToTarget(event, target, targetValue, expressionManager));
-      });
     }
 
     protected String originalEventKey(CoreEvent event) {

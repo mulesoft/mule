@@ -2,15 +2,15 @@
   "4.3.0": {
     "revapi": {
       "ignore": [
-          {
-            "code": "java.method.removed",
-            "old": "method org.mule.runtime.api.i18n.I18nMessage org.mule.runtime.core.api.config.i18n.CoreMessages::backpressure(java.lang.String, org.mule.runtime.core.api.construct.BackPressureReason)",
-            "package": "org.mule.runtime.core.api.config.i18n",
-            "classSimpleName": "CoreMessages",
-            "methodName": "backpressure",
-            "elementKind": "method",
-            "justification": ""
-          },
+        {
+          "code": "java.method.finalMethodAddedToNonFinalClass",
+          "new": "method java.util.concurrent.CompletableFuture<org.mule.runtime.api.event.Event> org.mule.runtime.core.privileged.component.AbstractExecutableComponent::execute(org.mule.runtime.api.event.Event, java.util.function.Consumer<org.mule.runtime.core.api.event.CoreEvent.Builder>)",
+          "package": "org.mule.runtime.core.privileged.component",
+          "classSimpleName": "AbstractExecutableComponent",
+          "methodName": "execute",
+          "elementKind": "method",
+          "justification": "No implementors of this API implement a method with this signature."
+        },
         {
           "code": "java.method.abstractMethodAdded",
           "new": "method org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::duplicateFor(org.mule.runtime.api.component.location.Location)",
