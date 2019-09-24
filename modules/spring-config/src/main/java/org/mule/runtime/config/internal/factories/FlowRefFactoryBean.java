@@ -255,7 +255,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     private Publisher<CoreEvent> applyForStaticSubFlow(ReactiveProcessor resolvedTarget, Flux<CoreEvent> pub,
                                                        Optional<ComponentLocation> location) {
 
-      pub = pub.transform(eventPub -> applyWithChildContext(eventPub, resolvedTarget, location, popSubFlowFlowStackElement()));
+      pub = pub.transform(eventPub -> applyWithChildContext(eventPub, resolvedTarget, location));
 
       return decoratePublisherWithTargetVariableIfNecessary(pub);
     }

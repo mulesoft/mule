@@ -31,6 +31,7 @@ import java.util.function.Consumer;
 import javax.xml.namespace.QName;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 /**
  * Constructs a custom chain for subflows using the subflow name as the chain name.
@@ -115,11 +116,11 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
 
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-      // TODO: Not adding subflow stack elements
       return from(publisher)
-          .doOnNext(pushSubFlowFlowStackElement())
-          .transform(s -> super.apply(s))
-          .doOnNext(popSubFlowFlowStackElement());
+          .flatMap(event -> Mono.just(event)
+              .doOnNext(pushSubFlowFlowStackElement())
+              .transform(s -> super.apply(s))
+              .doAfterSuccessOrError((event1, error) -> popSubFlowFlowStackElement().accept(event1)));
     }
   }
 }
