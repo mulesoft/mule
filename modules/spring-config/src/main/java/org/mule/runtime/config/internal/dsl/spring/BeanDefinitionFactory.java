@@ -50,8 +50,8 @@ import org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisi
 import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
-import org.mule.runtime.core.api.exception.DefaultErrorTypeMatcherFactory;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
+import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
@@ -224,7 +224,7 @@ public class BeanDefinitionFactory {
                     .lookupErrorType(source)
                     .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source)));
 
-                ErrorTypeMatcher errorTypeMatcher = new DefaultErrorTypeMatcherFactory().create(errorType);
+                ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorType);
                 ErrorType targetValue = resolveErrorType(parameters.get(TARGET_TYPE));
                 return new ErrorMapping(errorTypeMatcher, targetValue);
               }).collect(toList()), componentModel);

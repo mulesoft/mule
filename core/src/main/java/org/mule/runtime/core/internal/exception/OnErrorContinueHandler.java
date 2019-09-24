@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -17,10 +18,11 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.DefaultErrorTypeMatcherFactory;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.ErrorTypeMatcherFactory;
+import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
+
+import java.util.Optional;
 
 /**
  * Handler that will consume errors and finally commit transactions. Replaces the catch-exception-strategy from Mule 3.
@@ -39,24 +41,26 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
   @Override
   protected void doInitialise(MuleContext muleContext) throws InitialisationException {
     super.doInitialise(muleContext);
-    ErrorTypeMatcherFactory matcherFactory = new DefaultErrorTypeMatcherFactory();
 
     ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
-    sourceErrorMatcher = matcherFactory.create(errorTypeRepository.getSourceResponseErrorType());
+    sourceErrorMatcher = new SingleErrorTypeMatcher(errorTypeRepository.getSourceResponseErrorType());
 
     if (errorType != null) {
       String[] errors = errorType.split(",");
       for (String error : errors) {
-        // Since the partial initialisation was successful, we know this error ids are safe
         String sanitizedError = error.trim();
-        ErrorType errorType = errorTypeRepository.lookupErrorType(buildFromStringRepresentation(sanitizedError)).get();
-        if (sourceErrorMatcher.match(errorType)) {
-          throw new InitialisationException(getInitialisationError(sanitizedError), this);
+        ComponentIdentifier errorTypeIdentifier = buildFromStringRepresentation(sanitizedError);
+
+        Optional<ErrorType> errorType = errorTypeRepository.lookupErrorType(errorTypeIdentifier);
+        if (errorType.isPresent()) {
+          if (sourceErrorMatcher.match(errorType.get())) {
+            throw new InitialisationException(getInitialisationError(sanitizedError), this);
+          }
         }
       }
     } else if (when == null) {
       // No error type and no expression, force ANY matcher
-      errorTypeMatcher = matcherFactory.create(errorTypeRepository.getAnyErrorType());
+      errorTypeMatcher = new SingleErrorTypeMatcher(errorTypeRepository.getAnyErrorType());
     }
 
   }

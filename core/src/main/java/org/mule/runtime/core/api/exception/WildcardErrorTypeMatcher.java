@@ -8,35 +8,32 @@ package org.mule.runtime.core.api.exception;
 
 import java.util.Objects;
 
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
 
 public final class WildcardErrorTypeMatcher implements ErrorTypeMatcher {
 
   public static String WILDCARD_TOKEN = "*";
 
-  private final ErrorType errorType;
+  private final ComponentIdentifier errorTypeIdentifier;
 
-  private boolean identifierIsWildcard;
+  private boolean nameIsWildcard;
 
   private boolean namespaceIsWildcard;
 
-  public WildcardErrorTypeMatcher(ErrorType errorType) {
-    this.errorType = errorType;
-    identifierIsWildcard = WILDCARD_TOKEN.equals(errorType.getIdentifier());
-    namespaceIsWildcard = WILDCARD_TOKEN.equals(errorType.getNamespace());
+  public WildcardErrorTypeMatcher(ComponentIdentifier errorTypeIdentifier) {
+    this.errorTypeIdentifier = errorTypeIdentifier;
+    this.nameIsWildcard = WILDCARD_TOKEN.equals(errorTypeIdentifier.getName());
+    this.namespaceIsWildcard = WILDCARD_TOKEN.equals(errorTypeIdentifier.getNamespace());
   }
 
   @Override
   public boolean match(ErrorType errorType) {
-    if (matchIdentifier(errorType) && matchNamespace(errorType) && matchParent(errorType)) {
+    if (matchIdentifier(errorType) && matchNamespace(errorType)) {
       return true;
     }
 
     return isChild(errorType);
-  }
-
-  private boolean matchParent(ErrorType errorType) {
-    return Objects.equals(this.errorType.getParentErrorType(), errorType.getParentErrorType());
   }
 
   private boolean matchNamespace(ErrorType errorType) {
@@ -44,15 +41,15 @@ public final class WildcardErrorTypeMatcher implements ErrorTypeMatcher {
       return true;
     }
 
-    return Objects.equals(this.errorType.getNamespace(), errorType.getNamespace());
+    return Objects.equals(this.errorTypeIdentifier.getNamespace(), errorType.getNamespace());
   }
 
   private boolean matchIdentifier(ErrorType errorType) {
-    if (identifierIsWildcard) {
+    if (nameIsWildcard) {
       return true;
     }
 
-    return Objects.equals(this.errorType.getIdentifier(), errorType.getIdentifier());
+    return Objects.equals(this.errorTypeIdentifier.getName(), errorType.getIdentifier());
   }
 
   private boolean isChild(ErrorType errorType) {

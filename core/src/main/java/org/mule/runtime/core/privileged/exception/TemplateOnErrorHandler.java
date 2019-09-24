@@ -21,6 +21,7 @@ import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createI
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_START;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher.WILDCARD_TOKEN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
@@ -42,11 +43,11 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.ErrorHandlerNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.DefaultErrorTypeMatcherFactory;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.ErrorTypeMatcherFactory;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
+import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -60,6 +61,7 @@ import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -88,7 +90,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   protected ConfigurationComponentLocator locator;
 
   @Inject
-  private ConfigurationProperties configurationProperties;
+  protected ConfigurationProperties configurationProperties;
 
   protected Optional<Location> flowLocation = empty();
   private MessageProcessorChain configuredMessageProcessors;
@@ -302,20 +304,40 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       String parsedIdentifier = identifier.trim();
       final ComponentIdentifier errorTypeComponentIdentifier = buildFromStringRepresentation(parsedIdentifier);
 
-      ErrorTypeMatcherFactory matcherFactory = new DefaultErrorTypeMatcherFactory();
-      return matcherFactory.create(errorTypeRepository.lookupErrorType(errorTypeComponentIdentifier)
-          .orElseGet(() -> {
-            // When lazy init deployment is used an error-mapping may not be initialized due to the component that declares it
-            // could not be part of the minimal application model. So, whenever we found that scenario we have to create the
-            // errorType if not present in the repository already.
-            if (configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false)) {
-              return errorTypeRepository.addErrorType(errorTypeComponentIdentifier, errorTypeRepository.getAnyErrorType());
-            }
-            throw new MuleRuntimeException(createStaticMessage("Could not find ErrorType for the given identifier: '%s'",
-                                                               parsedIdentifier));
-          }));
+      if (doesErrorTypeContainWildcards(errorTypeComponentIdentifier)) {
+        return new WildcardErrorTypeMatcher(errorTypeComponentIdentifier);
+      } else {
+        return new SingleErrorTypeMatcher(errorTypeRepository.lookupErrorType(errorTypeComponentIdentifier)
+            .orElseGet(() -> {
+              // When lazy init deployment is used an error-mapping may not be initialized due to the component that declares it
+              // could not be part of the minimal application model. So, whenever we found that scenario we have to create the
+              // errorType if not present in the repository already.
+              if (configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false)) {
+                return errorTypeRepository.addErrorType(errorTypeComponentIdentifier, errorTypeRepository.getAnyErrorType());
+              }
+              throw new MuleRuntimeException(createStaticMessage("Could not find ErrorType for the given identifier: '%s'",
+                                                                 parsedIdentifier));
+            }));
+      }
+
     }).collect(toList());
     return new DisjunctiveErrorTypeMatcher(matchers);
+  }
+
+  protected static boolean doesErrorTypeContainWildcards(ComponentIdentifier errorTypeIdentifier) {
+    if (errorTypeIdentifier == null) {
+      return false;
+    }
+
+    if (Objects.equals(WILDCARD_TOKEN, errorTypeIdentifier.getName())) {
+      return true;
+    }
+
+    if (Objects.equals(WILDCARD_TOKEN, errorTypeIdentifier.getNamespace())) {
+      return true;
+    }
+
+    return false;
   }
 
   /**

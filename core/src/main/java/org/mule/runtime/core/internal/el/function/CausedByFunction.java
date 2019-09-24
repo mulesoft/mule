@@ -21,8 +21,8 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
-import org.mule.runtime.core.api.exception.DefaultErrorTypeMatcherFactory;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
+import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,7 +47,7 @@ public class CausedByFunction implements ExpressionFunction {
     checkArgument(error != null, "There's no error to match against.");
     String errorIdentifier = (String) parameters[1];
 
-    ErrorTypeMatcher errorTypeMatcher = new DefaultErrorTypeMatcherFactory().create(resolveErrorType(errorIdentifier));
+    ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(resolveErrorType(errorIdentifier));
     return errorTypeMatcher.match(error.getErrorType());
   }
 

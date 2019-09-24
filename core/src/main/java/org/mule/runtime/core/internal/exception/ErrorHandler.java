@@ -22,8 +22,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.DefaultErrorTypeMatcherFactory;
-import org.mule.runtime.core.api.exception.ErrorTypeMatcherFactory;
+import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
@@ -50,7 +49,6 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
   private ErrorType anyErrorType;
   protected String name;
-  private ErrorTypeMatcherFactory matcherFactory;
 
   @Inject
   private NotificationDispatcher notificationDispatcher;
@@ -59,7 +57,6 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   public void initialise() throws InitialisationException {
     super.initialise();
     anyErrorType = muleContext.getErrorTypeRepository().getAnyErrorType();
-    matcherFactory = new DefaultErrorTypeMatcherFactory();
     addCriticalErrorHandler();
     addDefaultErrorHandlerIfRequired();
     validateConfiguredExceptionStrategies();
@@ -117,7 +114,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   private void addCriticalErrorHandler() {
-    exceptionListeners.add(0, new OnCriticalErrorHandler(matcherFactory.create(muleContext.getErrorTypeRepository()
+    exceptionListeners.add(0, new OnCriticalErrorHandler(new SingleErrorTypeMatcher(muleContext.getErrorTypeRepository()
         .getErrorType(OVERLOAD).get())));
   }
 
