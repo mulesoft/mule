@@ -14,6 +14,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromMultipleDefinitions;
+import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
@@ -24,11 +25,14 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.PrivateOperationsModelProperty;
 import org.mule.runtime.config.internal.factories.ModuleOperationMessageProcessorChainFactoryBean;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
@@ -37,6 +41,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
+import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
 
 import java.util.ArrayList;
@@ -81,15 +86,61 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
       extensionModel.getModelProperty(PrivateOperationsModelProperty.class)
           .ifPresent(privateOperations -> privateOperations.getOperationNames()
               .forEach(privateOperationName -> privateOperations.getOperationModel(privateOperationName)
-                  .ifPresent(opModel -> addModuleOperationChainParser(tnsDefinitionBuilder, TNS_PREFIX,
-                                                                      dslSyntaxResolver,
+                  .ifPresent(opModel -> addModuleOperationChainParser(tnsDefinitionBuilder, dslSyntaxResolver,
                                                                       extensionModel, opModel))));
 
       new IdempotentExtensionWalker() {
 
         @Override
-        public void onConfiguration(ConfigurationModel model) {
-          System.out.println(" -> config: " + extensionModel.getName() + "." + model.getName());
+        protected void onConnectionProvider(ConnectionProviderModel model) {
+          System.out.println(" -> onConnectionProvider: " + extensionModel.getName() + "." + model.getName());
+
+          List<KeyAttributeDefinitionPair> paramsDefinitions =
+              processParametersDefinitions(definitionBuilder, dslSyntaxResolver, model);
+
+          definitions.add(definitionBuilder
+              .withIdentifier(dslSyntaxResolver.resolve(model).getElementName())
+              .withTypeDefinition(fromType(XmlConfiguration.class))
+              // .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
+              // .withConstructorParameterDefinition(fromFixedValue(model).build())
+              // .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
+              // .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build())
+              .withSetterParameterDefinition("parameters",
+                                             fromMultipleDefinitions(paramsDefinitions
+                                                 .toArray(new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
+                                                     .build())
+              .build());
+        }
+
+        @Override
+        public void onConfiguration(ConfigurationModel configurationModel) {
+          System.out.println(" -> config: " + extensionModel.getName() + "." + configurationModel.getName());
+
+          List<KeyAttributeDefinitionPair> paramsDefinitions =
+              processParametersDefinitions(definitionBuilder, dslSyntaxResolver, configurationModel);
+
+
+
+          // for (ParameterModel parameterModel : configurationModel.getAllParameterModels()) {
+          // configDefinitionBuilder = configDefinitionBuilder
+          // .withSetterParameterDefinition(parameterModel
+          // .getName(), fromSimpleParameter(dslSyntaxResolver.resolve(parameterModel).getAttributeName())
+          // .withDefaultValue(parameterModel.getDefaultValue())
+          // .build());
+          // }
+
+          definitions.add(definitionBuilder
+              .withIdentifier(dslSyntaxResolver.resolve(configurationModel).getElementName())
+              .withTypeDefinition(fromType(XmlConfiguration.class))
+              .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
+              .withConstructorParameterDefinition(fromFixedValue(configurationModel).build())
+              .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
+              .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build())
+              .withSetterParameterDefinition("properties",
+                                             fromMultipleDefinitions(paramsDefinitions
+                                                 .toArray(new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
+                                                     .build())
+              .build());
 
           // addModuleOperationChainParser(model.getName());
           // parseWith(new ConfigurationDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver,
@@ -100,23 +151,45 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
         public void onOperation(OperationModel model) {
           // For public operations, register them with the extension namespace for external use, as well as with the `tns`
           // namespace for internal use
-
-          addModuleOperationChainParser(definitionBuilder,
-                                        xmlDslModel.getPrefix(),
-                                        dslSyntaxResolver,
-                                        extensionModel, model);
-          addModuleOperationChainParser(tnsDefinitionBuilder,
-                                        xmlDslModel.getPrefix(),
-                                        dslSyntaxResolver,
-                                        extensionModel, model);
+          addModuleOperationChainParser(definitionBuilder, dslSyntaxResolver, extensionModel, model);
+          addModuleOperationChainParser(tnsDefinitionBuilder, dslSyntaxResolver, extensionModel, model);
         }
       }.walk(extensionModel);
     }
   }
 
-  private void addModuleOperationChainParser(final Builder baseDefinition, String namespacePrefix,
-                                             DslSyntaxResolver dslSyntaxResolver,
+  private void addModuleOperationChainParser(final Builder baseDefinition, DslSyntaxResolver dslSyntaxResolver,
                                              ExtensionModel extensionModel, OperationModel operationModel) {
+    List<KeyAttributeDefinitionPair> paramsDefinitions =
+        processParametersDefinitions(baseDefinition, dslSyntaxResolver, operationModel);
+
+    definitions.add(baseDefinition.withIdentifier(dslSyntaxResolver.resolve(operationModel).getElementName())
+        .withTypeDefinition(fromType(AnnotatedProcessor.class))
+        .withObjectFactoryType(ModuleOperationMessageProcessorChainFactoryBean.class)
+        .withSetterParameterDefinition("parameters",
+                                       fromMultipleDefinitions(paramsDefinitions
+                                           .toArray(new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
+                                               .build())
+        .withSetterParameterDefinition("properties", fromChildMapConfiguration(String.class, String.class)
+            .withWrapperIdentifier("module-operation-properties").build())
+        .withSetterParameterDefinition("extensionModel", fromFixedValue(extensionModel).build())
+        .withSetterParameterDefinition("operationModel", fromFixedValue(operationModel).build())
+        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
+        .asPrototype().build());
+
+    final Builder baseCoreDefinition = new Builder().withNamespace(CORE_PREFIX);
+
+    definitions.add(baseCoreDefinition.withIdentifier("module-operation-properties")
+        .withTypeDefinition(fromType(TreeMap.class)).build());
+    definitions.add(baseCoreDefinition
+        .withIdentifier("module-operation-property-entry")
+        .withTypeDefinition(fromMapEntryType(String.class, String.class))
+        .build());
+  }
+
+  private List<KeyAttributeDefinitionPair> processParametersDefinitions(final Builder baseDefinition,
+                                                                        DslSyntaxResolver dslSyntaxResolver,
+                                                                        ParameterizedModel operationModel) {
     List<KeyAttributeDefinitionPair> paramsDefinitions = new ArrayList<>();
 
     final List<ParameterModel> allParameterModels = operationModel.getAllParameterModels();
@@ -144,29 +217,7 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
             .build());
       }
     }
-
-    definitions.add(baseDefinition.withIdentifier(dslSyntaxResolver.resolve(operationModel).getElementName())
-        .withTypeDefinition(fromType(AnnotatedProcessor.class))
-        .withObjectFactoryType(ModuleOperationMessageProcessorChainFactoryBean.class)
-        .withSetterParameterDefinition("parameters",
-                                       fromMultipleDefinitions(paramsDefinitions
-                                           .toArray(new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
-                                               .build())
-        .withSetterParameterDefinition("properties", fromChildMapConfiguration(String.class, String.class)
-            .withWrapperIdentifier("module-operation-properties").build())
-        .withSetterParameterDefinition("extensionModel", fromFixedValue(extensionModel).build())
-        .withSetterParameterDefinition("operationModel", fromFixedValue(operationModel).build())
-        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-        .asPrototype().build());
-
-    final Builder baseCoreDefinition = new Builder().withNamespace(CORE_PREFIX);
-
-    definitions.add(baseCoreDefinition.withIdentifier("module-operation-properties")
-        .withTypeDefinition(fromType(TreeMap.class)).build());
-    definitions.add(baseCoreDefinition
-        .withIdentifier("module-operation-property-entry")
-        .withTypeDefinition(fromMapEntryType(String.class, String.class))
-        .build());
+    return paramsDefinitions;
   }
 
   @Override
