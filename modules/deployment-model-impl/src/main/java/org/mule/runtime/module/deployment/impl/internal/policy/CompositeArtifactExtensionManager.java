@@ -154,6 +154,12 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
     disposeIfNeeded(childExtensionManager, LOGGER);
   }
 
+  @Override
+  public void disposeConfiguration(String key, ConfigurationInstance configuration) {
+    parentExtensionManager.disposeConfiguration(key, configuration);
+    childExtensionManager.disposeConfiguration(key, configuration);
+  }
+
   public ExtensionManager getParentExtensionManager() {
     return parentExtensionManager;
   }

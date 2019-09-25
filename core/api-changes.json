@@ -2,6 +2,15 @@
   "4.2.3": {
     "revapi": {
       "ignore": [
+       {
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method void org.mule.runtime.core.api.extension.ExtensionManager::disposeConfiguration(java.lang.String, org.mule.runtime.extension.api.runtime.config.ConfigurationInstance)",
+          "package": "org.mule.runtime.core.api.extension",
+          "classSimpleName": "ExtensionManager",
+          "methodName": "disposeConfiguration",
+          "elementKind": "method",
+          "justification":"MULE-17359: CPU Light thread pool exhausted due to a testConnectivity when DynamicConfiguration is created"
+        },
         {
           "code": "java.method.finalMethodAddedToNonFinalClass",
           "new": "method java.util.concurrent.CompletableFuture<org.mule.runtime.api.event.Event> org.mule.runtime.core.privileged.component.AbstractExecutableComponent::execute(org.mule.runtime.api.event.Event, java.util.function.Consumer<org.mule.runtime.core.api.event.CoreEvent.Builder>)",

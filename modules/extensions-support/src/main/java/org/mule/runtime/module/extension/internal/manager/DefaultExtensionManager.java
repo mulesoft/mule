@@ -250,6 +250,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     return extensionRegistry.getExtension(extensionName);
   }
 
+  @Override
   public void disposeConfiguration(String key, ConfigurationInstance configuration) {
     try {
       stopIfNeeded(configuration);
