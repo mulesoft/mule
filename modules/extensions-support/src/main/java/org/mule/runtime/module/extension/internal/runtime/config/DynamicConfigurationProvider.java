@@ -35,6 +35,7 @@ import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -82,7 +83,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   private final com.github.benmanes.caffeine.cache.LoadingCache<ResolverResultAndEvent, ConfigurationInstance> cache;
   private final ReflectionCache reflectionCache;
   private final ExpressionManager expressionManager;
-  private final DefaultExtensionManager extensionManager;
+  private final ExtensionManager extensionManager;
 
   /**
    * Creates a new instance
@@ -114,7 +115,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     this.resolverSet = resolverSet;
     this.connectionProviderResolver = connectionProviderResolver;
     this.expirationPolicy = expirationPolicy;
-    this.extensionManager = (DefaultExtensionManager) muleContext.getExtensionManager();
+    this.extensionManager = muleContext.getExtensionManager();
 
     cache = Caffeine.newBuilder().expireAfterAccess(expirationPolicy.getMaxIdleTime(), expirationPolicy.getTimeUnit())
         .removalListener((key, value, cause) -> extensionManager

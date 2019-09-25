@@ -132,4 +132,12 @@ public interface ExtensionManager {
    */
   void registerConfigurationProvider(ConfigurationProvider configurationProvider);
 
+  /**
+   * Performs actions related to the disposal of the configuration in the extension manager
+   * 
+   * @param key the key for the configuration to be disposed
+   * @param configuration the configuration to be disposed.
+   */
+  default void disposeConfiguration(String key, ConfigurationInstance configuration) {}
+
 }
