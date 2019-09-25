@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.factories;
+package org.mule.runtime.extension.internal.factories;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
@@ -14,13 +14,17 @@ import static org.mule.runtime.core.privileged.processor.chain.DefaultMessagePro
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.extension.internal.config.dsl.XmlConfiguration;
 
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -31,12 +35,25 @@ public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProc
 
   private ExtensionModel extensionModel;
   private OperationModel operationModel;
+  // private OperationModel operationModel;
+
+  // @Config
+  // private XmlConfiguration config;
+
+  @Inject
+  private ExtensionManager extensionManager;
 
   @Inject
   protected ConfigurationComponentLocator locator;
 
   @Override
   public MessageProcessorChain doGetObject() throws Exception {
+    // if (parameters.containsKey("config-ref")) {
+    // final Optional<ConfigurationProvider> configurationProvider =
+    // extensionManager.getConfigurationProvider(parameters.get("config-ref"));
+    // System.out.println(" >> ModuleOperationMessageProcessorChainFactoryBean.configurationProvider: " + configurationProvider);
+    // }
+
     MessageProcessorChainBuilder builder = getBuilderInstance();
     for (Object processor : processors) {
       if (processor instanceof Processor) {
@@ -57,9 +74,23 @@ public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProc
 
   @Override
   protected MessageProcessorChainBuilder getBuilderInstance() {
-    return new ModuleOperationMessageProcessorChainBuilder(properties, parameters, extensionModel,
+    return new ModuleOperationMessageProcessorChainBuilder(getProperties(), parameters, extensionModel,
                                                            operationModel,
                                                            muleContext.getExpressionManager());
+  }
+
+
+  public Map<String, String> getProperties() {
+    if (parameters.containsKey("config-ref")) {
+      final Optional<ConfigurationProvider> configurationProvider =
+          extensionManager.getConfigurationProvider(parameters.get("config-ref"));
+      System.out.println(" >> ModuleOperationMessageProcessorChainFactoryBean.configurationProvider: " + configurationProvider);
+
+      return configurationProvider.filter(cp -> cp instanceof XmlConfiguration).map(cp -> ((XmlConfiguration) cp).getParameters())
+          .orElse(emptyMap());
+    } else {
+      return emptyMap();
+    }
   }
 
   public void setProperties(Map<String, String> properties) {

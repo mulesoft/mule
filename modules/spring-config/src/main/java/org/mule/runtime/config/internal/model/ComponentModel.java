@@ -169,6 +169,13 @@ public abstract class ComponentModel {
   }
 
   /**
+   * @param parameterName name of the configuration parameter.
+   */
+  public void removeParameter(String parameterName) {
+    this.parameters.remove(parameterName);
+  }
+
+  /**
    * @return the type of the object to be created when processing this {@code ComponentModel}.
    */
   public Class<?> getType() {

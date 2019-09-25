@@ -30,7 +30,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.PrivateOperationsModelProperty;
-import org.mule.runtime.config.internal.factories.ModuleOperationMessageProcessorChainFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
@@ -40,7 +39,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
-import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
+import org.mule.runtime.extension.internal.factories.ModuleOperationMessageProcessorChainFactoryBean;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
 
 import java.util.ArrayList;
@@ -113,7 +112,7 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
 
         @Override
         public void onConfiguration(ConfigurationModel configurationModel) {
-          System.out.println(" -> config: " + extensionModel.getName() + "." + configurationModel.getName());
+          System.out.println(" -> config: " + extensionModel.getName() + ":" + configurationModel.getName());
 
           List<KeyAttributeDefinitionPair> paramsDefinitions =
               processParametersDefinitions(definitionBuilder, dslSyntaxResolver, configurationModel);
@@ -131,14 +130,19 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
           definitions.add(definitionBuilder
               .withIdentifier(dslSyntaxResolver.resolve(configurationModel).getElementName())
               .withTypeDefinition(fromType(XmlConfiguration.class))
+              // .withTypeDefinition(fromType(ConfigurationProvider.class))
+              // .withObjectFactoryType(XmlConfigurationProviderObjectFactory.class)
+              // .withConstructorParameterDefinition(fromSimpleParameter("name").build())
               .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
               .withConstructorParameterDefinition(fromFixedValue(configurationModel).build())
+              // .withConstructorParameterDefinition(fromFixedValue(null).build())
               .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
-              .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build())
-              .withSetterParameterDefinition("properties",
+              // .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build())
+              .withSetterParameterDefinition("parameters",
                                              fromMultipleDefinitions(paramsDefinitions
                                                  .toArray(new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
                                                      .build())
+              // .withSetterParameterDefinition("innerConfigs", fromChildCollectionConfiguration(Object.class).build())
               .build());
 
           // addModuleOperationChainParser(model.getName());

@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
@@ -61,8 +62,7 @@ public class ModuleTestConnectionTestCase extends AbstractXmlExtensionMuleArtifa
   }
 
   private void assertConnectionOn(String beanName) throws MuleException {
-    ConfigurationInstance config = muleContext.getExtensionManager().getConfiguration(
-                                                                                      beanName, testEvent());
+    ConfigurationInstance config = muleContext.getExtensionManager().getConfiguration(beanName, testEvent());
     assertThat(config, is(notNullValue()));
     assertThat(config.getConnectionProvider().isPresent(), is(true));
     final ConnectionProvider connectionProvider = config.getConnectionProvider().get();

@@ -9,36 +9,73 @@ package org.mule.runtime.extension.internal.config.dsl;
 import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.module.extension.internal.runtime.exception.RequiredParameterNotSetException;
 
 import java.util.Map;
 
-public class XmlConfiguration extends AbstractComponent /* implements ConfigurationProvider */ {
+public class XmlConfiguration extends AbstractComponent implements ConfigurationProvider {
 
   private final ExtensionModel extensionModel;
   private final ConfigurationModel configurationModel;
-  private final MuleContext muleContext;
+  protected final MuleContext muleContext;
 
-  public XmlConfiguration(ExtensionModel extensionModel,
-                          ConfigurationModel configurationModel,
+  public XmlConfiguration(ExtensionModel extensionModel, ConfigurationModel configurationModel,
                           MuleContext muleContext) {
     this.extensionModel = extensionModel;
     this.configurationModel = configurationModel;
     this.muleContext = muleContext;
   }
 
-  private Map<String, Object> properties = emptyMap();
+  private Map<String, String> parameters = emptyMap();
 
-  public Map<String, Object> getProperties() {
-    return properties;
+  public Map<String, String> getParameters() {
+    return parameters;
   }
 
-  public void setProperties(Map<String, Object> properties) {
-    System.out.println(" >> properties: " + properties.toString());
-    this.properties = properties;
+  public void setParameters(Map<String, String> parameters) {
+    System.out.println(" >> properties: " + parameters.toString());
+    this.parameters = parameters;
   }
+
+  @Override
+  public ConfigurationInstance get(Event event) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public boolean isDynamic() {
+    return false;
+  }
+
+  @Override
+  public ExtensionModel getExtensionModel() {
+    return extensionModel;
+  }
+
+  @Override
+  public ConfigurationModel getConfigurationModel() {
+    return configurationModel;
+  }
+
+  @Override
+  public String getName() {
+    final String name = configurationModel.getAllParameterModels().stream()
+        .filter(ParameterModel::isComponentId)
+        .findAny()
+        .map(p -> parameters.get(p.getName()).toString())
+        .orElseThrow(() -> new RequiredParameterNotSetException("cannot create a configuration without a name"));
+    return name;
+  }
+
+
 
   // @Override
   // public ConfigurationInstance get(Event event) {
