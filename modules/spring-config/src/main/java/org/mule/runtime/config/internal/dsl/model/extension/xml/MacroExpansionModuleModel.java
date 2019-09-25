@@ -226,7 +226,7 @@ public class MacroExpansionModuleModel {
       for (Map.Entry<ComponentModel, List<ComponentModel>> entry : componentModelsToReplaceByIndex.entrySet()) {
         final int componentModelIndex = muleRootComponentModel.getInnerComponents().indexOf(entry.getKey());
         muleRootComponentModel.getInnerComponents().addAll(componentModelIndex, entry.getValue());
-        muleRootComponentModel.getInnerComponents().remove(componentModelIndex + entry.getValue().size());
+        // muleRootComponentModel.getInnerComponents().remove(componentModelIndex + entry.getValue().size());
       }
     });
   }
