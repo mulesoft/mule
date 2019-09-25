@@ -152,7 +152,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   protected BeanDefinitionFactory beanDefinitionFactory;
   private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
   private final ArtifactType artifactType;
-  private final List<ComponentIdentifier> componentNotSupportedByNewParsers = new ArrayList<>();
   protected SpringConfigurationComponentLocator componentLocator = new SpringConfigurationComponentLocator(componentName -> {
     try {
       BeanDefinition beanDefinition = getBeanFactory().getBeanDefinition(componentName);
@@ -244,10 +243,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   private void validateAllConfigElementHaveParsers() {
     applicationModel.executeOnEveryComponentTree(componentModel -> {
-      Optional<ComponentIdentifier> parentIdentifierOptional = ofNullable(componentModel.getParent())
-          .flatMap(parentComponentModel -> ofNullable(parentComponentModel.getIdentifier()));
-      if (!beanDefinitionFactory.hasDefinition(componentModel.getIdentifier(), parentIdentifierOptional)) {
-        componentNotSupportedByNewParsers.add(componentModel.getIdentifier());
+      if (!beanDefinitionFactory.hasDefinition(componentModel.getIdentifier())) {
         throw new RuntimeException(format("Invalid config '%s'. No definition parser found for that config",
                                           componentModel.getIdentifier()));
       }

@@ -11,12 +11,12 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.config.internal.model.ApplicationModel.MODULE_OPERATION_CHAIN;
 import static org.mule.runtime.config.internal.model.ApplicationModel.NAME_ATTRIBUTE;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONFIG_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
@@ -54,8 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * A {@link MacroExpansionModuleModel} works tightly with a {@link ApplicationModel} to go over all the registered
@@ -123,29 +121,22 @@ public class MacroExpansionModuleModel {
   }
 
   private void expandOperations(Set<String> moduleGlobalElementsNames) {
-    applicationModel.executeOnEveryMuleComponentTree(containerComponentModel -> {
-      Map<Integer, ComponentModel> componentModelsToReplaceByIndex = new HashMap<>();
-      IntStream.range(0, containerComponentModel.getInnerComponents().size())
-          .filter(i -> containerComponentModel.getInnerComponents().get(i).getIdentifier().getNamespace()
-              .equals(extensionModel.getXmlDslModel().getPrefix()))
-          .forEach(i -> {
-            ComponentModel operationRefModel = containerComponentModel.getInnerComponents().get(i);
-            operationRefModel.getModel(OperationModel.class)
-                .ifPresent(operationModel -> {
-                  final String containerName = calculateContainerRootName(containerComponentModel, operationModel);
-                  final ComponentModel moduleOperationChain =
-                      createModuleOperationChain(operationRefModel, operationModel, moduleGlobalElementsNames, empty(),
-                                                 containerName);
-                  componentModelsToReplaceByIndex.put(i, moduleOperationChain);
-                });
-          });
-      for (Map.Entry<Integer, ComponentModel> entry : componentModelsToReplaceByIndex.entrySet()) {
-        entry.getValue().setParent(containerComponentModel);
-        containerComponentModel.getInnerComponents().add(entry.getKey(), entry.getValue());
-        containerComponentModel.getInnerComponents().remove(entry.getKey() + 1);
-      }
-      componentModelsToReplaceByIndex.clear();
-    });
+    applicationModel.executeOnEveryMuleComponentTree(containerComponentModel -> containerComponentModel.getInnerComponents()
+        .stream()
+        .filter(operationRefModel -> operationRefModel.getIdentifier().getNamespace()
+            .equals(extensionModel.getXmlDslModel().getPrefix()))
+        .forEach(operationRefModel -> {
+          operationRefModel.getModel(OperationModel.class)
+              .ifPresent(operationModel -> {
+                final String containerName = calculateContainerRootName(containerComponentModel, operationModel);
+                final ComponentModel moduleOperationChain =
+                    createModuleOperationChain(operationRefModel, operationModel, moduleGlobalElementsNames, empty(),
+                                               containerName);
+
+                moduleOperationChain.getInnerComponents().forEach(inner -> inner.setParent(operationRefModel));
+                operationRefModel.getInnerComponents().addAll(moduleOperationChain.getInnerComponents());
+              });
+        }));
   }
 
   /**
@@ -163,9 +154,6 @@ public class MacroExpansionModuleModel {
     String nameAttribute;
     if (containerComponentModel.isRoot()) {
       nameAttribute = containerComponentModel.getNameAttribute();
-    } else if (MODULE_OPERATION_CHAIN.equals(containerComponentModel.getIdentifier())) {
-      nameAttribute =
-          (String) containerComponentModel.getMetadata().getParserAttributes().get(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME);
     } else if (containerComponentModel.getParent() != null) {
       nameAttribute = calculateContainerRootName(containerComponentModel.getParent(), operationModel);
     } else {
@@ -260,7 +248,7 @@ public class MacroExpansionModuleModel {
           macroExpandedGlobalElement.setRoot(true);
           macroExpandedGlobalElement.setParent(muleRootElement);
           return macroExpandedGlobalElement;
-        }).collect(Collectors.toList());
+        }).collect(toList());
 
   }
 
@@ -298,23 +286,23 @@ public class MacroExpansionModuleModel {
         referencesOperationsWithinModule((ComponentAst) operationRefModel) ? configRefParentTnsName
             : getConfigRefName(operationRefModel);
     ComponentModel.Builder processorChainBuilder = new ComponentModel.Builder();
-    processorChainBuilder
-        .setIdentifier(builder()
-            .namespace(CORE_PREFIX)
-            .namespaceUri(CORE_NAMESPACE)
-            .name("module-operation-chain").build());
+    processorChainBuilder.setIdentifier(operationRefModel.getIdentifier());
 
-    processorChainBuilder.addParameter("moduleName", extensionModel.getXmlDslModel().getPrefix(), false);
-    processorChainBuilder.addParameter("moduleOperation", operationModel.getName(), false);
     Map<String, String> propertiesMap = extractProperties(configRefName);
     Map<String, String> parametersMap =
         extractParameters((ComponentAst) operationRefModel, operationModel.getAllParameterModels());
     ComponentModel propertiesComponentModel =
         getParameterChild(propertiesMap, "module-operation-properties", "module-operation-property-entry");
-    ComponentModel parametersComponentModel =
-        getParameterChild(parametersMap, "module-operation-parameters", "module-operation-parameter-entry");
     processorChainBuilder.addChildComponentModel(propertiesComponentModel);
-    processorChainBuilder.addChildComponentModel(parametersComponentModel);
+    operationRefModel.getParameters().forEach((paramName, paramValue) -> {
+      processorChainBuilder.addParameter(paramName, paramValue, operationRefModel.isParameterValueProvidedBySchema(paramName));
+    });
+
+    for (ComponentModel paramModelChild : operationRefModel.getInnerComponents()) {
+      final ComponentModel copiedParam = new ComponentModel.Builder(paramModelChild).build();
+      processorChainBuilder.addChildComponentModel(copiedParam);
+    }
+
     processorChainBuilder.setSourceCode(operationRefModel.getSourceCode());
 
     bodyProcessors.stream()
@@ -325,6 +313,7 @@ public class MacroExpansionModuleModel {
                                                          getLiteralParameters(propertiesMap, parametersMap),
                                                          containerName)))
         .forEach(processorChainBuilder::addChildComponentModel);
+
     copyErrorMappings(operationRefModel, processorChainBuilder);
 
     for (Map.Entry<String, Object> customAttributeEntry : operationRefModel.getMetadata().getParserAttributes().entrySet()) {
@@ -344,6 +333,9 @@ public class MacroExpansionModuleModel {
     for (ComponentModel processorChainModelChild : processorChainModel.getInnerComponents()) {
       processorChainModelChild.setParent(processorChainModel);
     }
+
+    processorChainModel.setComponentModel(operationModel);
+    processorChainModel.setComponentType(operationRefModel.getComponentType());
 
     return processorChainModel;
   }

@@ -60,7 +60,7 @@ import java.util.Set;
 
 /**
  * Adds the capability to expose tooling focused capabilities associated with the {@link StaticConfigurationProvider}'s
- * components. So sar the capabilities are:
+ * components. So far the capabilities are:
  * <ul>
  * <li>{@link MetadataKeyProvider}, to resolve {@link MetadataKey metadata keys} associated to a configuration</li>
  * <li>{@link ConfigurationParameterValueProvider}, to resolve {@link Value values} associated to a configuration and their

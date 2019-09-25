@@ -66,6 +66,16 @@ public class DefaultFlowCallStack implements FlowCallStack {
     return innerStack.pop();
   }
 
+  /**
+   * Retrieves, but does not remove, the top-most element from this stack.
+   *
+   * @return the top-most element of this stack.
+   * @throws EmptyStackException if this stack is empty.
+   */
+  public FlowStackElement peek() {
+    return innerStack.peek();
+  }
+
   @Override
   public List<FlowStackElement> getElements() {
     return new ArrayList<>(innerStack);

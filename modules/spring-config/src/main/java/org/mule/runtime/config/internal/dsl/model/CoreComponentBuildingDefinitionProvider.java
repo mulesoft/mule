@@ -24,7 +24,6 @@ import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.R
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromMultipleDefinitions;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
@@ -34,7 +33,6 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.CommonTypeConverters.stringToClassConverter;
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
-import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTES_STREAMING_MAX_BUFFER_SIZE;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTE_STREAMING_BUFFER_DATA_UNIT;
@@ -81,7 +79,6 @@ import org.mule.runtime.config.internal.factories.DynamicConfigExpirationObjectF
 import org.mule.runtime.config.internal.factories.ErrorHandlerFactoryBean;
 import org.mule.runtime.config.internal.factories.ExpirationPolicyObjectFactory;
 import org.mule.runtime.config.internal.factories.FlowRefFactoryBean;
-import org.mule.runtime.config.internal.factories.ModuleOperationMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.internal.factories.OnErrorFactoryBean;
 import org.mule.runtime.config.internal.factories.ProcessorExpressionRouteFactoryBean;
 import org.mule.runtime.config.internal.factories.ProcessorRouteFactoryBean;
@@ -92,7 +89,6 @@ import org.mule.runtime.config.internal.factories.streaming.InMemoryCursorIterat
 import org.mule.runtime.config.internal.factories.streaming.InMemoryCursorStreamProviderObjectFactory;
 import org.mule.runtime.config.internal.factories.streaming.NullCursorIteratorProviderObjectFactory;
 import org.mule.runtime.config.internal.factories.streaming.NullCursorStreamProviderObjectFactory;
-import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.privileged.dsl.processor.AddVariablePropertyConfigurator;
 import org.mule.runtime.config.privileged.dsl.processor.MessageProcessorChainFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
@@ -193,7 +189,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -340,7 +335,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(MessageProcessorChain.class)).withObjectFactoryType(MessageProcessorChainFactoryBean.class)
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asPrototype().build());
-    addModuleOperationChainParser(componentBuildingDefinitions);
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(SUB_FLOW)
         .withTypeDefinition(fromType(MessageProcessorChain.class))
         .withObjectFactoryType(SubflowMessageProcessorChainFactoryBean.class)
@@ -1124,36 +1118,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                                                         Class<?> transactionManagerClass) {
     return transactionManagerBaseDefinition.withIdentifier(transactionManagerName)
         .withTypeDefinition(fromType(transactionManagerClass));
-  }
-
-  /**
-   * Parser for the expanded operations, generated dynamically by the {@link ApplicationModel} by reading the extensions
-   *
-   * @param componentBuildingDefinitions
-   */
-  private void addModuleOperationChainParser(LinkedList<ComponentBuildingDefinition> componentBuildingDefinitions) {
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("module-operation-chain")
-        .withTypeDefinition(fromType(AnnotatedProcessor.class))
-        .withObjectFactoryType(ModuleOperationMessageProcessorChainFactoryBean.class)
-        .withSetterParameterDefinition("properties", fromChildMapConfiguration(String.class, String.class)
-            .withWrapperIdentifier("module-operation-properties").build())
-        .withSetterParameterDefinition("parameters", fromChildMapConfiguration(String.class, String.class)
-            .withWrapperIdentifier("module-operation-parameters").build())
-        .withSetterParameterDefinition("moduleName", fromSimpleParameter("moduleName").build())
-        .withSetterParameterDefinition("moduleOperation", fromSimpleParameter("moduleOperation").build())
-        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-        .asPrototype().build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("module-operation-properties")
-        .withTypeDefinition(fromType(TreeMap.class)).build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("module-operation-property-entry")
-        .withTypeDefinition(fromMapEntryType(String.class, String.class))
-        .build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("module-operation-parameters")
-        .withTypeDefinition(fromType(TreeMap.class)).build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("module-operation-parameter-entry")
-        .withTypeDefinition(fromMapEntryType(String.class, String.class))
-        .build());
   }
 
 }
