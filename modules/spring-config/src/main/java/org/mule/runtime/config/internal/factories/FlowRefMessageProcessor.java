@@ -27,6 +27,7 @@ public abstract class FlowRefMessageProcessor extends AbstractComponent
 
   private final Component owner;
 
+
   protected FlowRefMessageProcessor(Component owner) {
     this.owner = owner;
   }
