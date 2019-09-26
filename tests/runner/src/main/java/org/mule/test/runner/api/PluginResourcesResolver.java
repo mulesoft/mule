@@ -16,10 +16,11 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_AUTO_GENERATED_ARTIFACT_PATH_INSIDE_JAR;
-import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
+import org.mule.test.runner.utils.TroubleshootingUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,7 +71,9 @@ public class PluginResourcesResolver {
       try (InputStream stream = pluginJsonUrl.openStream()) {
         mulePluginModel = new MulePluginModelJsonSerializer().deserialize(IOUtils.toString(stream));
       } catch (IOException e) {
-        throw new IllegalArgumentException(format("Could not read extension describer on plugin '%s'", pluginJsonUrl),
+        TroubleshootingUtils.copyPluginToAuxJenkinsFolderForTroubleshooting(pluginJsonUrl);
+        throw new IllegalArgumentException(format("Could not read extension describer on plugin '%s' from JAR with MD5 '%s'",
+                                                  pluginJsonUrl, TroubleshootingUtils.getMD5FromFile(pluginJsonUrl)),
                                            e);
       }
 
