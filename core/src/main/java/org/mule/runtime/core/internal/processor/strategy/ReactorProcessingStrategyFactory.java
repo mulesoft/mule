@@ -81,7 +81,8 @@ public class ReactorProcessingStrategyFactory extends AbstractProcessingStrategy
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
       if (processor.getProcessingType() == CPU_LITE_ASYNC) {
-        return publisher -> from(publisher).transform(processor)
+        return publisher -> from(publisher)
+            .transform(processor)
             .publishOn(fromExecutorService(decorateScheduler(cpuLightScheduler)))
             .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, getCpuLightScheduler()));
       } else {

@@ -34,7 +34,7 @@ import java.util.function.Supplier;
  *
  * @since 4.0
  */
-public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory extends ReactorStreamProcessingStrategyFactory
+public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory extends AbstractStreamProcessingStrategyFactory
     implements TransactionAwareProcessingStrategyFactory {
 
   @Override
