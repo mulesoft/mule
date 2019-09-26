@@ -19,7 +19,8 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
-import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory;
+
+import java.util.function.Function;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -31,9 +32,6 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.infra.Blackhole;
 import org.reactivestreams.Publisher;
-
-import java.util.function.Function;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
@@ -47,25 +45,19 @@ public class ProcessingStrategyBenchmark extends AbstractBenchmark {
 
   private ProcessingStrategy directPs;
   private ProcessingStrategy emitterPs;
-  private ProcessingStrategy workQueuePs;
-
   private Flow flow;
 
   private Sink directSink;
   private Sink emitterSink;
-  private Sink workQueueSink;
 
   private FluxSink<CoreEvent> directPipeline;
   private FluxSink<CoreEvent> emitterPipeline;
-  private FluxSink<CoreEvent> workQueuePipeline;
 
   private FluxSink<CoreEvent> directProcessor;
   private FluxSink<CoreEvent> emitterProcessor;
-  private FluxSink<CoreEvent> workQueueProcessor;
 
   private Sink directAllSink;
   private Sink emitterAllSink;
-  private Sink workQueueAllSink;
 
   @Setup(Level.Trial)
   public void setUp() throws MuleException {
@@ -75,8 +67,6 @@ public class ProcessingStrategyBenchmark extends AbstractBenchmark {
     startIfNeeded(directPs);
     emitterPs = new TransactionAwareProactorStreamEmitterProcessingStrategyFactory().create(muleContext, "emitter_mb");
     startIfNeeded(emitterPs);
-    workQueuePs = new TransactionAwareProactorStreamWorkQueueProcessingStrategyFactory().create(muleContext, "workQueue_mb");
-    startIfNeeded(workQueuePs);
 
     flow = createFlow(muleContext);
 
@@ -86,7 +76,6 @@ public class ProcessingStrategyBenchmark extends AbstractBenchmark {
 
     directSink = directPs.createSink(flow, publisher -> baseFlux(publisher, processor));
     emitterSink = emitterPs.createSink(flow, publisher -> baseFlux(publisher, processor));
-    workQueueSink = workQueuePs.createSink(flow, publisher -> baseFlux(publisher, processor));
 
     Flux.<CoreEvent>create(s -> directPipeline = s, ERROR)
         .transform(directPs.onPipeline(publisher -> baseFlux(publisher, processor)))
@@ -94,28 +83,17 @@ public class ProcessingStrategyBenchmark extends AbstractBenchmark {
     Flux.<CoreEvent>create(s -> emitterPipeline = s, ERROR)
         .transform(emitterPs.onPipeline(publisher -> baseFlux(publisher, processor)))
         .subscribe();
-    Flux.<CoreEvent>create(s -> workQueuePipeline = s, ERROR)
-        .transform(workQueuePs.onPipeline(publisher -> baseFlux(publisher, processor)))
-        .subscribe();
-
     Flux.<CoreEvent>create(s -> directProcessor = s, ERROR)
         .transform(directPs.onProcessor(publisher -> baseFlux(publisher, processor)))
         .subscribe();
     Flux.<CoreEvent>create(s -> emitterProcessor = s, ERROR)
         .transform(emitterPs.onProcessor(publisher -> baseFlux(publisher, processor)))
         .subscribe();
-    Flux.<CoreEvent>create(s -> workQueueProcessor = s, ERROR)
-        .transform(workQueuePs.onProcessor(publisher -> baseFlux(publisher, processor)))
-        .subscribe();
 
     directAllSink =
         directPs.createSink(flow, publisher -> baseFlux(publisher, directPs.onPipeline(directPs.onProcessor(processor))));
     emitterAllSink =
         emitterPs.createSink(flow, publisher -> baseFlux(publisher, emitterPs.onPipeline(emitterPs.onProcessor(processor))));
-    workQueueAllSink =
-        workQueuePs.createSink(flow,
-                               publisher -> baseFlux(publisher, workQueuePs.onPipeline(workQueuePs.onProcessor(processor))));
-
   }
 
   private Flux<CoreEvent> baseFlux(Publisher<CoreEvent> publisher,
@@ -141,12 +119,6 @@ public class ProcessingStrategyBenchmark extends AbstractBenchmark {
   }
 
   @Benchmark
-  @Threads(Threads.MAX)
-  public CoreEvent workQueueSink() {
-    return Mono.<CoreEvent>create(resultSink -> workQueueSink.accept(createEvent(flow, resultSink))).block();
-  }
-
-  @Benchmark
   @Threads(1)
   public CoreEvent directPipeline() {
     return Mono.<CoreEvent>create(resultSink -> directPipeline.next(createEvent(flow, resultSink))).block();
@@ -156,12 +128,6 @@ public class ProcessingStrategyBenchmark extends AbstractBenchmark {
   @Threads(1)
   public CoreEvent emitterPipeline() {
     return Mono.<CoreEvent>create(resultSink -> emitterPipeline.next(createEvent(flow, resultSink))).block();
-  }
-
-  @Benchmark
-  @Threads(1)
-  public CoreEvent workQueuePipeline() {
-    return Mono.<CoreEvent>create(resultSink -> workQueuePipeline.next(createEvent(flow, resultSink))).block();
   }
 
   @Benchmark
@@ -177,12 +143,6 @@ public class ProcessingStrategyBenchmark extends AbstractBenchmark {
   }
 
   @Benchmark
-  @Threads(1)
-  public CoreEvent workQueueProcessor() {
-    return Mono.<CoreEvent>create(resultSink -> workQueueProcessor.next(createEvent(flow, resultSink))).block();
-  }
-
-  @Benchmark
   @Threads(Threads.MAX)
   public CoreEvent directAllSink() {
     return Mono.<CoreEvent>create(resultSink -> directAllSink.accept(createEvent(flow, resultSink))).block();
@@ -192,11 +152,5 @@ public class ProcessingStrategyBenchmark extends AbstractBenchmark {
   @Threads(Threads.MAX)
   public CoreEvent emitterAllSink() {
     return Mono.<CoreEvent>create(resultSink -> emitterAllSink.accept(createEvent(flow, resultSink))).block();
-  }
-
-  @Benchmark
-  @Threads(Threads.MAX)
-  public CoreEvent workQueueAllSink() {
-    return Mono.<CoreEvent>create(resultSink -> workQueueAllSink.accept(createEvent(flow, resultSink))).block();
   }
 }
