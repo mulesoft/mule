@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessingStrategyFactory {
+public abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessingStrategyFactory {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractStreamProcessingStrategyFactory.class);
 
