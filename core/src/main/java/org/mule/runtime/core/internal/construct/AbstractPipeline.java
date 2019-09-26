@@ -226,7 +226,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   protected Function<CoreEvent, Publisher<? extends CoreEvent>> routeThroughProcessingStrategy() {
     return event -> {
-      // Retrieve response publisher before error is communicate
+      // Retrieve response publisher before error is communicated
       Publisher<CoreEvent> responsePublisher = ((BaseEventContext) event.getContext()).getResponsePublisher();
       try {
         // This accept/emit choice is made because there's a backpressure check done in the #emit sink message, which can be done
