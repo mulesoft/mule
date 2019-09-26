@@ -26,6 +26,7 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.test.runner.infrastructure.ExtensionsTestInfrastructureDiscoverer;
+import org.mule.test.runner.utils.TroubleshootingUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -159,8 +160,10 @@ class ExtensionPluginMetadataGenerator {
         try {
           return Class.forName(extensionClassName);
         } catch (ClassNotFoundException e) {
+          TroubleshootingUtils.copyPluginToAuxJenkinsFolderForTroubleshooting(firstURL);
           throw new IllegalArgumentException("Cannot load Extension class '" + extensionClassName + " obtained from: '" + firstURL
-              + "' using classpath: " + new ClassPathUrlProvider().getURLs(), e);
+              + "' with MD5 '" + TroubleshootingUtils.getMD5FromFile(firstURL) + "' using classpath: "
+              + new ClassPathUrlProvider().getURLs(), e);
         }
       }
       logger.debug("No class found annotated with {}", Extension.class.getName());
