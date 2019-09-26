@@ -33,7 +33,13 @@ public final class WildcardErrorTypeMatcher implements ErrorTypeMatcher {
       return true;
     }
 
-    return isChild(errorType);
+    // If the error to match is "*:ID", then also match children in any namespace.
+    if (!nameIsWildcard && isChild(errorType)) {
+      return true;
+    }
+
+    // If the error to match is "NS:*" and the namespace didn't match, then don't match children.
+    return false;
   }
 
   private boolean matchNamespace(ErrorType errorType) {
