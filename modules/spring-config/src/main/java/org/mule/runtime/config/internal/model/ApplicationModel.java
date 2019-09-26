@@ -352,9 +352,8 @@ public class ApplicationModel implements ArtifactAst {
     resolveComponentTypes();
     extensionModelHelper = new ExtensionModelHelper(extensionModels);
     muleComponentModels.forEach(componentModel -> componentModel.resolveTypedComponentIdentifier(extensionModelHelper));
-    executeOnEveryMuleComponentTree(componentModel -> new ComponentLocationVisitor().accept(componentModel));
-
-    muleComponentModels.forEach(componentModel -> componentModel.resolveTypedComponentIdentifier(extensionModelHelper));
+    final ComponentLocationVisitor clv = new ComponentLocationVisitor();
+    recursiveStreamWithHierarchy().forEach(clv);
   }
 
   public void macroExpandXmlSdkComponents(Set<ExtensionModel> extensionModels) {
