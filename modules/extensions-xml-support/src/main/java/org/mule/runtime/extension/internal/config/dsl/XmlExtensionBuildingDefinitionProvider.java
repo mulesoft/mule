@@ -86,27 +86,7 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
 
       new IdempotentExtensionWalker() {
 
-        // @Override
-        // protected void onConnectionProvider(ConnectionProviderModel model) {
-        // System.out.println(" -> onConnectionProvider: " + extensionModel.getName() + "." + model.getName());
-        //
-        // List<KeyAttributeDefinitionPair> paramsDefinitions =
-        // processParametersDefinitions(definitionBuilder, dslSyntaxResolver, model);
-        //
-        // definitions.add(definitionBuilder
-        // .withIdentifier(dslSyntaxResolver.resolve(model).getElementName())
-        // .withTypeDefinition(fromType(XmlConfiguration.class))
-        // // .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
-        // // .withConstructorParameterDefinition(fromFixedValue(model).build())
-        // // .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
-        // // .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build())
-        // .withSetterParameterDefinition("parameters",
-        // fromMultipleDefinitions(paramsDefinitions
-        // .toArray(new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
-        // .build())
-        // .build());
-        // }
-
+        @SuppressWarnings("unchecked")
         @Override
         public void onConfiguration(ConfigurationModel configurationModel) {
           List<KeyAttributeDefinitionPair> paramsDefinitions =

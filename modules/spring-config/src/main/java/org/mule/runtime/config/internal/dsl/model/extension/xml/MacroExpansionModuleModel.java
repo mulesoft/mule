@@ -211,6 +211,7 @@ public class MacroExpansionModuleModel {
                 List<ComponentModel> replacementGlobalElements =
                     createGlobalElementsInstance(configRefModel, moduleComponentModels, moduleGlobalElementsNames,
                                                  literalsParameters);
+                configRefModel.getInnerComponents().clear();
                 configRefModel.getInnerComponents().addAll(replacementGlobalElements);
               });
         }
