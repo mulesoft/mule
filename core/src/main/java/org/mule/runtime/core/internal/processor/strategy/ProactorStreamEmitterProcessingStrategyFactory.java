@@ -138,7 +138,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
                                                 () -> completionLatch.release());
 
         if (!processor.hasDownstreams()) {
-          throw resolveSubscriptionCause(failedSubscriptionCause);
+          throw resolveSubscriptionErrorCause(failedSubscriptionCause);
         }
 
         ReactorSink<CoreEvent> sink =
@@ -152,7 +152,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
       return new RoundRobinReactorSink<>(sinks);
     }
 
-    protected MuleRuntimeException resolveSubscriptionCause(AtomicReference<Throwable> failedSubscriptionCause) {
+    protected MuleRuntimeException resolveSubscriptionErrorCause(AtomicReference<Throwable> failedSubscriptionCause) {
       MuleRuntimeException exceptionToThrow;
       if (failedSubscriptionCause.get() != null) {
         exceptionToThrow = new MuleRuntimeException(createStaticMessage(NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR),
