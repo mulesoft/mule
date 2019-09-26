@@ -214,7 +214,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
    */
   private class StaticFlowRefMessageProcessor extends FlowRefMessageProcessor {
 
-    private AtomicBoolean wasStoppedOnce = new AtomicBoolean(false);
+    private AtomicBoolean hasStoppedOnce = new AtomicBoolean(false);
 
     protected StaticFlowRefMessageProcessor(FlowRefFactoryBean owner) {
       super(owner);
@@ -222,9 +222,14 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     @Override
     public void doStart() throws MuleException {
-      if (wasStoppedOnce.get() && resolvedReferencedProcessorSupplier.isComputed()) {
+      if (hasStoppedOnce.get() || targetIsFlowAndStopped()) {
         startIfNeeded(resolvedReferencedProcessorSupplier.get());
       }
+    }
+
+    protected boolean targetIsFlowAndStopped() {
+      return resolvedReferencedProcessorSupplier.get() instanceof Flow &&
+          ((Flow) resolvedReferencedProcessorSupplier.get()).getLifecycleState().isStopped();
     }
 
     private final LazyValue<ReactiveProcessor> resolvedReferencedProcessorSupplier = new LazyValue<>(() -> {
@@ -346,7 +351,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     @Override
     public void stop() throws MuleException {
       // The flowref was stopped once, so in the next start call, the referenced flow should be started
-      this.wasStoppedOnce.set(true);
+      this.hasStoppedOnce.set(true);
 
       resolvedReferencedProcessorSupplier.ifComputed(resolved -> {
         if (!(resolved instanceof Flow)) {
