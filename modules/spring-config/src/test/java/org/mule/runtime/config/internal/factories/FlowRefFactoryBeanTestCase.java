@@ -115,6 +115,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     expressionManager = mockMuleContext.getExpressionManager();
     doReturn(true).when(expressionManager).isExpression(anyString());
     when(targetFlow.apply(any(Publisher.class))).thenReturn(just(result));
+    when(targetFlow.referenced()).thenReturn(targetFlow);
 
     List<Processor> targetSubFlowProcessors = singletonList(targetSubFlowChild);
     when(targetSubFlow.getMessageProcessors()).thenReturn(targetSubFlowProcessors);
@@ -255,7 +256,6 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     flowRefFactoryBean.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
     flowRefFactoryBean.setApplicationContext(applicationContext);
     mockMuleContext.getInjector().inject(flowRefFactoryBean);
-    // flowRefFactoryBean.setMuleContext(mockMuleContext);
     return flowRefFactoryBean;
   }
 
