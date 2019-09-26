@@ -228,7 +228,8 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     }
 
     protected boolean targetIsFlowAndStopped() {
-      return resolvedReferencedProcessorSupplier.get() instanceof Flow &&
+      return resolvedReferencedProcessorSupplier.isComputed() &&
+          resolvedReferencedProcessorSupplier.get() instanceof Flow &&
           ((Flow) resolvedReferencedProcessorSupplier.get()).getLifecycleState().isStopped();
     }
 
