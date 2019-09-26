@@ -78,7 +78,6 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory;
-import org.mule.runtime.core.internal.processor.strategy.ReactorProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
@@ -126,8 +125,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     return asList(new Object[][] {
         {"TransactionAwareProactorStreamEmitterProcessingStrategyFactory",
             new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(), BLOCKING},
-        {"ReactorProcessingStrategyFactory",
-            new ReactorProcessingStrategyFactory(), BLOCKING},
         {"ProactorStreamEmitterProcessingStrategyFactory",
             new ProactorStreamEmitterProcessingStrategyFactory(), BLOCKING},
         {"BlockingProcessingStrategyFactory",
@@ -136,8 +133,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
             new DirectProcessingStrategyFactory(), BLOCKING},
         {"TransactionAwareProactorStreamEmitterProcessingStrategyFactory",
             new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
-        {"ReactorProcessingStrategyFactory",
-            new ReactorProcessingStrategyFactory(), NON_BLOCKING},
         {"ProactorStreamEmitterProcessingStrategyFactory",
             new ProactorStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
         {"BlockingProcessingStrategyFactory",

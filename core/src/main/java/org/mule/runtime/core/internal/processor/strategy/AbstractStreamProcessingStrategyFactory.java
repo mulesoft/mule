@@ -95,7 +95,7 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
   protected Supplier<Scheduler> getCpuLightSchedulerSupplier(MuleContext muleContext, String schedulersNamePrefix) {
     return () -> muleContext.getSchedulerService()
         .cpuLightScheduler(muleContext.getSchedulerBaseConfig()
-                               .withName(schedulersNamePrefix + "." + CPU_LITE.name()));
+            .withName(schedulersNamePrefix + "." + CPU_LITE.name()));
   }
 
   protected int resolveParallelism() {
