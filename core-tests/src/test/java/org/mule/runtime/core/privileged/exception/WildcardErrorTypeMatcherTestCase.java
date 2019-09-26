@@ -94,7 +94,7 @@ public class WildcardErrorTypeMatcherTestCase extends AbstractErrorTypeMatcherTe
   public void wildcardIdentifierAlsoMatchesChildren() {
     ComponentIdentifier wildcardErrorType = buildFromStringRepresentation(WILDCARD_TOKEN + ":TRANSFORMATION");
     ErrorType testErrorType =
-            ErrorTypeBuilder.builder().namespace("unknown").identifier("unknown").parentErrorType(transformationErrorType).build();
+        ErrorTypeBuilder.builder().namespace("unknown").identifier("unknown").parentErrorType(transformationErrorType).build();
 
     ErrorTypeMatcher wildcardMatcher = new WildcardErrorTypeMatcher(wildcardErrorType);
     assertThat(wildcardMatcher.match(testErrorType), is(true));
@@ -104,7 +104,7 @@ public class WildcardErrorTypeMatcherTestCase extends AbstractErrorTypeMatcherTe
   public void wildcardNamespaceDoesntMatchesChildren() {
     ComponentIdentifier wildcardErrorType = buildFromStringRepresentation(CORE_NAMESPACE_NAME + ":" + WILDCARD_TOKEN);
     ErrorType testErrorType =
-            ErrorTypeBuilder.builder().namespace("unknown").identifier("unknown").parentErrorType(transformationErrorType).build();
+        ErrorTypeBuilder.builder().namespace("unknown").identifier("unknown").parentErrorType(transformationErrorType).build();
 
     ErrorTypeMatcher wildcardMatcher = new WildcardErrorTypeMatcher(wildcardErrorType);
     assertThat(wildcardMatcher.match(testErrorType), is(false));
