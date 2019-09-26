@@ -8,6 +8,7 @@ package org.mule.runtime.extension.internal.factories;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
+import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_OPERATION_CONFIG_REF;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
 
@@ -20,25 +21,18 @@ import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProc
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.extension.internal.config.dsl.XmlConfiguration;
+import org.mule.runtime.extension.internal.config.dsl.XmlSdkConfigurationProvider;
 
 import java.util.Map;
-import java.util.Optional;
 
 import javax.inject.Inject;
 
 public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProcessorChainObjectFactory {
 
-  private Map<String, String> properties = emptyMap();
   private Map<String, String> parameters = emptyMap();
 
   private ExtensionModel extensionModel;
   private OperationModel operationModel;
-  // private OperationModel operationModel;
-
-  // @Config
-  // private XmlConfiguration config;
 
   @Inject
   private ExtensionManager extensionManager;
@@ -48,12 +42,6 @@ public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProc
 
   @Override
   public MessageProcessorChain doGetObject() throws Exception {
-    // if (parameters.containsKey("config-ref")) {
-    // final Optional<ConfigurationProvider> configurationProvider =
-    // extensionManager.getConfigurationProvider(parameters.get("config-ref"));
-    // System.out.println(" >> ModuleOperationMessageProcessorChainFactoryBean.configurationProvider: " + configurationProvider);
-    // }
-
     MessageProcessorChainBuilder builder = getBuilderInstance();
     for (Object processor : processors) {
       if (processor instanceof Processor) {
@@ -81,20 +69,15 @@ public class ModuleOperationMessageProcessorChainFactoryBean extends MessageProc
 
 
   public Map<String, String> getProperties() {
-    if (parameters.containsKey("config-ref")) {
-      final Optional<ConfigurationProvider> configurationProvider =
-          extensionManager.getConfigurationProvider(parameters.get("config-ref"));
-      System.out.println(" >> ModuleOperationMessageProcessorChainFactoryBean.configurationProvider: " + configurationProvider);
-
-      return configurationProvider.filter(cp -> cp instanceof XmlConfiguration).map(cp -> ((XmlConfiguration) cp).getParameters())
+    // `properties` in the scope of a Xml-Sdk operation means the parameters of the config.
+    if (parameters.containsKey(MODULE_OPERATION_CONFIG_REF)) {
+      return extensionManager.getConfigurationProvider(parameters.get(MODULE_OPERATION_CONFIG_REF))
+          .filter(cp -> cp instanceof XmlSdkConfigurationProvider)
+          .map(cp -> ((XmlSdkConfigurationProvider) cp).getParameters())
           .orElse(emptyMap());
     } else {
       return emptyMap();
     }
-  }
-
-  public void setProperties(Map<String, String> properties) {
-    this.properties = properties;
   }
 
   public void setParameters(Map<String, String> parameters) {

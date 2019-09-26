@@ -33,7 +33,6 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
-import org.mule.runtime.config.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
 import org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
@@ -64,7 +63,7 @@ import java.util.Set;
  */
 public class MacroExpansionModuleModel {
 
-  private static final String MODULE_OPERATION_CONFIG_REF = "config-ref";
+  public static final String MODULE_OPERATION_CONFIG_REF = "config-ref";
   /**
    * Used to obtain the {@link ComponentIdentifier} element from the <module/>'s original {@ink ComponentModel} to be later added
    * in the macro expanded element (aka: <module-operation-chain ../>) so that the location set by the
@@ -288,7 +287,7 @@ public class MacroExpansionModuleModel {
       processorChainBuilder.addChildComponentModel(copiedParam);
     }
 
-    processorChainBuilder.setSourceCode(operationRefModel.getSourceCode());
+    operationRefModel.getMetadata().getSourceCode().ifPresent(processorChainBuilder::setSourceCode);
 
     bodyProcessors.stream()
         .map(bodyProcessor -> lookForTNSOperation((ComponentAst) bodyProcessor)
@@ -309,9 +308,9 @@ public class MacroExpansionModuleModel {
     }
     processorChainBuilder.addCustomAttribute(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME, containerName);
 
-    operationRefModel.getConfigFileName().ifPresent(processorChainBuilder::setConfigFileName);
-    operationRefModel.getLineNumber().ifPresent(processorChainBuilder::setLineNumber);
-    operationRefModel.getStartColumn().ifPresent(processorChainBuilder::setStartColumn);
+    operationRefModel.getMetadata().getFileName().ifPresent(processorChainBuilder::setConfigFileName);
+    operationRefModel.getMetadata().getStartLine().ifPresent(processorChainBuilder::setLineNumber);
+    operationRefModel.getMetadata().getStartColumn().ifPresent(processorChainBuilder::setStartColumn);
     processorChainBuilder.addCustomAttribute(ORIGINAL_IDENTIFIER, operationRefModel.getIdentifier());
 
     ComponentModel processorChainModel = processorChainBuilder.build();
@@ -596,10 +595,10 @@ public class MacroExpansionModuleModel {
   }
 
   private ComponentModel buildFrom(ComponentModel componentModelOrigin, ComponentModel.Builder operationReplacementModel) {
-    componentModelOrigin.getConfigFileName().ifPresent(operationReplacementModel::setConfigFileName);
-    componentModelOrigin.getLineNumber().ifPresent(operationReplacementModel::setLineNumber);
-    componentModelOrigin.getStartColumn().ifPresent(operationReplacementModel::setStartColumn);
-    operationReplacementModel.setSourceCode(componentModelOrigin.getSourceCode());
+    componentModelOrigin.getMetadata().getFileName().ifPresent(operationReplacementModel::setConfigFileName);
+    componentModelOrigin.getMetadata().getStartLine().ifPresent(operationReplacementModel::setLineNumber);
+    componentModelOrigin.getMetadata().getStartColumn().ifPresent(operationReplacementModel::setStartColumn);
+    componentModelOrigin.getMetadata().getSourceCode().ifPresent(operationReplacementModel::setSourceCode);
     ComponentModel componentModel = operationReplacementModel.build();
     for (ComponentModel child : componentModel.getInnerComponents()) {
       child.setParent(componentModel);
@@ -640,39 +639,11 @@ public class MacroExpansionModuleModel {
                                          String originalValue) {
     String result;
     if ((moduleGlobalElementsNames.contains(originalValue))) {
-      // // current value is a global element reference
-      // if (originalValue.equals(getTestConnectionGlobalElement().orElse(null))) {
-      // // and it's also a reference to a bean that will be doing test connection, which implies no renaming must be done when
-      // // macro expanding.
-      // result = configRefNameToAppend;
-      // } else {
       result = originalValue.concat("-").concat(configRefNameToAppend);
-      // }
     } else {
       // not a global element, returning the original value.
       result = originalValue;
     }
     return result;
-  }
-
-  /**
-   * @return if present, the global element marked with {@link TestConnectionGlobalElementModelProperty} when macro expanded will
-   *         hold the original value.
-   */
-  private Optional<String> getTestConnectionGlobalElement() {
-    return getConfigurationModel()
-        .flatMap(this::getTestConnectionGlobalElement);
-  }
-
-  private Optional<String> getTestConnectionGlobalElement(ConfigurationModel configurationModel) {
-    final Optional<ConnectionProviderModel> connectionProviderModel =
-        configurationModel.getConnectionProviderModel(MODULE_CONNECTION_GLOBAL_ELEMENT_NAME);
-    if (connectionProviderModel.isPresent()) {
-      final Optional<TestConnectionGlobalElementModelProperty> modelProperty =
-          connectionProviderModel.get().getModelProperty(TestConnectionGlobalElementModelProperty.class);
-      return modelProperty.map(TestConnectionGlobalElementModelProperty::getGlobalElementName);
-    } else {
-      return empty();
-    }
   }
 }

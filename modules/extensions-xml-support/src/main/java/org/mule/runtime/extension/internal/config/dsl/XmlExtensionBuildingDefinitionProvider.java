@@ -11,15 +11,12 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromMultipleDefinitions;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
-import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -39,6 +36,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.internal.factories.ModuleOperationMessageProcessorChainFactoryBean;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
 
@@ -46,7 +44,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeMap;
 
 public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuildingDefinitionProvider {
 
@@ -112,42 +109,23 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
 
         @Override
         public void onConfiguration(ConfigurationModel configurationModel) {
-          System.out.println(" -> config: " + extensionModel.getName() + ":" + configurationModel.getName());
-
           List<KeyAttributeDefinitionPair> paramsDefinitions =
               processParametersDefinitions(definitionBuilder, dslSyntaxResolver, configurationModel);
 
-
-
-          // for (ParameterModel parameterModel : configurationModel.getAllParameterModels()) {
-          // configDefinitionBuilder = configDefinitionBuilder
-          // .withSetterParameterDefinition(parameterModel
-          // .getName(), fromSimpleParameter(dslSyntaxResolver.resolve(parameterModel).getAttributeName())
-          // .withDefaultValue(parameterModel.getDefaultValue())
-          // .build());
-          // }
-
           definitions.add(definitionBuilder
               .withIdentifier(dslSyntaxResolver.resolve(configurationModel).getElementName())
-              .withTypeDefinition(fromType(XmlConfiguration.class))
-              // .withTypeDefinition(fromType(ConfigurationProvider.class))
-              // .withObjectFactoryType(XmlConfigurationProviderObjectFactory.class)
-              // .withConstructorParameterDefinition(fromSimpleParameter("name").build())
+              .withTypeDefinition(fromType(ConfigurationProvider.class))
+              .withObjectFactoryType(XmlSdkConfigurationProviderFactory.class)
               .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
               .withConstructorParameterDefinition(fromFixedValue(configurationModel).build())
-              // .withConstructorParameterDefinition(fromFixedValue(null).build())
               .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
-              // .withSetterParameterDefinition("expirationPolicy", fromChildConfiguration(ExpirationPolicy.class).build())
               .withSetterParameterDefinition("parameters",
                                              fromMultipleDefinitions(paramsDefinitions
                                                  .toArray(new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
                                                      .build())
-              // .withSetterParameterDefinition("innerConfigs", fromChildCollectionConfiguration(Object.class).build())
+              .withSetterParameterDefinition("innerConfigProviders",
+                                             fromChildCollectionConfiguration(ConfigurationProvider.class).build())
               .build());
-
-          // addModuleOperationChainParser(model.getName());
-          // parseWith(new ConfigurationDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver,
-          // parsingContext));
         }
 
         @Override
@@ -173,21 +151,10 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
                                        fromMultipleDefinitions(paramsDefinitions
                                            .toArray(new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
                                                .build())
-        .withSetterParameterDefinition("properties", fromChildMapConfiguration(String.class, String.class)
-            .withWrapperIdentifier("module-operation-properties").build())
         .withSetterParameterDefinition("extensionModel", fromFixedValue(extensionModel).build())
         .withSetterParameterDefinition("operationModel", fromFixedValue(operationModel).build())
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asPrototype().build());
-
-    final Builder baseCoreDefinition = new Builder().withNamespace(CORE_PREFIX);
-
-    definitions.add(baseCoreDefinition.withIdentifier("module-operation-properties")
-        .withTypeDefinition(fromType(TreeMap.class)).build());
-    definitions.add(baseCoreDefinition
-        .withIdentifier("module-operation-property-entry")
-        .withTypeDefinition(fromMapEntryType(String.class, String.class))
-        .build());
   }
 
   private List<KeyAttributeDefinitionPair> processParametersDefinitions(final Builder baseDefinition,
