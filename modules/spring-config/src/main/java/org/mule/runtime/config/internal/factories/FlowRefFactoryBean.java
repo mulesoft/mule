@@ -60,6 +60,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -213,14 +214,15 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
    */
   private class StaticFlowRefMessageProcessor extends FlowRefMessageProcessor {
 
+    private AtomicBoolean wasStoppedOnce = new AtomicBoolean(false);
+
     protected StaticFlowRefMessageProcessor(FlowRefFactoryBean owner) {
       super(owner);
     }
 
     @Override
     public void doStart() throws MuleException {
-      // TODO: Fix me. Failing in org.mule.test.core.context.notification.FlowStackTestCase#secondFlowStatic startup
-      if (resolvedReferencedProcessorSupplier.isComputed()) {
+      if (wasStoppedOnce.get() && resolvedReferencedProcessorSupplier.isComputed()) {
         startIfNeeded(resolvedReferencedProcessorSupplier.get());
       }
     }
@@ -343,6 +345,9 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     @Override
     public void stop() throws MuleException {
+      // The flowref was stopped once, so in the next start call, the referenced flow should be started
+      this.wasStoppedOnce.set(true);
+
       resolvedReferencedProcessorSupplier.ifComputed(resolved -> {
         if (!(resolved instanceof Flow)) {
           try {
