@@ -12,7 +12,6 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.beanutils.BeanUtils.copyProperty;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
-import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_PROTOTYPE_OBJECT;
 import static org.mule.runtime.config.internal.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
@@ -24,22 +23,18 @@ import static org.mule.runtime.deployment.model.internal.application.MuleApplica
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.privileged.dsl.BeanDefinitionPostProcessor;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor;
-import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
@@ -143,31 +138,9 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
       Map<QName, Object> annotations =
           processMetadataAnnotationsHelper(beanDefinitionBuilder, componentModel);
       processNestedAnnotations(componentModel, annotations);
-      processMacroExpandedAnnotations(componentModel, annotations);
       if (!annotations.isEmpty()) {
         beanDefinitionBuilder.addPropertyValue(ANNOTATIONS_PROPERTY_NAME, annotations);
       }
-    }
-  }
-
-  /**
-   * Strictly needed when doing the macro expansion, if the current component model was not in the original <flow/> we need to
-   * look for the rootest element that contains it (which happens to be the flow's name) so that later on from that name the
-   * correct {@link ProcessingStrategy} will be picked up. Without that, all the streams managed by the runtime
-   * ({@link CursorStreamProvider} won't be properly handled, ending up in closed streams or even deadlocks.
-   * <p/>
-   * Any alteration on this method should be tightly coupled with
-   * {@link ModuleOperationMessageProcessorChainFactoryBean#doGetObject()}, which internally relies on
-   * {@link DefaultMessageProcessorChainBuilder#newLazyProcessorChainBuilder(org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChainBuilder, org.mule.runtime.core.api.MuleContext, java.util.function.Supplier)}
-   *
-   * @param componentModel that might contain the <flow/>'s name attribute as a custom attribute
-   * @param annotations to alter by adding the {@link AbstractComponent#ROOT_CONTAINER_NAME_KEY} if the component model has the
-   *        name of the flow.
-   */
-  private void processMacroExpandedAnnotations(ComponentModel componentModel, Map<QName, Object> annotations) {
-    if (componentModel.getMetadata().getParserAttributes().containsKey(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME)) {
-      final Object flowName = componentModel.getMetadata().getParserAttributes().get(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME);
-      annotations.put(AbstractComponent.ROOT_CONTAINER_NAME_KEY, flowName);
     }
   }
 

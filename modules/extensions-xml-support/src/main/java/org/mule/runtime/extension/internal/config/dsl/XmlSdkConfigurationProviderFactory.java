@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class XmlSdkConfigurationProviderFactory extends AbstractExtensionObjectFactory<ConfigurationProvider>
+class XmlSdkConfigurationProviderFactory extends AbstractExtensionObjectFactory<ConfigurationProvider>
     implements ObjectFactory<ConfigurationProvider> {
 
   private final ExtensionModel extensionModel;

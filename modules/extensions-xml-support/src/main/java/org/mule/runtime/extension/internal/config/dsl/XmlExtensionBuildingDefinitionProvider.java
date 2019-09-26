@@ -33,6 +33,7 @@ import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProvider
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
@@ -45,6 +46,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * A {@link ComponentBuildingDefinitionProvider} which makes all definitions of extensions done with the XML SDK be declared by
+ * the same definitions of the XML SDK.
+ * 
+ * @since 4.3
+ */
 public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuildingDefinitionProvider {
 
   private static final String MESSAGE_PROCESSORS = "messageProcessors";

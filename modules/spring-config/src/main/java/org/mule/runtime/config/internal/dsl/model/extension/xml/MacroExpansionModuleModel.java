@@ -14,6 +14,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.model.ApplicationModel.NAME_ATTRIBUTE;
@@ -33,7 +34,6 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
-import org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -76,13 +76,6 @@ public class MacroExpansionModuleModel {
    * Reserved prefix in a <module/> to define a reference an operation of the same module (no circular dependencies allowed)
    */
   public static final String TNS_PREFIX = "tns";
-
-  /**
-   * Used to leave breadcrumbs of which is the flow's name containing the macro expanded chain.
-   *
-   * @see CommonBeanDefinitionCreator#processMacroExpandedAnnotations(ComponentModel, java.util.Map)
-   */
-  public static final String ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME = "ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME";
 
   /**
    * Used when the <module/> contains global elements without <property/>ies to be expanded, thus the macro expansion will take
@@ -307,7 +300,7 @@ public class MacroExpansionModuleModel {
     for (Map.Entry<String, String> customAttributeEntry : operationRefModel.getMetadata().getDocAttributes().entrySet()) {
       processorChainBuilder.addCustomAttribute(customAttributeEntry.getKey(), customAttributeEntry.getValue());
     }
-    processorChainBuilder.addCustomAttribute(ROOT_MACRO_EXPANDED_FLOW_CONTAINER_NAME, containerName);
+    processorChainBuilder.addCustomAttribute(ROOT_CONTAINER_NAME_KEY.toString(), containerName);
 
     operationRefModel.getMetadata().getFileName().ifPresent(processorChainBuilder::setConfigFileName);
     operationRefModel.getMetadata().getStartLine().ifPresent(processorChainBuilder::setLineNumber);
