@@ -43,7 +43,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.exception.RecursiveSubFlowException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveAroundInterceptorAdapter;
@@ -190,8 +189,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       if (object == null && !(throwable instanceof MessagingException)) {
         LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE, throwable);
         throw new IllegalStateException(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE);
-      } else if (throwable instanceof RecursiveSubFlowException) {
-        throw new IllegalStateException(throwable);
       }
 
       if (object != null && !(object instanceof CoreEvent) && throwable instanceof MessagingException) {

@@ -117,7 +117,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher)
           .doOnNext(pushSubFlowFlowStackElement())
-          // TODO: Add explanatory comment here
+          // To avoid recursive transformation when there are flowref cycles, the chain is lazily transformed
           .compose(s -> super.apply(s))
           .doOnNext(popSubFlowFlowStackElement());
     }
