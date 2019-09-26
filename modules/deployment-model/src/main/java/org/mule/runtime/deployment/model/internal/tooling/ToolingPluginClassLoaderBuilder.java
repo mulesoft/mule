@@ -11,6 +11,7 @@ import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
+import static org.mule.runtime.deployment.model.internal.tooling.ToolingRegionClassLoader.newToolingRegionClassLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -19,6 +20,7 @@ import org.mule.runtime.deployment.model.internal.RegionPluginClassLoadersFactor
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.plugin.PluginResolutionError;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
@@ -114,6 +116,12 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
     return new ToolingArtifactClassLoader(regionClassLoader,
                                           getPluginArtifactClassLoader(artifactPluginDescriptor,
                                                                        regionClassLoader.getArtifactPluginClassLoaders()));
+  }
+
+  @Override
+  protected RegionClassLoader createRegionClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor,
+                                                      ClassLoader parentClassLoader, ClassLoaderLookupPolicy parentLookupPolicy) {
+    return newToolingRegionClassLoader(artifactId, artifactDescriptor, parentClassLoader, parentLookupPolicy);
   }
 
   /**
