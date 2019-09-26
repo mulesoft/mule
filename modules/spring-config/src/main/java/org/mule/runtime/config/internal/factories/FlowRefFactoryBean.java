@@ -73,6 +73,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
 public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> implements ApplicationContextAware {
 
@@ -217,7 +218,12 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     }
 
     @Override
-    public void doStart() {}
+    public void doStart() throws MuleException {
+      // TODO: Fix me. Failing in org.mule.test.core.context.notification.FlowStackTestCase#secondFlowStatic startup
+      if (resolvedReferencedProcessorSupplier.isComputed()) {
+        startIfNeeded(resolvedReferencedProcessorSupplier.get());
+      }
+    }
 
     private final LazyValue<ReactiveProcessor> resolvedReferencedProcessorSupplier = new LazyValue<>(() -> {
       try {
@@ -232,11 +238,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       final ReactiveProcessor resolvedReferencedProcessor = resolvedReferencedProcessorSupplier.get();
 
       Flux<CoreEvent> pub = from(publisher)
-          .subscriberContext(context -> {
-            HashSet<String> currentAppliedFlowrefs = context.getOrDefault(APPLIED_FLOWREFS_KEY, new HashSet<>());
-            currentAppliedFlowrefs.remove(refName);
-            return context.put(APPLIED_FLOWREFS_KEY, currentAppliedFlowrefs);
-          });
+          .subscriberContext(clearCurrentFlowRefFromCycleDetection());
 
       if (target != null) {
         pub = pub.map(event -> quickCopy(event, singletonMap(originalEventKey(event), event)))
@@ -259,7 +261,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
                                                             location,
                                                             resolvedTarget.getExceptionListener()));
 
-      return decoratePublisherWithTargetVariableIfNecessary(pub);
+      return decoratePublisher(pub);
     }
 
     private Publisher<CoreEvent> applyForStaticSubFlow(ReactiveProcessor resolvedTarget, Flux<CoreEvent> pub,
@@ -267,7 +269,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
       pub = pub.transform(eventPub -> applyWithChildContext(eventPub, resolvedTarget, location, popSubFlowFlowStackElement()));
 
-      return decoratePublisherWithTargetVariableIfNecessary(pub);
+      return decoratePublisher(pub);
     }
 
     private FlowExceptionHandler popSubFlowFlowStackElement() {
@@ -279,20 +281,60 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       };
     }
 
-    private Publisher<CoreEvent> decoratePublisherWithTargetVariableIfNecessary(Flux<CoreEvent> pub) {
-      pub = pub.subscriberContext(context -> {
+    /**
+     * Decorates flowRef publisher with:
+     * <ul>
+     * <li>Result to target variable mapping</li>
+     * <li>FlowRef entry cycle detection</li>
+     * </ul>
+     * 
+     * @param pub the current publisher
+     * @return the decorated publisher
+     */
+    private Publisher<CoreEvent> decoratePublisher(Flux<CoreEvent> pub) {
+      pub = pub.subscriberContext(checkAndMarkCurrentFlowRefForCycleDetection());
+      return (target != null)
+          ? pub.map(eventAfter -> outputToTarget(((InternalEvent) eventAfter)
+              .getInternalParameter(originalEventKey(eventAfter)), target, targetValue,
+                                                 expressionManager).apply(eventAfter))
+          : pub;
+    }
+
+    /**
+     * Clears the current subflow marker from the {@link Context} that is being propagated from downstream.
+     * 
+     * @return the after-flowref-is-applied {@link Context} transformer
+     */
+    protected Function<Context, Context> clearCurrentFlowRefFromCycleDetection() {
+      return context -> {
+        HashSet<String> currentAppliedFlowrefs = context.getOrDefault(APPLIED_FLOWREFS_KEY, new HashSet<>());
+        currentAppliedFlowrefs.remove(refName);
+        return context.put(APPLIED_FLOWREFS_KEY, currentAppliedFlowrefs);
+      };
+    }
+
+    /**
+     * Does two things:
+     * <ul>
+     * <li>If the current flowref marker is found in the {@link Context}, it means it wasn't cleared. This implies that after the
+     * inner chain of this flowref was subscribed, the subscriberContext defined in
+     * {@link StaticFlowRefMessageProcessor#clearCurrentFlowRefFromCycleDetection} wasn't called, which happens only after the
+     * innerChain subscription ends.</li> Since it wasn't called, it means some other flowref refers to the same inner chain,
+     * hence the cycle.
+     * <li>If this is the first time the flowref is visited, sets the marker.</li>
+     * </ul>
+     * 
+     * @return the before-flowref-is-applied {@link Context} transformer
+     */
+    private Function<Context, Context> checkAndMarkCurrentFlowRefForCycleDetection() {
+      return context -> {
         HashSet<String> currentAppliedFlowrefs = context.getOrDefault(APPLIED_FLOWREFS_KEY, new HashSet<>());
         if (currentAppliedFlowrefs.contains(refName)) {
           throw propagate(new RecursiveSubFlowException(refName, StaticFlowRefMessageProcessor.this));
         }
         currentAppliedFlowrefs.add(refName);
         return context.put(APPLIED_FLOWREFS_KEY, currentAppliedFlowrefs);
-      });
-      return (target != null)
-          ? pub.map(eventAfter -> outputToTarget(((InternalEvent) eventAfter)
-              .getInternalParameter(originalEventKey(eventAfter)), target, targetValue,
-                                                 expressionManager).apply(eventAfter))
-          : pub;
+      };
     }
 
     protected String originalEventKey(CoreEvent event) {
