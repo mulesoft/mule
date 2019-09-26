@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.deployment.model.internal.tooling.ToolingRegionClassLoader.newToolingRegionClassLoader;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -138,6 +139,12 @@ public class ToolingApplicationClassLoaderBuilder
   @Override
   protected ArtifactClassLoader getParentClassLoader() {
     return parentClassLoader;
+  }
+
+  @Override
+  protected RegionClassLoader createRegionClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor,
+                                                      ClassLoader parentClassLoader, ClassLoaderLookupPolicy parentLookupPolicy) {
+    return newToolingRegionClassLoader(artifactId, artifactDescriptor, parentClassLoader, parentLookupPolicy);
   }
 
   /**
