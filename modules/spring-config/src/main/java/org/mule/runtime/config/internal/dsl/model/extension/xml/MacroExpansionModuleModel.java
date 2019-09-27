@@ -17,8 +17,6 @@ import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.config.internal.model.ApplicationModel.NAME_ATTRIBUTE;
-import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONFIG_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -30,7 +28,6 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
-import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
@@ -200,7 +197,7 @@ public class MacroExpansionModuleModel {
                 Map<String, String> connectionPropertiesMap =
                     extractConnectionProperties((ComponentAst) configRefModel, configurationModel);
                 propertiesMap.putAll(connectionPropertiesMap);
-                final Map<String, String> literalsParameters = getLiteralParameters(propertiesMap, emptyMap());
+                final Map<String, String> literalsParameters = getLiteralParameters(emptyMap());
                 List<ComponentModel> replacementGlobalElements =
                     createGlobalElementsInstance(configRefModel, moduleComponentModels, moduleGlobalElementsNames,
                                                  literalsParameters);
@@ -210,10 +207,6 @@ public class MacroExpansionModuleModel {
         }
       }
     });
-  }
-
-  private Optional<ConfigurationModel> getConfigurationModel() {
-    return extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME);
   }
 
   private List<ComponentModel> createGlobalElementsInstance(ComponentModel configRefModel,
@@ -269,7 +262,6 @@ public class MacroExpansionModuleModel {
     ComponentModel.Builder processorChainBuilder = new ComponentModel.Builder();
     processorChainBuilder.setIdentifier(operationRefModel.getIdentifier());
 
-    Map<String, String> propertiesMap = extractProperties(configRefName);
     Map<String, String> parametersMap =
         extractParameters((ComponentAst) operationRefModel, operationModel.getAllParameterModels());
     operationRefModel.getParameters().forEach((paramName, paramValue) -> {
@@ -288,7 +280,7 @@ public class MacroExpansionModuleModel {
             .map(tnsOperation -> createModuleOperationChain(bodyProcessor, tnsOperation, moduleGlobalElementsNames,
                                                             configRefName, containerName))
             .orElseGet(() -> copyOperationComponentModel(bodyProcessor, configRefName, moduleGlobalElementsNames,
-                                                         getLiteralParameters(propertiesMap, parametersMap),
+                                                         getLiteralParameters(parametersMap),
                                                          containerName)))
         .forEach(processorChainBuilder::addChildComponentModel);
 
@@ -366,20 +358,14 @@ public class MacroExpansionModuleModel {
   }
 
   /**
-   * @param propertiesMap <property>s that are feed in the current usage of the <module/>
    * @param parametersMap <param>s that are feed in the current usage of the <module/>
    * @return a {@link Map} of <property>s and <parameter>s that could be replaced by their literal values
    */
-  private Map<String, String> getLiteralParameters(Map<String, String> propertiesMap, Map<String, String> parametersMap) {
-    final Map<String, String> literalsParameters = propertiesMap.entrySet().stream()
+  private Map<String, String> getLiteralParameters(Map<String, String> parametersMap) {
+    final Map<String, String> literalsParameters = parametersMap.entrySet().stream()
         .filter(entry -> !isExpression(entry.getValue()))
         .collect(toMap(e -> getReplaceableExpression(e.getKey(), VARS),
                        Map.Entry::getValue));
-
-    literalsParameters.putAll(parametersMap.entrySet().stream()
-        .filter(entry -> !isExpression(entry.getValue()))
-        .collect(toMap(e -> getReplaceableExpression(e.getKey(), VARS),
-                       Map.Entry::getValue)));
     return literalsParameters;
   }
 
@@ -398,36 +384,6 @@ public class MacroExpansionModuleModel {
 
   private boolean isExpression(String value) {
     return value.startsWith("#[") && value.endsWith("]");
-  }
-
-  /**
-   * Extracts the properties of the current <module/> if applies (it might not have a configuration in it)
-   *
-   * @param configRefName current <operation/> to macro expand, from which the config-ref attribute's value will be extracted.
-   * @return a map with the name and values of the <module/>'s properties.
-   */
-  private Map<String, String> extractProperties(Optional<String> configRefName) {
-    Map<String, String> valuesMap = new HashMap<>();
-    configRefName
-        .filter(configParameter -> defaultGlobalElementName()
-            .map(defaultGlobalElementName -> !defaultGlobalElementName.equals(configParameter)).orElse(true))
-        .ifPresent(configParameter -> {
-          // look for the global element which "name" attribute maps to "configParameter" value
-          ComponentAst configRefComponentModel = ((ArtifactAst) applicationModel).topLevelComponentsStream()
-              .filter(componentModel -> componentModel.getIdentifier().getNamespace()
-                  .equals(extensionModel.getXmlDslModel().getPrefix()))
-              .filter(componentModel -> componentModel.getModel(ConfigurationModel.class).isPresent()
-                  && configParameter.equals(componentModel.getRawParameterValue(NAME_ATTRIBUTE).orElse(null)))
-              .findFirst()
-              .orElseThrow(() -> new IllegalArgumentException(format("There's no <%s:config> named [%s] in the current mule app",
-                                                                     extensionModel.getXmlDslModel().getPrefix(),
-                                                                     configParameter)));
-          // as configParameter != null, a ConfigurationModel must exists
-          final ConfigurationModel configurationModel = getConfigurationModel().get();
-          valuesMap.putAll(extractParameters(configRefComponentModel, configurationModel.getAllParameterModels()));
-          valuesMap.putAll(extractConnectionProperties(configRefComponentModel, configurationModel));
-        });
-    return valuesMap;
   }
 
   /**

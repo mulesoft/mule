@@ -189,7 +189,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
      */
     private Map<String, Pair<String, MetadataType>> parseParameters(Map<String, String> parameters,
                                                                     List<ParameterModel> parameterModels) {
-      final HashMap<String, Pair<String, MetadataType>> result = new HashMap<>();
+      final Map<String, Pair<String, MetadataType>> result = new HashMap<>();
 
       for (ParameterModel parameterModel : parameterModels) {
         final String parameterName = parameterModel.getName();
