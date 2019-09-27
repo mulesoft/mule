@@ -249,6 +249,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
      */
     @Override
     protected int doAddObject(String name, Object object, List<Object> bucket) {
+
+      System.out.println(" >> ComponentConfigurationLifecycleObjectSorter.doAddObject: " + name);
+
       if (bucket.contains(object)) {
         return 0;
       }
