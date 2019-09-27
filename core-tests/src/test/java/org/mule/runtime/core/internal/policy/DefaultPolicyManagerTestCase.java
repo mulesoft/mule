@@ -40,6 +40,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 
 public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
 
@@ -56,7 +57,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
   public void before() throws InitialisationException {
     policyManager = new DefaultPolicyManager();
 
-    policyProvider = mock(PolicyProvider.class);
+    policyProvider = mock(PolicyProvider.class, RETURNS_DEEP_STUBS);
     final Registry registry = mock(Registry.class);
     when(registry.lookupByType(PolicyProvider.class)).thenReturn(of(policyProvider));
     policyManager.setRegistry(registry);
@@ -180,27 +181,32 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void operationSamePolicyForSameParams() {
+    Policy policy = mockPolicy();
+
     when(policyProvider.findOperationParameterizedPolicies(any(PolicyPointcutParameters.class)))
-        .thenReturn(asList(mock(Policy.class)));
+        .thenReturn(asList(policy));
     when(policyProvider.isPoliciesAvailable()).thenReturn(true);
     policiesChangeCallbackCaptor.getValue().run();
 
-    final OperationPolicy policy1 = policyManager.createOperationPolicy(operation1Component, mock(InternalEvent.class),
-                                                                        mock(OperationParametersProcessor.class));
-    final OperationPolicy policy2 = policyManager.createOperationPolicy(operation2Component, mock(InternalEvent.class),
-                                                                        mock(OperationParametersProcessor.class));
+    final OperationPolicy operationPolicy1 = policyManager.createOperationPolicy(operation1Component, mock(InternalEvent.class),
+                                                                                 mock(OperationParametersProcessor.class));
+    final OperationPolicy operationPolicy2 = policyManager.createOperationPolicy(operation2Component, mock(InternalEvent.class),
+                                                                                 mock(OperationParametersProcessor.class));
 
-    assertThat(policy1, instanceOf(CompositeOperationPolicy.class));
-    assertThat(policy2, instanceOf(CompositeOperationPolicy.class));
+    assertThat(operationPolicy1, instanceOf(CompositeOperationPolicy.class));
+    assertThat(operationPolicy2, instanceOf(CompositeOperationPolicy.class));
 
-    assertThat(policy1, sameInstance(policy2));
+    assertThat(operationPolicy1, sameInstance(operationPolicy2));
   }
 
   @Test
   public void operationDifferentPolicyForDifferentParams() {
+    Policy policy1 = mockPolicy();
+    Policy policy2 = mockPolicy();
+
     when(policyProvider.findOperationParameterizedPolicies(any(PolicyPointcutParameters.class)))
-        .thenReturn(asList(mock(Policy.class)))
-        .thenReturn(asList(mock(Policy.class)));
+        .thenReturn(asList(policy1))
+        .thenReturn(asList(policy2));
     when(policyProvider.isPoliciesAvailable()).thenReturn(true);
     policiesChangeCallbackCaptor.getValue().run();
 
@@ -212,21 +218,22 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
     final InternalEvent event2 = mock(InternalEvent.class);
     when(event2.getInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS)).thenReturn(sourcePolicyParams2);
 
-    final OperationPolicy policy1 = policyManager.createOperationPolicy(operation1Component, event1,
-                                                                        mock(OperationParametersProcessor.class));
-    final OperationPolicy policy2 = policyManager.createOperationPolicy(operation1Component, event2,
-                                                                        mock(OperationParametersProcessor.class));
+    final OperationPolicy operationPolicy1 = policyManager.createOperationPolicy(operation1Component, event1,
+                                                                                 mock(OperationParametersProcessor.class));
+    final OperationPolicy operationPolicy2 = policyManager.createOperationPolicy(operation1Component, event2,
+                                                                                 mock(OperationParametersProcessor.class));
 
-    assertThat(policy1, instanceOf(CompositeOperationPolicy.class));
-    assertThat(policy2, instanceOf(CompositeOperationPolicy.class));
+    assertThat(operationPolicy1, instanceOf(CompositeOperationPolicy.class));
+    assertThat(operationPolicy2, instanceOf(CompositeOperationPolicy.class));
 
     assertThat(policy1, not(policy2));
   }
 
   @Test
   public void operationSamePolicyForDifferentOperationSameParams() {
+    Policy policy = mockPolicy();
     when(policyProvider.findOperationParameterizedPolicies(any(PolicyPointcutParameters.class)))
-        .thenReturn(asList(mock(Policy.class)));
+        .thenReturn(asList(policy));
     when(policyProvider.isPoliciesAvailable()).thenReturn(true);
     policiesChangeCallbackCaptor.getValue().run();
 
@@ -239,6 +246,14 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
     assertThat(policy2, instanceOf(CompositeOperationPolicy.class));
 
     assertThat(policy1, sameInstance(policy2));
+  }
+
+  private Policy mockPolicy() {
+    Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
+    when(policy.getPolicyChain().getProcessingStrategy().onPipeline(ArgumentMatchers.any()))
+        .thenAnswer(inv -> inv.getArgument(0));
+
+    return policy;
   }
 
 }

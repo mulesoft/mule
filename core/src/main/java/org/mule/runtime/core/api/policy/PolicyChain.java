@@ -84,6 +84,10 @@ public class PolicyChain extends AbstractComponent
     notificationHelper = new PolicyNotificationHelper(notificationManager, muleContext.getConfiguration().getId(), this);
   }
 
+  public ProcessingStrategy getProcessingStrategy() {
+    return processingStrategy;
+  }
+
   public void setProcessingStrategy(ProcessingStrategy processingStrategy) {
     this.processingStrategy = processingStrategy;
   }

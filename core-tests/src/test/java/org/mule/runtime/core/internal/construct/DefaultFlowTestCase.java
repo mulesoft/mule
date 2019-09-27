@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static reactor.core.publisher.Mono.just;
 
@@ -219,7 +219,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     // When max concurrency is default Integer.MAX_VALUE then the Scheduler is created with no withMaxConcurrentTasks
     // configuration.
     verify(muleContext.getSchedulerService())
-        .ioScheduler(eq(muleContext.getSchedulerBaseConfig().withName(flow.getName() + "." + BLOCKING.name())));
+        .cpuLightScheduler(eq(muleContext.getSchedulerBaseConfig().withName(flow.getName() + "." + CPU_LITE.name())));
   }
 
   @Test
@@ -235,7 +235,7 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
       customFlow.start();
       assertThat(customFlow.getMaxConcurrency(), equalTo(customMaxConcurrency));
       verify(muleContext.getSchedulerService())
-          .ioScheduler(eq(muleContext.getSchedulerBaseConfig().withName(flow.getName() + "." + BLOCKING.name())));
+          .cpuLightScheduler(eq(muleContext.getSchedulerBaseConfig().withName(flow.getName() + "." + CPU_LITE.name())));
       customFlow.stop();
 
     } finally {

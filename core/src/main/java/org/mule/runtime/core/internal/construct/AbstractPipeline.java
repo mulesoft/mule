@@ -22,6 +22,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createFlowBackPressureException;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.getDefaultProcessingStrategyFactory;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
@@ -72,7 +73,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Mono;
 
 /**
@@ -162,13 +162,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   private ProcessingStrategyFactory defaultProcessingStrategy() {
-    final ProcessingStrategyFactory defaultProcessingStrategyFactory =
-        getMuleContext().getConfiguration().getDefaultProcessingStrategyFactory();
-    if (defaultProcessingStrategyFactory == null) {
-      return createDefaultProcessingStrategyFactory();
-    } else {
-      return defaultProcessingStrategyFactory;
-    }
+    return getDefaultProcessingStrategyFactory(muleContext, this::createDefaultProcessingStrategyFactory);
   }
 
   @Override
