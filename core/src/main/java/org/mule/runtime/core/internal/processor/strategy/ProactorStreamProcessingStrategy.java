@@ -250,34 +250,4 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
   public BackPressureReason checkBackpressureEmitting(CoreEvent event) {
     return checkCapacity(event);
   }
-
-  protected final class ProactorSinkWrapper<E> implements ReactorSink<E> {
-
-    private final ReactorSink<E> innerSink;
-
-    protected ProactorSinkWrapper(ReactorSink<E> innerSink) {
-      this.innerSink = innerSink;
-    }
-
-    @Override
-    public final void accept(CoreEvent event) {
-      innerSink.accept(event);
-    }
-
-    @Override
-    public final BackPressureReason emit(CoreEvent event) {
-      return innerSink.emit(event);
-    }
-
-    @Override
-    public E intoSink(CoreEvent event) {
-      return innerSink.intoSink(event);
-    }
-
-    @Override
-    public final void dispose() {
-      innerSink.dispose();
-    }
-  }
-
 }
