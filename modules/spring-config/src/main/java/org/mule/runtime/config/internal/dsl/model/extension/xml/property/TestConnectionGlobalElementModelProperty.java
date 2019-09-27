@@ -17,6 +17,8 @@ import org.mule.runtime.api.meta.model.ModelProperty;
  */
 public class TestConnectionGlobalElementModelProperty implements ModelProperty {
 
+  private static final long serialVersionUID = 5298491194279550347L;
+
   private final String globalElementName;
 
   public TestConnectionGlobalElementModelProperty(String globalElementName) {

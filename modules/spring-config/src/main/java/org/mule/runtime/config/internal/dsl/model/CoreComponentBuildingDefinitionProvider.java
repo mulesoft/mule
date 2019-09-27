@@ -242,15 +242,16 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
   private static final Class<?> MESSAGE_PROCESSOR_CLASS = Processor.class;
 
+  @SuppressWarnings("rawtypes")
   private static ComponentBuildingDefinition.Builder baseDefinition =
       new ComponentBuildingDefinition.Builder().withNamespace(CORE_PREFIX);
-  private ComponentBuildingDefinition.Builder transactionManagerBaseDefinition;
 
   @Override
   public void init() {
-    transactionManagerBaseDefinition = baseDefinition;
+    // Nothing to do
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
 
@@ -711,6 +712,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     };
   }
 
+  @SuppressWarnings("unchecked")
   private List<ComponentBuildingDefinition> getIdempotentValidatorsDefinitions() {
     List<ComponentBuildingDefinition> definitions = new LinkedList<>();
 
@@ -731,6 +733,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return definitions;
   }
 
+  @SuppressWarnings("unchecked")
   private List<ComponentBuildingDefinition> getTransformersBuildingDefinitions() {
     List<ComponentBuildingDefinition> transformerComponentBuildingDefinitions = new ArrayList<>();
     transformerComponentBuildingDefinitions.add(getCoreTransformerBaseBuilder(XmlEntityEncoder.class)
@@ -959,6 +962,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     };
   }
 
+  @SuppressWarnings("unchecked")
   private static ComponentBuildingDefinition.Builder getSetVariablePropertyBaseBuilder(ConfigurableInstanceFactory configurableInstanceFactory,
                                                                                        Class<? extends AbstractAddVariablePropertyProcessor> setterClass,
                                                                                        KeyAttributeDefinitionPair... configurationAttributes) {
@@ -996,6 +1000,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return buildingDefinitions;
   }
 
+  @SuppressWarnings("unchecked")
   private List<ComponentBuildingDefinition> getBytesStreamingDefinitions() {
     List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
 
@@ -1029,6 +1034,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return buildingDefinitions;
   }
 
+  @SuppressWarnings("unchecked")
   private List<ComponentBuildingDefinition> getObjectsStreamingDefinitions() {
     List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
 
@@ -1059,6 +1065,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return buildingDefinitions;
   }
 
+  @SuppressWarnings("unchecked")
   private List<ComponentBuildingDefinition> getReconnectionDefinitions() {
     List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
 
@@ -1085,6 +1092,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return buildingDefinitions;
   }
 
+  @SuppressWarnings("unchecked")
   private List<ComponentBuildingDefinition> getTransactionDefinitions() {
     List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
 
@@ -1112,12 +1120,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
   private Builder getCoreMuleMessageTransformerBaseBuilder() {
     return getMuleMessageTransformerBaseBuilder().withNamespace(CORE_PREFIX);
-  }
-
-  private ComponentBuildingDefinition.Builder createTransactionManagerDefinitionBuilder(String transactionManagerName,
-                                                                                        Class<?> transactionManagerClass) {
-    return transactionManagerBaseDefinition.withIdentifier(transactionManagerName)
-        .withTypeDefinition(fromType(transactionManagerClass));
   }
 
 }
