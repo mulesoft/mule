@@ -229,7 +229,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         new BeanDefinitionFactory(componentBuildingDefinitionRegistry, muleContext.getErrorTypeRepository());
 
     createApplicationModel();
-    // initialize();
 
     this.configurationDependencyResolver =
         new ConfigurationDependencyResolver(applicationModel, componentBuildingDefinitionRegistry);

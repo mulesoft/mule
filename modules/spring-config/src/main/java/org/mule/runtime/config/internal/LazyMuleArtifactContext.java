@@ -28,6 +28,7 @@ import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.g
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
+import static org.mule.runtime.config.internal.model.ApplicationModel.SECURITY_MANAGER;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
@@ -336,7 +337,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       final Predicate<? super ComponentAst> springModulePredicate =
           componentModel -> "spring".equals(componentModel.getIdentifier().getNamespace())
               && ("config".equals(componentModel.getIdentifier().getName()) ||
-                  "security-manager".equals(componentModel.getIdentifier().getName()));
+                  SECURITY_MANAGER.equals(componentModel.getIdentifier().getName()));
 
       final Predicate<? super ComponentAst> alwaysEnabledPredicate = componentModel -> {
         return getDependencyResolver().resolveAlwaysEnabledComponents().stream().anyMatch(dependencyNode -> {
