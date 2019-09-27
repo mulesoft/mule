@@ -220,19 +220,6 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       super(owner);
     }
 
-    @Override
-    public void doStart() throws MuleException {
-      if (hasStoppedOnce.get() || targetIsFlowAndStopped()) {
-        startIfNeeded(resolvedReferencedProcessorSupplier.get());
-      }
-    }
-
-    protected boolean targetIsFlowAndStopped() {
-      return resolvedReferencedProcessorSupplier.isComputed() &&
-          resolvedReferencedProcessorSupplier.get() instanceof Flow &&
-          ((Flow) resolvedReferencedProcessorSupplier.get()).getLifecycleState().isStopped();
-    }
-
     private final LazyValue<ReactiveProcessor> resolvedReferencedProcessorSupplier = new LazyValue<>(() -> {
       try {
         return getReferencedFlow(refName, StaticFlowRefMessageProcessor.this);
@@ -265,7 +252,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     private Publisher<CoreEvent> applyForStaticFlow(Flow resolvedTarget, Flux<CoreEvent> pub,
                                                     Optional<ComponentLocation> location) {
-      pub = pub.transform(eventPub -> applyWithChildContext(eventPub, resolvedTarget.referenced(),
+      pub = pub.transform(eventPub -> applyWithChildContext(eventPub, wrapInExceptionMapper(resolvedTarget.referenced()),
                                                             location,
                                                             resolvedTarget.getExceptionListener()));
 
@@ -275,9 +262,16 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     private Publisher<CoreEvent> applyForStaticSubFlow(ReactiveProcessor resolvedTarget, Flux<CoreEvent> pub,
                                                        Optional<ComponentLocation> location) {
 
-      pub = pub.transform(eventPub -> applyWithChildContext(eventPub, resolvedTarget, location, popSubFlowFlowStackElement()));
+      pub = pub.transform(eventPub -> applyWithChildContext(eventPub, wrapInExceptionMapper(resolvedTarget), location,
+                                                            popSubFlowFlowStackElement()));
 
       return decoratePublisher(pub);
+    }
+
+    private ReactiveProcessor wrapInExceptionMapper(ReactiveProcessor target) {
+      return publisher -> Flux.from(publisher)
+          .transform(target)
+          .onErrorMap(MessagingException.class, getMessagingExceptionMapper());
     }
 
     private FlowExceptionHandler popSubFlowFlowStackElement() {
@@ -300,7 +294,8 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
      * @return the decorated publisher
      */
     private Publisher<CoreEvent> decoratePublisher(Flux<CoreEvent> pub) {
-      pub = pub.subscriberContext(checkAndMarkCurrentFlowRefForCycleDetection());
+      pub = pub
+          .subscriberContext(checkAndMarkCurrentFlowRefForCycleDetection());
       return (target != null)
           ? pub.map(eventAfter -> outputToTarget(((InternalEvent) eventAfter)
               .getInternalParameter(originalEventKey(eventAfter)), target, targetValue,
@@ -350,28 +345,29 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     }
 
     @Override
-    public void stop() throws MuleException {
-      // The flowref was stopped once, so in the next start call, the referenced flow should be started
-      this.hasStoppedOnce.set(true);
+    public void doStart() throws MuleException {
+      if (targetIsComputedAndSubFlow()) {
+        startIfNeeded(resolvedReferencedProcessorSupplier.get());
+      }
+    }
 
-      resolvedReferencedProcessorSupplier.ifComputed(resolved -> {
-        if (!(resolved instanceof Flow)) {
-          try {
-            stopIfNeeded(resolved);
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(e);
-          }
-        }
-      });
+    @Override
+    public void stop() throws MuleException {
+      if (targetIsComputedAndSubFlow()) {
+        stopIfNeeded(resolvedReferencedProcessorSupplier.get());
+      }
     }
 
     @Override
     public void dispose() {
-      resolvedReferencedProcessorSupplier.ifComputed(resolved -> {
-        if (!(resolved instanceof Flow)) {
-          disposeIfNeeded(resolved, LOGGER);
-        }
-      });
+      if (targetIsComputedAndSubFlow()) {
+        disposeIfNeeded(resolvedReferencedProcessorSupplier.get(), LOGGER);
+      }
+    }
+
+    protected boolean targetIsComputedAndSubFlow() {
+      return resolvedReferencedProcessorSupplier.isComputed() &&
+          !(resolvedReferencedProcessorSupplier.get() instanceof Flow);
     }
   }
 
