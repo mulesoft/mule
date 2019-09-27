@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.config.internal;
 
-import static com.google.common.collect.ImmutableList.copyOf;
 import static java.util.Arrays.asList;
+import static java.util.Collections.sort;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toCollection;
@@ -28,7 +28,6 @@ import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.g
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
-import static org.mule.runtime.config.internal.model.ApplicationModel.SECURITY_MANAGER;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
@@ -47,12 +46,12 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.metadata.MetadataService;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
-import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
@@ -61,7 +60,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
-import org.mule.runtime.core.internal.lifecycle.phases.DefaultLifecycleObjectSorter;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore;
@@ -70,6 +68,7 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.dsl.api.ConfigResource;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 
 import java.io.File;
@@ -81,7 +80,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -143,8 +141,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     this.componentLocator = new SpringConfigurationComponentLocator();
 
     graph = generateFor(applicationModel);
-    // TODO move further down
-    initialize();
 
     this.parentComponentModelInitializer = parentComponentModelInitializer;
 
@@ -175,6 +171,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                                       new SharedPartitionedPersistentObjectStore<>(new File(sharedPartitionatedPersistentObjectStorePath)));
 
     }
+
+    initialize();
   }
 
   private static Map<String, String> extendArtifactProperties(Map<String, String> artifactProperties) {
@@ -184,11 +182,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   }
 
   private void applyLifecycle(List<Object> components, boolean applyStartPhase) {
-    muleContext.withLifecycleLock(() -> {
-      if (muleContext.isInitialised()) {
+    getMuleContext().withLifecycleLock(() -> {
+      if (getMuleContext().isInitialised()) {
         initializeComponents(components);
       }
-      if (applyStartPhase && muleContext.isStarted()) {
+      if (applyStartPhase && getMuleContext().isStarted()) {
         startComponent(components);
       }
     });
@@ -201,7 +199,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         if (object instanceof MessageProcessorChain) {
           // When created it will be initialized
         } else {
-          muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME);
+          getMuleRegistry().applyLifecycle(object, Initialisable.PHASE_NAME);
         }
       } catch (MuleException e) {
         throw new RuntimeException(e);
@@ -216,52 +214,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         if (object instanceof MessageProcessorChain) {
           // Has to be ignored as when it is registered it will be started too
         } else {
-          muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
+          getMuleRegistry().applyLifecycle(object, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
         }
       } catch (MuleException e) {
         throw new RuntimeException(e);
       }
     }
-  }
-
-  private static BeanDependencyResolver getBeanDependencyResolver(ConfigurationDependencyResolver configurationDependencyResolver,
-                                                                  Map<String, Object> components) {
-    return beanName -> configurationDependencyResolver
-        .resolveComponentDependencies(beanName).stream()
-        .map(componentName -> components.get(componentName))
-        .filter(Objects::nonNull)
-        .collect(toList());
-  }
-
-  class ComponentConfigurationLifecycleObjectSorter extends DefaultLifecycleObjectSorter {
-
-    private final BeanDependencyResolver beanDependencyResolver;
-
-    public ComponentConfigurationLifecycleObjectSorter(BeanDependencyResolver beanDependencyResolver) {
-      // Only Object.class type is defined as a single bucket as we just need to sort the configuration components (DSL)
-      super(new Class[] {Object.class});
-      this.beanDependencyResolver = beanDependencyResolver;
-    }
-
-    /**
-     * Implementation that handles duplicates. Whenever a new object is added, then all its dependencies are added as well. So if
-     * one of those dependencies wants to be added again, it's ignored.
-     */
-    @Override
-    protected int doAddObject(String name, Object object, List<Object> bucket) {
-
-      System.out.println(" >> ComponentConfigurationLifecycleObjectSorter.doAddObject: " + name);
-
-      if (bucket.contains(object)) {
-        return 0;
-      }
-      List<Object> dependencies = beanDependencyResolver.resolveBeanDependencies(name)
-          .stream().filter(dependency -> !bucket.contains(dependency)).collect(toList());
-      bucket.addAll(dependencies);
-      bucket.add(object);
-      return dependencies.size() + 1;
-    }
-
   }
 
   @Override
@@ -309,7 +267,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private List<Object> createComponents(Optional<Predicate<ComponentAst>> predicateOptional, Optional<Location> locationOptional,
                                         Optional<ComponentModelInitializerAdapter> parentComponentModelInitializerAdapter) {
     checkState(predicateOptional.isPresent() != locationOptional.isPresent(), "predicate or location has to be passed");
-    return withContextClassLoader(muleContext.getExecutionClassLoader(), () -> {
+    return withContextClassLoader(getMuleContext().getExecutionClassLoader(), () -> {
       // First unregister any already initialized/started component
       unregisterBeans(beansCreated);
       // Clean up resources...
@@ -337,35 +295,24 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       final Predicate<? super ComponentAst> configPredicate = componentModel -> componentModel.getIdentifier()
           .equals(CONFIGURATION_IDENTIFIER);
 
-      final Predicate<? super ComponentAst> springModulePredicate =
-          componentModel -> "spring".equals(componentModel.getIdentifier().getNamespace())
-              && ("config".equals(componentModel.getIdentifier().getName()) ||
-                  SECURITY_MANAGER.equals(componentModel.getIdentifier().getName()));
+      final Predicate<? super ComponentAst> alwaysEnabledPredicate =
+          componentModel -> componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
+              .map(ComponentBuildingDefinition::isAlwaysEnabled).orElse(false);
 
-      final Predicate<? super ComponentAst> alwaysEnabledPredicate = componentModel -> {
-        return getDependencyResolver().resolveAlwaysEnabledComponents().stream().anyMatch(dependencyNode -> {
-          return !dependencyNode.isTopLevel() && dependencyNode.isUnnamedTopLevel() && dependencyNode.getComponentIdentifier()
-              .map(depId -> componentModel.getIdentifier().equals(depId)).orElse(false);
-        });
-      };
-
-      // final ArtifactAst minimalApplicationModel = graph.minimalArtifactFor(basePredicate
-      ArtifactAst minimalApplicationModel = graph.minimalArtifactFor(basePredicate
+      final ArtifactAst minimalApplicationModel = graph.minimalArtifactFor(basePredicate
           .or(txManagerPredicate)
           .or(configPredicate)
-          .or(springModulePredicate)
           .or(alwaysEnabledPredicate));
 
-      if (locationOptional.isPresent()) {
-        if (minimalApplicationModel.recursiveStream()
-            .noneMatch(comp -> comp.getLocation() != null
-                && comp.getLocation().getLocation().equals(locationOptional.get().toString()))) {
-          throw new NoSuchComponentModelException(createStaticMessage("No object found at location "
-              + locationOptional.get().toString()));
-        }
+      if (locationOptional.map(loc -> minimalApplicationModel.recursiveStream()
+          .noneMatch(comp -> comp.getLocation() != null
+              && comp.getLocation().getLocation().equals(loc.toString())))
+          .orElse(false)) {
+        throw new NoSuchComponentModelException(createStaticMessage("No object found at location "
+            + locationOptional.get().toString()));
       }
 
-      List<String> applicationComponents =
+      List<Pair<String, ComponentAst>> applicationComponents =
           createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
 
       super.prepareObjectProviders();
@@ -380,9 +327,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    * flow is not.
    */
   @Override
-  protected List<String> createApplicationComponents(DefaultListableBeanFactory beanFactory, ArtifactAst minimalAppModel,
-                                                     boolean mustBeRoot) {
-    final List<String> applicationComponents = super.createApplicationComponents(beanFactory, minimalAppModel, mustBeRoot);
+  protected List<Pair<String, ComponentAst>> createApplicationComponents(DefaultListableBeanFactory beanFactory,
+                                                                         ArtifactAst minimalAppModel,
+                                                                         boolean mustBeRoot) {
+    final List<Pair<String, ComponentAst>> applicationComponents =
+        super.createApplicationComponents(beanFactory, minimalAppModel, mustBeRoot);
 
     final Set<ComponentAst> orphanComponents = resolveOrphanComponents(minimalAppModel);
     LOGGER.debug("orphanComponents found: {}", orphanComponents.toString());
@@ -395,7 +344,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           final String nameAttribute = cm.getName().get();
           LOGGER.debug("Registering orphan named component '{}'...", nameAttribute);
 
-          applicationComponents.add(0, nameAttribute);
+          applicationComponents.add(0, new Pair<>(nameAttribute, cm));
           final BeanDefinition beanDef = ((SpringComponentModel) cm).getBeanDefinition();
           if (beanDef != null) {
             beanFactory.registerBeanDefinition(cm.getName().get(), beanDef);
@@ -411,7 +360,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
             final String beanName = cm.getName().orElse(uniqueValue(beanDef.getBeanClassName()));
 
             LOGGER.debug("Registering orphan un-named component '{}'...", beanName);
-            applicationComponents.add(beanName);
+            applicationComponents.add(new Pair<>(beanName, cm));
             beanFactory.registerBeanDefinition(beanName, beanDef);
             postProcessBeanDefinition((SpringComponentModel) cm, beanFactory, beanName);
           }
@@ -432,50 +381,50 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    * @param applicationComponentNames name of components to be created.
    * @return List beans created for the given component names sorted by precedence.
    */
-  private List<Object> createBeans(List<String> applicationComponentNames) {
-    Map<String, Object> objects = new LinkedHashMap<>();
+  private List<Object> createBeans(List<Pair<String, ComponentAst>> applicationComponentNames) {
+    Map<Pair<String, ComponentAst>, Object> objects = new LinkedHashMap<>();
     // Create beans only once by calling the lookUp at the Registry
-    applicationComponentNames.forEach(componentName -> {
-      Object object = getRegistry().lookupByName(componentName).orElse(null);
+    applicationComponentNames.forEach(componentPair -> {
+      Object object = getRegistry().lookupByName(componentPair.getFirst()).orElse(null);
       if (object != null) {
         // MessageProcessorChainBuilder has to be manually created and added to the registry in order to be able
         // to dispose it later
         if (object instanceof MessageProcessorChainBuilder) {
-          String chainKey = componentName + "@" + object.hashCode();
+          Pair<String, ComponentAst> chainKey =
+              new Pair<>(componentPair.getFirst() + "@" + object.hashCode(), componentPair.getSecond());
           MessageProcessorChain messageProcessorChain = ((MessageProcessorChainBuilder) object).build();
           try {
-            initialiseIfNeeded(messageProcessorChain, this.muleContext);
+            initialiseIfNeeded(messageProcessorChain, getMuleContext());
           } catch (InitialisationException e) {
-            unregisterBeans(copyOf(objects.keySet()));
+            unregisterBeans(objects.keySet().stream().map(p -> p.getFirst()).collect(toList()));
             throw new IllegalStateException("Couldn't initialise an instance of a MessageProcessorChain", e);
           }
           try {
-            getMuleContext().getRegistry().registerObject(chainKey, messageProcessorChain);
+            getMuleRegistry().registerObject(chainKey.getFirst(), messageProcessorChain);
           } catch (RegistrationException e) {
             // Unregister any already created component
-            unregisterBeans(copyOf(objects.keySet()));
+            unregisterBeans(objects.keySet().stream().map(p -> p.getFirst()).collect(toList()));
             throw new IllegalStateException("Couldn't register an instance of a MessageProcessorChain", e);
           }
           objects.put(chainKey, messageProcessorChain);
         }
-        objects.put(componentName, object);
+        objects.put(componentPair, object);
       }
     });
 
-    // Sorter in order to later initialize and start components according to their dependencies
-    ComponentConfigurationLifecycleObjectSorter componentConfigurationLifecycleObjectSorter =
-        new ComponentConfigurationLifecycleObjectSorter(getBeanDependencyResolver(getDependencyResolver(), objects));
     // A Map to access the componentName by the bean instance
-    Map<Object, String> componentNames = new HashMap<>();
+    Map<Object, Pair<String, ComponentAst>> componentNames = new HashMap<>();
     objects.entrySet().forEach(entry -> {
       Object object = entry.getValue();
-      String componentName = entry.getKey();
-      componentConfigurationLifecycleObjectSorter.addObject(componentName, object);
-      componentNames.put(object, componentName);
+      Pair<String, ComponentAst> component = entry.getKey();
+      componentNames.put(object, component);
     });
-    List<Object> sortedObjects = componentConfigurationLifecycleObjectSorter.getSortedObjects();
-    // Register the bean names to be later disposed
-    sortedObjects.forEach(object -> beansCreated.add(componentNames.get(object)));
+
+    // Sort in order to later initialize and start components according to their dependencies
+    List<Object> sortedObjects = new ArrayList<>(objects.values());
+    sort(sortedObjects, (o1, o2) -> graph.dependencyComparator().compare(componentNames.get(o1).getSecond(),
+                                                                         componentNames.get(o2).getSecond()));
+    sortedObjects.forEach(object -> beansCreated.add(componentNames.get(object).getFirst()));
     return sortedObjects;
   }
 
@@ -483,7 +432,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     boolean registerMuleSecurityManager = false;
     // Always unregister first the default security manager from Mule.
     try {
-      muleContext.getRegistry().unregisterObject(OBJECT_SECURITY_MANAGER);
+      getMuleRegistry().unregisterObject(OBJECT_SECURITY_MANAGER);
       registerMuleSecurityManager = true;
     } catch (Exception e) {
       // NoSuchBeanDefinitionException can be ignored
@@ -497,7 +446,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         // Has to be created before as the factory for SecurityManager (MuleSecurityManagerConfigurator) is expecting to
         // retrieve it (through MuleContext and registry) while creating it. See
         // org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator.doGetObject
-        muleContext.getRegistry().registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
+        getMuleRegistry().registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
       } catch (RegistrationException e) {
         throw new MuleRuntimeException(createStaticMessage("Couldn't register a new instance of Mule security manager in the registry"),
                                        e);
@@ -508,7 +457,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private void resetMuleConfiguration() {
     // Always unregister first the default configuration from Mule.
     try {
-      muleContext.getRegistry().unregisterObject(OBJECT_MULE_CONFIGURATION);
+      getMuleRegistry().unregisterObject(OBJECT_MULE_CONFIGURATION);
     } catch (Exception e) {
       // NoSuchBeanDefinitionException can be ignored
       if (!hasCause(e, NoSuchBeanDefinitionException.class)) {
@@ -545,7 +494,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     while (beanNames.hasNext()) {
       String beanName = beanNames.next();
       try {
-        unregisterObject(muleContext, beanName);
+        unregisterObject(getMuleContext(), beanName);
       } catch (Exception e) {
         logger.warn(String
             .format("Exception unregistering an object during lazy initialization of component %s, exception message is %s",

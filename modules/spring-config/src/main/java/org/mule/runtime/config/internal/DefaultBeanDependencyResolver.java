@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal;
 import static com.google.common.graph.Traverser.forTree;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
@@ -116,8 +117,8 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
   }
 
   /**
-   * Adds the dependencies that are explicit on the {@link BeanDefinition}. These were inferred from
-   * introspecting fields annotated with {@link Inject} or were programatically added to the definition
+   * Adds the dependencies that are explicit on the {@link BeanDefinition}. These were inferred from introspecting fields
+   * annotated with {@link Inject} or were programmatically added to the definition
    */
   private void addAutoDiscoveredDependencies(String key, Set<String> processedKeys,
                                              DependencyNode node) {

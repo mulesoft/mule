@@ -145,14 +145,13 @@ public class ApplicationModel implements ArtifactAst {
   public static final String REFERENCE_ATTRIBUTE = "ref";
   public static final String VALUE_ATTRIBUTE = "value";
   public static final String TRANSFORMER_REFERENCE_ELEMENT = "transformer";
-  public static final String DATA_WEAVE = "weave";
   public static final String CUSTOM_TRANSFORMER = "custom-transformer";
   public static final String DESCRIPTION_ELEMENT = "description";
   public static final String PROPERTIES_ELEMENT = "properties";
   private static final String MODULE_OPERATION_CHAIN_ELEMENT = "module-operation-chain";
 
   public static final String REDELIVERY_POLICY_ELEMENT = "redelivery-policy";
-  // TODO MULE-9638 Remove once all bean definitions parsers where migrated
+  // TODO MULE-9638 Remove once all bean definitions parsers have been migrated
   public static final String TEST_NAMESPACE = "test";
   public static final String DOC_NAMESPACE = "doc";
   public static final String SPRING_SECURITY_NAMESPACE = "ss";
@@ -160,10 +159,6 @@ public class ApplicationModel implements ArtifactAst {
   public static final String MULE_XML_NAMESPACE = "mulexml";
   public static final String PGP_NAMESPACE = "pgp";
   public static final String XSL_NAMESPACE = "xsl";
-  public static final String TRANSPORT_NAMESPACE = "transports";
-  public static final String JMS_NAMESPACE = "jms";
-  public static final String VM_NAMESPACE = "vm";
-  public static final String HTTP_TRANSPORT_NAMESPACE = "http-transport";
   public static final String BATCH_NAMESPACE = "batch";
   public static final String PARSER_TEST_NAMESPACE = "parsers-test";
   public static final String GLOBAL_PROPERTY = "global-property";
@@ -263,30 +258,10 @@ public class ApplicationModel implements ArtifactAst {
           .add(builder().namespace(XSL_NAMESPACE).name("param").build())
           .add(builder().namespace(XSL_NAMESPACE).name("attribute").build())
           .add(builder().namespace(XSL_NAMESPACE).name("element").build())
-          .add(builder().namespace(TRANSPORT_NAMESPACE).name("inbound-endpoint").build())
-          .add(builder().namespace(TRANSPORT_NAMESPACE).name("outbound-endpoint").build())
-          .add(builder().namespace(JMS_NAMESPACE).name("inbound-endpoint").build())
-          .add(builder().namespace(VM_NAMESPACE).name("inbound-endpoint").build())
-          .add(builder().namespace(HTTP_TRANSPORT_NAMESPACE).name("inbound-endpoint").build())
-          .add(builder().namespace(HTTP_TRANSPORT_NAMESPACE).name("set-cookie").build())
-          .add(builder().namespace(HTTP_TRANSPORT_NAMESPACE).name("header").build())
-          .add(builder().namespace(HTTP_TRANSPORT_NAMESPACE)
-              .name("http-response-to-object-transformer")
-              .build())
-          .add(builder().namespace(HTTP_TRANSPORT_NAMESPACE)
-              .name("http-response-to-string-transformer")
-              .build())
-          .add(builder().namespace(HTTP_TRANSPORT_NAMESPACE)
-              .name("message-to-http-response-transformer")
-              .build())
-          .add(builder().namespace(HTTP_TRANSPORT_NAMESPACE)
-              .name("object-to-http-request-transformer")
-              .build())
           .add(builder().namespace(BATCH_NAMESPACE).name("step").build())
           .add(builder().namespace(BATCH_NAMESPACE).name("execute").build())
           .add(builder().namespace(PARSER_TEST_NAMESPACE).name("child").build())
           .add(builder().namespace(PARSER_TEST_NAMESPACE).name("kid").build())
-          .add(builder().namespace(DATA_WEAVE).name("reader-property").build())
           .build();
 
   private final Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry;
