@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.util.message;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -50,7 +49,7 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
 
   @Override
   public int indexOf(Object o) {
-    return lock.withReadLock(r -> {
+    return lock.withReadLock(() -> {
       int i = delegate.indexOf(o);
       if (i == -1 && o instanceof Message) {
         i = delegate.indexOf(Result.builder((Message) o).build());
@@ -62,7 +61,7 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
 
   @Override
   public int lastIndexOf(Object o) {
-    return lock.withReadLock(r -> {
+    return lock.withReadLock(() -> {
       int i = delegate.lastIndexOf(o);
       if (i == -1 && o instanceof Message) {
         i = delegate.lastIndexOf(Result.builder((Message) o).build());
@@ -131,7 +130,7 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
 
   @Override
   public List<Message> subList(int fromIndex, int toIndex) {
-    return lock.withReadLock(r -> {
+    return lock.withReadLock(() -> {
       List results = delegate.subList(fromIndex, toIndex);
       return new ResultsToMessageList(results, cursorProviderFactory, eventContext);
     });

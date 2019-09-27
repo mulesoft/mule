@@ -39,9 +39,11 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
+import org.reactivestreams.Publisher;
+
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
-import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
@@ -186,7 +188,7 @@ public class CompositeOperationPolicy
                       ComponentLocation operationLocation,
                       ExecutorCallback callback) {
 
-    readWriteLock.withReadLock(lockReleaser -> {
+    readWriteLock.withReadLock(() -> {
       if (!disposed.get()) {
         FluxSink<CoreEvent> policySink = policySinks.get(operationLocation.getLocation()).get();
 
@@ -196,8 +198,6 @@ public class CompositeOperationPolicy
       } else {
         callback.error(new MessagingException(createStaticMessage("Operation policy already disposed"), operationEvent));
       }
-
-      return null;
     });
   }
 

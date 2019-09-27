@@ -16,6 +16,7 @@ import static reactor.core.Exceptions.propagate;
 @FunctionalInterface
 public interface CheckedRunnable extends Runnable {
 
+  @Override
   default void run() {
     try {
       runChecked();
@@ -28,7 +29,7 @@ public interface CheckedRunnable extends Runnable {
   /**
    * Handles the {@code throwable}
    *
-   * @param throwable the error that was catched
+   * @param throwable the error that was caught
    */
   default void handleException(Throwable throwable) {
     throw propagate(throwable);
