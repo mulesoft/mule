@@ -60,7 +60,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -213,8 +212,6 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
    * @since 4.3.0
    */
   private class StaticFlowRefMessageProcessor extends FlowRefMessageProcessor {
-
-    private AtomicBoolean hasStoppedOnce = new AtomicBoolean(false);
 
     protected StaticFlowRefMessageProcessor(FlowRefFactoryBean owner) {
       super(owner);
