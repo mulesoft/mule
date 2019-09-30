@@ -47,6 +47,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,7 +59,7 @@ import java.util.stream.Stream;
 import org.junit.Before;
 import org.mockito.Mock;
 
-public abstract class AbstractDslModelTestCase {
+public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
 
   protected static final String NAMESPACE = "mockns";
   protected static final String NAMESPACE_URI = "http://www.mulesoft.org/schema/mule/mockns";

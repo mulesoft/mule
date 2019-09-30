@@ -12,7 +12,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.LocatedMuleException;
@@ -22,8 +24,6 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.Optional;
 
-import javax.xml.namespace.QName;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -32,9 +32,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 @SmallTest
 public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
 
-  private static QName docNameAttrName = new QName("http://www.mulesoft.org/schema/mule/documentation", "name");
-
-  private ComponentLocation mockComponentLocation = mock(ComponentLocation.class);
+  private final ComponentLocation mockComponentLocation = mock(ComponentLocation.class);
 
   @Test
   public void namedComponent() {
@@ -47,7 +45,7 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
   @Test
   public void annotatedComponent() {
     Component annotated = mock(Component.class);
-    when(annotated.getAnnotation(eq(docNameAttrName))).thenReturn("Mock Component");
+    when(annotated.getAnnotation(eq(NAME_ANNOTATION_KEY))).thenReturn("Mock Component");
     when(annotated.toString()).thenReturn("Mock@1");
     configureProcessorLocation(annotated);
 
@@ -60,7 +58,7 @@ public class LocatedMuleExceptionTestCase extends AbstractMuleContextTestCase {
   public void namedAnnotatedComponent() {
     Component namedAnnotated = mock(Component.class, withSettings().extraInterfaces(NamedObject.class));
     when(((NamedObject) namedAnnotated).getName()).thenReturn("mockComponent");
-    when(namedAnnotated.getAnnotation(eq(docNameAttrName))).thenReturn("Mock Component");
+    when(namedAnnotated.getAnnotation(eq(NAME_ANNOTATION_KEY))).thenReturn("Mock Component");
     when(namedAnnotated.toString()).thenReturn("Mock@1");
     configureProcessorLocation(namedAnnotated);
 

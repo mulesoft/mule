@@ -10,6 +10,9 @@ import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
+import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
 import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapter;
@@ -42,6 +45,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+
+import javax.xml.namespace.QName;
 
 /**
  * An {@code ComponentModel} represents the user configuration of a component (flow, config, message processor, etc) defined in an
@@ -141,7 +146,7 @@ public abstract class ComponentModel {
 
     attrs.putAll(componentMetadata.getParserAttributes());
     componentMetadata.getDocAttributes()
-        .forEach((k, v) -> attrs.put("{http://www.mulesoft.org/schema/mule/documentation}" + k, v));
+        .forEach((k, v) -> attrs.put("{" + NS_MULE_DOCUMENTATION + "}" + k, v));
 
     return attrs;
   }
@@ -511,11 +516,23 @@ public abstract class ComponentModel {
      */
     public Builder addCustomAttribute(String name, Object value) {
       checkIsNotBuildingFromRootComponentModel("customAttributes");
-      if (name.startsWith("{http://www.mulesoft.org/schema/mule/documentation}")) {
-        this.metadataBuilder.putDocAttribute(name.substring("{http://www.mulesoft.org/schema/mule/documentation}".length()),
-                                             value.toString());
+      return addCustomAttribute(QName.valueOf(name), value);
+    }
+
+    /**
+     * Adds a custom attribute to the {@code ComponentModel}. This custom attribute is meant to hold metadata of the configuration
+     * and not to be used to instantiate the runtime object that corresponds to this configuration.
+     *
+     * @param name custom attribute name.
+     * @param value custom attribute value.
+     * @return the builder.
+     */
+    public Builder addCustomAttribute(final QName qname, Object value) {
+      checkIsNotBuildingFromRootComponentModel("customAttributes");
+      if (isEmpty(qname.getNamespaceURI()) || NS_MULE_PARSER_METADATA.equals(qname.getNamespaceURI())) {
+        this.metadataBuilder.putParserAttribute(qname.getLocalPart(), value);
       } else {
-        this.metadataBuilder.putParserAttribute(name, value);
+        this.metadataBuilder.putDocAttribute(qname.toString(), value.toString());
       }
       return this;
     }

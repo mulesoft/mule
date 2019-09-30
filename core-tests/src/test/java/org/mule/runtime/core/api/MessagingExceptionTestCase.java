@@ -20,6 +20,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
@@ -27,6 +28,7 @@ import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createI
 import static org.mule.runtime.core.internal.exception.MessagingException.PAYLOAD_INFO_KEY;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -50,8 +52,6 @@ import java.net.ConnectException;
 import java.net.SocketException;
 import java.util.Optional;
 
-import javax.xml.namespace.QName;
-
 import org.hamcrest.core.Is;
 import org.junit.After;
 import org.junit.Before;
@@ -72,7 +72,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
 
   private boolean originalVerboseExceptions;
 
-  private MessagingExceptionLocationProvider locationProvider = new MessagingExceptionLocationProvider();
+  private final MessagingExceptionLocationProvider locationProvider = new MessagingExceptionLocationProvider();
 
   @Mock
   private MuleContext mockContext;
@@ -255,12 +255,10 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
                is("Mock@1 @ MessagingExceptionTestCase:unknown:-1"));
   }
 
-  private static QName docNameAttrName = new QName("http://www.mulesoft.org/schema/mule/documentation", "name");
-
   @Test
   public void withAnnotatedFailingProcessorNoPathResolver() {
     AnnotatedProcessor mockProcessor = mock(AnnotatedProcessor.class);
-    when(mockProcessor.getAnnotation(eq(docNameAttrName))).thenReturn("Mock Component");
+    when(mockProcessor.getAnnotation(eq(NAME_ANNOTATION_KEY))).thenReturn("Mock Component");
     configureProcessorLocation(mockProcessor);
 
     MessagingException exception = new MessagingException(createStaticMessage(""), testEvent, mockProcessor);
@@ -280,7 +278,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   @Test
   public void withAnnotatedFailingProcessorPathResolver() {
     AnnotatedProcessor mockProcessor = mock(AnnotatedProcessor.class);
-    when(mockProcessor.getAnnotation(eq(docNameAttrName))).thenReturn("Mock Component");
+    when(mockProcessor.getAnnotation(eq(NAME_ANNOTATION_KEY))).thenReturn("Mock Component");
     configureProcessorLocation(mockProcessor);
     when(mockComponentLocation.getLocation()).thenReturn("flow/processor");
 
@@ -294,7 +292,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   @Test
   public void withAnnotatedFailingProcessorNotPathResolver() {
     AnnotatedProcessor mockProcessor = mock(AnnotatedProcessor.class);
-    when(mockProcessor.getAnnotation(eq(docNameAttrName))).thenReturn("Mock Component");
+    when(mockProcessor.getAnnotation(eq(NAME_ANNOTATION_KEY))).thenReturn("Mock Component");
     configureProcessorLocation(mockProcessor);
 
     MessagingException exception = new MessagingException(createStaticMessage(""), testEvent, mockProcessor);

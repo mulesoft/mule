@@ -19,6 +19,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
@@ -43,6 +44,11 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -51,19 +57,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import javax.xml.namespace.QName;
-
 @SmallTest
 public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestCase {
 
   public static final String CONFIG_FILE_NAME = "muleApp.xml";
   public static final int LINE_NUMBER = 10;
-  private static QName docNameAttrName = new QName("http://www.mulesoft.org/schema/mule/documentation", "name");
 
   private static final String NESTED_FLOW_NAME = "nestedFlow";
   private static final String ROOT_FLOW_NAME = "rootFlow";
@@ -182,7 +180,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
 
     Component annotatedMessageProcessor = (Component) createMockProcessor("/comp", true);
 
-    when(annotatedMessageProcessor.getAnnotation(docNameAttrName)).thenReturn("annotatedName");
+    when(annotatedMessageProcessor.getAnnotation(NAME_ANNOTATION_KEY)).thenReturn("annotatedName");
     manager
         .onMessageProcessorNotificationPreInvoke(buildProcessorNotification(event, (Processor) annotatedMessageProcessor));
     assertThat(getContextInfo(event, rootFlowConstruct),
@@ -389,7 +387,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
   private Matcher<ProcessorsTrace> hasExecutedProcessors(final String... expectedProcessors) {
     return new TypeSafeMatcher<ProcessorsTrace>() {
 
-      private List<Matcher> failed = new ArrayList<>();
+      private final List<Matcher> failed = new ArrayList<>();
 
       @Override
       protected boolean matchesSafely(ProcessorsTrace processorsTrace) {
