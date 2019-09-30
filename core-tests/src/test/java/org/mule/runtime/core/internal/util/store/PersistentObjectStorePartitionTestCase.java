@@ -96,24 +96,19 @@ public class PersistentObjectStorePartitionTestCase extends AbstractMuleTestCase
   }
 
   @Test
-  public void skipAndMoveCorruptedOrUnreadableFilesWithoutCreatingDir() {
+  public void skipAndMoveCorruptedOrUnreadableFilesWithoutCreatingDir() throws Exception {
     final String KEY = "key";
     final String VALUE = "value";
-    try {
-      File.createTempFile("temp", ".obj", objectStoreFolder.getRoot());
-      File corruptedFolder = openDirectory(workingDirectory.getAbsolutePath()
-          + File.separator + PersistentObjectStorePartition.CORRUPTED_FOLDER);
-      deleteDirectory(corruptedFolder);
+    File.createTempFile("temp", ".obj", objectStoreFolder.getRoot());
+    File corruptedFolder = openDirectory(workingDirectory.getAbsolutePath()
+        + File.separator + PersistentObjectStorePartition.CORRUPTED_FOLDER);
+    deleteDirectory(corruptedFolder);
 
-      partition.store(KEY, VALUE);
-      // Expect the new stored object, and the partition-descriptor file
-      assertEquals(2, objectStoreFolder.getRoot().listFiles().length);
-
-      // Expect to have one more corrupted file in the corrupted folder
-      assertEquals(1, corruptedFolder.list().length);
-    } catch (Exception e) {
-      fail("Supposed to have skipped corrupted or unreadable files");
-    }
+    partition.store(KEY, VALUE);
+    // Expect the new stored object, and the partition-descriptor file
+    assertThat(objectStoreFolder.getRoot().listFiles().length, is(2));
+    // Expect to have one more corrupted file in the corrupted folder
+    assertThat(corruptedFolder.list().length, is(1));
   }
 
   @Test
