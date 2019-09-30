@@ -7,11 +7,11 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-test-extensions-parent</artifactId>
-        <version>4.2.2-SNAPSHOT</version>
+        <version>4.2.2-rc1</version>
     </parent>
 
     <artifactId>mule-non-implicit-config-extension</artifactId>
-    <version>4.2.2-SNAPSHOT</version>
+    <version>4.2.2-rc1</version>
     <packaging>jar</packaging>
 
     <name>Mule Non Implicit Config Test Extension</name>
