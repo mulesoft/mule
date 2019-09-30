@@ -85,4 +85,10 @@ public class OperationErrorHandlingTestCase extends AbstractExtensionFunctionalT
       throw t;
     }
   }
+
+  @Test
+  public void customErrorsAreCaughtUsingWildcards() throws Exception {
+    CoreEvent result = runFlow("errorCaughtUsingWildcard");
+    assertThat(getPayloadAsString(result.getMessage()), is("Wildcard namespace was caught; Wildcard name was caught"));
+  }
 }
