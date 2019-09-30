@@ -158,6 +158,8 @@ class ExtensionPluginMetadataGenerator {
         }
         String extensionClassName = extensionsAnnotatedClasses.iterator().next().getBeanClassName();
         try {
+          logger.trace("Going to load Extension class '" + extensionClassName + "' obtained from: '" + firstURL
+              + "' using classpath: " + new ClassPathUrlProvider().getURLs());
           return Class.forName(extensionClassName);
         } catch (ClassNotFoundException e) {
           TroubleshootingUtils.copyPluginToAuxJenkinsFolderForTroubleshooting(firstURL);
