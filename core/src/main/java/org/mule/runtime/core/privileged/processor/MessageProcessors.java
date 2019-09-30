@@ -35,6 +35,8 @@ import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.construct.FlowBackPressureEventsAccumulatedException;
+import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorderToReactorSinkAdapter;
@@ -491,7 +493,9 @@ public class MessageProcessors {
       try {
         if (throwable != null) {
           final MessagingException error = (MessagingException) throwable;
-          errorSwitchSinkSinkRef.next(left(new MessagingException(toParentContext(error.getEvent()), error)));
+          if (!(throwable.getCause() instanceof FlowBackPressureException)) {
+            errorSwitchSinkSinkRef.next(left(new MessagingException(toParentContext(error.getEvent()), error)));
+          }
         } else if (response == null && completeParentIfEmpty) {
           getParentContext(eventChildCtx).success();
           errorSwitchSinkSinkRef.next();
