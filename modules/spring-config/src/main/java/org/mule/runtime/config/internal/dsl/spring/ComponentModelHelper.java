@@ -59,8 +59,8 @@ public class ComponentModelHelper {
       return ON_ERROR;
     }
     return extensionModelHelper
-        .findComponentType(componentModel.getMetadata().getParserAttributes().containsKey(ORIGINAL_IDENTIFIER)
-            ? (ComponentIdentifier) componentModel.getMetadata().getParserAttributes().get(ORIGINAL_IDENTIFIER)
+        .findComponentType(componentModel.getMetadata().getParserAttributes().containsKey(ORIGINAL_IDENTIFIER.toString())
+            ? (ComponentIdentifier) componentModel.getMetadata().getParserAttributes().get(ORIGINAL_IDENTIFIER.toString())
             : componentModel.getIdentifier());
   }
 

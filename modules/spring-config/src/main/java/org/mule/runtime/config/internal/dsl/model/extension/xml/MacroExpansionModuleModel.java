@@ -15,6 +15,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
+import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
@@ -46,6 +47,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
 /**
  * A {@link MacroExpansionModuleModel} works tightly with a {@link ApplicationModel} to go over all the registered
  * {@link ExtensionModel}s that are XML based (see {@link XmlExtensionModelProperty}) looking for code to macro expand.
@@ -67,7 +70,7 @@ public class MacroExpansionModuleModel {
    * {@link org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor} can properly set the paths for every element
    * (even the macro expanded)
    */
-  public static final String ORIGINAL_IDENTIFIER = "ORIGINAL_IDENTIFIER";
+  public static final QName ORIGINAL_IDENTIFIER = new QName(NS_MULE_PARSER_METADATA, "ORIGINAL_IDENTIFIER");
 
   /**
    * Reserved prefix in a <module/> to define a reference an operation of the same module (no circular dependencies allowed)
@@ -292,7 +295,7 @@ public class MacroExpansionModuleModel {
     for (Map.Entry<String, String> customAttributeEntry : operationRefModel.getMetadata().getDocAttributes().entrySet()) {
       processorChainBuilder.addCustomAttribute(customAttributeEntry.getKey(), customAttributeEntry.getValue());
     }
-    processorChainBuilder.addCustomAttribute(ROOT_CONTAINER_NAME_KEY.toString(), containerName);
+    processorChainBuilder.addCustomAttribute(ROOT_CONTAINER_NAME_KEY, containerName);
 
     operationRefModel.getMetadata().getFileName().ifPresent(processorChainBuilder::setConfigFileName);
     operationRefModel.getMetadata().getStartLine().ifPresent(processorChainBuilder::setLineNumber);
