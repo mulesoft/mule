@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.internal.util.store;
 
+import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -89,6 +90,27 @@ public class PersistentObjectStorePartitionTestCase extends AbstractMuleTestCase
 
       // Expect to have one more corrupted file in the corrupted folder
       assertEquals(corruptedBefore + 1, corruptedFolder.list().length);
+    } catch (Exception e) {
+      fail("Supposed to have skipped corrupted or unreadable files");
+    }
+  }
+
+  @Test
+  public void skipAndMoveCorruptedOrUnreadableFilesWithoutCreatingDir() {
+    final String KEY = "key";
+    final String VALUE = "value";
+    try {
+      File.createTempFile("temp", ".obj", objectStoreFolder.getRoot());
+      File corruptedFolder = openDirectory(workingDirectory.getAbsolutePath()
+          + File.separator + PersistentObjectStorePartition.CORRUPTED_FOLDER);
+      deleteDirectory(corruptedFolder);
+
+      partition.store(KEY, VALUE);
+      // Expect the new stored object, and the partition-descriptor file
+      assertEquals(2, objectStoreFolder.getRoot().listFiles().length);
+
+      // Expect to have one more corrupted file in the corrupted folder
+      assertEquals(1, corruptedFolder.list().length);
     } catch (Exception e) {
       fail("Supposed to have skipped corrupted or unreadable files");
     }
