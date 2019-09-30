@@ -87,7 +87,8 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
         toMetadataDescriptorResult(componentWithOutput.getOutput().getType(), componentWithOutput.getOutput().hasDynamicType(),
                                    output);
     MetadataResult<TypeMetadataDescriptor> attributesDescriptor =
-        toMetadataDescriptorResult(componentWithOutput.getOutputAttributes().getType(), false, attributes);
+        toMetadataDescriptorResult(componentWithOutput.getOutputAttributes().getType(),
+                                   componentWithOutput.getOutputAttributes().hasDynamicType(), attributes);
 
     OutputMetadataDescriptor descriptor = OutputMetadataDescriptor.builder()
         .withReturnType(outputDescriptor.get())
