@@ -183,12 +183,6 @@ public class BeanDefinitionFactory {
       return null;
     }
 
-    if (!componentModel.isEnabled()) {
-      // Just register the location, for support of lazyInit scenarios
-      componentLocator.addComponentLocation(componentModel.getComponentLocation());
-      return null;
-    }
-
     resolveComponentBeanDefinition(componentModel);
     componentDefinitionModelProcessor.accept(componentModel, registry);
 

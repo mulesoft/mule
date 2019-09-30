@@ -38,6 +38,10 @@
             <artifactId>mule-artifact-ast</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-artifact-ast-dependency-graph</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>

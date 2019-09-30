@@ -823,8 +823,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
   protected ApplicationModel loadApplicationModel(ArtifactDeclaration declaration) throws Exception {
     return new ApplicationModel(new ArtifactConfig.Builder().build(),
-                                declaration, extensions, emptyMap(), Optional.empty(), Optional.empty(),
-                                false, uri -> getClass().getResourceAsStream(uri));
+                                declaration, extensions, emptyMap(), empty(), empty(),
+                                uri -> getClass().getResourceAsStream(uri));
   }
 
   private void mockSimpleMetadataKeyId(OperationModel model) {
@@ -855,7 +855,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
                                                       METADATA_KEY_PART_1,
                                                       CATEGORY_NAME)));
 
-    when(model.getModelProperty(MetadataResolverFactoryModelProperty.class)).thenReturn(Optional.empty());
+    when(model.getModelProperty(MetadataResolverFactoryModelProperty.class)).thenReturn(empty());
 
     when(model.getAllParameterModels()).thenReturn(parameterModels);
   }
@@ -882,7 +882,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
             case METADATA_KEY_PART_3:
               return of(partThree);
           }
-          return Optional.empty();
+          return empty();
         });
 
     ObjectTypeBuilder groupType = BaseTypeBuilder.create(MetadataFormat.JAVA).objectType();
@@ -912,7 +912,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
       if (invocation.getArguments()[0].equals(MetadataKeyPartModelProperty.class)) {
         return of(new MetadataKeyPartModelProperty(order));
       }
-      return Optional.empty();
+      return empty();
     });
 
     when(metadataKeyId.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
