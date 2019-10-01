@@ -250,8 +250,11 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
         .toPath().normalize();
     Path absoluteFilePath = file.toPath();
     Path relativePath = workingDirectory.relativize(absoluteFilePath);
-    File corruptedFile = new File(muleContext.getConfiguration().getWorkingDirectory()
-        + File.separator + CORRUPTED_FOLDER + File.separator + relativePath.toString());
+    File corruptedDir = new File(muleContext.getConfiguration().getWorkingDirectory() + File.separator + CORRUPTED_FOLDER);
+    if (!corruptedDir.exists()) {
+      corruptedDir.mkdir();
+    }
+    File corruptedFile = new File(corruptedDir.getAbsolutePath() + File.separator + relativePath.toString());
     Files.move(file.toPath(), corruptedFile.getParentFile().toPath());
   }
 
