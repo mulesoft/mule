@@ -184,8 +184,8 @@ class ExtensionPluginMetadataGenerator {
    * @param rootArtifactRemoteRepositories
    * @return {@link ExtensionModel} for the extensionClass
    */
-  ExtensionModel getExtensionModel(Artifact plugin, Class extensionClass, DependencyResolver dependencyResolver,
-                                   List<RemoteRepository> rootArtifactRemoteRepositories) {
+  private ExtensionModel getExtensionModel(Artifact plugin, Class extensionClass, DependencyResolver dependencyResolver,
+                                           List<RemoteRepository> rootArtifactRemoteRepositories) {
     ExtensionModelLoader loader =
         extensionModelLoaderFinder.findLoaderByProperty(plugin, dependencyResolver, rootArtifactRemoteRepositories)
             .orElse(extensionModelLoaderFinder.findLoaderFromMulePlugin(extensionMulePluginJson));
@@ -209,7 +209,6 @@ class ExtensionPluginMetadataGenerator {
     File generatedResourcesDirectory = new File(generatedResourcesBase, plugin.getArtifactId() + separator + "META-INF");
     generatedResourcesDirectory.mkdirs();
     extensionsInfrastructure.generateLoaderResources(extensionModel, generatedResourcesDirectory);
-    extensionsInfrastructure.generateSchemaTestResource(extensionModel, generatedResourcesDirectory);
     extensionGeneratorEntries.add(new ExtensionGeneratorEntry(extensionModel, generatedResourcesDirectory));
     return generatedResourcesDirectory.getParentFile();
   }
