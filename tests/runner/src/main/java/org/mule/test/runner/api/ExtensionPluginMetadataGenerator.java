@@ -184,8 +184,8 @@ class ExtensionPluginMetadataGenerator {
    * @param rootArtifactRemoteRepositories
    * @return {@link ExtensionModel} for the extensionClass
    */
-  private ExtensionModel getExtensionModel(Artifact plugin, Class extensionClass, DependencyResolver dependencyResolver,
-                                           List<RemoteRepository> rootArtifactRemoteRepositories) {
+  ExtensionModel getExtensionModel(Artifact plugin, Class extensionClass, DependencyResolver dependencyResolver,
+                                   List<RemoteRepository> rootArtifactRemoteRepositories) {
     ExtensionModelLoader loader =
         extensionModelLoaderFinder.findLoaderByProperty(plugin, dependencyResolver, rootArtifactRemoteRepositories)
             .orElse(extensionModelLoaderFinder.findLoaderFromMulePlugin(extensionMulePluginJson));

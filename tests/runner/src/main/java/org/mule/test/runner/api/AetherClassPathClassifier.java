@@ -594,6 +594,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
               generateExtensionMetadata(pluginClassifiedNode.getArtifact(), context, extensionPluginMetadataGenerator,
                                         pluginClassifiedNode.getUrls(), rootArtifactRemoteRepositories);
           pluginClassifiedNode.setUrls(urls);
+        } else {
+          registerExtensionMetadata(pluginClassifiedNode.getArtifact(), extensionPluginMetadataGenerator,
+                                    pluginClassifiedNode.getUrls(), rootArtifactRemoteRepositories);
         }
       }
     }
@@ -842,6 +845,22 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       }
     }
     return urls;
+  }
+
+  /**
+   * Discovers the extension model and adds it in the extensions manager.
+   *
+   * @param plugin plugin {@link Artifact} to discover its Extension metadata
+   * @param pluginGenerator {@link ExtensionPluginMetadataGenerator} extensions metadata generator
+   * @param urls current {@link List} of {@link URL}s classified for the plugin
+   * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact
+   */
+  private void registerExtensionMetadata(Artifact plugin, ExtensionPluginMetadataGenerator pluginGenerator,
+                                         List<URL> urls, List<RemoteRepository> rootArtifactRemoteRepositories) {
+    Class extensionClass = pluginGenerator.scanForExtensionAnnotatedClasses(plugin, urls);
+    if (extensionClass != null) {
+      pluginGenerator.getExtensionModel(plugin, extensionClass, dependencyResolver, rootArtifactRemoteRepositories);
+    }
   }
 
   /**
