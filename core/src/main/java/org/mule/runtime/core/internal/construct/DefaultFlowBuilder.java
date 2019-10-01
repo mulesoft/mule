@@ -220,9 +220,6 @@ public class DefaultFlowBuilder implements Builder {
     @Override
     public ReactiveProcessor referenced() {
       return pub -> from(pub)
-          .doOnNext(assertStarted())
-          // If an error occurs prior to the event being injected into target flow, fail all flow processing
-          .onErrorStop()
           // Insert the incoming event into the flow, routing it through the processing strategy
           .flatMap(routeThroughProcessingStrategy()
               // Don't propagate errors, these will be handled by parent flow through the EventContext hierarchy mechanism

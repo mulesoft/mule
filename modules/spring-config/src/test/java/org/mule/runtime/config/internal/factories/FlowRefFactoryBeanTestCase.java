@@ -55,6 +55,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -96,6 +97,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   private final ProcessingStrategy callerFlowProcessingStrategy = mock(ProcessingStrategy.class);
   private final Flow callerFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);
   private final Flow targetFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);
+  private final LifecycleState flowLifeCycleState = mock(LifecycleState.class);
   private final MessageProcessorChain targetSubFlow = mock(MessageProcessorChain.class, INITIALIZABLE_MESSAGE_PROCESSOR);
   private final Processor targetSubFlowChild = (Processor) mock(Object.class, INITIALIZABLE_MESSAGE_PROCESSOR);
   private final SubflowMessageProcessorChainBuilder targetSubFlowChainBuilder = spy(new SubflowMessageProcessorChainBuilder());
@@ -116,6 +118,9 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     doReturn(true).when(expressionManager).isExpression(anyString());
     when(targetFlow.apply(any(Publisher.class))).thenReturn(just(result));
     when(targetFlow.referenced()).thenReturn(targetFlow);
+    // For flow lifecycle checks
+    when(flowLifeCycleState.isStarted()).thenReturn(true);
+    when(targetFlow.getLifecycleState()).thenReturn(flowLifeCycleState);
 
     List<Processor> targetSubFlowProcessors = singletonList(targetSubFlowChild);
     when(targetSubFlow.getMessageProcessors()).thenReturn(targetSubFlowProcessors);

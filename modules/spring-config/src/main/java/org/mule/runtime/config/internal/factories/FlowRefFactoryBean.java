@@ -29,9 +29,11 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.config.internal.MuleArtifactContext;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -61,6 +63,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -251,11 +254,23 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     private Publisher<CoreEvent> applyForStaticFlow(Flow resolvedTarget, Flux<CoreEvent> pub,
                                                     Optional<ComponentLocation> location) {
-      pub = pub.transform(eventPub -> applyWithChildContext(eventPub, wrapInExceptionMapper(resolvedTarget.referenced()),
-                                                            location,
-                                                            resolvedTarget.getExceptionListener()));
+      pub = pub
+          .doOnNext(assertTargetFlowIsStarted(resolvedTarget))
+          .transform(eventPub -> applyWithChildContext(eventPub, wrapInExceptionMapper(resolvedTarget.referenced()),
+                                                       location,
+                                                       resolvedTarget.getExceptionListener()));
 
       return decoratePublisher(pub);
+    }
+
+    private Consumer<CoreEvent> assertTargetFlowIsStarted(Flow resolvedTarget) {
+      return event -> {
+        if (!resolvedTarget.getLifecycleState().isStarted()) {
+          throw propagate(new MessagingException(event,
+                                                 new LifecycleException(CoreMessages.isStopped(resolvedTarget.getName()),
+                                                                        event.getMessage())));
+        }
+      };
     }
 
     private Publisher<CoreEvent> applyForStaticSubFlow(ReactiveProcessor resolvedTarget, Flux<CoreEvent> pub,
