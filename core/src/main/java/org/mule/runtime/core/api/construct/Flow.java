@@ -49,8 +49,10 @@ public interface Flow extends ExecutableComponent, Lifecycle, Pipeline, Processo
   String getInitialState();
 
   /**
-   * @return a processor for this flow to be used when invoking this flow from a reactor {@link Flux} (i.e.: when calling it from
-   *         a {@code flow-ref})
+   * Decorates the common flow {@link ReactiveProcessor} application by avoiding the emission of an error downstream in the
+   * {@link Flux}. Normally used when invoking this {@link Flow} from a {@link Flux} chain, as in the {@code flow-ref} case.
+   * 
+   * @return the decorated {@link ReactiveProcessor}
    */
   ReactiveProcessor referenced();
 
