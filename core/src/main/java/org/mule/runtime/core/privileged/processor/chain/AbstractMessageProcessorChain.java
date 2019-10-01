@@ -30,6 +30,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.MuleContext;
@@ -142,7 +143,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           // #1 Register local error hook to wrap exceptions in a MessagingException maintaining failed event.
           .subscriberContext(context -> context.put(REACTOR_ON_OPERATOR_ERROR_LOCAL, getLocalOperatorErrorHook(processor)))
           // #2 Register continue error strategy to handle errors without stopping the stream.
-          .onErrorContinue(getContinueStrategyErrorHandler(processor));
+          .onErrorContinue(exception -> !(exception instanceof LifecycleException),
+                           getContinueStrategyErrorHandler(processor));
     }
     return stream.subscriberContext(ctx -> {
       ClassLoader tccl = currentThread().getContextClassLoader();
