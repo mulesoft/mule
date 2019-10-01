@@ -13,11 +13,11 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -37,17 +37,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.IntUnaryOperator;
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
 import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * Creates {@link AsyncProcessingStrategyFactory} instance that implements the proactor pattern by
- * de-multiplexing incoming events onto a multiple emitter using the {@link SchedulerService#cpuLightScheduler()} to process these
- * events from each emitter. In contrast to the {@link AbstractStreamProcessingStrategyFactory} the proactor pattern treats
+ * Creates {@link AsyncProcessingStrategyFactory} instance that implements the proactor pattern by de-multiplexing incoming events
+ * onto a multiple emitter using the {@link SchedulerService#cpuLightScheduler()} to process these events from each emitter. In
+ * contrast to the {@link AbstractStreamProcessingStrategyFactory} the proactor pattern treats
  * {@link ProcessingType#CPU_INTENSIVE} and {@link ProcessingType#BLOCKING} processors differently and schedules there execution
  * on dedicated {@link SchedulerService#cpuIntensiveScheduler()} and {@link SchedulerService#ioScheduler()} ()} schedulers.
  * <p/>
@@ -80,6 +83,9 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
   }
 
   static class ProactorStreamEmitterProcessingStrategy extends ProactorStreamProcessingStrategy {
+
+    private static final String NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR = "No subscriptions active for processor.";
+    private static Logger LOGGER = getLogger(ProactorStreamEmitterProcessingStrategy.class);
 
     private final int bufferSize;
     private final boolean isThreadLoggingEnabled;
@@ -124,10 +130,12 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
       for (int i = 0; i < sinksCount; i++) {
         Latch completionLatch = new Latch();
         EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(getBufferQueueSize());
-        processor.transform(function).subscribe(null, e -> completionLatch.release(), () -> completionLatch.release());
+        AtomicReference<Throwable> failedSubscriptionCause = new AtomicReference<>();
+        processor.transform(function).subscribe(null, getThrowableConsumer(completionLatch, failedSubscriptionCause),
+                                                () -> completionLatch.release());
 
         if (!processor.hasDownstreams()) {
-          throw new MuleRuntimeException(createStaticMessage("No subscriptions active for processor."));
+          throw resolveSubscriptionErrorCause(failedSubscriptionCause);
         }
 
         ReactorSink<CoreEvent> sink =
@@ -139,6 +147,25 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
       }
 
       return new RoundRobinReactorSink<>(sinks);
+    }
+
+    protected MuleRuntimeException resolveSubscriptionErrorCause(AtomicReference<Throwable> failedSubscriptionCause) {
+      MuleRuntimeException exceptionToThrow;
+      if (failedSubscriptionCause.get() != null) {
+        exceptionToThrow = new MuleRuntimeException(createStaticMessage(NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR),
+                                                    failedSubscriptionCause.get());
+      } else {
+        exceptionToThrow = new MuleRuntimeException(createStaticMessage(NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR));
+      }
+      return exceptionToThrow;
+    }
+
+    protected Consumer<Throwable> getThrowableConsumer(Latch completionLatch,
+                                                       AtomicReference<Throwable> failedSubscriptionCause) {
+      return e -> {
+        failedSubscriptionCause.set(e);
+        completionLatch.release();
+      };
     }
 
     @Override

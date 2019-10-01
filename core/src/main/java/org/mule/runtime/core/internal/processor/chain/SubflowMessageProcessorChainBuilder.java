@@ -13,8 +13,6 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.core.api.config.DefaultMuleConfiguration.isFlowTrace;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
@@ -25,14 +23,14 @@ import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
-import org.reactivestreams.Publisher;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
 import javax.xml.namespace.QName;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Constructs a custom chain for subflows using the subflow name as the chain name.
@@ -118,10 +116,10 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher)
-          .concatMap(event -> just(event)
-              .doOnNext(pushSubFlowFlowStackElement())
-              .transform(s -> super.apply(s))
-              .doOnSuccessOrError((result, throwable) -> popSubFlowFlowStackElement().accept(event)));
+          .doOnNext(pushSubFlowFlowStackElement())
+          // To avoid recursive transformation when there are flowref cycles, the chain is lazily transformed
+          .compose(s -> super.apply(s))
+          .doOnNext(popSubFlowFlowStackElement());
     }
   }
 }
