@@ -84,7 +84,7 @@ public class MuleContextUtils {
     }
 
     @Override
-    public <T> T inject(T object) throws MuleException {
+    public <T> T inject(T object) {
       for (Field field : getAllFields(object.getClass(), withAnnotation(Inject.class))) {
         Class<?> dependencyType = field.getType();
 
@@ -179,6 +179,10 @@ public class MuleContextUtils {
     }
 
     return muleContext;
+  }
+
+  public static NotificationDispatcher getNotificationDispatcher(MuleContext muleContext) throws RegistrationException {
+    return ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
   }
 
   /**

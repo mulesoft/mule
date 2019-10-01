@@ -78,12 +78,7 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory;
-import org.mule.runtime.core.internal.processor.strategy.ProactorStreamWorkQueueProcessingStrategyFactory;
-import org.mule.runtime.core.internal.processor.strategy.ReactorProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
-import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueProcessingStrategyFactory;
-import org.mule.runtime.core.internal.processor.strategy.TransactionAwareWorkQueueStreamProcessingStrategyFactory;
-import org.mule.runtime.core.internal.processor.strategy.WorkQueueProcessingStrategyFactory;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
@@ -109,7 +104,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Flux;
 
 @RunWith(Parameterized.class)
@@ -129,38 +123,18 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Parameterized.Parameters(name = "{0}, {2}")
   public static Collection<Object[]> parameters() {
     return asList(new Object[][] {
-        {"TransactionAwareWorkQueueProcessingStrategyFactory",
-            new TransactionAwareWorkQueueProcessingStrategyFactory(), BLOCKING},
-        {"TransactionAwareWorkQueueStreamProcessingStrategyFactory",
-            new TransactionAwareWorkQueueStreamProcessingStrategyFactory(), BLOCKING},
         {"TransactionAwareProactorStreamEmitterProcessingStrategyFactory",
             new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(), BLOCKING},
-        {"ReactorProcessingStrategyFactory",
-            new ReactorProcessingStrategyFactory(), BLOCKING},
-        {"ProactorStreamWorkQueueProcessingStrategyFactory",
-            new ProactorStreamWorkQueueProcessingStrategyFactory(), BLOCKING},
         {"ProactorStreamEmitterProcessingStrategyFactory",
             new ProactorStreamEmitterProcessingStrategyFactory(), BLOCKING},
-        {"WorkQueueProcessingStrategyFactory",
-            new WorkQueueProcessingStrategyFactory(), BLOCKING},
         {"BlockingProcessingStrategyFactory",
             new BlockingProcessingStrategyFactory(), BLOCKING},
         {"DirectProcessingStrategyFactory",
             new DirectProcessingStrategyFactory(), BLOCKING},
-        {"TransactionAwareWorkQueueProcessingStrategyFactory",
-            new TransactionAwareWorkQueueProcessingStrategyFactory(), NON_BLOCKING},
-        {"TransactionAwareWorkQueueStreamProcessingStrategyFactory",
-            new TransactionAwareWorkQueueStreamProcessingStrategyFactory(), NON_BLOCKING},
         {"TransactionAwareProactorStreamEmitterProcessingStrategyFactory",
             new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
-        {"ReactorProcessingStrategyFactory",
-            new ReactorProcessingStrategyFactory(), NON_BLOCKING},
-        {"ProactorStreamWorkQueueProcessingStrategyFactory",
-            new ProactorStreamWorkQueueProcessingStrategyFactory(), NON_BLOCKING},
         {"ProactorStreamEmitterProcessingStrategyFactory",
             new ProactorStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
-        {"WorkQueueProcessingStrategyFactory",
-            new WorkQueueProcessingStrategyFactory(), NON_BLOCKING},
         {"BlockingProcessingStrategyFactory",
             new BlockingProcessingStrategyFactory(), NON_BLOCKING},
         {"DirectProcessingStrategyFactory",

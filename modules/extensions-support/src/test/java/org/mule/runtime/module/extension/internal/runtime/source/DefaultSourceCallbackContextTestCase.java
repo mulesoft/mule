@@ -70,7 +70,8 @@ public class DefaultSourceCallbackContextTestCase extends AbstractMuleTestCase {
 
     final TransactionSourceBinder binder = mock(TransactionSourceBinder.class);
     when(binder.bindToTransaction(txConfig, sourceCallback.getConfigurationInstance(), sourceCallback.getSourceLocation(),
-                                  connectionHandler)).thenThrow(TransactionException.class);
+                                  connectionHandler, sourceCallback.getTransactionManager(), sourceCallback.getTimeout()))
+                                      .thenThrow(TransactionException.class);
     when(sourceCallback.getTransactionSourceBinder()).thenReturn(binder);
 
     DefaultSourceCallbackContext ctx = new DefaultSourceCallbackContext(sourceCallback);

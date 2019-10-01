@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
@@ -21,6 +22,7 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assume.assumeThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.spy;
@@ -33,10 +35,14 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.DROP;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.RejectingScheduler.REJECTION_COUNT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
+import static org.mule.tck.probe.PollingProber.probe;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
@@ -50,7 +56,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.construct.FlowBackPressureMaxConcurrencyExceededException;
 import org.mule.runtime.core.internal.construct.FlowBackPressureRequiredSchedulerBusyException;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -82,7 +87,7 @@ import io.qameta.allure.Story;
 public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
   @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+  public ExpectedException expectedException = none();
 
   public ProactorStreamEmitterProcessingStrategyTestCase(Mode mode) {
     super(mode);
@@ -240,7 +245,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     flow.initialise();
     flow.start();
 
-    TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
+    getInstance().bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), 5));
 
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(DefaultMuleException.class));
@@ -271,7 +276,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   @Description("If IO pool is busy OVERLOAD error is thrown")
   public void blockingRejectedExecution() throws Exception {
     Scheduler blockingSchedulerSpy = spy(blocking);
-    Scheduler rejectingSchedulerSpy = spy(new RejectingScheduler(blockingSchedulerSpy));
+    RejectingScheduler rejectingSchedulerSpy = new RejectingScheduler(blockingSchedulerSpy);
 
     flow = flowBuilder.get().processors(blockingProcessor)
         .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(DEFAULT_BUFFER_SIZE,
@@ -284,9 +289,18 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
         .build();
     flow.initialise();
     flow.start();
+    rejectingSchedulerSpy.reset();
+
     processFlow(testEvent());
-    verify(rejectingSchedulerSpy, times(11)).submit(any(Callable.class));
+
     verify(blockingSchedulerSpy, times(1)).submit(any(Callable.class));
+    // Reactor dispatches different tasks to the scheduler for processing the task, so we cannot assume a 1-1 ratio between events
+    // and calls to the scheduler, or that they happen all in a predictable order (threading, ya know...).
+    probe(() -> {
+      assertThat(rejectingSchedulerSpy.getRejections(), is(greaterThanOrEqualTo(REJECTION_COUNT)));
+      return true;
+    });
+
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));
@@ -298,7 +312,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   @Description("If CPU INTENSIVE pool is busy OVERLOAD error is thrown")
   public void cpuIntensiveRejectedExecution() throws Exception {
     Scheduler cpuIntensiveSchedulerSpy = spy(cpuIntensive);
-    Scheduler rejectingSchedulerSpy = spy(new RejectingScheduler(cpuIntensiveSchedulerSpy));
+    RejectingScheduler rejectingSchedulerSpy = new RejectingScheduler(cpuIntensiveSchedulerSpy);
 
     flow = flowBuilder.get().processors(cpuIntensiveProcessor)
         .processingStrategyFactory((context, prefix) -> new ProactorStreamEmitterProcessingStrategy(DEFAULT_BUFFER_SIZE,
@@ -311,9 +325,18 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
         .build();
     flow.initialise();
     flow.start();
+    rejectingSchedulerSpy.reset();
+
     processFlow(testEvent());
-    verify(rejectingSchedulerSpy, times(11)).submit(any(Callable.class));
+
     verify(cpuIntensiveSchedulerSpy, times(1)).submit(any(Callable.class));
+    // Reactor dispatches different tasks to the scheduler for processing the task, so we cannot assume a 1-1 ratio between events
+    // and calls to the scheduler, or that they happen all in a predictable order (threading, ya know...).
+    probe(() -> {
+      assertThat(rejectingSchedulerSpy.getRejections(), is(greaterThanOrEqualTo(REJECTION_COUNT)));
+      return true;
+    });
+
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(CPU_INTENSIVE)).count(), equalTo(1l));
     assertThat(threads, not(hasItem(startsWith(CPU_LIGHT))));

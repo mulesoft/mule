@@ -83,7 +83,8 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
         sourceCallback.getTransactionSourceBinder().bindToTransaction(sourceCallback.getTransactionConfig(),
                                                                       sourceCallback.getConfigurationInstance(),
                                                                       sourceCallback.getSourceLocation(),
-                                                                      connectionHandler);
+                                                                      connectionHandler, sourceCallback.getTransactionManager(),
+                                                                      sourceCallback.getTimeout());
         transactionHandle = DEFAULT_TRANSACTION_HANDLE;
       }
     } catch (Exception e) {

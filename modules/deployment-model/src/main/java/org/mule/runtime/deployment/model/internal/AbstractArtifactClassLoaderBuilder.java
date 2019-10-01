@@ -112,9 +112,10 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
     checkState(parentClassLoader != null, "parent class loader cannot be null");
     final String artifactId = getArtifactId(artifactDescriptor);
     ClassLoaderLookupPolicy parentLookupPolicy = getParentLookupPolicy(parentClassLoader);
-    RegionClassLoader regionClassLoader =
-        new RegionClassLoader(artifactId, artifactDescriptor, parentClassLoader.getClassLoader(),
-                              parentLookupPolicy);
+    RegionClassLoader regionClassLoader = createRegionClassLoader(artifactId,
+                                                                  artifactDescriptor,
+                                                                  parentClassLoader.getClassLoader(),
+                                                                  parentLookupPolicy);
 
     ArtifactClassLoaderFilter artifactClassLoaderFilter =
         createArtifactClassLoaderFilter(artifactDescriptor.getClassLoaderModel(),
@@ -141,6 +142,20 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
       artifactPluginIndex++;
     }
     return artifactClassLoader;
+  }
+
+  /**
+   * Template method to build different implementations of a {@link RegionClassLoader}
+   * @return a new {@link RegionClassLoader}
+   */
+  protected RegionClassLoader createRegionClassLoader(String artifactId,
+                                                      ArtifactDescriptor artifactDescriptor,
+                                                      ClassLoader parentClassLoader,
+                                                      ClassLoaderLookupPolicy parentLookupPolicy) {
+    return new RegionClassLoader(artifactId,
+                                 artifactDescriptor,
+                                 parentClassLoader,
+                                 parentLookupPolicy);
   }
 
   /**

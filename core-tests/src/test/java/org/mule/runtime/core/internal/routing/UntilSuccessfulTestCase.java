@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.routing;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -29,6 +30,7 @@ import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -107,7 +109,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   protected void doSetUp() throws Exception {
     super.doSetUp();
     flow = createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
-    untilSuccessful = buildUntilSuccessful(1000L);
+    untilSuccessful = buildUntilSuccessful("1000");
     if (tx) {
       getInstance().bindTransaction(mock(Transaction.class));
     }
@@ -120,9 +122,9 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     super.doTearDown();
   }
 
-  private UntilSuccessful buildUntilSuccessful(Long millisBetweenRetries) throws Exception {
+  private UntilSuccessful buildUntilSuccessful(String millisBetweenRetries) throws Exception {
     UntilSuccessful untilSuccessful = new UntilSuccessful();
-    untilSuccessful.setMaxRetries(2);
+    untilSuccessful.setMaxRetries("2");
     untilSuccessful.setAnnotations(getAppleFlowComponentLocationAnnotations());
     if (millisBetweenRetries != null) {
       untilSuccessful.setMillisBetweenRetries(millisBetweenRetries);
@@ -171,25 +173,25 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     try {
       untilSuccessful.process(testEvent);
     } finally {
-      assertEquals(1 + untilSuccessful.getMaxRetries(), targetMessageProcessor.getEventCount());
+      assertEquals(1 + Integer.parseInt(untilSuccessful.getMaxRetries()), targetMessageProcessor.getEventCount());
     }
   }
 
   @Test
   public void testTemporaryDeliveryFailure() throws Exception {
-    targetMessageProcessor.setNumberOfFailuresToSimulate(untilSuccessful.getMaxRetries());
+    targetMessageProcessor.setNumberOfFailuresToSimulate(Integer.parseInt(untilSuccessful.getMaxRetries()));
     untilSuccessful.initialise();
     untilSuccessful.start();
 
     final CoreEvent testEvent = eventBuilder(muleContext).message(of("ERROR")).build();
     assertSame(testEvent.getMessage(), untilSuccessful.process(testEvent).getMessage());
     assertTargetEventReceived(testEvent);
-    assertEquals(targetMessageProcessor.getEventCount(), untilSuccessful.getMaxRetries() + 1);
+    assertEquals(targetMessageProcessor.getEventCount(), Integer.parseInt(untilSuccessful.getMaxRetries()) + 1);
   }
 
   @Test
   public void testProcessingStrategyUsage() throws Exception {
-    targetMessageProcessor.setNumberOfFailuresToSimulate(untilSuccessful.getMaxRetries());
+    targetMessageProcessor.setNumberOfFailuresToSimulate(Integer.parseInt(untilSuccessful.getMaxRetries()));
     untilSuccessful.initialise();
     untilSuccessful.start();
 
@@ -205,7 +207,64 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful = buildUntilSuccessful(null);
     untilSuccessful.initialise();
     untilSuccessful.start();
-    assertEquals(60 * 1000, untilSuccessful.getMillisBetweenRetries());
+    assertEquals(60 * 1000, Integer.parseInt(untilSuccessful.getMillisBetweenRetries()));
+  }
+
+  @Test
+  public void testWithExpressionRetries() throws Exception {
+    targetMessageProcessor.setNumberOfFailuresToSimulate(4);
+    untilSuccessful.setMaxRetries("#[2 + 2]");
+    untilSuccessful.initialise();
+    untilSuccessful.start();
+
+
+    final CoreEvent testEvent = eventBuilder(muleContext).message(of("ERROR")).build();
+    assertSame(testEvent.getMessage(), untilSuccessful.process(testEvent).getMessage());
+    assertTargetEventReceived(testEvent);
+    assertEquals(targetMessageProcessor.getEventCount(), 5);
+  }
+
+  @Test
+  public void testWithExpressionRetriesMultipleExecutions() throws Exception {
+    targetMessageProcessor.setNumberOfFailuresToSimulate(2);
+    untilSuccessful.setMaxRetries("#[payload + 2]");
+    untilSuccessful.initialise();
+    untilSuccessful.start();
+
+
+    final CoreEvent testEvent = eventBuilder(muleContext).message(of(4)).build();
+    assertSame(testEvent.getMessage(), untilSuccessful.process(testEvent).getMessage());
+    assertSame(testEvent.getMessage(), untilSuccessful.process(testEvent).getMessage());
+    assertEquals(targetMessageProcessor.getEventCount(), 4);
+  }
+
+  @Test
+  public void testWithExpressionRetriesUsingPayload() throws Exception {
+    targetMessageProcessor.setNumberOfFailuresToSimulate(10);
+    untilSuccessful.setMaxRetries("#[payload + 2]");
+    untilSuccessful.initialise();
+    untilSuccessful.start();
+    final CoreEvent testEvent = eventBuilder(muleContext).message(of(1)).build();
+    expected.expect(MessagingException.class);
+    expected.expectCause(instanceOf(RetryPolicyExhaustedException.class));
+    try {
+      untilSuccessful.process(testEvent);
+    } finally {
+      assertEquals(targetMessageProcessor.getEventCount(), 4);
+    }
+  }
+
+  @Test
+  public void testWithWrongExpressionRetry() throws Exception {
+    targetMessageProcessor.setNumberOfFailuresToSimulate(10);
+    untilSuccessful.setMaxRetries("#[payload + 2]");
+    untilSuccessful.initialise();
+    untilSuccessful.start();
+
+    final CoreEvent testEvent = eventBuilder(muleContext).message(of("queso")).build();
+    expected.expect(ExpressionRuntimeException.class);
+    expected.expectMessage(containsString("You called the function '+' with these arguments"));
+    untilSuccessful.process(testEvent);
   }
 
   private void assertTargetEventReceived(CoreEvent request) throws MuleException {

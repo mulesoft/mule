@@ -24,7 +24,6 @@ import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.R
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildMapConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromMultipleDefinitions;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
@@ -34,7 +33,6 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.CommonTypeConverters.stringToClassConverter;
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
-import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTES_STREAMING_MAX_BUFFER_SIZE;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTE_STREAMING_BUFFER_DATA_UNIT;
@@ -56,6 +54,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENT
 import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.AbstractServerNotification;
@@ -80,7 +79,6 @@ import org.mule.runtime.config.internal.factories.DynamicConfigExpirationObjectF
 import org.mule.runtime.config.internal.factories.ErrorHandlerFactoryBean;
 import org.mule.runtime.config.internal.factories.ExpirationPolicyObjectFactory;
 import org.mule.runtime.config.internal.factories.FlowRefFactoryBean;
-import org.mule.runtime.config.internal.factories.ModuleOperationMessageProcessorChainFactoryBean;
 import org.mule.runtime.config.internal.factories.OnErrorFactoryBean;
 import org.mule.runtime.config.internal.factories.ProcessorExpressionRouteFactoryBean;
 import org.mule.runtime.config.internal.factories.ProcessorRouteFactoryBean;
@@ -91,7 +89,6 @@ import org.mule.runtime.config.internal.factories.streaming.InMemoryCursorIterat
 import org.mule.runtime.config.internal.factories.streaming.InMemoryCursorStreamProviderObjectFactory;
 import org.mule.runtime.config.internal.factories.streaming.NullCursorIteratorProviderObjectFactory;
 import org.mule.runtime.config.internal.factories.streaming.NullCursorStreamProviderObjectFactory;
-import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.privileged.dsl.processor.AddVariablePropertyConfigurator;
 import org.mule.runtime.config.privileged.dsl.processor.MessageProcessorChainFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
@@ -192,7 +189,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -246,15 +242,16 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
   private static final Class<?> MESSAGE_PROCESSOR_CLASS = Processor.class;
 
+  @SuppressWarnings("rawtypes")
   private static ComponentBuildingDefinition.Builder baseDefinition =
       new ComponentBuildingDefinition.Builder().withNamespace(CORE_PREFIX);
-  private ComponentBuildingDefinition.Builder transactionManagerBaseDefinition;
 
   @Override
   public void init() {
-    transactionManagerBaseDefinition = baseDefinition;
+    // Nothing to do
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
 
@@ -339,7 +336,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(MessageProcessorChain.class)).withObjectFactoryType(MessageProcessorChainFactoryBean.class)
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .asPrototype().build());
-    addModuleOperationChainParser(componentBuildingDefinitions);
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(SUB_FLOW)
         .withTypeDefinition(fromType(MessageProcessorChain.class))
         .withObjectFactoryType(SubflowMessageProcessorChainFactoryBean.class)
@@ -424,9 +420,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(UNTIL_SUCCESSFUL).withTypeDefinition(fromType(UntilSuccessful.class))
-            .withSetterParameterDefinition("maxRetries", fromSimpleParameter("maxRetries").withDefaultValue(5).build())
+            .withSetterParameterDefinition("maxRetries", fromSimpleParameter("maxRetries").withDefaultValue("5").build())
             .withSetterParameterDefinition("millisBetweenRetries",
-                                           fromSimpleParameter("millisBetweenRetries").withDefaultValue(60000).build())
+                                           fromSimpleParameter("millisBetweenRetries").withDefaultValue("60000").build())
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
             .build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(FOREACH).withTypeDefinition(fromType(Foreach.class))
@@ -441,11 +437,10 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition(MESSAGE_PROCESSORS,
                                            fromChildCollectionConfiguration(MessageProcessorChain.class).build())
             .build());
-    componentBuildingDefinitions
-        .add(baseDefinition.withIdentifier(ROUND_ROBIN).withTypeDefinition(fromType(RoundRobin.class))
-            .withSetterParameterDefinition(MESSAGE_PROCESSORS,
-                                           fromChildCollectionConfiguration(MessageProcessorChain.class).build())
-            .build());
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier(ROUND_ROBIN)
+        .withTypeDefinition(fromType(RoundRobin.class))
+        .withSetterParameterDefinition("routes", fromChildCollectionConfiguration(MessageProcessorChain.class).build())
+        .build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(CHOICE).withTypeDefinition(fromType(ChoiceRouter.class))
         .withObjectFactoryType(ChoiceRouterObjectFactory.class)
         .withSetterParameterDefinition("routes", fromChildCollectionConfiguration(ProcessorExpressionRoute.class).build())
@@ -716,6 +711,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     };
   }
 
+  @SuppressWarnings("unchecked")
   private List<ComponentBuildingDefinition> getIdempotentValidatorsDefinitions() {
     List<ComponentBuildingDefinition> definitions = new LinkedList<>();
 
@@ -736,6 +732,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return definitions;
   }
 
+  @SuppressWarnings("unchecked")
   private List<ComponentBuildingDefinition> getTransformersBuildingDefinitions() {
     List<ComponentBuildingDefinition> transformerComponentBuildingDefinitions = new ArrayList<>();
     transformerComponentBuildingDefinitions.add(getCoreTransformerBaseBuilder(XmlEntityEncoder.class)
@@ -964,6 +961,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     };
   }
 
+  @SuppressWarnings("unchecked")
   private static ComponentBuildingDefinition.Builder getSetVariablePropertyBaseBuilder(ConfigurableInstanceFactory configurableInstanceFactory,
                                                                                        Class<? extends AbstractAddVariablePropertyProcessor> setterClass,
                                                                                        KeyAttributeDefinitionPair... configurationAttributes) {
@@ -1001,6 +999,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return buildingDefinitions;
   }
 
+  @SuppressWarnings("unchecked")
   private List<ComponentBuildingDefinition> getBytesStreamingDefinitions() {
     List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
 
@@ -1034,6 +1033,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return buildingDefinitions;
   }
 
+  @SuppressWarnings("unchecked")
   private List<ComponentBuildingDefinition> getObjectsStreamingDefinitions() {
     List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
 
@@ -1064,6 +1064,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return buildingDefinitions;
   }
 
+  @SuppressWarnings("unchecked")
   private List<ComponentBuildingDefinition> getReconnectionDefinitions() {
     List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
 
@@ -1090,6 +1091,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return buildingDefinitions;
   }
 
+  @SuppressWarnings("unchecked")
   private List<ComponentBuildingDefinition> getTransactionDefinitions() {
     List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
 
@@ -1117,42 +1119,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
   private Builder getCoreMuleMessageTransformerBaseBuilder() {
     return getMuleMessageTransformerBaseBuilder().withNamespace(CORE_PREFIX);
-  }
-
-  private ComponentBuildingDefinition.Builder createTransactionManagerDefinitionBuilder(String transactionManagerName,
-                                                                                        Class<?> transactionManagerClass) {
-    return transactionManagerBaseDefinition.withIdentifier(transactionManagerName)
-        .withTypeDefinition(fromType(transactionManagerClass));
-  }
-
-  /**
-   * Parser for the expanded operations, generated dynamically by the {@link ApplicationModel} by reading the extensions
-   *
-   * @param componentBuildingDefinitions
-   */
-  private void addModuleOperationChainParser(LinkedList<ComponentBuildingDefinition> componentBuildingDefinitions) {
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("module-operation-chain")
-        .withTypeDefinition(fromType(AnnotatedProcessor.class))
-        .withObjectFactoryType(ModuleOperationMessageProcessorChainFactoryBean.class)
-        .withSetterParameterDefinition("properties", fromChildMapConfiguration(String.class, String.class)
-            .withWrapperIdentifier("module-operation-properties").build())
-        .withSetterParameterDefinition("parameters", fromChildMapConfiguration(String.class, String.class)
-            .withWrapperIdentifier("module-operation-parameters").build())
-        .withSetterParameterDefinition("moduleName", fromSimpleParameter("moduleName").build())
-        .withSetterParameterDefinition("moduleOperation", fromSimpleParameter("moduleOperation").build())
-        .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
-        .asPrototype().build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("module-operation-properties")
-        .withTypeDefinition(fromType(TreeMap.class)).build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("module-operation-property-entry")
-        .withTypeDefinition(fromMapEntryType(String.class, String.class))
-        .build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("module-operation-parameters")
-        .withTypeDefinition(fromType(TreeMap.class)).build());
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("module-operation-parameter-entry")
-        .withTypeDefinition(fromMapEntryType(String.class, String.class))
-        .build());
   }
 
 }

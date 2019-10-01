@@ -12,11 +12,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
+import static org.mule.tck.junit4.matcher.metadata.MetadataKeyResultSuccessMatcher.isSuccess;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 import static org.mule.test.metadata.extension.resolver.TestInputOutputSourceResolverWithKeyResolver.STARTED_KEY_MASK;
 import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.EXPLICIT_RESOLUTION;
+
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -48,7 +50,7 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
   @Test
   public void getSourceMetadataKeys() {
     final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService.getMetadataKeys(location);
-    assertThat(metadataKeysResult.isSuccess(), is(true));
+    assertThat(metadataKeysResult, isSuccess());
     final Set<MetadataKey> metadataKeys = getKeysFromContainer(metadataKeysResult.get());
     assertThat(metadataKeys.size(), is(4));
     assertThat(metadataKeys, hasItems(metadataKeyWithId(PERSON), metadataKeyWithId(CAR),
@@ -58,7 +60,7 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
   @Test
   public void getSourceDynamicOutputMetadata() throws Exception {
     final MetadataResult<ComponentMetadataDescriptor<SourceModel>> result = getComponentDynamicMetadata(PERSON_METADATA_KEY);
-    assertThat(result.isSuccess(), is(true));
+    assertThat(result, isSuccess());
     ComponentMetadataDescriptor<SourceModel> componentMetadata = result.get();
     assertExpectedOutput(componentMetadata.getModel(), personType, typeLoader.load(StringAttributes.class));
     assertThat(componentMetadata.getMetadataAttributes().getKey().get(), is(PERSON_METADATA_KEY));

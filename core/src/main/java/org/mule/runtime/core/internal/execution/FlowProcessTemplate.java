@@ -48,7 +48,7 @@ public interface FlowProcessTemplate extends MessageSourceResponseParametersProc
    * Routes the {@link CoreEvent} through the processors chain using async API.
    *
    * @param event {@link CoreEvent} created from the raw message of this context
-   * @return the {@link Publisher} that will ne siganlled on processing completion
+   * @return the {@link Publisher} that will ne signalled on processing completion
    */
   Publisher<CoreEvent> routeEventAsync(CoreEvent event);
 

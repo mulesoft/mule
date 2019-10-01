@@ -94,99 +94,21 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.commons.io.IOUtils;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
 import io.qameta.allure.Description;
 import io.qameta.allure.Flaky;
 import io.qameta.allure.Issue;
+import org.apache.commons.io.IOUtils;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Contains test for application deployment on the default domain
  */
-@RunWith(Parameterized.class)
-public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
+public class ApplicationDeploymentTestCase extends AbstractApplicationDeploymentTestCase {
 
-  private static final String PRIVILEGED_EXTENSION_ARTIFACT_ID = "privilegedExtensionPlugin";
-  private static final String PRIVILEGED_EXTENSION_ARTIFACT_FULL_ID = "org.mule.test:" + PRIVILEGED_EXTENSION_ARTIFACT_ID;
-  private static final String APP_WITH_PRIVILEGED_EXTENSION_PLUGIN_CONFIG = "app-with-privileged-extension-plugin-config.xml";
-  private static final String BROKEN_CONFIG_XML = "/broken-config.xml";
-
-  private static final Matcher<File> exists = new BaseMatcher<File>() {
-
-    @Override
-    public boolean matches(Object o) {
-      return ((File) o).exists();
-    }
-
-    @Override
-    public void describeTo(org.hamcrest.Description description) {
-      description.appendText("File does not exist");
-    }
-  };
-
-  // Classes and JAR resources
-  private static File pluginEcho3TestClassFile;
-  private static File pluginEcho2TestClassFile;
-  private static File pluginForbiddenJavaEchoTestClassFile;
-  private static File pluginForbiddenMuleContainerEchoTestClassFile;
-  private static File pluginForbiddenMuleThirdPartyEchoTestClassFile;
-  private static File privilegedExtensionV1JarFile;
-
-  @Parameterized.Parameters(name = "Parallel: {0}; classloaderModelVersion: {1}")
-  public static List<Object[]> parameters() {
-    return asList(new Object[][] {
-        {false, "1.0"},
-        {true, "1.0"},
-        {false, "1.1.0"},
-        {true, "1.1.0"}
-    });
-  }
-
-  private String classloaderModelVersion = "1.1.0";
-
-  // Application artifact builders
-  private ApplicationFileBuilder incompleteAppFileBuilder;
-  private ApplicationFileBuilder brokenAppFileBuilder;
-  private ApplicationFileBuilder brokenAppWithFunkyNameAppFileBuilder;
-  private ApplicationFileBuilder waitAppFileBuilder;
-  private ApplicationFileBuilder dummyAppDescriptorWithPropsFileBuilder;
-
-  // Application plugin artifact builders
-  private ArtifactPluginFileBuilder echoPluginWithLib1;
-
-  @BeforeClass
-  public static void compileTestClasses() throws Exception {
-    pluginEcho2TestClassFile =
-        new CompilerUtils.SingleClassCompiler().dependingOn(barUtils2_0JarFile)
-            .compile(getResourceFile("/org/foo/echo/Plugin2Echo.java"));
-    pluginEcho3TestClassFile = new CompilerUtils.SingleClassCompiler().compile(getResourceFile("/org/foo/echo/Plugin3Echo.java"));
-    pluginForbiddenJavaEchoTestClassFile =
-        new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenJavaJarFile)
-            .compile(getResourceFile("/org/foo/echo/PluginForbiddenJavaEcho.java"));
-    pluginForbiddenMuleContainerEchoTestClassFile =
-        new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenMuleContainerJarFile)
-            .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleContainerEcho.java"));
-    pluginForbiddenMuleThirdPartyEchoTestClassFile =
-        new CompilerUtils.SingleClassCompiler().dependingOn(barUtilsForbiddenMuleThirdPartyJarFile)
-            .compile(getResourceFile("/org/foo/echo/PluginForbiddenMuleThirdPartyEcho.java"));
-
-    privilegedExtensionV1JarFile =
-        new CompilerUtils.ExtensionCompiler().compiling(getResourceFile("/org/foo/privileged/PrivilegedExtension.java"),
-                                                        getResourceFile("/org/foo/privileged/PrivilegedOperation.java"))
-            .compile("mule-module-privileged-1.0.jar", "1.0");
-  }
-
-  public ApplicationDeploymentTestCase(boolean parallelDeployment, String classloaderModelVersion) {
+  public ApplicationDeploymentTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
-    this.classloaderModelVersion = classloaderModelVersion;
   }
 
   @Before
@@ -1052,6 +974,48 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
+  public void deploymentFailureWhenDomainNotFound() throws Exception {
+    final DefaultDomainManager emptyDomainManager = new DefaultDomainManager();
+    TestApplicationFactory appFactory =
+        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
+                                     emptyDomainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+                                     createDescriptorLoaderRepository());
+    appFactory.setFailOnStopApplication(true);
+    deploymentService.setAppFactory(appFactory);
+
+    addPackedAppFromBuilder(emptyAppFileBuilder);
+    startDeployment();
+    assertDeploymentFailure(applicationDeploymentListener, emptyAppFileBuilder.getId());
+
+    reset(applicationDeploymentListener);
+    emptyDomainManager.addDomain(createDefaultDomain());
+    addPackedAppFromBuilder(emptyAppFileBuilder);
+    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+  }
+
+  @Test
+  public void deploymentSuccessWhenUsingDefaultDomain() throws Exception {
+    final DefaultDomainManager domainManager = new DefaultDomainManager();
+    TestApplicationFactory appFactory =
+        createTestApplicationFactory(new MuleApplicationClassLoaderFactory(new DefaultNativeLibraryFinderFactory()),
+                                     domainManager, serviceManager, extensionModelLoaderManager, moduleRepository,
+                                     createDescriptorLoaderRepository());
+    appFactory.setFailOnStopApplication(true);
+    deploymentService.setAppFactory(appFactory);
+
+    domainManager.addDomain(createDefaultDomain());
+    addPackedAppFromBuilder(emptyAppFileBuilder);
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+  }
+
+  @Test
+  public void zaraza() {
+
+  }
+
+  @Test
   public void undeploysAppCompletelyEvenOnDisposingException() throws Exception {
     addPackedAppFromBuilder(emptyAppFileBuilder);
 
@@ -1424,121 +1388,6 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     startDeployment();
 
     assertDeploymentSuccess(applicationDeploymentListener, usesPlugin2.getId());
-
-    executeApplicationFlow("main");
-  }
-
-  @Test
-  @Issue("MULE-13756")
-  @Description("Tests that code called form plugin's Processor cannot access internal resources/packages of the application")
-  public void deploysAppWithLocalPackageAndPlugin() throws Exception {
-    ArtifactPluginFileBuilder loadsAppResourcePlugin = new ArtifactPluginFileBuilder("loadsAppResourcePlugin")
-        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
-        .containingClass(loadsAppResourceCallbackClassFile, "org/foo/LoadsAppResourceCallback.class");
-
-    ApplicationFileBuilder nonExposingAppFileBuilder = appFileBuilder("non-exposing-app")
-        .configuredWith(EXPORTED_PACKAGES, "org.bar")
-        .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
-        .definedBy("app-with-loads-app-resource-plugin-config.xml")
-        .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
-        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
-        .containingResource("test-resource.txt", "test-resource.txt")
-        .containingResource("test-resource.txt", "test-resource-not-exported.txt")
-        .dependingOn(loadsAppResourcePlugin);
-
-    addPackedAppFromBuilder(nonExposingAppFileBuilder);
-
-    startDeployment();
-
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, nonExposingAppFileBuilder.getId());
-
-    executeApplicationFlow("main");
-  }
-
-  @Test
-  @Issue("MULE-13756")
-  @Description("Tests that code called form application's Processor can access internal resources/packages of the application")
-  public void deploysAppWithLocalPackage() throws Exception {
-    ApplicationFileBuilder nonExposingAppFileBuilder = appFileBuilder("non-exposing-app")
-        .configuredWith(EXPORTED_PACKAGES, "org.bar")
-        .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
-        .definedBy("app-with-loads-app-resource-plugin-config.xml")
-        .containingClass(loadsAppResourceCallbackClassFile, "org/foo/LoadsAppResourceCallback.class")
-        .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
-        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
-        .containingResource("test-resource.txt", "test-resource.txt")
-        .containingResource("test-resource.txt", "test-resource-not-exported.txt");
-
-    addPackedAppFromBuilder(nonExposingAppFileBuilder);
-
-    startDeployment();
-
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, nonExposingAppFileBuilder.getId());
-
-    executeApplicationFlow("main");
-  }
-
-  @Test
-  @Issue("MULE-13756")
-  @Description("Tests that code called form plugin's ProcessorInterceptor cannot access internal resources/packages of the application")
-  public void deploysAppWithLocalPackageAndPluginWithInterceptors() throws Exception {
-    File loadsAppResourceInterceptorFactoryClassFile =
-        new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsAppResourceInterceptorFactory.java"));
-    File loadsAppResourceInterceptorClassFile =
-        new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsAppResourceInterceptor.java"));
-
-    ArtifactPluginFileBuilder loadsAppResourceInterceptorPlugin =
-        new ArtifactPluginFileBuilder("loadsAppResourceInterceptorPlugin")
-            .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.lalala")
-            .containingClass(loadsAppResourceInterceptorFactoryClassFile, "org/foo/LoadsAppResourceInterceptorFactory.class")
-            .containingClass(loadsAppResourceInterceptorClassFile, "org/foo/LoadsAppResourceInterceptor.class")
-            .containingResource("registry-bootstrap-loads-app-resource-pif.properties",
-                                "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties");
-
-    ApplicationFileBuilder nonExposingAppFileBuilder = appFileBuilder("non-exposing-app")
-        .configuredWith(EXPORTED_PACKAGES, "org.bar")
-        .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
-        .definedBy("app-with-plugin-bootstrap.xml")
-        .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
-        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
-        .containingResource("test-resource.txt", "test-resource.txt")
-        .containingResource("test-resource.txt", "test-resource-not-exported.txt")
-        .dependingOn(loadsAppResourceInterceptorPlugin);
-
-    addPackedAppFromBuilder(nonExposingAppFileBuilder);
-
-    startDeployment();
-
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, nonExposingAppFileBuilder.getId());
-
-    executeApplicationFlow("main");
-  }
-
-  @Test
-  @Issue("MULE-13756")
-  @Description("Tests that code called form application's ProcessorInterceptor can access internal resources/packages of the application")
-  public void deploysAppWithInterceptorsAndLocalPackage() throws Exception {
-    File loadsOwnResourceInterceptorFactoryClassFile =
-        new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsOwnResourceInterceptorFactory.java"));
-    File loadsOwnResourceInterceptorClassFile =
-        new SingleClassCompiler().compile(getResourceFile("/org/foo/LoadsOwnResourceInterceptor.java"));
-
-    ApplicationFileBuilder nonExposingAppFileBuilder = appFileBuilder("non-exposing-app")
-        .configuredWith(EXPORTED_PACKAGES, "org.bar")
-        .configuredWith(EXPORTED_RESOURCES, "test-resource.txt")
-        .definedBy("app-with-interceptor.xml")
-        .containingClass(loadsOwnResourceInterceptorFactoryClassFile, "org/foo/LoadsOwnResourceInterceptorFactory.class")
-        .containingClass(loadsOwnResourceInterceptorClassFile, "org/foo/LoadsOwnResourceInterceptor.class")
-        .containingClass(barUtils1ClassFile, "org/bar/BarUtils.class")
-        .containingClass(echoTestClassFile, "org/foo/EchoTest.class")
-        .containingResource("test-resource.txt", "test-resource.txt")
-        .containingResource("test-resource.txt", "test-resource-not-exported.txt");
-
-    addPackedAppFromBuilder(nonExposingAppFileBuilder);
-
-    startDeployment();
-
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, nonExposingAppFileBuilder.getId());
 
     executeApplicationFlow("main");
   }
@@ -2145,10 +1994,13 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   @Issue("MULE-16995")
   @Description("This test covers an scenario where an app declares extensions-api as a shared library while using a privileged extension.")
   public void appWithUnneededExtensionsApiDepDeploys() throws Exception {
+    String extensionsApiLib = getProperty("extensionsApiLib");
+    assumeThat(extensionsApiLib == null, is(false));
+
     final ApplicationFileBuilder applicationFileBuilder = appFileBuilder("privilegedPluginApp")
         .definedBy(APP_WITH_PRIVILEGED_EXTENSION_PLUGIN_CONFIG)
         .dependingOn(createPrivilegedExtensionPlugin())
-        .dependingOnSharedLibrary(new JarFileBuilder("mule-extensions-api", new File(getProperty("extensionsApiLib")))
+        .dependingOnSharedLibrary(new JarFileBuilder("mule-extensions-api", new File(extensionsApiLib))
             .withGroupId("org.mule.runtime")
             .withVersion("1.1.6"));
     addPackedAppFromBuilder(applicationFileBuilder);
@@ -2308,6 +2160,50 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
+  public void redeployMethodRedeploysIfApplicationIsAlreadyDeployedPacked() throws Exception {
+    DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
+    deploymentService.addDeploymentListener(mockDeploymentListener);
+
+    // Deploy an application (packed)
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    startDeployment();
+
+    // Application was deployed
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(1)).onDeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+
+    reset(mockDeploymentListener);
+
+    // Redeploy by using redeploy method
+    deploymentService.redeploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+
+    // Application was redeployed
+    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+  }
+
+  @Test
+  public void redeployMethodRedeploysIfApplicationIsAlreadyDeployedExploded() throws Exception {
+    DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
+    deploymentService.addDeploymentListener(mockDeploymentListener);
+
+    // Deploy an application (exploded)
+    addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder);
+    startDeployment();
+
+    // Application was deployed
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(1)).onDeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+    verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+
+    // Redeploy by using redeploy method
+    deploymentService.redeploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+
+    // Application was redeployed
+    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+  }
+
+  @Test
   public void deployMethodRedeploysIfApplicationIsAlreadyDeployedPacked() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     deploymentService.addDeploymentListener(mockDeploymentListener);
@@ -2322,6 +2218,8 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
                                                                  dummyAppDescriptorFileBuilder.getId());
     verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(
                                                                    dummyAppDescriptorFileBuilder.getId());
+
+    reset(mockDeploymentListener);
 
     // Redeploy by using deploy method
     deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
@@ -2353,21 +2251,6 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     // Application was redeployed
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(
                                                                    dummyAppDescriptorFileBuilder.getId());
-  }
-
-  protected ApplicationFileBuilder appFileBuilder(final String artifactId) {
-    return new ApplicationFileBuilder(artifactId)
-        .withClassloaderModelVersion(classloaderModelVersion);
-  }
-
-  protected ApplicationFileBuilder appFileBuilder(String artifactId, ApplicationFileBuilder source) {
-    return new ApplicationFileBuilder(artifactId, source)
-        .withClassloaderModelVersion(classloaderModelVersion);
-  }
-
-  protected ApplicationFileBuilder appFileBuilder(String artifactId, boolean upperCaseInExtension) {
-    return new ApplicationFileBuilder(artifactId, upperCaseInExtension)
-        .withClassloaderModelVersion(classloaderModelVersion);
   }
 
   private void testTempFileOnRedeployment(CheckedRunnable deployApp, CheckedRunnable redeployApp) throws Exception {

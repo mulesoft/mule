@@ -17,8 +17,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_CONTINUE;
@@ -29,7 +32,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.rule.VerboseExceptions;
@@ -48,13 +50,13 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
 
   protected MuleContext muleContext = mockContextWithServices();
   private static final String DEFAULT_LOG_MESSAGE = "LOG";
+  private static final int DEFAULT_TIMEOUT = 5;
 
   @Rule
   public ExpectedException expectedException = none();
 
-  private final TestTransaction mockTransaction = spy(new TestTransaction(muleContext));
-  private final TestTransaction mockXaTransaction = spy(new TestTransaction(muleContext, true));
-
+  private TestTransaction mockTransaction;
+  private TestTransaction mockXaTransaction;
 
   private OnErrorContinueHandler onErrorContinueHandler;
 
@@ -67,15 +69,21 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
   public void before() throws Exception {
     super.before();
 
-    Transaction currentTransaction = TransactionCoordination.getInstance().getTransaction();
+    Transaction currentTransaction = getInstance().getTransaction();
     if (currentTransaction != null) {
-      TransactionCoordination.getInstance().unbindTransaction(currentTransaction);
+      getInstance().unbindTransaction(currentTransaction);
     }
 
     onErrorContinueHandler = new OnErrorContinueHandler();
     onErrorContinueHandler.setAnnotations(getFlowComponentLocationAnnotations(flow.getName()));
     onErrorContinueHandler.setMuleContext(muleContext);
     onErrorContinueHandler.setNotificationFirer(mock(NotificationDispatcher.class));
+
+    NotificationDispatcher notificationDispatcher = getNotificationDispatcher(muleContext);
+    mockTransaction =
+        spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
+    mockXaTransaction =
+        spy(new TestTransaction("appName", notificationDispatcher, true, DEFAULT_TIMEOUT));
   }
 
   @Test
@@ -137,7 +145,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
    */
   @Test
   public void messageToStringNotCalledOnFailure() throws Exception {
-    muleEvent = CoreEvent.builder(muleEvent).message(spy(of(""))).build();
+    muleEvent = builder(muleEvent).message(spy(of(""))).build();
     muleEvent = spy(muleEvent);
     when(mockException.getStackTrace()).thenReturn(new StackTraceElement[0]);
     when(mockException.getEvent()).thenReturn(muleEvent);
@@ -152,7 +160,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
   }
 
   private Processor createChagingEventMessageProcessor(final CoreEvent lastEventCreated) {
-    return event -> CoreEvent.builder(event).message(lastEventCreated.getMessage()).build();
+    return event -> builder(event).message(lastEventCreated.getMessage()).build();
   }
 
   private Processor createFailingEventMessageProcessor() {
@@ -162,14 +170,12 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
   }
 
   private Processor createSetStringMessageProcessor(final String appendText) {
-    return event -> {
-      return CoreEvent.builder(event).message(InternalMessage.builder(event.getMessage()).value(appendText).build()).build();
-    };
+    return event -> builder(event).message(InternalMessage.builder(event.getMessage()).value(appendText).build()).build();
   }
 
   private void configureXaTransactionAndSingleResourceTransaction() throws TransactionException {
-    TransactionCoordination.getInstance().bindTransaction(mockXaTransaction);
-    TransactionCoordination.getInstance().suspendCurrentTransaction();
-    TransactionCoordination.getInstance().bindTransaction(mockTransaction);
+    getInstance().bindTransaction(mockXaTransaction);
+    getInstance().suspendCurrentTransaction();
+    getInstance().bindTransaction(mockTransaction);
   }
 }

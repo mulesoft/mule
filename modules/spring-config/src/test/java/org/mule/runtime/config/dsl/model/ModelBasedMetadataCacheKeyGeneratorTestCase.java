@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
+import static org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue.plain;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 
@@ -45,6 +46,7 @@ import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
+import org.mule.runtime.app.declaration.api.ConnectionElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConstructElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterGroupElementDeclaration;
@@ -79,6 +81,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -86,9 +90,6 @@ import org.mockito.internal.creation.MockSettingsImpl;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslModelTestCase {
@@ -260,48 +261,6 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
   }
 
   @Test
-  public void allParametersAsRequiredForMetadataDoesNotModifyHash() throws Exception {
-
-    mockRequiredForMetadataModelProperty(configuration, null);
-    mockRequiredForMetadataModelProperty(connectionProvider, null);
-
-    MetadataCacheId keyParts = getIdForComponent(getBaseApp());
-    LOGGER.debug(keyParts.toString());
-
-    List<String> parameterNames = parameterGroupModel.getParameterModels().stream()
-        .map(parameterModel -> parameterModel.getName()).collect(Collectors.toList());
-
-    mockRequiredForMetadataModelProperty(configuration, parameterNames);
-    mockRequiredForMetadataModelProperty(connectionProvider, parameterNames);
-
-    MetadataCacheId otherKeyParts = getIdForComponent(getBaseApp());
-    LOGGER.debug(otherKeyParts.toString());
-
-    assertThat(keyParts, is(otherKeyParts));
-  }
-
-  @Test
-  public void allParametersInConnectionAsRequiredForMetadataDoesNotModifyHash() throws Exception {
-
-    mockRequiredForMetadataModelProperty(configuration, null);
-    mockRequiredForMetadataModelProperty(connectionProvider, null);
-
-    MetadataCacheId keyParts = getIdForComponent(getBaseApp());
-    LOGGER.debug(keyParts.toString());
-
-    List<String> parameterNames = parameterGroupModel.getParameterModels().stream()
-        .map(parameterModel -> parameterModel.getName()).collect(Collectors.toList());
-
-    mockRequiredForMetadataModelProperty(configuration, null);
-    mockRequiredForMetadataModelProperty(connectionProvider, parameterNames);
-
-    MetadataCacheId otherKeyParts = getIdForComponent(getBaseApp());
-    LOGGER.debug(otherKeyParts.toString());
-
-    assertThat(keyParts, is(otherKeyParts));
-  }
-
-  @Test
   public void configurationParametersAsRequireForMetadataModifiesHash() throws Exception {
 
     mockRequiredForMetadataModelProperty(configuration, null);
@@ -356,6 +315,25 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
     assertThat(keyParts, not(otherKeyParts));
 
+  }
+
+  @Test
+  public void metadataKeyCacheIdForConfigModelShouldIncludeConnectionParameters() throws Exception {
+    MetadataCacheId keyParts = getKeyHash(getBaseApp(), MY_CONFIG);
+    LOGGER.debug(keyParts.toString());
+
+    ArtifactDeclaration declaration = getBaseApp();
+    ConnectionElementDeclaration connectionElementDeclaration =
+        ((ConfigurationElementDeclaration) declaration.getGlobalElements().get(0))
+            .getConnection().get();
+
+    // Change the value of a connection parameter that is required for metadata
+    connectionElementDeclaration.getParameterGroups().get(0).getParameter("otherName").get().setValue(plain("changed"));
+
+    MetadataCacheId otherKeyParts = getKeyHash(declaration, MY_CONFIG);
+    LOGGER.debug(otherKeyParts.toString());
+
+    assertThat(otherKeyParts, not(is(keyParts)));
   }
 
   @Test
@@ -718,8 +696,10 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
   private void mockRequiredForMetadataModelProperty(EnrichableModel model, List<String> parameterNames) {
     if (parameterNames == null) {
+      List<String> allParameterNames = parameterGroupModel.getParameterModels().stream()
+          .map(parameterModel -> parameterModel.getName()).collect(Collectors.toList());
       when(model.getModelProperty(RequiredForMetadataModelProperty.class))
-          .thenReturn(empty());
+          .thenReturn(of(new RequiredForMetadataModelProperty(allParameterNames)));
     } else {
       RequiredForMetadataModelProperty requiredForMetadataModelProperty = new RequiredForMetadataModelProperty(parameterNames);
 
@@ -843,8 +823,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
   protected ApplicationModel loadApplicationModel(ArtifactDeclaration declaration) throws Exception {
     return new ApplicationModel(new ArtifactConfig.Builder().build(),
-                                declaration, extensions, emptyMap(), Optional.empty(), Optional.empty(),
-                                false, uri -> getClass().getResourceAsStream(uri));
+                                declaration, extensions, emptyMap(), empty(), empty(),
+                                uri -> getClass().getResourceAsStream(uri));
   }
 
   private void mockSimpleMetadataKeyId(OperationModel model) {
@@ -875,7 +855,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
                                                       METADATA_KEY_PART_1,
                                                       CATEGORY_NAME)));
 
-    when(model.getModelProperty(MetadataResolverFactoryModelProperty.class)).thenReturn(Optional.empty());
+    when(model.getModelProperty(MetadataResolverFactoryModelProperty.class)).thenReturn(empty());
 
     when(model.getAllParameterModels()).thenReturn(parameterModels);
   }
@@ -902,7 +882,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
             case METADATA_KEY_PART_3:
               return of(partThree);
           }
-          return Optional.empty();
+          return empty();
         });
 
     ObjectTypeBuilder groupType = BaseTypeBuilder.create(MetadataFormat.JAVA).objectType();
@@ -932,7 +912,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
       if (invocation.getArguments()[0].equals(MetadataKeyPartModelProperty.class)) {
         return of(new MetadataKeyPartModelProperty(order));
       }
-      return Optional.empty();
+      return empty();
     });
 
     when(metadataKeyId.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());

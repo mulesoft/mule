@@ -54,7 +54,6 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
@@ -120,13 +119,13 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   private ExpressionManager expressionManager;
 
   @Override
-  protected OperationMessageProcessor createOperationMessageProcessor() {
+  protected OperationMessageProcessor createOperationMessageProcessor() throws MuleException {
     OperationMessageProcessor operationMessageProcessor =
         new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
                                       cursorStreamProviderFactory, new NoRetryPolicyTemplate(), extensionManager,
                                       mockPolicyManager, reflectionCache);
     operationMessageProcessor.setAnnotations(getFlowComponentLocationAnnotations(FLOW_NAME));
-    return operationMessageProcessor;
+    return muleContext.getInjector().inject(operationMessageProcessor);
   }
 
   @Test
@@ -318,7 +317,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
   @Test
   public void operationWithExpressionInTargetParameter() throws Exception {
-
     String flowName = FLOW_NAME;
     target = "#[mel:someExpression]";
     messageProcessor = createOperationMessageProcessor();
@@ -492,7 +490,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(valueResolver.resolve(any(ValueResolvingContext.class))).thenReturn("person");
   }
 
-  private void setUpOperationReturning(Object payload, Type type) throws InitialisationException {
+  private void setUpOperationReturning(Object payload, Type type) throws MuleException {
     messageProcessor = createOperationMessageProcessor();
     MetadataType mapType = new DefaultExtensionsTypeLoaderFactory().createTypeLoader().load(type);
     when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("desc", mapType, false, emptySet()));

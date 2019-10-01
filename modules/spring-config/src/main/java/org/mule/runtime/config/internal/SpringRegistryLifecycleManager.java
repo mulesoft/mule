@@ -25,10 +25,8 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.security.SecurityManager;
-import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.queue.QueueManager;
@@ -97,10 +95,18 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
           Initialisable.class
       });
 
-      setIgnoredObjectTypes(new Class[] {ExtensionManager.class, SpringRegistry.class, SpringRegistryBootstrap.class,
-          Component.class, MessageSource.class, InterceptingMessageProcessor.class, AbstractMessageProcessorOwner.class,
-          FlowExceptionHandler.class, OutboundRouter.class,
-          MessageProcessorChain.class, MuleContext.class, Service.class});
+      setIgnoredObjectTypes(new Class[] {
+          ExtensionManager.class,
+          SpringRegistry.class,
+          SpringRegistryBootstrap.class,
+          Component.class,
+          InterceptingMessageProcessor.class,
+          FlowExceptionHandler.class,
+          OutboundRouter.class,
+          MessageProcessorChain.class,
+          MuleContext.class,
+          Service.class
+      });
     }
 
 
@@ -146,8 +152,14 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
     public SpringContextDisposePhase() {
       super();
-      setIgnoredObjectTypes(new Class[] {Component.class, MessageSource.class, InterceptingMessageProcessor.class,
-          OutboundRouter.class, MuleContext.class, ServerNotificationManager.class, Service.class});
+      setIgnoredObjectTypes(new Class[] {
+          Component.class,
+          InterceptingMessageProcessor.class,
+          OutboundRouter.class,
+          MuleContext.class,
+          ServerNotificationManager.class,
+          Service.class
+      });
     }
 
     @Override

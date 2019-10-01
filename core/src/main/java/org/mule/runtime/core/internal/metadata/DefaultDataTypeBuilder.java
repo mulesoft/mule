@@ -75,6 +75,8 @@ public class DefaultDataTypeBuilder
   private DataType itemType = OBJECT;
   private DataType valueType = OBJECT;
 
+  private DataType original = OBJECT;
+  private boolean mutated = false;
   private boolean built = false;
 
   public DefaultDataTypeBuilder() {
@@ -82,6 +84,7 @@ public class DefaultDataTypeBuilder
   }
 
   public DefaultDataTypeBuilder(DataType dataType) {
+    this.original = dataType;
     if (dataType instanceof CollectionDataType) {
       this.typeRef = new WeakReference<>(dataType.getType());
       this.itemTypeBuilder = DataType.builder(((CollectionDataType) dataType).getItemDataType());
@@ -115,6 +118,7 @@ public class DefaultDataTypeBuilder
     requireNonNull(type, "'type' cannot be null.");
     this.typeRef = new WeakReference<>(handleProxy(type));
 
+    mutated = true;
     return this;
   }
 
@@ -249,6 +253,7 @@ public class DefaultDataTypeBuilder
 
   @Override
   public DataTypeCollectionTypeBuilder asCollectionTypeBuilder() {
+    mutated = true;
     return this;
   }
 
@@ -268,6 +273,7 @@ public class DefaultDataTypeBuilder
 
   @Override
   public DataTypeFunctionTypeBuilder asFunctionTypeBuilder() {
+    mutated = true;
     return this;
   }
 
@@ -302,6 +308,7 @@ public class DefaultDataTypeBuilder
 
   @Override
   public DataTypeMapTypeBuilder asMapTypeBuilder() {
+    mutated = true;
     return this;
   }
 
@@ -323,18 +330,21 @@ public class DefaultDataTypeBuilder
       this.itemTypeBuilder = DataType.builder();
     }
     this.itemTypeBuilder.type(handleProxy(itemType));
+    mutated = true;
     return this;
   }
 
   @Override
   public DataTypeFunctionTypeBuilder returnType(DataType dataType) {
     this.returnType = dataType;
+    mutated = true;
     return this;
   }
 
   @Override
   public DataTypeFunctionTypeBuilder parametersType(List<FunctionParameter> list) {
     this.parametersType = list;
+    mutated = true;
     return this;
   }
 
@@ -348,6 +358,7 @@ public class DefaultDataTypeBuilder
       this.keyTypeBuilder = DataType.builder();
     }
     this.keyTypeBuilder.type(handleProxy(keyType));
+    mutated = true;
     return this;
   }
 
@@ -361,6 +372,7 @@ public class DefaultDataTypeBuilder
       this.valueTypeBuilder = DataType.builder();
     }
     this.valueTypeBuilder.type(handleProxy(valueType));
+    mutated = true;
     return this;
   }
 
@@ -380,6 +392,7 @@ public class DefaultDataTypeBuilder
     validateAlreadyBuilt();
 
     this.mediaType = MediaType.parse(mediaType);
+    mutated = true;
     return this;
   }
 
@@ -389,6 +402,7 @@ public class DefaultDataTypeBuilder
     validateAlreadyBuilt();
 
     this.mediaType = mediaType;
+    mutated = true;
     return this;
   }
 
@@ -397,6 +411,7 @@ public class DefaultDataTypeBuilder
     validateAlreadyBuilt();
 
     itemTypeBuilder.mediaType(itemMimeType);
+    mutated = true;
     return this;
   }
 
@@ -405,6 +420,7 @@ public class DefaultDataTypeBuilder
     validateAlreadyBuilt();
 
     itemTypeBuilder.mediaType(itemMediaType);
+    mutated = true;
     return this;
   }
 
@@ -413,6 +429,7 @@ public class DefaultDataTypeBuilder
     validateAlreadyBuilt();
 
     keyTypeBuilder.mediaType(keyMediaType);
+    mutated = true;
     return this;
   }
 
@@ -421,6 +438,7 @@ public class DefaultDataTypeBuilder
     validateAlreadyBuilt();
 
     keyTypeBuilder.mediaType(keyMediaType);
+    mutated = true;
     return this;
   }
 
@@ -429,6 +447,7 @@ public class DefaultDataTypeBuilder
     validateAlreadyBuilt();
 
     valueTypeBuilder.mediaType(valueMediaType);
+    mutated = true;
     return this;
   }
 
@@ -437,6 +456,7 @@ public class DefaultDataTypeBuilder
     validateAlreadyBuilt();
 
     valueTypeBuilder.mediaType(valueMediaType);
+    mutated = true;
     return this;
   }
 
@@ -455,6 +475,7 @@ public class DefaultDataTypeBuilder
     } else {
       mediaType = mediaType.withCharset(null);
     }
+    mutated = true;
     return this;
   }
 
@@ -463,6 +484,7 @@ public class DefaultDataTypeBuilder
     validateAlreadyBuilt();
 
     mediaType = mediaType.withCharset(charset);
+    mutated = true;
     return this;
   }
 
@@ -510,6 +532,9 @@ public class DefaultDataTypeBuilder
   public DataType build() {
     if (built) {
       throwAlreadyBuilt();
+    }
+    if (!mutated) {
+      return original;
     }
 
     built = true;

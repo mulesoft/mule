@@ -23,8 +23,9 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
-import static org.mule.runtime.deployment.model.internal.artifact.ArtifactUtils.createBundleDescriptorFromName;
+import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
+import static org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager.isCompatibleBundle;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
@@ -59,9 +60,10 @@ import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifact;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
+import org.mule.runtime.module.deployment.impl.internal.domain.AmbiguousDomainReferenceException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
-import org.mule.runtime.module.deployment.impl.internal.domain.IncompatibleDomainVersionException;
+import org.mule.runtime.module.deployment.impl.internal.domain.IncompatibleDomainException;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
 import java.io.File;
@@ -154,21 +156,11 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     return descriptor;
   }
 
-  private Domain internalGetDomain() throws IncompatibleDomainVersionException, DomainNotFoundException {
-    Optional<BundleDescriptor> domainBundleDescriptor = descriptor.getDomainDescriptor();
-    if (domainBundleDescriptor.isPresent()) {
-      return domainRepository.getDomain(domainBundleDescriptor.get());
-    } else {
-      return domainRepository.getDomain(createBundleDescriptorFromName(descriptor.getDomainName()));
-    }
-  }
-
   @Override
   public Domain getDomain() {
     try {
-      return internalGetDomain();
-    } catch (IncompatibleDomainVersionException | DomainNotFoundException e) {
-      // return null to avoid breaking api
+      return getApplicationDomain(domainRepository, descriptor);
+    } catch (DomainNotFoundException | IncompatibleDomainException | AmbiguousDomainReferenceException e) {
       return null;
     }
   }
@@ -230,7 +222,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
               .setPolicyProvider(policyManager)
               .setRuntimeComponentBuildingDefinitionProvider(runtimeComponentBuildingDefinitionProvider);
 
-      Domain domain = internalGetDomain();
+      Domain domain = getApplicationDomain(domainRepository, descriptor);
       if (domain.getRegistry() != null) {
         artifactBuilder.setParentArtifact(domain);
       }
@@ -400,6 +392,39 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   @Override
   public String toString() {
     return format("%s[%s]@%s", getClass().getName(), descriptor.getName(), Integer.toHexString(System.identityHashCode(this)));
+  }
+
+  static Domain getApplicationDomain(DomainRepository domainRepository, ApplicationDescriptor descriptor)
+      throws DomainNotFoundException, IncompatibleDomainException, AmbiguousDomainReferenceException {
+    Domain resolvedDomain = resolveApplicationDomain(domainRepository, descriptor);
+    descriptor.setDomainName(resolvedDomain.getDescriptor().getName());
+    return resolvedDomain;
+  }
+
+  private static Domain resolveApplicationDomain(DomainRepository domainRepository, ApplicationDescriptor descriptor)
+      throws DomainNotFoundException, IncompatibleDomainException, AmbiguousDomainReferenceException {
+    String configuredDomainName = descriptor.getDomainName();
+    Optional<BundleDescriptor> domainBundleDescriptor = descriptor.getDomainDescriptor();
+
+    boolean shouldUseDefaultDomain = (configuredDomainName == null) || DEFAULT_DOMAIN_NAME.equals(configuredDomainName);
+    if (!shouldUseDefaultDomain && !domainBundleDescriptor.isPresent()) {
+      throw new IllegalStateException(format("Dependency for domain '%s' was not declared", configuredDomainName));
+    }
+
+    if (!domainBundleDescriptor.isPresent()) {
+      return domainRepository.getDomain(DEFAULT_DOMAIN_NAME);
+    }
+
+    if (configuredDomainName != null) {
+      Domain foundDomain = domainRepository.getDomain(configuredDomainName);
+      if (isCompatibleBundle(foundDomain.getDescriptor().getBundleDescriptor(), domainBundleDescriptor.get())) {
+        return foundDomain;
+      } else {
+        throw new IncompatibleDomainException(configuredDomainName, foundDomain);
+      }
+    }
+
+    return domainRepository.getCompatibleDomain(domainBundleDescriptor.get());
   }
 
 }

@@ -67,7 +67,7 @@ class BackPressureStrategySelector {
       throws FlowBackPressureException {
     final BackPressureReason reason = abstractPipeline.getProcessingStrategy().checkBackpressureEmitting(event);
     if (reason != null) {
-      createAndThrowIfNeeded(abstractPipeline.getName(), reason);
+      throw abstractPipeline.getBackPressureExceptions().get(reason);
     }
   }
 

@@ -17,13 +17,13 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.processor.Processor;
 
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
-
 import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
+
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 
 public class FlowTraceUtils {
 
@@ -61,7 +61,7 @@ public class FlowTraceUtils {
     }
   }
 
-
+  @SafeVarargs
   public static void assertStackElements(FlowCallStack flowStack, Matcher<FlowStackElement>... flowStackElementMatchers) {
     assertThat(flowStack.toString(), flowStack.getElements(), hasSize(flowStackElementMatchers.length));
     int i = 0;

@@ -10,76 +10,116 @@ package org.mule.runtime.module.deployment.impl.internal.domain;
 import static java.lang.String.format;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
 import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Manages {@link Domain} instances created on the container.
  */
 public class DefaultDomainManager implements DomainRepository, DomainManager {
 
-  private Map<SemVerBundleDescriptorWrapper, Domain> domainsByDescriptor = new HashMap<>();
+  private Map<String, Domain> domainsByName = new HashMap<>();
 
   @Override
-  public Domain getDomain(BundleDescriptor bundleDescriptor) throws DomainNotFoundException, IncompatibleDomainVersionException {
-    SemVerBundleDescriptorWrapper bundleDescriptorWrapper = new SemVerBundleDescriptorWrapper(bundleDescriptor);
-    Domain domain = domainsByDescriptor.get(bundleDescriptorWrapper);
-    if (domain == null) {
-      throw new DomainNotFoundException(bundleDescriptor.getArtifactFileName(), domainsByDescriptor.keySet());
+  public void addDomain(Domain domain) {
+    String domainName = getDomainName(domain);
+    if (domainsByName.containsKey(domainName)) {
+      throw new IllegalArgumentException(format("Domain '%s' already exists", domainName));
     }
 
-    String availableVersion = domain.getDescriptor().getBundleDescriptor().getVersion();
-    String expectedVersion = bundleDescriptor.getVersion();
-    if (isCompatibleVersion(availableVersion, expectedVersion)) {
-      return domain;
-    } else {
-      throw new IncompatibleDomainVersionException(bundleDescriptor.getArtifactFileName(), availableVersion);
-    }
+    domainsByName.put(domainName, domain);
   }
 
   @Override
-  public boolean contains(BundleDescriptor descriptor) {
-    SemVerBundleDescriptorWrapper bundleDescriptorWrapper = new SemVerBundleDescriptorWrapper(descriptor);
-    if (domainsByDescriptor.containsKey(bundleDescriptorWrapper)) {
-      Domain domain = domainsByDescriptor.get(bundleDescriptorWrapper);
-      String availableVersion = domain.getDescriptor().getBundleDescriptor().getVersion();
-      String expectedVersion = descriptor.getVersion();
-      return isCompatibleVersion(availableVersion, expectedVersion);
+  public void removeDomain(Domain domain) {
+    String domainName = getDomainName(domain);
+    domainsByName.remove(domainName);
+  }
+
+  @Override
+  public Domain getDomain(String domainName) throws DomainNotFoundException {
+    if (!domainsByName.containsKey(domainName)) {
+      throw new DomainNotFoundException(domainName, domainsByName.keySet());
+    }
+
+    return domainsByName.get(domainName);
+  }
+
+  @Override
+  public boolean contains(String name) {
+    return domainsByName.containsKey(name);
+  }
+
+  @Override
+  public Domain getCompatibleDomain(BundleDescriptor wantedDescriptor)
+      throws DomainNotFoundException, AmbiguousDomainReferenceException {
+    Set<String> foundDomainNames = new HashSet<>();
+    Domain lastFoundDomain = null;
+
+    for (Domain domain : domainsByName.values()) {
+      BundleDescriptor currentDescriptor = domain.getDescriptor().getBundleDescriptor();
+      if (currentDescriptor == null) {
+        // Skip the domains without bundle descriptor (default, for example)
+        continue;
+      }
+
+      if (isCompatibleBundle(currentDescriptor, wantedDescriptor)) {
+        foundDomainNames.add(domain.getDescriptor().getName());
+        lastFoundDomain = domain;
+      }
+    }
+
+    if (foundDomainNames.size() < 1) {
+      throw new DomainNotFoundException(wantedDescriptor.getArtifactFileName(), domainsByName.keySet());
+    }
+
+    if (foundDomainNames.size() > 1) {
+      throw new AmbiguousDomainReferenceException(wantedDescriptor, foundDomainNames);
+    }
+
+    return lastFoundDomain;
+  }
+
+  @Override
+  public boolean containsCompatible(BundleDescriptor descriptor) {
+    for (Domain domain : domainsByName.values()) {
+      if (isCompatibleBundle(domain.getDescriptor().getBundleDescriptor(), descriptor)) {
+        return true;
+      }
     }
 
     return false;
   }
 
-  @Override
-  public void addDomain(Domain domain) {
-    final SemVerBundleDescriptorWrapper bundleDescriptorWrapper = new SemVerBundleDescriptorWrapper(domain.getDescriptor());
-    Domain foundDomain = domainsByDescriptor.get(bundleDescriptorWrapper);
-    if (foundDomain != null) {
-      throw new IllegalArgumentException(getDomainAlreadyExistsErrorMessage(getDomainName(domain), getDomainName(foundDomain)));
-    }
-    domainsByDescriptor.put(bundleDescriptorWrapper, domain);
-  }
-
-  @Override
-  public void removeDomain(Domain domain) {
-    final SemVerBundleDescriptorWrapper bundleDescriptorWrapper = new SemVerBundleDescriptorWrapper(domain.getDescriptor());
-    domainsByDescriptor.remove(bundleDescriptorWrapper);
-  }
-
   private static String getDomainName(Domain domain) {
-    DomainDescriptor domainDescriptor = domain.getDescriptor();
-    BundleDescriptor bundleDescriptor = domainDescriptor.getBundleDescriptor();
-    if (bundleDescriptor == null) {
-      return domainDescriptor.getName();
-    } else {
-      return bundleDescriptor.getArtifactFileName();
-    }
+    return domain.getDescriptor().getName();
   }
 
-  private static String getDomainAlreadyExistsErrorMessage(String requestedDomainName, String foundDomainName) {
-    return format("Trying to add domain '%s', but a domain named '%s' was found", requestedDomainName, foundDomainName);
+  /**
+   * Determines if a bundle descriptor is compatible with another one.
+   *
+   * @param available bundle descriptor that is available to use.
+   * @param expected bundle descriptor that is expected.
+   * @return true if match in group and artifact id, have the same classifier and the versions are compatible, false otherwise.
+   */
+  public static boolean isCompatibleBundle(BundleDescriptor available, BundleDescriptor expected) {
+    if (!available.getClassifier().equals(expected.getClassifier())) {
+      return false;
+    }
+
+    if (!available.getGroupId().equals(expected.getGroupId())) {
+      return false;
+    }
+
+    if (!available.getArtifactId().equals(expected.getArtifactId())) {
+      return false;
+    }
+
+    return isCompatibleVersion(available.getVersion(), expected.getVersion());
   }
+
 }

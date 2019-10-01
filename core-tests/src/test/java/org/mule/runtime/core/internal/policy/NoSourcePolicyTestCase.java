@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static java.util.Optional.empty;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
@@ -28,6 +30,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
+import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -107,7 +110,11 @@ public class NoSourcePolicyTestCase extends AbstractMuleTestCase {
         block(callback -> noSourcePolicy.process(initialEvent, respParametersProcessor, callback));
 
     assertThat(result.getRight(), nullValue());
-    assertThat(result.getLeft().getMessagingException().getEvent(), is(initialEvent));
+    assertThat(result.getLeft().getMessagingException().getEvent().getMessage(), Is.is(initialEvent.getMessage()));
+    assertThat(result.getLeft().getMessagingException().getEvent().getContext(), Is.is(initialEvent.getContext()));
+    assertThat(result.getLeft().getMessagingException().getEvent().getSecurityContext(),
+               Is.is(initialEvent.getSecurityContext()));
+    assertThat(result.getLeft().getMessagingException().getEvent().getError(), not(Is.is(empty())));
     assertThat(result.getLeft().getErrorResponseParameters().get(), is(errorParameters));
   }
 

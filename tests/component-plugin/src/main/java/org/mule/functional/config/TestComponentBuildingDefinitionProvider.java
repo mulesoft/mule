@@ -24,6 +24,8 @@ import org.mule.functional.api.component.EventCallback;
 import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.functional.api.component.InvocationCountMessageProcessor;
 import org.mule.functional.api.component.LifecycleObject;
+import org.mule.functional.api.component.LifecycleTrackerScope;
+import org.mule.functional.api.component.LifecycleTrackerSource;
 import org.mule.functional.api.component.LogChecker;
 import org.mule.functional.api.component.OnErrorCheckLogHandler;
 import org.mule.functional.api.component.ResponseAssertionMessageProcessor;
@@ -147,6 +149,16 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("lifecycle-tracker-check")
         .withTypeDefinition(fromType(LifecycleTrackerCheckProcessor.class))
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition
+        .withIdentifier("lifecycle-tracker-source")
+        .withTypeDefinition(fromType(LifecycleTrackerSource.class))
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition
+        .withIdentifier("lifecycle-tracker-scope")
+        .withTypeDefinition(fromType(LifecycleTrackerScope.class))
         .build());
 
     componentBuildingDefinitions.add(baseDefinition

@@ -8,6 +8,7 @@ package org.mule.runtime.core.privileged.execution;
 
 import static java.lang.String.format;
 import static java.util.regex.Pattern.compile;
+import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
 
@@ -29,8 +30,6 @@ import javax.xml.namespace.QName;
  */
 @NoExtend
 public abstract class LocationExecutionContextProvider extends ComponentLocationProvider implements ExceptionContextProvider {
-
-
 
   private static final Pattern URL_PATTERN = compile("url=\"[a-z]*://([^@]*)@");
   private static final Pattern ADDRESS_PATTERN = compile("address=\"[a-z]*://([^@]*)@");
@@ -79,15 +78,8 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
       beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, sourceCode);
     }
 
-    String documentationName = docAttributes.get("name");
-    if (documentationName != null) {
-      beanAnnotations.put(NAME_ANNOTATION_KEY, documentationName);
-    }
-    docAttributes.forEach((key, value) -> {
-      if (!key.equals("name")) {
-        beanAnnotations.put(QName.valueOf(key), value);
-      }
-    });
+    beanAnnotations.putAll(docAttributes.entrySet().stream()
+        .collect(toMap(e -> QName.valueOf(e.getKey()), e -> e.getValue())));
   }
 
   protected static String getSourceXML(Component element) {

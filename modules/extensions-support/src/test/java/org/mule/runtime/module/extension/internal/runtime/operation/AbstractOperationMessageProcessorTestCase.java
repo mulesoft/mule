@@ -43,6 +43,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.s
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
 import org.mule.metadata.api.model.StringType;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -394,7 +395,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     return messageProcessor;
   }
 
-  protected abstract OperationMessageProcessor createOperationMessageProcessor();
+  protected abstract OperationMessageProcessor createOperationMessageProcessor() throws MuleException;
 
   @Test
   public void initialise() throws Exception {

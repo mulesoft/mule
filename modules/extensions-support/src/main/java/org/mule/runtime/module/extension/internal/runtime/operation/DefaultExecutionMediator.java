@@ -47,7 +47,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -93,7 +92,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
                                   ErrorTypeRepository typeRepository,
                                   ValueTransformer... valueTransformers) {
     this.connectionManager = connectionManager;
-    this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel);
+    this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel, typeRepository);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     this.valueTransformers = valueTransformers != null ? asList(valueTransformers) : emptyList();
   }
@@ -149,33 +148,10 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     }
   }
 
-  private void executeWithoutRetry(Consumer<ExecutorCallback> executeCommand,
-                                   BiConsumer<ExecutorCallback, Object> onSuccess,
-                                   BiConsumer<ExecutorCallback, Throwable> onError,
-                                   ExecutorCallback callback) {
-
-    ExecutorCallback hack = new ExecutorCallback() {
-
-      @Override
-      public void complete(Object value) {
-        onSuccess.accept(callback, value);
-      }
-
-      @Override
-      public void error(Throwable e) {
-        onError.accept(callback, e);
-      }
-    };
-
-    executeCommand.accept(hack);
-  }
-
   private void executeWithRetry(ExecutionContextAdapter<M> context,
                                 RetryPolicyTemplate retryPolicy,
                                 List<Interceptor> executedInterceptors,
                                 Consumer<ExecutorCallback> executeCommand,
-                                BiConsumer<ExecutorCallback, Object> onSuccess,
-                                BiConsumer<ExecutorCallback, Throwable> onError,
                                 ExecutorCallback callback) {
 
     retryPolicy.applyPolicy(() -> {
@@ -194,9 +170,9 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
                             context.getCurrentScheduler())
         .whenComplete((v, e) -> {
           if (e != null) {
-            onError.accept(callback, e);
+            callback.error(e);
           } else {
-            onSuccess.accept(callback, v);
+            callback.complete(v);
           }
         });
   }
@@ -236,41 +212,46 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       }
     };
 
-    BiConsumer<ExecutorCallback, Object> onSuccess = (callback, value) -> {
-      // after() method cannot be invoked in the finally. Needs to be explicitly called before completing the callback.
-      // Race conditions appear otherwise, specially in connection pooling scenarios.
-      try {
-        value = transform(context, value);
-        onSuccess(context, value, executedInterceptors);
-        after(context, value, executedInterceptors);
-        callback.complete(value);
-      } catch (Throwable t) {
-        try {
-          t = handleError(t, context, executedInterceptors);
-        } finally {
-          try {
-            after(context, value, executedInterceptors);
-          } finally {
-            callback.error(t);
-          }
-        }
-      } finally {
-        if (stats != null) {
-          stats.discountInflightOperation();
-        }
-      }
-    };
+    ExecutorCallback callbackDelegate = new ExecutorCallback() {
 
-    BiConsumer<ExecutorCallback, Throwable> onError = (callback, t) -> {
-      t = handleError(t, context, executedInterceptors);
-      try {
-        after(context, null, executedInterceptors);
-      } finally {
+      @Override
+      public void complete(Object value) {
+        // after() method cannot be invoked in the finally. Needs to be explicitly called before completing the callback.
+        // Race conditions appear otherwise, specially in connection pooling scenarios.
         try {
-          callback.error(t);
+          value = transform(context, value);
+          onSuccess(context, value, executedInterceptors);
+          after(context, value, executedInterceptors);
+          executorCallback.complete(value);
+        } catch (Throwable t) {
+          try {
+            t = handleError(t, context, executedInterceptors);
+          } finally {
+            try {
+              after(context, value, executedInterceptors);
+            } finally {
+              executorCallback.error(t);
+            }
+          }
         } finally {
           if (stats != null) {
             stats.discountInflightOperation();
+          }
+        }
+      }
+
+      @Override
+      public void error(Throwable t) {
+        t = handleError(t, context, executedInterceptors);
+        try {
+          after(context, null, executedInterceptors);
+        } finally {
+          try {
+            executorCallback.error(t);
+          } finally {
+            if (stats != null) {
+              stats.discountInflightOperation();
+            }
           }
         }
       }
@@ -278,9 +259,9 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
     RetryPolicyTemplate retryPolicy = context.getRetryPolicyTemplate().orElse(null);
     if (retryPolicy != null && retryPolicy.isEnabled()) {
-      executeWithRetry(context, retryPolicy, executedInterceptors, executeCommand, onSuccess, onError, executorCallback);
+      executeWithRetry(context, retryPolicy, executedInterceptors, executeCommand, callbackDelegate);
     } else {
-      executeWithoutRetry(executeCommand, onSuccess, onError, executorCallback);
+      executeCommand.accept(callbackDelegate);
     }
   }
 

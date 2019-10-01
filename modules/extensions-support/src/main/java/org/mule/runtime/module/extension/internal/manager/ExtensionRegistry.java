@@ -19,21 +19,15 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.extension.api.runtime.config.ExpirableConfigurationProvider;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,7 +49,7 @@ final class ExtensionRegistry {
       CacheBuilder.newBuilder().build(new CacheLoader<ExtensionModel, Multimap<ConfigurationModel, ConfigurationProvider>>() {
 
         @Override
-        public Multimap<ConfigurationModel, ConfigurationProvider> load(ExtensionModel key) throws Exception {
+        public Multimap<ConfigurationModel, ConfigurationProvider> load(ExtensionModel key) {
           List<ConfigurationProvider> providers = registry.lookupAllByType(ConfigurationProvider.class).stream()
               .filter(provider -> provider.getExtensionModel() == key).collect(toImmutableList());
           Multimap multimap = HashMultimap.create();
@@ -107,18 +101,6 @@ final class ExtensionRegistry {
    */
   boolean containsExtension(String name) {
     return extensions.containsKey(new ExtensionEntityKey(name));
-
-  }
-
-  /**
-   * Returns all the {@link ConfigurationProvider configuration providers} which serve {@link ConfigurationModel configuration
-   * models} owned by {@code extensionModel}
-   *
-   * @param extensionModel a registered {@link ExtensionModel}
-   * @return an immutable {@link List}. Might be empty but will never be {@code null}
-   */
-  Collection<ConfigurationProvider> getConfigurationProviders(ExtensionModel extensionModel) {
-    return providersByExtension.getUnchecked(extensionModel).values();
   }
 
   /**
@@ -150,24 +132,7 @@ final class ExtensionRegistry {
                                                                 configurationProvider.getName())),
                                      e);
     }
-
     providersByExtension.invalidate(configurationProvider.getExtensionModel());
-  }
-
-  /**
-   * Returns a {@link Multimap} which keys are registrations keys and the values are the {@link ConfigurationInstance} instances
-   * which are expired
-   *
-   * @return an immutable {@link Multimap}
-   */
-  Multimap<String, ConfigurationInstance> getExpiredConfigs() {
-    ListMultimap<String, ConfigurationInstance> expired = ArrayListMultimap.create();
-    for (ExtensionModel extensionModel : extensions.values()) {
-      getConfigurationProviders(extensionModel).stream().filter(provider -> provider instanceof ExpirableConfigurationProvider)
-          .forEach(provider -> expired.putAll(provider.getName(), ((ExpirableConfigurationProvider) provider).getExpired()));
-    }
-
-    return Multimaps.unmodifiableListMultimap(expired);
   }
 
 }

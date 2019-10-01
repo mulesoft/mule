@@ -9,21 +9,22 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.MediaTypeUtils.getDefaultMediaType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.MediaTypeUtils;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -44,6 +45,8 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import javax.transaction.TransactionManager;
 
 /**
  * Default implementation of {@link SourceCallback}. Instances are to be created through the {@link #builder()} method.
@@ -98,6 +101,21 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
       return this;
     }
 
+    public Builder<T, A> setApplicationName(String applicationName) {
+      product.applicationName = applicationName;
+      return this;
+    }
+
+    public Builder<T, A> setNotificationDispatcher(NotificationDispatcher notificationDispatcher) {
+      product.notificationDispatcher = notificationDispatcher;
+      return this;
+    }
+
+    public Builder<T, A> setTransactionFactoryManager(SingleResourceTransactionFactoryManager transactionFactoryManager) {
+      product.transactionFactoryManager = transactionFactoryManager;
+      return this;
+    }
+
     public Builder<T, A> setSource(ExtensionMessageSource messageSource) {
       product.messageSource = messageSource;
       return this;
@@ -137,10 +155,13 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
       checkArgument(product.sourceModel, "source");
       checkArgument(product.cursorProviderFactory, "cursorStreamProviderFactory");
       checkArgument(product.messageSource, "messageSource");
-      checkArgument(product.muleContext, "muleContext");
+      checkArgument(product.applicationName, "applicationName");
+      checkArgument(product.notificationDispatcher, "notificationDispatcher");
+      checkArgument(product.transactionFactoryManager, "transactionFactoryManager");
 
       product.transactionSourceBinder =
-          new TransactionSourceBinder(product.messageSource.getExtensionModel(), product.sourceModel, product.muleContext);
+          new TransactionSourceBinder(product.messageSource.getExtensionModel(), product.sourceModel, product.applicationName,
+                                      product.notificationDispatcher, product.transactionFactoryManager);
 
       return product;
     }
@@ -163,6 +184,9 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   private ConfigurationInstance configurationInstance;
   private Processor listener;
   private MuleContext muleContext;
+  private String applicationName;
+  private NotificationDispatcher notificationDispatcher;
+  private SingleResourceTransactionFactoryManager transactionFactoryManager;
   private ExtensionMessageSource messageSource;
   private ExceptionCallback<ConnectionException> exceptionCallback;
   private MessageProcessingManager messageProcessingManager;
@@ -187,9 +211,9 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     Map<String, Object> initialisationParameters = messageSource.getInitialisationParameters();
 
     encodingParam = ofNullable((String) initialisationParameters.get(ENCODING_PARAMETER_NAME))
-        .map(encoding -> parseCharset(encoding));
+        .map(MediaTypeUtils::parseCharset);
     mimeTypeInitParam = ofNullable((String) initialisationParameters.get(MIME_TYPE_PARAMETER_NAME))
-        .map(mimeType -> MediaType.parse(mimeType));
+        .map(MediaType::parse);
   });
 
   /**
@@ -237,10 +261,10 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
                            SourceResultAdapter resultAdapter) {
     SourceCallbackContextAdapter contextAdapter = (SourceCallbackContextAdapter) context;
     messageProcessingManager.processMessage(
-                                            new FlowProcessingTemplate(resultAdapter, listener,
-                                                                       contextAdapter.getNotificationsFunctions(),
-                                                                       completionHandlerFactory
-                                                                           .createCompletionHandler(contextAdapter)),
+                                            new ExtensionsFlowProcessingTemplate(resultAdapter, listener,
+                                                                                 contextAdapter.getNotificationsFunctions(),
+                                                                                 completionHandlerFactory
+                                                                                     .createCompletionHandler(contextAdapter)),
                                             messageProcessContext);
   }
 
@@ -322,8 +346,27 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     return messageSource.getExtensionModel().getName();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public ComponentLocation getSourceLocation() {
     return messageSource.getLocation();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public TransactionManager getTransactionManager() {
+    return muleContext.getTransactionManager();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int getTimeout() {
+    return getTransactionConfig().getTimeout();
   }
 }

@@ -17,11 +17,9 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_DOMAIN_IDENT
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_EE_DOMAIN_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry.WrapperElementType.SINGLE;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.addAnnotation;
-import static org.mule.runtime.config.internal.dsl.spring.WrapperElementType.COLLECTION;
-import static org.mule.runtime.config.internal.dsl.spring.WrapperElementType.MAP;
-import static org.mule.runtime.config.internal.dsl.spring.WrapperElementType.SINGLE;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.DESCRIPTION_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.DOC_DESCRIPTION_IDENTIFIER;
@@ -46,7 +44,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
-import org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
@@ -55,9 +52,7 @@ import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
-import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
-import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,7 +64,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
@@ -189,12 +183,6 @@ public class BeanDefinitionFactory {
       return null;
     }
 
-    if (!componentModel.isEnabled()) {
-      // Just register the location, for support of lazyInit scenarios
-      componentLocator.addComponentLocation(componentModel.getComponentLocation());
-      return null;
-    }
-
     resolveComponentBeanDefinition(componentModel);
     componentDefinitionModelProcessor.accept(componentModel, registry);
 
@@ -218,7 +206,8 @@ public class BeanDefinitionFactory {
               addAnnotation(ANNOTATION_ERROR_MAPPINGS, errorMappingComponents.stream().map(innerComponent -> {
                 Map<String, String> parameters = innerComponent.getParameters();
                 ComponentIdentifier source = parameters.containsKey(SOURCE_TYPE)
-                    ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE)) : ANY;
+                    ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE))
+                    : ANY;
 
                 ErrorType errorType = errorTypeRepository
                     .lookupErrorType(source)
@@ -325,25 +314,23 @@ public class BeanDefinitionFactory {
   }
 
   private void processComponentWrapper(SpringComponentModel componentModel) {
-    ComponentBuildingDefinition<?> parentBuildingDefinition =
-        componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getParent().getIdentifier()).get();
-    Map<String, WrapperElementType> wrapperIdentifierAndTypeMap = getWrapperIdentifierAndTypeMap(parentBuildingDefinition);
-    WrapperElementType wrapperElementType = wrapperIdentifierAndTypeMap.get(componentModel.getIdentifier().getName());
-    if (wrapperElementType.equals(SINGLE)) {
-      if (componentModel.getInnerComponents().isEmpty()) {
-        String location =
-            componentModel.getComponentLocation() != null ? componentModel.getComponentLocation().getLocation() : "";
-        throw new IllegalStateException(format("Element [%s] located at [%s] does not have any child element declared, but one is required.",
-                                               componentModel.getIdentifier(), location));
+    componentBuildingDefinitionRegistry.getWrappedComponent(componentModel.getIdentifier()).ifPresent(wrapperElementType -> {
+      if (wrapperElementType.equals(SINGLE)) {
+        if (componentModel.getInnerComponents().isEmpty()) {
+          String location =
+              componentModel.getComponentLocation() != null ? componentModel.getComponentLocation().getLocation() : "";
+          throw new IllegalStateException(format("Element [%s] located at [%s] does not have any child element declared, but one is required.",
+                                                 componentModel.getIdentifier(), location));
+        }
+        final SpringComponentModel firstComponentModel = (SpringComponentModel) componentModel.getInnerComponents().get(0);
+        componentModel.setType(firstComponentModel.getType());
+        componentModel.setBeanDefinition(firstComponentModel.getBeanDefinition());
+        componentModel.setBeanReference(firstComponentModel.getBeanReference());
+      } else {
+        throw new IllegalStateException(format("Element %s does not have a building definition and it should since it's of type %s",
+                                               componentModel.getIdentifier(), wrapperElementType));
       }
-      final SpringComponentModel firstComponentModel = (SpringComponentModel) componentModel.getInnerComponents().get(0);
-      componentModel.setType(firstComponentModel.getType());
-      componentModel.setBeanDefinition(firstComponentModel.getBeanDefinition());
-      componentModel.setBeanReference(firstComponentModel.getBeanReference());
-    } else {
-      throw new IllegalStateException(format("Element %s does not have a building definition and it should since it's of type %s",
-                                             componentModel.getIdentifier(), wrapperElementType));
-    }
+    });
   }
 
   private BeanDefinitionCreator buildComponentModelProcessorChainOfResponsability() {
@@ -372,72 +359,17 @@ public class BeanDefinitionFactory {
   }
 
   /**
-   * Used to collaborate with the bean definition parsers mechanism. If {@code #hasDefinition} returns false, then the old
-   * mechanism must be used.
+   * Used to collaborate with the bean definition parsers mechanism.
    *
    * @param componentIdentifier a {@code ComponentModel} identifier.
-   * @param parentComponentModelOptional the {@code ComponentModel} parent identifier.
    * @return true if there's a {@code ComponentBuildingDefinition} for the specified configuration identifier, false if there's
    *         not.
    */
-  public boolean hasDefinition(ComponentIdentifier componentIdentifier,
-                               Optional<ComponentIdentifier> parentComponentModelOptional) {
+  public boolean hasDefinition(ComponentIdentifier componentIdentifier) {
     return isComponentIgnored(componentIdentifier)
         || customBuildersComponentIdentifiers.contains(componentIdentifier)
         || componentBuildingDefinitionRegistry.getBuildingDefinition(componentIdentifier).isPresent()
-        || isWrapperComponent(componentIdentifier, parentComponentModelOptional);
-  }
-
-  // TODO MULE-9638 this code will be removed and a cache will be implemented
-  public boolean isWrapperComponent(ComponentIdentifier componentModel,
-                                    Optional<ComponentIdentifier> parentComponentModelOptional) {
-    if (!parentComponentModelOptional.isPresent()) {
-      return false;
-    }
-    Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
-        componentBuildingDefinitionRegistry.getBuildingDefinition(parentComponentModelOptional.get());
-    if (!buildingDefinitionOptional.isPresent()) {
-      return false;
-    }
-    final Map<String, WrapperElementType> wrapperIdentifierAndTypeMap =
-        getWrapperIdentifierAndTypeMap(buildingDefinitionOptional.get());
-    return wrapperIdentifierAndTypeMap.containsKey(componentModel.getName());
-  }
-
-  private <T> Map<String, WrapperElementType> getWrapperIdentifierAndTypeMap(ComponentBuildingDefinition<T> buildingDefinition) {
-    final Map<String, WrapperElementType> wrapperIdentifierAndTypeMap = new HashMap<>();
-    AbstractAttributeDefinitionVisitor wrapperIdentifiersCollector = new AbstractAttributeDefinitionVisitor() {
-
-      @Override
-      public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifierOptional) {
-        wrapperIdentifierOptional.ifPresent(wrapperIdentifier -> wrapperIdentifierAndTypeMap.put(wrapperIdentifier, COLLECTION));
-      }
-
-      @Override
-      public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifierOptional, Optional<String> childIdentifier) {
-        wrapperIdentifierOptional.ifPresent(wrapperIdentifier -> wrapperIdentifierAndTypeMap.put(wrapperIdentifier, SINGLE));
-      }
-
-      @Override
-      public void onComplexChildMap(Class<?> keyType, Class<?> valueType, String wrapperIdentifier) {
-        wrapperIdentifierAndTypeMap.put(wrapperIdentifier, MAP);
-      }
-
-      @Override
-      public void onMultipleValues(KeyAttributeDefinitionPair[] definitions) {
-        for (KeyAttributeDefinitionPair attributeDefinition : definitions) {
-          attributeDefinition.getAttributeDefinition().accept(this);
-        }
-      }
-    };
-
-    Consumer<AttributeDefinition> collectWrappersConsumer =
-        attributeDefinition -> attributeDefinition.accept(wrapperIdentifiersCollector);
-    buildingDefinition.getSetterParameterDefinitions().stream()
-        .map(setterAttributeDefinition -> setterAttributeDefinition.getAttributeDefinition())
-        .forEach(collectWrappersConsumer);
-    buildingDefinition.getConstructorAttributeDefinition().stream().forEach(collectWrappersConsumer);
-    return wrapperIdentifierAndTypeMap;
+        || componentBuildingDefinitionRegistry.getWrappedComponent(componentIdentifier).isPresent();
   }
 
 }

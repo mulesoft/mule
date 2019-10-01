@@ -49,4 +49,28 @@
     <flow name="throwError">
         <heisenberg:throw-error/>
     </flow>
+
+    <flow name="errorCaughtUsingWildcard">
+        <try>
+            <try>
+                <flow-ref name="cureCancer" />
+            </try>
+            <error-handler>
+                <on-error-propagate type="*:HEALTH" >
+                    <set-payload value="Wildcard namespace was caught" />
+                </on-error-propagate>
+                <on-error-propagate type="ANY" >
+                    <set-payload value="Wildcard namespace wasn't caught" />
+                </on-error-propagate>
+            </error-handler>
+        </try>
+        <error-handler>
+            <on-error-continue type="HEISENBERG:*" >
+                <set-payload value="#[payload ++ '; Wildcard name was caught']" />
+            </on-error-continue>
+            <on-error-continue type="ANY" >
+                <set-payload value="#[payload ++ '; Wildcard name wasn't caught']" />
+            </on-error-continue>
+        </error-handler>
+    </flow>
 </mule>

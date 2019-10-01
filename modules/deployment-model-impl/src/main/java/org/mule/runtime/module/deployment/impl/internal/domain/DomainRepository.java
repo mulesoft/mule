@@ -17,13 +17,34 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils;
 public interface DomainRepository {
 
   /**
+   * Gets the domain matching given name.
+   *
+   * @param name domain name to find. Non empty.
+   * @return a {@link Domain} corresponding to the given name or null is no such domain exists.
+   *
+   * @throws DomainNotFoundException if didn't find any compatible domain.
+   */
+  Domain getDomain(String name) throws DomainNotFoundException;
+
+  /**
+   * Checks if exists a domain with the given name.
+   *
+   * @param name The name of the domain to search.
+   * @return <tt>true</tt> if this repository contains a domain with the specified name, or <tt>false</tt> otherwise.
+   */
+  boolean contains(String name);
+
+  /**
    * Gets a domain compatible with the given bundle descriptor. The version must be compatible
    * (see {@link BundleDescriptorUtils#isCompatibleVersion(String, String)} for more information).
    *
    * @param descriptor Descriptor of the domain to find.
    * @return a {@link Domain} corresponding to the given descriptor or null is no such domain exists.
+   * 
+   * @throws DomainNotFoundException if didn't find any compatible domain.
+   * @throws AmbiguousDomainReferenceException if multiple compatible domains were found for given descriptor.
    */
-  Domain getDomain(BundleDescriptor descriptor) throws DomainNotFoundException, IncompatibleDomainVersionException;
+  Domain getCompatibleDomain(BundleDescriptor descriptor) throws DomainNotFoundException, AmbiguousDomainReferenceException;
 
   /**
    * Checks if exists a domain compatible with the given bundle descriptor. The version must be compatible
@@ -32,5 +53,5 @@ public interface DomainRepository {
    * @param descriptor Descriptor of the domain to find.
    * @return <tt>true</tt> if this repository contains a domain for the specified descriptor, or <tt>false</tt> otherwise.
    */
-  boolean contains(BundleDescriptor descriptor);
+  boolean containsCompatible(BundleDescriptor descriptor);
 }

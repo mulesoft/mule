@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static com.google.common.io.Files.createTempDir;
+import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -27,11 +28,11 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.PROVIDED;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
+
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
@@ -47,10 +48,7 @@ import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
-import com.google.common.io.PatternFilenameFilter;
-
 import java.io.File;
-import java.io.FilenameFilter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -66,6 +64,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableSet;
+import com.vdurmont.semver4j.Semver;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
@@ -91,6 +91,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   public static final String MULE_ARTIFACT_PATCH_JSON_FILE_NAME = "mule-artifact-patch.json";
 
   public static final String CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER = "_classLoaderModelMavenReactorResolver";
+  public static final String CLASS_LOADER_MODEL_VERSION_120 = "1.2.0";
 
   protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
   protected MavenClient mavenClient;
@@ -193,12 +194,40 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     // since for this case we explicitly need to consume the exported API from the plugin.
     final List<URL> dependenciesArtifactsUrls = loadUrls(artifactFile, classLoaderModelBuilder, bundleDependencies, patches);
 
-    // TODO MULE-17114 retrieve this data from the json if present, if not then call this
-    populateLocalPackages(artifactFile, classLoaderModelBuilder, dependenciesArtifactsUrls, exportedPackages, exportedResources);
+    ArtifactAttributes artifactAttributes;
+    if (new Semver(packagerClassLoaderModel.getVersion(), LOOSE).isLowerThan(CLASS_LOADER_MODEL_VERSION_120)) {
+      artifactAttributes = discoverLocalPackages(dependenciesArtifactsUrls);
+    } else {
+      artifactAttributes = collectLocalPackages(packagerClassLoaderModel);
+    }
+    populateLocalPackages(artifactAttributes, classLoaderModelBuilder);
 
     classLoaderModelBuilder.dependingOn(bundleDependencies);
 
     return classLoaderModelBuilder.build();
+  }
+
+  private ArtifactAttributes collectLocalPackages(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel) {
+    ImmutableSet.Builder<String> packagesSetBuilder = ImmutableSet.builder();
+    if (packagerClassLoaderModel.getPackages() != null) {
+      packagesSetBuilder.add(packagerClassLoaderModel.getPackages());
+    }
+
+    ImmutableSet.Builder<String> resourcesSetBuilder = ImmutableSet.builder();
+    if (packagerClassLoaderModel.getResources() != null) {
+      resourcesSetBuilder.add(packagerClassLoaderModel.getResources());
+    }
+
+    packagerClassLoaderModel.getDependencies().stream().forEach(artifact -> {
+      if (artifact.getPackages() != null) {
+        packagesSetBuilder.add(artifact.getPackages());
+      }
+      if (artifact.getResources() != null) {
+        resourcesSetBuilder.add(artifact.getResources());
+      }
+    });
+
+    return new ArtifactAttributes(packagesSetBuilder.build(), resourcesSetBuilder.build());
   }
 
   private List<URL> getArtifactPatches(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel) {
@@ -396,8 +425,7 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     final List<URL> dependenciesArtifactsUrls =
         loadUrls(artifactFile, classLoaderModelBuilder, nonProvidedDependencies, emptyList());
 
-    // TODO MULE-17114 retrieve this data from the json if present, if not then call this
-    populateLocalPackages(artifactFile, classLoaderModelBuilder, dependenciesArtifactsUrls, exportedPackages, exportedResources);
+    populateLocalPackages(discoverLocalPackages(dependenciesArtifactsUrls), classLoaderModelBuilder);
 
     classLoaderModelBuilder.dependingOn(resolvedDependencies);
 
@@ -415,9 +443,10 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
                                                                                               org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
                                                                                               Map<String, Object> attributes);
 
-  protected void populateLocalPackages(File artifactFile, final ArtifactClassLoaderModelBuilder classLoaderModelBuilder,
-                                       List<URL> dependenciesArtifactsUrls,
-                                       Set<String> exportedPackages, Set<String> exportedResources) {
+  private ArtifactAttributes discoverLocalPackages(List<URL> dependenciesArtifactsUrls) {
+    final Set<String> packages = new HashSet<>();
+    final Set<String> resources = new HashSet<>();
+
     for (URL dependencyArtifactUrl : dependenciesArtifactsUrls) {
       final URI dependencyArtifactUri;
       try {
@@ -426,17 +455,23 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
         throw new MuleRuntimeException(e);
       }
 
-      final JarInfo exploredJar = jarExplorerFactory.get().explore(dependencyArtifactUri);
-
-      final Set<String> localPackages = new HashSet<>(exploredJar.getPackages());
-      localPackages.removeAll(exportedPackages);
-
-      final Set<String> localResources = new HashSet<>(exploredJar.getResources());
-      localResources.removeAll(exportedResources);
-
-      classLoaderModelBuilder.withLocalPackages(localPackages);
-      classLoaderModelBuilder.withLocalResources(localResources);
+      try {
+        final JarInfo exploredJar = jarExplorerFactory.get().explore(dependencyArtifactUri);
+        packages.addAll(exploredJar.getPackages());
+        resources.addAll(exploredJar.getResources());
+      } catch (IllegalArgumentException e) {
+        // Workaround for MMP-499
+        LOGGER.warn("File for dependency artifact not found: '{}'. Skipped localPackages scanning for that artifact.",
+                    dependencyArtifactUri);
+      }
     }
+    return new ArtifactAttributes(packages, resources);
+  }
+
+  protected void populateLocalPackages(ArtifactAttributes artifactAttributes,
+                                       ArtifactClassLoaderModelBuilder classLoaderModelBuilder) {
+    classLoaderModelBuilder.withLocalPackages(new HashSet<>(artifactAttributes.getPackages()));
+    classLoaderModelBuilder.withLocalResources(new HashSet<>(artifactAttributes.getResources()));
   }
 
   protected abstract boolean includeProvidedDependencies(ArtifactType artifactType);

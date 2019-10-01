@@ -10312,7 +10312,15 @@
           ],
           "name": "connection",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "saulPhoneNumber",
+                "fullyBald",
+                "beardTrimming"
+              ]
+            }
+          }
         },
         {
           "connectionManagementType": "NONE",
@@ -11191,7 +11199,15 @@
           ],
           "name": "secure",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "saulPhoneNumber",
+                "fullyBald",
+                "beardTrimming"
+              ]
+            }
+          }
         }
       ],
       "messageSources": [
@@ -17335,7 +17351,44 @@
       },
       "name": "config",
       "description": "Default configuration",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "familyInformations",
+            "enemies",
+            "monthlyIncomes",
+            "cancer",
+            "recipe",
+            "deathsBySeasons",
+            "money",
+            "weapon",
+            "wildCardWeapons",
+            "wildCards",
+            "weaponValueMap",
+            "candidateDoors",
+            "initialHealth",
+            "finalHealth",
+            "labAddress",
+            "firstEndevour",
+            "healthProgressions",
+            "name",
+            "labeledRicin",
+            "nextDoor",
+            "ricinPacks",
+            "myName",
+            "age",
+            "dateOfConception",
+            "dateOfBirth",
+            "dateOfDeath",
+            "dateOfGraduation",
+            "knownAddresses",
+            "fullyBald",
+            "beardTrimming",
+            "worksAtDEA",
+            "lovesMinerals"
+          ]
+        }
+      }
     }
   ],
   "operations": [
@@ -28059,6 +28112,183 @@
       "kind": "operation"
     },
     {
+      "blocking": false,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": {
+            "id": "*/*",
+            "label": "*/*",
+            "validMimeTypes": [
+              "*/*"
+            ]
+          },
+          "type": "Any",
+          "annotations": {
+            "typeId": "java.lang.Object",
+            "classInformation": {
+              "classname": "java.lang.Object",
+              "hasDefaultConstructor": true,
+              "isInterface": false,
+              "isInstantiable": true,
+              "isAbstract": false,
+              "isFinal": false,
+              "implementedInterfaces": [],
+              "parent": "",
+              "genericTypes": [],
+              "isMap": false
+            },
+            "typeAlias": {
+              "value": "Object"
+            }
+          }
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Object",
+          "annotations": {
+            "typeId": "java.lang.Object",
+            "classInformation": {
+              "classname": "java.lang.Object",
+              "hasDefaultConstructor": true,
+              "isInterface": false,
+              "isInstantiable": true,
+              "isAbstract": false,
+              "isFinal": false,
+              "implementedInterfaces": [],
+              "parent": "",
+              "genericTypes": [],
+              "isMap": false
+            },
+            "typeAlias": {
+              "value": "Object"
+            }
+          },
+          "fields": []
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "notifications": [],
+      "nestedComponents": [
+        {
+          "isRequired": true,
+          "allowedStereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          ],
+          "name": "operations",
+          "description": "",
+          "modelProperties": {},
+          "kind": "chain"
+        }
+      ],
+      "errors": [],
+      "stereotype": {
+        "type": "HEISENBERG-EMPIRE",
+        "namespace": "HEISENBERG",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "MULE"
+        }
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "tapPhones",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
       "blocking": true,
       "executionType": "CPU_LITE",
       "output": {
@@ -29867,7 +30097,15 @@
       ],
       "name": "connection",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "saulPhoneNumber",
+            "fullyBald",
+            "beardTrimming"
+          ]
+        }
+      }
     },
     {
       "connectionManagementType": "NONE",
@@ -30746,7 +30984,15 @@
       ],
       "name": "secure",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "saulPhoneNumber",
+            "fullyBald",
+            "beardTrimming"
+          ]
+        }
+      }
     }
   ],
   "messageSources": [

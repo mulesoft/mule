@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.dsl.spring;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
+
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
@@ -34,10 +35,9 @@ import org.springframework.beans.factory.support.ManagedMap;
 
 /**
  * Based on the object building definition provided by {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition} and
- * the user configuration defined in {@link ComponentModel} it populates all the
- * spring {@link org.springframework.beans.factory.config.BeanDefinition} attributes using the helper class
- * {@link BeanDefinitionBuilderHelper}.
- * {@link BeanDefinitionBuilderHelper}.
+ * the user configuration defined in {@link ComponentModel} it populates all the spring
+ * {@link org.springframework.beans.factory.config.BeanDefinition} attributes using the helper class
+ * {@link BeanDefinitionBuilderHelper}. {@link BeanDefinitionBuilderHelper}.
  *
  * @since 4.0
  */
@@ -78,32 +78,34 @@ class ComponentConfigurationBuilder<T> {
      * TODO: MULE-9638 This ugly code is required since we need to get the object type from the bean definition. This code will go
      * away one we remove the old parsing method.
      */
-    return componentModel.getInnerComponents().stream().filter(child -> child.isEnabled()).map(model -> {
-      // When it comes from old model it does not have the type set
-      Class<?> beanDefinitionType = model.getType();
-      final SpringComponentModel springModel = (SpringComponentModel) model;
-      if (beanDefinitionType == null) {
-        if (springModel.getBeanDefinition() == null) {
-          // Some component do not have a bean definition since the element parsing is ignored. i.e: annotations
-          return null;
-        } else {
-          try {
-            String beanClassName = springModel.getBeanDefinition().getBeanClassName();
-            if (beanClassName != null) {
-              beanDefinitionType = org.apache.commons.lang3.ClassUtils.getClass(beanClassName);
+    return componentModel.getInnerComponents().stream()
+        .map(model -> {
+          // When it comes from old model it does not have the type set
+          Class<?> beanDefinitionType = model.getType();
+          final SpringComponentModel springModel = (SpringComponentModel) model;
+          if (beanDefinitionType == null) {
+            if (springModel.getBeanDefinition() == null) {
+              // Some component do not have a bean definition since the element parsing is ignored. i.e: annotations
+              return null;
             } else {
-              // Happens in case of spring:property
-              beanDefinitionType = Object.class;
+              try {
+                String beanClassName = springModel.getBeanDefinition().getBeanClassName();
+                if (beanClassName != null) {
+                  beanDefinitionType = org.apache.commons.lang3.ClassUtils.getClass(beanClassName);
+                } else {
+                  // Happens in case of spring:property
+                  beanDefinitionType = Object.class;
+                }
+              } catch (ClassNotFoundException e) {
+                logger.debug("Exception trying to determine ComponentModel type: ", e);
+                beanDefinitionType = Object.class;
+              }
             }
-          } catch (ClassNotFoundException e) {
-            logger.debug("Exception trying to determine ComponentModel type: ", e);
-            beanDefinitionType = Object.class;
           }
-        }
-      }
-      Object bean = springModel.getBeanDefinition() != null ? springModel.getBeanDefinition() : springModel.getBeanReference();
-      return new ComponentValue(model, beanDefinitionType, bean);
-    }).filter(beanDefinitionTypePair -> beanDefinitionTypePair != null).collect(toList());
+          Object bean =
+              springModel.getBeanDefinition() != null ? springModel.getBeanDefinition() : springModel.getBeanReference();
+          return new ComponentValue(model, beanDefinitionType, bean);
+        }).filter(beanDefinitionTypePair -> beanDefinitionTypePair != null).collect(toList());
   }
 
   private ConfigurableAttributeDefinitionVisitor constructorVisitor() {

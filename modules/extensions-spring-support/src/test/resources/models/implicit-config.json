@@ -1230,13 +1230,30 @@
           ],
           "name": "connection",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "privateName",
+                "number"
+              ]
+            }
+          }
         }
       ],
       "messageSources": [],
       "name": "config",
       "description": "Default configuration",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "optionalNoDefault",
+            "optionalWithDefault",
+            "name",
+            "nullSafePojo",
+            "nullSafePojoShowInDsl"
+          ]
+        }
+      }
     }
   ],
   "operations": [],
@@ -1579,7 +1596,14 @@
       ],
       "name": "connection",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "privateName",
+            "number"
+          ]
+        }
+      }
     }
   ],
   "messageSources": [],

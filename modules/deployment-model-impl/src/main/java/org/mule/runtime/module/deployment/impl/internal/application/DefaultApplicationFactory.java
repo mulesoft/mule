@@ -12,9 +12,8 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
-import static org.mule.runtime.deployment.model.internal.artifact.ArtifactUtils.createBundleDescriptorFromName;
+import static org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication.getApplicationDomain;
 import org.mule.runtime.api.service.ServiceRepository;
-import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
@@ -27,12 +26,12 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
+import org.mule.runtime.module.deployment.impl.internal.domain.AmbiguousDomainReferenceException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainRepository;
-import org.mule.runtime.module.deployment.impl.internal.domain.IncompatibleDomainVersionException;
+import org.mule.runtime.module.deployment.impl.internal.domain.IncompatibleDomainException;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyInstanceProviderFactory;
@@ -110,9 +109,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
       throw new IllegalArgumentException("Mule application name may not contain spaces: " + appName);
     }
 
-
-    final ApplicationDescriptor descriptor = applicationDescriptorFactory.create(artifactDir, properties);
-
+    final ApplicationDescriptor descriptor = createArtifactDescriptor(artifactDir, properties);
     return createArtifact(descriptor);
   }
 
@@ -122,12 +119,12 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   }
 
   @Override
-  public DeployableArtifactDescriptor createArtifactDescriptor(File artifactLocation, Optional<Properties> deploymentProperties) {
+  public ApplicationDescriptor createArtifactDescriptor(File artifactLocation, Optional<Properties> deploymentProperties) {
     return applicationDescriptorFactory.create(artifactLocation, deploymentProperties);
   }
 
   public Application createArtifact(ApplicationDescriptor descriptor) throws IOException {
-    Domain domain = getApplicationDomain(descriptor);
+    Domain domain = getDomainForDescriptor(descriptor);
 
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
         pluginDependenciesResolver.resolve(domain.getDescriptor().getPlugins(),
@@ -170,23 +167,17 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     return new ApplicationWrapper(delegate);
   }
 
-  private Domain getApplicationDomain(ApplicationDescriptor descriptor) {
+  private Domain getDomainForDescriptor(ApplicationDescriptor descriptor) {
     try {
-      String domainName = descriptor.getDomainName();
-      Optional<BundleDescriptor> domainBundleDescriptor = descriptor.getDomainDescriptor();
-      if (domainBundleDescriptor.isPresent()) {
-        BundleDescriptor bundleDescriptor = domainBundleDescriptor.get();
-        return domainRepository.getDomain(bundleDescriptor);
-      } else {
-        BundleDescriptor bundleDescriptor = createBundleDescriptorFromName(domainName);
-        return domainRepository.getDomain(bundleDescriptor);
-      }
+      return getApplicationDomain(domainRepository, descriptor);
     } catch (DomainNotFoundException e) {
       throw new DeploymentException(createStaticMessage(format("Domain '%s' has to be deployed in order to deploy Application '%s'",
                                                                e.getDomainName(), descriptor.getName())),
                                     e);
-    } catch (IncompatibleDomainVersionException e) {
-      throw new DeploymentException(e.getI18nMessage(), e);
+    } catch (IncompatibleDomainException e) {
+      throw new DeploymentException(createStaticMessage("Domain was found, but the bundle descriptor is incompatible"), e);
+    } catch (AmbiguousDomainReferenceException e) {
+      throw new DeploymentException(createStaticMessage("Multiple domains were found"), e);
     }
   }
 

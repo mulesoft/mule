@@ -2656,30 +2656,13 @@
             {
               "type": {
                 "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Integer",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "int": {}
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": 5,
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "5",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,
@@ -2694,30 +2677,13 @@
             {
               "type": {
                 "format": "java",
-                "type": "Number",
-                "annotations": {
-                  "classInformation": {
-                    "classname": "java.lang.Integer",
-                    "hasDefaultConstructor": false,
-                    "isInterface": false,
-                    "isInstantiable": false,
-                    "isAbstract": false,
-                    "isFinal": true,
-                    "implementedInterfaces": [
-                      "java.lang.Comparable"
-                    ],
-                    "parent": "java.lang.Number",
-                    "genericTypes": [],
-                    "isMap": false
-                  },
-                  "int": {}
-                }
+                "type": "String"
               },
               "hasDynamicType": false,
               "required": false,
               "isConfigOverride": false,
-              "expressionSupport": "NOT_SUPPORTED",
-              "defaultValue": 60000,
+              "expressionSupport": "SUPPORTED",
+              "defaultValue": "60000",
               "role": "BEHAVIOUR",
               "dslConfiguration": {
                 "allowsInlineDefinition": true,

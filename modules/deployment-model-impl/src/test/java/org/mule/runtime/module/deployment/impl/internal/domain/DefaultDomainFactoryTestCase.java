@@ -28,7 +28,6 @@ import org.mule.runtime.deployment.model.internal.application.MuleApplicationCla
 import org.mule.runtime.deployment.model.internal.domain.AbstractDomainTestCase;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderBuilder;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
@@ -88,9 +87,6 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
     String domainName = "custom-domain";
 
     final DomainDescriptor descriptor = new DomainDescriptor(domainName);
-    BundleDescriptor.Builder builder = new BundleDescriptor.Builder().setGroupId("com.mulesoft").setArtifactId(domainName)
-        .setClassifier("mule-domain").setType("jar").setVersion("1.0.0");
-    descriptor.setBundleDescriptor(builder.build());
     when(domainDescriptorFactory.create(any(), any())).thenReturn(descriptor);
 
     final MuleApplicationClassLoader domainArtifactClassLoader = mock(MuleApplicationClassLoader.class);
@@ -107,6 +103,7 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
     when(domainClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()).thenReturn(domainClassLoaderBuilderMock);
 
     Domain domain = domainFactory.createArtifact(new File(domainName), empty());
+
     assertThat(domain.getArtifactName(), is(domainName));
     assertThat(domain.getDescriptor(), is(descriptor));
     assertThat(domain.getArtifactClassLoader(), is(domainArtifactClassLoader));

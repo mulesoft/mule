@@ -585,13 +585,28 @@
           ],
           "name": "connection",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "someParameter"
+              ]
+            }
+          }
         }
       ],
       "messageSources": [],
       "name": "ValueWithRequiredParam",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "channel",
+            "required1",
+            "required2",
+            "name"
+          ]
+        }
+      }
     },
     {
       "stereotype": {
@@ -1157,13 +1172,28 @@
           ],
           "name": "connection",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "someParameter"
+              ]
+            }
+          }
         }
       ],
       "messageSources": [],
       "name": "ValuesWithRequiredParamsFromParamGroup",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "valueParam",
+            "name",
+            "channels",
+            "anyParameter"
+          ]
+        }
+      }
     },
     {
       "stereotype": {
@@ -1729,13 +1759,28 @@
           ],
           "name": "connection",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "someParameter"
+              ]
+            }
+          }
         }
       ],
       "messageSources": [],
       "name": "ValuesWithRequiredParamsFromShowInDslGroup",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "valueParam",
+            "name",
+            "channels",
+            "anyParameter"
+          ]
+        }
+      }
     },
     {
       "stereotype": {
@@ -2979,7 +3024,15 @@
           ],
           "name": "WithValueWithRequiredParam",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "channel",
+                "required1",
+                "required2"
+              ]
+            }
+          }
         },
         {
           "connectionManagementType": "NONE",
@@ -3346,7 +3399,15 @@
           ],
           "name": "WithValuesWithRequiredParamsFromParamGroup",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "valueParam",
+                "channels",
+                "anyParameter"
+              ]
+            }
+          }
         },
         {
           "connectionManagementType": "NONE",
@@ -3713,7 +3774,15 @@
           ],
           "name": "WithValuesWithRequiredParamsFromShowInDslGroup",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "valueParam",
+                "channels",
+                "anyParameter"
+              ]
+            }
+          }
         },
         {
           "connectionManagementType": "NONE",
@@ -3993,7 +4062,13 @@
           ],
           "name": "connection",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "someParameter"
+              ]
+            }
+          }
         },
         {
           "connectionManagementType": "NONE",
@@ -4310,7 +4385,14 @@
           ],
           "name": "failure-connection",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "values",
+                "errorCode"
+              ]
+            }
+          }
         },
         {
           "connectionManagementType": "NONE",
@@ -4598,7 +4680,13 @@
           ],
           "name": "with-value-parameter",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "channel"
+              ]
+            }
+          }
         }
       ],
       "messageSources": [
@@ -5433,7 +5521,15 @@
       ],
       "name": "config",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "data",
+            "configValues",
+            "name"
+          ]
+        }
+      }
     },
     {
       "stereotype": {
@@ -5920,13 +6016,26 @@
           ],
           "name": "connection",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "someParameter"
+              ]
+            }
+          }
         }
       ],
       "messageSources": [],
       "name": "config-with-value",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "channel",
+            "name"
+          ]
+        }
+      }
     },
     {
       "stereotype": {
@@ -6167,7 +6276,15 @@
       "messageSources": [],
       "name": "failure-config",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "values",
+            "errorCode",
+            "name"
+          ]
+        }
+      }
     }
   ],
   "operations": [

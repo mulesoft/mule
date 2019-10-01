@@ -27,6 +27,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -36,7 +37,8 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.util.rx.MonoSinkWrapper;
+import org.mule.runtime.core.internal.execution.SourcePolicyTestUtils;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +52,6 @@ import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.MonoSink;
 import reactor.core.scheduler.Schedulers;
 
 public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTestCase {
@@ -84,17 +85,17 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     when(operationPolicyParametersTransformer.get().fromParametersToMessage(any())).thenReturn(Message.of(null));
     doAnswer(invocation -> {
 
-      MonoSink<CoreEvent> sink = invocation.getArgument(2);
+      ExecutorCallback callback = invocation.getArgument(2);
 
       Mono<CoreEvent> mono = Mono.from(processor().apply(just(invocation.getArgument(1))));
       if (processChangeThread || policyChangeThread) {
         mono.publishOn(Schedulers.single())
-            .subscribe(sink::success, sink::error);
+            .subscribe(callback::complete, callback::error);
       } else {
         try {
-          sink.success(mono.block());
+          callback.complete(mono.block());
         } catch (Throwable t) {
-          sink.error(t);
+          callback.error(t);
         }
       }
 
@@ -123,14 +124,13 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
   }
 
   @Test
-  public void singlePolicy() {
+  public void singlePolicy() throws Throwable {
     compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy),
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory);
 
-    CoreEvent result =
-        block(sink -> compositeOperationPolicy
-            .process(initialEvent, operationExecutionFunction, operationParametersProcessor, operationLocation, sink));
+    CoreEvent result = block(callback -> compositeOperationPolicy
+        .process(initialEvent, operationExecutionFunction, operationParametersProcessor, operationLocation, callback));
 
     assertThat(result.getMessage(), is(nextProcessResultEvent.getMessage()));
     verify(operationExecutionFunction).execute(any(), any(), any());
@@ -140,14 +140,14 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
   }
 
   @Test
-  public void compositePolicy() {
+  public void compositePolicy() throws Throwable {
     compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory);
 
     CoreEvent result =
-        block(sink -> compositeOperationPolicy.process(initialEvent, operationExecutionFunction, operationParametersProcessor,
-                                                       operationLocation, sink));
+        block(callback -> compositeOperationPolicy.process(initialEvent, operationExecutionFunction, operationParametersProcessor,
+                                                           operationLocation, callback));
     assertThat(result.getMessage(), is(nextProcessResultEvent.getMessage()));
     verify(operationExecutionFunction).execute(any(), any(), any());
     verify(operationPolicyProcessorFactory, atLeastOnce()).createOperationPolicy(same(firstPolicy), any());
@@ -185,8 +185,8 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     expectedException.expect(MuleException.class);
     expectedException.expectCause(is(policyException));
     try {
-      block(sink -> compositeOperationPolicy.process(initialEvent, operationExecutionFunction, operationParametersProcessor,
-                                                     operationLocation, sink));
+      block(callback -> compositeOperationPolicy.process(initialEvent, operationExecutionFunction, operationParametersProcessor,
+                                                         operationLocation, callback));
     } catch (Throwable throwable) {
       throw rxExceptionToMuleException(throwable);
     }
@@ -198,15 +198,15 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     doAnswer(inv -> {
       CoreEvent event = inv.getArgument(1);
       Mono<CoreEvent> baseMono = just(event);
-      MonoSink<CoreEvent> sink = inv.getArgument(2);
+      ExecutorCallback callback = inv.getArgument(2);
 
       if (processChangeThread) {
         baseMono
-            .doOnNext(ev -> sink.error(new MessagingException(ev, policyException)))
+            .doOnNext(ev -> callback.error(new MessagingException(ev, policyException)))
             .publishOn(Schedulers.single())
             .subscribe();
       } else {
-        sink.error(new MessagingException(event, policyException));
+        callback.error(new MessagingException(event, policyException));
       }
 
       return null;
@@ -218,16 +218,16 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     expectedException.expect(MuleException.class);
     expectedException.expectCause(is(policyException));
     try {
-      block(sink -> compositeOperationPolicy.process(initialEvent, operationExecutionFunction,
-                                                     operationParametersProcessor,
-                                                     operationLocation, sink));
+      block(callback -> compositeOperationPolicy.process(initialEvent, operationExecutionFunction,
+                                                         operationParametersProcessor,
+                                                         operationLocation, callback));
     } catch (Throwable throwable) {
       throw rxExceptionToMuleException(throwable);
     }
   }
 
   @Test
-  public void reactorPipelinesReused() {
+  public void reactorPipelinesReused() throws Throwable {
     InvocationsRecordingCompositeOperationPolicy.reset();
     final InvocationsRecordingCompositeOperationPolicy operationPolicy =
         new InvocationsRecordingCompositeOperationPolicy(asList(firstPolicy),
@@ -238,8 +238,8 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     assertThat(operationPolicy.getPolicyCount(), is(0));
 
     for (int i = 0; i < getRuntime().availableProcessors() * 2; ++i) {
-      block(sink -> operationPolicy
-          .process(initialEvent, operationExecutionFunction, operationParametersProcessor, operationLocation, sink));
+      block(callback -> operationPolicy
+          .process(initialEvent, operationExecutionFunction, operationParametersProcessor, operationLocation, callback));
     }
 
     assertThat(operationPolicy.getNextOperationCount(), is(getRuntime().availableProcessors()));
@@ -247,7 +247,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
   }
 
   @Test
-  public void processAfterPolicyDispose() throws MuleException {
+  public void processAfterPolicyDispose() throws Throwable {
     expectedException.expect(MessagingException.class);
 
     compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
@@ -257,8 +257,8 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     compositeOperationPolicy.dispose();
 
     try {
-      block(sink -> compositeOperationPolicy.process(initialEvent, operationExecutionFunction, operationParametersProcessor,
-                                                     operationLocation, sink));
+      block(callback -> compositeOperationPolicy.process(initialEvent, operationExecutionFunction, operationParametersProcessor,
+                                                         operationLocation, callback));
     } catch (Exception throwable) {
       throw rxExceptionToMuleException(throwable);
     }
@@ -301,22 +301,18 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     }
   }
 
-  private CoreEvent block(Consumer<MonoSink<CoreEvent>> consumer) {
-    return Mono.<CoreEvent>create(sink -> {
-      sink = new MonoSinkWrapper<CoreEvent>(sink) {
+  private CoreEvent block(Consumer<ExecutorCallback> consumer) throws Throwable {
+    return SourcePolicyTestUtils.block(callback -> consumer.accept(new ExecutorCallback() {
 
-        @Override
-        public void success(CoreEvent value) {
-          super.success(value);
-        }
+      @Override
+      public void complete(Object value) {
+        callback.complete((CoreEvent) value);
+      }
 
-        @Override
-        public void error(Throwable e) {
-          super.error(e);
-        }
-      };
-
-      consumer.accept(sink);
-    }).block();
+      @Override
+      public void error(Throwable e) {
+        callback.error(e);
+      }
+    }));
   }
 }

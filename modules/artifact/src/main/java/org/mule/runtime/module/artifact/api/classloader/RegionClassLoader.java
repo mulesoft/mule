@@ -19,6 +19,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.CompoundEnumeration;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
@@ -67,7 +68,6 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     registerAsParallelCapable();
   }
 
-
   private static final String CLASS_EXTENSION = ".class";
   private static final Logger LOGGER = getLogger(RegionClassLoader.class);
 
@@ -80,7 +80,16 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   private final Map<String, List<ArtifactClassLoader>> resourceMapping = new HashMap<>();
   private final Object descriptorMappingLock = new Object();
   private final Map<BundleDescriptor, URLClassLoader> descriptorMapping = new HashMap<>();
+
   private ArtifactClassLoader ownerClassLoader;
+
+  /**
+   * Region specific {@link ResourceReleaser} to add behaviour in the {@link RegionClassLoader#dispose()} execution.
+   * By default it will prompt a gc in the JVM if possible to release the softkeys cleared in the caches.
+   *
+   * This behaviour can be changed by extending {@link RegionClassLoader} and calling the provided protected constructor
+   */
+  private ResourceReleaser regionResourceReleaser = System::gc;
 
   /**
    * Creates a new region.
@@ -90,9 +99,29 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
    * @param parent parent classloader for the region. Non null
    * @param lookupPolicy lookup policy to use on the region
    */
-  public RegionClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, ClassLoader parent,
+  public RegionClassLoader(String artifactId,
+                           ArtifactDescriptor artifactDescriptor,
+                           ClassLoader parent,
                            ClassLoaderLookupPolicy lookupPolicy) {
     super(artifactId, artifactDescriptor, new URL[0], parent, lookupPolicy, emptyList());
+  }
+
+  /**
+   * Constructor to be called by extending classes and override the {@link ClassLoaderResourceReleaser} resourceReleaser.
+   *
+   * @param artifactId artifact unique ID for the artifact owning the created class loader instance. Non empty.
+   * @param artifactDescriptor descriptor for the artifact owning the created class loader instance. Non null.
+   * @param parent parent classloader for the region. Non null
+   * @param lookupPolicy lookup policy to use on the region
+   * @param regionResourceReleaser {@link ResourceReleaser} to be called after invocating {@link RegionClassLoader#dispose()}
+   * */
+  protected RegionClassLoader(String artifactId,
+                              ArtifactDescriptor artifactDescriptor,
+                              ClassLoader parent,
+                              ClassLoaderLookupPolicy lookupPolicy,
+                              ResourceReleaser regionResourceReleaser) {
+    super(artifactId, artifactDescriptor, new URL[0], parent, lookupPolicy, emptyList());
+    this.regionResourceReleaser = regionResourceReleaser;
   }
 
   @Override
@@ -383,8 +412,10 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     });
     descriptorMapping.clear();
     disposeClassLoader(ownerClassLoader);
-
     super.dispose();
+
+    //System.gc() by default
+    regionResourceReleaser.release();
   }
 
   private void disposeClassLoader(ArtifactClassLoader classLoader) {

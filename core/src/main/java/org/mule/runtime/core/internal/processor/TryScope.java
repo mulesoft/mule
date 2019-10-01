@@ -23,6 +23,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.apply
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextBlocking;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -47,7 +48,6 @@ import java.util.List;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Wraps the invocation of a list of nested processors {@link org.mule.runtime.core.api.processor.Processor} with a transaction.
@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(TryScope.class);
+  private static final Logger LOGGER = getLogger(TryScope.class);
 
   protected MessageProcessorChain nestedChain;
   protected MuleTransactionConfig transactionConfig;

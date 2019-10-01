@@ -8,6 +8,8 @@ package org.mule.runtime.config.internal.dsl.model.extension.xml;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 import static org.apache.commons.lang3.StringUtils.repeat;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.ComponentModelReaderHelper.toXml;
@@ -23,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 
@@ -36,8 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link MacroExpansionModulesModel} goes over all the parametrized {@link ExtensionModel} by filtering them if they have
- * the {@link XmlExtensionModelProperty} (implies that has to be macro expanded).
+ * A {@link MacroExpansionModulesModel} goes over all the parametrized {@link ExtensionModel} by filtering them if they have the
+ * {@link XmlExtensionModelProperty} (implies that has to be macro expanded).
  * <p/>
  * For every occurrence that happens, it will expand the operations/configurations by working with the
  * {@link MacroExpansionModuleModel} passing through just one {@link ExtensionModel} to macro expand in the current Mule
@@ -71,18 +72,24 @@ public class MacroExpansionModulesModel {
    * Goes through the entire xml mule application looking for the message processors that can be expanded, and then takes care of
    * the global elements if there are at least one {@link ExtensionModel} to macro expand.
    */
-  public void expand() {
+  public void expand(Runnable postProcess) {
+    if (sortedExtensions.isEmpty()) {
+      postProcess.run();
+      return;
+    }
+
     for (ExtensionModel sortedExtension : sortedExtensions) {
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(String.format("macro expanding '%s' connector, xmlns:%s=\"%s\"",
-                                   sortedExtension.getName(),
-                                   sortedExtension.getXmlDslModel().getPrefix(),
-                                   sortedExtension.getXmlDslModel().getNamespace()));
+        LOGGER.debug(format("macro expanding '%s' connector, xmlns:%s=\"%s\"",
+                            sortedExtension.getName(),
+                            sortedExtension.getXmlDslModel().getPrefix(),
+                            sortedExtension.getXmlDslModel().getNamespace()));
       }
       new MacroExpansionModuleModel(applicationModel, sortedExtension).expand();
+      postProcess.run();
     }
     if (LOGGER.isDebugEnabled()) {
-      //only log the macro expanded app if there are smart connectors in it
+      // only log the macro expanded app if there are smart connectors in it
       boolean hasMacroExpansionExtension = sortedExtensions.stream()
           .anyMatch(extensionModel -> extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent());
       if (hasMacroExpansionExtension) {
@@ -102,8 +109,8 @@ public class MacroExpansionModulesModel {
   }
 
   /**
-   * Constructs a Direct Acyclic Graph (DAG) with the dependencies at namespace level of those {@link ExtensionModel} that must
-   * be macro expanded with a topological order.
+   * Constructs a Direct Acyclic Graph (DAG) with the dependencies at namespace level of those {@link ExtensionModel} that must be
+   * macro expanded with a topological order.
    * <p/>
    * It starts by taking the namespaces of macro expandable <module/>s from the Mule Application, to then assembly a DAG using
    * those namespaces as starting point. For each <module/> namespace, it will go over it's dependencies using
@@ -113,14 +120,14 @@ public class MacroExpansionModulesModel {
    * plain it in a simple {@link List} to be later used in the {@link #expand()} method.
    *
    * @param extensions complete set of {@link ExtensionModel}s used in the app that might or might not be macro expandable (it
-   *                   will filter them.
+   *        will filter them.
    * @return a <bold>sorted</bold> collection of {@link ExtensionModel} to macro expand. This order must not be altered.
    */
   private List<ExtensionModel> calculateExtensionByTopologicalOrder(Set<ExtensionModel> extensions) {
     final List<ExtensionModel> result = new ArrayList<>();
     final Map<String, ExtensionModel> allExtensionsByNamespace = extensions.stream()
         .filter(extensionModel -> extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent())
-        .collect(Collectors.toMap(extModel -> extModel.getXmlDslModel().getNamespace(), Function.identity()));
+        .collect(toMap(extModel -> extModel.getXmlDslModel().getNamespace(), Function.identity()));
 
     // we first check there are at least one extension to macro expand
     if (!allExtensionsByNamespace.isEmpty()) {
@@ -179,7 +186,7 @@ public class MacroExpansionModulesModel {
                                                                Set<String> namespacesExtensions) {
     return getUsedNamespaces(rootComponentModel).stream()
         .filter(namespacesExtensions::contains)
-        .collect(Collectors.toSet());
+        .collect(toSet());
   }
 
   /**
@@ -193,6 +200,6 @@ public class MacroExpansionModulesModel {
     return rootComponentModel.getParameters().entrySet().stream()
         .filter(parameter -> parameter.getKey().startsWith(XMLNS_ATTRIBUTE + ":"))
         .map(Map.Entry::getValue)
-        .collect(Collectors.toSet());
+        .collect(toSet());
   }
 }

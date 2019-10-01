@@ -1,0 +1,16 @@
+{
+  "configs": [],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "empty-app",
+  "minMuleVersion": "4.0.0",
+  "requiredProduct": "MULE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {}
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

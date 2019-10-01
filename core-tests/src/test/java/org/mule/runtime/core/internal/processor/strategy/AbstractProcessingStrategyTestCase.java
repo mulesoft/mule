@@ -33,12 +33,14 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.IO_RW;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.probe.PollingProber.DEFAULT_TIMEOUT;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.bubble;
 import static reactor.core.Exceptions.propagate;
@@ -63,7 +65,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -299,7 +300,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
       asyncExecutor.submit(() -> processFlow(newEvent()));
     }
 
-    latchedProcessor.getAllLatchedLatch().await();
+    assertThat("Processors not executed in time",
+               latchedProcessor.getAllLatchedLatch().await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
 
     asyncExecutor.submit(() -> processFlow(newEvent()));
 
@@ -505,7 +507,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   @Test
   public void txSameThreadPolicyHonored() throws Exception {
-    assumeThat(this, instanceOf(TransactionAwareProcessingStragyTestCase.class));
+    assumeThat(this, instanceOf(TransactionAwareProcessingStrategyTestCase.class));
 
     triggerableMessageSource = new TriggerableMessageSource();
 
@@ -515,7 +517,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow.initialise();
     flow.start();
 
-    TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
+    getInstance()
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), 10));
     processFlow(newEvent());
 
     assertThat(threads.toString(), threads, hasSize(equalTo(1)));
@@ -524,7 +527,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
   @Test
   public void txSameThreadPolicyHonoredWithAsyncProcessorInFlow() throws Exception {
-    assumeThat(this, instanceOf(TransactionAwareProcessingStragyTestCase.class));
+    assumeThat(this, instanceOf(TransactionAwareProcessingStrategyTestCase.class));
 
     triggerableMessageSource = new TriggerableMessageSource();
 
@@ -534,14 +537,15 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow.initialise();
     flow.start();
 
-    TransactionCoordination.getInstance().bindTransaction(new TestTransaction(muleContext));
+    getInstance()
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), 10));
     processFlow(newEvent());
 
     assertThat(threads.toString(), threads, hasSize(equalTo(1)));
     assertThat(threads.toString(), threads, hasItem(currentThread().getName()));
   }
 
-  protected static interface TransactionAwareProcessingStragyTestCase {
+  protected interface TransactionAwareProcessingStrategyTestCase {
 
   }
 
@@ -790,7 +794,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   static class RejectingScheduler extends TestScheduler {
 
     static int REJECTION_COUNT = 10;
-    private int rejections;
+    private final AtomicInteger rejections = new AtomicInteger();
+    private final AtomicInteger accepted = new AtomicInteger();
     private final Scheduler delegate;
 
     public RejectingScheduler(Scheduler delegate) {
@@ -800,20 +805,35 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
     @Override
     public Future<?> submit(Runnable task) {
-      if (rejections++ < REJECTION_COUNT) {
+      if (rejections.getAndUpdate(r -> r < REJECTION_COUNT ? r + 1 : r) < REJECTION_COUNT) {
         throw new RejectedExecutionException();
       } else {
+        accepted.incrementAndGet();
         return delegate.submit(task);
       }
     }
 
     @Override
     public Future<?> submit(Callable task) {
-      if (rejections++ < REJECTION_COUNT) {
+      if (rejections.getAndUpdate(r -> r < REJECTION_COUNT ? r + 1 : r) < REJECTION_COUNT) {
         throw new RejectedExecutionException();
       } else {
+        accepted.incrementAndGet();
         return delegate.submit(task);
       }
+    }
+
+    public int getRejections() {
+      return rejections.get();
+    }
+
+    public int getAccepted() {
+      return accepted.get();
+    }
+
+    public void reset() {
+      rejections.set(0);
+      accepted.set(0);
     }
   }
 

@@ -146,4 +146,20 @@ public class PropertiesResolverConfigurationPropertiesResolverTestCase extends A
     resolver.resolveValue("${unresolved-nested-key}");
   }
 
+  @Test
+  public void resolveWithEscapedPrefix() {
+    assertThat(resolver.resolveValue("Hello \\${child-complex-key2}"), is("Hello ${child-complex-key2}"));
+  }
+
+  @Test
+  public void resolveWithEscapedPrefixNotClosed() {
+    assertThat(resolver.resolveValue("Hello \\${child-complex-key2"), is("Hello ${child-complex-key2"));
+  }
+
+  @Test
+  public void resolveWithEscapedPrefixAndNotEscaped() {
+    assertThat(resolver.resolveValue("Hello \\${${child-complex-key2}"),
+               is("Hello ${child-value1-parent-value1-parent-value2-child-value2"));
+  }
+
 }

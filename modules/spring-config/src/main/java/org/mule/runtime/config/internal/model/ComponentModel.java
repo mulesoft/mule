@@ -10,14 +10,26 @@ import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
+import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
+import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapter;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
+import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
+import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper.ExtensionWalkerModelDelegate;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
@@ -29,9 +41,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+
+import javax.xml.namespace.QName;
 
 /**
  * An {@code ComponentModel} represents the user configuration of a component (flow, config, message processor, etc) defined in an
@@ -72,8 +87,6 @@ public abstract class ComponentModel {
 
   private Object objectInstance;
   private Class<?> type;
-  private boolean enabled = true;
-
 
   /**
    * @return the line number in which the component was defined in the configuration file. It may be empty if the component was
@@ -131,7 +144,7 @@ public abstract class ComponentModel {
 
     attrs.putAll(componentMetadata.getParserAttributes());
     componentMetadata.getDocAttributes()
-        .forEach((k, v) -> attrs.put("{http://www.mulesoft.org/schema/mule/documentation}" + k, v));
+        .forEach((k, v) -> attrs.put("{" + NS_MULE_DOCUMENTATION + "}" + k, v));
 
     return attrs;
   }
@@ -210,6 +223,54 @@ public abstract class ComponentModel {
     }
 
     return empty();
+  }
+
+  public void resolveTypedComponentIdentifier(ExtensionModelHelper extensionModelHelper) {
+    executeOnComponentTree(this, componentModel -> {
+      extensionModelHelper.walkToComponent(componentModel.getIdentifier(), new ExtensionWalkerModelDelegate() {
+
+        @Override
+        public void onConfiguration(ConfigurationModel model) {
+          componentModel.setConfigurationModel(model);
+        }
+
+        @Override
+        public void onConnectionProvider(ConnectionProviderModel model) {
+          componentModel.setConnectionProviderModel(model);
+        };
+
+        @Override
+        public void onOperation(OperationModel model) {
+          componentModel.setComponentModel(model);
+        }
+
+        @Override
+        public void onSource(SourceModel model) {
+          componentModel.setComponentModel(model);
+        }
+
+        @Override
+        public void onConstruct(ConstructModel model) {
+          componentModel.setComponentModel(model);
+        }
+
+      });
+      if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
+        extensionModelHelper.findMetadataType(componentModel.getType())
+            .flatMap(t -> createMetadataTypeModelAdapter(t))
+            .ifPresent(componentModel::setMetadataTypeModelAdapter);
+      }
+
+      componentModel.setComponentType(resolveComponentType((ComponentAst) componentModel, extensionModelHelper));
+    });
+  }
+
+  private void executeOnComponentTree(final ComponentModel component, final Consumer<ComponentModel> task)
+      throws MuleRuntimeException {
+    task.accept(component);
+    component.getInnerComponents().forEach((innerComponent) -> {
+      executeOnComponentTree(innerComponent, task);
+    });
   }
 
   public void setComponentModel(org.mule.runtime.api.meta.model.ComponentModel model) {
@@ -318,15 +379,6 @@ public abstract class ComponentModel {
   }
 
   /**
-   * Sets the component as enabled, meaning that it should be created and the beanDefinition associated with created too.
-   *
-   * @param enabled if this component is enabled and has to be created.
-   */
-  public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
-  }
-
-  /**
    * Executes the task on every inner component associated to this componentModel.
    *
    * @param task to be executed on inner components.
@@ -336,13 +388,6 @@ public abstract class ComponentModel {
       task.accept(componentModel);
       componentModel.executedOnEveryInnerComponent(task);
     }
-  }
-
-  /**
-   * @return {@code true} if this component is enabled and has to be created.
-   */
-  public boolean isEnabled() {
-    return this.enabled;
   }
 
   /**
@@ -453,11 +498,23 @@ public abstract class ComponentModel {
      */
     public Builder addCustomAttribute(String name, Object value) {
       checkIsNotBuildingFromRootComponentModel("customAttributes");
-      if (name.startsWith("{http://www.mulesoft.org/schema/mule/documentation}")) {
-        this.metadataBuilder.putDocAttribute(name.substring("{http://www.mulesoft.org/schema/mule/documentation}".length()),
-                                             value.toString());
+      return addCustomAttribute(QName.valueOf(name), value);
+    }
+
+    /**
+     * Adds a custom attribute to the {@code ComponentModel}. This custom attribute is meant to hold metadata of the configuration
+     * and not to be used to instantiate the runtime object that corresponds to this configuration.
+     *
+     * @param name custom attribute name.
+     * @param value custom attribute value.
+     * @return the builder.
+     */
+    public Builder addCustomAttribute(final QName qname, Object value) {
+      checkIsNotBuildingFromRootComponentModel("customAttributes");
+      if (isEmpty(qname.getNamespaceURI()) || NS_MULE_PARSER_METADATA.equals(qname.getNamespaceURI())) {
+        this.metadataBuilder.putParserAttribute(qname.getLocalPart(), value);
       } else {
-        this.metadataBuilder.putParserAttribute(name, value);
+        this.metadataBuilder.putDocAttribute(qname.toString(), value.toString());
       }
       return this;
     }
@@ -556,22 +613,21 @@ public abstract class ComponentModel {
     if (root != that.root) {
       return false;
     }
+    if (!Objects.equals(componentLocation, that.componentLocation)) {
+      return false;
+    }
     if (!identifier.equals(that.identifier)) {
       return false;
     }
-    if (!parameters.equals(that.parameters)) {
-      return false;
-    }
-    return innerComponents.equals(that.innerComponents);
-
+    return parameters.equals(that.parameters);
   }
 
   @Override
   public int hashCode() {
     int result = (root ? 1 : 0);
+    result = 31 * result + Objects.hashCode(componentLocation);
     result = 31 * result + identifier.hashCode();
     result = 31 * result + parameters.hashCode();
-    result = 31 * result + innerComponents.hashCode();
     return result;
   }
 

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal;
 
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.model.ComponentModel;
 
 import java.util.function.Predicate;
@@ -18,11 +19,11 @@ import java.util.function.Predicate;
 public interface ComponentModelInitializer {
 
   /**
-   * Initializes the {@link ComponentModel componentModels} that match for the predicate.
+   * Initializes the {@link <ComponentAst> componentModels} that match for the predicate.
    *
    * @param componentModelPredicate a {@link Predicate} for {@link ComponentModel} to be initialized.
    * @param applyStartPhase boolean indicating if the Start phase should be applied to the created components
    */
-  void initializeComponents(Predicate<ComponentModel> componentModelPredicate, boolean applyStartPhase);
+  void initializeComponents(Predicate<ComponentAst> componentModelPredicate, boolean applyStartPhase);
 
 }

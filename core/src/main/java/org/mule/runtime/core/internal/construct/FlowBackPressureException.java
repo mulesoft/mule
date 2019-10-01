@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.construct;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.backpressure;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.BackPressureReason;
@@ -28,7 +28,7 @@ public abstract class FlowBackPressureException extends MuleException {
    * back-pressure without throwing an exception.
    */
   public FlowBackPressureException(String flowName, BackPressureReason reason) {
-    super(createStaticMessage(BACK_PRESSURE_ERROR_MESSAGE, flowName, reason.toString()));
+    super(backpressure(flowName, reason));
   }
 
   /**
@@ -36,29 +36,7 @@ public abstract class FlowBackPressureException extends MuleException {
    * strategy is in use and back-pressure is identified by a {@link RejectedExecutionException}.
    */
   public FlowBackPressureException(String flowName, BackPressureReason reason, Throwable cause) {
-    super(createStaticMessage(BACK_PRESSURE_ERROR_MESSAGE, flowName, reason.toString()), cause);
-  }
-
-  public static FlowBackPressureException createFlowBackPressureException(String flowName, BackPressureReason reason) {
-    switch (reason) {
-      case MAX_CONCURRENCY_EXCEEDED:
-        return new FlowBackPressureMaxConcurrencyExceededException(flowName, reason);
-      case REQUIRED_SCHEDULER_BUSY:
-        return new FlowBackPressureRequiredSchedulerBusyException(flowName, reason);
-      case REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER:
-        return new FlowBackPressureRequiredSchedulerBusyWithFullBufferException(flowName, reason);
-      case EVENTS_ACCUMULATED:
-        return new FlowBackPressureEventsAccumulatedException(flowName, reason);
-      default:
-        return null;
-    }
-  }
-
-  public static void createAndThrowIfNeeded(String flowName, BackPressureReason reason) throws FlowBackPressureException {
-    final FlowBackPressureException toThrow = createFlowBackPressureException(flowName, reason);
-    if (toThrow != null) {
-      throw toThrow;
-    }
+    super(backpressure(flowName, reason), cause);
   }
 
   public static FlowBackPressureException createFlowBackPressureException(String flowName, BackPressureReason reason,

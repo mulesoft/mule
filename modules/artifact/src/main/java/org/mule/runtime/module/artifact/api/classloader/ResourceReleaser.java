@@ -14,6 +14,7 @@ import org.mule.api.annotation.NoImplement;
  * the access to them.
  */
 @NoImplement
+@FunctionalInterface
 public interface ResourceReleaser {
 
   /**

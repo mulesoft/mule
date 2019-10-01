@@ -13,7 +13,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
-import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;
 import static reactor.core.publisher.Mono.subscriberContext;
@@ -29,16 +28,19 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.Sink;
+import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingExecutorServiceDecorator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.IntUnaryOperator;
 import java.util.function.Supplier;
+
 
 import org.slf4j.Logger;
 import reactor.core.publisher.EmitterProcessor;
@@ -46,9 +48,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * Creates {@link ReactorProcessingStrategyFactory.ReactorProcessingStrategy} instance that implements the proactor pattern by
+ * Creates {@link AsyncProcessingStrategyFactory} instance that implements the proactor pattern by
  * de-multiplexing incoming events onto a multiple emitter using the {@link SchedulerService#cpuLightScheduler()} to process these
- * events from each emitter. In contrast to the {@link ReactorStreamProcessingStrategy} the proactor pattern treats
+ * events from each emitter. In contrast to the {@link AbstractStreamProcessingStrategyFactory} the proactor pattern treats
  * {@link ProcessingType#CPU_INTENSIVE} and {@link ProcessingType#BLOCKING} processors differently and schedules there execution
  * on dedicated {@link SchedulerService#cpuIntensiveScheduler()} and {@link SchedulerService#ioScheduler()} ()} schedulers.
  * <p/>
@@ -56,7 +58,7 @@ import reactor.core.publisher.Mono;
  *
  * @since 4.2.0
  */
-public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStreamProcessingStrategyFactory {
+public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStreamProcessingStrategyFactory {
 
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
@@ -76,11 +78,6 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
   }
 
   @Override
-  protected int resolveParallelism() {
-    return Integer.max(CORES, getMaxConcurrency());
-  }
-
-  @Override
   public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
     return ProactorStreamEmitterProcessingStrategy.class;
   }
@@ -89,7 +86,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
 
     private static final String NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR = "No subscriptions active for processor.";
     private static Logger LOGGER = getLogger(ProactorStreamEmitterProcessingStrategy.class);
-
+    
     private final int bufferSize;
     private final boolean isThreadLoggingEnabled;
 
@@ -146,7 +143,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
                                      () -> awaitSubscribersCompletion(flowConstruct, shutdownTimeout, completionLatch,
                                                                       currentTimeMillis()),
                                      createOnEventConsumer(), getBufferQueueSize());
-        sinks.add(new ProactorSinkWrapper<>(sink));
+        sinks.add(sink);
       }
 
       return new RoundRobinReactorSink<>(sinks);
@@ -179,22 +176,44 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends ReactorStrea
     }
 
     @Override
-    protected Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, Scheduler processorScheduler,
+    protected Mono<CoreEvent> scheduleProcessor(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
+                                                Mono<CoreEvent> eventFlux) {
+      return scheduleWithLogging(processor, processorScheduler, eventFlux);
+    }
+
+    @Override
+    protected Flux<CoreEvent> scheduleProcessor(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
                                                 Flux<CoreEvent> eventFlux) {
       return scheduleWithLogging(processor, processorScheduler, eventFlux);
     }
 
-    private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, Scheduler processorScheduler,
-                                                Flux<CoreEvent> eventFlux) {
+    private Mono<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
+                                                Mono<CoreEvent> eventFlux) {
       if (isThreadLoggingEnabled) {
-        return eventFlux
+        return Mono.from(eventFlux)
             .flatMap(e -> subscriberContext()
                 .flatMap(ctx -> Mono.just(e).transform(processor)
                     .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
                         .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(processorScheduler),
                                                                                                e.getContext().getId())))));
       } else {
-        return eventFlux
+        return Mono.from(eventFlux)
+            .publishOn(fromExecutorService(decorateScheduler(processorScheduler)))
+            .transform(processor);
+      }
+    }
+
+    private Flux<CoreEvent> scheduleWithLogging(ReactiveProcessor processor, ScheduledExecutorService processorScheduler,
+                                                Flux<CoreEvent> eventFlux) {
+      if (isThreadLoggingEnabled) {
+        return Flux.from(eventFlux)
+            .flatMap(e -> subscriberContext()
+                .flatMap(ctx -> Mono.just(e).transform(processor)
+                    .subscribeOn(fromExecutorService(new ThreadLoggingExecutorServiceDecorator(ctx
+                        .getOrEmpty(THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY), decorateScheduler(processorScheduler),
+                                                                                               e.getContext().getId())))));
+      } else {
+        return Flux.from(eventFlux)
             .publishOn(fromExecutorService(decorateScheduler(processorScheduler)))
             .transform(processor);
       }

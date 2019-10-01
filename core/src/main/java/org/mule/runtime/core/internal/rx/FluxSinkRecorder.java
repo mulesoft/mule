@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.rx;
 
-import org.mule.runtime.core.internal.exception.MessagingException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -53,14 +51,12 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
     }
   }
 
-  public void error(MessagingException error) {
+  public void error(Throwable error) {
     boolean present = true;
     synchronized (this) {
       if (fluxSink == null) {
         present = false;
-        bufferedEvents.add(() -> {
-          fluxSink.error(error);
-        });
+        bufferedEvents.add(() -> fluxSink.error(error));
       }
     }
 

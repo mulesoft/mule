@@ -27,6 +27,7 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Un
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.tck.MuleTestUtils.spyInjector;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
@@ -186,12 +187,12 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   @Mock
   protected MetadataResolverFactory metadataResolverFactory;
 
-
   protected boolean primaryNodeOnly = false;
   protected SourceAdapter sourceAdapter;
   protected SourceCallback sourceCallback;
   protected ExtensionMessageSource messageSource;
   protected StreamingManager streamingManager = spy(new DefaultStreamingManager());
+  private NotificationDispatcher notificationDispatcher;
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
@@ -207,6 +208,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   public void before() throws Exception {
     initMocks(this);
     spyInjector(muleContext);
+    notificationDispatcher = getNotificationDispatcher(muleContext);
     reset(muleContext.getSchedulerService());
     when(result.getMediaType()).thenReturn(of(ANY));
     when(result.getAttributes()).thenReturn(empty());
@@ -235,7 +237,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
     mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
 
     retryPolicyTemplate
-        .setNotificationFirer(((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class));
+        .setNotificationFirer(notificationDispatcher);
     initialiseIfNeeded(retryPolicyTemplate, muleContext);
 
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_EXTENSION_MANAGER, extensionManager);
@@ -288,8 +290,10 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
         .setProcessingManager(messageProcessingManager)
         .setListener(messageProcessor)
         .setSource(messageSource)
-        .setMuleContext(muleContext)
         .setProcessContext(messageProcessContext)
+        .setApplicationName(muleContext.getConfiguration().getId())
+        .setNotificationDispatcher(notificationDispatcher)
+        .setTransactionFactoryManager(muleContext.getTransactionFactoryManager())
         .setCompletionHandlerFactory(completionHandlerFactory)
         .setExceptionCallback(exceptionCallback)
         .setCursorStreamProviderFactory(cursorStreamProviderFactory)
@@ -329,12 +333,13 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
 
     ExtensionMessageSource messageSource =
         new ExtensionMessageSource(extensionModel, sourceModel, sourceAdapterFactory, configurationProvider, primaryNodeOnly,
-                                   retryPolicyTemplate, cursorStreamProviderFactory, FAIL, extensionManager);
+                                   retryPolicyTemplate, cursorStreamProviderFactory, FAIL, extensionManager,
+                                   notificationDispatcher, muleContext.getTransactionFactoryManager(),
+                                   muleContext.getConfiguration().getId());
     messageSource.setListener(messageProcessor);
     messageSource.setAnnotations(getAppleFlowComponentLocationAnnotations());
     muleContext.getInjector().inject(messageSource);
     return messageSource;
   }
-
 
 }

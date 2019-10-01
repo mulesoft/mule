@@ -13,7 +13,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
-import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
+import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErrorMappings;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
@@ -25,6 +25,7 @@ import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
@@ -188,7 +189,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
      */
     private Map<String, Pair<String, MetadataType>> parseParameters(Map<String, String> parameters,
                                                                     List<ParameterModel> parameterModels) {
-      final HashMap<String, Pair<String, MetadataType>> result = new HashMap<>();
+      final Map<String, Pair<String, MetadataType>> result = new HashMap<>();
 
       for (ParameterModel parameterModel : parameterModels) {
         final String parameterName = parameterModel.getName();
@@ -206,11 +207,20 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
      */
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-      Map<String, String> annotation = (Map<String, String>) getAnnotation(ANNOTATION_PARAMETERS);
-      String moduleOperationName = annotation.get("moduleName") + ":" + annotation.get("moduleOperation");
       return from(publisher)
-          .doOnNext(event -> ((DefaultFlowCallStack) event.getFlowCallStack())
-              .push(new FlowStackElement(moduleOperationName, null)))
+          .doOnNext(event -> {
+            final DefaultFlowCallStack flowCallStack = (DefaultFlowCallStack) event.getFlowCallStack();
+
+            final ComponentIdentifier identifier = (ComponentIdentifier) getAnnotation(ANNOTATION_NAME);
+            if (identifier.getNamespace() == null || "tns".equals(identifier.getNamespace())) {
+              final String[] peekedWithNamespace = flowCallStack.peek().getFlowName().split("\\:");
+              String peekedNamespace = peekedWithNamespace[0];
+
+              flowCallStack.push(new FlowStackElement(peekedNamespace + ":" + identifier.getName(), null));
+            } else {
+              flowCallStack.push(new FlowStackElement(identifier.getNamespace() + ":" + identifier.getName(), null));
+            }
+          })
           .concatMap(request -> {
             Publisher<CoreEvent> child = processWithChildContextDontComplete(createEventWithParameters(request), super::apply,
                                                                              ofNullable(getLocation()));

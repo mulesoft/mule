@@ -83,6 +83,20 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import javax.inject.Inject;
+import javax.xml.namespace.QName;
+
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -99,19 +113,6 @@ import org.mockito.verification.VerificationMode;
 import org.reactivestreams.Publisher;
 
 import com.google.common.collect.ImmutableMap;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import javax.inject.Inject;
-import javax.xml.namespace.QName;
 
 import reactor.core.publisher.Mono;
 
@@ -1914,7 +1915,8 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     final TypedComponentIdentifier part =
         builder().identifier(buildFromStringRepresentation(componentIdentifier)).type(OPERATION).build();
     return new DefaultComponentLocation(of("flowName"),
-                                        singletonList(new DefaultLocationPart("0", of(part), empty(), empty(), empty())));
+                                        singletonList(new DefaultLocationPart("0", of(part), empty(), OptionalInt.empty(),
+                                                                              OptionalInt.empty())));
   }
 
   private static Map<String, ProcessorParameterValue> mapArgWithEntry(String key, Object value) {

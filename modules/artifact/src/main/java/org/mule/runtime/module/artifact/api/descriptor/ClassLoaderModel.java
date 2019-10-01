@@ -267,10 +267,21 @@ public final class ClassLoaderModel {
     }
 
     /**
+     * Does the filtering of exported packages and resources from the local ones.
+     */
+    private void filterExportedFromLocalResources() {
+      localPackages.removeAll(packages);
+      localResources.removeAll(resources);
+    }
+
+    /**
      * Creates a {@link ClassLoaderModel} with the current configuration.
      * @return a non null {@link ClassLoaderModel}
      */
     public ClassLoaderModel build() {
+      // first we remove from local packages and resources those that are exported.
+      filterExportedFromLocalResources();
+
       return new ClassLoaderModel(urls.toArray(new URL[0]),
                                   unmodifiableSet(packages), unmodifiableSet(resources),
                                   unmodifiableSet(localPackages), unmodifiableSet(localResources),

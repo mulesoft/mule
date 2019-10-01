@@ -2992,7 +2992,13 @@
           ],
           "name": "mystic",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "multipleConfig"
+              ]
+            }
+          }
         },
         {
           "connectionManagementType": "POOLING",
@@ -3499,7 +3505,13 @@
           ],
           "name": "pooling-mystic",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "multipleConfig"
+              ]
+            }
+          }
         }
       ],
       "messageSources": [
@@ -4171,7 +4183,15 @@
       ],
       "name": "dr-strange",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "ironManConfig",
+            "spellStore",
+            "name"
+          ]
+        }
+      }
     },
     {
       "stereotype": {
@@ -5605,7 +5625,13 @@
           ],
           "name": "missile",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "missileConfigurationDirectory"
+              ]
+            }
+          }
         },
         {
           "connectionManagementType": "NONE",
@@ -5893,13 +5919,27 @@
           ],
           "name": "odd-missile",
           "description": "",
-          "modelProperties": {}
+          "modelProperties": {
+            "requiredForMetadata": {
+              "requiredParameters": [
+                "missileConfigurationDirectory"
+              ]
+            }
+          }
         }
       ],
       "messageSources": [],
       "name": "ironMan",
       "description": "",
-      "modelProperties": {}
+      "modelProperties": {
+        "requiredForMetadata": {
+          "requiredParameters": [
+            "ironManConfigFile",
+            "aiType",
+            "name"
+          ]
+        }
+      }
     }
   ],
   "operations": [

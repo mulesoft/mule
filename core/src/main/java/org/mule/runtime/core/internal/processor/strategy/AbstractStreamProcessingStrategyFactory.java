@@ -8,23 +8,27 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.getInteger;
+import static java.lang.Integer.max;
 import static java.lang.Long.max;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static reactor.util.concurrent.Queues.SMALL_BUFFER_SIZE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static reactor.util.concurrent.Queues.isPowerOfTwo;
 
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.function.Supplier;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Abstract {@link ProcessingStrategyFactory} to be used by implementations that de-multiplex incoming messages.
@@ -34,19 +38,19 @@ import java.util.concurrent.CountDownLatch;
  *
  * @since 4.0
  */
-abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessingStrategyFactory {
+public abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessingStrategyFactory {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractStreamProcessingStrategyFactory.class);
 
   protected static final String SYSTEM_PROPERTY_PREFIX = AbstractStreamProcessingStrategyFactory.class.getName() + ".";
   protected static final int CORES = getInteger(SYSTEM_PROPERTY_PREFIX + "AVAILABLE_CORES", getRuntime().availableProcessors());
 
-  protected static final int DEFAULT_BUFFER_SIZE = getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_BUFFER_SIZE", SMALL_BUFFER_SIZE);
+  protected static final int DEFAULT_BUFFER_SIZE = getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_BUFFER_SIZE", 1024);
 
   // Use one subscriber for every two cores available, or 1 subscriber for 1 core. This value is high for most scenarios but
   // required to achieve absolute minimum latency for the scenarios where this is important.
   protected static final int DEFAULT_SUBSCRIBER_COUNT =
-      getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_SUBSCRIBER_COUNT", Integer.max(1, (CORES / 2)));
+      getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_SUBSCRIBER_COUNT", max(1, (CORES / 2)));
   private int bufferSize = DEFAULT_BUFFER_SIZE;
   private int subscriberCount = DEFAULT_SUBSCRIBER_COUNT;
 
@@ -86,6 +90,16 @@ abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessin
   @Override
   public Class<? extends ProcessingStrategy> getProcessingStrategyType() {
     return AbstractStreamProcessingStrategy.class;
+  }
+
+  protected Supplier<Scheduler> getCpuLightSchedulerSupplier(MuleContext muleContext, String schedulersNamePrefix) {
+    return () -> muleContext.getSchedulerService()
+        .cpuLightScheduler(muleContext.getSchedulerBaseConfig()
+            .withName(schedulersNamePrefix + "." + CPU_LITE.name()));
+  }
+
+  protected int resolveParallelism() {
+    return max(CORES, getMaxConcurrency());
   }
 
   /**

@@ -7,28 +7,27 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getOAuthConnectionProvider;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.core.internal.util.rx.MonoSinkWrapper;
 import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConnectionProviderWrapper;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConnectionProviderWrapper;
@@ -38,7 +37,6 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import java.util.Optional;
 
 import org.slf4j.Logger;
-import reactor.core.publisher.MonoSink;
 
 /**
  * A specialization of {@link OperationMessageProcessor} for operations which might be running
@@ -72,34 +70,33 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
   }
 
   @Override
-  protected void executeOperation(CoreEvent event,
-                                  ExecutionContextAdapter<OperationModel> operationContext,
-                                  MonoSink<CoreEvent> sink) {
-
-    super.executeOperation(event, operationContext, refreshable(event, operationContext, sink));
-
+  protected void executeOperation(ExecutionContextAdapter<OperationModel> operationContext, ExecutorCallback callback) {
+    super.executeOperation(operationContext, refreshable(operationContext, callback));
   }
 
-  private MonoSink<CoreEvent> refreshable(CoreEvent event,
-                                          ExecutionContextAdapter<OperationModel> operationContext,
-                                          MonoSink<CoreEvent> sink) {
-    return new MonoSinkWrapper<CoreEvent>(sink) {
+  private ExecutorCallback refreshable(ExecutionContextAdapter<OperationModel> operationContext, ExecutorCallback callback) {
+    return new ExecutorCallback() {
+
+      @Override
+      public void complete(Object value) {
+        callback.complete(value);
+      }
 
       @Override
       public void error(Throwable e) {
         AccessTokenExpiredException expiredException = getTokenExpirationException(e);
         if (expiredException == null) {
-          delegate.error(e);
+          callback.error(e);
           return;
         }
 
         OAuthConnectionProviderWrapper connectionProvider = getOAuthConnectionProvider(operationContext);
         if (connectionProvider == null) {
-          delegate.error(e);
+          callback.error(e);
           return;
         }
 
-        Reference<Optional<String>> resourceOwnerIdReference = new Reference<>(empty());
+        Reference<Optional<String>> resourceOwnerIdReference = new Reference<>(Optional.empty());
         connectionProvider.getGrantType().accept(new OAuthGrantTypeVisitor() {
 
           @Override
@@ -134,7 +131,7 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
         try {
           connectionProvider.refreshToken(resourceOwnerId.orElse(""));
         } catch (Exception refreshException) {
-          delegate.error(new MuleRuntimeException(createStaticMessage(format(
+          callback.error(new MuleRuntimeException(createStaticMessage(format(
                                                                              "AccessToken %s expired while executing operation '%s:%s' using config '%s'. Refresh token "
                                                                                  + "workflow was attempted but failed with the following exception",
                                                                              forResourceOwner(resourceOwnerId),
@@ -152,7 +149,7 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
                               forResourceOwner(resourceOwnerId), operationContext.getConfiguration().get().getName()));
         }
 
-        OAuthOperationMessageProcessor.super.executeOperation(event, operationContext, sink);
+        OAuthOperationMessageProcessor.super.executeOperation(operationContext, callback);
       }
     };
   }

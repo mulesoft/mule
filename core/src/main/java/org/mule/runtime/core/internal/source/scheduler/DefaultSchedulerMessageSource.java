@@ -6,44 +6,44 @@
  */
 package org.mule.runtime.core.internal.source.scheduler;
 
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
-import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObjectOrFail;
-import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
+import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.source.SchedulerConfiguration;
 import org.mule.runtime.api.source.SchedulerMessageSource;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.context.notification.NotificationHelper;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.scheduler.PeriodicScheduler;
-import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
+import org.mule.runtime.core.internal.execution.MessageProcessContext;
+import org.mule.runtime.core.internal.execution.MessageProcessingManager;
+import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+
+import java.util.Optional;
+import java.util.concurrent.ScheduledFuture;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
-
-import java.util.concurrent.ScheduledFuture;
 
 /**
  * <p>
@@ -62,7 +62,6 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   private final static Logger LOGGER = getLogger(DefaultSchedulerMessageSource.class);
 
   private final PeriodicScheduler scheduler;
-  private final NotificationHelper notificationHelper;
   private final boolean disallowConcurrentExecution;
 
   private Scheduler pollingExecutor;
@@ -70,8 +69,17 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   private Processor listener;
   private FlowConstruct flowConstruct;
   private MuleContext muleContext;
+
+  @Inject
+  private ConfigurationComponentLocator componentLocator;
+
+  @Inject
+  private MessageProcessingManager messageProcessingManager;
+
   private boolean started;
   private volatile boolean executing = false;
+  private FlowProcessTemplate flowProcessingTemplate;
+  private SchedulerProcessContext flowProcessContext;
 
   /**
    * @param muleContext application's context
@@ -82,8 +90,6 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     this.muleContext = muleContext;
     this.scheduler = scheduler;
     this.disallowConcurrentExecution = disallowConcurrentExecution;
-    this.notificationHelper =
-        new NotificationHelper(muleContext.getNotificationManager(), ConnectorMessageNotification.class, false);
   }
 
   @Override
@@ -157,36 +163,27 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     }
 
     if (execute) {
-      Message request = of(null);
-      pollWith(request);
+      doPoll();
     } else {
       LOGGER.info("Flow '{}' is already running and 'disallowConcurrentExecution' is set to 'true'. Execution skipped.",
-                  flowConstruct.getRootContainerLocation().getGlobalName());
+                  getLocation().getRootContainerName());
     }
   }
 
-  private void pollWith(final Message request) {
+  private void doPoll() {
     try {
-      just(request)
-          .map(message -> InternalEvent.builder(create(flowConstruct, getLocation())).message(request)
-              .build())
-          .doOnNext(event -> setCurrentEvent(event))
-          .doOnNext(event -> notificationHelper.fireNotification(this, event, getLocation(), MESSAGE_RECEIVED))
-          .cast(CoreEvent.class)
-          .transform(listener)
-          .doOnError(MessagingException.class,
-                     me -> ((BaseEventContext) me.getEvent().getContext()).error(me))
-          .doOnSuccess(result -> ((BaseEventContext) result.getContext()).success())
-          .doFinally(s -> {
-            synchronized (DefaultSchedulerMessageSource.this) {
-              executing = false;
-            }
-          })
-          .subscribe(requestUnbounded());
+      messageProcessingManager.processMessage(flowProcessingTemplate, flowProcessContext);
     } catch (Exception e) {
       muleContext.getExceptionListener().handleException(e);
     }
   }
+
+  protected void setIsExecuting(boolean value) {
+    synchronized (this) {
+      executing = value;
+    }
+  }
+
 
   /**
    * <p>
@@ -200,7 +197,13 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
    */
   @Override
   public void initialise() throws InitialisationException {
-    this.flowConstruct = getFromAnnotatedObjectOrFail(muleContext.getConfigurationComponentLocator(), this);
+    getFromAnnotatedObject(componentLocator, this)
+        .ifPresent(flow -> this.flowConstruct = flow);
+
+    // Flow execution configurations
+    this.flowProcessingTemplate = new SchedulerFlowProcessingTemplate(listener, emptyList(), this);
+    this.flowProcessContext = new SchedulerProcessContext();
+
     createScheduler();
   }
 
@@ -234,5 +237,33 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   @Override
   public BackPressureStrategy getBackPressureStrategy() {
     return FAIL;
+  }
+
+  private class SchedulerProcessContext implements MessageProcessContext {
+
+    @Override
+    public MessageSource getMessageSource() {
+      return DefaultSchedulerMessageSource.this;
+    }
+
+    @Override
+    public Optional<TransactionConfig> getTransactionConfig() {
+      return empty();
+    }
+
+    @Override
+    public ClassLoader getExecutionClassLoader() {
+      return muleContext.getExecutionClassLoader();
+    }
+
+    @Override
+    public ErrorTypeLocator getErrorTypeLocator() {
+      return ((PrivilegedMuleContext) muleContext).getErrorTypeLocator();
+    }
+
+    @Override
+    public FlowConstruct getFlowConstruct() {
+      return flowConstruct;
+    }
   }
 }
