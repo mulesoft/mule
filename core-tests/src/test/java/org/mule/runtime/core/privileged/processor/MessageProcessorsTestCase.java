@@ -264,7 +264,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processWithChildContextBlockingErrorInChainRegainsParentContext() throws Exception {
+  public void processWithChildContextBlockingErrorInChainRegainsParentContext() {
     try {
       processWithChildContextBlocking(input, createChain(error), Optional.empty());
       fail("Exception expected");
@@ -277,7 +277,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   @Issue("MULE-16892")
-  public void processWithChildContextErrorInChainMantainsChildContext() throws Exception {
+  public void processWithChildContextErrorInChainMaintainsChildContext() throws Exception {
     Reference<EventContext> contextReference = new Reference<>();
     from(processWithChildContext(input, createChain(error), Optional.empty()))
         .doOnError(e -> {
@@ -538,7 +538,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processToApplyErrorInChain() throws Exception {
+  public void processToApplyErrorInChain() {
     try {
       processToApply(input, createChain(error));
       fail("Exception expected");
@@ -555,7 +555,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processToApplyErrorInFlow() throws Exception {
+  public void processToApplyErrorInFlow() {
     try {
       processToApply(input, createFlow(error));
       fail("Exception expected");
@@ -590,7 +590,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processAckAndStop() throws Exception {
+  public void processAckAndStop() {
     assertThat(from(MessageProcessors.process(input, ackAndStop)).block(), is(nullValue()));
     assertThat(from(responsePublisher).block(), is(nullValue()));
   }
@@ -608,7 +608,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processRespondAndStop() throws Exception {
+  public void processRespondAndStop() {
     assertThat(from(MessageProcessors.process(input, respondAndStop)).block(), is(response));
     assertThat(from(responsePublisher).block(), is(response));
   }
@@ -627,7 +627,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processAckAndMap() throws Exception {
+  public void processAckAndMap() {
     assertThat(from(MessageProcessors.process(input, ackAndMap)).block(), is(output));
     assertThat(from(responsePublisher).block(), is(nullValue()));
   }
@@ -645,7 +645,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processRespondAndMap() throws Exception {
+  public void processRespondAndMap() {
     assertThat(from(MessageProcessors.process(input, respondAndMap)).block(), is(output));
     assertThat(from(responsePublisher).block(), is(response));
   }
@@ -663,7 +663,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processError() throws Exception {
+  public void processError() {
     thrown.expectCause((is(instanceOf(MessagingException.class))));
     thrown.expectCause(hasCause(is(exception)));
     try {
@@ -676,7 +676,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processErrorInChain() throws Exception {
+  public void processErrorInChain() {
     try {
       from(MessageProcessors.process(input, createChain(error))).block();
       fail("Exception expected");
@@ -693,7 +693,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processErrorInFlow() throws Exception {
+  public void processErrorInFlow() {
     try {
       from(MessageProcessors.process(input, createFlow(error))).block();
       fail("Exception expected");
@@ -725,7 +725,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     assertThat(fluxCompleted.get(), is(true));
   }
 
-  private Processor createChain(ReactiveProcessor processor) throws InitialisationException {
+  private Processor createChain(ReactiveProcessor processor) {
     MessageProcessorChain chain = newChain(Optional.empty(), new ReactiveProcessorToProcessorAdaptor(processor));
     chain.setMuleContext(muleContext);
     return chain;
