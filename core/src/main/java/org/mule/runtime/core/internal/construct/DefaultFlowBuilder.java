@@ -19,7 +19,6 @@ import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.empty;
-
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
@@ -222,6 +221,8 @@ public class DefaultFlowBuilder implements Builder {
     public ReactiveProcessor referenced() {
       return pub -> from(pub)
           .doOnNext(assertStarted())
+              // If an error occurs prior
+          .onErrorStop()
           // Insert the incoming event into the flow, routing it through the processing strategy
           .flatMap(routeThroughProcessingStrategy()
               // Don't propagate errors, these will be handled by parent flow through the EventContext hierarchy mechanism

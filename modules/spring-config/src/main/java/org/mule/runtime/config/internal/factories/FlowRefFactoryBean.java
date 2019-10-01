@@ -60,6 +60,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -217,6 +218,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       super(owner);
     }
 
+    private final AtomicBoolean stoppedOnce = new AtomicBoolean(false);
     private final LazyValue<ReactiveProcessor> resolvedReferencedProcessorSupplier = new LazyValue<>(() -> {
       try {
         return getReferencedFlow(refName, StaticFlowRefMessageProcessor.this);
@@ -343,7 +345,8 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     @Override
     public void doStart() throws MuleException {
-      if (targetIsComputedAndSubFlow()) {
+      // Preventing two sequential stop calls in case the flow with a referenced subflow is first constructed, and then started
+      if (stoppedOnce.get() && targetIsComputedAndSubFlow()) {
         startIfNeeded(resolvedReferencedProcessorSupplier.get());
       }
     }
@@ -352,6 +355,8 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     public void stop() throws MuleException {
       if (targetIsComputedAndSubFlow()) {
         stopIfNeeded(resolvedReferencedProcessorSupplier.get());
+        // Since it was manually stopped, in the next start the target should be started
+        stoppedOnce.set(true);
       }
     }
 
