@@ -407,6 +407,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
             throw new IllegalStateException("Couldn't register an instance of a MessageProcessorChain", e);
           }
           objects.put(chainKey, messageProcessorChain);
+        } else if (object instanceof TransactionManagerFactory) {
+          try {
+            getMuleContext()
+                .setTransactionManager(((TransactionManagerFactory) object).create(getMuleContext().getConfiguration()));
+          } catch (Exception e) {
+            throw new IllegalStateException("Couldn't register an instance of a TransactionManager", e);
+          }
         }
         objects.put(componentPair, object);
       }

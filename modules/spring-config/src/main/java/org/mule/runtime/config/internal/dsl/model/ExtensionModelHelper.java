@@ -29,6 +29,7 @@ import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.construct.HasConstructModels;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
@@ -38,6 +39,8 @@ import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
@@ -203,26 +206,25 @@ public class ExtensionModelHelper {
 
             new ExtensionWalker() {
 
+              final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(extensionModel);
+
               @Override
               protected void onOperation(HasOperationModels owner, OperationModel model) {
-                if (dslSyntaxResolversByExtension.get(extensionModel).resolve(model).getElementName()
-                    .equals(componentIdentifier.getName())) {
+                if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                   modelRef.set(model);
                 }
               }
 
               @Override
               protected void onSource(HasSourceModels owner, SourceModel model) {
-                if (dslSyntaxResolversByExtension.get(extensionModel).resolve(model).getElementName()
-                    .equals(componentIdentifier.getName())) {
+                if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                   modelRef.set(model);
                 }
               }
 
               @Override
               protected void onConstruct(HasConstructModels owner, ConstructModel model) {
-                if (dslSyntaxResolversByExtension.get(extensionModel).resolve(model).getElementName()
-                    .equals(componentIdentifier.getName())) {
+                if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                   modelRef.set(model);
                 }
               }
@@ -251,11 +253,11 @@ public class ExtensionModelHelper {
 
             new ExtensionWalker() {
 
+              final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(currentExtension);
+
               @Override
-              protected void onConnectionProvider(org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels owner,
-                                                  ConnectionProviderModel model) {
-                if (dslSyntaxResolversByExtension.get(currentExtension).resolve(model).getElementName()
-                    .equals(componentIdentifier.getName())) {
+              protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
+                if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                   modelRef.set(model);
                 }
               };
@@ -283,10 +285,11 @@ public class ExtensionModelHelper {
 
             new ExtensionWalker() {
 
+              final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(currentExtension);
+
               @Override
               protected void onConfiguration(ConfigurationModel model) {
-                if (dslSyntaxResolversByExtension.get(currentExtension).resolve(model).getElementName()
-                    .equals(componentIdentifier.getName())) {
+                if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                   modelRef.set(model);
                 }
               }
@@ -296,6 +299,19 @@ public class ExtensionModelHelper {
             return ofNullable(modelRef.get());
           });
     });
+  }
+
+  public Optional<? extends ParameterModel> findParameterModel(ComponentIdentifier nestedComponentId,
+                                                               ParameterizedModel model) {
+    return lookupExtensionModelFor(nestedComponentId)
+        .flatMap(currentExtension -> {
+          final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(currentExtension);
+
+          return model.getAllParameterModels()
+              .stream()
+              .filter(pm -> dslSyntaxResolver.resolve(pm).getElementName().equals(nestedComponentId.getName()))
+              .findAny();
+        });
   }
 
   /**

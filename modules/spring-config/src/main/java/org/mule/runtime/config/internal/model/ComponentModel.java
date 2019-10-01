@@ -15,7 +15,8 @@ import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
-import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapter;
+import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapterWithSterotype;
+import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createParameterizedTypeModelAdapter;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
@@ -24,6 +25,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -232,32 +234,47 @@ public abstract class ComponentModel {
         @Override
         public void onConfiguration(ConfigurationModel model) {
           componentModel.setConfigurationModel(model);
+          processPojoParameters(extensionModelHelper, componentModel, model);
         }
 
         @Override
         public void onConnectionProvider(ConnectionProviderModel model) {
           componentModel.setConnectionProviderModel(model);
-        };
+          processPojoParameters(extensionModelHelper, componentModel, model);
+        }
 
         @Override
         public void onOperation(OperationModel model) {
           componentModel.setComponentModel(model);
+          processPojoParameters(extensionModelHelper, componentModel, model);
         }
 
         @Override
         public void onSource(SourceModel model) {
           componentModel.setComponentModel(model);
+          processPojoParameters(extensionModelHelper, componentModel, model);
         }
 
         @Override
         public void onConstruct(ConstructModel model) {
           componentModel.setComponentModel(model);
+          processPojoParameters(extensionModelHelper, componentModel, model);
         }
+
+        private void processPojoParameters(ExtensionModelHelper extensionModelHelper, ComponentModel componentModel,
+                                           ParameterizedModel model) {
+          ((ComponentAst) componentModel).recursiveStream().forEach(childComp -> {
+            extensionModelHelper.findParameterModel(childComp.getIdentifier(), model).ifPresent(paramModel -> {
+              ((ComponentModel) childComp)
+                  .setMetadataTypeModelAdapter(createParameterizedTypeModelAdapter(paramModel.getType()));
+            });
+          });
+        };
 
       });
       if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
         extensionModelHelper.findMetadataType(componentModel.getType())
-            .flatMap(t -> createMetadataTypeModelAdapter(t))
+            .flatMap(t -> createMetadataTypeModelAdapterWithSterotype(t))
             .ifPresent(componentModel::setMetadataTypeModelAdapter);
       }
 
