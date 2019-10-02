@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -62,7 +61,6 @@ public abstract class ComponentModel {
   private DefaultComponentLocation componentLocation;
   private TypedComponentIdentifier.ComponentType componentType;
   private Predicate<Map.Entry<String, String>> expansionParameterFilter;
-  List<String> expansionParams = new ArrayList<>(); //TODO: this is just meant for testing, should be a filter of some sort
 
   private Object objectInstance;
   private Class<?> type;
@@ -110,7 +108,6 @@ public abstract class ComponentModel {
   }
 
   public Map<String, String> getFilteredParameters() {
-    //return unmodifiableMap(parameters.entrySet().stream().filter(param -> !expansionParams.contains(param.getKey())).collect(Collectors.toMap(e->e.getKey(),e->e.getValue())));
     return unmodifiableMap(parameters.entrySet().stream().filter(expansionParameterFilter)
         .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue())));
   }
