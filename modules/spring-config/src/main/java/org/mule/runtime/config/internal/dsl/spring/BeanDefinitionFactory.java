@@ -213,7 +213,7 @@ public class BeanDefinitionFactory {
             addAnnotation(ANNOTATION_NAME, componentModel.getIdentifier(), componentModel);
             // We need to use a mutable map since spring will resolve the properties placeholder present in the value if needed
             // and it will be done by mutating the same map.
-            addAnnotation(ANNOTATION_PARAMETERS, new HashMap<>(componentModel.getParameters()), componentModel);
+            addAnnotation(ANNOTATION_PARAMETERS, new HashMap<>(componentModel.getFilteredParameters()), componentModel);
             // add any error mappings if present
             List<ComponentModel> errorMappingComponents = componentModel.getInnerComponents().stream()
                 .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER.equals(innerComponent.getIdentifier())).collect(toList());

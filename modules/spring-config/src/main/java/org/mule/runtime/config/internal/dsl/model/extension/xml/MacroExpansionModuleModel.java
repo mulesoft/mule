@@ -22,6 +22,8 @@ import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMess
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+
+import org.apache.commons.collections.list.LazyList;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -46,13 +48,8 @@ import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -293,10 +290,14 @@ public class MacroExpansionModuleModel {
     processorChainBuilder
         .setIdentifier(builder().namespace(CORE_PREFIX).name("module-operation-chain").build());
 
+    processorChainBuilder.setParameterFilter(param -> !Arrays.asList("moduleName", "moduleOperation").contains(param.getKey()));
+
     processorChainBuilder.addParameter("moduleName", extensionModel.getXmlDslModel().getPrefix(), false);
     processorChainBuilder.addParameter("moduleOperation", operationModel.getName(), false);
     Map<String, String> propertiesMap = extractProperties(configRefName);
     Map<String, String> parametersMap = extractParameters(operationRefModel, operationModel.getAllParameterModels());
+    parametersMap.forEach((k, v) -> processorChainBuilder.addParameter(k, v, false));
+
     ComponentModel propertiesComponentModel =
         getParameterChild(propertiesMap, "module-operation-properties", "module-operation-property-entry");
     ComponentModel parametersComponentModel =
@@ -344,6 +345,10 @@ public class MacroExpansionModuleModel {
     return operationRefModel.getParameters().containsKey(MODULE_OPERATION_CONFIG_REF)
         ? of(operationRefModel.getParameters().get(MODULE_OPERATION_CONFIG_REF))
         : defaultGlobalElementName();
+  }
+
+  private Predicate<List<String>> expansionParametersFilter(List<String> internalParamNames) {
+    return parameter -> internalParamNames.contains(parameter);
   }
 
   /**

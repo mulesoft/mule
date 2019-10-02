@@ -26,6 +26,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.Map.Entry;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * An {@code ComponentModel} represents the user configuration of a component (flow, config, message processor, etc) defined in an
@@ -58,6 +61,8 @@ public abstract class ComponentModel {
   private String textContent;
   private DefaultComponentLocation componentLocation;
   private TypedComponentIdentifier.ComponentType componentType;
+  private Predicate<Map.Entry<String, String>> expansionParameterFilter;
+  List<String> expansionParams = new ArrayList<>(); //TODO: this is just meant for testing, should be a filter of some sort
 
   private Object objectInstance;
   private Class<?> type;
@@ -103,6 +108,13 @@ public abstract class ComponentModel {
   public Map<String, String> getParameters() {
     return unmodifiableMap(parameters);
   }
+
+  public Map<String, String> getFilteredParameters() {
+    //return unmodifiableMap(parameters.entrySet().stream().filter(param -> !expansionParams.contains(param.getKey())).collect(Collectors.toMap(e->e.getKey(),e->e.getValue())));
+    return unmodifiableMap(parameters.entrySet().stream().filter(expansionParameterFilter)
+        .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue())));
+  }
+
 
   /**
    * @return a {@code java.util.List} of all the child {@code ComponentModel}s
@@ -389,6 +401,10 @@ public abstract class ComponentModel {
       checkIsNotBuildingFromRootComponentModel("customAttributes");
       this.model.customAttributes.put(name, value);
       return this;
+    }
+
+    public void setParameterFilter(Predicate<Map.Entry<String, String>> expansionParameterFilter) {
+      this.model.expansionParameterFilter = expansionParameterFilter;
     }
 
     /**
