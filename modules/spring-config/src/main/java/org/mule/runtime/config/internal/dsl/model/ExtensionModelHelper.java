@@ -302,7 +302,7 @@ public class ExtensionModelHelper {
   }
 
   public Optional<ParameterModel> findParameterModel(ComponentIdentifier nestedComponentId,
-                                                               ParameterizedModel model) {
+                                                     ParameterizedModel model) {
     return lookupExtensionModelFor(nestedComponentId)
         .flatMap(currentExtension -> {
           final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(currentExtension);
