@@ -60,7 +60,7 @@ public abstract class ComponentModel {
   private String textContent;
   private DefaultComponentLocation componentLocation;
   private TypedComponentIdentifier.ComponentType componentType;
-  private Predicate<Map.Entry<String, String>> expansionParameterFilter;
+  private Predicate<Map.Entry<String, String>> expansionParameterFilter = param -> true;
 
   private Object objectInstance;
   private Class<?> type;
