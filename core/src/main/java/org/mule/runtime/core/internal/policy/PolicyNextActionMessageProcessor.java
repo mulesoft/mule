@@ -11,7 +11,6 @@ import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -80,9 +79,9 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
         })
         .compose(eventPub -> subscriberContext()
             .flatMapMany(ctx -> eventPub
-                .flatMap(event -> ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)
-                    ? just(policyEventMapper.onSourcePolicyNext(event, ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)))
-                    : just(policyEventMapper.onOperationPolicyNext(event)))
+                .map(event -> ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)
+                    ? policyEventMapper.onSourcePolicyNext(event, ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))
+                    : policyEventMapper.onOperationPolicyNext(event))
                 .transform(ctx.get(POLICY_NEXT_OPERATION))
                 .cast(CoreEvent.class)))
         .doOnNext(coreEvent -> {

@@ -17,8 +17,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
-import java.util.function.Supplier;
-
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
@@ -62,13 +60,13 @@ public class OperationPolicyProcessor implements ReactiveProcessor {
     return from(publisher)
         .map(policyEventMapper::onOperationPolicyBegin)
         .doOnNext(event -> logPolicy(event.getContext().getCorrelationId(), policy.getPolicyId(),
-                                     () -> getMessageAttributesAsString(event), "Before operation"))
+                                     event, "Before operation"))
         .transform(policy.getPolicyChain().onChainError(t -> manageError((MessagingException) t)))
         .subscriberContext(ctx -> ctx.put(POLICY_NEXT_OPERATION, nextProcessor))
         .map(policyChainResult -> policyEventMapper
             .onOperationPolicyFinish(policyChainResult, policy.getPolicyChain().isPropagateMessageTransformations()))
         .doOnNext(event -> logPolicy(event.getContext().getCorrelationId(), policy.getPolicyId(),
-                                     () -> getMessageAttributesAsString(event), "After operation"));
+                                     event, "After operation"));
   }
 
   private void manageError(MessagingException messagingException) {
@@ -83,10 +81,11 @@ public class OperationPolicyProcessor implements ReactiveProcessor {
     return event.getMessage().getAttributes().getValue().toString();
   }
 
-  private void logPolicy(String eventId, String policyName, Supplier<String> message, String startingMessage) {
+  private void logPolicy(String eventId, String policyName, CoreEvent event, String startingMessage) {
     if (LOGGER.isTraceEnabled()) {
       // TODO Remove event id when first policy generates it. MULE-14455
-      LOGGER.trace("Event Id: " + eventId + ".\n" + startingMessage + "\nPolicy:" + policyName + "\n" + message.get());
+      LOGGER.trace("Event Id: " + eventId + ".\n" + startingMessage + "\nPolicy:" + policyName + "\n"
+          + getMessageAttributesAsString(event));
     }
   }
 }
