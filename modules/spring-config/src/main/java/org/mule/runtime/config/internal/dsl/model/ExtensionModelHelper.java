@@ -301,7 +301,7 @@ public class ExtensionModelHelper {
     });
   }
 
-  public Optional<? extends ParameterModel> findParameterModel(ComponentIdentifier nestedComponentId,
+  public Optional<ParameterModel> findParameterModel(ComponentIdentifier nestedComponentId,
                                                                ParameterizedModel model) {
     return lookupExtensionModelFor(nestedComponentId)
         .flatMap(currentExtension -> {

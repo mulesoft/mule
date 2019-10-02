@@ -390,30 +390,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         // MessageProcessorChainBuilder has to be manually created and added to the registry in order to be able
         // to dispose it later
         if (object instanceof MessageProcessorChainBuilder) {
-          Pair<String, ComponentAst> chainKey =
-              new Pair<>(componentPair.getFirst() + "@" + object.hashCode(), componentPair.getSecond());
-          MessageProcessorChain messageProcessorChain = ((MessageProcessorChainBuilder) object).build();
-          try {
-            initialiseIfNeeded(messageProcessorChain, getMuleContext());
-          } catch (InitialisationException e) {
-            unregisterBeans(objects.keySet().stream().map(p -> p.getFirst()).collect(toList()));
-            throw new IllegalStateException("Couldn't initialise an instance of a MessageProcessorChain", e);
-          }
-          try {
-            getMuleRegistry().registerObject(chainKey.getFirst(), messageProcessorChain);
-          } catch (RegistrationException e) {
-            // Unregister any already created component
-            unregisterBeans(objects.keySet().stream().map(p -> p.getFirst()).collect(toList()));
-            throw new IllegalStateException("Couldn't register an instance of a MessageProcessorChain", e);
-          }
-          objects.put(chainKey, messageProcessorChain);
+          handleChainBuilder((MessageProcessorChainBuilder) object, componentPair, objects);
         } else if (object instanceof TransactionManagerFactory) {
-          try {
-            getMuleContext()
-                .setTransactionManager(((TransactionManagerFactory) object).create(getMuleContext().getConfiguration()));
-          } catch (Exception e) {
-            throw new IllegalStateException("Couldn't register an instance of a TransactionManager", e);
-          }
+          handleTxManagerFactory((TransactionManagerFactory) object);
         }
         objects.put(componentPair, object);
       }
@@ -433,6 +412,35 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                                                          componentNames.get(o2).getSecond()));
     sortedObjects.forEach(object -> beansCreated.add(componentNames.get(object).getFirst()));
     return sortedObjects;
+  }
+
+  private void handleChainBuilder(MessageProcessorChainBuilder object, Pair<String, ComponentAst> componentPair,
+                                  Map<Pair<String, ComponentAst>, Object> objects) {
+    Pair<String, ComponentAst> chainKey =
+        new Pair<>(componentPair.getFirst() + "@" + object.hashCode(), componentPair.getSecond());
+    MessageProcessorChain messageProcessorChain = object.build();
+    try {
+      initialiseIfNeeded(messageProcessorChain, getMuleContext());
+    } catch (InitialisationException e) {
+      unregisterBeans(objects.keySet().stream().map(p -> p.getFirst()).collect(toList()));
+      throw new IllegalStateException("Couldn't initialise an instance of a MessageProcessorChain", e);
+    }
+    try {
+      getMuleRegistry().registerObject(chainKey.getFirst(), messageProcessorChain);
+    } catch (RegistrationException e) {
+      // Unregister any already created component
+      unregisterBeans(objects.keySet().stream().map(p -> p.getFirst()).collect(toList()));
+      throw new IllegalStateException("Couldn't register an instance of a MessageProcessorChain", e);
+    }
+    objects.put(chainKey, messageProcessorChain);
+  }
+
+  private void handleTxManagerFactory(TransactionManagerFactory object) {
+    try {
+      getMuleContext().setTransactionManager(object.create(getMuleContext().getConfiguration()));
+    } catch (Exception e) {
+      throw new IllegalStateException("Couldn't register an instance of a TransactionManager", e);
+    }
   }
 
   private void resetMuleSecurityManager() {

@@ -22,6 +22,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.ExpressionSupport;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -89,18 +90,16 @@ class MetadataTypeModelAdapter implements HasStereotypeModel, ParameterizedModel
 
   private class ObjectTypeAsParameterGroupAdapter implements ParameterGroupModel {
 
-    private final ObjectType adaptedType;
     private final Map<String, ParameterModel> parameterModelsByName;
     private final List<ParameterModel> parameterModels;
 
     public ObjectTypeAsParameterGroupAdapter(ObjectType adaptedType) {
-      this.adaptedType = adaptedType;
       this.parameterModels = unmodifiableList(adaptedType.getFields().stream()
           .map(ObjectFieldTypeAsParameterModelAdapter::new)
           .collect(toList()));
       this.parameterModelsByName = parameterModels
           .stream()
-          .collect(toMap(p -> p.getName(), identity()));
+          .collect(toMap(NamedObject::getName, identity()));
     }
 
     @Override

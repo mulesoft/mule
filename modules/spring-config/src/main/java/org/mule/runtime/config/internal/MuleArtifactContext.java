@@ -490,10 +490,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                                  alwaysEnabledGeneratedTopLevelComponentsName.add(nameAttribute);
                                                  createdComponentModels
                                                      .add(new Pair<>(nameAttribute, (ComponentAst) resolvedComponentModel));
-                                               } else if (((ComponentModel) resolvedSpringComponentModel).getType() != null
+                                               } else if (resolvedSpringComponentModel.getType() != null
                                                    && TransactionManagerFactory.class
-                                                       .isAssignableFrom(((ComponentModel) resolvedSpringComponentModel)
-                                                           .getType())) {
+                                                       .isAssignableFrom(resolvedSpringComponentModel.getType())) {
                                                  createdComponentModels
                                                      .add(new Pair<>(nameAttribute, resolvedSpringComponentModel));
                                                }

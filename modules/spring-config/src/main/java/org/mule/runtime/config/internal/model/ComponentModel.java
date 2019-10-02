@@ -15,7 +15,6 @@ import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
-import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapterWithSterotype;
 import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createParameterizedTypeModelAdapter;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -263,18 +262,16 @@ public abstract class ComponentModel {
 
         private void processPojoParameters(ExtensionModelHelper extensionModelHelper, ComponentModel componentModel,
                                            ParameterizedModel model) {
-          ((ComponentAst) componentModel).recursiveStream().forEach(childComp -> {
-            extensionModelHelper.findParameterModel(childComp.getIdentifier(), model).ifPresent(paramModel -> {
-              ((ComponentModel) childComp)
-                  .setMetadataTypeModelAdapter(createParameterizedTypeModelAdapter(paramModel.getType()));
-            });
-          });
+          ((ComponentAst) componentModel).recursiveStream()
+              .forEach(childComp -> extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
+                  .ifPresent(paramModel -> ((ComponentModel) childComp)
+                      .setMetadataTypeModelAdapter(createParameterizedTypeModelAdapter(paramModel.getType()))));
         };
 
       });
       if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
         extensionModelHelper.findMetadataType(componentModel.getType())
-            .flatMap(t -> createMetadataTypeModelAdapterWithSterotype(t))
+            .flatMap(MetadataTypeModelAdapter::createMetadataTypeModelAdapterWithSterotype)
             .ifPresent(componentModel::setMetadataTypeModelAdapter);
       }
 
