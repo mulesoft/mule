@@ -209,7 +209,6 @@ class ExtensionPluginMetadataGenerator {
     File generatedResourcesDirectory = new File(generatedResourcesBase, plugin.getArtifactId() + separator + "META-INF");
     generatedResourcesDirectory.mkdirs();
     extensionsInfrastructure.generateLoaderResources(extensionModel, generatedResourcesDirectory);
-    extensionsInfrastructure.generateSchemaTestResource(extensionModel, generatedResourcesDirectory);
     extensionGeneratorEntries.add(new ExtensionGeneratorEntry(extensionModel, generatedResourcesDirectory));
     return generatedResourcesDirectory.getParentFile();
   }
