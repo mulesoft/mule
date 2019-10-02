@@ -276,7 +276,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private List<Object> createComponents(Optional<Predicate<ComponentAst>> predicateOptional, Optional<Location> locationOptional,
                                         boolean applyStartPhase,
                                         Optional<ComponentModelInitializerAdapter> parentComponentModelInitializerAdapter) {
-    //TODO: rodro: parentComponentModelInitializerAdapter is not used, it used to be called to initialize components missed here and present in domain
     checkState(predicateOptional.isPresent() != locationOptional.isPresent(), "predicate or location has to be passed");
     return withContextClassLoader(getMuleContext().getExecutionClassLoader(), () -> {
       // User input components to be initialized...
@@ -325,7 +324,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         // Same minimalApplication has been requested, so we don't need to recreate the same beans.
         return emptyList();
       }
-
 
       // First unregister any already initialized/started component
       unregisterBeans(beansCreated);
