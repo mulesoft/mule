@@ -8,14 +8,12 @@
 package org.mule.runtime.core.api.construct;
 
 import static org.mule.runtime.api.deployment.management.ComponentInitialStateManager.SERVICE_ID;
-
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.execution.ExecutableComponent;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -23,8 +21,6 @@ import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 
 import java.util.List;
-
-import reactor.core.publisher.Flux;
 
 /**
  * Defines a {@link Pipeline} that represents a Mule flow.
@@ -47,14 +43,6 @@ public interface Flow extends ExecutableComponent, Lifecycle, Pipeline, Processo
    * @return initial state of the flow, which can be {@value INITIAL_STATE_STARTED} or {@value INITIAL_STATE_STOPPED}
    */
   String getInitialState();
-
-  /**
-   * Decorates the common flow {@link ReactiveProcessor} application by avoiding the emission of an error downstream in the
-   * {@link Flux}. Normally used when invoking this {@link Flow} from a {@link Flux} chain, as in the {@code flow-ref} case.
-   * 
-   * @return the decorated {@link ReactiveProcessor}
-   */
-  ReactiveProcessor referenced();
 
   /**
    * Creates a new flow builder
@@ -118,7 +106,7 @@ public interface Flow extends ExecutableComponent, Lifecycle, Pipeline, Processo
 
     /**
      * Usually a flow is started automatically ("started"), but this attribute can be used to disable initial startup ("stopped").
-     *
+     * 
      * @param initialState The initial state of the flow. Non null.
      * @return same builder instance.
      */
@@ -130,7 +118,7 @@ public interface Flow extends ExecutableComponent, Lifecycle, Pipeline, Processo
      * number of threads that a {@link MessageSource} may use to invoke a {@link Flow} and so if a direct or blocking
      * {@link ProcessingStrategy} is used where processing occurs in source threads it is actually the source that defines maximum
      * concurrency.
-     *
+     * 
      * @param maxConcurrency
      * @return
      */
