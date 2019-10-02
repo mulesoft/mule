@@ -26,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -145,7 +146,7 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
             Map<BundleDescriptor, Set<BundleDescriptor>> pluginAdditionalLibrariesMap =
                 super.doProcessAdditionalPluginLibraries(artifactPackagerPlugin.get());
             pluginAdditionalLibrariesMap.forEach((pluginDescriptor, additionalLibraries) -> {
-              Set<BundleDescriptor> effectivePluginAdditionalLibraries = new HashSet<>();
+              Set<BundleDescriptor> effectivePluginAdditionalLibraries = new LinkedHashSet<>();
               if (deployableArtifactAdditionalLibrariesMap.containsKey(pluginDescriptor)) {
                 effectivePluginAdditionalLibraries.addAll(additionalLibraries.stream()
                     .filter(additionalLibrary -> {
@@ -168,7 +169,7 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
                       // Let's use the one defined and the main artifact since it may be overriding the declared by the plugin
                       return false;
                     })
-                    .collect(Collectors.toSet()));
+                    .collect(Collectors.toCollection(LinkedHashSet::new)));
               } else {
                 effectivePluginAdditionalLibraries.addAll(additionalLibraries);
               }

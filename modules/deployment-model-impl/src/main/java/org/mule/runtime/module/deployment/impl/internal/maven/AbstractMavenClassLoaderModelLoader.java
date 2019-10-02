@@ -130,7 +130,11 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
   @Override
   public final ClassLoaderModel load(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)
       throws InvalidDescriptorLoaderException {
-    return createClassLoaderModel(artifactFile, attributes, artifactType);
+    ClassLoaderModel classLoaderModel = createClassLoaderModel(artifactFile, attributes, artifactType);
+    for (URL url : classLoaderModel.getUrls()) {
+      LOGGER.warn(url.toString());
+    }
+    return classLoaderModel;
   }
 
   protected ClassLoaderModel createClassLoaderModel(File artifactFile, Map<String, Object> attributes, ArtifactType artifactType)

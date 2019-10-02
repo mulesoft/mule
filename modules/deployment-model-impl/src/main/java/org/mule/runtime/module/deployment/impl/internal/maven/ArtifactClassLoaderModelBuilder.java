@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -43,10 +44,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
@@ -162,7 +165,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
                                             .setAdditionalDependencies(pluginAdditionalLibraries.stream()
                                                 .map(additionalDependency -> new BundleDependency.Builder()
                                                     .setDescriptor(additionalDependency).build())
-                                                .collect(toSet()))
+                                                .collect(toCollection(LinkedHashSet::new)))
                                             .build());
               });
         });
@@ -184,7 +187,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
                 .setArtifactId(pluginArtifactId)
                 .setVersion("-")
                 .build();
-            Set<BundleDescriptor> mulePluginAdditionalLibraries = new HashSet<>();
+            Set<BundleDescriptor> mulePluginAdditionalLibraries = new LinkedHashSet<>();
             Xpp3Dom dependenciesDom = plugin.getChild(PLUGIN_DEPENDENCIES_FIELD);
             if (dependenciesDom != null) {
               for (Xpp3Dom dependency : dependenciesDom.getChildren(PLUGIN_DEPENDENCY_FIELD)) {

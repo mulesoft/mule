@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.maven;
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASS_LOADER_MODEL_VERSION_120;
@@ -22,6 +23,7 @@ import org.mule.tools.api.classloader.model.Artifact;
 import java.io.File;
 import java.net.URI;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -101,7 +103,7 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
                                                                                               plugin.getAdditionalDependencies()
                                                                                                   .stream()
                                                                                                   .map(this::toBundleDependency)
-                                                                                                  .collect(toSet()))));
+                                                                                                  .collect(toCollection(LinkedHashSet::new)))));
   }
 
   private boolean areSameDependency(org.mule.tools.api.classloader.model.Plugin plugin, BundleDependency dependency) {
