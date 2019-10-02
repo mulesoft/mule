@@ -116,8 +116,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   private final ArtifactAstDependencyGraph graph;
 
-  private Set<String> currentComponentLocationsCreated = new HashSet<>();
-  private boolean appliedStartedPhase = false;
+  private Set<String> currentComponentLocationsRequested = new HashSet<>();
+  private boolean appliedStartedPhaseRequest = false;
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -319,8 +319,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
               .map(comp -> comp.getLocation().getLocation())
               .collect(Collectors.toSet()));
 
-      if (ImmutableSet.copyOf(currentComponentLocationsCreated).equals(ImmutableSet.copyOf(requestedLocations)) &&
-          appliedStartedPhase == applyStartPhase) {
+      if (ImmutableSet.copyOf(currentComponentLocationsRequested).equals(ImmutableSet.copyOf(requestedLocations)) &&
+          appliedStartedPhaseRequest == applyStartPhase) {
         // Same minimalApplication has been requested, so we don't need to recreate the same beans.
         return emptyList();
       }
@@ -328,9 +328,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       // First unregister any already initialized/started component
       unregisterBeans(beansCreated);
 
-      currentComponentLocationsCreated.clear();
-      currentComponentLocationsCreated.addAll(requestedLocations);
-      appliedStartedPhase = applyStartPhase;
+      currentComponentLocationsRequested.clear();
+      currentComponentLocationsRequested.addAll(requestedLocations);
+      appliedStartedPhaseRequest = applyStartPhase;
 
       // Clean up resources...
       beansCreated.clear();
