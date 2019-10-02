@@ -10,8 +10,7 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
@@ -43,13 +42,10 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
@@ -152,12 +148,12 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
   }
 
   private void processAdditionalPluginLibraries(Plugin packagingPlugin) {
-    Map<BundleDescriptor, Set<BundleDescriptor>> pluginsWithAdditionalLibraries =
+    Map<BundleDescriptor, List<BundleDescriptor>> pluginsWithAdditionalLibraries =
         doProcessAdditionalPluginLibraries(packagingPlugin);
     pluginsWithAdditionalLibraries.entrySet()
         .forEach(entry -> {
           BundleDescriptor pluginBundleDescriptor = entry.getKey();
-          Set<BundleDescriptor> pluginAdditionalLibraries = entry.getValue();
+          List<BundleDescriptor> pluginAdditionalLibraries = entry.getValue();
           findBundleDependency(pluginBundleDescriptor.getGroupId(), pluginBundleDescriptor.getArtifactId(), of(MULE_PLUGIN))
               .ifPresent(pluginArtifactBundleDependency -> {
                 replaceBundleDependency(pluginArtifactBundleDependency,
@@ -165,14 +161,14 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
                                             .setAdditionalDependencies(pluginAdditionalLibraries.stream()
                                                 .map(additionalDependency -> new BundleDependency.Builder()
                                                     .setDescriptor(additionalDependency).build())
-                                                .collect(toCollection(LinkedHashSet::new)))
+                                                .collect(toList()))
                                             .build());
               });
         });
   }
 
-  protected Map<BundleDescriptor, Set<BundleDescriptor>> doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
-    Map<BundleDescriptor, Set<BundleDescriptor>> pluginsAdditionalLibraries = new HashMap<>();
+  protected Map<BundleDescriptor, List<BundleDescriptor>> doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
+    Map<BundleDescriptor, List<BundleDescriptor>> pluginsAdditionalLibraries = new HashMap<>();
     Object configuration = packagingPlugin.getConfiguration();
     if (configuration != null) {
       Xpp3Dom additionalPluginDependenciesDom = ((Xpp3Dom) configuration).getChild(ADDITIONAL_PLUGIN_DEPENDENCIES_FIELD);
@@ -187,7 +183,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
                 .setArtifactId(pluginArtifactId)
                 .setVersion("-")
                 .build();
-            Set<BundleDescriptor> mulePluginAdditionalLibraries = new LinkedHashSet<>();
+            List<BundleDescriptor> mulePluginAdditionalLibraries = new ArrayList<>();
             Xpp3Dom dependenciesDom = plugin.getChild(PLUGIN_DEPENDENCIES_FIELD);
             if (dependenciesDom != null) {
               for (Xpp3Dom dependency : dependenciesDom.getChildren(PLUGIN_DEPENDENCY_FIELD)) {
@@ -294,8 +290,8 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
           .filter(bundleDescriptor -> bundleDescriptor.getDescriptor().getGroupId()
               .equals(this.artifactBundleDescriptor.getGroupId())
               && bundleDescriptor.getDescriptor().getArtifactId().equals(this.artifactBundleDescriptor.getArtifactId()))
-          .filter(bundleDependency -> bundleDependency.getAdditionalDependencies() != null
-              && !bundleDependency.getAdditionalDependencies().isEmpty())
+          .filter(bundleDependency -> bundleDependency.getAdditionalDependenciesList() != null
+              && !bundleDependency.getAdditionalDependenciesList().isEmpty())
           .forEach(bundleDependency -> processPluginAdditionalDependenciesURIs(bundleDependency)
               .forEach(uri -> {
                 final URL dependencyArtifactUrl;

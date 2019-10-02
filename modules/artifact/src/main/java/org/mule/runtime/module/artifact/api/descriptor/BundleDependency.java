@@ -11,6 +11,9 @@ import static java.lang.String.format;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -23,8 +26,8 @@ public final class BundleDependency {
   private BundleDescriptor descriptor;
   private BundleScope scope;
   private URI bundleUri;
-  private Set<BundleDependency> additionalDependencies;
-  private Set<BundleDependency> transitiveDependencies;
+  private List<BundleDependency> additionalDependencies;
+  private List<BundleDependency> transitiveDependencies;
 
   private Set<String> packages;
   private Set<String> resources;
@@ -43,11 +46,27 @@ public final class BundleDependency {
     return bundleUri;
   }
 
+  /**
+   * @deprecated use {@link BundleDependency#getAdditionalDependenciesList()}
+   */
+  @Deprecated
   public Set<BundleDependency> getAdditionalDependencies() {
+    return new LinkedHashSet<>(additionalDependencies);
+  }
+
+  public List<BundleDependency> getAdditionalDependenciesList() {
     return additionalDependencies;
   }
 
+  /**
+   * @deprecated use {@link BundleDependency#getTransitiveDependenciesList()}
+   */
+  @Deprecated
   public Set<BundleDependency> getTransitiveDependencies() {
+    return new LinkedHashSet<>(transitiveDependencies);
+  }
+
+  public List<BundleDependency> getTransitiveDependenciesList() {
     return transitiveDependencies;
   }
 
@@ -125,12 +144,30 @@ public final class BundleDependency {
       return this;
     }
 
+    /**
+     * @deprecated use {@link Builder#setAdditionalDependencies(List)}
+     */
+    @Deprecated
     public Builder setAdditionalDependencies(Set<BundleDependency> additionalDependencies) {
+      this.bundleDependency.additionalDependencies = new ArrayList<>(additionalDependencies);
+      return this;
+    }
+
+    public Builder setAdditionalDependencies(List<BundleDependency> additionalDependencies) {
       this.bundleDependency.additionalDependencies = additionalDependencies;
       return this;
     }
 
+    /**
+     * @deprecated use {@link Builder#setTransitiveDependencies(List)}
+     */
+    @Deprecated
     public Builder setTransitiveDependencies(Set<BundleDependency> transitiveDependencies) {
+      this.bundleDependency.transitiveDependencies = new ArrayList<>(transitiveDependencies);
+      return this;
+    }
+
+    public Builder setTransitiveDependencies(List<BundleDependency> transitiveDependencies) {
       this.bundleDependency.transitiveDependencies = transitiveDependencies;
       return this;
     }

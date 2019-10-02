@@ -12,6 +12,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.Matchers.empty;
@@ -269,6 +270,52 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
     buildAndValidateModel(3);
   }
 
+  @Test
+  public void urlOrderIsCorrect() throws Exception {
+    final String groupId = "test.gid";
+    final String version1 = "1.0.0";
+
+    final String transitiveDependency1Id = "transitiveDependency1";
+    org.mule.maven.client.api.model.BundleDependency transitive1 =
+        createBundleDependency(groupId, transitiveDependency1Id, version1, null);
+
+    final String transitiveDependency2Id = "transitiveDependency2";
+    org.mule.maven.client.api.model.BundleDependency transitive2 =
+        createBundleDependency(groupId, transitiveDependency2Id, version1, null);
+
+    final String depWithTransitive1Id = "depT1";
+    org.mule.maven.client.api.model.BundleDependency dependencyWithTransitive1 =
+        createBundleDependency(groupId, depWithTransitive1Id, version1, null, singletonList(transitive1));
+
+    final String depWithTransitive2Id = "depT2";
+    org.mule.maven.client.api.model.BundleDependency dependencyWithTransitive2 =
+        createBundleDependency(groupId, depWithTransitive2Id, version1, null, singletonList(transitive2));
+
+    when(mockMavenClient.resolveArtifactDependencies(any(), anyBoolean(), anyBoolean(), any(), any(), any()))
+        .thenReturn(asList(dependencyWithTransitive1, transitive1, dependencyWithTransitive2, transitive2));
+
+    File app = toFile(getClass().getClassLoader().getResource(Paths.get(APPS_FOLDER, "no-dependencies").toString()));
+
+    MavenConfiguration mockMavenConfiguration = mock(MavenConfiguration.class, RETURNS_DEEP_STUBS);
+    when(mockMavenConfiguration.getLocalMavenRepositoryLocation()).thenReturn(temporaryFolder.newFolder());
+    when(mockMavenClient.getMavenConfiguration()).thenReturn(mockMavenConfiguration);
+
+    ClassLoaderModel classLoaderModel = buildClassLoaderModel(app);
+    assertThat(classLoaderModel.getUrls().length, equalTo(5));
+    assertThat(classLoaderModel.getUrls()[1], is(getDummyUriFor(dependencyWithTransitive1.getDescriptor().getGroupId(),
+                                                                dependencyWithTransitive1.getDescriptor().getArtifactId(),
+                                                                dependencyWithTransitive1.getDescriptor().getVersion()).toURL()));
+    assertThat(classLoaderModel.getUrls()[2], is(getDummyUriFor(transitive1.getDescriptor().getGroupId(),
+                                                                transitive1.getDescriptor().getArtifactId(),
+                                                                transitive1.getDescriptor().getVersion()).toURL()));
+    assertThat(classLoaderModel.getUrls()[3], is(getDummyUriFor(dependencyWithTransitive2.getDescriptor().getGroupId(),
+                                                                dependencyWithTransitive2.getDescriptor().getArtifactId(),
+                                                                dependencyWithTransitive2.getDescriptor().getVersion()).toURL()));
+    assertThat(classLoaderModel.getUrls()[4], is(getDummyUriFor(transitive2.getDescriptor().getGroupId(),
+                                                                transitive2.getDescriptor().getArtifactId(),
+                                                                transitive2.getDescriptor().getVersion()).toURL()));
+  }
+
   private ClassLoaderModel buildAndValidateModel(int expectedDependencies) throws Exception {
     File app = toFile(getClass().getClassLoader().getResource(Paths.get(APPS_FOLDER, "no-dependencies").toString()));
 
@@ -288,17 +335,25 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
 
   private static org.mule.maven.client.api.model.BundleDependency createBundleDependency(String groupId, String artifactId,
                                                                                          String version, String classifier) {
-    return new org.mule.maven.client.api.model.BundleDependency.Builder()
-        .setDescriptor(new BundleDescriptor.Builder()
-            .setGroupId(groupId)
-            .setArtifactId(artifactId)
-            .setClassifier(classifier)
-            .setBaseVersion(version)
-            .setVersion(version)
-            .build())
+    return createBundleDependency(groupId, artifactId, version, classifier, emptyList());
+  }
+
+  private static org.mule.maven.client.api.model.BundleDependency createBundleDependency(String groupId, String artifactId,
+                                                                                         String version, String classifier,
+                                                                                         List<org.mule.maven.client.api.model.BundleDependency> transitiveDependencies) {
+    org.mule.maven.client.api.model.BundleDependency.Builder bundleDependencyBuilder =
+        new org.mule.maven.client.api.model.BundleDependency.Builder();
+    bundleDependencyBuilder.setDescriptor(new BundleDescriptor.Builder()
+        .setGroupId(groupId)
+        .setArtifactId(artifactId)
+        .setClassifier(classifier)
+        .setBaseVersion(version)
+        .setVersion(version)
+        .build())
         .setBundleUri(getDummyUriFor(groupId, artifactId, version))
-        .setScope(COMPILE)
-        .build();
+        .setScope(COMPILE);
+    transitiveDependencies.forEach(bundleDependencyBuilder::addTransitiveDependency);
+    return bundleDependencyBuilder.build();
   }
 
   private URL getDependencyUrl(org.mule.maven.client.api.model.BundleDependency dependency) throws Exception {
