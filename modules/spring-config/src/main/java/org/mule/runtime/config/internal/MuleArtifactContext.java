@@ -75,6 +75,7 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
@@ -489,6 +490,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                                  alwaysEnabledGeneratedTopLevelComponentsName.add(nameAttribute);
                                                  createdComponentModels
                                                      .add(new Pair<>(nameAttribute, (ComponentAst) resolvedComponentModel));
+                                               } else if (resolvedSpringComponentModel.getType() != null
+                                                   && TransactionManagerFactory.class
+                                                       .isAssignableFrom(resolvedSpringComponentModel.getType())) {
+                                                 createdComponentModels
+                                                     .add(new Pair<>(nameAttribute, resolvedSpringComponentModel));
                                                }
                                              }
                                              registry.registerBeanDefinition(nameAttribute,

@@ -30,7 +30,7 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
   private final TransactionManager transactionManager;
   private final NotificationDispatcher notificationDispatcher;
   private final boolean processOnException;
-  private boolean mustResolveAnyTransaction;
+  private final boolean mustResolveAnyTransaction;
 
   public BeginAndResolveTransactionInterceptor(ExecutionInterceptor next, TransactionConfig transactionConfig,
                                                String applicationName, NotificationDispatcher notificationDispatcher,
