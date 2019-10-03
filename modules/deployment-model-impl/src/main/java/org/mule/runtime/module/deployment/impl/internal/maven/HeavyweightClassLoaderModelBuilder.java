@@ -10,7 +10,6 @@ import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASS_LOADER_MODEL_VERSION_120;
 
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -24,7 +23,6 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.vdurmont.semver4j.Semver;
 import org.apache.commons.lang3.StringUtils;
@@ -64,7 +62,7 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   }
 
   @Override
-  protected Map<BundleDescriptor, Set<BundleDescriptor>> doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
+  protected Map<BundleDescriptor, List<BundleDescriptor>> doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
     if (packagerClassLoaderModel instanceof AppClassLoaderModel) {
       AppClassLoaderModel appClassLoaderModel = (AppClassLoaderModel) packagerClassLoaderModel;
       appClassLoaderModel.getAdditionalPluginDependencies()
@@ -75,7 +73,7 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
 
   @Override
   protected List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency) {
-    return bundleDependency.getAdditionalDependencies().stream().map(additionalDependency -> {
+    return bundleDependency.getAdditionalDependenciesList().stream().map(additionalDependency -> {
       if (isSupportingPackagesResourcesInformation()) {
         withLocalPackages(additionalDependency.getPackages());
         withLocalResources(additionalDependency.getResources());
@@ -85,7 +83,7 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   }
 
   private BundleDependency createExtendedBundleDependency(BundleDependency original,
-                                                          Set<BundleDependency> additionalPluginDependencies) {
+                                                          List<BundleDependency> additionalPluginDependencies) {
     return new BundleDependency.Builder(original).setAdditionalDependencies(additionalPluginDependencies).build();
   }
 
@@ -101,7 +99,7 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
                                                                                               plugin.getAdditionalDependencies()
                                                                                                   .stream()
                                                                                                   .map(this::toBundleDependency)
-                                                                                                  .collect(toSet()))));
+                                                                                                  .collect(toList()))));
   }
 
   private boolean areSameDependency(org.mule.tools.api.classloader.model.Plugin plugin, BundleDependency dependency) {

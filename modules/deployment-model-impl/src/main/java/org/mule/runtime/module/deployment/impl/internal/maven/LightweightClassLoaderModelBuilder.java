@@ -27,13 +27,11 @@ import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.vdurmont.semver4j.Semver;
 import org.apache.commons.lang3.StringUtils;
@@ -49,12 +47,12 @@ import org.apache.maven.model.Plugin;
 public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModelBuilder {
 
   private MavenClient mavenClient;
-  private Set<BundleDependency> nonProvidedDependencies;
+  private List<BundleDependency> nonProvidedDependencies;
   private File temporaryFolder;
   private Map<Pair<String, String>, Boolean> sharedLibraryAlreadyExported = new HashMap<>();
 
   public LightweightClassLoaderModelBuilder(File artifactFolder, BundleDescriptor artifactBundleDescriptor,
-                                            MavenClient mavenClient, Set<BundleDependency> nonProvidedDependencies) {
+                                            MavenClient mavenClient, List<BundleDependency> nonProvidedDependencies) {
     super(artifactFolder, artifactBundleDescriptor);
     this.mavenClient = mavenClient;
     this.nonProvidedDependencies = nonProvidedDependencies;
@@ -66,7 +64,7 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   protected List<URI> processPluginAdditionalDependenciesURIs(BundleDependency bundleDependency) {
     List<org.mule.maven.client.api.model.BundleDependency> resolvedAdditionalDependencies =
         mavenClient.resolveArtifactDependencies(
-                                                bundleDependency.getAdditionalDependencies().stream()
+                                                bundleDependency.getAdditionalDependenciesList().stream()
                                                     .map(additionalDependency -> toMavenClientBundleDescriptor(additionalDependency
                                                         .getDescriptor()))
                                                     .collect(toList()),
@@ -121,7 +119,7 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
     JarInfo jarInfo = fileJarExplorer.explore(resolvedBundleDependency.getBundleUri());
     this.exportingPackages(jarInfo.getPackages());
     this.exportingResources(jarInfo.getResources());
-    resolvedBundleDependency.getTransitiveDependencies()
+    resolvedBundleDependency.getTransitiveDependenciesList()
         .forEach(this::exportBundleDependencyAndTransitiveDependencies);
   }
 
@@ -179,15 +177,15 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
   }
 
   @Override
-  protected Map<BundleDescriptor, Set<BundleDescriptor>> doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
+  protected Map<BundleDescriptor, List<BundleDescriptor>> doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
     if (!temporaryFolder.exists() && !temporaryFolder.mkdirs()) {
       throw new MuleRuntimeException(createStaticMessage("Could not create temporary folder under "
           + temporaryFolder.getAbsolutePath()));
     }
 
-    Map<BundleDescriptor, Set<BundleDescriptor>> deployableArtifactAdditionalLibrariesMap =
+    Map<BundleDescriptor, List<BundleDescriptor>> deployableArtifactAdditionalLibrariesMap =
         super.doProcessAdditionalPluginLibraries(packagingPlugin);
-    Map<BundleDescriptor, Set<BundleDescriptor>> effectivePluginsAdditionalLibrariesMap =
+    Map<BundleDescriptor, List<BundleDescriptor>> effectivePluginsAdditionalLibrariesMap =
         new HashMap<>(deployableArtifactAdditionalLibrariesMap);
     nonProvidedDependencies.stream()
         .filter(bundleDependency -> MULE_PLUGIN.equals(bundleDependency.getDescriptor().getClassifier().orElse(null)))
@@ -200,10 +198,10 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
           }
           Optional<Plugin> artifactPackagerPlugin = findArtifactPackagerPlugin(effectiveModel);
           artifactPackagerPlugin.ifPresent(plugin -> {
-            Map<BundleDescriptor, Set<BundleDescriptor>> pluginAdditionalLibrariesMap =
+            Map<BundleDescriptor, List<BundleDescriptor>> pluginAdditionalLibrariesMap =
                 super.doProcessAdditionalPluginLibraries(artifactPackagerPlugin.get());
             pluginAdditionalLibrariesMap.forEach((pluginDescriptor, additionalLibraries) -> {
-              Set<BundleDescriptor> effectivePluginAdditionalLibraries = new HashSet<>();
+              List<BundleDescriptor> effectivePluginAdditionalLibraries = new ArrayList<>();
               if (deployableArtifactAdditionalLibrariesMap.containsKey(pluginDescriptor)) {
                 effectivePluginAdditionalLibraries.addAll(additionalLibraries.stream()
                     .filter(additionalLibrary -> {
@@ -226,7 +224,7 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
                       // Let's use the one defined and the main artifact since it may be overriding the declared by the plugin
                       return false;
                     })
-                    .collect(Collectors.toSet()));
+                    .collect(toList()));
               } else {
                 effectivePluginAdditionalLibraries.addAll(additionalLibraries);
               }
@@ -237,19 +235,19 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
     return effectivePluginsAdditionalLibrariesMap;
   }
 
-  private boolean existsInLibrariesMap(Map<BundleDescriptor, Set<BundleDescriptor>> additionalLibrariesPerPluginMap,
+  private boolean existsInLibrariesMap(Map<BundleDescriptor, List<BundleDescriptor>> additionalLibrariesPerPluginMap,
                                        BundleDescriptor plugin, BundleDescriptor additionalLibrary) {
-    Set<BundleDescriptor> additionalLibraries = additionalLibrariesPerPluginMap.get(plugin);
+    List<BundleDescriptor> additionalLibraries = additionalLibrariesPerPluginMap.get(plugin);
     if (additionalLibraries == null) {
       return false;
     }
     return additionalLibraries.contains(additionalLibrary);
   }
 
-  private Optional<BundleDescriptor> findLibraryInAdditionalLibrariesMap(Map<BundleDescriptor, Set<BundleDescriptor>> additionalLibrariesPerPluginMap,
+  private Optional<BundleDescriptor> findLibraryInAdditionalLibrariesMap(Map<BundleDescriptor, List<BundleDescriptor>> additionalLibrariesPerPluginMap,
                                                                          BundleDescriptor plugin,
                                                                          BundleDescriptor additionalLibrary) {
-    Set<BundleDescriptor> additionalLibraries = additionalLibrariesPerPluginMap.get(plugin);
+    List<BundleDescriptor> additionalLibraries = additionalLibrariesPerPluginMap.get(plugin);
     if (additionalLibraries == null) {
       return empty();
     }

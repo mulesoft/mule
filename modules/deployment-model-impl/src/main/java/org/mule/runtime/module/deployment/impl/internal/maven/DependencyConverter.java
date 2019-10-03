@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toList;
 import org.mule.maven.client.api.model.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
@@ -31,7 +31,7 @@ public class DependencyConverter {
             .filter(transitiveDependency -> !org.mule.maven.client.api.model.BundleScope.PROVIDED
                 .equals(transitiveDependency.getScope()))
             .map(this::convert)
-            .collect(toSet()))
+            .collect(toList()))
         .setDescriptor(convertBundleDescriptor(mavenBundleDependency.getDescriptor()));
     bundleDependency = builder.build();
     cache.put(mavenBundleDependency.getDescriptor(), bundleDependency);

@@ -62,7 +62,7 @@ public class DeployableMavenClassLoaderModelLoader extends AbstractMavenClassLoa
                                                                                      BundleDescriptor artifactBundleDescriptor,
                                                                                      MavenClient mavenClient,
                                                                                      Map<String, Object> attributes,
-                                                                                     Set<BundleDependency> nonProvidedDependencies) {
+                                                                                     List<BundleDependency> nonProvidedDependencies) {
     return new LightweightClassLoaderModelBuilder(artifactFile, artifactBundleDescriptor, mavenClient, nonProvidedDependencies);
   }
 
