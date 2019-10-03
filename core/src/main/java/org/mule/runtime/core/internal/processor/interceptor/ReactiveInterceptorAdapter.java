@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.processor.interceptor;
 
 import static java.lang.String.valueOf;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
@@ -19,6 +20,7 @@ import static org.mule.runtime.core.internal.interception.DefaultInterceptionEve
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
+import static java.util.Collections.unmodifiableList;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -37,16 +39,13 @@ import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
-import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -85,7 +84,9 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
     final ProcessorInterceptor interceptor = interceptorFactory.get();
     Map<String, String> dslParameters = (Map<String, String>) ((Component) component).getAnnotation(ANNOTATION_PARAMETERS);
 
-    ReactiveProcessor interceptedProcessor = doApply(component, next, componentLocation, interceptor, dslParameters.entrySet().stream().filter(param -> !(param.getKey().equals("moduleOperation") || param.getKey().equals("moduleName"))).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue())));
+    List macroExpansionInternalParams = unmodifiableList(Arrays.asList("moduleName", "moduleOperation"));
+
+    ReactiveProcessor interceptedProcessor = doApply(component, next, componentLocation, interceptor, dslParameters.entrySet().stream().filter(param -> !macroExpansionInternalParams.contains(param.getKey())).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue())));
 
     LOGGER.debug("Interceptor '{}' for processor '{}' configured.", interceptor, componentLocation.getLocation());
     return interceptedProcessor;
