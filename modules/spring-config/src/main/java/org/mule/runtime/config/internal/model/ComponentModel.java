@@ -263,9 +263,13 @@ public abstract class ComponentModel {
         private void processPojoParameters(ExtensionModelHelper extensionModelHelper, ComponentModel componentModel,
                                            ParameterizedModel model) {
           ((ComponentAst) componentModel).recursiveStream()
-              .forEach(childComp -> extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
-                  .ifPresent(paramModel -> ((ComponentModel) childComp)
-                      .setMetadataTypeModelAdapter(createParameterizedTypeModelAdapter(paramModel.getType()))));
+              .forEach(childComp -> {
+                ((ComponentModel) childComp)
+                    .setMetadataTypeModelAdapter(extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
+                        .map(paramModel -> createParameterizedTypeModelAdapter(paramModel.getType()))
+                        .orElse(extensionModelHelper.findMetadataType(((ComponentModel) childComp).getType())
+                            .map(MetadataTypeModelAdapter::createParameterizedTypeModelAdapter).orElse(null)));
+              });
         };
 
       });
