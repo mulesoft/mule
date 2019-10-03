@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.processor.interceptor;
 
 import static java.lang.String.valueOf;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
@@ -21,6 +20,7 @@ import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.just;
 import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toMap;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -45,7 +45,11 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -62,6 +66,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
 
   private static final String BEFORE_METHOD_NAME = "before";
   private static final String AFTER_METHOD_NAME = "after";
+  private static List macroExpansionInternalParams = unmodifiableList(Arrays.asList("moduleName", "moduleOperation"));
 
   private final ProcessorInterceptorFactory interceptorFactory;
 
@@ -83,10 +88,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
 
     final ProcessorInterceptor interceptor = interceptorFactory.get();
     Map<String, String> dslParameters = (Map<String, String>) ((Component) component).getAnnotation(ANNOTATION_PARAMETERS);
-
-    List macroExpansionInternalParams = unmodifiableList(Arrays.asList("moduleName", "moduleOperation"));
-
-    ReactiveProcessor interceptedProcessor = doApply(component, next, componentLocation, interceptor, dslParameters.entrySet().stream().filter(param -> !macroExpansionInternalParams.contains(param.getKey())).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue())));
+    ReactiveProcessor interceptedProcessor = doApply(component, next, componentLocation, interceptor, dslParameters.entrySet().stream().filter(param -> !macroExpansionInternalParams.contains(param.getKey())).collect(toMap(p -> p.getKey(), p -> p.getValue())));
 
     LOGGER.debug("Interceptor '{}' for processor '{}' configured.", interceptor, componentLocation.getLocation());
     return interceptedProcessor;
