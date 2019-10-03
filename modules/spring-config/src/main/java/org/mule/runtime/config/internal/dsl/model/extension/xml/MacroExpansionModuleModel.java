@@ -291,6 +291,8 @@ public class MacroExpansionModuleModel {
     processorChainBuilder.addParameter("moduleOperation", operationModel.getName(), false);
     Map<String, String> propertiesMap = extractProperties(configRefName);
     Map<String, String> parametersMap = extractParameters(operationRefModel, operationModel.getAllParameterModels());
+    parametersMap.forEach((k, v) -> processorChainBuilder.addParameter(k, v, false));
+
     ComponentModel propertiesComponentModel =
         getParameterChild(propertiesMap, "module-operation-properties", "module-operation-property-entry");
     ComponentModel parametersComponentModel =
