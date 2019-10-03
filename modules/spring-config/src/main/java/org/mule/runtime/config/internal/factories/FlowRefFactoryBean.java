@@ -133,9 +133,10 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     }
 
     if (expressionManager.isExpression(refName)) {
-      return new DynamicFlowRefMessageProcessor(this, refName);
+      return new DynamicFlowRefMessageProcessor(this, event -> (String) expressionManager.evaluate(refName, event, getLocation())
+          .getValue());
     } else {
-      return new StaticFlowRefMessageProcessor(this);
+      return new StaticFlowRefMessageProcessor(this, new DynamicFlowRefMessageProcessor(this, event -> refName));
     }
   }
 
@@ -217,14 +218,11 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
   /**
    * Flow-ref message processor with a statically (constant along the flow execution) defined target route.
    *
-   * @since 4.3.0
+   * @since 4.3, 4.2.3
    */
   private class StaticFlowRefMessageProcessor extends FlowRefMessageProcessor {
 
-    protected StaticFlowRefMessageProcessor(FlowRefFactoryBean owner) {
-      super(owner);
-    }
-
+    private final DynamicFlowRefMessageProcessor recursiveFallback;
     private final AtomicBoolean stoppedOnce = new AtomicBoolean(false);
     private final LazyValue<ReactiveProcessor> resolvedReferencedProcessorSupplier = new LazyValue<>(() -> {
       try {
@@ -234,8 +232,19 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       }
     });
 
+    private volatile boolean recursionFound = false;
+
+    protected StaticFlowRefMessageProcessor(FlowRefFactoryBean owner, DynamicFlowRefMessageProcessor recursiveFallback) {
+      super(owner);
+      this.recursiveFallback = recursiveFallback;
+    }
+
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+      if (recursionFound) {
+        return from(publisher).transform(recursiveFallback);
+      }
+
       final ReactiveProcessor resolvedReferencedProcessor = resolvedReferencedProcessorSupplier.get();
 
       Flux<CoreEvent> pub = from(publisher)
@@ -248,17 +257,18 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
       Optional<ComponentLocation> location = ofNullable(StaticFlowRefMessageProcessor.this.getLocation());
 
-      Flux<CoreEvent> lala;
       if (resolvedReferencedProcessor instanceof Flow) {
-        lala = from(applyForStaticFlow((Flow) resolvedReferencedProcessor, pub, location));
+        pub = from(applyForStaticFlow((Flow) resolvedReferencedProcessor, pub, location));
       } else {
-        lala = from(applyForStaticSubFlow(resolvedReferencedProcessor, pub, location));
+        pub = from(applyForStaticSubFlow(resolvedReferencedProcessor, pub, location));
       }
 
-      return lala.onErrorResume(t -> t instanceof RecursiveFlowRefException, t -> {
-        final DynamicFlowRefMessageProcessor transformer = new DynamicFlowRefMessageProcessor(getOwner(), "#['" + refName + "']");
-        transformer.setAnnotations(this.getAnnotations());
-        return from(publisher).transform(transformer);
+      // This onErrorResume here is intended to handle the recursive error when it happens during subscription
+      // If a recursion is found, do a fallback that avoids prebuilding the whole chain.
+      return pub.onErrorResume(t -> t instanceof RecursiveFlowRefException, t -> {
+        recursionFound = true;
+        LOGGER.warn(t.toString());
+        return from(publisher).transform(recursiveFallback);
       });
     }
 
@@ -397,22 +407,28 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       return resolvedReferencedProcessorSupplier.isComputed() &&
           !(resolvedReferencedProcessorSupplier.get() instanceof Flow);
     }
+
+    @Override
+    public void setAnnotations(Map<QName, Object> newAnnotations) {
+      super.setAnnotations(newAnnotations);
+      recursiveFallback.setAnnotations(newAnnotations);
+    }
   }
 
   /**
    * Flow-ref message processor whose route might change along the flow execution. This means the target route is defined with a
    * data-weave expression.
    *
-   * @since 4.3.0
+   * @since 4.3, 4.2.3
    */
   private class DynamicFlowRefMessageProcessor extends FlowRefMessageProcessor {
 
-    private String refName;
-    private LoadingCache<String, Processor> targetsCache;
+    private final Function<CoreEvent, String> refNameFromEvent;
+    private final LoadingCache<String, Processor> targetsCache;
 
-    public DynamicFlowRefMessageProcessor(FlowRefFactoryBean owner, String refName) {
+    public DynamicFlowRefMessageProcessor(FlowRefFactoryBean owner, Function<CoreEvent, String> refNameFromEvent) {
       super(owner);
-      this.refName = refName;
+      this.refNameFromEvent = refNameFromEvent;
       this.targetsCache = CacheBuilder.newBuilder()
           .maximumSize(20)
           .build(new CacheLoader<String, Processor>() {
@@ -472,9 +488,8 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
      * @throws MuleException
      */
     protected Processor resolveTargetFlowOrSubflow(CoreEvent event) throws MuleException {
-      String targetFlowName = (String) expressionManager.evaluate(refName, event, getLocation()).getValue();
       try {
-        return targetsCache.getUnchecked(targetFlowName);
+        return targetsCache.getUnchecked(refNameFromEvent.apply(event));
 
       } catch (UncheckedExecutionException e) {
         if (e.getCause() instanceof MuleRuntimeException) {
