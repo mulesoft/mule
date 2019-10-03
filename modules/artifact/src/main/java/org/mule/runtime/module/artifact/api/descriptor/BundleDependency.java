@@ -54,6 +54,9 @@ public final class BundleDependency {
     return new LinkedHashSet<>(additionalDependencies);
   }
 
+  /**
+   * @since 4.2.2, 4.3.0
+   */
   public List<BundleDependency> getAdditionalDependenciesList() {
     return additionalDependencies;
   }
@@ -66,6 +69,9 @@ public final class BundleDependency {
     return new LinkedHashSet<>(transitiveDependencies);
   }
 
+  /**
+   * @since 4.2.2, 4.3.0
+   */
   public List<BundleDependency> getTransitiveDependenciesList() {
     return transitiveDependencies;
   }
@@ -153,6 +159,9 @@ public final class BundleDependency {
       return this;
     }
 
+    /**
+     * @since 4.2.2, 4.3.0
+     */
     public Builder setAdditionalDependencies(List<BundleDependency> additionalDependencies) {
       this.bundleDependency.additionalDependencies = additionalDependencies;
       return this;
@@ -167,6 +176,9 @@ public final class BundleDependency {
       return this;
     }
 
+    /**
+     * @since 4.2.2, 4.3.0
+     */
     public Builder setTransitiveDependencies(List<BundleDependency> transitiveDependencies) {
       this.bundleDependency.transitiveDependencies = transitiveDependencies;
       return this;
