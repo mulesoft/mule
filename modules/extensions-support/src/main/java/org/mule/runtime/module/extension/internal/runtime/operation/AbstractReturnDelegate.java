@@ -253,7 +253,6 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
      *
      * @param n number of bytes read, or -1 if no more bytes are available
      * @throws IOException if the stream could not be closed
-     * @since 2.0
      */
     @Override
     protected void afterRead(final int n) throws IOException {
