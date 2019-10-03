@@ -291,8 +291,16 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
     org.mule.maven.client.api.model.BundleDependency dependencyWithTransitive2 =
         createBundleDependency(groupId, depWithTransitive2Id, version1, null, singletonList(transitive2));
 
-    when(mockMavenClient.resolveArtifactDependencies(any(), anyBoolean(), anyBoolean(), any(), any(), any()))
-        .thenReturn(asList(dependencyWithTransitive1, transitive1, dependencyWithTransitive2, transitive2));
+    List<org.mule.maven.client.api.model.BundleDependency> resolvedDependencies =
+        asList(dependencyWithTransitive1, transitive1, dependencyWithTransitive2, transitive2);
+
+    when(mockMavenClient.resolveArtifactDependencies(
+                                                     any(),
+                                                     anyBoolean(),
+                                                     anyBoolean(),
+                                                     any(),
+                                                     any(),
+                                                     any())).thenReturn(resolvedDependencies);
 
     File app = toFile(getClass().getClassLoader().getResource(Paths.get(APPS_FOLDER, "no-dependencies").toString()));
 
@@ -302,18 +310,13 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
 
     ClassLoaderModel classLoaderModel = buildClassLoaderModel(app);
     assertThat(classLoaderModel.getUrls().length, equalTo(5));
-    assertThat(classLoaderModel.getUrls()[1], is(getDummyUriFor(dependencyWithTransitive1.getDescriptor().getGroupId(),
-                                                                dependencyWithTransitive1.getDescriptor().getArtifactId(),
-                                                                dependencyWithTransitive1.getDescriptor().getVersion()).toURL()));
-    assertThat(classLoaderModel.getUrls()[2], is(getDummyUriFor(transitive1.getDescriptor().getGroupId(),
-                                                                transitive1.getDescriptor().getArtifactId(),
-                                                                transitive1.getDescriptor().getVersion()).toURL()));
-    assertThat(classLoaderModel.getUrls()[3], is(getDummyUriFor(dependencyWithTransitive2.getDescriptor().getGroupId(),
-                                                                dependencyWithTransitive2.getDescriptor().getArtifactId(),
-                                                                dependencyWithTransitive2.getDescriptor().getVersion()).toURL()));
-    assertThat(classLoaderModel.getUrls()[4], is(getDummyUriFor(transitive2.getDescriptor().getGroupId(),
-                                                                transitive2.getDescriptor().getArtifactId(),
-                                                                transitive2.getDescriptor().getVersion()).toURL()));
+    for (int i = 1; i < classLoaderModel.getUrls().length; i++) { //The first one does not count because it's the main artifact.
+      org.mule.maven.client.api.model.BundleDependency dependency = resolvedDependencies.get(i - 1);
+      URL url = getDummyUriFor(dependency.getDescriptor().getGroupId(),
+                               dependency.getDescriptor().getArtifactId(),
+                               dependency.getDescriptor().getVersion()).toURL();
+      assertThat(classLoaderModel.getUrls()[i], is(equalTo(url)));
+    }
   }
 
   private ClassLoaderModel buildAndValidateModel(int expectedDependencies) throws Exception {
