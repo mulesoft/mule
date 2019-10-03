@@ -39,6 +39,7 @@ import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLo
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -135,7 +136,7 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
                                                                                      BundleDescriptor artifactBundleDescriptor,
                                                                                      MavenClient mavenClient,
                                                                                      Map<String, Object> attributes,
-                                                                                     Set<BundleDependency> nonProvidedDependencies) {
+                                                                                     List<BundleDependency> nonProvidedDependencies) {
     final LightweightClassLoaderModelBuilder lightweightClassLoaderModelBuilder =
         new LightweightClassLoaderModelBuilder(artifactFile, artifactBundleDescriptor, mavenClient, nonProvidedDependencies);
     configClassLoaderModelBuilder(lightweightClassLoaderModelBuilder, attributes);
@@ -154,8 +155,8 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
   }
 
   @Override
-  protected Set<BundleDependency> resolveArtifactDependencies(File artifactFile, Map<String, Object> attributes,
-                                                              ArtifactType artifactType) {
+  protected List<BundleDependency> resolveArtifactDependencies(File artifactFile, Map<String, Object> attributes,
+                                                               ArtifactType artifactType) {
     if (attributes instanceof PluginExtendedClassLoaderModelAttributes) {
       BundleDescriptor pluginBundleDescriptor = (BundleDescriptor) attributes.get(BundleDescriptor.class.getName());
       ArtifactDescriptor deployableArtifactDescriptor =
@@ -184,7 +185,7 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
     return resolveArtifactDependenciesUsingMavenClient(artifactFile);
   }
 
-  private Set<BundleDependency> resolveArtifactDependenciesUsingMavenClient(File artifactFile) {
+  private List<BundleDependency> resolveArtifactDependenciesUsingMavenClient(File artifactFile) {
     if (logger.isWarnEnabled()) {
       logger.warn(format(
                          "Resolving a mule-plugin from '%s' without the deployable resolution context in order to resolve its class loader model. "
@@ -276,9 +277,9 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
 
   }
 
-  private Set<BundleDependency> collectTransitiveDependencies(BundleDependency rootDependency) {
-    Set<BundleDependency> allTransitiveDependencies = new HashSet<>();
-    for (BundleDependency transitiveDependency : rootDependency.getTransitiveDependencies()) {
+  private List<BundleDependency> collectTransitiveDependencies(BundleDependency rootDependency) {
+    List<BundleDependency> allTransitiveDependencies = new ArrayList<>();
+    for (BundleDependency transitiveDependency : rootDependency.getTransitiveDependenciesList()) {
       allTransitiveDependencies.add(transitiveDependency);
       if (transitiveDependency.getDescriptor().getClassifier().map(c -> !MULE_PLUGIN_CLASSIFIER.equals(c)).orElse(true)) {
         allTransitiveDependencies.addAll(collectTransitiveDependencies(transitiveDependency));
