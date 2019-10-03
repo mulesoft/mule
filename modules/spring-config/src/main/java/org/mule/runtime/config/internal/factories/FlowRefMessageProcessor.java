@@ -7,8 +7,8 @@
 package org.mule.runtime.config.internal.factories;
 
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -25,9 +25,9 @@ import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 public abstract class FlowRefMessageProcessor extends AbstractComponent
     implements AnnotatedProcessor, Startable, Stoppable, Disposable {
 
-  private final Component owner;
+  private final FlowRefFactoryBean owner;
 
-  protected FlowRefMessageProcessor(Component owner) {
+  protected FlowRefMessageProcessor(FlowRefFactoryBean owner) {
     this.owner = owner;
   }
 
@@ -47,4 +47,8 @@ public abstract class FlowRefMessageProcessor extends AbstractComponent
   }
 
   public abstract void doStart() throws MuleException;
+
+  public FlowRefFactoryBean getOwner() {
+    return owner;
+  }
 }
