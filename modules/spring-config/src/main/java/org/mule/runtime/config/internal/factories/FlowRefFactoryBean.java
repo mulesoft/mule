@@ -242,6 +242,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       if (recursionFound) {
+        // If a recursion was found previously, avoid trying to build the chain and revalidating again, use the fallback directly.
         return from(publisher).transform(recursiveFallback);
       }
 
