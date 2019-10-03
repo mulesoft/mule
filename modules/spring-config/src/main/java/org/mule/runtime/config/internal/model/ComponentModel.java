@@ -233,46 +233,46 @@ public abstract class ComponentModel {
         @Override
         public void onConfiguration(ConfigurationModel model) {
           componentModel.setConfigurationModel(model);
-          processPojoParameters(extensionModelHelper, componentModel, model);
+          processPojoParameters(extensionModelHelper, model);
         }
 
         @Override
         public void onConnectionProvider(ConnectionProviderModel model) {
           componentModel.setConnectionProviderModel(model);
-          processPojoParameters(extensionModelHelper, componentModel, model);
+          processPojoParameters(extensionModelHelper, model);
         }
 
         @Override
         public void onOperation(OperationModel model) {
           componentModel.setComponentModel(model);
-          processPojoParameters(extensionModelHelper, componentModel, model);
+          processPojoParameters(extensionModelHelper, model);
         }
 
         @Override
         public void onSource(SourceModel model) {
           componentModel.setComponentModel(model);
-          processPojoParameters(extensionModelHelper, componentModel, model);
+          processPojoParameters(extensionModelHelper, model);
         }
 
         @Override
         public void onConstruct(ConstructModel model) {
           componentModel.setComponentModel(model);
-          processPojoParameters(extensionModelHelper, componentModel, model);
+          processPojoParameters(extensionModelHelper, model);
         }
 
-        private void processPojoParameters(ExtensionModelHelper extensionModelHelper, ComponentModel componentModel,
-                                           ParameterizedModel model) {
+        private void processPojoParameters(ExtensionModelHelper extensionModelHelper, ParameterizedModel model) {
           ((ComponentAst) componentModel).recursiveStream()
-              .forEach(childComp -> {
-                ((ComponentModel) childComp)
-                    .setMetadataTypeModelAdapter(extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
-                        .map(paramModel -> createParameterizedTypeModelAdapter(paramModel.getType()))
-                        .orElse(extensionModelHelper.findMetadataType(((ComponentModel) childComp).getType())
-                            .map(MetadataTypeModelAdapter::createParameterizedTypeModelAdapter).orElse(null)));
-              });
+              .map(childComp -> (ComponentModel) childComp)
+              .forEach(childComp -> childComp
+                  .setMetadataTypeModelAdapter(extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
+                      .map(paramModel -> createParameterizedTypeModelAdapter(paramModel.getType()))
+                      .orElse(extensionModelHelper.findMetadataType(childComp.getType())
+                          .map(MetadataTypeModelAdapter::createParameterizedTypeModelAdapter).orElse(null))));
         };
 
       });
+
+      // Last resort to try to find a matching metadata type for this component
       if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
         extensionModelHelper.findMetadataType(componentModel.getType())
             .flatMap(MetadataTypeModelAdapter::createMetadataTypeModelAdapterWithSterotype)
