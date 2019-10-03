@@ -37,6 +37,7 @@ import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
+import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
@@ -48,6 +49,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
@@ -83,7 +85,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
     final ProcessorInterceptor interceptor = interceptorFactory.get();
     Map<String, String> dslParameters = (Map<String, String>) ((Component) component).getAnnotation(ANNOTATION_PARAMETERS);
 
-    ReactiveProcessor interceptedProcessor = doApply(component, next, componentLocation, interceptor, dslParameters);
+    ReactiveProcessor interceptedProcessor = doApply(component, next, componentLocation, interceptor, dslParameters.entrySet().stream().filter(param -> !(param.getKey().equals("moduleOperation") || param.getKey().equals("moduleName"))).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue())));
 
     LOGGER.debug("Interceptor '{}' for processor '{}' configured.", interceptor, componentLocation.getLocation());
     return interceptedProcessor;

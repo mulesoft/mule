@@ -22,8 +22,6 @@ import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMess
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
-
-
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -297,8 +295,6 @@ public class MacroExpansionModuleModel {
     processorChainBuilder
         .setIdentifier(builder().namespace(CORE_PREFIX).name("module-operation-chain").build());
 
-    processorChainBuilder.setParameterFilter(param -> !Arrays.asList("moduleName", "moduleOperation").contains(param.getKey()));
-
     processorChainBuilder.addParameter("moduleName", extensionModel.getXmlDslModel().getPrefix(), false);
     processorChainBuilder.addParameter("moduleOperation", operationModel.getName(), false);
     Map<String, String> propertiesMap = extractProperties(configRefName);
@@ -352,10 +348,6 @@ public class MacroExpansionModuleModel {
     return operationRefModel.getParameters().containsKey(MODULE_OPERATION_CONFIG_REF)
         ? of(operationRefModel.getParameters().get(MODULE_OPERATION_CONFIG_REF))
         : defaultGlobalElementName();
-  }
-
-  private Predicate<List<String>> expansionParametersFilter(List<String> internalParamNames) {
-    return parameter -> internalParamNames.contains(parameter);
   }
 
   /**
