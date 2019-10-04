@@ -307,13 +307,13 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     });
 
     Flux.from(applyWithChildContext(just(input), createChain(backPressureError), Optional.empty(),
-                                                      (exception, event) -> {
-                                                        contextReference
-                                                            .set(((MessagingException) exception).getEvent().getContext());
-                                                        eventReference
-                                                                .set(event);
-                                                        return event;
-                                                      }))
+                                    (exception, event) -> {
+                                      contextReference
+                                          .set(((MessagingException) exception).getEvent().getContext());
+                                      eventReference
+                                          .set(event);
+                                      return event;
+                                    }))
         .subscribe();
 
     assertThat(contextReference.get(), notNullValue());
