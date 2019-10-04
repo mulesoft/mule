@@ -532,7 +532,10 @@ public abstract class ComponentModel {
       if (isEmpty(qname.getNamespaceURI()) || NS_MULE_PARSER_METADATA.equals(qname.getNamespaceURI())) {
         this.metadataBuilder.putParserAttribute(qname.getLocalPart(), value);
       } else {
-        this.metadataBuilder.putDocAttribute(qname.toString(), value.toString());
+        if (NS_MULE_DOCUMENTATION.equals(qname.getNamespaceURI())) {
+          // This is added for compatibility, since in previous versions the doc attributes were looked up without the namespace.
+          this.metadataBuilder.putDocAttribute(qname.getLocalPart(), value.toString());
+        }
       }
       return this;
     }
