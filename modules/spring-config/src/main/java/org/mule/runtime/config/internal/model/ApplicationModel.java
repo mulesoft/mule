@@ -33,6 +33,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
 import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapterWithSterotype;
+import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createParameterizedTypeModelAdapter;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -299,8 +300,7 @@ public class ApplicationModel implements ArtifactAst {
    * @param parentConfigurationProperties the {@link ConfigurationProperties} of the parent artifact. For instance, application
    *        will receive the domain resolver.
    * @param componentBuildingDefinitionRegistry an optional {@link ComponentBuildingDefinitionRegistry} used to correlate items in
-   *        this model to their definitions
-   *        expanded) false implies the mule is being created from a tooling perspective.
+   *        this model to their definitions expanded) false implies the mule is being created from a tooling perspective.
    * @param externalResourceProvider the provider for configuration properties files and ${file::name.txt} placeholders
    * @throws Exception when the application configuration has semantic errors.
    */
@@ -581,8 +581,8 @@ public class ApplicationModel implements ArtifactAst {
               @Override
               public void onFixedValue(Object value) {
                 if (value instanceof MetadataType) {
-                  createMetadataTypeModelAdapterWithSterotype((MetadataType) value)
-                      .ifPresent(componentModel::setMetadataTypeModelAdapter);
+                  componentModel.setMetadataTypeModelAdapter(createMetadataTypeModelAdapterWithSterotype((MetadataType) value)
+                      .orElse(createParameterizedTypeModelAdapter((MetadataType) value)));
                 }
               }
             });
