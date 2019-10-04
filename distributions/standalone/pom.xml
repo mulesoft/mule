@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-distributions</artifactId>
-        <version>3.9.0</version>
+        <version>3.9.0-hf1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-standalone</artifactId>
     <!-- Packaging 'pom' ensures that maven does not try to bind a plugin to the
@@ -16,7 +16,7 @@
     <description>Includes the Mule server with all of its modules and transports.</description>
 
     <properties>
-        <apikit.version>${project.version}</apikit.version>
+        <apikit.version>${mule.version}</apikit.version>
     </properties>
 
     <build>
@@ -123,21 +123,51 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>net.nicoulaj.maven.plugins</groupId>
+                <artifactId>checksum-maven-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>artifacts</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <attachChecksums>true</attachChecksums>
+                    <algorithms>
+                        <algorithm>SHA-256</algorithm>
+                    </algorithms>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
     <dependencies>
+        <!-- Lib Patches -->
+        <dependency>
+            <groupId>com.mulesoft.muleesb.patches</groupId>
+            <artifactId>SE-12551-${mule.version}</artifactId>
+            <version>7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mulesoft.muleesb.patches</groupId>
+            <artifactId>SE-12562-${mule.version}</artifactId>
+            <version>1.0</version>
+        </dependency>
+
         <!-- Mule Core -->
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
         </dependency>
         <!-- Include all Mule Modules -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-modules-all</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <type>pom</type>
             <exclusions>
                 <exclusion>
@@ -152,33 +182,33 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-db</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
         </dependency>
 
         <!-- Modules for standalone container -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-reboot</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-launcher</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
         </dependency>
 
         <!-- Include all Mule Patterns -->
         <dependency>
             <groupId>org.mule.patterns</groupId>
             <artifactId>mule-patterns-all</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <type>pom</type>
         </dependency>
         <!-- Include all Mule Transports -->
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transports-all</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <type>pom</type>
         </dependency>
 
@@ -211,13 +241,13 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.mockito</groupId>
@@ -238,7 +268,7 @@
         <dependency>
             <groupId>org.mule.tools</groupId>
             <artifactId>mule-tools-anttasks</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <type>jar</type>
         </dependency>
 

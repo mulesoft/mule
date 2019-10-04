@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-distributions</artifactId>
-        <version>3.9.0</version>
+        <version>3.9.0-hf1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-studio</artifactId>
     <!-- Packaging 'pom' ensures that maven does not try to bind a plugin to the

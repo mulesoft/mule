@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-distributions</artifactId>
-        <version>3.9.0</version>
+        <version>3.9.0-hf1-SNAPSHOT</version>
     </parent>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
@@ -88,22 +88,29 @@
         </plugins>
     </build>
     <dependencies>
+        <!-- Lib Patches -->
+        <dependency>
+            <groupId>com.mulesoft.muleesb.patches</groupId>
+            <artifactId>SE-12562-${mule.version}</artifactId>
+            <version>1.0</version>
+        </dependency>
+
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-modules-all</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>org.mule.patterns</groupId>
             <artifactId>mule-patterns-all</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transports-all</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <type>pom</type>
         </dependency>
     </dependencies>
