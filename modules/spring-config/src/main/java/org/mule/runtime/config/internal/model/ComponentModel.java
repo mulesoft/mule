@@ -15,7 +15,7 @@ import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
-import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createParameterizedTypeModelAdapter;
+import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapter;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
@@ -265,9 +265,9 @@ public abstract class ComponentModel {
               .map(childComp -> (ComponentModel) childComp)
               .forEach(childComp -> childComp
                   .setMetadataTypeModelAdapter(extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
-                      .map(paramModel -> createParameterizedTypeModelAdapter(paramModel.getType()))
+                      .map(paramModel -> createMetadataTypeModelAdapter(paramModel.getType()))
                       .orElse(extensionModelHelper.findMetadataType(childComp.getType())
-                          .map(MetadataTypeModelAdapter::createParameterizedTypeModelAdapter).orElse(null))));
+                          .map(MetadataTypeModelAdapter::createMetadataTypeModelAdapter).orElse(null))));
         };
 
       });
@@ -275,7 +275,7 @@ public abstract class ComponentModel {
       // Last resort to try to find a matching metadata type for this component
       if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
         extensionModelHelper.findMetadataType(componentModel.getType())
-            .flatMap(MetadataTypeModelAdapter::createMetadataTypeModelAdapterWithSterotype)
+            .map(MetadataTypeModelAdapter::createMetadataTypeModelAdapter)
             .ifPresent(componentModel::setMetadataTypeModelAdapter);
       }
 
