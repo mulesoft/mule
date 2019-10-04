@@ -23,22 +23,23 @@ import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Knows how to modify events when jumping between policies and between a policy and the flow/operation
  */
 public class PolicyEventMapper {
 
-  private static final String POLICY_VARS = "policy.vars.%s";
+  private static final String POLICY_VARS_PREFIX = "policy.vars.";
   private static final String POLICY_SOURCE_ORIGINAL_EVENT = "policy.source.originalEvent";
   private static final String POLICY_OPERATION_ORIGINAL_EVENT = "policy.operation.originalEvent";
 
   private final String policyId;
+  private final String policyVarsInternalParameterName;
 
   public PolicyEventMapper() {
     this(null);
@@ -46,6 +47,7 @@ public class PolicyEventMapper {
 
   public PolicyEventMapper(String policyId) {
     this.policyId = policyId;
+    policyVarsInternalParameterName = POLICY_VARS_PREFIX + policyId;
   }
 
   /**
@@ -65,7 +67,7 @@ public class PolicyEventMapper {
   /**
    * Restores, if any, the variables of the source part of the policy, as variables are shared between source and operation within
    * the same policy. At this point it may contain variables added in the flow.
-   * 
+   *
    * @param event the event just before the operation is executed
    */
   public CoreEvent onOperationPolicyBegin(CoreEvent event) {
@@ -83,7 +85,7 @@ public class PolicyEventMapper {
    * correctly handled. <br />
    * <br />
    * If operation was executed successfully: <br />
-   * 
+   *
    * - restores variables from the operation result. This is to not lose variables added by operation if, for example, the
    * operation has defined a target. In the case that after this policy, there is another policy applied, variables of that second
    * policy will be restored when {@link #fromPolicyNext} is executed. <br />
@@ -92,7 +94,7 @@ public class PolicyEventMapper {
    * <br />
    *
    * If operation was not executed: <br />
-   * 
+   *
    * - restore variables from the operation policy initial event <br />
    * - message is propagated as it is <br />
    *
@@ -227,7 +229,7 @@ public class PolicyEventMapper {
    * After flow execution is completed with an error, the result is transformed using the <code>parametersTransformer</code> from
    * the error response parameters into a {@link Message}. Those error response parameters are preserved as they are needed later.
    * Variables are also restored since when this method is called, the source policy's {@link #fromPolicyNext} won't be.
-   * 
+   *
    * @param event the event after the flow's error-handler is executed
    * @param policyId the nearest to the flow (with the greater order) source policy.
    * @param parametersTransformer does the transformation from flow's response parameters into a {@link Message}.
@@ -270,11 +272,11 @@ public class PolicyEventMapper {
   }
 
   private String policyVarsInternalParameterName() {
-    return String.format(POLICY_VARS, policyId);
+    return policyVarsInternalParameterName;
   }
 
   private String policyVarsInternalParameterName(String policyId) {
-    return String.format(POLICY_VARS, policyId);
+    return POLICY_VARS_PREFIX + policyId;
   }
 
   private PrivilegedEvent getOriginalEvent(CoreEvent event) {

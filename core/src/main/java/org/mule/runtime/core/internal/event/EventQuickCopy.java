@@ -139,13 +139,14 @@ public final class EventQuickCopy {
 
     @Override
     public Map<String, ?> getInternalParameters() {
-      if (getEvent().getInternalParameters().isEmpty()) {
+      final Map<String, ?> eventInternalParameters = getEvent().getInternalParameters();
+      if (eventInternalParameters.isEmpty()) {
         return internalParameters;
       }
 
       final Map<String, Object> resolvedParams =
-          new HashMap<>(2 * (getEvent().getInternalParameters().size() + internalParameters.size()));
-      resolvedParams.putAll(getEvent().getInternalParameters());
+          new HashMap<>(2 * (eventInternalParameters.size() + internalParameters.size()));
+      resolvedParams.putAll(eventInternalParameters);
       resolvedParams.putAll(internalParameters);
       return resolvedParams;
     }
