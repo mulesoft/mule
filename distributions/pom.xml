@@ -8,8 +8,14 @@
     </parent>
     <groupId>org.mule.distributions</groupId>
     <artifactId>mule-distributions</artifactId>
+    <version>3.9.0-hf1-SNAPSHOT</version>
+
     <packaging>pom</packaging>
     <name>Mule Distributions</name>
+
+    <properties>
+        <mule.version>3.9.0</mule.version>
+    </properties>
 
     <build>
         <plugins>

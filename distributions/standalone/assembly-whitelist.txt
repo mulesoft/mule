@@ -447,6 +447,11 @@
 #
 /mule-standalone-${productVersion}/logs/README.txt
 
+#
+# /lib/user
+#
+/mule-standalone-${productVersion}/lib/user/SE-12551-3.9.0-7.0.jar
+/mule-standalone-${productVersion}/lib/user/SE-12562-3.9.0-1.0.jar
 
 #
 # /lib/src
