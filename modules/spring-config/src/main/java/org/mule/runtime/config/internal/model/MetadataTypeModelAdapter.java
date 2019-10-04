@@ -44,19 +44,29 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-class MetadataTypeModelAdapter implements ParameterizedModel {
+class MetadataTypeModelAdapter implements HasStereotypeModel, ParameterizedModel {
 
-  static MetadataTypeModelAdapter createMetadataTypeModelAdapter(MetadataType type) {
+  static Optional<MetadataTypeModelAdapter> createMetadataTypeModelAdapterWithSterotype(MetadataType type) {
     return type.getAnnotation(StereotypeTypeAnnotation.class)
         .flatMap(sta -> sta.getAllowedStereotypes().stream().findFirst())
-        .map(st -> (MetadataTypeModelAdapter) new MetadataTypeModelAdapterWithStereotype(type, st))
-        .orElseGet(() -> new MetadataTypeModelAdapter(type));
+        .map(st -> new MetadataTypeModelAdapter(type, st));
+  }
+
+  static MetadataTypeModelAdapter createParameterizedTypeModelAdapter(MetadataType type) {
+    return new MetadataTypeModelAdapter(type, null);
   }
 
   private final MetadataType type;
+  private final StereotypeModel stereotype;
 
-  private MetadataTypeModelAdapter(MetadataType type) {
+  private MetadataTypeModelAdapter(MetadataType type, StereotypeModel stereotype) {
     this.type = type;
+    this.stereotype = stereotype;
+  }
+
+  @Override
+  public StereotypeModel getStereotype() {
+    return stereotype;
   }
 
   @Override
@@ -78,23 +88,7 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
     }
   }
 
-  private static class MetadataTypeModelAdapterWithStereotype extends MetadataTypeModelAdapter implements HasStereotypeModel {
-
-    private final StereotypeModel stereotype;
-
-    private MetadataTypeModelAdapterWithStereotype(MetadataType type, StereotypeModel stereotype) {
-      super(type);
-      this.stereotype = stereotype;
-    }
-
-    @Override
-    public StereotypeModel getStereotype() {
-      return stereotype;
-    }
-
-  }
-
-  private static class ObjectTypeAsParameterGroupAdapter implements ParameterGroupModel {
+  private class ObjectTypeAsParameterGroupAdapter implements ParameterGroupModel {
 
     private final Map<String, ParameterModel> parameterModelsByName;
     private final List<ParameterModel> parameterModels;
@@ -160,7 +154,7 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
 
   }
 
-  private static class ObjectFieldTypeAsParameterModelAdapter implements ParameterModel {
+  private class ObjectFieldTypeAsParameterModelAdapter implements ParameterModel {
 
     private final ObjectFieldType wrappedFieldType;
 

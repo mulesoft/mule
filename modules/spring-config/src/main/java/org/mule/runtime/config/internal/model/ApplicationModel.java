@@ -32,7 +32,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_EE_DOMAIN_ID
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
-import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapter;
+import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapterWithSterotype;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -581,7 +581,8 @@ public class ApplicationModel implements ArtifactAst {
               @Override
               public void onFixedValue(Object value) {
                 if (value instanceof MetadataType) {
-                  componentModel.setMetadataTypeModelAdapter(createMetadataTypeModelAdapter((MetadataType) value));
+                  createMetadataTypeModelAdapterWithSterotype((MetadataType) value)
+                      .ifPresent(componentModel::setMetadataTypeModelAdapter);
                 }
               }
             });
