@@ -69,6 +69,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
+import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -371,6 +372,12 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     // additional dependencies declared by the deployable artifact for a plugin are not seen as dependencies, they just go to the
     // urls
     assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getDependencies(), hasSize(0));
+
+    assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getLocalPackages(), IsCollectionWithSize.hasSize(19));
+    assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getLocalPackages(), hasItems("org.apache.commons.collections",
+                                                                                            "org.apache.commons.io"));
+    assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getLocalResources(), hasItems("META-INF/maven/commons-collections/commons-collections/pom.xml",
+                                                                                             "META-INF/maven/commons-io/commons-io/pom.xml"));
 
     ArtifactPluginDescriptor dependantPluginDescriptor = desc.getPlugins().stream()
         .filter(plugin -> plugin.getBundleDescriptor().getArtifactId().contains("dependant")).findFirst().get();
