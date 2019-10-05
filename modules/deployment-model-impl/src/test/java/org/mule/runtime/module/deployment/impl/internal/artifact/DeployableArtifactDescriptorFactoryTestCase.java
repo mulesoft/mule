@@ -376,8 +376,9 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getLocalPackages(), IsCollectionWithSize.hasSize(19));
     assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getLocalPackages(), hasItems("org.apache.commons.collections",
                                                                                             "org.apache.commons.io"));
-    assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getLocalResources(), hasItems("META-INF/maven/commons-collections/commons-collections/pom.xml",
-                                                                                             "META-INF/maven/commons-io/commons-io/pom.xml"));
+    assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getLocalResources(),
+               hasItems("META-INF/maven/commons-collections/commons-collections/pom.xml",
+                        "META-INF/maven/commons-io/commons-io/pom.xml"));
 
     ArtifactPluginDescriptor dependantPluginDescriptor = desc.getPlugins().stream()
         .filter(plugin -> plugin.getBundleDescriptor().getArtifactId().contains("dependant")).findFirst().get();

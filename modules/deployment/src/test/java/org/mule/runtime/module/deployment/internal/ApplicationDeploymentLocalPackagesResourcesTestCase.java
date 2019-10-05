@@ -31,9 +31,9 @@ public class ApplicationDeploymentLocalPackagesResourcesTestCase extends Abstrac
   @Parameterized.Parameters(name = "Parallel: {0}; classloaderModelVersion: {1}")
   public static List<Object[]> parameters() {
     return asList(new Object[][] {
-            {false, "1.0.0"},
-            {false, "1.1.0"},
-            {false, "1.2.0"},
+        {false, "1.0.0"},
+        {false, "1.1.0"},
+        {false, "1.2.0"},
     });
   }
 
