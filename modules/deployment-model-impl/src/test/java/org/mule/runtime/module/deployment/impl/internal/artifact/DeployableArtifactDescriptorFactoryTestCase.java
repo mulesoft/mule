@@ -373,7 +373,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     // urls
     assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getDependencies(), hasSize(0));
 
-    assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getLocalPackages(), IsCollectionWithSize.hasSize(19));
+    assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getLocalPackages(), hasSize(19));
     assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getLocalPackages(), hasItems("org.apache.commons.collections",
                                                                                             "org.apache.commons.io"));
     assertThat(testEmptyPluginDescriptor.getClassLoaderModel().getLocalResources(),
