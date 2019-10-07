@@ -12,13 +12,20 @@ import static java.lang.Runtime.getRuntime;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.functional.Either.left;
+import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock.readWriteLock;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
+import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Flux.create;
+import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -46,7 +53,6 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
-import reactor.core.publisher.Mono;
 
 /**
  * {@link OperationPolicy} created from a list of {@link Policy}.
@@ -110,24 +116,23 @@ public class CompositeOperationPolicy
     public FluxSink<CoreEvent> get() {
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
 
-      Flux<CoreEvent> policyFlux =
-          Flux.create(sinkRef)
-              .transform(getExecutionProcessor())
-              .doOnNext(result -> {
-                final BaseEventContext childContext = getStoredChildContext(result);
-                if (!childContext.isComplete()) {
-                  childContext.success(result);
-                }
-                recoverCallback((InternalEvent) result).complete(quickCopy(childContext.getParentContext().get(), result));
-              })
-              .onErrorContinue(MessagingException.class, (t, e) -> {
-                final MessagingException me = (MessagingException) t;
+      Flux<CoreEvent> policyFlux = create(sinkRef)
+          .transform(getExecutionProcessor())
+          .doOnNext(result -> {
+            final BaseEventContext childContext = getStoredChildContext(result);
+            if (!childContext.isComplete()) {
+              childContext.success(result);
+            }
+            recoverCallback((InternalEvent) result).complete(quickCopy(childContext.getParentContext().get(), result));
+          })
+          .onErrorContinue(MessagingException.class, (t, e) -> {
+            final MessagingException me = (MessagingException) t;
 
-                me.setProcessedEvent(quickCopy(getStoredChildContext(me.getEvent()).getParentContext().get(),
-                                               me.getEvent()));
+            me.setProcessedEvent(quickCopy(getStoredChildContext(me.getEvent()).getParentContext().get(),
+                                           me.getEvent()));
 
-                recoverCallback((InternalEvent) me.getEvent()).error(me);
-              });
+            recoverCallback((InternalEvent) me.getEvent()).error(me);
+          });
 
       policyFlux.subscribe();
       return sinkRef.getFluxSink();
@@ -146,39 +151,65 @@ public class CompositeOperationPolicy
    */
   @Override
   protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy lastPolicy) {
-    return Flux.from(eventPub)
-        .flatMap(event -> {
-          OperationParametersProcessor parametersProcessor =
-              ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_PARAMETERS_PROCESSOR);
-          Map<String, Object> parametersMap = new HashMap<>(parametersProcessor.getOperationParameters());
-
-          if (getParametersTransformer().isPresent()) {
-            parametersMap.putAll(getParametersTransformer().get().fromMessageToParameters(event.getMessage()));
-          }
-
+    FluxSinkRecorder<Either<CoreEvent, Throwable>> sinkRecorder = new FluxSinkRecorder<>();
+    final Flux<CoreEvent> doOnNext = from(eventPub)
+        .doOnNext(event -> {
           OperationExecutionFunction operationExecutionFunction =
               ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_OPERATION_EXEC_FUNCTION);
 
-          DeferredMonoSinkExecutorCallback<CoreEvent> callback = new DeferredMonoSinkExecutorCallback();
-          operationExecutionFunction.execute(parametersMap, event, callback);
+          operationExecutionFunction.execute(resolveOperationParameters(event), event, new ExecutorCallback() {
 
-          return Mono.<CoreEvent>create(callback::setSink);
+            @Override
+            public void complete(Object value) {
+              sinkRecorder.next(left((CoreEvent) value, Throwable.class));
+            }
+
+            @Override
+            public void error(Throwable e) {
+              // if `sink.error` is called here, it will cancel the flux altogether. That's why an `Either` is used here, so the
+              // error can be propagated afterwards in a way consistent with our expected error handling.
+              sinkRecorder.next(right(CoreEvent.class, e));
+            }
+          });
         })
-        .map(response -> quickCopy(response, singletonMap(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)));
+        .doOnComplete(() -> sinkRecorder.complete());
+
+    return subscribeFluxOnPublisherSubscription(create(sinkRecorder)
+        .map(result -> {
+          result.applyRight(t -> {
+            throw propagate(t);
+          });
+          return result.getLeft();
+        }), doOnNext)
+            .map(response -> quickCopy(response, singletonMap(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)));
+  }
+
+  private Map<String, Object> resolveOperationParameters(CoreEvent event) {
+    OperationParametersProcessor parametersProcessor =
+        ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_PARAMETERS_PROCESSOR);
+    final Map<String, Object> operationParameters = parametersProcessor.getOperationParameters();
+
+    return getParametersTransformer()
+        .map(paramsTransformer -> {
+          Map<String, Object> parametersMap = new HashMap<>(operationParameters);
+          parametersMap.putAll(paramsTransformer.fromMessageToParameters(event.getMessage()));
+          return parametersMap;
+        })
+        .orElse(operationParameters);
   }
 
   /**
    * Always uses the stored result of {@code processNextOperation} so all the chains after the operation execution are executed
    * with the actual operation result and not a modified version from another policy.
    *
-   * @param policy        the policy to execute.
+   * @param policy the policy to execute.
    * @param nextProcessor the processor to execute when the policy next-processor gets executed
-   * @param eventPub      the event to use to execute the policy chain.
+   * @param eventPub the event to use to execute the policy chain.
    */
   @Override
   protected Publisher<CoreEvent> applyPolicy(Policy policy, ReactiveProcessor nextProcessor, Publisher<CoreEvent> eventPub) {
-    ReactiveProcessor defaultOperationPolicy = operationPolicyProcessorFactory.createOperationPolicy(policy, nextProcessor);
-    return Flux.from(eventPub).transform(defaultOperationPolicy);
+    return from(eventPub)
+        .transform(operationPolicyProcessorFactory.createOperationPolicy(policy, nextProcessor));
   }
 
   @Override

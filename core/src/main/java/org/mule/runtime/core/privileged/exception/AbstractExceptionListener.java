@@ -18,6 +18,7 @@ import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createI
 import static org.mule.runtime.api.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.TypedException;
@@ -61,9 +62,9 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   @Inject
   protected NotificationDispatcher notificationFirer;
 
-  private List<Processor> messageProcessors = new CopyOnWriteArrayList<>();
+  private final List<Processor> messageProcessors = new CopyOnWriteArrayList<>();
 
-  private AtomicBoolean initialised = new AtomicBoolean(false);
+  private final AtomicBoolean initialised = new AtomicBoolean(false);
 
   private boolean enableNotifications = true;
   protected String logException = TRUE.toString();
