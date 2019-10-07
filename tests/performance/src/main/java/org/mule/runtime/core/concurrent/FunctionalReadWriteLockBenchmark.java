@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.concurrent;
 
+import static java.lang.Math.random;
+
 import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock;
@@ -32,7 +34,7 @@ public class FunctionalReadWriteLockBenchmark extends AbstractBenchmark {
   @Threads(Threads.MAX)
   public double withReadLockWithReleaser() {
     return rwLock.withReadLock(releaser -> {
-      return Math.random();
+      return random();
     });
   }
 
@@ -40,7 +42,7 @@ public class FunctionalReadWriteLockBenchmark extends AbstractBenchmark {
   @Threads(Threads.MAX)
   public double withReadLock() {
     return rwLock.withReadLock(() -> {
-      return Math.random();
+      return random();
     });
   }
 }
