@@ -223,7 +223,8 @@ public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> 
         new ArtifactCoordinates(builder.getGroupId(), builder.getArtifactId(), builder.getVersion(), builder.getType(),
                                 builder.getClassifier());
     final Artifact artifact = new Artifact(artifactCoordinates, builder.getArtifactFile().toURI());
-    if (isSupportingPackagesResourcesInformation()) {
+    // mule-maven-plugin (packager) will not include packages/resources for mule-plugin dependencies
+    if (isSupportingPackagesResourcesInformation() && !MULE_PLUGIN_CLASSIFIER.equals(builder.getClassifier())) {
       JarInfo jarInfo = jarFileExplorer.explore(artifact.getUri());
       artifact.setPackages(jarInfo.getPackages().toArray(new String[jarInfo.getPackages().size()]));
       artifact.setResources(jarInfo.getResources().toArray(new String[jarInfo.getResources().size()]));
