@@ -172,6 +172,9 @@ public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
     if (this instanceof ImmutableCaseInsensitiveHashMap) {
       return this;
     }
+    if (this.isEmpty() && EMPTY_MAP != null) {
+      return EMPTY_MAP;
+    }
     return new ImmutableCaseInsensitiveHashMap<>(this);
   }
 
