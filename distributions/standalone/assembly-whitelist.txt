@@ -453,5 +453,5 @@
 #
 # /lib/src
 #
-/mule-standalone-${productVersion}/src/mule-${productVersion}-src.zip
+/mule-standalone-${productVersion}/src/mule-3.9.0-src.zip
 /mule-standalone-${productVersion}/src/README.txt

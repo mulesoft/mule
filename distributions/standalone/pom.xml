@@ -17,6 +17,7 @@
 
     <properties>
         <apikit.version>${mule.version}</apikit.version>
+        <communityDistDir>${project.build.directory}/ce-distribution</communityDistDir>
     </properties>
 
     <build>
@@ -72,6 +73,36 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!--
+                             This has to happen early in the build lifecycle so that plugins running
+                             later in the build lifecycle can work on the unpacked distro.
+                             -->
+                        <id>unpack-dependencies</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skipDistributions}</skip>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.mule.distributions</groupId>
+                                    <artifactId>mule-standalone</artifactId>
+                                    <version>${mule.version}</version>
+                                    <type>tar.gz</type>
+                                    <outputDirectory>${communityDistDir}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.codehaus.gmaven</groupId>
                 <artifactId>gmaven-plugin</artifactId>
                 <executions>
@@ -81,6 +112,7 @@
                             <goal>execute</goal>
                         </goals>
                         <configuration>
+                            <skip>true</skip>
                             <source>
                                 if (project.properties.skipDistributions == "true") return
 
