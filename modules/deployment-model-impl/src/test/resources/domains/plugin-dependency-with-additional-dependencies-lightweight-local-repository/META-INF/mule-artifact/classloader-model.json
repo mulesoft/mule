@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "artifactCoordinates": {
     "groupId": "test",
     "artifactId": "plugin-dependency-with-additional-dependencies",
@@ -41,7 +41,28 @@
             "version": "3.2.1",
             "type": "jar"
           },
-          "uri": "file://${project.build.testOutputDirectory}/apps/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar"
+          "uri": "file://${project.build.testOutputDirectory}/apps/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar",
+          "packages": [
+            "org.apache.commons.collections",
+            "org.apache.commons.collections.bag",
+            "org.apache.commons.collections.bidimap",
+            "org.apache.commons.collections.buffer",
+            "org.apache.commons.collections.collection",
+            "org.apache.commons.collections.comparators",
+            "org.apache.commons.collections.functors",
+            "org.apache.commons.collections.iterators",
+            "org.apache.commons.collections.keyvalue",
+            "org.apache.commons.collections.list",
+            "org.apache.commons.collections.map",
+            "org.apache.commons.collections.set"
+          ],
+          "resources": [
+            "META-INF/maven/commons-collections/commons-collections/pom.properties",
+            "META-INF/maven/commons-collections/commons-collections/pom.xml",
+            "META-INF/LICENSE.txt",
+            "META-INF/MANIFEST.MF",
+            "META-INF/NOTICE.txt"
+          ]
         },
         {
           "artifactCoordinates": {
@@ -50,7 +71,23 @@
             "version": "2.6",
             "type": "jar"
           },
-          "uri": "file://${project.build.testOutputDirectory}/apps/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/commons-io/commons-io/2.6/commons-io-2.6.jar"
+          "uri": "file://${project.build.testOutputDirectory}/apps/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/commons-io/commons-io/2.6/commons-io-2.6.jar",
+          "packages": [
+            "org.apache.commons.io",
+            "org.apache.commons.io.filefilter",
+            "org.apache.commons.io.comparator",
+            "org.apache.commons.io.input",
+            "org.apache.commons.io.monitor",
+            "org.apache.commons.io.output",
+            "org.apache.commons.io.serialization"
+          ],
+          "resources": [
+            "META-INF/maven/commons-io/commons-io/pom.properties",
+            "META-INF/maven/commons-io/commons-io/pom.xml",
+            "META-INF/LICENSE.txt",
+            "META-INF/MANIFEST.MF",
+            "META-INF/NOTICE.txt"
+          ]
         }
       ]
     }
