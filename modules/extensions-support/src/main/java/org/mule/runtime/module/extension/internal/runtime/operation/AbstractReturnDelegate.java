@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.io.IOUtils.EOF;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.core.api.util.StreamingUtils.supportsStreaming;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
@@ -53,7 +54,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.commons.io.input.AutoCloseInputStream;
+import org.apache.commons.io.input.ClosedInputStream;
+import org.apache.commons.io.input.ProxyInputStream;
 
 /**
  * Base class for {@link ReturnDelegate} implementations.
@@ -76,7 +78,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   private boolean isSpecialHandling = false;
   private ReturnHandler returnHandler = nullHandler();
 
-  private Charset defaultEncoding;
+  private final Charset defaultEncoding;
 
   /**
    * Creates a new instance
@@ -237,7 +239,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     return contextMimeType.orElse(mediaType).withCharset(contextEncoding.orElse(existingEncoding));
   }
 
-  protected class ConnectedInputStreamWrapper extends AutoCloseInputStream {
+  protected class ConnectedInputStreamWrapper extends ProxyInputStream {
 
     private final ConnectionHandler<?> connectionHandler;
 
@@ -246,10 +248,24 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
       this.connectionHandler = connectionHandler;
     }
 
+    /**
+     * Automatically closes the stream if the end of stream was reached.
+     *
+     * @param n number of bytes read, or -1 if no more bytes are available
+     * @throws IOException if the stream could not be closed
+     */
+    @Override
+    protected void afterRead(final int n) throws IOException {
+      if (n == EOF) {
+        close();
+      }
+    }
+
     @Override
     public void close() throws IOException {
       try {
         super.close();
+        in = new ClosedInputStream();
       } finally {
         connectionHandler.release();
       }
