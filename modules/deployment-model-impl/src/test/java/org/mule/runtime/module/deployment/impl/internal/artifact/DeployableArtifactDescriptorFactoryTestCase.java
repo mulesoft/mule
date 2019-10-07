@@ -11,11 +11,13 @@ import static java.io.File.separator;
 import static java.lang.String.format;
 import static java.nio.file.Paths.get;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
@@ -60,8 +62,11 @@ import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.BaseMatcher;
@@ -457,6 +462,67 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
     File resolvedFile = createDeployableDescriptorFactory().getLogConfigFile(deployableModel);
     assertThat(resolvedFile.toPath(), is(logConfigFile.toPath()));
+  }
+
+  @Test
+  public void appWithSameDependencyWithDifferentClassifier() throws Exception {
+    installArtifact(getArtifact("dependencies/library"), new File(repositoryLocation.getValue()));
+    installArtifact(getArtifact("dependencies/library-test-jar"), new File(repositoryLocation.getValue()));
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + "/same-dep-diff-classifier");
+
+    ClassLoaderModel classLoaderModel = desc.getClassLoaderModel();
+
+    assertThat(classLoaderModel.getDependencies(), contains(
+                                                            bundleDependency("library"),
+                                                            bundleDependency("library")));
+
+    assertThat(stream(classLoaderModel.getUrls()).map(URL::getPath).collect(toList()),
+               contains(
+                        containsString("same-dep-diff-classifier"),
+                        containsString("library-1.0.0.jar"),
+                        containsString("library-1.0.0-test-jar.jar")));
+  }
+
+  @Test
+  public void appWithPluginWithSameDependencyWithDifferentClassifier() throws Exception {
+    installArtifact(getArtifact("dependencies/library"), new File(repositoryLocation.getValue()));
+    installArtifact(getArtifact("dependencies/library-test-jar"), new File(repositoryLocation.getValue()));
+    installArtifact(getArtifact("dependencies/plugin-with-transitive-dependencies-different-classifier"),
+                    new File(repositoryLocation.getValue()));
+
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-same-dep-diff-classifier");
+
+    ArtifactPluginDescriptor plugin = desc.getPlugins().iterator().next();
+    ClassLoaderModel pluginClassLoderModel = plugin.getClassLoaderModel();
+
+    assertThat(pluginClassLoderModel.getDependencies(), contains(
+                                                                 bundleDependency("library"),
+                                                                 bundleDependency("library")));
+
+    assertThat(stream(pluginClassLoderModel.getUrls()).map(URL::getPath).collect(toList()),
+               contains(
+                        containsString("plugin-with-transitive-dependencies-different-classifier-1.0.0-mule-plugin.jar"),
+                        containsString("library-1.0.0.jar"),
+                        containsString("library-1.0.0-test-jar.jar")));
+  }
+
+  @Test
+  public void appWithPluginWithSameDependencyWithDifferentClassifierAsAdditionalDependencies() throws Exception {
+    installArtifact(getArtifact("dependencies/library"), new File(repositoryLocation.getValue()));
+    installArtifact(getArtifact("dependencies/library-test-jar"), new File(repositoryLocation.getValue()));
+
+    D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-same-dep-diff-classifier-as-additional");
+
+    ArtifactPluginDescriptor plugin = desc.getPlugins().iterator().next();
+    ClassLoaderModel pluginClassLoderModel = plugin.getClassLoaderModel();
+
+    assertThat(pluginClassLoderModel.getDependencies(), is(empty()));
+
+    assertThat(stream(pluginClassLoderModel.getUrls()).map(URL::getPath).collect(toList()),
+               contains(
+                        containsString("test-empty-plugin"),
+                        containsString("library-1.0.0.jar"),
+                        containsString("library-1.0.0-test-jar.jar")));
   }
 
   private void requiredProductValidationExpectedException(String appName) {

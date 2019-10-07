@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -65,6 +66,8 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
   private static final String GROUP_ID = "groupId";
   private static final String ARTIFACT_ID = "artifactId";
   private static final String VERSION = "version";
+  private static final String CLASSIFIER = "classifier";
+  private static final String TYPE = "type";
   protected static final String MULE_PLUGIN = "mule-plugin";
 
   private boolean processSharedLibraries = false;
@@ -187,14 +190,13 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
             Xpp3Dom dependenciesDom = plugin.getChild(PLUGIN_DEPENDENCIES_FIELD);
             if (dependenciesDom != null) {
               for (Xpp3Dom dependency : dependenciesDom.getChildren(PLUGIN_DEPENDENCY_FIELD)) {
-                String dependencyGroupId = getAttribute(dependency, GROUP_ID);
-                String dependencyArtifactId = getAttribute(dependency, ARTIFACT_ID);
-                String dependencyVersion = getAttribute(dependency, VERSION);
-                mulePluginAdditionalLibraries.add(new BundleDescriptor.Builder()
-                    .setGroupId(dependencyGroupId)
-                    .setArtifactId(dependencyArtifactId)
-                    .setVersion(dependencyVersion)
-                    .build());
+                BundleDescriptor.Builder bdBuilder = new BundleDescriptor.Builder();
+                bdBuilder.setGroupId(getAttribute(dependency, GROUP_ID));
+                bdBuilder.setArtifactId(getAttribute(dependency, ARTIFACT_ID));
+                bdBuilder.setVersion(getAttribute(dependency, VERSION));
+                getOptionalAttribute(dependency, CLASSIFIER).ifPresent(bdBuilder::setClassifier);
+                getOptionalAttribute(dependency, TYPE).ifPresent(bdBuilder::setType);
+                mulePluginAdditionalLibraries.add(bdBuilder.build());
               }
             }
             pluginsAdditionalLibraries.put(mulePluginDescriptor, mulePluginAdditionalLibraries);
@@ -246,14 +248,22 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
     }
   }
 
+  private Optional<String> getOptionalAttribute(Xpp3Dom tag, String attributeName) {
+    Xpp3Dom attributeDom = tag.getChild(attributeName);
+    if(attributeDom == null) {
+      return empty();
+    }
+    return of(getAttribute(tag, attributeName));
+  }
+
   protected String getAttribute(Xpp3Dom tag, String attributeName) {
     Xpp3Dom attributeDom = tag.getChild(attributeName);
     checkState(attributeDom != null, format("'%s' element not declared at '%s' in the pom file of the artifact '%s'",
                                             attributeName, tag.toString(), artifactFolder.getName()));
     String attributeValue = attributeDom.getValue().trim();
     checkState(!isEmpty(attributeValue),
-               format("'%s' was defined but has an empty value at '%s' declared in the pom file of the artifact %s",
-                      attributeName, tag.toString(), artifactFolder.getName()));
+                 format("'%s' was defined but has an empty value at '%s' declared in the pom file of the artifact %s",
+                        attributeName, tag.toString(), artifactFolder.getName()));
     return attributeValue;
 
   }
