@@ -17,10 +17,41 @@
 
     <properties>
         <apikit.version>3.8.1</apikit.version>
+        <communityDistDir>${project.build.directory}/ce-distribution</communityDistDir>
     </properties>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!--
+                             This has to happen early in the build lifecycle so that plugins running
+                             later in the build lifecycle can work on the unpacked distro.
+                             -->
+                        <id>unpack-dependencies</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skipDistributions}</skip>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.mule.distributions</groupId>
+                                    <artifactId>mule-standalone</artifactId>
+                                    <version>${mule.version}</version>
+                                    <type>tar.gz</type>
+                                    <outputDirectory>${communityDistDir}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
@@ -98,14 +129,14 @@
                                 ant.mkdir(dir: tempDir)
 
                                 ant.unjar(dest: tempDir) {
-                                    fileset(dir: muleRoot) {
-                                        include(name: '**/*-sources.jar')
-                                        exclude(name: 'osgi-libs/**/*-sources.jar')
-                                    }
+                                fileset(dir: muleRoot) {
+                                include(name: '**/*-sources.jar')
+                                exclude(name: 'osgi-libs/**/*-sources.jar')
+                                }
                                 }
 
                                 ant.zip(basedir: tempDir,
-                                        destfile: "$project.build.directory/mule-${project.version}-src.zip")
+                                destfile: "$project.build.directory/mule-${project.version}-src.zip")
                             </source>
                         </configuration>
                     </execution>

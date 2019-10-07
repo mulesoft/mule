@@ -8,6 +8,14 @@
 
     <fileSets>
         <fileSet>
+            <directory>${communityDistDir}/mule-standalone-${mule.version}/src</directory>
+            <outputDirectory>src</outputDirectory>
+            <includes>
+                <include>mule-${mule.version}-src.zip</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
             <directory>src/main/resources</directory>
             <outputDirectory></outputDirectory>
             <excludes>
