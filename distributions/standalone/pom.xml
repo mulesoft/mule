@@ -149,7 +149,7 @@
         <dependency>
             <groupId>com.mulesoft.muleesb.patches</groupId>
             <artifactId>SE-12551-${mule.version}</artifactId>
-            <version>7.0</version>
+            <version>4.0</version>
         </dependency>
         <dependency>
             <groupId>com.mulesoft.muleesb.patches</groupId>
