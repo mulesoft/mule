@@ -75,9 +75,6 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
 
   @Override
   public CaseInsensitiveMultiMap toImmutableMultiMap() {
-    if (this instanceof ImmutableCaseInsensitiveMultiMap) {
-      return this;
-    }
     if (this.isEmpty() && emptyMultiMap() != null) {
       return emptyMultiMap();
     }
@@ -94,6 +91,10 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
       this.paramsMap = unmodifiableMap(paramsMap);
     }
 
+    @Override
+    public CaseInsensitiveMultiMap toImmutableMultiMap() {
+      return this;
+    }
   }
 
   @Override
