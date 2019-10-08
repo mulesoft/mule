@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -46,7 +45,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
@@ -250,7 +248,7 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
 
   private Optional<String> getOptionalAttribute(Xpp3Dom tag, String attributeName) {
     Xpp3Dom attributeDom = tag.getChild(attributeName);
-    if(attributeDom == null) {
+    if (attributeDom == null) {
       return empty();
     }
     return of(getAttribute(tag, attributeName));
@@ -262,8 +260,8 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
                                             attributeName, tag.toString(), artifactFolder.getName()));
     String attributeValue = attributeDom.getValue().trim();
     checkState(!isEmpty(attributeValue),
-                 format("'%s' was defined but has an empty value at '%s' declared in the pom file of the artifact %s",
-                        attributeName, tag.toString(), artifactFolder.getName()));
+               format("'%s' was defined but has an empty value at '%s' declared in the pom file of the artifact %s",
+                      attributeName, tag.toString(), artifactFolder.getName()));
     return attributeValue;
 
   }
