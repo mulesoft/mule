@@ -64,6 +64,7 @@ import org.mule.test.heisenberg.extension.exception.HealthException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.exception.NullExceptionEnricher;
 import org.mule.test.heisenberg.extension.model.*;
+import org.mule.test.heisenberg.extension.model.drugs.DrugBatch;
 import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
 import org.mule.test.heisenberg.extension.stereotypes.KillingStereotype;
@@ -552,25 +553,24 @@ public class HeisenbergOperations implements Disposable {
         .build();
   }
 
-  public List<Result<DrugBatch, String>> getDrugs() {
-    return new ArrayList<>();
-    /*    return new PagingProvider<HeisenbergConnection, Result<DrugBatch, String>>() {
-    
+  public PagingProvider<HeisenbergConnection, Result<DrugBatch, String>> getDrugs() {
+    return new PagingProvider<HeisenbergConnection, Result<DrugBatch, String>>() {
+
       @Override
       public List<Result<DrugBatch, String>> getPage(HeisenbergConnection connection) {
         return new ArrayList<>();
       }
-    
+
       @Override
       public java.util.Optional<Integer> getTotalResults(HeisenbergConnection connection) {
         return java.util.Optional.empty();
       }
-    
+
       @Override
       public void close(HeisenbergConnection connection) throws MuleException {
-    
+
       }
-    };*/
+    };
   }
 
 }
