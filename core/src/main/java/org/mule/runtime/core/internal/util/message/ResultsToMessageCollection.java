@@ -8,8 +8,8 @@ package org.mule.runtime.core.internal.util.message;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock.readWriteLock;
+
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -48,22 +48,21 @@ abstract class ResultsToMessageCollection implements Collection<Message> {
 
   @Override
   public int size() {
-    return lock.withReadLock(r -> delegate.size());
+    return lock.withReadLock(() -> delegate.size());
   }
 
   @Override
   public boolean isEmpty() {
-    return lock.withReadLock(r -> delegate.isEmpty());
+    return lock.withReadLock(() -> delegate.isEmpty());
   }
 
   @Override
   public boolean contains(Object o) {
-    return lock.withReadLock(r -> {
+    return lock.withReadLock(() -> {
       boolean contains = delegate.contains(o);
       if (!contains && o instanceof Message) {
         contains = delegate.contains(Result.builder((Message) o));
       }
-
       return contains;
     });
   }
@@ -75,12 +74,12 @@ abstract class ResultsToMessageCollection implements Collection<Message> {
 
   @Override
   public Object[] toArray() {
-    return lock.withReadLock(r -> transformArray(delegate.toArray()));
+    return lock.withReadLock(() -> transformArray(delegate.toArray()));
   }
 
   @Override
   public <T> T[] toArray(T[] a) {
-    return lock.withReadLock(r -> transformArray(delegate.toArray(a)));
+    return lock.withReadLock(() -> transformArray(delegate.toArray(a)));
   }
 
   private <T> T[] transformArray(T[] array) {
@@ -104,7 +103,7 @@ abstract class ResultsToMessageCollection implements Collection<Message> {
     if (c == null) {
       throw new NullPointerException();
     }
-    return lock.withReadLock(r -> delegate.stream().allMatch(delegate::contains));
+    return lock.withReadLock(() -> delegate.stream().allMatch(delegate::contains));
   }
 
   protected Collection<?> toResults(Collection<?> messages) {
@@ -150,7 +149,7 @@ abstract class ResultsToMessageCollection implements Collection<Message> {
 
   @Override
   public boolean retainAll(Collection<?> c) {
-    return delegate.retainAll(toResults((Collection<Message>) c));
+    return delegate.retainAll(toResults(c));
   }
 
   @Override
@@ -160,12 +159,12 @@ abstract class ResultsToMessageCollection implements Collection<Message> {
 
   @Override
   public boolean equals(Object o) {
-    return lock.withReadLock(r -> delegate.equals(o));
+    return lock.withReadLock(() -> delegate.equals(o));
   }
 
   @Override
   public int hashCode() {
-    return lock.withReadLock(r -> delegate.hashCode());
+    return lock.withReadLock(() -> delegate.hashCode());
   }
 
   @Override

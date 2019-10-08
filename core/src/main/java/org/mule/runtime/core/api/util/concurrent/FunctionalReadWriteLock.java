@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.util.concurrent;
 
 import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
+
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
@@ -58,12 +59,12 @@ public final class FunctionalReadWriteLock {
   /**
    * Executes the given function under the protection of the read lock and returns the output value.
    * <p>
-   * The function receives a {@link LockReleaser} in order to release the read lock
-   * in case a lock downgrade needs to be performed. If no downgrade is necessary, then there's
-   * no need to manually release the lock.
+   * The function receives a {@link LockReleaser} in order to release the read lock in case a lock downgrade needs to be
+   * performed. If no downgrade is necessary, then there's no need to manually release the lock, and it is recommended to use
+   * {@link #withReadLock(CheckedRunnable)} or {@link #withReadLock(CheckedSupplier)} instead.
    *
    * @param function the protected function
-   * @param <T>      the generic type of the return value
+   * @param <T> the generic type of the return value
    * @return the function's output
    */
   public <T> T withReadLock(CheckedFunction<LockReleaser, T> function) {
@@ -77,11 +78,30 @@ public final class FunctionalReadWriteLock {
   }
 
   /**
-   * Executes the given supplier under the protection of the write lock and returns the
-   * generated value.
+   * Executes the given supplier under the protection of the read lock and returns the generated value.
    *
    * @param supplier a {@link CheckedSupplier}
-   * @param <T>      the generic type of the output value
+   * @param <T> the generic type of the output value
+   * @return the generated value
+   */
+  public <T> T withReadLock(CheckedSupplier<T> supplier) {
+    return withLock(readLock, supplier);
+  }
+
+  /**
+   * Executes the given supplier under the protection of the read lock.
+   *
+   * @param runnable a {@link CheckedRunnable}
+   */
+  public void withReadLock(CheckedRunnable runnable) {
+    withLock(readLock, runnable);
+  }
+
+  /**
+   * Executes the given supplier under the protection of the write lock and returns the generated value.
+   *
+   * @param supplier a {@link CheckedSupplier}
+   * @param <T> the generic type of the output value
    * @return the generated value
    */
   public <T> T withWriteLock(CheckedSupplier<T> supplier) {
@@ -97,7 +117,7 @@ public final class FunctionalReadWriteLock {
     withLock(writeLock, runnable);
   }
 
-  private final class DefaultLockReleaser implements LockReleaser {
+  private static final class DefaultLockReleaser implements LockReleaser {
 
     private final Lock lock;
     private boolean acquired = true;

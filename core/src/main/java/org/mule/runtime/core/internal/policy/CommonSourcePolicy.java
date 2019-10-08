@@ -67,7 +67,7 @@ class CommonSourcePolicy {
                       MessageSourceResponseParametersProcessor respParamProcessor,
                       CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> callback) {
 
-    readWriteLock.withReadLock(lockReleaser -> {
+    readWriteLock.withReadLock(() -> {
       if (!disposed.get()) {
         policySink.get().next(quickCopy(sourceEvent, of(POLICY_SOURCE_PARAMETERS_PROCESSOR, respParamProcessor,
                                                         POLICY_SOURCE_PROCESS_CALLBACK, callback)));
@@ -83,8 +83,6 @@ class CommonSourcePolicy {
         SourcePolicyFailureResult result = new SourcePolicyFailureResult(me, errorParameters);
         callback.complete(left(result));
       }
-
-      return null;
     });
   }
 
