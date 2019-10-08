@@ -95,7 +95,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   protected Optional<Location> flowLocation = empty();
   private MessageProcessorChain configuredMessageProcessors;
 
-  protected String when;
+  protected Optional<String> when = empty();
   protected boolean handleException;
 
   protected String errorType = null;
@@ -366,18 +366,21 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   public void setWhen(String when) {
-    this.when = when;
+    this.when = ofNullable(when);
   }
 
   @Override
   public boolean accept(CoreEvent event) {
-    return acceptsAll() || (acceptsErrorType(event)
-        && (when == null || muleContext.getExpressionManager().evaluateBoolean(when, event, getLocation())));
+    return acceptsAll() || (acceptsErrorType(event) && acceptsExpression(event));
   }
 
 
   private boolean acceptsErrorType(CoreEvent event) {
-    return errorTypeMatcher != null && errorTypeMatcher.match(event.getError().get().getErrorType());
+    return errorTypeMatcher == null || errorTypeMatcher.match(event.getError().get().getErrorType());
+  }
+
+  private boolean acceptsExpression(CoreEvent event) {
+    return when.map(expr -> muleContext.getExpressionManager().evaluateBoolean(expr, event, getLocation())).orElse(true);
   }
 
   protected Function<CoreEvent, CoreEvent> afterRouting() {

@@ -58,7 +58,7 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
           }
         }
       }
-    } else if (when == null) {
+    } else if (!when.isPresent()) {
       // No error type and no expression, force ANY matcher
       errorTypeMatcher = new SingleErrorTypeMatcher(errorTypeRepository.getAnyErrorType());
     }
@@ -93,7 +93,7 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
   public TemplateOnErrorHandler duplicateFor(Location buildFor) {
     OnErrorContinueHandler cpy = new OnErrorContinueHandler();
     cpy.setFlowLocation(buildFor);
-    cpy.setWhen(this.when);
+    when.ifPresent(expr -> cpy.setWhen(expr));
     cpy.setHandleException(this.handleException);
     cpy.setErrorType(this.errorType);
     cpy.setMessageProcessors(this.getMessageProcessors());

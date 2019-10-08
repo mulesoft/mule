@@ -71,7 +71,7 @@ public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
     cpy.succeedIfNoLog = this.succeedIfNoLog;
     cpy.exceptionLogged = this.exceptionLogged;
     cpy.handledException = this.handledException;
-    cpy.setWhen(this.when);
+    when.ifPresent(expr -> cpy.setWhen(expr));
     cpy.setHandleException(this.handleException);
     cpy.setErrorType(this.errorType);
     cpy.setMessageProcessors(this.getMessageProcessors());
