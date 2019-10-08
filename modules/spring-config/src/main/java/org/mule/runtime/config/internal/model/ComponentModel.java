@@ -17,6 +17,7 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
 import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createParameterizedTypeModelAdapter;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -266,8 +267,14 @@ public abstract class ComponentModel {
               .forEach(childComp -> childComp
                   .setMetadataTypeModelAdapter(extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
                       .map(paramModel -> createParameterizedTypeModelAdapter(paramModel.getType()))
-                      .orElse(extensionModelHelper.findMetadataType(childComp.getType())
-                          .map(MetadataTypeModelAdapter::createParameterizedTypeModelAdapter).orElse(null))));
+                      .orElseGet(() -> {
+                        final Optional<? extends MetadataType> childMetadataType =
+                            extensionModelHelper.findMetadataType(childComp.getType());
+                        return childMetadataType
+                            .flatMap(MetadataTypeModelAdapter::createMetadataTypeModelAdapterWithSterotype)
+                            .orElseGet(() -> childMetadataType.map(MetadataTypeModelAdapter::createParameterizedTypeModelAdapter)
+                                .orElse(null));
+                      })));
         };
 
       });

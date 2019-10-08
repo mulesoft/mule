@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.extension;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.instanceOf;
@@ -34,7 +35,9 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_S
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ON_ERROR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SUB_FLOW;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
 import org.mule.metadata.api.annotation.DefaultValueAnnotation;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
@@ -179,6 +182,27 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(errorHandler.isRequired(), is(false));
     assertThat(errorHandler, instanceOf(NestedComponentModel.class));
     assertThat(((NestedComponentModel) errorHandler).getAllowedStereotypes(), contains(ERROR_HANDLER));
+  }
+
+  @Test
+  public void subFlow() {
+    final ConstructModel subFlow = coreExtensionModel.getConstructModel("subFlow").get();
+
+    assertThat(subFlow.getStereotype().getType(), is(SUB_FLOW.getType()));
+    assertThat(subFlow.allowsTopLevelDeclaration(), is(true));
+
+    final List<ParameterModel> paramModels = subFlow.getAllParameterModels();
+    assertThat(paramModels, empty());
+
+    List<? extends NestableElementModel> nestedComponents = subFlow.getNestedComponents();
+    assertThat(nestedComponents, hasSize(1));
+
+    NestableElementModel chain = nestedComponents.get(0);
+    assertThat(chain.getName(), is("processors"));
+    assertThat(chain.isRequired(), is(true));
+    assertThat(chain, instanceOf(NestedChainModel.class));
+    assertThat(((NestedChainModel) chain).getAllowedStereotypes().stream()
+        .anyMatch(s -> s.getType().equals(PROCESSOR.getType())), is(true));
   }
 
   @Test
@@ -337,6 +361,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(flowRefModel.getAllParameterModels().get(0).getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(flowRefModel.getAllParameterModels().get(0).getType(), instanceOf(DefaultStringType.class));
     assertThat(flowRefModel.getAllParameterModels().get(0).isRequired(), is(true));
+    assertThat(flowRefModel.getAllParameterModels().get(0).getAllowedStereotypes(), is(asList(FLOW, SUB_FLOW)));
 
     assertTarget(flowRefModel.getAllParameterModels().get(1));
   }

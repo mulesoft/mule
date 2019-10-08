@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.extension;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
@@ -60,11 +61,13 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ON_ERROR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SUB_FLOW;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addReconnectionStrategyParameter;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -299,7 +302,7 @@ class MuleExtensionModelDeclarer {
     flowRef.onDefaultParameterGroup()
         .withRequiredParameter("name")
         .ofType(typeLoader.load(String.class))
-        .withAllowedStereotypes(singletonList(FLOW))
+        .withAllowedStereotypes(asList(FLOW, SUB_FLOW))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The name of the flow to call");
   }
@@ -562,10 +565,11 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareSubflow(ExtensionDeclarer extensionDeclarer) {
-    ConstructDeclarer flow = extensionDeclarer.withConstruct("subFlow")
-        .allowingTopLevelDefinition();
+    ConstructDeclarer subFlow = extensionDeclarer.withConstruct("subFlow")
+        .allowingTopLevelDefinition()
+        .withStereotype(SUB_FLOW);
 
-    flow.withChain().setRequired(true).withAllowedStereotypes(PROCESSOR);
+    subFlow.withChain().setRequired(true).withAllowedStereotypes(PROCESSOR);
   }
 
   private void declareFirstSuccessful(ExtensionDeclarer extensionDeclarer) {
