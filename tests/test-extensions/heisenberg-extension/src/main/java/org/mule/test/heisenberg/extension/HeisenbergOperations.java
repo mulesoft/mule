@@ -33,7 +33,6 @@ import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
-import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
@@ -64,18 +63,7 @@ import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HealthException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.exception.NullExceptionEnricher;
-import org.mule.test.heisenberg.extension.model.BarberPreferences;
-import org.mule.test.heisenberg.extension.model.HealthStatus;
-import org.mule.test.heisenberg.extension.model.Investment;
-import org.mule.test.heisenberg.extension.model.KillParameters;
-import org.mule.test.heisenberg.extension.model.KnockeableDoor;
-import org.mule.test.heisenberg.extension.model.PersonalInfo;
-import org.mule.test.heisenberg.extension.model.RecursiveChainA;
-import org.mule.test.heisenberg.extension.model.RecursiveChainB;
-import org.mule.test.heisenberg.extension.model.RecursivePojo;
-import org.mule.test.heisenberg.extension.model.SaleInfo;
-import org.mule.test.heisenberg.extension.model.SimpleKnockeableDoor;
-import org.mule.test.heisenberg.extension.model.Weapon;
+import org.mule.test.heisenberg.extension.model.*;
 import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
 import org.mule.test.heisenberg.extension.stereotypes.KillingStereotype;
@@ -563,4 +551,26 @@ public class HeisenbergOperations implements Disposable {
         .put("serializable", serializable)
         .build();
   }
+
+  public List<Result<DrugBatch, String>> getDrugs() {
+    return new ArrayList<>();
+    /*    return new PagingProvider<HeisenbergConnection, Result<DrugBatch, String>>() {
+    
+      @Override
+      public List<Result<DrugBatch, String>> getPage(HeisenbergConnection connection) {
+        return new ArrayList<>();
+      }
+    
+      @Override
+      public java.util.Optional<Integer> getTotalResults(HeisenbergConnection connection) {
+        return java.util.Optional.empty();
+      }
+    
+      @Override
+      public void close(HeisenbergConnection connection) throws MuleException {
+    
+      }
+    };*/
+  }
+
 }
