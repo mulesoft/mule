@@ -169,8 +169,8 @@ public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
    * @since 4.1.5
    */
   public CaseInsensitiveHashMap<K, V> toImmutableCaseInsensitiveMap() {
-    if (this instanceof ImmutableCaseInsensitiveHashMap) {
-      return this;
+    if (this.isEmpty() && EMPTY_MAP != null) {
+      return EMPTY_MAP;
     }
     return new ImmutableCaseInsensitiveHashMap<>(this);
   }
@@ -182,5 +182,9 @@ public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
       this.delegate = unmodifiableMap(delegate);
     }
 
+    @Override
+    public CaseInsensitiveHashMap<K, V> toImmutableCaseInsensitiveMap() {
+      return this;
+    }
   }
 }

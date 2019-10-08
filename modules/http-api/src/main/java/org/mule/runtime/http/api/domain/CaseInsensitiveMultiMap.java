@@ -28,6 +28,26 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
 
   private static final long serialVersionUID = -3754163327838153655L;
 
+  private static final CaseInsensitiveMultiMap EMPTY_MAP = new CaseInsensitiveMultiMap().toImmutableMultiMap();
+
+  /**
+   * Returns an empty case-insensitive-multi-map (immutable). This map is serializable.
+   *
+   * <p>
+   * This example illustrates the type-safe way to obtain an empty map:
+   *
+   * <pre>
+   *
+   * CaseInsensitiveMultiMap s = CaseInsensitiveMultiMap.emptyMultiMap();
+   * </pre>
+   *
+   * @return an empty case-insensitive-multi-map
+   * @since 1.3
+   */
+  public static CaseInsensitiveMultiMap emptyCaseInsensitiveMultiMap() {
+    return EMPTY_MAP;
+  }
+
   protected final boolean optimized;
 
   public CaseInsensitiveMultiMap() {
@@ -55,9 +75,10 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
 
   @Override
   public CaseInsensitiveMultiMap toImmutableMultiMap() {
-    if (this instanceof ImmutableCaseInsensitiveMultiMap) {
-      return this;
+    if (this.isEmpty() && emptyCaseInsensitiveMultiMap() != null) {
+      return emptyCaseInsensitiveMultiMap();
     }
+
     return new ImmutableCaseInsensitiveMultiMap(this);
   }
 
@@ -70,6 +91,10 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
       this.paramsMap = unmodifiableMap(paramsMap);
     }
 
+    @Override
+    public CaseInsensitiveMultiMap toImmutableMultiMap() {
+      return this;
+    }
   }
 
   @Override
