@@ -9,9 +9,13 @@ package org.mule.runtime.module.deployment.internal;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.reset;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
+import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
+import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 
@@ -215,5 +219,34 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
     Application application = findApp(appDependingOnDomain100FileBuilder.getId(), 1);
     ApplicationDescriptor applicationDescriptor = application.getDescriptor();
     assertThat(applicationDescriptor.getDomainName(), is(emptyDomain101FileBuilder.getId()));
+  }
+
+  @Test
+  public void stoppedApplicationsAreNotStartedWhenDomainIsRedeployed() throws Exception {
+    startDeployment();
+
+    // Add domain 1.0.0
+    addExplodedDomainFromBuilder(emptyDomain100FileBuilder, emptyDomain100FileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomain100FileBuilder.getId());
+    reset(domainDeploymentListener);
+
+    // Add app pointing to 1.0.0
+    String applicationName = appDependingOnDomain100FileBuilder.getId();
+    addExplodedAppFromBuilder(appDependingOnDomain100FileBuilder, applicationName);
+    assertDeploymentSuccess(applicationDeploymentListener, applicationName);
+
+    assertApplicationStatus(applicationName, STARTED);
+    deploymentService.findApplication(applicationName).stop();
+    assertApplicationStatus(applicationName, STOPPED);
+
+    addExplodedDomainFromBuilder(emptyDomain100FileBuilder, emptyDomain100FileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, emptyDomain100FileBuilder.getId());
+
+    assertApplicationStatus(applicationName, STOPPED);
+  }
+
+  private void assertApplicationStatus(String appName, ApplicationStatus expectedStatus) {
+    Application application = deploymentService.findApplication(appName);
+    assertThat(application.getStatus(), is(expectedStatus));
   }
 }
