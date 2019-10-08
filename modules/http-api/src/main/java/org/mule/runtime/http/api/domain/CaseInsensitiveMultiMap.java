@@ -44,7 +44,7 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
    * @return an empty case-insensitive-multi-map
    * @since 1.3
    */
-  public static CaseInsensitiveMultiMap emptyMultiMap() {
+  public static CaseInsensitiveMultiMap emptyCaseInsensitiveMultiMap() {
     return EMPTY_MAP;
   }
 
@@ -75,8 +75,8 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
 
   @Override
   public CaseInsensitiveMultiMap toImmutableMultiMap() {
-    if (this.isEmpty() && emptyMultiMap() != null) {
-      return emptyMultiMap();
+    if (this.isEmpty() && emptyCaseInsensitiveMultiMap() != null) {
+      return emptyCaseInsensitiveMultiMap();
     }
 
     return new ImmutableCaseInsensitiveMultiMap(this);
