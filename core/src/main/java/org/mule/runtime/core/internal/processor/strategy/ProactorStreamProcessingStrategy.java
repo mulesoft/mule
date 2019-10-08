@@ -124,7 +124,7 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
                  maxConcurrency, getParallelism(), subscribers);
 
     final ScheduledExecutorService retryScheduler =
-        new RejectionCallbackExecutorServiceDecorator(scheduler, getCpuLightScheduler(),
+        new RejectionCallbackExecutorServiceDecorator(scheduler, decorateScheduler(getCpuLightScheduler()),
                                                       () -> onRejected(scheduler),
                                                       () -> lastRetryTimestamp.set(MIN_VALUE),
                                                       ofMillis(SCHEDULER_BUSY_RETRY_INTERVAL_MS));
