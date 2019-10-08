@@ -15,13 +15,14 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_BEGIN_OR_JOIN;
+import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextBlocking;
 import static reactor.core.publisher.Flux.from;
 
@@ -97,6 +98,9 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
       return publisher;
     } else if (isTransactionActive() || transactionConfig.getAction() != ACTION_INDIFFERENT) {
       return Scope.super.apply(publisher);
+    } else if (transactionConfig.getAction() == ACTION_INDIFFERENT) {
+      return from(publisher)
+          .flatMap(event -> processWithChildContext(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler));
     } else {
       return from(publisher)
           .transform(event -> applyWithChildContext(event, nestedChain, ofNullable(getLocation()), messagingExceptionHandler));
