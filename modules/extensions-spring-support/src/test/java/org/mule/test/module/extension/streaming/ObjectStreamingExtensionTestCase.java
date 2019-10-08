@@ -15,6 +15,7 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.OBJECT_STREAMING;
 
+import org.junit.Ignore;
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -92,6 +93,7 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
 
   @Test
   @Description("Operation is configured not to stream and stream gets closed automatically even if not consumed")
+  @Ignore("MULE-17546")
   public void nonRepeatableStreamIsManaged() throws Exception {
     Object stream = getObjectStream("getStreamWithoutStreaming", false);
     assertThat(stream, is(instanceOf(ConsumerStreamingIterator.class)));
