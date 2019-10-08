@@ -222,13 +222,16 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                                      pluginDescriptor.getBundleDescriptor(), dependency.getDescriptor(),
                                      artifactPluginDescriptorResolved.getBundleDescriptor()));
                     ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
-                    pluginDescriptor.setClassLoaderModel(createBuilderWithoutDependency(originalClassLoaderModel, dependency)
-                        .dependingOn(ImmutableSet.of(
-                                                     new BundleDependency.Builder()
-                                                         .setDescriptor(artifactPluginDescriptorResolved.getBundleDescriptor())
-                                                         .setScope(dependency.getScope())
-                                                         .build()))
-                        .build());
+                    boolean includeLocals = shouldIncludeLocals(pluginDescriptor);
+                    pluginDescriptor
+                        .setClassLoaderModel(createBuilderWithoutDependency(originalClassLoaderModel, dependency, includeLocals)
+                            .dependingOn(ImmutableSet.of(
+                                                         new BundleDependency.Builder()
+                                                             .setDescriptor(artifactPluginDescriptorResolved
+                                                                 .getBundleDescriptor())
+                                                             .setScope(dependency.getScope())
+                                                             .build()))
+                            .build());
                   } else {
                     if (logger.isDebugEnabled()) {
                       logger.debug(format(
@@ -267,6 +270,30 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
     return pluginDescriptorsWithDependences;
   }
 
+  private boolean shouldIncludeLocals(ArtifactPluginDescriptor pluginDescriptor) {
+    BundleDescriptor pluginBundleDescriptor = pluginDescriptor.getBundleDescriptor();
+    Set<BundleDescriptor> forbidden = null;
+
+    for (BundleDescriptor forbiddenDescriptor : forbidden) {
+      if (doDescriptorsMatch(forbiddenDescriptor, pluginBundleDescriptor)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean doDescriptorsMatch(BundleDescriptor forbiddenDescriptor, BundleDescriptor pluginBundleDescriptor) {
+    if (!pluginBundleDescriptor.getGroupId().equals(forbiddenDescriptor.getGroupId())) {
+      return false;
+    }
+    if (!pluginBundleDescriptor.getArtifactId().equals(forbiddenDescriptor.getArtifactId())) {
+      return false;
+    }
+
+
+    return true;
+  }
+
   private boolean isPlugin(BundleDependency dependency) {
     return dependency.getDescriptor().isPlugin();
   }
@@ -280,19 +307,24 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
     ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
     final Set<String> exportedClassPackages = new HashSet<>(originalClassLoaderModel.getExportedPackages());
     exportedClassPackages.removeAll(packagesExportedByDependencies);
-    pluginDescriptor.setClassLoaderModel(createBuilderWithoutExportedPackages(originalClassLoaderModel)
+    boolean includeLocals = shouldIncludeLocals(pluginDescriptor);
+    pluginDescriptor.setClassLoaderModel(createBuilderWithoutExportedPackages(originalClassLoaderModel, includeLocals)
         .exportingPackages(exportedClassPackages).build());
-
   }
 
-  private ClassLoaderModelBuilder createBuilderWithoutExportedPackages(ClassLoaderModel originalClassLoaderModel) {
+  private ClassLoaderModelBuilder createBuilderWithoutExportedPackages(ClassLoaderModel originalClassLoaderModel,
+                                                                       boolean includeLocals) {
     ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder()
         .dependingOn(originalClassLoaderModel.getDependencies())
         .exportingPrivilegedPackages(originalClassLoaderModel.getPrivilegedExportedPackages(),
                                      originalClassLoaderModel.getPrivilegedArtifacts())
-        .exportingResources(originalClassLoaderModel.getExportedResources())
-        .withLocalPackages(originalClassLoaderModel.getLocalPackages())
-        .withLocalResources(originalClassLoaderModel.getLocalResources());
+        .exportingResources(originalClassLoaderModel.getExportedResources());
+
+    if (includeLocals) {
+      classLoaderModelBuilder.withLocalResources(originalClassLoaderModel.getLocalResources())
+          .withLocalPackages(originalClassLoaderModel.getLocalPackages());
+    }
+
     for (URL url : originalClassLoaderModel.getUrls()) {
       classLoaderModelBuilder.containing(url);
     }
@@ -300,7 +332,8 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
   }
 
   private ClassLoaderModelBuilder createBuilderWithoutDependency(ClassLoaderModel originalClassLoaderModel,
-                                                                 BundleDependency dependencyToBeExcluded) {
+                                                                 BundleDependency dependencyToBeExcluded,
+                                                                 boolean includeLocals) {
     ClassLoaderModelBuilder classLoaderModelBuilder = new ClassLoaderModelBuilder()
         .dependingOn(originalClassLoaderModel.getDependencies().stream()
             .filter(dependency -> !dependency.equals(dependencyToBeExcluded))
@@ -308,9 +341,13 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
         .exportingPackages(originalClassLoaderModel.getExportedPackages())
         .exportingPrivilegedPackages(originalClassLoaderModel.getPrivilegedExportedPackages(),
                                      originalClassLoaderModel.getPrivilegedArtifacts())
-        .exportingResources(originalClassLoaderModel.getExportedResources())
-        .withLocalPackages(originalClassLoaderModel.getLocalPackages())
-        .withLocalResources(originalClassLoaderModel.getLocalResources());
+        .exportingResources(originalClassLoaderModel.getExportedResources());
+
+    if (includeLocals) {
+      classLoaderModelBuilder.withLocalResources(originalClassLoaderModel.getLocalResources())
+          .withLocalPackages(originalClassLoaderModel.getLocalPackages());
+    }
+
     for (URL url : originalClassLoaderModel.getUrls()) {
       classLoaderModelBuilder.containing(url);
     }
