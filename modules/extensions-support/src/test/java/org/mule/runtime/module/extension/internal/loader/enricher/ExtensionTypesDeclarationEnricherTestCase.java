@@ -17,12 +17,7 @@ import org.mule.runtime.extension.api.declaration.type.annotation.Infrastructure
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
-import org.mule.test.heisenberg.extension.model.CarWash;
-import org.mule.test.heisenberg.extension.model.KnockeableDoor;
-import org.mule.test.heisenberg.extension.model.Methylamine;
-import org.mule.test.heisenberg.extension.model.PersonalInfo;
-import org.mule.test.heisenberg.extension.model.Ricin;
-import org.mule.test.heisenberg.extension.model.Weapon;
+import org.mule.test.heisenberg.extension.model.*;
 import org.mule.test.heisenberg.extension.model.drugs.Drug;
 import org.mule.test.heisenberg.extension.model.drugs.Meta;
 
@@ -35,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -78,5 +74,11 @@ public class ExtensionTypesDeclarationEnricherTestCase extends AbstractMuleTestC
   @Description("Checks that types that are declared in the extension but not used explicitly are added")
   public void addsUnusedDeclaredTypes() throws Exception {
     assertTypes(extensionModel.getTypes(), true, "Type %s was not present", Drug.class, Meta.class);
+  }
+
+  @Test
+  @Description("Checks that POJOs declared in structures like PagingProvider<Connnection C,Result<POJO,Void>> or List<Result<Void,POJO>> are added as Types in the model.")
+  public void addsPOJOsInsideAListOfResultsAsTypes() throws Exception {
+    assertTypes(extensionModel.getTypes(), true, "Type %s was not present", DrugBatch.class, DEAOfficerAttributes.class);
   }
 }
