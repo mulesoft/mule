@@ -264,6 +264,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   @Test
+  @Ignore("MULE-17544")
   public void failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt() throws Exception {
     startFlow("failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt");
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> assertState(false, false, true));
