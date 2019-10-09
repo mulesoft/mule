@@ -45,7 +45,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
@@ -65,6 +64,8 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
   private static final String GROUP_ID = "groupId";
   private static final String ARTIFACT_ID = "artifactId";
   private static final String VERSION = "version";
+  private static final String CLASSIFIER = "classifier";
+  private static final String TYPE = "type";
   protected static final String MULE_PLUGIN = "mule-plugin";
 
   private boolean processSharedLibraries = false;
@@ -187,14 +188,13 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
             Xpp3Dom dependenciesDom = plugin.getChild(PLUGIN_DEPENDENCIES_FIELD);
             if (dependenciesDom != null) {
               for (Xpp3Dom dependency : dependenciesDom.getChildren(PLUGIN_DEPENDENCY_FIELD)) {
-                String dependencyGroupId = getAttribute(dependency, GROUP_ID);
-                String dependencyArtifactId = getAttribute(dependency, ARTIFACT_ID);
-                String dependencyVersion = getAttribute(dependency, VERSION);
-                mulePluginAdditionalLibraries.add(new BundleDescriptor.Builder()
-                    .setGroupId(dependencyGroupId)
-                    .setArtifactId(dependencyArtifactId)
-                    .setVersion(dependencyVersion)
-                    .build());
+                BundleDescriptor.Builder bdBuilder = new BundleDescriptor.Builder();
+                bdBuilder.setGroupId(getAttribute(dependency, GROUP_ID));
+                bdBuilder.setArtifactId(getAttribute(dependency, ARTIFACT_ID));
+                bdBuilder.setVersion(getAttribute(dependency, VERSION));
+                getOptionalAttribute(dependency, CLASSIFIER).ifPresent(bdBuilder::setClassifier);
+                getOptionalAttribute(dependency, TYPE).ifPresent(bdBuilder::setType);
+                mulePluginAdditionalLibraries.add(bdBuilder.build());
               }
             }
             pluginsAdditionalLibraries.put(mulePluginDescriptor, mulePluginAdditionalLibraries);
@@ -244,6 +244,14 @@ public abstract class ArtifactClassLoaderModelBuilder extends ClassLoaderModel.C
     } else {
       return false;
     }
+  }
+
+  private Optional<String> getOptionalAttribute(Xpp3Dom tag, String attributeName) {
+    Xpp3Dom attributeDom = tag.getChild(attributeName);
+    if (attributeDom == null) {
+      return empty();
+    }
+    return of(getAttribute(tag, attributeName));
   }
 
   protected String getAttribute(Xpp3Dom tag, String attributeName) {

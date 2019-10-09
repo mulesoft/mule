@@ -45,7 +45,8 @@ public class MavenTestUtils {
   private static File packageArtifact(File explodedArtifactFile, Model pomModel) {
     String fileNameInRepo = pomModel.getArtifactId()
         + "-" + pomModel.getVersion()
-        + (pomModel.getPackaging() != null ? "-" + pomModel.getPackaging() : "")
+        + (pomModel.getPackaging() != null && !pomModel.getPackaging().equalsIgnoreCase("jar") ? "-" + pomModel.getPackaging()
+            : "")
         + ".jar";
     File compressedFile = new File(explodedArtifactFile, fileNameInRepo);
     compress(compressedFile, listFiles(explodedArtifactFile, null, true).stream()
