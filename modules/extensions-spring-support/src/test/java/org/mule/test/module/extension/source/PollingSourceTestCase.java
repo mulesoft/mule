@@ -13,6 +13,7 @@ import static org.mule.test.petstore.extension.NumberPetAdoptionSource.ALL_NUMBE
 import static org.mule.test.petstore.extension.PetAdoptionSource.ALL_PETS;
 import static org.mule.test.petstore.extension.PetAdoptionSource.FAILED_ADOPTION_COUNT;
 
+import org.junit.Ignore;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -52,6 +53,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   @Test
+  @Ignore("MULE-17580")
   public void vanillaPoll() throws Exception {
     startFlow("vanilla");
     assertAllPetsAdopted();
