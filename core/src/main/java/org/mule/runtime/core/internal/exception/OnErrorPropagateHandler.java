@@ -26,7 +26,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
   @Override
   public boolean acceptsAll() {
-    return errorTypeMatcher == null && when == null;
+    return errorTypeMatcher == null && !when.isPresent();
   }
 
   /**
@@ -56,7 +56,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   public TemplateOnErrorHandler duplicateFor(Location buildFor) {
     OnErrorPropagateHandler cpy = new OnErrorPropagateHandler();
     cpy.setFlowLocation(buildFor);
-    cpy.setWhen(this.when);
+    when.ifPresent(expr -> cpy.setWhen(expr));
     cpy.setHandleException(this.handleException);
     cpy.setErrorType(this.errorType);
     cpy.setMessageProcessors(this.getMessageProcessors());
