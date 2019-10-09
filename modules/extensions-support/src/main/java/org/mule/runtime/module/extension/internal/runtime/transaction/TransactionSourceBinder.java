@@ -67,7 +67,8 @@ public class TransactionSourceBinder {
 
     Transaction tx =
         transactionConfig.getFactory().beginTransaction(applicationName, notificationDispatcher, transactionFactoryManager,
-                                                        transactionManager, timeout);
+                                                        transactionManager);
+    tx.setTimeout(timeout);
     ((TransactionAdapter) tx).setComponentLocation(sourceLocation);
 
     ConfigurationInstance configuration = ofNullable(configurationInstance)

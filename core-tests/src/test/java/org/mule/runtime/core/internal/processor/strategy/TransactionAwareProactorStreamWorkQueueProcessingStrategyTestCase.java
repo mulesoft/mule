@@ -78,7 +78,7 @@ public class TransactionAwareProactorStreamWorkQueueProcessingStrategyTestCase
     flow.start();
 
     getInstance()
-        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), 5));
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
 
     processFlow(testEvent());
 

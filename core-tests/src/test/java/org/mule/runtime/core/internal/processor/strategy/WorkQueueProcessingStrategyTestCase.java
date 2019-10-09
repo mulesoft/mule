@@ -56,8 +56,6 @@ import io.qameta.allure.Story;
 @Story(WORK_QUEUE)
 public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
-  private static final int DEFAULT_TIMEOUT = 5;
-
   public WorkQueueProcessingStrategyTestCase(Mode mode) {
     super(mode);
   }
@@ -171,7 +169,7 @@ public class WorkQueueProcessingStrategyTestCase extends AbstractProcessingStrat
     flow.start();
 
     getInstance()
-        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), DEFAULT_TIMEOUT));
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
 
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(DefaultMuleException.class));

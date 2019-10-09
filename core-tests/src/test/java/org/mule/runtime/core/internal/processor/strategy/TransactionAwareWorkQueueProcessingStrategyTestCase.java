@@ -59,7 +59,7 @@ public class TransactionAwareWorkQueueProcessingStrategyTestCase extends WorkQue
     flow.start();
 
     getInstance()
-        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), 2));
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
 
     processFlow(testEvent());
 
