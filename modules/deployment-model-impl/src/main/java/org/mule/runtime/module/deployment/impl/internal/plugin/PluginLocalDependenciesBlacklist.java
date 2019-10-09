@@ -14,11 +14,28 @@ import com.vdurmont.semver4j.Semver;
 
 import java.util.List;
 
+/**
+ * Utility class to check whether a plugin should use its local resources and packages instead of the ones of the
+ * artifact where it is included.
+ * The check was added to provide backward compatibility for artifacts that use the bug fixed in MULE-17112
+ * as a feature.
+ * In order to have a way to add new artifacts to the blacklist, the check was added in a separate class.
+ *
+ * @since 4.2.2
+ */
 class PluginLocalDependenciesBlacklist {
 
   private static List<BundleDescriptor> pluginsBlacklist = singletonList(new BundleDescriptor.Builder()
       .setGroupId("com.mulesoft.connectors").setArtifactId("mule-ibm-ctg-connector").setVersion("2.3.1").build());
 
+    /**
+     * Checks if the {@link ArtifactPluginDescriptor} is blacklisted. It means that exists a blacklisted bundle
+     * descriptor such that the group id and artifact id match with the artifact bundle descriptor, and which
+     * version is greater than or equal to the artifact version.
+     *
+     * @param pluginDescriptor {@link ArtifactPluginDescriptor} to search in the blacklist.
+     * @return true if the {@link ArtifactPluginDescriptor} is blacklisted, or false otherwise.
+     */
   static boolean isBlacklisted(ArtifactPluginDescriptor pluginDescriptor) {
     BundleDescriptor pluginBundleDescriptor = pluginDescriptor.getBundleDescriptor();
     for (BundleDescriptor blacklistedPluginDescriptor : pluginsBlacklist) {
