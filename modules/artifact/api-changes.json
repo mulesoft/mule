@@ -37,6 +37,42 @@
           "methodName": "getResources",
           "elementKind": "method",
           "justification": "MULE-17114: Add the notImported information from MULE-17112 into the plugins packager"
+        },
+        {
+         "code": "java.method.added",
+         "new": "method org.mule.runtime.module.artifact.api.descriptor.BundleDependency.Builder org.mule.runtime.module.artifact.api.descriptor.BundleDependency.Builder::setAdditionalDependencies(java.util.List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>)",
+         "package": "org.mule.runtime.module.artifact.api.descriptor",
+         "classSimpleName": "Builder",
+         "methodName": "setAdditionalDependencies",
+         "elementKind": "method",
+         "justification": "MULE-17524: Set instead of List generating inconsistencies resolving dependencies"
+        },
+        {
+         "code": "java.method.added",
+         "new": "method org.mule.runtime.module.artifact.api.descriptor.BundleDependency.Builder org.mule.runtime.module.artifact.api.descriptor.BundleDependency.Builder::setTransitiveDependencies(java.util.List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>)",
+         "package": "org.mule.runtime.module.artifact.api.descriptor",
+         "classSimpleName": "Builder",
+         "methodName": "setTransitiveDependencies",
+         "elementKind": "method",
+         "justification": "MULE-17524: Set instead of List generating inconsistencies resolving dependencies"
+        },
+        {
+         "code": "java.method.added",
+         "new": "method java.util.List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> org.mule.runtime.module.artifact.api.descriptor.BundleDependency::getAdditionalDependenciesList()",
+         "package": "org.mule.runtime.module.artifact.api.descriptor",
+         "classSimpleName": "BundleDependency",
+         "methodName": "getAdditionalDependenciesList",
+         "elementKind": "method",
+         "justification": "MULE-17524: Set instead of List generating inconsistencies resolving dependencies"
+        },
+        {
+         "code": "java.method.added",
+         "new": "method java.util.List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> org.mule.runtime.module.artifact.api.descriptor.BundleDependency::getTransitiveDependenciesList()",
+         "package": "org.mule.runtime.module.artifact.api.descriptor",
+         "classSimpleName": "BundleDependency",
+         "methodName": "getTransitiveDependenciesList",
+         "elementKind": "method",
+         "justification": "MULE-17524: Set instead of List generating inconsistencies resolving dependencies"
         }
       ]
     }
