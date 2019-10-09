@@ -75,7 +75,7 @@ public class TransactionNotificationsTestCase extends AbstractMuleContextTestCas
 
     private DummyTransaction(String applicationName,
                              NotificationDispatcher notificationFirer) {
-      super(applicationName, notificationFirer, 0);
+      super(applicationName, notificationFirer);
     }
 
     @Override

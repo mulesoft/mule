@@ -24,7 +24,7 @@ public final class FakeTransactionFactory implements UniversalTransactionFactory
   @Override
   public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
                                       SingleResourceTransactionFactoryManager transactionFactoryManager,
-                                      TransactionManager transactionManager, int timeout) {
+                                      TransactionManager transactionManager) {
     return null;
   }
 

@@ -63,7 +63,8 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
       // Timeout is a traversal attribute of all Transaction implementations.
       // Setting it up here for all of them rather than in every implementation.
       tx = transactionConfig.getFactory().beginTransaction(applicationName, notificationDispatcher, transactionFactoryManager,
-                                                           transactionManager, timeout);
+                                                           transactionManager);
+      tx.setTimeout(timeout);
       resolveStartedTransaction = true;
       if (logger.isDebugEnabled()) {
         logger.debug("Transaction successfully started: " + tx);

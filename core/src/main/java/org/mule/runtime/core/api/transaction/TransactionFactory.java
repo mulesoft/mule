@@ -27,7 +27,7 @@ public interface TransactionFactory {
    * @throws TransactionException if the transaction cannot be created or begun
    * @param muleContext
    *
-   * @deprecated since 4.3.0. Use {@link #beginTransaction(String, NotificationDispatcher, SingleResourceTransactionFactoryManager, TransactionManager, int)} instead
+   * @deprecated since 4.3.0. Use {@link #beginTransaction(String, NotificationDispatcher, SingleResourceTransactionFactoryManager, TransactionManager)} instead
    */
   @Deprecated
   Transaction beginTransaction(MuleContext muleContext) throws TransactionException;
@@ -42,10 +42,9 @@ public interface TransactionFactory {
    */
   default Transaction beginTransaction(String applicationName, NotificationDispatcher notificationDispatcher,
                                        SingleResourceTransactionFactoryManager transactionFactoryManager,
-                                       TransactionManager transactionManager, int timeout)
+                                       TransactionManager transactionManager)
       throws TransactionException {
     Transaction transaction = beginTransaction(((DefaultNotificationDispatcher) notificationDispatcher).getContext());
-    transaction.setTimeout(timeout);
     return transaction;
   }
 

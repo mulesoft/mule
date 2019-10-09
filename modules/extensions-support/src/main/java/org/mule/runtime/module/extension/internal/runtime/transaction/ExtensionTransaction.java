@@ -26,8 +26,8 @@ public class ExtensionTransaction extends AbstractSingleResourceTransaction {
 
   private Optional<ExtensionTransactionalResource> boundResource = empty();
 
-  public ExtensionTransaction(String applicationName, NotificationDispatcher notificationFirer, int timeout) {
-    super(applicationName, notificationFirer, timeout);
+  public ExtensionTransaction(String applicationName, NotificationDispatcher notificationFirer) {
+    super(applicationName, notificationFirer);
   }
 
   /**

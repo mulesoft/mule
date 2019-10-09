@@ -62,14 +62,13 @@ public class XaTransaction extends AbstractTransaction {
 
   protected TransactionManager txManager;
 
-  public XaTransaction(String applicationName, TransactionManager transactionManager, NotificationDispatcher notificationFirer,
-                       int timeout) {
-    super(applicationName, notificationFirer, timeout);
+  public XaTransaction(String applicationName, TransactionManager transactionManager, NotificationDispatcher notificationFirer) {
+    super(applicationName, notificationFirer);
     this.txManager = transactionManager;
   }
 
   /**
-   * @deprecated since 4.3.0. Use {@link #XaTransaction(String, TransactionManager, NotificationDispatcher, int)} instead
+   * @deprecated since 4.3.0. Use {@link #XaTransaction(String, TransactionManager, NotificationDispatcher)} instead
    */
   @Deprecated
   public XaTransaction(MuleContext muleContext) {

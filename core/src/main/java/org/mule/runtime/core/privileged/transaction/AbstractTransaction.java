@@ -59,10 +59,9 @@ public abstract class AbstractTransaction implements TransactionAdapter {
     }
   }
 
-  protected AbstractTransaction(String applicationName, NotificationDispatcher notificationFirer, int timeout) {
+  protected AbstractTransaction(String applicationName, NotificationDispatcher notificationFirer) {
     this.applicationName = applicationName;
     this.notificationFirer = notificationFirer;
-    this.timeout = timeout;
   }
 
   @Override
