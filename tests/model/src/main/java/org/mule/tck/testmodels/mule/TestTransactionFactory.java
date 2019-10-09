@@ -37,8 +37,7 @@ public class TestTransactionFactory implements TransactionFactory {
     try {
       return beginTransaction(muleContext.getConfiguration().getId(),
                               ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class),
-                              muleContext.getTransactionFactoryManager(), muleContext.getTransactionManager(),
-                              mockTransaction.getTimeout());
+                              muleContext.getTransactionFactoryManager(), muleContext.getTransactionManager());
     } catch (Exception e) {
       throw new RuntimeException();
     }
@@ -46,13 +45,13 @@ public class TestTransactionFactory implements TransactionFactory {
 
   public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
                                       SingleResourceTransactionFactoryManager transactionFactoryManager,
-                                      TransactionManager transactionManager, int timeout)
+                                      TransactionManager transactionManager)
       throws TransactionException {
     Transaction testTransaction;
     if (mockTransaction != null) {
       testTransaction = mockTransaction;
     } else {
-      testTransaction = new TestTransaction(applicationName, notificationFirer, false, timeout);
+      testTransaction = new TestTransaction(applicationName, notificationFirer, false);
     }
 
     testTransaction.begin();

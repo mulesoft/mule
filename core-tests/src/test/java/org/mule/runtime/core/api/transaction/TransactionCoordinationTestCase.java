@@ -37,8 +37,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
 
-  private static final int DEFAULT_TIMEOUT = 20;
-
   private NotificationDispatcher notificationDispatcher;
 
   private TransactionCoordination tc;
@@ -107,7 +105,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   public void testCommitCurrentTransaction() throws Exception {
     assertThat(tc.getTransaction(), nullValue());
     tc.commitCurrentTransaction();
-    TestTransaction testTransaction = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
+    TestTransaction testTransaction = spy(new TestTransaction("appName", notificationDispatcher));
 
     tc.bindTransaction(testTransaction);
     tc.commitCurrentTransaction();
@@ -118,9 +116,9 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   @Test
   public void testCommitCurrentTransactionWithSuspendedTransaction() throws Exception {
     assertThat(tc.getTransaction(), nullValue());
-    TestTransaction xaTx = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
+    TestTransaction xaTx = spy(new TestTransaction("appName", notificationDispatcher));
     xaTx.setXA(true);
-    Transaction tx = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
+    Transaction tx = spy(new TestTransaction("appName", notificationDispatcher));
 
     tc.bindTransaction(xaTx);
     tc.suspendCurrentTransaction();
@@ -146,7 +144,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   public void testRollbackCurrentTransaction() throws Exception {
     assertThat(tc.getTransaction(), nullValue());
     tc.commitCurrentTransaction();
-    TestTransaction testTransaction = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
+    TestTransaction testTransaction = spy(new TestTransaction("appName", notificationDispatcher));
 
     tc.bindTransaction(testTransaction);
     tc.rollbackCurrentTransaction();
@@ -157,9 +155,9 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   @Test
   public void testRollbackCurrentTransactionWithSuspendedTransaction() throws Exception {
     assertThat(tc.getTransaction(), nullValue());
-    TestTransaction xaTx = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
+    TestTransaction xaTx = spy(new TestTransaction("appName", notificationDispatcher));
     xaTx.setXA(true);
-    Transaction tx = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
+    Transaction tx = spy(new TestTransaction("appName", notificationDispatcher));
 
     tc.bindTransaction(xaTx);
     tc.suspendCurrentTransaction();
@@ -199,7 +197,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
     assertThat(tc.getTransaction(), nullValue());
     tc.resumeXaTransactionIfAvailable();
 
-    Transaction tx = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
+    Transaction tx = spy(new TestTransaction("appName", notificationDispatcher));
     tc.bindTransaction(tx);
     tc.resumeXaTransactionIfAvailable();
     verify(tx, times(0)).resume();
@@ -210,7 +208,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
     assertThat(tc.getTransaction(), nullValue());
     tc.resumeXaTransactionIfAvailable();
 
-    TestTransaction tx = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
+    TestTransaction tx = spy(new TestTransaction("appName", notificationDispatcher));
     tx.setXA(true);
     tc.bindTransaction(tx);
     tc.suspendCurrentTransaction();
@@ -222,7 +220,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   @Test(expected = IllegalTransactionStateException.class)
   public void testResumeXaTransactionTwice() throws Exception {
     assertThat(tc.getTransaction(), nullValue());
-    TestTransaction tx = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
+    TestTransaction tx = spy(new TestTransaction("appName", notificationDispatcher));
     tx.setXA(true);
     tc.bindTransaction(tx);
     tc.resumeSuspendedTransaction();
@@ -232,7 +230,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   @Test
   public void testResolveTransactionForRollback() throws Exception {
     assertThat(tc.getTransaction(), nullValue());
-    TestTransaction tx = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
+    TestTransaction tx = spy(new TestTransaction("appName", notificationDispatcher));
     tx.setXA(true);
     tc.bindTransaction(tx);
     tx.setRollbackOnly();
@@ -244,7 +242,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   @Test
   public void testResolveTransactionForCommit() throws Exception {
     assertThat(tc.getTransaction(), nullValue());
-    TestTransaction tx = spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
+    TestTransaction tx = spy(new TestTransaction("appName", notificationDispatcher));
     tx.setXA(true);
     tc.bindTransaction(tx);
     tc.resolveTransaction();

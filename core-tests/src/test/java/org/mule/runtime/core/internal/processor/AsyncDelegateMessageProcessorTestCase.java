@@ -127,7 +127,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
 
   @Test
   public void processWithTx() throws Exception {
-    Transaction transaction = new TestTransaction("appName", getNotificationDispatcher(muleContext), 2);
+    Transaction transaction = new TestTransaction("appName", getNotificationDispatcher(muleContext));
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
     try {

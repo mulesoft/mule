@@ -27,7 +27,7 @@ public interface TransactionFactory {
    * @param muleContext
    *
    * @deprecated since 4.3.0. Use
-   *             {@link #beginTransaction(String, NotificationDispatcher, SingleResourceTransactionFactoryManager, TransactionManager, int)}
+   *             {@link #beginTransaction(String, NotificationDispatcher, SingleResourceTransactionFactoryManager, TransactionManager)}
    *             instead
    */
   @Deprecated
@@ -43,10 +43,9 @@ public interface TransactionFactory {
    */
   default Transaction beginTransaction(String applicationName, NotificationDispatcher notificationDispatcher,
                                        SingleResourceTransactionFactoryManager transactionFactoryManager,
-                                       TransactionManager transactionManager, int timeout)
+                                       TransactionManager transactionManager)
       throws TransactionException {
     Transaction transaction = beginTransaction(((DefaultNotificationDispatcher) notificationDispatcher).getContext());
-    transaction.setTimeout(timeout);
     return transaction;
   }
 

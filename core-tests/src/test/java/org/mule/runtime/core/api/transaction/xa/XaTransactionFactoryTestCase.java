@@ -39,8 +39,7 @@ public class XaTransactionFactoryTestCase extends AbstractMuleTestCase {
 
     final Transaction transaction = transactionFactory.beginTransaction("appName", getNotificationDispatcher(muleContext),
                                                                         new SingleResourceTransactionFactoryManager(),
-                                                                        muleContext.getTransactionManager(), timeout);
-
+                                                                        muleContext.getTransactionManager());
     assertThat(transaction.getTimeout(), equalTo(timeout));
   }
 }

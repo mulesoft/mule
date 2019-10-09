@@ -73,11 +73,11 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
 
   @Spy
   protected TestTransaction mockTransaction =
-      new TestTransaction(applicationName, notificationDispatcher, DEFAULT_TIMEOUT);
+      new TestTransaction(applicationName, notificationDispatcher);
 
   @Spy
   protected TestTransaction mockNewTransaction =
-      new TestTransaction(applicationName, notificationDispatcher, DEFAULT_TIMEOUT);
+      new TestTransaction(applicationName, notificationDispatcher);
 
   @Mock
   protected ExternalTransactionAwareTransactionFactory mockExternalTransactionFactory;

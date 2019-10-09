@@ -35,11 +35,11 @@ public class XaTransactionFactory implements ExternalTransactionAwareTransaction
   @Override
   public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
                                       SingleResourceTransactionFactoryManager transactionFactoryManager,
-                                      TransactionManager transactionManager, int timeout)
+                                      TransactionManager transactionManager)
       throws TransactionException {
-    this.timeout = timeout;
     try {
-      XaTransaction xat = new XaTransaction(applicationName, transactionManager, notificationFirer, timeout);
+      XaTransaction xat = new XaTransaction(applicationName, transactionManager, notificationFirer);
+      xat.setTimeout(timeout);
       xat.begin();
       return xat;
     } catch (Exception e) {
@@ -98,8 +98,7 @@ public class XaTransactionFactory implements ExternalTransactionAwareTransaction
       return this.beginTransaction(muleContext.getConfiguration().getId(),
                                    ((MuleContextWithRegistry) muleContext).getRegistry()
                                        .lookupObject(NotificationDispatcher.class),
-                                   muleContext.getTransactionFactoryManager(), muleContext.getTransactionManager(),
-                                   10000);
+                                   muleContext.getTransactionFactoryManager(), muleContext.getTransactionManager());
     } catch (RegistrationException e) {
       throw new TransactionException(cannotStartTransaction("XA"), e);
     }

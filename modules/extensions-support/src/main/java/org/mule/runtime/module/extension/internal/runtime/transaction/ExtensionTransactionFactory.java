@@ -32,8 +32,7 @@ public class ExtensionTransactionFactory implements TransactionFactory {
       return this.beginTransaction(muleContext.getConfiguration().getId(),
                                    ((MuleContextWithRegistry) muleContext).getRegistry()
                                        .lookupObject(NotificationDispatcher.class),
-                                   muleContext.getTransactionFactoryManager(), muleContext.getTransactionManager(),
-                                   10000);
+                                   muleContext.getTransactionFactoryManager(), muleContext.getTransactionManager());
     } catch (RegistrationException e) {
       throw new TransactionException(cannotStartTransaction("Extension"), e);
     }
@@ -45,9 +44,9 @@ public class ExtensionTransactionFactory implements TransactionFactory {
   @Override
   public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
                                       SingleResourceTransactionFactoryManager transactionFactoryManager,
-                                      TransactionManager transactionManager, int timeout)
+                                      TransactionManager transactionManager)
       throws TransactionException {
-    Transaction transaction = new ExtensionTransaction(applicationName, notificationFirer, timeout);
+    Transaction transaction = new ExtensionTransaction(applicationName, notificationFirer);
     transaction.begin();
 
     return transaction;

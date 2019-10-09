@@ -139,7 +139,7 @@ public class DirectProcessingStrategyTestCase extends AbstractProcessingStrategy
     flow.start();
 
     getInstance()
-        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), 5));
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
 
     processFlow(testEvent());
 

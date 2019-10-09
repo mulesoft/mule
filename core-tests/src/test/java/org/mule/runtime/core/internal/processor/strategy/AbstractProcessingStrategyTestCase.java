@@ -518,7 +518,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow.start();
 
     getInstance()
-        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), 10));
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
     processFlow(newEvent());
 
     assertThat(threads.toString(), threads, hasSize(equalTo(1)));
@@ -538,7 +538,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow.start();
 
     getInstance()
-        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext), 10));
+        .bindTransaction(new TestTransaction("appName", getNotificationDispatcher(muleContext)));
     processFlow(newEvent());
 
     assertThat(threads.toString(), threads, hasSize(equalTo(1)));

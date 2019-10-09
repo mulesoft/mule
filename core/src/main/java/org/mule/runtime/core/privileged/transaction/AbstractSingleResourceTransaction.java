@@ -70,8 +70,8 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
   }
 
   protected AbstractSingleResourceTransaction(String applicationName,
-                                              NotificationDispatcher notificationFirer, int timeout) {
-    super(applicationName, notificationFirer, timeout);
+                                              NotificationDispatcher notificationFirer) {
+    super(applicationName, notificationFirer);
   }
 
   @Override
