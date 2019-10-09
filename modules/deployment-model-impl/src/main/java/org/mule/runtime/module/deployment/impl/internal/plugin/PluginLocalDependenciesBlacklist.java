@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -13,6 +14,9 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import com.vdurmont.semver4j.Semver;
 
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class to check whether a plugin should use its local resources and packages instead of the ones of the
@@ -25,21 +29,28 @@ import java.util.List;
  */
 class PluginLocalDependenciesBlacklist {
 
+  private static final Logger logger = LoggerFactory.getLogger(PluginLocalDependenciesBlacklist.class);
+
   private static List<BundleDescriptor> pluginsBlacklist = singletonList(new BundleDescriptor.Builder()
       .setGroupId("com.mulesoft.connectors").setArtifactId("mule-ibm-ctg-connector").setVersion("2.3.1").build());
 
-    /**
-     * Checks if the {@link ArtifactPluginDescriptor} is blacklisted. It means that exists a blacklisted bundle
-     * descriptor such that the group id and artifact id match with the artifact bundle descriptor, and which
-     * version is greater than or equal to the artifact version.
-     *
-     * @param pluginDescriptor {@link ArtifactPluginDescriptor} to search in the blacklist.
-     * @return true if the {@link ArtifactPluginDescriptor} is blacklisted, or false otherwise.
-     */
+  /**
+   * Checks if the {@link ArtifactPluginDescriptor} is blacklisted. It means that exists a blacklisted bundle
+   * descriptor such that the group id and artifact id match with the artifact bundle descriptor, and which
+   * version is greater than or equal to the artifact version.
+   *
+   * @param pluginDescriptor {@link ArtifactPluginDescriptor} to search in the blacklist.
+   * @return true if the {@link ArtifactPluginDescriptor} is blacklisted, or false otherwise.
+   */
   static boolean isBlacklisted(ArtifactPluginDescriptor pluginDescriptor) {
     BundleDescriptor pluginBundleDescriptor = pluginDescriptor.getBundleDescriptor();
     for (BundleDescriptor blacklistedPluginDescriptor : pluginsBlacklist) {
       if (doDescriptorsMatch(blacklistedPluginDescriptor, pluginBundleDescriptor)) {
+        if (logger.isWarnEnabled()) {
+          logger
+              .warn(format("Plugin '%s' won't load the local dependencies as locals, please update to the latest plugin version",
+                           pluginDescriptor.getBundleDescriptor()));
+        }
         return true;
       }
     }
