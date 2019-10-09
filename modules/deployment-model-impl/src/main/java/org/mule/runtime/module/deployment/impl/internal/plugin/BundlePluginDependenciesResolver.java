@@ -13,6 +13,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
+import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesBlacklist.isBlacklisted;
 
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.plugin.DuplicateExportedPackageException;
@@ -222,7 +223,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                                      pluginDescriptor.getBundleDescriptor(), dependency.getDescriptor(),
                                      artifactPluginDescriptorResolved.getBundleDescriptor()));
                     ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
-                    boolean includeLocals = shouldIncludeLocals(pluginDescriptor);
+                    boolean includeLocals = !isBlacklisted(pluginDescriptor);
                     pluginDescriptor
                         .setClassLoaderModel(createBuilderWithoutDependency(originalClassLoaderModel, dependency, includeLocals)
                             .dependingOn(ImmutableSet.of(
@@ -270,30 +271,6 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
     return pluginDescriptorsWithDependences;
   }
 
-  private boolean shouldIncludeLocals(ArtifactPluginDescriptor pluginDescriptor) {
-    BundleDescriptor pluginBundleDescriptor = pluginDescriptor.getBundleDescriptor();
-    Set<BundleDescriptor> forbidden = null;
-
-    for (BundleDescriptor forbiddenDescriptor : forbidden) {
-      if (doDescriptorsMatch(forbiddenDescriptor, pluginBundleDescriptor)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private boolean doDescriptorsMatch(BundleDescriptor forbiddenDescriptor, BundleDescriptor pluginBundleDescriptor) {
-    if (!pluginBundleDescriptor.getGroupId().equals(forbiddenDescriptor.getGroupId())) {
-      return false;
-    }
-    if (!pluginBundleDescriptor.getArtifactId().equals(forbiddenDescriptor.getArtifactId())) {
-      return false;
-    }
-
-
-    return true;
-  }
-
   private boolean isPlugin(BundleDependency dependency) {
     return dependency.getDescriptor().isPlugin();
   }
@@ -307,7 +284,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
     ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
     final Set<String> exportedClassPackages = new HashSet<>(originalClassLoaderModel.getExportedPackages());
     exportedClassPackages.removeAll(packagesExportedByDependencies);
-    boolean includeLocals = shouldIncludeLocals(pluginDescriptor);
+    boolean includeLocals = !isBlacklisted(pluginDescriptor);
     pluginDescriptor.setClassLoaderModel(createBuilderWithoutExportedPackages(originalClassLoaderModel, includeLocals)
         .exportingPackages(exportedClassPackages).build());
   }
