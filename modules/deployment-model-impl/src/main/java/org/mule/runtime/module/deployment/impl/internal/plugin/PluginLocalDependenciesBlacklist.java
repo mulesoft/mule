@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
-import static java.lang.String.format;
 import static java.util.Collections.singletonList;
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import com.vdurmont.semver4j.Semver;
@@ -35,22 +33,19 @@ class PluginLocalDependenciesBlacklist {
       .setGroupId("com.mulesoft.connectors").setArtifactId("mule-ibm-ctg-connector").setVersion("2.3.1").build());
 
   /**
-   * Checks if the {@link ArtifactPluginDescriptor} is blacklisted. It means that exists a blacklisted bundle
+   * Checks if the {@link BundleDescriptor} is blacklisted. It means that exists a blacklisted bundle
    * descriptor such that the group id and artifact id match with the artifact bundle descriptor, and which
    * version is greater than or equal to the artifact version.
    *
-   * @param pluginDescriptor {@link ArtifactPluginDescriptor} to search in the blacklist.
-   * @return true if the {@link ArtifactPluginDescriptor} is blacklisted, or false otherwise.
+   * @param pluginDescriptor {@link BundleDescriptor} to search in the blacklist.
+   * @return true if the {@link BundleDescriptor} is blacklisted, or false otherwise.
    */
-  static boolean isBlacklisted(ArtifactPluginDescriptor pluginDescriptor) {
-    BundleDescriptor pluginBundleDescriptor = pluginDescriptor.getBundleDescriptor();
+  static boolean isBlacklisted(BundleDescriptor pluginDescriptor) {
     for (BundleDescriptor blacklistedPluginDescriptor : pluginsBlacklist) {
-      if (doDescriptorsMatch(blacklistedPluginDescriptor, pluginBundleDescriptor)) {
-        if (logger.isWarnEnabled()) {
-          logger
-              .warn(format("Plugin '%s' won't load the local dependencies as locals, please update to the latest plugin version",
-                           pluginDescriptor.getBundleDescriptor()));
-        }
+      if (doDescriptorsMatch(blacklistedPluginDescriptor, pluginDescriptor)) {
+        logger
+            .warn("Plugin '{}' local dependencies won't have precedence over the dependencies of the artifact being deployed. Please update to the latest plugin version",
+                  pluginDescriptor);
         return true;
       }
     }

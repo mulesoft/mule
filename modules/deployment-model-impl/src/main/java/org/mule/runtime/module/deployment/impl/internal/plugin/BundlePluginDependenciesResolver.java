@@ -223,7 +223,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                                      pluginDescriptor.getBundleDescriptor(), dependency.getDescriptor(),
                                      artifactPluginDescriptorResolved.getBundleDescriptor()));
                     ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
-                    boolean includeLocals = !isBlacklisted(pluginDescriptor);
+                    boolean includeLocals = !isBlacklisted(pluginDescriptor.getBundleDescriptor());
                     pluginDescriptor
                         .setClassLoaderModel(createBuilderWithoutDependency(originalClassLoaderModel, dependency, includeLocals)
                             .dependingOn(ImmutableSet.of(
@@ -284,7 +284,7 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
     ClassLoaderModel originalClassLoaderModel = pluginDescriptor.getClassLoaderModel();
     final Set<String> exportedClassPackages = new HashSet<>(originalClassLoaderModel.getExportedPackages());
     exportedClassPackages.removeAll(packagesExportedByDependencies);
-    boolean includeLocals = !isBlacklisted(pluginDescriptor);
+    boolean includeLocals = !isBlacklisted(pluginDescriptor.getBundleDescriptor());
     pluginDescriptor.setClassLoaderModel(createBuilderWithoutExportedPackages(originalClassLoaderModel, includeLocals)
         .exportingPackages(exportedClassPackages).build());
   }
