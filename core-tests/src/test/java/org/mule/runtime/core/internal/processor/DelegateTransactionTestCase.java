@@ -24,28 +24,33 @@ import org.mule.tck.util.MuleContextUtils;
 
 public class DelegateTransactionTestCase extends AbstractMuleTestCase {
 
-  private static final int DEFAULT_TX_TIMEOUT = 20;
+  private static final int DEFAULT_TX_TIMEOUT = 30000;
 
+  private String applicationName = "appName";
   private NotificationDispatcher notificationDispatcher;
+  private TransactionManager transactionManager;
+  private SingleResourceTransactionFactoryManager transactionFactoryManager;
 
   @Before
   public void detUp() throws RegistrationException {
     notificationDispatcher = MuleContextUtils.getNotificationDispatcher(mockMuleContext());
+    transactionManager = mock(TransactionManager.class);
+    transactionFactoryManager = new SingleResourceTransactionFactoryManager();
   }
 
   @Test
   public void defaultTxTimeout() {
-    DelegateTransaction delegateTransaction = new DelegateTransaction("appName", notificationDispatcher,
-                                                                      new SingleResourceTransactionFactoryManager(),
-                                                                      mock(TransactionManager.class), DEFAULT_TX_TIMEOUT);
+    DelegateTransaction delegateTransaction = new DelegateTransaction(applicationName, notificationDispatcher,
+                                                                      transactionFactoryManager,
+                                                                      transactionManager);
     assertThat(delegateTransaction.getTimeout(), is(DEFAULT_TX_TIMEOUT));
   }
 
   @Test
   public void changeTxTimeout() {
-    DelegateTransaction delegateTransaction = new DelegateTransaction("appName", notificationDispatcher,
-                                                                      new SingleResourceTransactionFactoryManager(),
-                                                                      mock(TransactionManager.class), DEFAULT_TX_TIMEOUT);
+    DelegateTransaction delegateTransaction = new DelegateTransaction(applicationName, notificationDispatcher,
+                                                                      transactionFactoryManager,
+                                                                      transactionManager);
     int newTimeout = 10;
     delegateTransaction.setTimeout(newTimeout);
     assertThat(delegateTransaction.getTimeout(), is(newTimeout));

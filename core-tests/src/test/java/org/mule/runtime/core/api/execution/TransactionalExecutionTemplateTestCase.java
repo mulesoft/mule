@@ -56,7 +56,6 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
 
   protected static MuleContext mockMuleContext = mockContextWithServices();
   private static NotificationDispatcher notificationDispatcher;
-  private static final int DEFAULT_TIMEOUT = 5;
 
   @Mock
   protected CoreEvent RETURN_VALUE;
@@ -64,11 +63,11 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
   private final String applicationName = "appName";
   @Spy
   protected TestTransaction mockTransaction =
-      new TestTransaction(applicationName, notificationDispatcher, DEFAULT_TIMEOUT);
+      new TestTransaction(applicationName, notificationDispatcher);
 
   @Spy
   protected TestTransaction mockNewTransaction =
-      new TestTransaction(applicationName, notificationDispatcher, DEFAULT_TIMEOUT);
+      new TestTransaction(applicationName, notificationDispatcher);
 
   @Mock(lenient = true)
   protected MessagingException mockMessagingException;

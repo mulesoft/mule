@@ -26,8 +26,8 @@ public class TestTransaction extends AbstractSingleResourceTransaction {
   private String testProperty;
   private boolean isXA;
 
-  public TestTransaction(String applicationName, NotificationDispatcher notificationFirer, int timeout) {
-    super(applicationName, notificationFirer, timeout);
+  public TestTransaction(String applicationName, NotificationDispatcher notificationFirer) {
+    super(applicationName, notificationFirer);
   }
 
   @Override
@@ -40,8 +40,8 @@ public class TestTransaction extends AbstractSingleResourceTransaction {
     return null; // To change body of implemented methods use File | Settings | File Templates.
   }
 
-  public TestTransaction(String applicationName, NotificationDispatcher notificationFirer, boolean isXa, int timeout) {
-    super(applicationName, notificationFirer, timeout);
+  public TestTransaction(String applicationName, NotificationDispatcher notificationFirer, boolean isXa) {
+    super(applicationName, notificationFirer);
     this.isXA = isXa;
   }
 

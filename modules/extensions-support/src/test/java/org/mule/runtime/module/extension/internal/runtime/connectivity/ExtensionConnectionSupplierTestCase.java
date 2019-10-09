@@ -63,7 +63,7 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
   public void before() throws Exception {
     TransactionManager transactionManager = mock(TransactionManager.class, RETURNS_DEEP_STUBS);
     muleContext.setTransactionManager(transactionManager);
-    transaction = spy(new XaTransaction("appName", transactionManager, getNotificationDispatcher(muleContext), 20));
+    transaction = spy(new XaTransaction("appName", transactionManager, getNotificationDispatcher(muleContext)));
     XATransactionalConnection connection = mock(XATransactionalConnection.class, RETURNS_DEEP_STUBS);
     config = new Object();
 

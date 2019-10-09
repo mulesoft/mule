@@ -20,7 +20,6 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transaction.XaTransaction;
 import org.mule.runtime.core.privileged.transaction.xa.XaResourceFactoryHolder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -66,7 +65,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
   @Test
   public void recognizeDifferentWrappersOfSameResource() throws Exception {
     XaTransaction xaTransaction =
-        new XaTransaction("appName", mockTransactionManager, notificationDispatcher, DEFAULT_TIMEOUT);
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
     Object resourceFactory = new Object();
     Object resource = new Object();
     when(mockXaResourceFactoryHolder1.getHoldObject()).thenReturn(resourceFactory);
@@ -87,7 +86,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
     when(mockTransactionManager.getTransaction()).thenReturn(tx);
 
     XaTransaction xaTransaction =
-        new XaTransaction("appName", mockTransactionManager, notificationDispatcher, DEFAULT_TIMEOUT);
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
     xaTransaction.begin();
 
     assertFalse(xaTransaction.isRollbackOnly());
@@ -104,7 +103,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
     int timeoutValue = 1500;
     int timeoutValueInSeconds = 1500 / 1000;
     XaTransaction xaTransaction =
-        new XaTransaction("appName", mockTransactionManager, notificationDispatcher, timeoutValueInSeconds);
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
     xaTransaction.setTimeout(timeoutValue);
     xaTransaction.begin();
     xaTransaction.enlistResource(mockXaResource);
@@ -117,7 +116,8 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
     final int timeoutSecs = timeoutMillis / 1000;
 
     XaTransaction xaTransaction =
-        new XaTransaction("appName", mockTransactionManager, notificationDispatcher, timeoutMillis);
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    xaTransaction.setTimeout(timeoutMillis);
     xaTransaction.begin();
 
     final InOrder inOrder = inOrder(mockTransactionManager);

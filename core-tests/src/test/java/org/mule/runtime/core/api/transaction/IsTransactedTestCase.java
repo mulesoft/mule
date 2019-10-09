@@ -25,7 +25,7 @@ public class IsTransactedTestCase extends AbstractMuleTestCase {
   @Test
   public void testIsTransacted() throws Exception {
     MuleTransactionConfig cfg = new MuleTransactionConfig();
-    TestTransaction testTx = new TestTransaction("appName", new DefaultNotificationDispatcher(), 5);
+    TestTransaction testTx = new TestTransaction("appName", new DefaultNotificationDispatcher());
 
     cfg.setAction(TransactionConfig.ACTION_NEVER);
     assertFalse(cfg.isTransacted());
@@ -92,7 +92,7 @@ public class IsTransactedTestCase extends AbstractMuleTestCase {
     @Override
     public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
                                         SingleResourceTransactionFactoryManager transactionFactoryManager,
-                                        TransactionManager transactionManager, int timeout) {
+                                        TransactionManager transactionManager) {
       return null;
     }
 
@@ -112,7 +112,7 @@ public class IsTransactedTestCase extends AbstractMuleTestCase {
     @Override
     public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
                                         SingleResourceTransactionFactoryManager transactionFactoryManager,
-                                        TransactionManager transactionManager, int timeout) {
+                                        TransactionManager transactionManager) {
       return null;
     }
 

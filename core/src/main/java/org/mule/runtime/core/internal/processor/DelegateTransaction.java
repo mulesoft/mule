@@ -26,15 +26,17 @@ import javax.transaction.TransactionManager;
  */
 public class DelegateTransaction extends AbstractTransaction {
 
-  private Transaction delegate = new NullTransaction(timeout);
+  private static final Integer DEFAULT_TRANSACTION_TIMEOUT = 30000;
+
+  private Transaction delegate = new NullTransaction();
 
   private SingleResourceTransactionFactoryManager transactionFactoryManager;
   private TransactionManager transactionManager;
 
   public DelegateTransaction(String applicationName, NotificationDispatcher notificationFirer,
                              SingleResourceTransactionFactoryManager transactionFactoryManager,
-                             TransactionManager transactionManager, int timeout) {
-    super(applicationName, notificationFirer, timeout);
+                             TransactionManager transactionManager) {
+    super(applicationName, notificationFirer);
     this.transactionFactoryManager = transactionFactoryManager;
     this.transactionManager = transactionManager;
   }
@@ -95,10 +97,10 @@ public class DelegateTransaction extends AbstractTransaction {
     }
     TransactionFactory transactionFactory = transactionFactoryManager.getTransactionFactoryFor(key.getClass());
     this.unbindTransaction();
-    int timeout = delegate.getTimeout();
     this.delegate = transactionFactory.beginTransaction(applicationName, notificationFirer, transactionFactoryManager,
-                                                        transactionManager, timeout);
-    delegate.bindResource(key, resource);
+                                                        transactionManager);
+    this.delegate.setTimeout(timeout);
+    this.delegate.bindResource(key, resource);
     ((TransactionAdapter) delegate).setComponentLocation(componentLocation);
   }
 
@@ -148,11 +150,7 @@ public class DelegateTransaction extends AbstractTransaction {
 
   private class NullTransaction implements TransactionAdapter {
 
-    private int timeout;
-
-    NullTransaction(int timeout) {
-      this.timeout = timeout;
-    }
+    private Integer timeout;
 
     @Override
     public void begin() {}
@@ -185,6 +183,10 @@ public class DelegateTransaction extends AbstractTransaction {
 
     @Override
     public int getTimeout() {
+      if (timeout != null) {
+        return timeout;
+      }
+      timeout = DEFAULT_TRANSACTION_TIMEOUT;
       return timeout;
     }
 
