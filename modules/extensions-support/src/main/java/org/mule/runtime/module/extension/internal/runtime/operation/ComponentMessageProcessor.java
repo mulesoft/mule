@@ -192,8 +192,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     if (isAsync()) {
       return flux
-          // This flatMap allows the operation to run in parallel. The processing strategy relies on this
-          // (ProactorStreamProcessingStrategy#proactor) to do some performance optimizations.
           .flatMap(event -> {
             DeferredMonoSinkExecutorCallback callback = new DeferredMonoSinkExecutorCallback();
             onEvent(event, callback);
