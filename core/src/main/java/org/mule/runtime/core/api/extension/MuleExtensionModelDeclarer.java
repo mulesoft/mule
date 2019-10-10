@@ -58,6 +58,7 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ERROR_HANDLER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ON_ERROR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
@@ -171,6 +172,7 @@ class MuleExtensionModelDeclarer {
 
   private void declareObject(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer object = extensionDeclarer.withConstruct("object")
+        .withStereotype(OBJECT)
         .allowingTopLevelDefinition()
         .describedAs("Element to declare a java object. Objects declared globally can be referenced from other parts of the " +
             "configuration or recovered programmatically through org.mule.runtime.api.artifact.Registry.");
