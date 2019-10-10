@@ -63,9 +63,9 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
 
   private final NotificationDispatcher notificationDispatcher = getNotificationDispatcher(muleContext);
   private final TestTransaction mockTransaction =
-      spy(new TestTransaction("appName", notificationDispatcher, DEFAULT_TIMEOUT));
+      spy(new TestTransaction("appName", notificationDispatcher));
   private final TestTransaction mockXaTransaction =
-      spy(new TestTransaction("appNAme", notificationDispatcher, true, DEFAULT_TIMEOUT));
+      spy(new TestTransaction("appNAme", notificationDispatcher, true));
 
   private OnErrorPropagateHandler onErrorPropagateHandler;
 

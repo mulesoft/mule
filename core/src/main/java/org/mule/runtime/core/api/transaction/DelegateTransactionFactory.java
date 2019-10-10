@@ -32,8 +32,7 @@ public final class DelegateTransactionFactory implements TypedTransactionFactory
       return this.beginTransaction(muleContext.getConfiguration().getId(),
                                    ((MuleContextWithRegistry) muleContext).getRegistry()
                                        .lookupObject(NotificationDispatcher.class),
-                                   muleContext.getTransactionFactoryManager(), muleContext.getTransactionManager(),
-                                   10000);
+                                   muleContext.getTransactionFactoryManager(), muleContext.getTransactionManager());
     } catch (RegistrationException e) {
       throw new TransactionException(cannotStartTransaction("Delegate"), e);
     }
@@ -42,10 +41,10 @@ public final class DelegateTransactionFactory implements TypedTransactionFactory
   @Override
   public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
                                       SingleResourceTransactionFactoryManager transactionFactoryManager,
-                                      TransactionManager transactionManager, int timeout)
+                                      TransactionManager transactionManager)
       throws TransactionException {
     DelegateTransaction delegateTransaction =
-        new DelegateTransaction(applicationName, notificationFirer, transactionFactoryManager, transactionManager, timeout);
+        new DelegateTransaction(applicationName, notificationFirer, transactionFactoryManager, transactionManager);
     delegateTransaction.begin();
     return delegateTransaction;
   }

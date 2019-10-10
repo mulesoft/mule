@@ -30,9 +30,8 @@ public class ExternalXaTransaction extends XaTransaction {
   private static final Logger LOGGER = getLogger(ExternalXaTransaction.class);
 
   public ExternalXaTransaction(String applicationName, TransactionManager transactionManager,
-                               NotificationDispatcher notificationFirer,
-                               int timeout) {
-    super(applicationName, transactionManager, notificationFirer, timeout);
+                               NotificationDispatcher notificationFirer) {
+    super(applicationName, transactionManager, notificationFirer);
   }
 
   @Override
@@ -45,7 +44,7 @@ public class ExternalXaTransaction extends XaTransaction {
     try {
       synchronized (this) {
         transaction = txManager.getTransaction();
-        transaction.registerSynchronization(new ExternalTransaction(applicationName, notificationFirer, timeout));
+        transaction.registerSynchronization(new ExternalTransaction(applicationName, notificationFirer));
       }
     } catch (Exception e) {
       throw new TransactionException(CoreMessages.cannotStartTransaction("XA"), e);
@@ -57,8 +56,8 @@ public class ExternalXaTransaction extends XaTransaction {
    */
   class ExternalTransaction extends AbstractTransaction implements Synchronization {
 
-    public ExternalTransaction(String applicationName, NotificationDispatcher notificationFirer, int timeout) {
-      super(applicationName, notificationFirer, timeout);
+    public ExternalTransaction(String applicationName, NotificationDispatcher notificationFirer) {
+      super(applicationName, notificationFirer);
     }
 
     /** Nothing to do */
