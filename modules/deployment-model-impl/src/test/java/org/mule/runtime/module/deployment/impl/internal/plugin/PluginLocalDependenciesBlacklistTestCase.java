@@ -58,6 +58,15 @@ public class PluginLocalDependenciesBlacklistTestCase extends AbstractMuleTestCa
     assertThat(isBlacklisted(latterPatch), is(false));
   }
 
+  @Test
+  public void wrongGroupOrArtifactDontMatch() {
+    BundleDescriptor wrongGroup = new BundleDescriptor.Builder().setGroupId("com.mulesoft.wrong")
+        .setArtifactId("mule-ibm-ctg-connector").setVersion("2.3.1").build();
+    assertThat(isBlacklisted(wrongGroup), is(false));
 
+    BundleDescriptor wrongArtifact = new BundleDescriptor.Builder().setGroupId("com.mulesoft.connectors")
+        .setArtifactId("mule-ibm-ctg-wrong").setVersion("2.3.1").build();
+    assertThat(isBlacklisted(wrongArtifact), is(false));
+  }
 
 }
