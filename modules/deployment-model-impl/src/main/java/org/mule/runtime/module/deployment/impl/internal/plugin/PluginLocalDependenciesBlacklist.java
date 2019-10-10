@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.2.2
  */
-class PluginLocalDependenciesBlacklist {
+public class PluginLocalDependenciesBlacklist {
 
   private static final Logger logger = LoggerFactory.getLogger(PluginLocalDependenciesBlacklist.class);
 
@@ -40,7 +40,7 @@ class PluginLocalDependenciesBlacklist {
    * @param pluginDescriptor {@link BundleDescriptor} to search in the blacklist.
    * @return true if the {@link BundleDescriptor} is blacklisted, or false otherwise.
    */
-  static boolean isBlacklisted(BundleDescriptor pluginDescriptor) {
+  public static boolean isBlacklisted(BundleDescriptor pluginDescriptor) {
     for (BundleDescriptor blacklistedPluginDescriptor : pluginsBlacklist) {
       if (doDescriptorsMatch(blacklistedPluginDescriptor, pluginDescriptor)) {
         logger
