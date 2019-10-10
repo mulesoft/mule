@@ -17,8 +17,11 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
+import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.tck.mockito.answer.BuilderAnswer.BUILDER_ANSWER;
+
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
@@ -68,7 +71,8 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
   public void setUp() throws Exception {
 
     domain = new TestMuleDomain(domainDescriptor, artifactClassLoader, domainClassLoaderRepository, serviceRepository,
-                                artifactPlugins, extensionModelLoaderManager, getRuntimeComponentBuildingDefinitionProvider());
+                                artifactPlugins, extensionModelLoaderManager, getRuntimeComponentBuildingDefinitionProvider(),
+                                getRuntimeLockFactory());
     currentThread().setContextClassLoader(originalThreadClassloader);
     when(domainDescriptor.getDeploymentProperties()).thenReturn(empty());
     when(domainDescriptor.getDataFolderName()).thenReturn("dataFolderName");
@@ -113,9 +117,10 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
     public TestMuleDomain(DomainDescriptor descriptor, ArtifactClassLoader deploymentClassLoader,
                           ClassLoaderRepository classLoaderRepository, ServiceRepository serviceRepository,
                           List<ArtifactPlugin> artifactPlugins, ExtensionModelLoaderManager extensionModelLoaderManager,
-                          ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
+                          ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider,
+                          LockFactory runtimeLockFactory) {
       super(descriptor, deploymentClassLoader, classLoaderRepository, serviceRepository, artifactPlugins,
-            extensionModelLoaderManager, runtimeComponentBuildingDefinitionProvider);
+            extensionModelLoaderManager, runtimeComponentBuildingDefinitionProvider, runtimeLockFactory);
     }
 
     @Override

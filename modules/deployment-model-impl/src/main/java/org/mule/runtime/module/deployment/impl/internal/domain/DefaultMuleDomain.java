@@ -21,10 +21,12 @@ import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.api.value.ValueProviderService;
@@ -62,6 +64,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
   private final ExtensionModelLoaderManager extensionModelLoaderManager;
   private final ClassLoaderRepository classLoaderRepository;
   private final ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
+  private final LockFactory runtimeLockFactory;
 
   private MuleContextListener muleContextListener;
 
@@ -70,7 +73,8 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
                            ServiceRepository serviceRepository,
                            List<ArtifactPlugin> artifactPlugins,
                            ExtensionModelLoaderManager extensionModelLoaderManager,
-                           ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
+                           ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider,
+                           LockFactory runtimeLockFactory) {
     super("domain", "domain", deploymentClassLoader);
     this.classLoaderRepository = classLoaderRepository;
     this.descriptor = descriptor;
@@ -78,6 +82,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
     this.artifactPlugins = artifactPlugins;
     this.extensionModelLoaderManager = extensionModelLoaderManager;
     this.runtimeComponentBuildingDefinitionProvider = runtimeComponentBuildingDefinitionProvider;
+    this.runtimeLockFactory = runtimeLockFactory;
   }
 
   @Override
@@ -177,7 +182,8 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
           .setProperties(ofNullable(resolveDeploymentProperties(descriptor.getDataFolderName(),
                                                                 descriptor.getDeploymentProperties())))
           .setServiceRepository(serviceRepository)
-          .setRuntimeComponentBuildingDefinitionProvider(runtimeComponentBuildingDefinitionProvider);
+          .setRuntimeComponentBuildingDefinitionProvider(runtimeComponentBuildingDefinitionProvider)
+          .setRuntimeLockFactory(runtimeLockFactory);
 
       if (!descriptor.getConfigResources().isEmpty()) {
         validateConfigurationFileDoNotUsesCoreNamespace();

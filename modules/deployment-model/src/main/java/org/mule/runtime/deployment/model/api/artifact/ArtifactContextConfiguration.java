@@ -11,16 +11,17 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Configuration required for the creation of an {@link ArtifactContext}.
@@ -40,6 +41,7 @@ public final class ArtifactContextConfiguration {
   private List<ServiceConfigurator> serviceConfigurators = emptyList();
   private Optional<MuleContext> parentContext = empty();
   private ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
+  private LockFactory runtimeLockFactory;
 
   private ArtifactContextConfiguration() {}
 
@@ -122,6 +124,10 @@ public final class ArtifactContextConfiguration {
 
   public ComponentBuildingDefinitionProvider getRuntimeComponentBuildingDefinitionProvider() {
     return runtimeComponentBuildingDefinitionProvider;
+  }
+
+  public LockFactory getRuntimeLockFactory() {
+    return runtimeLockFactory;
   }
 
   /**
@@ -230,6 +236,14 @@ public final class ArtifactContextConfiguration {
       return this;
     }
 
+    /**
+     * @param runtimeLockFactory {@link LockFactory} for the runtime that can be shared along deployable artifacts to synchronize access on different deployable artifacts to the same resources.
+     * @return the builder
+     */
+    public ArtifactContextConfigurationBuilder setRuntimeLockFactory(LockFactory runtimeLockFactory) {
+      artifactContextConfiguration.runtimeLockFactory = runtimeLockFactory;
+      return this;
+    }
 
     /**
      * @return creates a {@link ArtifactContextConfiguration} with te provided configuration.
@@ -237,5 +251,6 @@ public final class ArtifactContextConfiguration {
     public ArtifactContextConfiguration build() {
       return artifactContextConfiguration;
     }
+
   }
 }

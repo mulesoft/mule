@@ -13,6 +13,8 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication.getApplicationDomain;
+
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -78,8 +80,9 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                    PluginDependenciesResolver pluginDependenciesResolver,
                                    ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
                                    LicenseValidator licenseValidator,
-                                   ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
-    super(licenseValidator, runtimeComponentBuildingDefinitionProvider);
+                                   ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider,
+                                   LockFactory runtimeLockFactory) {
+    super(licenseValidator, runtimeComponentBuildingDefinitionProvider, runtimeLockFactory);
     checkArgument(applicationClassLoaderBuilderFactory != null, "Application classloader builder factory cannot be null");
     checkArgument(applicationDescriptorFactory != null, "Application descriptor factory cannot be null");
     checkArgument(domainRepository != null, "Domain repository cannot be null");
@@ -161,7 +164,8 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
         new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository,
                                    serviceRepository, extensionModelLoaderRepository, descriptor.getArtifactLocation(),
                                    classLoaderRepository,
-                                   applicationPolicyProvider, getRuntimeComponentBuildingDefinitionProvider());
+                                   applicationPolicyProvider, getRuntimeComponentBuildingDefinitionProvider(),
+                                   getRuntimeLockFactory());
 
     applicationPolicyProvider.setApplication(delegate);
     return new ApplicationWrapper(delegate);
