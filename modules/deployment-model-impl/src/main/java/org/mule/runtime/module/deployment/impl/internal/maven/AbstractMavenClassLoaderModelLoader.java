@@ -27,6 +27,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.PROVIDED;
+import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesBlacklist.isBlacklisted;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 
 import org.mule.maven.client.api.MavenClient;
@@ -154,8 +155,9 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel =
         getPackagerClassLoaderModel(classLoaderModelDescriptor);
 
+    BundleDescriptor artifactBundleDescriptor = (BundleDescriptor) attributes.get(BundleDescriptor.class.getName());
     final ArtifactClassLoaderModelBuilder classLoaderModelBuilder =
-        newHeavyWeightClassLoaderModelBuilder(artifactFile, (BundleDescriptor) attributes.get(BundleDescriptor.class.getName()),
+        newHeavyWeightClassLoaderModelBuilder(artifactFile, artifactBundleDescriptor,
                                               packagerClassLoaderModel, attributes);
     final Set<String> exportedPackages = new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES));
     final Set<String> exportedResources = new HashSet<>(getAttribute(attributes, EXPORTED_RESOURCES));
@@ -200,7 +202,9 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     } else {
       artifactAttributes = collectLocalPackages(packagerClassLoaderModel);
     }
-    populateLocalPackages(artifactAttributes, classLoaderModelBuilder);
+    if (!isBlacklisted(artifactBundleDescriptor)) {
+      populateLocalPackages(artifactAttributes, classLoaderModelBuilder);
+    }
 
     classLoaderModelBuilder.dependingOn(bundleDependencies);
 
@@ -406,8 +410,9 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     Set<BundleDependency> nonProvidedDependencies =
         resolvedDependencies.stream().filter(dep -> !PROVIDED.equals(dep.getScope())).collect(Collectors.toSet());
 
+    BundleDescriptor artifactBundleDescriptor = (BundleDescriptor) attributes.get(BundleDescriptor.class.getName());
     final LightweightClassLoaderModelBuilder classLoaderModelBuilder =
-        newLightweightClassLoaderModelBuilder(artifactFile, (BundleDescriptor) attributes.get(BundleDescriptor.class.getName()),
+        newLightweightClassLoaderModelBuilder(artifactFile, artifactBundleDescriptor,
                                               mavenClient, attributes, nonProvidedDependencies);
 
     final Set<String> exportedPackages = new HashSet<>(getAttribute(attributes, EXPORTED_PACKAGES));
@@ -425,7 +430,9 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     final List<URL> dependenciesArtifactsUrls =
         loadUrls(artifactFile, classLoaderModelBuilder, nonProvidedDependencies, emptyList());
 
-    populateLocalPackages(discoverLocalPackages(dependenciesArtifactsUrls), classLoaderModelBuilder);
+    if (!isBlacklisted(artifactBundleDescriptor)) {
+      populateLocalPackages(discoverLocalPackages(dependenciesArtifactsUrls), classLoaderModelBuilder);
+    }
 
     classLoaderModelBuilder.dependingOn(resolvedDependencies);
 
