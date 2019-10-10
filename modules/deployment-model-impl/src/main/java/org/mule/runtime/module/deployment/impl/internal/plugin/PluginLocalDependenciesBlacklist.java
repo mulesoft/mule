@@ -67,31 +67,7 @@ public class PluginLocalDependenciesBlacklist {
   private static boolean isBlacklistedVersionGreaterOrEqual(String blacklistedVersion, String pluginVersion) {
     Semver blacklistedSemver = new Semver(blacklistedVersion);
     Semver pluginSemver = new Semver(pluginVersion);
-
-    // Check majors
-    if (blacklistedSemver.getMajor() < pluginSemver.getMajor()) {
-      return false;
-    }
-
-    if (blacklistedSemver.getMajor() > pluginSemver.getMajor()) {
-      return true;
-    }
-
-    // Majors are equals, check minors
-    if (blacklistedSemver.getMinor() < pluginSemver.getMinor()) {
-      return false;
-    }
-
-    if (blacklistedSemver.getMinor() > pluginSemver.getMinor()) {
-      return true;
-    }
-
-    // Majors and minors are equals, check patch versions
-    if (blacklistedSemver.getPatch() < pluginSemver.getPatch()) {
-      return false;
-    }
-
-    return true;
+    return !blacklistedSemver.isLowerThan(pluginSemver);
   }
 
   private static boolean doGroupsMatch(BundleDescriptor first, BundleDescriptor second) {
