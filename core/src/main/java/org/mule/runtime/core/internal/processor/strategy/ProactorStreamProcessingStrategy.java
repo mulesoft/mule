@@ -136,7 +136,8 @@ public abstract class ProactorStreamProcessingStrategy extends AbstractReactorSt
       return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
           .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
     } else if (maxConcurrency == MAX_VALUE) {
-      if ((processor instanceof InterceptedReactiveProcessor)
+      if (processor.getProcessingType() == CPU_INTENSIVE
+          && (processor instanceof InterceptedReactiveProcessor)
           && sdkOperationClass != null
           && sdkOperationClass.isAssignableFrom(((InterceptedReactiveProcessor) processor).getProcessor().getClass())) {
         // For no limit, the java SDK already does a flatMap internally, so no need to do an additional one here
