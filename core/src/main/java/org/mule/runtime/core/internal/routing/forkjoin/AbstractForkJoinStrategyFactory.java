@@ -162,7 +162,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
                                     RoutingPair pair) {
     return defer(() -> delayErrors ? just(createTimeoutErrorEvent(timeoutErrorType, pair))
         : error(new TimeoutException(buildDetailedDescription(pair))))
-                .transform(processingStrategy.onPipeline(p -> p));
+            .transform(processingStrategy.onPipeline(p -> p));
   }
 
   private ReactiveProcessor applyProcessingStrategy(ProcessingStrategy processingStrategy, ReactiveProcessor processor,
