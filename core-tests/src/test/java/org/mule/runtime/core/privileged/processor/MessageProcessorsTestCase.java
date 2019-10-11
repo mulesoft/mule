@@ -21,10 +21,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
@@ -40,12 +38,12 @@ import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.internal.construct.FlowBackPressureMaxConcurrencyExceededException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
@@ -233,7 +231,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     AtomicBoolean completed = new AtomicBoolean();
     ((BaseEventContext) (input.getContext())).onComplete((e, t) -> completed.set(true));
 
-    final CoreEvent result = processToApplyWithChildContext(input, Mono::from);
+    final CoreEvent result = processToApplyWithChildContext(input, publisher -> from(publisher));
     ((BaseEventContext) result.getContext()).success();
 
     assertThat(((BaseEventContext) result.getContext()).isComplete(), is(true));
@@ -267,7 +265,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processWithChildContextBlockingErrorInChainRegainsParentContext() {
+  public void processWithChildContextBlockingErrorInChainRegainsParentContext() throws Exception {
     try {
       processWithChildContextBlocking(input, createChain(error), Optional.empty());
       fail("Exception expected");
@@ -280,7 +278,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   @Issue("MULE-16892")
-  public void processWithChildContextErrorInChainMaintainsChildContext() {
+  public void processWithChildContextErrorInChainMantainsChildContext() throws Exception {
     Reference<EventContext> contextReference = new Reference<>();
     from(processWithChildContext(input, createChain(error), Optional.empty()))
         .doOnError(e -> {
@@ -297,36 +295,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  @Issue("MULE-17386")
-  public void processErrorWithChildContextAndHandledByParent() {
-    Reference<EventContext> contextReference = new Reference<>();
-    Reference<CoreEvent> eventReference = new Reference<>();
-
-    InternalReactiveProcessor backPressureError = publisher -> from(publisher).map(in -> {
-      throw propagateWrappingFatal(new FlowBackPressureMaxConcurrencyExceededException("flowName", MAX_CONCURRENCY_EXCEEDED));
-    });
-
-    Flux.from(applyWithChildContext(just(input), createChain(backPressureError), Optional.empty(),
-                                    (exception, event) -> {
-                                      contextReference
-                                          .set(((MessagingException) exception).getEvent().getContext());
-                                      eventReference
-                                          .set(event);
-                                      return event;
-                                    }))
-        .subscribe();
-
-    assertThat(contextReference.get(), notNullValue());
-    assertThat(contextReference.get(), is(not(input.getContext())));
-    BaseEventContext context = (BaseEventContext) contextReference.get();
-    assertThat(context.getParentContext().get(), is(input.getContext()));
-
-    assertThat(context, is(eventReference.get().getContext()));
-  }
-
-  @Test
   @Issue("MULE-16892")
-  public void processWithChildContextDontCompleteErrorInChainRegainsParentContext() {
+  public void processWithChildContextDontCompleteErrorInChainRegainsParentContext() throws Exception {
     Reference<EventContext> contextReference = new Reference<>();
     from(processWithChildContextDontComplete(input, createChain(error), Optional.empty()))
         .doOnError(e -> {
@@ -343,7 +313,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   @Issue("MULE-16892")
-  public void applyWithChildContextErrorInChainRegainsParentContext() {
+  public void applyWithChildContextErrorInChainRegainsParentContext() throws Exception {
     Reference<EventContext> contextReference = new Reference<>();
 
     Processor errorProcessor = createChain(error);
@@ -569,7 +539,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processToApplyErrorInChain() {
+  public void processToApplyErrorInChain() throws Exception {
     try {
       processToApply(input, createChain(error));
       fail("Exception expected");
@@ -586,7 +556,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processToApplyErrorInFlow() {
+  public void processToApplyErrorInFlow() throws Exception {
     try {
       processToApply(input, createFlow(error));
       fail("Exception expected");
@@ -621,13 +591,13 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processAckAndStop() {
+  public void processAckAndStop() throws Exception {
     assertThat(from(MessageProcessors.process(input, ackAndStop)).block(), is(nullValue()));
     assertThat(from(responsePublisher).block(), is(nullValue()));
   }
 
   @Test
-  public void processAckAndStopInChain() {
+  public void processAckAndStopInChain() throws Exception {
     assertThat(from(MessageProcessors.process(input, createChain(ackAndStop))).block(), is(nullValue()));
     assertThat(from(responsePublisher).block(), is(nullValue()));
   }
@@ -639,13 +609,13 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processRespondAndStop() {
+  public void processRespondAndStop() throws Exception {
     assertThat(from(MessageProcessors.process(input, respondAndStop)).block(), is(response));
     assertThat(from(responsePublisher).block(), is(response));
   }
 
   @Test
-  public void processRespondAndStopInChain() {
+  public void processRespondAndStopInChain() throws Exception {
     assertThat(from(MessageProcessors.process(input, createChain(respondAndStop))).block(), is(response));
     assertThat(from(responsePublisher).block(), is(response));
   }
@@ -658,13 +628,13 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processAckAndMap() {
+  public void processAckAndMap() throws Exception {
     assertThat(from(MessageProcessors.process(input, ackAndMap)).block(), is(output));
     assertThat(from(responsePublisher).block(), is(nullValue()));
   }
 
   @Test
-  public void processAckAndMapInChain() {
+  public void processAckAndMapInChain() throws Exception {
     assertThat(from(MessageProcessors.process(input, createChain(ackAndMap))).block(), is(output));
     assertThat(from(responsePublisher).block(), is(nullValue()));
   }
@@ -676,13 +646,13 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processRespondAndMap() {
+  public void processRespondAndMap() throws Exception {
     assertThat(from(MessageProcessors.process(input, respondAndMap)).block(), is(output));
     assertThat(from(responsePublisher).block(), is(response));
   }
 
   @Test
-  public void processRespondAndMapInChain() {
+  public void processRespondAndMapInChain() throws Exception {
     assertThat(from(MessageProcessors.process(input, createChain(respondAndMap))).block(), is(output));
     assertThat(from(responsePublisher).block(), is(response));
   }
@@ -694,7 +664,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processError() {
+  public void processError() throws Exception {
     thrown.expectCause((is(instanceOf(MessagingException.class))));
     thrown.expectCause(hasCause(is(exception)));
     try {
@@ -707,7 +677,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processErrorInChain() {
+  public void processErrorInChain() throws Exception {
     try {
       from(MessageProcessors.process(input, createChain(error))).block();
       fail("Exception expected");
@@ -724,7 +694,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void processErrorInFlow() {
+  public void processErrorInFlow() throws Exception {
     try {
       from(MessageProcessors.process(input, createFlow(error))).block();
       fail("Exception expected");
@@ -756,7 +726,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     assertThat(fluxCompleted.get(), is(true));
   }
 
-  private Processor createChain(ReactiveProcessor processor) {
+  private Processor createChain(ReactiveProcessor processor) throws InitialisationException {
     MessageProcessorChain chain = newChain(Optional.empty(), new ReactiveProcessorToProcessorAdaptor(processor));
     chain.setMuleContext(muleContext);
     return chain;
