@@ -84,25 +84,23 @@ public class MuleMessageProcessingManagerTestCase extends AbstractMuleTestCase {
     when(mockMuleContext.getErrorTypeRepository()).thenReturn(createDefaultErrorTypeRepository());
 
     when(completeMessageProcessTemplateAndContext.getTransactionConfig()).thenReturn(empty());
+    when(mockMuleContext.getConfiguration().getId()).thenReturn("appName");
   }
 
   @Test
   public void nullMessageProcessPhaseInRegistry() throws Exception {
     when(mockMuleContext.getTransactionManager()).thenReturn(null);
-    when(mockMuleContext.getConfiguration().getId()).thenReturn("appName");
     processAndVerifyDefaultPhasesUsingRegistryPhases(null);
   }
 
   @Test
   public void emptyMessageProcessPhaseInRegistry() throws Exception {
-    when(mockMuleContext.getConfiguration().getId()).thenReturn("appName");
     processAndVerifyDefaultPhasesUsingRegistryPhases(emptyList());
   }
 
   @Test
   public void notSupportedMessageProcessPhaseInRegistry() throws Exception {
     MessageProcessPhase notSupportedPhase = createNotSupportedPhase();
-    when(mockMuleContext.getConfiguration().getId()).thenReturn("appName");
     processAndVerifyDefaultPhasesUsingRegistryPhases(asList(notSupportedPhase));
   }
 
