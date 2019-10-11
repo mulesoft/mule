@@ -39,7 +39,6 @@ import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
 import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
 import org.mule.runtime.core.privileged.routing.RoutingResult;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -162,9 +161,8 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
   private Mono<CoreEvent> onTimeout(ProcessingStrategy processingStrategy, boolean delayErrors, ErrorType timeoutErrorType,
                                     RoutingPair pair) {
     return defer(() -> delayErrors ? just(createTimeoutErrorEvent(timeoutErrorType, pair))
-        : error(new TimeoutException(TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX + " '"
-            + pair.getEvent().getGroupCorrelation().get().getSequence() + "'")))
-                .transform(processingStrategy.onPipeline(p -> p));
+        : error(new TimeoutException(buildDetailedDescription(pair))))
+            .transform(processingStrategy.onPipeline(p -> p));
   }
 
   private ReactiveProcessor applyProcessingStrategy(ProcessingStrategy processingStrategy, ReactiveProcessor processor,
@@ -177,13 +175,20 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
   }
 
   private CoreEvent createTimeoutErrorEvent(ErrorType timeoutErrorType, RoutingPair pair) {
+    final String detailedDescription = buildDetailedDescription(pair);
+
     return builder(pair.getEvent()).message(Message.of(null))
         .error(ErrorBuilder.builder().errorType(timeoutErrorType)
-            .exception(new TimeoutException()).description(TIMEOUT_EXCEPTION_DESCRIPTION)
-            .detailedDescription(TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX + " '"
-                + pair.getEvent().getGroupCorrelation().get().getSequence() + "'")
+            .exception(new TimeoutException(detailedDescription))
+            .description(TIMEOUT_EXCEPTION_DESCRIPTION)
+            .detailedDescription(detailedDescription)
             .build())
         .build();
+  }
+
+  private String buildDetailedDescription(RoutingPair pair) {
+    return TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX + " '"
+        + pair.getEvent().getGroupCorrelation().get().getSequence() + "'";
   }
 
   private CompositeRoutingException createCompositeRoutingException(List<CoreEvent> results) {
