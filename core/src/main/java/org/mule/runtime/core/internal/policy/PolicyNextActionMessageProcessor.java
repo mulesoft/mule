@@ -56,6 +56,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   private PolicyNotificationHelper notificationHelper;
   private PolicyEventMapper policyEventMapper;
 
+  private OnExecuteNextErrorConsumer onExecuteNextErrorConsumer;
+
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
     return processToApply(event, this);
@@ -66,6 +68,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
     this.policyEventMapper = new PolicyEventMapper(getPolicyId());
     this.notificationHelper =
         new PolicyNotificationHelper(muleContext.getNotificationManager(), getPolicyId(), this);
+    this.onExecuteNextErrorConsumer =
+        new OnExecuteNextErrorConsumer(policyEventMapper::fromPolicyNext, notificationHelper, getLocation());
   }
 
   @Override
@@ -90,12 +94,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
           logExecuteNextEvent("After execute-next", coreEvent.getContext(), coreEvent.getMessage(),
                               getPolicyId());
         })
-        .map(result -> policyEventMapper.fromPolicyNext(result))
-        .onErrorContinue(MessagingException.class, (error, v) -> {
-          new OnExecuteNextErrorConsumer(event -> policyEventMapper.fromPolicyNext(event), notificationHelper, getLocation())
-              .accept(error);
-
-        });
+        .map(policyEventMapper::fromPolicyNext)
+        .onErrorContinue(MessagingException.class, (error, v) -> onExecuteNextErrorConsumer.accept(error));
   }
 
   private Consumer<CoreEvent> pushAfterNextFlowStackElement() {
