@@ -144,6 +144,50 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
     return policyTemplate.orElseGet(() -> createRetryPolicyTemplate(event));
   }
 
+  public Publisher<CoreEvent> resumeBasedApply(Publisher<CoreEvent> publisher) {
+
+    AtomicReference<CoreEvent> retrialEvent = new AtomicReference();
+    AtomicInteger retryCounter = new AtomicInteger(maxRetriesAsInteger + 1);
+    Duration choosenDuration = timeBetweenRetries;
+    Integer maxRetriesEvaluated = 0;
+
+    if (expressionManager.isExpression(maxRetries)) {
+      ExpressionManagerSession session = expressionManager.openSession(getLocation(), event, NULL_BINDING_CONTEXT);
+      Integer maxRetries = (Integer) session.evaluate(this.maxRetries, DataType.NUMBER).getValue();
+      maxRetriesEvaluated = maxRetries;
+      retryCounter.set(maxRetries + 1);
+      if (expressionManager.isExpression(millisBetweenRetries)) {
+        Integer millisBetweenRetries = (Integer) session.evaluate(this.millisBetweenRetries, DataType.NUMBER).getValue();
+        choosenDuration = Duration.ofMillis(millisBetweenRetries);
+      } else {
+        choosenDuration = Duration.ofMillis(Integer.parseInt(millisBetweenRetries));
+      }
+    }
+
+    return from(publisher)
+        .doOnNext(retrialEvent::set)
+        .transform(publisher1 -> applyWithChildContext(publisher1, nestedChain, of(UntilSuccessful.this.getLocation())))
+        .onErrorResume(getRetryPredicate(), getOnResumeComposer(retrialEvent, retryCounter));
+  }
+
+  protected Function<Throwable, Publisher<? extends CoreEvent>> getOnResumeComposer(AtomicReference<CoreEvent> retrialEvent,
+                                                                                    AtomicInteger retryCounter) {
+    return (error) -> Flux.just(retrialEvent.get())
+        .transform(publisher2 -> applyWithChildContext(publisher2, nestedChain, of(UntilSuccessful.this.getLocation())))
+        .compose(publisher2 -> {
+          if (retryCounter.decrementAndGet() > 0) {
+            // Retry
+            LOGGER.error("Retrying execution of event, attempt {} of {}.", retryCounter.get(),
+                         maxRetriesAsInteger != RETRY_COUNT_FOREVER ? maxRetriesAsInteger : "unlimited");
+            return publisher2.onErrorResume(getRetryPredicate(), getOnResumeComposer(retrialEvent, retryCounter));
+          } else {
+            // Retries exhausted
+            LOGGER.error("Retry attempts exhausted. Failing...");
+            throw propagate(new RetryExhaustedException(error));
+          }
+        });
+  }
+
 
   public Publisher<CoreEvent> alternativeApply(Publisher<CoreEvent> publisher) {
     return from(publisher)
@@ -176,7 +220,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
             sink.next(event);
           })
               .transform(publisher1 -> applyWithChildContext(publisher1, nestedChain,
-                                                             Optional.of(UntilSuccessful.this.getLocation())))
+                                                             of(UntilSuccessful.this.getLocation())))
               .doOnNext(completedEvent -> sinkReference.get().complete())
               .onErrorContinue(getRetryPredicate(), (error, failureEvent) -> {
                 int retriesLeft = retryCounter.decrementAndGet();
