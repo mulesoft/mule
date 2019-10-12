@@ -22,7 +22,6 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
-import org.junit.Ignore;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -85,23 +84,21 @@ public class MuleMessageProcessingManagerTestCase extends AbstractMuleTestCase {
     when(mockMuleContext.getErrorTypeRepository()).thenReturn(createDefaultErrorTypeRepository());
 
     when(completeMessageProcessTemplateAndContext.getTransactionConfig()).thenReturn(empty());
+    when(mockMuleContext.getConfiguration().getId()).thenReturn("appName");
   }
 
   @Test
-  @Ignore("MULE-17540")
   public void nullMessageProcessPhaseInRegistry() throws Exception {
-    processAndVerifyDefaultPhasesUsingRegistryPhases(null);
     when(mockMuleContext.getTransactionManager()).thenReturn(null);
+    processAndVerifyDefaultPhasesUsingRegistryPhases(null);
   }
 
   @Test
-  @Ignore("MULE-17540")
   public void emptyMessageProcessPhaseInRegistry() throws Exception {
     processAndVerifyDefaultPhasesUsingRegistryPhases(emptyList());
   }
 
   @Test
-  @Ignore("MULE-17540")
   public void notSupportedMessageProcessPhaseInRegistry() throws Exception {
     MessageProcessPhase notSupportedPhase = createNotSupportedPhase();
     processAndVerifyDefaultPhasesUsingRegistryPhases(asList(notSupportedPhase));
