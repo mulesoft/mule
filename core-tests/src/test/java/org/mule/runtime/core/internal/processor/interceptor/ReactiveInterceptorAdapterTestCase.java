@@ -48,6 +48,7 @@ import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
+import org.junit.Ignore;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
@@ -978,6 +979,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   }
 
   @Test
+  @Ignore("MULE-17579")
   public void firstInterceptorMutatesEventAroundAfterProceed() throws Exception {
     ProcessorInterceptor interceptor1 = prepareInterceptor(new TestProcessorInterceptor("outer") {
 

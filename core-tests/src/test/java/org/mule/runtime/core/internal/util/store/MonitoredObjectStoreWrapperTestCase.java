@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.probe.PollingProber.check;
 
+import org.junit.Ignore;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreSettings;
@@ -140,6 +141,7 @@ public class MonitoredObjectStoreWrapperTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Ignore("MULE-17581")
   public void expireWhileEntryRemovedAfterRetrieve() throws Exception {
     when(settings.getMaxEntries()).thenReturn(empty());
     when(settings.getEntryTTL()).thenReturn(of(1L));
