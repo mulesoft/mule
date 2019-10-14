@@ -16,6 +16,7 @@ import static java.lang.Thread.currentThread;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.util.concurrent.Queues.isPowerOfTwo;
 
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -28,7 +29,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Abstract {@link ProcessingStrategyFactory} to be used by implementations that de-multiplex incoming messages.
@@ -40,12 +40,12 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractStreamProcessingStrategyFactory extends AbstractProcessingStrategyFactory {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractStreamProcessingStrategyFactory.class);
+  private static final Logger LOGGER = getLogger(AbstractStreamProcessingStrategyFactory.class);
 
   protected static final String SYSTEM_PROPERTY_PREFIX = AbstractStreamProcessingStrategyFactory.class.getName() + ".";
   protected static final int CORES = getInteger(SYSTEM_PROPERTY_PREFIX + "AVAILABLE_CORES", getRuntime().availableProcessors());
-
   protected static final int DEFAULT_BUFFER_SIZE = getInteger(SYSTEM_PROPERTY_PREFIX + "DEFAULT_BUFFER_SIZE", 1024);
+  protected static final int FLOW_DISPATCH_WORKERS = getInteger(SYSTEM_PROPERTY_PREFIX + "FLOW_DISPATCH_WORKERS", 0);
 
   // Use one subscriber for every two cores available, or 1 subscriber for 1 core. This value is high for most scenarios but
   // required to achieve absolute minimum latency for the scenarios where this is important.

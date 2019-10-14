@@ -78,7 +78,9 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.StreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.TransactionAwareStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
@@ -123,16 +125,24 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   @Parameterized.Parameters(name = "{0}, {2}")
   public static Collection<Object[]> parameters() {
     return asList(new Object[][] {
+        {"TransactionAwareStreamEmitterProcessingStrategyFactory",
+            new TransactionAwareStreamEmitterProcessingStrategyFactory(), BLOCKING},
         {"TransactionAwareProactorStreamEmitterProcessingStrategyFactory",
             new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(), BLOCKING},
+        {"StreamEmitterProcessingStrategyFactory",
+            new StreamEmitterProcessingStrategyFactory(), BLOCKING},
         {"ProactorStreamEmitterProcessingStrategyFactory",
             new ProactorStreamEmitterProcessingStrategyFactory(), BLOCKING},
         {"BlockingProcessingStrategyFactory",
             new BlockingProcessingStrategyFactory(), BLOCKING},
         {"DirectProcessingStrategyFactory",
             new DirectProcessingStrategyFactory(), BLOCKING},
+        {"TransactionAwareStreamEmitterProcessingStrategyFactory",
+            new TransactionAwareStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
         {"TransactionAwareProactorStreamEmitterProcessingStrategyFactory",
             new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
+        {"StreamEmitterProcessingStrategyFactory",
+            new StreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
         {"ProactorStreamEmitterProcessingStrategyFactory",
             new ProactorStreamEmitterProcessingStrategyFactory(), NON_BLOCKING},
         {"BlockingProcessingStrategyFactory",

@@ -22,17 +22,16 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.function.Function;
+
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.invocation.InvocationOnMock;
 import org.reactivestreams.Publisher;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.function.Function;
-
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
@@ -74,7 +73,10 @@ public abstract class AbstractCompositePolicyTestCase extends AbstractMuleContex
     secondPolicyResultEvent = createTestEvent();
 
     when(firstPolicy.getPolicyChain().apply(any())).thenReturn(just(firstPolicyResultEvent));
+    when(firstPolicy.getPolicyChain().getProcessingStrategy().onPipeline(any())).thenAnswer(inv -> inv.getArgument(0));
     when(secondPolicy.getPolicyChain().apply(any())).thenReturn(just(secondPolicyResultEvent));
+    when(secondPolicy.getPolicyChain().getProcessingStrategy().onPipeline(any())).thenAnswer(inv -> inv.getArgument(0));
+
   }
 
   protected CoreEvent createTestEvent() {

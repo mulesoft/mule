@@ -21,6 +21,7 @@ import static reactor.core.publisher.Flux.create;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.subscriberContext;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -35,7 +36,10 @@ import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.processor.strategy.TransactionAwareStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorderToReactorSinkAdapter;
 import org.mule.runtime.core.internal.rx.MonoSinkRecorder;
@@ -53,6 +57,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -593,6 +598,26 @@ public class MessageProcessors {
                                                                    Location rootContainerLocation) {
     return locator.find(rootContainerLocation).filter(loc -> loc instanceof FlowConstruct)
         .map(loc -> ((FlowConstruct) loc).getProcessingStrategy());
+  }
+
+  public static ProcessingStrategyFactory getDefaultProcessingStrategyFactory(MuleContext muleContext) {
+    return getDefaultProcessingStrategyFactory(muleContext, () -> createDefaultProcessingStrategyFactory());
+  }
+
+  public static ProcessingStrategyFactory getDefaultProcessingStrategyFactory(MuleContext muleContext,
+                                                                              Supplier<ProcessingStrategyFactory> defaultSupplier) {
+    ProcessingStrategyFactory defaultProcessingStrategyFactory =
+        muleContext.getConfiguration().getDefaultProcessingStrategyFactory();
+
+    if (defaultProcessingStrategyFactory == null) {
+      defaultProcessingStrategyFactory = defaultSupplier.get();
+    }
+
+    return defaultProcessingStrategyFactory;
+  }
+
+  public static ProcessingStrategyFactory createDefaultProcessingStrategyFactory() {
+    return new TransactionAwareStreamEmitterProcessingStrategyFactory();
   }
 
   /**

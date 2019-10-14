@@ -8,15 +8,14 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.processor.strategy.StreamEmitterProcessingStrategyFactory.StreamEmitterProcessingStrategy;
 
 /**
- * Creates a processing strategy with same behavior as {@link ProactorStreamEmitterProcessingStrategyFactory} apart from the
+ * Creates a processing strategy with same behavior as {@link StreamEmitterProcessingStrategyFactory} apart from the
  * fact it will process synchronously without error when a transaction is active.
  *
- * @since 4.0
+ * @since 4.3.0
  */
-public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory extends ProactorStreamEmitterProcessingStrategyFactory
+public class TransactionAwareStreamEmitterProcessingStrategyFactory extends StreamEmitterProcessingStrategyFactory
     implements TransactionAwareProcessingStrategyFactory {
 
   @Override

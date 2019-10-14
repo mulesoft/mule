@@ -19,6 +19,7 @@ import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.empty;
+
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
@@ -34,8 +35,8 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
-import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.processor.MessageProcessors;
 
 import java.util.List;
 import java.util.Optional;
@@ -245,7 +246,7 @@ public class DefaultFlowBuilder implements Builder {
      */
     @Override
     protected ProcessingStrategyFactory createDefaultProcessingStrategyFactory() {
-      return new TransactionAwareProactorStreamEmitterProcessingStrategyFactory();
+      return MessageProcessors.createDefaultProcessingStrategyFactory();
     }
 
     @Override

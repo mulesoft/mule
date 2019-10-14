@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
-import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.TransactionAwareStreamEmitterProcessingStrategyFactory;
 
 import java.util.function.Function;
 
@@ -65,7 +65,7 @@ public class ProcessingStrategyBenchmark extends AbstractBenchmark {
 
     directPs = new DirectProcessingStrategyFactory().create(muleContext, "direct_mb");
     startIfNeeded(directPs);
-    emitterPs = new TransactionAwareProactorStreamEmitterProcessingStrategyFactory().create(muleContext, "emitter_mb");
+    emitterPs = new TransactionAwareStreamEmitterProcessingStrategyFactory().create(muleContext, "emitter_mb");
     startIfNeeded(emitterPs);
 
     flow = createFlow(muleContext);

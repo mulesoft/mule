@@ -6,11 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static java.lang.Integer.MAX_VALUE;
-
-import org.mule.runtime.api.scheduler.SchedulerConfig;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 
 /**
@@ -55,15 +50,4 @@ public abstract class AbstractProcessingStrategyFactory implements AsyncProcessi
   public boolean isMaxConcurrencyEagerCheck() {
     return maxConcurrencyEagerCheck;
   }
-
-  protected SchedulerConfig createSchedulerConfig(MuleContext muleContext, String schedulersNamePrefix,
-                                                  ReactiveProcessor.ProcessingType processingType) {
-    SchedulerConfig schedulerConfig =
-        muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + "." + processingType.name());
-    if (getMaxConcurrency() != MAX_VALUE) {
-      schedulerConfig = schedulerConfig.withMaxConcurrentTasks(getMaxConcurrency());
-    }
-    return schedulerConfig;
-  }
-
 }

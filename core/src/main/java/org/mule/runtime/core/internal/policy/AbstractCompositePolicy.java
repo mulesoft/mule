@@ -16,12 +16,12 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
-import org.reactivestreams.Publisher;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Abstract implementation that performs the chaining of a set of policies and the {@link Processor} being intercepted.
@@ -64,7 +64,8 @@ public abstract class AbstractCompositePolicy<ParametersTransformer> {
     for (Function<ReactiveProcessor, ReactiveProcessor> interceptor : interceptors) {
       chainedPoliciesAndOperation = interceptor.apply(chainedPoliciesAndOperation);
     }
-    return chainedPoliciesAndOperation;
+
+    return lastPolicy.getPolicyChain().getProcessingStrategy().onPipeline(chainedPoliciesAndOperation);
   }
 
   /**

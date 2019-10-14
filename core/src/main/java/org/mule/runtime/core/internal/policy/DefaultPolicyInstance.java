@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.getDefaultProcessingStrategyFactory;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
 
@@ -33,7 +34,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
-import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
 
 import java.util.Optional;
 
@@ -78,13 +78,7 @@ public class DefaultPolicyInstance extends AbstractComponent
   }
 
   private ProcessingStrategyFactory defaultProcessingStrategy() {
-    final ProcessingStrategyFactory defaultProcessingStrategyFactory =
-        getMuleContext().getConfiguration().getDefaultProcessingStrategyFactory();
-    if (defaultProcessingStrategyFactory == null) {
-      return new TransactionAwareProactorStreamEmitterProcessingStrategyFactory();
-    } else {
-      return defaultProcessingStrategyFactory;
-    }
+    return getDefaultProcessingStrategyFactory(muleContext);
   }
 
   @Override
