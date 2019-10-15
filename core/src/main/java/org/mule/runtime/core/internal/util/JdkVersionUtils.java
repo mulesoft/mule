@@ -299,7 +299,7 @@ public class JdkVersionUtils {
       logger.info("You're executing with a JDK made by a vendor that is not on the recommended list of vendors. Vendor: "
           + JAVA_VENDOR + " Please consider changing to a recommended JDK vendor.");
     } else if (getBoolean(MULE_JDK_DEBUG)) {
-      logger.info("You're executing with a JDK made by a recommended vendor.");
+      logger.warn("You're executing with a JDK made by a recommended vendor.");
     }
   }
 }
