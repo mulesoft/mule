@@ -25,6 +25,8 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PAR
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder.RECONNECTION_CONFIG;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SUB_FLOW;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.CONFIG_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
@@ -518,7 +520,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     assertThat(callFlowOp.isPresent(), is(true));
     assertThat(callFlowOp.get().getAllParameterModels().size(), is(4));
     ParameterModel referenceParameter = callFlowOp.get().getAllParameterModels().get(0);
-    assertParameterWithStereotypes(referenceParameter, "reference", MuleStereotypes.FLOW);
+    assertParameterWithStereotypes(referenceParameter, "reference", FLOW, SUB_FLOW);
     assertThat(doSomethingOp.get().getAllParameterModels().get(1).getName(), is(CONFIG_ATTRIBUTE_NAME));
     assertThat(doSomethingOp.get().getAllParameterModels().get(2).getName(), is(TARGET_PARAMETER_NAME));
     assertThat(doSomethingOp.get().getAllParameterModels().get(3).getName(), is(TARGET_VALUE_PARAMETER_NAME));

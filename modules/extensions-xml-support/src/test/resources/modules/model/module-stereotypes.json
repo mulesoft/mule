@@ -363,6 +363,10 @@
                     {
                       "type": "FLOW",
                       "namespace": "MULE"
+                    },
+                    {
+                      "type": "SUB_FLOW",
+                      "namespace": "MULE"
                     }
                   ],
                   "name": "reference",
