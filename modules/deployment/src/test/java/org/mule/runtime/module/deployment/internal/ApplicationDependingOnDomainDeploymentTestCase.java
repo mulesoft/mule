@@ -251,6 +251,39 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
     // Application was redeployed but it is not started
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(appDependingOnDomain100FileBuilder.getId());
     assertApplicationStatus(appDependingOnDomain100FileBuilder.getId(), CREATED);
+
+    // Redeploy domain again
+    deploymentService.redeployDomain(emptyDomain100FileBuilder.getId());
+
+    // Application was redeployed twice but it is not started
+    verify(mockDeploymentListener, times(2)).onRedeploymentSuccess(appDependingOnDomain100FileBuilder.getId());
+    assertApplicationStatus(appDependingOnDomain100FileBuilder.getId(), CREATED);
+  }
+
+  @Test
+  public void startedApplicationsAreStartedWhenDomainIsRedeployed() throws Exception {
+    DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
+    deploymentService.addDeploymentListener(mockDeploymentListener);
+
+    // Add domain 1.0.0
+    addExplodedDomainFromBuilder(emptyDomain100FileBuilder, emptyDomain100FileBuilder.getId());
+
+    // Deploy an application (exploded)
+    addExplodedAppFromBuilder(appDependingOnDomain100FileBuilder);
+    startDeployment();
+
+    // Application was deployed
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, appDependingOnDomain100FileBuilder.getId());
+
+    // Check status
+    assertApplicationStatus(appDependingOnDomain100FileBuilder.getId(), STARTED);
+
+    // Redeploy domain
+    deploymentService.redeployDomain(emptyDomain100FileBuilder.getId());
+
+    // Application was redeployed and started
+    verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(appDependingOnDomain100FileBuilder.getId());
+    assertApplicationStatus(appDependingOnDomain100FileBuilder.getId(), STARTED);
   }
 
   private void assertApplicationStatus(String appName, ApplicationStatus expectedStatus) {
