@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -23,6 +24,7 @@ import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPr
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
+import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
@@ -56,6 +58,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   public static final String JAR_FILE_SUFFIX = ".jar";
   public static final String ZIP_FILE_SUFFIX = ".zip";
   private static final Logger logger = LoggerFactory.getLogger(DefaultArchiveDeployer.class);
+  static final String START_ARTIFACT_ON_DEPLOYMENT_PROPERTY = "startArtifactOnDeployment";
 
   private final ArtifactDeployer<T> deployer;
   private final ArtifactArchiveInstaller artifactArchiveInstaller;
@@ -445,7 +448,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       trackArtifact(artifact);
 
       deploymentListener.onDeploymentStart(artifact.getArtifactName());
-      deployer.deploy(artifact);
+      deployer.deploy(artifact, shouldStartArtifact(artifact, deploymentProperties.orElse(null)));
 
       artifactArchiveInstaller.createAnchorFile(artifact.getArtifactName());
       deploymentListener.onDeploymentSuccess(artifact.getArtifactName());
@@ -470,6 +473,14 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
         throw new DeploymentException(createStaticMessage("Failed to deploy artifact: " + artifact.getArtifactName()), t);
       }
     }
+  }
+
+  private boolean shouldStartArtifact(T artifact, Properties deploymentProperties) {
+    if (!(artifact instanceof Application) || deploymentProperties == null) {
+      return true;
+    }
+
+    return valueOf(deploymentProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
   }
 
   private T deployOrRedeployPackagedArtifact(final URI artifactUri, String artifactName,
