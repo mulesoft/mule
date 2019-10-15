@@ -54,7 +54,7 @@ import java.util.Optional;
  * depending on the lifecycle phase.
  * <li>Allows an {@link ExceptionListener} to be set.
  * </ul>
- * Implementations of <code>AbstractFlowConstruct</code> should implement {@link #validateConstruct()} validate the resulting
+ * Implementations of <code>AbstractFlowConstuct</code> should implement {@link #validateConstruct()} validate the resulting
  * construct. Validation may include validation of the type of attributes of the {@link MessageSource}.
  * <p/>
  * Implementations may also implement {@link #doInitialise()}, {@link #doStart()}, {@link #doStop()} and {@link #doDispose()} if
