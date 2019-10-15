@@ -64,7 +64,7 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
   private ObjectStoreManager objectStoreManager;
 
   /**
-   * Default implementation should a {@link LockFactory} that comes from the deployavle artifact context.
+   * Default implementation should a {@link LockFactory} that comes from the deployable artifact context.
    */
   @Inject
   private LockFactory lockFactory;
@@ -76,7 +76,7 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
   public DefaultPersistentMetadataCacheManager() {}
 
   /**
-   * Allows to create an instance of this manager with the given parameters instead of letting the registry to create it.
+   * Allows to create an instance of this manager with the given parameters instead of letting the registry create it.
    *
    * @param objectStoreManagerSupplier {@link Supplier} for an {@link ObjectStoreManager} to be set instead of relying on the context to get it injected.
    * @param sharedLockFactory          {@link LockFactory} to be set instead of relying on the context to get it injected.

@@ -53,10 +53,20 @@ public class SharedPartitionedPersistentObjectStore<T extends Serializable> exte
   }
 
   @Override
-  public synchronized void open(String partitionName) throws ObjectStoreException {
+  public void open(String partitionName) throws ObjectStoreException {
     lock.lock();
     try {
       super.open(partitionName);
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  @Override
+  protected T doRemove(String key, String partitionName) throws ObjectStoreException {
+    lock.lock();
+    try {
+      return super.doRemove(key, partitionName);
     } finally {
       lock.unlock();
     }

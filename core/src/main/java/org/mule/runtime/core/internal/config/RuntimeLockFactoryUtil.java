@@ -11,6 +11,8 @@ import org.mule.runtime.core.internal.lock.ServerLockFactory;
 
 /**
  * Utility method for getting the runtime {@link LockFactory}.
+ *
+ * @since 4.3, 4.2.2
  */
 public class RuntimeLockFactoryUtil {
 

@@ -17,7 +17,7 @@ import java.util.concurrent.locks.Lock;
  * An implementation of {@link LockFactory} that is defined at the container level and can be shared
  * between deployable artifacts to synchronize access to shared resources.
  *
- * @since 4.2.2
+ * @since 4.3.0, 4.2.2
  */
 public class ServerLockFactory implements LockFactory, Disposable {
 
