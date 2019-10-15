@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal;
 
+import static com.google.common.collect.ImmutableSet.copyOf;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -14,6 +15,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.exception.ExceptionUtils.hasCause;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
@@ -86,9 +88,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
-import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -116,7 +116,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   private final ArtifactAstDependencyGraph graph;
 
-  private Set<String> currentComponentLocationsRequested = new HashSet<>();
+  private final Set<String> currentComponentLocationsRequested = new HashSet<>();
   private boolean appliedStartedPhaseRequest = false;
 
   /**
@@ -266,8 +266,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                    applyStartPhase);
   }
 
-  public Optional<ComponentModelInitializerAdapter> getParentComponentModelInitializerAdapter(
-                                                                                              boolean applyStartPhase) {
+  public Optional<ComponentModelInitializerAdapter> getParentComponentModelInitializerAdapter(boolean applyStartPhase) {
     return parentComponentModelInitializer
         .map(componentModelInitializer -> componentModelPredicate -> componentModelInitializer
             .initializeComponents(componentModelPredicate, applyStartPhase));
@@ -317,12 +316,25 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
               .filter(basePredicate)
               .filter(comp -> comp.getLocation() != null)
               .map(comp -> comp.getLocation().getLocation())
-              .collect(Collectors.toSet()));
+              .collect(toSet()));
 
-      if (ImmutableSet.copyOf(currentComponentLocationsRequested).equals(ImmutableSet.copyOf(requestedLocations)) &&
+      if (copyOf(currentComponentLocationsRequested).equals(copyOf(requestedLocations)) &&
           appliedStartedPhaseRequest == applyStartPhase) {
         // Same minimalApplication has been requested, so we don't need to recreate the same beans.
         return emptyList();
+      }
+
+      if (parentComponentModelInitializerAdapter.isPresent()) {
+        parentComponentModelInitializerAdapter.get()
+            .initializeComponents(componentModel -> graph.getMissingDependencies()
+                .stream()
+                .anyMatch(missingDep -> missingDep.isSatisfiedBy(componentModel)));
+      } else {
+        graph.getMissingDependencies().stream().forEach(missingDep -> {
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Ignoring dependency {} because it does not exist.", missingDep);
+          }
+        });
       }
 
       // First unregister any already initialized/started component
