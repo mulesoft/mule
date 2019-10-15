@@ -148,44 +148,106 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
     AtomicReference<CoreEvent> retrialEvent = new AtomicReference();
     AtomicInteger retryCounter = new AtomicInteger(maxRetriesAsInteger + 1);
-    Duration choosenDuration = timeBetweenRetries;
-    Integer maxRetriesEvaluated = 0;
 
-    if (expressionManager.isExpression(maxRetries)) {
-      ExpressionManagerSession session = expressionManager.openSession(getLocation(), event, NULL_BINDING_CONTEXT);
-      Integer maxRetries = (Integer) session.evaluate(this.maxRetries, DataType.NUMBER).getValue();
-      maxRetriesEvaluated = maxRetries;
-      retryCounter.set(maxRetries + 1);
-      if (expressionManager.isExpression(millisBetweenRetries)) {
-        Integer millisBetweenRetries = (Integer) session.evaluate(this.millisBetweenRetries, DataType.NUMBER).getValue();
-        choosenDuration = Duration.ofMillis(millisBetweenRetries);
-      } else {
-        choosenDuration = Duration.ofMillis(Integer.parseInt(millisBetweenRetries));
-      }
-    }
+    final LazyValue<Boolean> isTransactional = new LazyValue<>(() -> isTransactionActive());
+    reactor.core.scheduler.Scheduler reactorRetryScheduler =
+        fromExecutorService(new ConditionalExecutorServiceDecorator(timer, s -> isTransactional.get()));
 
     return from(publisher)
         .doOnNext(retrialEvent::set)
         .transform(publisher1 -> applyWithChildContext(publisher1, nestedChain, of(UntilSuccessful.this.getLocation())))
-        .onErrorResume(getRetryPredicate(), getOnResumeComposer(retrialEvent, retryCounter));
+        .onErrorResume(getRetryPredicate(),
+                       getOnResumeComposer(new RetryContext(retrialEvent), reactorRetryScheduler));
   }
 
-  protected Function<Throwable, Publisher<? extends CoreEvent>> getOnResumeComposer(AtomicReference<CoreEvent> retrialEvent,
-                                                                                    AtomicInteger retryCounter) {
-    return (error) -> Flux.just(retrialEvent.get())
-        .transform(publisher2 -> applyWithChildContext(publisher2, nestedChain, of(UntilSuccessful.this.getLocation())))
-        .compose(publisher2 -> {
-          if (retryCounter.decrementAndGet() > 0) {
-            // Retry
-            LOGGER.error("Retrying execution of event, attempt {} of {}.", retryCounter.get(),
-                         maxRetriesAsInteger != RETRY_COUNT_FOREVER ? maxRetriesAsInteger : "unlimited");
-            return publisher2.onErrorResume(getRetryPredicate(), getOnResumeComposer(retrialEvent, retryCounter));
-          } else {
-            // Retries exhausted
-            LOGGER.error("Retry attempts exhausted. Failing...");
-            throw propagate(new RetryExhaustedException(error));
-          }
-        });
+  protected Function<Throwable, Publisher<? extends CoreEvent>> getOnResumeComposer(final RetryContext context,
+                                                                                    reactor.core.scheduler.Scheduler delayScheduler) {
+    return (error) -> {
+
+      MessagingException messagingException = (MessagingException) error;
+      CoreEvent failureEvent = messagingException.getEvent();
+      RetryContext currentCtx = context;
+
+      if (currentCtx.firstRetry) {
+        // This is the first retry executed. Assemble context
+
+        // Set retrial event
+        currentCtx.failingEvent.set(messagingException.getEvent());
+
+        // Set retry count and inter-event delay
+        Duration chosenDuration;
+        Integer maxNumberOfRetries;
+
+        ExpressionManagerSession session = expressionManager.openSession(getLocation(), failureEvent, NULL_BINDING_CONTEXT);
+
+        if (expressionManager.isExpression(maxRetries)) {
+          maxNumberOfRetries = (Integer) session.evaluate(this.maxRetries, DataType.NUMBER).getValue();
+        } else {
+          maxNumberOfRetries = maxRetriesAsInteger;
+        }
+
+        if (expressionManager.isExpression(millisBetweenRetries)) {
+          Integer millisBetweenRetries = (Integer) session.evaluate(this.millisBetweenRetries, DataType.NUMBER).getValue();
+          chosenDuration = Duration.ofMillis(millisBetweenRetries);
+        } else {
+          chosenDuration = Duration.ofMillis(Integer.parseInt(millisBetweenRetries));
+        }
+
+        currentCtx.configureWith(maxNumberOfRetries, chosenDuration);
+      }
+
+
+      return Flux.just(currentCtx.getEvent())
+          .delayElements(context.delay, delayScheduler)
+          .transform(publisher2 -> applyWithChildContext(publisher2, nestedChain, of(UntilSuccessful.this.getLocation())))
+          .compose(publisher2 -> {
+            if (currentCtx.retryCount.get() > 0) {
+              // Retry
+              LOGGER.error("Retrying execution of event, attempt {} of {}.", currentCtx.retriesAttempted(),
+                           maxRetriesAsInteger != RETRY_COUNT_FOREVER ? currentCtx.maxRetries : "unlimited");
+              currentCtx.retryCount.decrementAndGet();
+              return publisher2.onErrorResume(getRetryPredicate(),
+                                              getOnResumeComposer(currentCtx, delayScheduler));
+            } else {
+              // Retries exhausted
+              LOGGER.error("Retry attempts exhausted. Failing...");
+              throw propagate(new RetryExhaustedException(error));
+            }
+          })
+          .onErrorMap(RetryExhaustedException.class, re -> getThrowableFunction(failureEvent).apply(unwrap(re.getCause())));
+
+    };
+  }
+
+  class RetryContext {
+
+    private int maxRetries;
+    private AtomicReference<CoreEvent> failingEvent;
+    boolean firstRetry;
+    private AtomicInteger retryCount = new AtomicInteger();
+    private Duration delay;
+
+    RetryContext(AtomicReference<CoreEvent> reference) {
+      failingEvent = reference;
+      firstRetry = true;
+    }
+
+    CoreEvent getEvent() {
+      return failingEvent.get();
+    }
+
+    void configureWith(Integer maxRetries, Duration delay) {
+      this.maxRetries = maxRetries;
+      this.delay = delay;
+      retryCount.set(maxRetries);
+      firstRetry = false;
+    }
+
+    int retriesAttempted() {
+      return maxRetries - retryCount.get() + 1;
+
+    }
+
   }
 
 
@@ -242,7 +304,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return alternativeApply(publisher);
+    return resumeBasedApply(publisher);
   }
 
   private Predicate<Throwable> getRetryPredicate() {
