@@ -39,6 +39,10 @@ public abstract class ProcessingStrategyDecorator implements ProcessingStrategy,
     this.delegate = delegate;
   }
 
+  public ProcessingStrategy getDelegate() {
+    return delegate;
+  }
+
   @Override
   public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
     return delegate.createSink(flowConstruct, pipeline);

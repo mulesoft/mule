@@ -25,7 +25,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.BackPressureReason;
@@ -79,8 +78,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
   }
 
   private Supplier<Scheduler> getFlowDispatchSchedulerSupplier(MuleContext muleContext, String schedulersNamePrefix) {
-    return new LazyValue<>(() -> {
-
+    return () -> {
       SchedulerConfig config = muleContext.getSchedulerBaseConfig().withName(schedulersNamePrefix + ".dispatch");
 
       if (FLOW_DISPATCH_WORKERS > 0) {
@@ -88,7 +86,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       }
 
       return muleContext.getSchedulerService().cpuLightScheduler(config);
-    });
+    };
   }
 
   @Override
@@ -165,7 +163,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
             new DefaultReactorSink<>(processor.sink(BUFFER),
                                      () -> awaitSubscribersCompletion(flowConstruct, shutdownTimeout, completionLatch,
                                                                       currentTimeMillis()),
-                                     createOnEventConsumer(), getBufferQueueSize());
+                                     onEventConsumer, getBufferQueueSize());
         sinks.add(sink);
       }
 

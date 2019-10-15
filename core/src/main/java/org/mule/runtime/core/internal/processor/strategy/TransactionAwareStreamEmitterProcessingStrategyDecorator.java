@@ -31,13 +31,15 @@ import java.util.function.Function;
  */
 public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends ProcessingStrategyDecorator {
 
-  private static final Consumer<CoreEvent> EVENT_CONSUMER = event -> {
+  private static final Consumer<CoreEvent> NULL_EVENT_CONSUMER = event -> {
   };
 
   public TransactionAwareStreamEmitterProcessingStrategyDecorator(ProcessingStrategy delegate) {
     super(delegate);
     if (delegate instanceof ProcessingStrategyAdapter) {
       ProcessingStrategyAdapter adapter = (ProcessingStrategyAdapter) delegate;
+
+      adapter.setOnEventConsumer(NULL_EVENT_CONSUMER);
       Function<ScheduledExecutorService, ScheduledExecutorService> delegateDecorator = adapter.getSchedulerDecorator();
       adapter.setSchedulerDecorator(scheduler -> new ConditionalExecutorServiceDecorator(delegateDecorator.apply(scheduler),
                                                                                          currentScheduler -> isTransactionActive()));
@@ -47,7 +49,7 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
   @Override
   public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
     Sink delegateSink = delegate.createSink(flowConstruct, pipeline);
-    Sink syncSink = new StreamPerThreadSink(pipeline, EVENT_CONSUMER, flowConstruct);
+    Sink syncSink = new StreamPerThreadSink(pipeline, NULL_EVENT_CONSUMER, flowConstruct);
     return new TransactionalDelegateSink(syncSink, delegateSink);
   }
 
