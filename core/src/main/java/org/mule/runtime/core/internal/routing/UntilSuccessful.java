@@ -13,16 +13,16 @@ import static java.util.Optional.of;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
-import static reactor.core.Exceptions.unwrap;
-import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -41,6 +41,7 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -51,7 +52,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -60,7 +60,6 @@ import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 import reactor.retry.RetryExhaustedException;
 
 /**
@@ -147,26 +146,38 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   class RetryContext {
 
     private int maxRetries;
-    private AtomicReference<CoreEvent> failingEvent;
-    boolean firstRetry;
+    CoreEvent event;
     private AtomicInteger retryCount = new AtomicInteger();
     private Duration delay;
 
-    RetryContext(AtomicReference<CoreEvent> reference) {
-      failingEvent = reference;
-      firstRetry = true;
+    RetryContext(CoreEvent event) {
+      this.event = event;
+
+      Integer maxRetriesEvaluated;
+      Duration chosenDuration;
+
+      ExpressionManagerSession session = expressionManager.openSession(getLocation(), event, NULL_BINDING_CONTEXT);
+
+      if (expressionManager.isExpression(UntilSuccessful.this.maxRetries)) {
+        Integer maxRetries = (Integer) session.evaluate(UntilSuccessful.this.maxRetries, DataType.NUMBER).getValue();
+        maxRetriesEvaluated = maxRetries;
+      } else {
+        maxRetriesEvaluated = maxRetriesAsInteger;
+      }
+
+      if (expressionManager.isExpression(millisBetweenRetries)) {
+        Integer millisBetweenRetries =
+            (Integer) session.evaluate(UntilSuccessful.this.millisBetweenRetries, DataType.NUMBER).getValue();
+        chosenDuration = Duration.ofMillis(millisBetweenRetries);
+      } else {
+        chosenDuration = Duration.ofMillis(Integer.parseInt(millisBetweenRetries));
+      }
+
+      retryCount.set(maxRetriesEvaluated);
+      maxRetries = maxRetriesEvaluated;
+      delay = chosenDuration;
     }
 
-    CoreEvent getEvent() {
-      return failingEvent.get();
-    }
-
-    void configureWith(Integer maxRetries, Duration delay) {
-      this.maxRetries = maxRetries;
-      this.delay = delay;
-      retryCount.set(maxRetries);
-      firstRetry = false;
-    }
 
     int retriesAttempted() {
       return maxRetries - retryCount.get() + 1;
@@ -175,55 +186,66 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   }
 
-  public Publisher<CoreEvent> alternativeApply(Publisher<CoreEvent> publisher) {
-    return from(publisher)
-        .flatMap(event -> {
-          AtomicInteger retryCounter = new AtomicInteger(maxRetriesAsInteger + 1);
-          Duration choosenDuration = timeBetweenRetries;
-          Integer maxRetriesEvaluated = 0;
+  class UntilSuccRouter {
 
-          if (expressionManager.isExpression(maxRetries)) {
-            ExpressionManagerSession session = expressionManager.openSession(getLocation(), event, NULL_BINDING_CONTEXT);
-            Integer maxRetries = (Integer) session.evaluate(this.maxRetries, DataType.NUMBER).getValue();
-            maxRetriesEvaluated = maxRetries;
-            retryCounter.set(maxRetries + 1);
-            if (expressionManager.isExpression(millisBetweenRetries)) {
-              Integer millisBetweenRetries = (Integer) session.evaluate(this.millisBetweenRetries, DataType.NUMBER).getValue();
-              choosenDuration = Duration.ofMillis(millisBetweenRetries);
-            } else {
-              choosenDuration = Duration.ofMillis(Integer.parseInt(millisBetweenRetries));
-            }
-          }
+    Flux<CoreEvent> router;
+    FluxSinkRecorder<CoreEvent> recorder = new FluxSinkRecorder<>();
+    Flux<CoreEvent> route;
+    RetryContext currentContext;
 
-          final LazyValue<Boolean> isTransactional = new LazyValue<>(() -> isTransactionActive());
-          reactor.core.scheduler.Scheduler reactorRetryScheduler =
-              fromExecutorService(new ConditionalExecutorServiceDecorator(timer, s -> isTransactional.get()));
+    UntilSuccRouter(Publisher<CoreEvent> publisher) {
+      router = Flux.from(publisher)
+          .doOnNext(event -> {
+            // publish event
 
-          AtomicReference<FluxSink> sinkReference = new AtomicReference<>();
-          Integer finalMaxRetriesEvaluated = maxRetriesEvaluated;
-          return Flux.<CoreEvent>create(sink -> {
-            sinkReference.set(sink);
-            sink.next(event);
+            currentContext = new RetryContext(event);
+
+            recorder.next(event);
           })
-              .transform(publisher1 -> applyWithChildContext(publisher1, nestedChain,
-                                                             of(UntilSuccessful.this.getLocation())))
-              .doOnNext(completedEvent -> sinkReference.get().complete())
-              .onErrorContinue(getRetryPredicate(), (error, failureEvent) -> {
-                int retriesLeft = retryCounter.decrementAndGet();
-                if (retriesLeft > 0) {
-                  // Retry
-                  LOGGER.error("Retrying execution of event, attempt {} of {}.", retriesLeft,
-                               maxRetriesAsInteger != RETRY_COUNT_FOREVER ? finalMaxRetriesEvaluated.toString() : "unlimited");
-                  sinkReference.get().next(event);
-                } else {
-                  // Retries exhausted
-                  LOGGER.error("Retry attempts exhausted. Failing...");
-                  throw propagate(new RetryExhaustedException(error));
-                }
-              })
-              .onErrorMap(RetryExhaustedException.class, re -> getThrowableFunction(event).apply(unwrap(re.getCause())))
-              .delayElements(choosenDuration, reactorRetryScheduler);
-        });
+          .doOnComplete(() -> {
+            // complete next stage of chain
+            currentContext = null;
+            recorder.complete();
+          });
+
+      final LazyValue<Boolean> isTransactional = new LazyValue<>(() -> isTransactionActive());
+      reactor.core.scheduler.Scheduler reactorRetryScheduler =
+          fromExecutorService(new ConditionalExecutorServiceDecorator(timer, s -> isTransactional.get()));
+
+      route = Flux.create(recorder)
+          .transform(publisher1 -> applyWithChildContext(Flux.from(publisher1), nestedChain,
+                                                         Optional.of(UntilSuccessful.this.getLocation())))
+          // Have to check if the context reaches the onErrorContinue
+          .onErrorContinue(getRetryPredicate(), (error, failureEvent) -> {
+            int retriesLeft =
+                currentContext.retryCount.getAndDecrement();
+            if (retriesLeft > 0) { // Retry
+              LOGGER.error("Retrying execution of event, attempt {} of {}.", currentContext.maxRetries - retriesLeft + 1,
+                           maxRetriesAsInteger != RETRY_COUNT_FOREVER ? currentContext.maxRetries : "unlimited");
+              recorder.next(currentContext.event);
+            } else { // Retries exhausted
+              LOGGER.error("Retry attempts exhausted. Failing...");
+              throw propagate(new RetryExhaustedException(error));
+            }
+          })
+          .onErrorMap(RetryExhaustedException.class,
+                      re -> getThrowableFunction(currentContext.event).apply(unwrap(re.getCause())));
+
+      // .delayElements(currentContext.delay, reactorRetryScheduler);
+    }
+
+    Publisher<CoreEvent> assemblePublisher() {
+
+      return route
+          .doOnSubscribe(subscription -> router.subscribe());
+
+    }
+  }
+
+
+  public Publisher<CoreEvent> alternativeApply(Publisher<CoreEvent> publisher) {
+    UntilSuccRouter router = new UntilSuccRouter(publisher);
+    return Flux.merge(subscribeFluxOnPublisherSubscription(router.route, router.router));
   }
 
   @Override
