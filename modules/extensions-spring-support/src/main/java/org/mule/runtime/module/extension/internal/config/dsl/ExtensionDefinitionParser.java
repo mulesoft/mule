@@ -47,6 +47,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.DateType;
@@ -56,6 +57,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.ExpressionSupport;
@@ -915,6 +917,12 @@ public abstract class ExtensionDefinitionParser {
       definitionBuilder = fromSimpleReferenceParameter(name);
 
     } else if (acceptsReferences && type instanceof ObjectType) {
+      definitionBuilder = fromSimpleReferenceParameter(name, typeConverter);
+
+    }
+    // Parameter is defined as Object therefore AnyType from Metadata
+    else if (acceptsReferences && type instanceof AnyType && type.getAnnotation(ClassInformationAnnotation.class)
+        .map(annotation -> annotation.getClassname().equals(Object.class.getName())).orElse(false)) {
       definitionBuilder = fromSimpleReferenceParameter(name, typeConverter);
 
     } else {
