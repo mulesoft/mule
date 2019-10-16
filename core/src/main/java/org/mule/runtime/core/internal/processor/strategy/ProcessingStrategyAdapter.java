@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -38,5 +40,13 @@ public interface ProcessingStrategyAdapter extends ProcessingStrategy {
    * @param schedulerDecorator a decoration function
    */
   void setSchedulerDecorator(Function<ScheduledExecutorService, ScheduledExecutorService> schedulerDecorator);
+
+  /**
+   * Sets a {@link Consumer} that will be invoked each time a new message is dispatch through {@code this} processing strategy
+   * but before the pipeline processes it.
+   *
+   * @param eventConsumer a {@link CoreEvent} {@link Consumer}
+   */
+  void setOnEventConsumer(Consumer<CoreEvent> eventConsumer);
 
 }

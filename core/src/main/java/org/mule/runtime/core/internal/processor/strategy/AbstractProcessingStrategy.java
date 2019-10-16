@@ -45,12 +45,19 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategyAd
 
   private Function<ScheduledExecutorService, ScheduledExecutorService> schedulerDecorator = identity();
 
+  protected Consumer<CoreEvent> onEventConsumer = createDefaultOnEventConsumer();
+
   @Override
   public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
-    return new DirectSink(pipeline, createOnEventConsumer(), SMALL_BUFFER_SIZE);
+    return new DirectSink(pipeline, createDefaultOnEventConsumer(), SMALL_BUFFER_SIZE);
   }
 
-  protected Consumer<CoreEvent> createOnEventConsumer() {
+  @Override
+  public void setOnEventConsumer(Consumer<CoreEvent> onEventConsumer) {
+    this.onEventConsumer = onEventConsumer;
+  }
+
+  protected Consumer<CoreEvent> createDefaultOnEventConsumer() {
     return event -> {
       if (isTransactionActive()) {
         ((BaseEventContext) event.getContext()).error(new MessagingException(event,
