@@ -24,7 +24,7 @@ import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNE
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.NON_LAZY_METADATA_SERVICE_KEY;
-import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.resolveOrphanComponents;
@@ -38,6 +38,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIG
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
+import static org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore.SHARED_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -49,7 +51,9 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.metadata.MetadataService;
+import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
@@ -65,8 +69,10 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
+import org.mule.runtime.core.internal.metadata.cache.DefaultPersistentMetadataCacheManager;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore;
+import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
@@ -88,6 +94,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,11 +146,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                  List<ClassLoader> pluginsClassLoaders,
                                  Optional<ComponentModelInitializer> parentComponentModelInitializer,
                                  Optional<ConfigurationProperties> parentConfigurationProperties, boolean disableXmlValidations,
-                                 ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider)
+                                 ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider,
+                                 LockFactory runtimeLockFactory)
       throws BeansException {
     super(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
           extendArtifactProperties(artifactProperties), artifactType, pluginsClassLoaders, parentConfigurationProperties,
-          disableXmlValidations, runtimeComponentBuildingDefinitionProvider);
+          disableXmlValidations, runtimeComponentBuildingDefinitionProvider, runtimeLockFactory);
 
     // Changes the component locator in order to allow accessing any component by location even when they are prototype
     this.componentLocator = new SpringConfigurationComponentLocator();
@@ -175,9 +183,30 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     String sharedPartitionatedPersistentObjectStorePath = artifactProperties.get(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH);
     if (sharedPartitionatedPersistentObjectStorePath != null) {
-      customizationService.overrideDefaultServiceImpl(BASE_PERSISTENT_OBJECT_STORE_KEY,
-                                                      new SharedPartitionedPersistentObjectStore<>(new File(sharedPartitionatedPersistentObjectStorePath)));
+      // We need to first define this service so it would be later initialized
+      customizationService.registerCustomServiceClass(SHARED_PERSISTENT_OBJECT_STORE_KEY,
+                                                      SharedPartitionedPersistentObjectStore.class);
+      customizationService.overrideDefaultServiceImpl(SHARED_PERSISTENT_OBJECT_STORE_KEY,
+                                                      new SharedPartitionedPersistentObjectStore<>(new File(sharedPartitionatedPersistentObjectStorePath),
+                                                                                                   runtimeLockFactory));
+      // Create a custom ObjectStoreManager that defines a different key for persistent object store
+      Supplier<ObjectStoreManager> osmSupplier = () -> {
+        MuleObjectStoreManager osm = new MuleObjectStoreManager();
+        osm.setBasePersistentStoreKey(SHARED_PERSISTENT_OBJECT_STORE_KEY);
+        osm.setBaseTransientStoreKey(BASE_IN_MEMORY_OBJECT_STORE_KEY);
+        osm.setSchedulerService(muleContext.getSchedulerService());
+        osm.setMuleContext(muleContext);
+        try {
+          // We have to manually initialise this component
+          getMuleRegistry().applyLifecycle(osm, Initialisable.PHASE_NAME);
+        } catch (MuleException e) {
+          throw new MuleRuntimeException(createStaticMessage("Error while initializing a shared object store manager"), e);
+        }
+        return osm;
+      };
 
+      customizationService.overrideDefaultServiceImpl(METADATA_CACHE_MANAGER_KEY,
+                                                      new DefaultPersistentMetadataCacheManager(osmSupplier, runtimeLockFactory));
     }
 
     initialize();

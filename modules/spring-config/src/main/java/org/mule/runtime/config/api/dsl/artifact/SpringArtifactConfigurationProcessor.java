@@ -7,6 +7,7 @@
 package org.mule.runtime.config.api.dsl.artifact;
 
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+
 import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
@@ -42,7 +43,8 @@ public final class SpringArtifactConfigurationProcessor implements ArtifactConfi
                                           artifactContextConfiguration.getArtifactType(),
                                           artifactContextConfiguration.isEnableLazyInitialization(),
                                           artifactContextConfiguration.isDisableXmlValidations(),
-                                          artifactContextConfiguration.getRuntimeComponentBuildingDefinitionProvider());
+                                          artifactContextConfiguration.getRuntimeComponentBuildingDefinitionProvider(),
+                                          artifactContextConfiguration.getRuntimeLockFactory());
     artifactContextConfiguration.getParentContext()
         .ifPresent(parentMuleContext -> springXmlConfigurationBuilder.setParentContext(parentMuleContext));
     artifactContextConfiguration.getServiceConfigurators().stream()
