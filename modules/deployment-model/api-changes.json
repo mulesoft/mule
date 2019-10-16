@@ -1,5 +1,29 @@
 {
-  "4.1.1": {
+  "4.2.3": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration.ArtifactContextConfigurationBuilder org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration.ArtifactContextConfigurationBuilder::setRuntimeLockFactory(org.mule.runtime.api.lock.LockFactory)",
+          "package": "org.mule.runtime.deployment.model.api.artifact",
+          "classSimpleName": "ArtifactContextConfigurationBuilder",
+          "methodName": "setRuntimeLockFactory",
+          "elementKind": "method",
+          "justification": "MULE-17560"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.api.lock.LockFactory org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration::getRuntimeLockFactory()",
+          "package": "org.mule.runtime.deployment.model.api.artifact",
+          "classSimpleName": "ArtifactContextConfiguration",
+          "methodName": "getRuntimeLockFactory",
+          "elementKind": "method",
+          "justification": "MULE-17560"
+        }
+      ]
+    }
+  },
+   "4.1.1": {
     "revapi": {
       "ignore": [
         {

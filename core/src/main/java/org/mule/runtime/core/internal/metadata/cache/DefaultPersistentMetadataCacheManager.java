@@ -15,6 +15,9 @@ import static org.apache.commons.lang3.math.NumberUtils.toLong;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.metadata.MetadataCache;
@@ -28,6 +31,7 @@ import org.mule.runtime.api.util.LazyValue;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -44,7 +48,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.1.4, 4.2.0
  */
-public class DefaultPersistentMetadataCacheManager implements MetadataCacheManager, Startable {
+public class DefaultPersistentMetadataCacheManager implements MetadataCacheManager, Initialisable, Startable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultPersistentMetadataCacheManager.class);
   public static final String PERSISTENT_METADATA_SERVICE_CACHE = "_mulePersistentMetadataService";
@@ -52,14 +56,43 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
   public static final String MULE_METADATA_CACHE_EXPIRATION_INTERVAL =
       SYSTEM_PROPERTY_PREFIX + "metadata.cache.expirationInterval.millis";
 
+  /**
+   * Default implementation should use an {@link ObjectStoreManager} that is tied to the deployable artifact lifecyle.
+   */
   @Inject
   @Named(OBJECT_STORE_MANAGER)
   private ObjectStoreManager objectStoreManager;
 
+  /**
+   * Default implementation should a {@link LockFactory} that comes from the deployable artifact context.
+   */
   @Inject
   private LockFactory lockFactory;
 
   private LazyValue<ObjectStore<MetadataCache>> metadataStore;
+
+  private Supplier<ObjectStoreManager> objectStoreManagerSupplier;
+
+  public DefaultPersistentMetadataCacheManager() {}
+
+  /**
+   * Allows to create an instance of this manager with the given parameters instead of letting the registry create it.
+   *
+   * @param objectStoreManagerSupplier {@link Supplier} for an {@link ObjectStoreManager} to be set instead of relying on the context to get it injected.
+   * @param sharedLockFactory          {@link LockFactory} to be set instead of relying on the context to get it injected.
+   */
+  public DefaultPersistentMetadataCacheManager(Supplier<ObjectStoreManager> objectStoreManagerSupplier,
+                                               LockFactory sharedLockFactory) {
+    this.objectStoreManagerSupplier = objectStoreManagerSupplier;
+    this.lockFactory = sharedLockFactory;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (objectStoreManagerSupplier != null) {
+      this.objectStoreManager = objectStoreManagerSupplier.get();
+    }
+  }
 
   @Override
   public void start() {

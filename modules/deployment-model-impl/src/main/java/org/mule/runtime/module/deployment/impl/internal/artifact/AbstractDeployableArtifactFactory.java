@@ -8,15 +8,16 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.validateArtifactLicense;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
-import java.util.Properties;
-
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.license.api.LicenseValidator;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.Properties;
 
 /**
  * Abstract class for {@link DeployableArtifact} factories.
@@ -30,17 +31,21 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
 
   private LicenseValidator licenseValidator;
   private ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
+  private LockFactory runtimeLockFactory;
 
   /**
    * Creates a new {@link AbstractDeployableArtifactFactory}
    * 
    * @param licenseValidator the license validator to use for plugins.
    * @param runtimeComponentBuildingDefinitionProvider provider for the runtime {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
+   * @param runtimeLockFactory {@link LockFactory} for Runtime, a unique and shared lock factory to be used between different artifacts.
    */
   public AbstractDeployableArtifactFactory(LicenseValidator licenseValidator,
-                                           ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
+                                           ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider,
+                                           LockFactory runtimeLockFactory) {
     this.licenseValidator = licenseValidator;
     this.runtimeComponentBuildingDefinitionProvider = runtimeComponentBuildingDefinitionProvider;
+    this.runtimeLockFactory = runtimeLockFactory;
   }
 
   @Override
@@ -76,4 +81,12 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
   public ComponentBuildingDefinitionProvider getRuntimeComponentBuildingDefinitionProvider() {
     return runtimeComponentBuildingDefinitionProvider;
   }
+
+  /**
+   * @return {@link LockFactory} associated to the Runtime.
+   */
+  public LockFactory getRuntimeLockFactory() {
+    return runtimeLockFactory;
+  }
+
 }

@@ -16,6 +16,7 @@ import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.core.internal.lock.ServerLockFactory;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
@@ -89,6 +90,7 @@ public class MuleArtifactResourcesRegistry {
   private final ServiceRegistryDescriptorLoaderRepository descriptorLoaderRepository;
   private final RegionPluginClassLoadersFactory pluginClassLoadersFactory;
   private final ToolingApplicationDescriptorFactory toolingApplicationDescriptorFactory;
+  private final ServerLockFactory runtimeLockFactory;
 
   /**
    * Builds a {@link MuleArtifactResourcesRegistry} instance
@@ -128,6 +130,8 @@ public class MuleArtifactResourcesRegistry {
    * Creates a repository for resources required for mule artifacts.
    */
   private MuleArtifactResourcesRegistry(ModuleRepository moduleRepository) {
+    runtimeLockFactory = new ServerLockFactory();
+
     containerClassLoader =
         new ContainerClassLoaderFactory(moduleRepository).createContainerClassLoader(getClass().getClassLoader());
     artifactClassLoaderManager = new DefaultClassLoaderManager();
@@ -176,7 +180,8 @@ public class MuleArtifactResourcesRegistry {
         new DefaultDomainFactory(domainDescriptorFactory, domainManager,
                                  artifactClassLoaderManager, serviceManager,
                                  pluginDependenciesResolver, domainClassLoaderBuilderFactory,
-                                 extensionModelLoaderManager, licenseValidator, runtimeComponentBuildingDefinitionProvider);
+                                 extensionModelLoaderManager, licenseValidator, runtimeComponentBuildingDefinitionProvider,
+                                 runtimeLockFactory);
 
     DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> policyClassLoaderFactory =
         trackDeployableArtifactClassLoaderFactory(new PolicyTemplateClassLoaderFactory());
@@ -190,7 +195,8 @@ public class MuleArtifactResourcesRegistry {
                                                        pluginDependenciesResolver,
                                                        artifactPluginDescriptorLoader,
                                                        licenseValidator,
-                                                       runtimeComponentBuildingDefinitionProvider);
+                                                       runtimeComponentBuildingDefinitionProvider,
+                                                       runtimeLockFactory);
     toolingApplicationDescriptorFactory =
         new ToolingApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
                                                 artifactDescriptorValidatorBuilder);
@@ -295,4 +301,12 @@ public class MuleArtifactResourcesRegistry {
   public PluginDependenciesResolver getPluginDependenciesResolver() {
     return pluginDependenciesResolver;
   }
+
+  /**
+   * @return a {@link RuntimeLockFactory} that can be shared between deployable artifacts.
+   */
+  public ServerLockFactory getRuntimeLockFactory() {
+    return runtimeLockFactory;
+  }
+
 }
