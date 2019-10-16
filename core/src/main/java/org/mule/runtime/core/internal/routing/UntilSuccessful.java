@@ -144,81 +144,6 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
     return policyTemplate.orElseGet(() -> createRetryPolicyTemplate(event));
   }
 
-  public Publisher<CoreEvent> resumeBasedApply(Publisher<CoreEvent> publisher) {
-
-    AtomicReference<CoreEvent> retrialEvent = new AtomicReference();
-    AtomicInteger retryCounter = new AtomicInteger(maxRetriesAsInteger + 1);
-
-    final LazyValue<Boolean> isTransactional = new LazyValue<>(() -> isTransactionActive());
-    reactor.core.scheduler.Scheduler reactorRetryScheduler =
-        fromExecutorService(new ConditionalExecutorServiceDecorator(timer, s -> isTransactional.get()));
-
-    return from(publisher)
-        .doOnNext(retrialEvent::set)
-        .transform(publisher1 -> applyWithChildContext(publisher1, nestedChain, of(UntilSuccessful.this.getLocation())))
-        .onErrorResume(getRetryPredicate(),
-                       getOnResumeComposer(new RetryContext(retrialEvent), reactorRetryScheduler));
-  }
-
-  protected Function<Throwable, Publisher<? extends CoreEvent>> getOnResumeComposer(final RetryContext context,
-                                                                                    reactor.core.scheduler.Scheduler delayScheduler) {
-    return (error) -> {
-
-      MessagingException messagingException = (MessagingException) error;
-      CoreEvent failureEvent = messagingException.getEvent();
-      RetryContext currentCtx = context;
-
-      if (currentCtx.firstRetry) {
-        // This is the first retry executed. Assemble context
-
-        // Set retrial event
-        currentCtx.failingEvent.set(messagingException.getEvent());
-
-        // Set retry count and inter-event delay
-        Duration chosenDuration;
-        Integer maxNumberOfRetries;
-
-        ExpressionManagerSession session = expressionManager.openSession(getLocation(), failureEvent, NULL_BINDING_CONTEXT);
-
-        if (expressionManager.isExpression(maxRetries)) {
-          maxNumberOfRetries = (Integer) session.evaluate(this.maxRetries, DataType.NUMBER).getValue();
-        } else {
-          maxNumberOfRetries = maxRetriesAsInteger;
-        }
-
-        if (expressionManager.isExpression(millisBetweenRetries)) {
-          Integer millisBetweenRetries = (Integer) session.evaluate(this.millisBetweenRetries, DataType.NUMBER).getValue();
-          chosenDuration = Duration.ofMillis(millisBetweenRetries);
-        } else {
-          chosenDuration = Duration.ofMillis(Integer.parseInt(millisBetweenRetries));
-        }
-
-        currentCtx.configureWith(maxNumberOfRetries, chosenDuration);
-      }
-
-
-      return Flux.just(currentCtx.getEvent())
-          .delayElements(context.delay, delayScheduler)
-          .transform(publisher2 -> applyWithChildContext(publisher2, nestedChain, of(UntilSuccessful.this.getLocation())))
-          .compose(publisher2 -> {
-            if (currentCtx.retryCount.get() > 0) {
-              // Retry
-              LOGGER.error("Retrying execution of event, attempt {} of {}.", currentCtx.retriesAttempted(),
-                           maxRetriesAsInteger != RETRY_COUNT_FOREVER ? currentCtx.maxRetries : "unlimited");
-              currentCtx.retryCount.decrementAndGet();
-              return publisher2.onErrorResume(getRetryPredicate(),
-                                              getOnResumeComposer(currentCtx, delayScheduler));
-            } else {
-              // Retries exhausted
-              LOGGER.error("Retry attempts exhausted. Failing...");
-              throw propagate(new RetryExhaustedException(error));
-            }
-          })
-          .onErrorMap(RetryExhaustedException.class, re -> getThrowableFunction(failureEvent).apply(unwrap(re.getCause())));
-
-    };
-  }
-
   class RetryContext {
 
     private int maxRetries;
@@ -249,7 +174,6 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
     }
 
   }
-
 
   public Publisher<CoreEvent> alternativeApply(Publisher<CoreEvent> publisher) {
     return from(publisher)
@@ -304,7 +228,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return resumeBasedApply(publisher);
+    return alternativeApply(publisher);
   }
 
   private Predicate<Throwable> getRetryPredicate() {
