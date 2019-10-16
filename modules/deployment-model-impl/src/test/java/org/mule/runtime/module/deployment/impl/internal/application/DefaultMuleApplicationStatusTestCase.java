@@ -20,13 +20,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
 import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
-
-import java.io.File;
-import java.net.URL;
-
-import javax.inject.Inject;
-
-import org.junit.Test;
+import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
@@ -43,6 +37,13 @@ import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRep
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
+
+import java.io.File;
+import java.net.URL;
+
+import javax.inject.Inject;
+
+import org.junit.Test;
 
 /**
  * This tests verifies that the {@link DefaultMuleApplication} status is set correctly depending on its
@@ -74,7 +75,8 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
                                              null, mock(ServiceRepository.class),
                                              mock(ExtensionModelLoaderRepository.class),
                                              appLocation, null, null,
-                                             getRuntimeComponentBuildingDefinitionProvider());
+                                             getRuntimeComponentBuildingDefinitionProvider(),
+                                             getRuntimeLockFactory());
     application.setArtifactContext(mockArtifactContext);
 
     muleContext.getInjector().inject(this);
@@ -119,7 +121,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
 
     DefaultMuleApplication application =
         new DefaultMuleApplication(descriptor, mock(MuleApplicationClassLoader.class), emptyList(), null,
-                                   null, null, appLocation, null, null, null);
+                                   null, null, appLocation, null, null, null, null);
     application.install();
     assertThat(application.getDeploymentClassLoader(), is(notNullValue()));
     application.dispose();

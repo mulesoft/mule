@@ -27,9 +27,11 @@ import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFA
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager.isCompatibleBundle;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.Notification.Action;
@@ -98,6 +100,8 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
 
   private NotificationListenerRegistry notificationRegistrer;
 
+  private LockFactory runtimeLockFactory;
+
   public DefaultMuleApplication(ApplicationDescriptor descriptor,
                                 MuleDeployableArtifactClassLoader deploymentClassLoader,
                                 List<ArtifactPlugin> artifactPlugins, DomainRepository domainRepository,
@@ -105,7 +109,8 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
                                 ExtensionModelLoaderRepository extensionModelLoaderRepository, File location,
                                 ClassLoaderRepository classLoaderRepository,
                                 ApplicationPolicyProvider applicationPolicyProvider,
-                                ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
+                                ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider,
+                                LockFactory runtimeLockFactory) {
     super("app", "application", deploymentClassLoader);
     this.descriptor = descriptor;
     this.domainRepository = domainRepository;
@@ -116,6 +121,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     this.location = location;
     this.policyManager = applicationPolicyProvider;
     this.runtimeComponentBuildingDefinitionProvider = runtimeComponentBuildingDefinitionProvider;
+    this.runtimeLockFactory = runtimeLockFactory;
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
     if (this.deploymentClassLoader == null) {
       throw new IllegalArgumentException("Classloader cannot be null");
@@ -220,7 +226,8 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
               .setProperties(ofNullable(resolveDeploymentProperties(descriptor.getDataFolderName(),
                                                                     descriptor.getDeploymentProperties())))
               .setPolicyProvider(policyManager)
-              .setRuntimeComponentBuildingDefinitionProvider(runtimeComponentBuildingDefinitionProvider);
+              .setRuntimeComponentBuildingDefinitionProvider(runtimeComponentBuildingDefinitionProvider)
+              .setRuntimeLockFactory(runtimeLockFactory);
 
       Domain domain = getApplicationDomain(domainRepository, descriptor);
       if (domain.getRegistry() != null) {

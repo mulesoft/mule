@@ -14,6 +14,8 @@ import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFA
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleDomainsDir;
+
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
@@ -68,9 +70,10 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
                               DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory,
                               ExtensionModelLoaderManager extensionModelLoaderManager,
                               LicenseValidator licenseValidator,
-                              ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
+                              ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider,
+                              LockFactory runtimeLockFactory) {
 
-    super(licenseValidator, runtimeComponentBuildingDefinitionProvider);
+    super(licenseValidator, runtimeComponentBuildingDefinitionProvider, runtimeLockFactory);
 
     checkArgument(domainDescriptorFactory != null, "domainDescriptorFactory cannot be null");
     checkArgument(domainManager != null, "Domain manager cannot be null");
@@ -159,7 +162,8 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
 
     DefaultMuleDomain defaultMuleDomain =
         new DefaultMuleDomain(domainDescriptor, domainClassLoader, classLoaderRepository, serviceRepository, artifactPlugins,
-                              extensionModelLoaderManager, getRuntimeComponentBuildingDefinitionProvider());
+                              extensionModelLoaderManager, getRuntimeComponentBuildingDefinitionProvider(),
+                              getRuntimeLockFactory());
 
     DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
     domainManager.addDomain(domainWrapper);

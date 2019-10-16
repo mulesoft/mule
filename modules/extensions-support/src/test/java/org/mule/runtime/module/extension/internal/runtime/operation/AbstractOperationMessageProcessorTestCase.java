@@ -29,6 +29,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
+import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
@@ -303,7 +304,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("metadata.cache.id.model.generator.factory",
                                                                          cacheIdGeneratorFactory);
 
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("core.metadata.cache.manager",
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(METADATA_CACHE_MANAGER_KEY,
                                                                          metadataCacheManager);
 
     when(resolverSet.resolve(argThat(new BaseMatcher<ValueResolvingContext>() {

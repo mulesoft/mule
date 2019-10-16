@@ -18,6 +18,7 @@ import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -26,6 +27,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.core.internal.lock.ServerLockFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory;
@@ -87,6 +89,7 @@ public class MuleContainer {
   private final RepositoryService repositoryService;
   private final ToolingService toolingService;
   private final MuleCoreExtensionManagerServer coreExtensionManager;
+  private ServerLockFactory muleLockFactory;
   private MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder().build();
   private static MuleLog4jContextFactory log4jContextFactory;
 
@@ -138,6 +141,7 @@ public class MuleContainer {
                                                                           new ClasspathMuleCoreExtensionDiscoverer(artifactResourcesRegistry
                                                                               .getContainerClassLoader()),
                                                                           new ReflectionMuleCoreExtensionDependencyResolver());
+    this.muleLockFactory = artifactResourcesRegistry.getRuntimeLockFactory();
 
     artifactResourcesRegistry.getContainerClassLoader().dispose();
   }
@@ -322,6 +326,10 @@ public class MuleContainer {
 
     if (deploymentService != null) {
       deploymentService.stop();
+    }
+
+    if (muleLockFactory != null) {
+      muleLockFactory.dispose();
     }
 
     if (extensionModelLoaderManager != null) {

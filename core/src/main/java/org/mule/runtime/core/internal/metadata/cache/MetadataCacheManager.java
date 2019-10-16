@@ -19,6 +19,11 @@ import org.mule.runtime.api.metadata.MetadataCache;
 public interface MetadataCacheManager {
 
   /**
+   * Key under which the {@link MetadataCacheManager} can be found in the {@link org.mule.runtime.api.artifact.Registry}
+   */
+  String METADATA_CACHE_MANAGER_KEY = "_metadataCacheManager";
+
+  /**
    * Returns the {@link MetadataCache} with the given {@code id} if one has already been defined. Otherwise,
    * a new instance of {@link MetadataCache} will be created, bound to the given {@code id} and then returned.
    *
