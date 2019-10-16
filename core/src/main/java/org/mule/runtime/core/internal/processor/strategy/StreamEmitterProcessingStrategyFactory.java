@@ -133,8 +133,13 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     public void stop() throws MuleException {
+      // do nothing as the stop is to actually be performed after the emitter termination
+    }
+
+    @Override
+    protected void stopSchedulers() {
       try {
-        super.stop();
+        super.stopSchedulers();
       } finally {
         if (flowDispatchScheduler != null) {
           flowDispatchScheduler.stop();
@@ -152,6 +157,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
         Latch completionLatch = new Latch();
         EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(getBufferQueueSize());
         AtomicReference<Throwable> failedSubscriptionCause = new AtomicReference<>();
+        processor.doAfterTerminate(this::stopSchedulers);
         processor.transform(function).subscribe(null, getThrowableConsumer(completionLatch, failedSubscriptionCause),
                                                 () -> completionLatch.release());
 
