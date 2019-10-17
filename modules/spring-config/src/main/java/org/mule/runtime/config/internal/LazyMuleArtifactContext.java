@@ -327,10 +327,14 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           componentModel -> componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
               .map(ComponentBuildingDefinition::isAlwaysEnabled).orElse(false);
 
+      final Predicate<? super ComponentAst> languageConstructPredicate =
+          componentModel -> beanDefinitionFactory.isLanguageConstructComponent(componentModel.getIdentifier());
+
       final ArtifactAst minimalApplicationModel = graph.minimalArtifactFor(basePredicate
           .or(txManagerPredicate)
           .or(configPredicate)
-          .or(alwaysEnabledPredicate));
+          .or(alwaysEnabledPredicate)
+          .or(languageConstructPredicate));
 
       if (locationOptional.map(loc -> minimalApplicationModel.recursiveStream()
           .noneMatch(comp -> comp.getLocation() != null

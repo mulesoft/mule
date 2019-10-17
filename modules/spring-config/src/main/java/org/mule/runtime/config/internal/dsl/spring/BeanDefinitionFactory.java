@@ -65,12 +65,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
+import com.google.common.collect.ImmutableSet;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.w3c.dom.Element;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * The {@code BeanDefinitionFactory} is the one that knows how to convert a {@code ComponentModel} to an actual
@@ -370,6 +369,15 @@ public class BeanDefinitionFactory {
         || customBuildersComponentIdentifiers.contains(componentIdentifier)
         || componentBuildingDefinitionRegistry.getBuildingDefinition(componentIdentifier).isPresent()
         || componentBuildingDefinitionRegistry.getWrappedComponent(componentIdentifier).isPresent();
+  }
+
+  /**
+   * @param componentIdentifier the component identifier to check
+   * @return {@code true} if the component identifier is one of the current language construct that have specific bean definitions parsers since we don't want to include
+   * them in the parsing API.
+   */
+  public boolean isLanguageConstructComponent(ComponentIdentifier componentIdentifier) {
+    return customBuildersComponentIdentifiers.contains(componentIdentifier);
   }
 
 }
