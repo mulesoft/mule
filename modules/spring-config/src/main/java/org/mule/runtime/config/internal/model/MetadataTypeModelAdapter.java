@@ -15,9 +15,12 @@ import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 
+import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
@@ -38,6 +41,7 @@ import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.declaration.type.annotation.ExpressionSupportAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
+import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
 
 import java.util.List;
 import java.util.Map;
@@ -99,16 +103,32 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
 
   private static class ObjectTypeAsParameterGroupAdapter implements ParameterGroupModel {
 
+    private final ObjectType adaptedType;
     private final Map<String, ParameterModel> parameterModelsByName;
     private final List<ParameterModel> parameterModels;
 
     public ObjectTypeAsParameterGroupAdapter(ObjectType adaptedType) {
-      this.parameterModels = unmodifiableList(adaptedType.getFields().stream()
+      this.adaptedType = adaptedType;
+
+      final List<ParameterModel> tempParameterModels = adaptedType.getFields().stream()
           .map(ObjectFieldTypeAsParameterModelAdapter::new)
-          .collect(toList()));
-      this.parameterModelsByName = parameterModels
+          .collect(toList());
+
+      this.parameterModelsByName = tempParameterModels
           .stream()
           .collect(toMap(NamedObject::getName, identity()));
+
+      if (!parameterModelsByName.containsKey("name")) {
+        final ImmutableParameterModel nameParam = new ImmutableParameterModel("name", "The name of this object in the DSL",
+                                                                              BaseTypeBuilder.create(JAVA).stringType().build(),
+                                                                              false, true, false, true, NOT_SUPPORTED,
+                                                                              null, BEHAVIOUR, null, null, null, null,
+                                                                              emptyList(), emptySet());
+        this.parameterModelsByName.put("name", nameParam);
+        tempParameterModels.add(nameParam);
+      }
+
+      this.parameterModels = unmodifiableList(tempParameterModels);
     }
 
     @Override
@@ -161,6 +181,10 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
       return false;
     }
 
+    @Override
+    public String toString() {
+      return "ObjectTypeAsParameterGroupAdapter{" + adaptedType.toString() + "}";
+    }
   }
 
   private static class ObjectFieldTypeAsParameterModelAdapter implements ParameterModel {
@@ -261,8 +285,12 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
 
     @Override
     public boolean isComponentId() {
-      return false;
+      return getName().equals("name");
     }
 
+    @Override
+    public String toString() {
+      return "ObjectFieldTypeAsParameterModelAdapter{" + wrappedFieldType.toString() + "}";
+    }
   }
 }

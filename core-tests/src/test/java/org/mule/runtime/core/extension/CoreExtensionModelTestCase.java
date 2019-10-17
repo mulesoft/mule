@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
@@ -152,13 +153,18 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(flow.allowsTopLevelDeclaration(), is(true));
 
     final List<ParameterModel> paramModels = flow.getAllParameterModels();
-    assertThat(paramModels, hasSize(2));
+    assertThat(paramModels, hasSize(3));
 
-    ParameterModel initialState = paramModels.get(0);
+    ParameterModel nameParam = paramModels.get(0);
+    assertThat(nameParam.getName(), is("name"));
+    assertThat(nameParam.getDefaultValue(), is(nullValue()));
+    assertThat(nameParam.isComponentId(), is(true));
+
+    ParameterModel initialState = paramModels.get(1);
     assertThat(initialState.getName(), is("initialState"));
     assertThat(initialState.getDefaultValue(), is("started"));
 
-    ParameterModel maxConcurrency = paramModels.get(1);
+    ParameterModel maxConcurrency = paramModels.get(2);
     assertThat(maxConcurrency.getName(), is("maxConcurrency"));
 
     List<? extends NestableElementModel> nestedComponents = flow.getNestedComponents();
@@ -192,7 +198,12 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(subFlow.allowsTopLevelDeclaration(), is(true));
 
     final List<ParameterModel> paramModels = subFlow.getAllParameterModels();
-    assertThat(paramModels, empty());
+    assertThat(paramModels, hasSize(1));
+
+    ParameterModel nameParam = paramModels.get(0);
+    assertThat(nameParam.getName(), is("name"));
+    assertThat(nameParam.getDefaultValue(), is(nullValue()));
+    assertThat(nameParam.isComponentId(), is(true));
 
     List<? extends NestableElementModel> nestedComponents = subFlow.getNestedComponents();
     assertThat(nestedComponents, hasSize(1));
@@ -573,9 +584,14 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(errorHandlerModel.allowsTopLevelDeclaration(), is(true));
     assertThat(errorHandlerModel.getStereotype().getType(), is(ERROR_HANDLER.getType()));
 
-    assertThat(errorHandlerModel.getAllParameterModels(), hasSize(1));
+    assertThat(errorHandlerModel.getAllParameterModels(), hasSize(2));
 
-    ParameterModel ref = errorHandlerModel.getAllParameterModels().get(0);
+    ParameterModel nameParam = errorHandlerModel.getAllParameterModels().get(0);
+    assertThat(nameParam.getName(), is("name"));
+    assertThat(nameParam.getDefaultValue(), is(nullValue()));
+    assertThat(nameParam.isComponentId(), is(true));
+
+    ParameterModel ref = errorHandlerModel.getAllParameterModels().get(1);
     assertThat(ref.getName(), is("ref"));
     assertThat(ref.getType(), is(instanceOf(StringType.class)));
     assertThat(ref.getExpressionSupport(), is(NOT_SUPPORTED));
