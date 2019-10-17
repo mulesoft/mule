@@ -113,6 +113,9 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     private Scheduler flowDispatchScheduler;
 
+    private final int sinksCount = getSinksCount();
+    private final AtomicInteger disposedEmittersCount = new AtomicInteger(0);
+
     public StreamEmitterProcessingStrategy(int bufferSize,
                                            int subscribers,
                                            Supplier<Scheduler> flowDispatchSchedulerSupplier,
@@ -138,11 +141,13 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     protected void stopSchedulers() {
-      try {
-        super.stopSchedulers();
-      } finally {
-        if (flowDispatchScheduler != null) {
-          flowDispatchScheduler.stop();
+      if (disposedEmittersCount.addAndGet(1) == sinksCount) {
+        try {
+          super.stopSchedulers();
+        } finally {
+          if (flowDispatchScheduler != null) {
+            flowDispatchScheduler.stop();
+          }
         }
       }
     }
@@ -150,7 +155,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     @Override
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor function) {
       final long shutdownTimeout = flowConstruct.getMuleContext().getConfiguration().getShutdownTimeout();
-      final int sinksCount = getSinksCount();
+
       List<ReactorSink<CoreEvent>> sinks = new ArrayList<>();
 
       for (int i = 0; i < sinksCount; i++) {
