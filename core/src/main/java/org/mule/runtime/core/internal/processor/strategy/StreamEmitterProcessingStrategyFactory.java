@@ -111,7 +111,11 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
             ? v
             : MIN_VALUE;
 
+    private final int sinksCount;
+    private final AtomicInteger disposedEmittersCount = new AtomicInteger(0);
+
     private Scheduler flowDispatchScheduler;
+
 
     public StreamEmitterProcessingStrategy(int bufferSize,
                                            int subscribers,
@@ -123,6 +127,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       super(subscribers, cpuLightSchedulerSupplier, parallelism, maxConcurrency, maxConcurrencyEagerCheck);
       this.bufferSize = bufferSize;
       this.flowDispatchSchedulerSupplier = flowDispatchSchedulerSupplier;
+      this.sinksCount = getSinksCount();
     }
 
     @Override
@@ -133,11 +138,18 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     public void stop() throws MuleException {
-      try {
-        super.stop();
-      } finally {
-        if (flowDispatchScheduler != null) {
-          flowDispatchScheduler.stop();
+      // do nothing as the stop is to actually be performed after the emitter termination
+    }
+
+    @Override
+    protected void stopSchedulers() {
+      if (disposedEmittersCount.addAndGet(1) == sinksCount) {
+        try {
+          super.stopSchedulers();
+        } finally {
+          if (flowDispatchScheduler != null) {
+            flowDispatchScheduler.stop();
+          }
         }
       }
     }
@@ -145,13 +157,14 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     @Override
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor function) {
       final long shutdownTimeout = flowConstruct.getMuleContext().getConfiguration().getShutdownTimeout();
-      final int sinksCount = getSinksCount();
+
       List<ReactorSink<CoreEvent>> sinks = new ArrayList<>();
 
       for (int i = 0; i < sinksCount; i++) {
         Latch completionLatch = new Latch();
         EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(getBufferQueueSize());
         AtomicReference<Throwable> failedSubscriptionCause = new AtomicReference<>();
+        processor.doAfterTerminate(this::stopSchedulers);
         processor.transform(function).subscribe(null, getThrowableConsumer(completionLatch, failedSubscriptionCause),
                                                 () -> completionLatch.release());
 
@@ -256,7 +269,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     protected int getBufferQueueSize() {
-      return bufferSize / getSinksCount();
+      return bufferSize / sinksCount;
     }
 
     static class RoundRobinReactorSink<E> implements AbstractProcessingStrategy.ReactorSink<E> {
