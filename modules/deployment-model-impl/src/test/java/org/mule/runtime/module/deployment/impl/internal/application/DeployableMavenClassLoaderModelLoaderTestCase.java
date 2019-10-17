@@ -15,6 +15,7 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.toFile;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.everyItem;
@@ -185,6 +186,59 @@ public class DeployableMavenClassLoaderModelLoaderTestCase {
     copyFile(simpleClassInternal, new File(internalPackageFolder, "SimpleClass.class"), false);
 
     doTestPackagesResourcesLoaded(appUrl, true);
+  }
+
+  @Test
+  public void classLoaderModel120WithSharedDepsWithMissingPackagesAndResourcesIsCorrectlyLoaded() throws Exception {
+    validateMissingPackagesAndResources("classloader-model-120-with-shared-deps-empty-packages");
+  }
+
+  @Test
+  public void classLoaderModel120WithAdditionalDepsWithMissingPackagesAndResourcesIsCorrectlyLoaded() throws Exception {
+    validateMissingPackagesAndResources("classloader-model-120-additional-deps-empty-packages");
+  }
+
+  private void validateMissingPackagesAndResources(String appName) throws Exception {
+    ClassLoaderModel classLoaderModel = buildClassLoaderModel(
+                                                              toFile(
+                                                                     getClass().getClassLoader().getResource(Paths
+                                                                         .get(APPS_FOLDER, appName).toString())),
+                                                              ImmutableMap.of(EXPORTED_PACKAGES,
+                                                                              ImmutableList.of("com.mycompany.api"),
+                                                                              EXPORTED_RESOURCES,
+                                                                              ImmutableList.of("tls.properties")),
+                                                              false);
+
+    Optional<BundleDependency> mulePluginBundleDependency = classLoaderModel.getDependencies().stream().filter(
+                                                                                                               bundleDependency -> "mule-plugin"
+                                                                                                                   .equals(bundleDependency
+                                                                                                                       .getDescriptor()
+                                                                                                                       .getClassifier()
+                                                                                                                       .orElse(null)))
+        .findFirst();
+    assertThat(mulePluginBundleDependency.isPresent(), is(true));
+
+    BundleDependency bundleDependency = mulePluginBundleDependency.get();
+
+    ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor("app");
+    applicationDescriptor.setClassLoaderModel(classLoaderModel);
+    PluginExtendedDeploymentProperties pluginExtendedDeploymentProperties =
+        new PluginExtendedDeploymentProperties(new Properties(), bundleDependency.getDescriptor(), applicationDescriptor);
+    PluginExtendedClassLoaderModelAttributes pluginExtendedClassLoaderModelAttributes =
+        new PluginExtendedClassLoaderModelAttributes(pluginExtendedDeploymentProperties, applicationDescriptor);
+    pluginExtendedClassLoaderModelAttributes.put(org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.class.getName(),
+                                                 bundleDependency.getDescriptor());
+
+    pluginExtendedClassLoaderModelAttributes.put(EXPORTED_PACKAGES, ImmutableList.of("org.mule.tests.simple.plugin.api"));
+    pluginExtendedClassLoaderModelAttributes.put(EXPORTED_RESOURCES, ImmutableList.of("simple-plugin.properties"));
+
+    ClassLoaderModel pluginClassLoaderModel =
+        buildPluginClassLoaderModel(toFile(bundleDependency.getBundleUri().toURL()), pluginExtendedClassLoaderModelAttributes);
+    assertThat(pluginClassLoaderModel.getLocalPackages(), everyItem(not(isIn(newArrayList("org.mule.tests.simple.plugin.api")))));
+    assertThat(pluginClassLoaderModel.getLocalPackages(), contains("org.mule.tests.simple.plugin.internal"));
+
+    assertThat(pluginClassLoaderModel.getLocalResources(), everyItem(not(isIn(newArrayList("simple-plugin.properties")))));
+    assertThat(pluginClassLoaderModel.getLocalResources(), contains("META-INF/simple-plugin/internal.txt"));
   }
 
   @Test

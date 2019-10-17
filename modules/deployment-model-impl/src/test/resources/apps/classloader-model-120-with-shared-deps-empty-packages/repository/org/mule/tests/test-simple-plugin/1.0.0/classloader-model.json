@@ -1,0 +1,19 @@
+{
+  "version": "1.2.0",
+  "artifactCoordinates": {
+    "groupId": "org.mule.tests",
+    "artifactId": "test-simple-plugin",
+    "version": "1.0.0",
+    "type": "jar",
+    "classifier": "mule-plugin"
+  },
+  "dependencies": [],
+  "packages": [
+    "org.mule.tests.simple.plugin.api",
+    "org.mule.tests.simple.plugin.internal"
+  ],
+  "resources": [
+    "simple-plugin.properties",
+    "META-INF/simple-plugin/internal.txt"
+  ]
+}
