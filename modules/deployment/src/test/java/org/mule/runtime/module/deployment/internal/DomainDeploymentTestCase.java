@@ -38,7 +38,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
-import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
+
 import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
@@ -812,8 +812,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
                             new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
                                                       getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
-    executeApplicationFlow("main");
-    assertThat(invocationCount, equalTo(1));
+    assertManualExecutionsCount(1);
   }
 
   @Test
@@ -841,8 +840,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
                             new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
                                                       getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
-    executeApplicationFlow("main");
-    assertThat(invocationCount, equalTo(1));
+    assertManualExecutionsCount(1);
   }
 
   @Test
@@ -871,8 +869,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
                             new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
                                                       getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
-    executeApplicationFlow("main");
-    assertThat(invocationCount, equalTo(1));
+    assertManualExecutionsCount(1);
   }
 
   @Ignore("MULE-15842: fix once we support declaring share objects plugins in policies")

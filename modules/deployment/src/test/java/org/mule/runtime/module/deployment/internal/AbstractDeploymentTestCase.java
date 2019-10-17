@@ -73,6 +73,7 @@ import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
+import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.correlationIdCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.invocationCount;
 import static org.mule.runtime.module.deployment.internal.TestPolicyProcessor.policyParametrization;
 import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
@@ -196,6 +197,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static final int ONE_HOUR_IN_MILLISECONDS = 3600000;
   protected static final String MULE_POLICY_CLASSIFIER = "mule-policy";
   protected static final String MULE_EXTENSION_CLASSIFIER = "mule-plugin";
+  protected static final String MANUAL_EXECUTION_CORRELATION_ID = "manualExecution";
 
   // Resources
   protected static final String MULE_CONFIG_XML_FILE = "mule-config.xml";
@@ -482,6 +484,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                                                               ArtifactDescriptorValidatorBuilder.builder()));
     // Reset test component state
     invocationCount = 0;
+    correlationIdCount.clear();
     policyParametrization = "";
   }
 
@@ -1268,11 +1271,26 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected void executeApplicationFlow(String flowName) throws Exception {
+    executeApplicationFlow(flowName, null);
+  }
+
+  protected void executeApplicationFlow(String flowName, String correlationId) throws Exception {
     ClassLoader appClassLoader = deploymentService.getApplications().get(0).getArtifactClassLoader().getClassLoader();
     withContextClassLoader(appClassLoader, () -> {
-      final FlowRunner flowRunner = new FlowRunner(deploymentService.getApplications().get(0).getRegistry(), flowName);
-      CoreEvent result = flowRunner.withPayload(TEST_MESSAGE).run();
-      flowRunner.dispose();
+      final FlowRunner flowRunner = new FlowRunner(deploymentService.getApplications().get(0).getRegistry(), flowName)
+          .withPayload(TEST_MESSAGE);
+
+      if (correlationId != null) {
+        flowRunner.withSourceCorrelationId(correlationId);
+      }
+
+      CoreEvent result;
+      try {
+        result = flowRunner.run();
+      } finally {
+        flowRunner.dispose();
+      }
+
       assertThat(currentThread().getContextClassLoader(), sameInstance(appClassLoader));
 
       return result;
@@ -1579,7 +1597,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
    * Updates a file's last modified time to be greater than the original timestamp
    *
    * @param timestamp time value in milliseconds of the original file's last modified time
-   * @param file file to update
+   * @param file      file to update
    */
   protected void updateFileModifiedTime(long timestamp, File file) {
     do {
@@ -1589,6 +1607,16 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected void resetUndeployLatch() {
     undeployLatch = new Latch();
+  }
+
+  protected void assertManualExecutionsCount(int expectedInvokations) throws Exception {
+    executeApplicationFlow("main", MANUAL_EXECUTION_CORRELATION_ID);
+    if (expectedInvokations > 0) {
+      assertThat(correlationIdCount.containsKey(MANUAL_EXECUTION_CORRELATION_ID), is(true));
+      assertThat(correlationIdCount.get(MANUAL_EXECUTION_CORRELATION_ID).get(), is(expectedInvokations));
+    } else {
+      assertThat(correlationIdCount.containsKey(MANUAL_EXECUTION_CORRELATION_ID), is(false));
+    }
   }
 
   private static class TestMuleDeploymentService extends MuleDeploymentService {
