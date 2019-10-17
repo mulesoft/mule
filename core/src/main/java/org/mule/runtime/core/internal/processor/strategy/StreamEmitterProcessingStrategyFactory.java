@@ -111,10 +111,11 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
             ? v
             : MIN_VALUE;
 
+    private final int sinksCount;
+    private final AtomicInteger disposedEmittersCount = new AtomicInteger(0);
+
     private Scheduler flowDispatchScheduler;
 
-    private final int sinksCount = getSinksCount();
-    private final AtomicInteger disposedEmittersCount = new AtomicInteger(0);
 
     public StreamEmitterProcessingStrategy(int bufferSize,
                                            int subscribers,
@@ -126,6 +127,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       super(subscribers, cpuLightSchedulerSupplier, parallelism, maxConcurrency, maxConcurrencyEagerCheck);
       this.bufferSize = bufferSize;
       this.flowDispatchSchedulerSupplier = flowDispatchSchedulerSupplier;
+      this.sinksCount = getSinksCount();
     }
 
     @Override
@@ -267,7 +269,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     protected int getBufferQueueSize() {
-      return bufferSize / getSinksCount();
+      return bufferSize / sinksCount;
     }
 
     static class RoundRobinReactorSink<E> implements AbstractProcessingStrategy.ReactorSink<E> {
