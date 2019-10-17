@@ -112,6 +112,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
             : MIN_VALUE;
 
     private final int sinksCount;
+    private boolean sinkCreated = false;
     private final AtomicInteger disposedEmittersCount = new AtomicInteger(0);
 
     private Scheduler flowDispatchScheduler;
@@ -138,20 +139,28 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     public void stop() throws MuleException {
-      // do nothing as the stop is to actually be performed after the emitter termination
+      if (!sinkCreated) {
+        stopSchedulersIfNeeded();
+      }
     }
 
     @Override
-    protected void stopSchedulers() {
-      if (disposedEmittersCount.addAndGet(1) == sinksCount) {
+    protected boolean stopSchedulersIfNeeded() {
+      boolean shouldStop = sinkCreated
+          ? disposedEmittersCount.addAndGet(1) == sinksCount
+          : true;
+
+      if (shouldStop) {
         try {
-          super.stopSchedulers();
+          super.stopSchedulersIfNeeded();
         } finally {
           if (flowDispatchScheduler != null) {
             flowDispatchScheduler.stop();
           }
         }
       }
+
+      return shouldStop;
     }
 
     @Override
@@ -164,9 +173,10 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
         Latch completionLatch = new Latch();
         EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(getBufferQueueSize());
         AtomicReference<Throwable> failedSubscriptionCause = new AtomicReference<>();
-        processor.doAfterTerminate(this::stopSchedulers);
-        processor.transform(function).subscribe(null, getThrowableConsumer(completionLatch, failedSubscriptionCause),
-                                                () -> completionLatch.release());
+        processor.transform(function)
+            .doAfterTerminate(this::stopSchedulersIfNeeded)
+            .subscribe(null, getThrowableConsumer(completionLatch, failedSubscriptionCause),
+                       () -> completionLatch.release());
 
         if (!processor.hasDownstreams()) {
           throw resolveSubscriptionErrorCause(failedSubscriptionCause);
@@ -180,6 +190,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
         sinks.add(sink);
       }
 
+      sinkCreated = true;
       return new RoundRobinReactorSink<>(sinks);
     }
 

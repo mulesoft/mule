@@ -134,14 +134,20 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
     }
 
     @Override
-    public void stop() throws MuleException {
-      super.stop();
-      if (blockingScheduler != null) {
-        blockingScheduler.stop();
+    protected boolean stopSchedulersIfNeeded() {
+      if (super.stopSchedulersIfNeeded()) {
+
+        if (blockingScheduler != null) {
+          blockingScheduler.stop();
+        }
+        if (cpuIntensiveScheduler != null) {
+          cpuIntensiveScheduler.stop();
+        }
+
+        return true;
       }
-      if (cpuIntensiveScheduler != null) {
-        cpuIntensiveScheduler.stop();
-      }
+
+      return false;
     }
 
     @Override
