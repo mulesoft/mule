@@ -140,19 +140,19 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     @Override
     public void stop() throws MuleException {
       if (!sinkCreated) {
-        stopSchedulers();
+        stopSchedulersIfNeeded();
       }
     }
 
     @Override
-    protected boolean stopSchedulers() {
+    protected boolean stopSchedulersIfNeeded() {
       boolean shouldStop = sinkCreated
           ? disposedEmittersCount.addAndGet(1) == sinksCount
           : true;
 
       if (shouldStop) {
         try {
-          super.stopSchedulers();
+          super.stopSchedulersIfNeeded();
         } finally {
           if (flowDispatchScheduler != null) {
             flowDispatchScheduler.stop();
@@ -174,7 +174,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
         EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(getBufferQueueSize());
         AtomicReference<Throwable> failedSubscriptionCause = new AtomicReference<>();
         processor.transform(function)
-            .doAfterTerminate(this::stopSchedulers)
+            .doAfterTerminate(this::stopSchedulersIfNeeded)
             .subscribe(null, getThrowableConsumer(completionLatch, failedSubscriptionCause),
                        () -> completionLatch.release());
 

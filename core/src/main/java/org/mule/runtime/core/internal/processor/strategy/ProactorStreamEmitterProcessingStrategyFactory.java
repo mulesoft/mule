@@ -134,8 +134,8 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
     }
 
     @Override
-    protected boolean stopSchedulers() {
-      if (super.stopSchedulers()) {
+    protected boolean stopSchedulersIfNeeded() {
+      if (super.stopSchedulersIfNeeded()) {
 
         if (blockingScheduler != null) {
           blockingScheduler.stop();

@@ -116,15 +116,15 @@ abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamPro
 
   @Override
   public void stop() throws MuleException {
-    stopSchedulers();
+    stopSchedulersIfNeeded();
   }
 
   /**
    * Stops all schedulers that should be stopped by this ProcessingStrategy
    *
-   * @return whether or not any scheduler were stopped
+   * @return whether or not it was needed or not
    */
-  protected boolean stopSchedulers() {
+  protected boolean stopSchedulersIfNeeded() {
     if (cpuLightScheduler != null) {
       cpuLightScheduler.stop();
     }
