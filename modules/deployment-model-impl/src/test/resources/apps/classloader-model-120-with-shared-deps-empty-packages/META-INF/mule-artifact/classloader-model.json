@@ -1,0 +1,42 @@
+{
+  "version": "1.2.0",
+  "artifactCoordinates": {
+    "groupId": "com.mycompany",
+    "artifactId": "classLoaderModel120SharedDepsEmptyPackages",
+    "version": "1.0.0-SNAPSHOT",
+    "type": "jar"
+  },
+  "dependencies": [
+    {
+      "artifactCoordinates": {
+        "groupId": "org.mule.tests",
+        "artifactId": "test-simple-plugin",
+        "version": "1.0.0",
+        "type": "jar",
+        "classifier": "mule-plugin"
+      },
+      "uri": "repository/org/mule/tests/test-simple-plugin/1.0.0/test-simple-plugin-1.0-mule-plugin.jar"
+    },
+    {
+      "artifactCoordinates": {
+        "groupId": "commons-csv",
+        "artifactId": "commons-csv",
+        "version": "1.5",
+        "type": "jar"
+      },
+      "uri": "repository/commons-csv/commons-csv/1.5/commons-csv-1.5.jar",
+      "isShared": true
+    }
+  ],
+  "packages": [
+    "com.mycompany.api",
+    "com.mycompany.internal"
+  ],
+  "resources": [
+    "META-INF/maven/com/mycompany/test/pom.properties",
+    "META-INF/maven/com/mycompany/test/pom.xml",
+    "META-INF/mule-artifact/classloader-model.json",
+    "META-INF/mule-artifact/mule-artifact.json",
+    "tls.properties"
+  ]
+}

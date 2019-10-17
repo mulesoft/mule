@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.maven;
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderModelLoader.CLASS_LOADER_MODEL_VERSION_120;
@@ -128,8 +129,10 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
             .setType(artifact.getArtifactCoordinates().getType())
             .build());
     if (isSupportingPackagesResourcesInformation()) {
-      bundleDependencyBuilder.setPackages(new HashSet<>(asList(artifact.getPackages())));
-      bundleDependencyBuilder.setResources(new HashSet<>(asList(artifact.getResources())));
+      bundleDependencyBuilder
+          .setPackages(artifact.getPackages() == null ? emptySet() : new HashSet<>(asList(artifact.getPackages())));
+      bundleDependencyBuilder
+          .setResources(artifact.getResources() == null ? emptySet() : new HashSet<>(asList(artifact.getResources())));
     }
     return bundleDependencyBuilder.build();
   }
@@ -149,8 +152,9 @@ public class HeavyweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
                                                                sharedDep.getArtifactCoordinates().getArtifactId()))
         .forEach(sharedDep -> {
           if (isSupportingPackagesResourcesInformation()) {
-            this.exportingPackages(new HashSet<>(asList(sharedDep.getPackages())));
-            this.exportingResources(new HashSet<>(asList(sharedDep.getResources())));
+            this.exportingPackages(sharedDep.getPackages() == null ? emptySet() : new HashSet<>(asList(sharedDep.getPackages())));
+            this.exportingResources(sharedDep.getResources() == null ? emptySet()
+                : new HashSet<>(asList(sharedDep.getResources())));
           } else {
             findAndExportSharedLibrary(sharedDep.getArtifactCoordinates().getGroupId(),
                                        sharedDep.getArtifactCoordinates().getArtifactId());
