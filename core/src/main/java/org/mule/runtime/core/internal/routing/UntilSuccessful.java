@@ -10,19 +10,20 @@ import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
-import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -43,6 +44,7 @@ import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
+import org.mule.runtime.core.privileged.processor.MessageProcessors;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
@@ -60,11 +62,12 @@ import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.retry.RetryExhaustedException;
 
 /**
- * UntilSuccessful attempts to route a message to the message processor it contains. Routing is considered successful if no
- * exception has been raised and, optionally, if the response matches an expression.
+ * UntilSuccessful attempts to downstreamFlux a message to the message processor it contains. Routing is considered successful if
+ * no exception has been raised and, optionally, if the response matches an expression.
  */
 public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
@@ -177,24 +180,17 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
       maxRetries = maxRetriesEvaluated;
       delay = chosenDuration;
     }
-
-
-    int retriesAttempted() {
-      return maxRetries - retryCount.get() + 1;
-
-    }
-
   }
 
-  class UntilSuccRouter {
+  class UntilSuccessfulRouter {
 
-    Flux<CoreEvent> router;
+    Flux<CoreEvent> upstreamFlux;
     FluxSinkRecorder<CoreEvent> recorder = new FluxSinkRecorder<>();
-    Flux<CoreEvent> route;
+    Flux<CoreEvent> downstreamFlux;
     RetryContext currentContext;
 
-    UntilSuccRouter(Publisher<CoreEvent> publisher) {
-      router = Flux.from(publisher)
+    UntilSuccessfulRouter(Publisher<CoreEvent> publisher) {
+      upstreamFlux = Flux.from(publisher)
           .doOnNext(event -> {
             // publish event
 
@@ -212,7 +208,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
       reactor.core.scheduler.Scheduler reactorRetryScheduler =
           fromExecutorService(new ConditionalExecutorServiceDecorator(timer, s -> isTransactional.get()));
 
-      route = Flux.create(recorder)
+      downstreamFlux = Flux.create(recorder)
           .transform(publisher1 -> applyWithChildContext(Flux.from(publisher1), nestedChain,
                                                          Optional.of(UntilSuccessful.this.getLocation())))
           // Have to check if the context reaches the onErrorContinue
@@ -229,28 +225,34 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
             }
           })
           .onErrorMap(RetryExhaustedException.class,
-                      re -> getThrowableFunction(currentContext.event).apply(unwrap(re.getCause())));
-
-      // .delayElements(currentContext.delay, reactorRetryScheduler);
-    }
-
-    Publisher<CoreEvent> assemblePublisher() {
-
-      return route
-          .doOnSubscribe(subscription -> router.subscribe());
-
+                      re -> getThrowableFunction(currentContext.event).apply(unwrap(re.getCause())))
+          // .concatMap(event -> Mono.just(event).delayElement(currentContext.delay, reactorRetryScheduler))
+          .doOnComplete(() -> System.out.println("hola perris"));
     }
   }
 
 
   public Publisher<CoreEvent> alternativeApply(Publisher<CoreEvent> publisher) {
-    UntilSuccRouter router = new UntilSuccRouter(publisher);
-    return Flux.merge(subscribeFluxOnPublisherSubscription(router.route, router.router));
+    UntilSuccessfulRouter router = new UntilSuccessfulRouter(publisher);
+
+    return router.downstreamFlux.compose(eventPub -> Mono.subscriberContext()
+        .flatMapMany(ctx -> eventPub.doOnSubscribe(s -> router.upstreamFlux.subscriberContext(ctx).subscribe())));
+
+    // return subscribeFluxOnPublisherSubscription(router.downstreamFlux, router.upstreamFlux);
   }
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return alternativeApply(publisher);
+    // return mule4xApply(publisher);
+  }
+
+  public Publisher<CoreEvent> mule4xApply(Publisher<CoreEvent> publisher) {
+    return from(publisher)
+        .flatMap(event -> Mono
+            .from(MessageProcessors.processWithChildContextDontComplete(event, nestedChain, ofNullable(getLocation())))
+            .transform(p -> fetchPolicyTemplate(event).applyPolicy(p, getRetryPredicate(), e -> {
+            }, getThrowableFunction(event), timer)));
   }
 
   private Predicate<Throwable> getRetryPredicate() {
@@ -273,7 +275,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   }
 
   /**
-   * @return the number of retries to process the route when failing. Default value is 5.
+   * @return the number of retries to process the downstreamFlux when failing. Default value is 5.
    */
   public String getMaxRetries() {
     return maxRetries;
@@ -281,7 +283,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   /**
    *
-   * @param maxRetries the number of retries to process the route when failing. Default value is 5.
+   * @param maxRetries the number of retries to process the downstreamFlux when failing. Default value is 5.
    */
   public void setMaxRetries(final String maxRetries) {
     this.maxRetries = maxRetries;
