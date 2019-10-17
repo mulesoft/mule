@@ -119,10 +119,17 @@ abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamPro
     stopSchedulers();
   }
 
-  protected void stopSchedulers() {
+  /**
+   * Stops all schedulers that should be stopped by this ProcessingStrategy
+   *
+   * @return whether or not any scheduler were stopped
+   */
+  protected boolean stopSchedulers() {
     if (cpuLightScheduler != null) {
       cpuLightScheduler.stop();
     }
+
+    return true;
   }
 
   protected Scheduler getCpuLightScheduler() {
