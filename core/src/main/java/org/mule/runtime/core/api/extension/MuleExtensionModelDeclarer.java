@@ -65,6 +65,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -181,7 +182,7 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("ref")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("@Deprecated since 4.0. Only meant to be used for backward compatibility. " +
+        .describedAs("@Deprecated since 4.0. Only meant to be used for backwards compatibility. " +
             "Reference to another object defined in the mule configuration or any other provider of objects.");
 
     object.onDefaultParameterGroup()
