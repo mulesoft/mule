@@ -30,7 +30,7 @@ public abstract class AbstractSessionHandler implements SessionHandler
 
     protected <T> T deserialize(MuleMessage message, byte[] bytes)
     {
-        ObjectSerializer objectSerializer = serSerializerClass(objectSerializerLocator.getObjectSerializer(message), MuleSession.class);
+        ObjectSerializer objectSerializer = setSerializerClass(objectSerializerLocator.getObjectSerializer(message), MuleSession.class);
         T object = objectSerializer.deserialize(bytes, message.getMuleContext().getExecutionClassLoader());
         if (object instanceof DeserializationPostInitialisable)
         {
@@ -47,7 +47,7 @@ public abstract class AbstractSessionHandler implements SessionHandler
         return object;
     }
 
-    private ObjectSerializer serSerializerClass(ObjectSerializer serializer, Class clazz)
+    private ObjectSerializer setSerializerClass(ObjectSerializer serializer, Class clazz)
     {
         if (serializer instanceof ClassSpecificObjectSerializer)
         {
