@@ -175,7 +175,7 @@ class MuleExtensionModelDeclarer {
         .allowingTopLevelDefinition()
         .describedAs("Element to declare a java object. Objects declared globally can be referenced from other parts of the " +
             "configuration or recovered programmatically through org.mule.runtime.api.artifact.Registry.")
-        .withDeprecation(new ImmutableDeprecationModel("Only meant to be used for backward compatibility.", "4.0", "5.0"));
+        .withDeprecation(new ImmutableDeprecationModel("Only meant to be used for backwards compatibility.", "4.0", "5.0"));
 
     object.onDefaultParameterGroup()
         .withOptionalParameter("name")
@@ -187,7 +187,7 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("ref")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("@Deprecated since 4.0. Only meant to be used for backward compatibility. " +
+        .describedAs("@Deprecated since 4.0. Only meant to be used for backwards compatibility. " +
             "Reference to another object defined in the mule configuration or any other provider of objects.");
 
     object.onDefaultParameterGroup()
