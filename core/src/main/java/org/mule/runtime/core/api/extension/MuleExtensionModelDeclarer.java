@@ -137,7 +137,7 @@ class MuleExtensionModelDeclarer {
     // constructs
     declareObject(extensionDeclarer, typeLoader);
     declareFlow(extensionDeclarer, typeLoader);
-    declareSubflow(extensionDeclarer);
+    declareSubflow(extensionDeclarer, typeLoader);
     declareChoice(extensionDeclarer, typeLoader);
     declareErrorHandler(extensionDeclarer, typeLoader);
     declareTry(extensionDeclarer, typeLoader);
@@ -552,8 +552,10 @@ class MuleExtensionModelDeclarer {
         .allowingTopLevelDefinition()
         .withStereotype(FLOW);
 
-    flow.onDefaultParameterGroup().withRequiredParameter("name").asComponentId()
-        .ofType(BaseTypeBuilder.create(JAVA).stringType().build());
+    flow.onDefaultParameterGroup()
+        .withRequiredParameter("name")
+        .asComponentId()
+        .ofType(typeLoader.load(String.class));
     flow.onDefaultParameterGroup().withOptionalParameter("initialState").defaultingTo("started")
         .ofType(BaseTypeBuilder.create(JAVA).stringType().enumOf("started", "stopped").build());
     flow.onDefaultParameterGroup().withOptionalParameter("maxConcurrency")
@@ -568,13 +570,15 @@ class MuleExtensionModelDeclarer {
 
   }
 
-  private void declareSubflow(ExtensionDeclarer extensionDeclarer) {
+  private void declareSubflow(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer subFlow = extensionDeclarer.withConstruct("subFlow")
         .allowingTopLevelDefinition()
         .withStereotype(SUB_FLOW);
 
-    subFlow.onDefaultParameterGroup().withRequiredParameter("name").asComponentId()
-        .ofType(BaseTypeBuilder.create(JAVA).stringType().build());
+    subFlow.onDefaultParameterGroup()
+        .withRequiredParameter("name")
+        .asComponentId()
+        .ofType(typeLoader.load(String.class));
     subFlow.withChain().setRequired(true).withAllowedStereotypes(PROCESSOR);
   }
 
@@ -711,8 +715,10 @@ class MuleExtensionModelDeclarer {
         .describedAs("Allows the definition of internal selective handlers. It will route the error to the first handler that matches it."
             + " If there's no match, then a default error handler will be executed.");
 
-    errorHandler.onDefaultParameterGroup().withRequiredParameter("name").asComponentId()
-        .ofType(BaseTypeBuilder.create(JAVA).stringType().build());
+    errorHandler.onDefaultParameterGroup()
+        .withRequiredParameter("name")
+        .asComponentId()
+        .ofType(typeLoader.load(String.class));
 
     errorHandler.onDefaultParameterGroup()
         .withOptionalParameter("ref")

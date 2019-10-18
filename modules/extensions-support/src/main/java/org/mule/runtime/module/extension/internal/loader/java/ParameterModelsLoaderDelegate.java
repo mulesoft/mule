@@ -99,7 +99,7 @@ public final class ParameterModelsLoaderDelegate {
                                          ParameterDeclarationContext declarationContext,
                                          ParameterGroupDeclarer parameterGroupDeclarer) {
     List<ParameterDeclarer> declarerList = new ArrayList<>();
-    checkAnnotationsNotUsedMoreThanOnce(parameters, ComponentId.class, Connection.class, Config.class, MetadataKeyId.class);
+    checkAnnotationsNotUsedMoreThanOnce(parameters, Connection.class, Config.class, MetadataKeyId.class);
 
     boolean supportsNestedElements = component instanceof HasNestedComponentsDeclarer;
     for (ExtensionParameter extensionParameter : parameters) {
@@ -156,6 +156,7 @@ public final class ParameterModelsLoaderDelegate {
           .filter(p -> p.getDeclaration().getName().equals("name")
               && p.getDeclaration().isRequired()
               && p.getDeclaration().getExpressionSupport() == NOT_SUPPORTED
+              && p.getDeclaration().getType().equals(typeLoader.load(String.class))
               && p.getDeclaration().getAllowedStereotypeModels().isEmpty())
           .forEach(p -> p.asComponentId());
     }

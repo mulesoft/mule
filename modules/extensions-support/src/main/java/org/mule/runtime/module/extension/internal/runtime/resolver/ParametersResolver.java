@@ -55,12 +55,11 @@ import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.exception.RequiredParameterNotSetException;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ExclusiveParameterGroupObjectBuilder;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-
-import com.google.common.base.Joiner;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -72,6 +71,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.google.common.base.Joiner;
 
 /**
  * Contains behavior to obtain a ResolverSet for a set of parameters values and a {@link ParameterizedModel}.
@@ -220,7 +221,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       throws ConfigurationException {
     Map<String, String> aliasedParameterNames = new HashMap<>();
     parameterModels.forEach(p -> {
-      if (!p.isComponentId()) {
+      if (!p.isComponentId() || p.getModelProperty(ExtensionParameterDescriptorModelProperty.class).isPresent()) {
         final String parameterName = getMemberName(p, p.getName());
         if (!parameterName.equals(p.getName())) {
           aliasedParameterNames.put(parameterName, p.getName());

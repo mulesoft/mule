@@ -15,12 +15,10 @@ import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 
-import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
@@ -39,6 +37,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.declaration.type.annotation.ExpressionSupportAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
@@ -50,20 +49,24 @@ import java.util.Set;
 
 class MetadataTypeModelAdapter implements ParameterizedModel {
 
-  static Optional<MetadataTypeModelAdapter> createMetadataTypeModelAdapterWithSterotype(MetadataType type) {
+  static Optional<MetadataTypeModelAdapter> createMetadataTypeModelAdapterWithSterotype(MetadataType type,
+                                                                                        ExtensionModelHelper extensionModelHelper) {
     return type.getAnnotation(StereotypeTypeAnnotation.class)
         .flatMap(sta -> sta.getAllowedStereotypes().stream().findFirst())
-        .map(st -> new MetadataTypeModelAdapterWithStereotype(type, st));
+        .map(st -> new MetadataTypeModelAdapterWithStereotype(type, st, extensionModelHelper));
   }
 
-  static MetadataTypeModelAdapter createParameterizedTypeModelAdapter(MetadataType type) {
-    return new MetadataTypeModelAdapter(type);
+  static MetadataTypeModelAdapter createParameterizedTypeModelAdapter(MetadataType type,
+                                                                      ExtensionModelHelper extensionModelHelper) {
+    return new MetadataTypeModelAdapter(type, extensionModelHelper);
   }
 
   private final MetadataType type;
+  private final MetadataType stringType;
 
-  private MetadataTypeModelAdapter(MetadataType type) {
+  private MetadataTypeModelAdapter(MetadataType type, ExtensionModelHelper extensionModelHelper) {
     this.type = type;
+    this.stringType = extensionModelHelper.findMetadataType(String.class).orElse(null);
   }
 
   @Override
@@ -79,7 +82,7 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
   @Override
   public List<ParameterGroupModel> getParameterGroupModels() {
     if (type instanceof ObjectType) {
-      return singletonList(new ObjectTypeAsParameterGroupAdapter((ObjectType) type));
+      return singletonList(new ObjectTypeAsParameterGroupAdapter((ObjectType) type, stringType));
     } else {
       return emptyList();
     }
@@ -89,8 +92,9 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
 
     private final StereotypeModel stereotype;
 
-    private MetadataTypeModelAdapterWithStereotype(MetadataType type, StereotypeModel stereotype) {
-      super(type);
+    private MetadataTypeModelAdapterWithStereotype(MetadataType type, StereotypeModel stereotype,
+                                                   ExtensionModelHelper extensionModelHelper) {
+      super(type, extensionModelHelper);
       this.stereotype = stereotype;
     }
 
@@ -107,7 +111,7 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
     private final Map<String, ParameterModel> parameterModelsByName;
     private final List<ParameterModel> parameterModels;
 
-    public ObjectTypeAsParameterGroupAdapter(ObjectType adaptedType) {
+    public ObjectTypeAsParameterGroupAdapter(ObjectType adaptedType, MetadataType stringType) {
       this.adaptedType = adaptedType;
 
       final List<ParameterModel> tempParameterModels = adaptedType.getFields().stream()
@@ -120,7 +124,7 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
 
       if (!parameterModelsByName.containsKey("name")) {
         final ImmutableParameterModel nameParam = new ImmutableParameterModel("name", "The name of this object in the DSL",
-                                                                              BaseTypeBuilder.create(JAVA).stringType().build(),
+                                                                              stringType,
                                                                               false, true, false, true, NOT_SUPPORTED,
                                                                               null, BEHAVIOUR, null, null, null, null,
                                                                               emptyList(), emptySet());

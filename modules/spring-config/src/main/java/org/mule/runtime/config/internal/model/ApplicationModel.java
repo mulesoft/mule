@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.model;
 
 import static com.google.common.base.Joiner.on;
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
@@ -322,10 +323,10 @@ public class ApplicationModel implements ArtifactAst {
     createEffectiveModel();
     indexComponentModels();
     validateModel(componentBuildingDefinitionRegistry);
+    extensionModelHelper = new ExtensionModelHelper(extensionModels);
     // TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart connectors
     // and crafted declared extension models)
     resolveComponentTypes();
-    extensionModelHelper = new ExtensionModelHelper(extensionModels);
     muleComponentModels.forEach(componentModel -> componentModel.resolveTypedComponentIdentifier(extensionModelHelper));
     final ComponentLocationVisitor clv = new ComponentLocationVisitor();
     recursiveStreamWithHierarchy().forEach(clv);
@@ -581,8 +582,10 @@ public class ApplicationModel implements ArtifactAst {
               @Override
               public void onFixedValue(Object value) {
                 if (value instanceof MetadataType) {
-                  componentModel.setMetadataTypeModelAdapter(createMetadataTypeModelAdapterWithSterotype((MetadataType) value)
-                      .orElse(createParameterizedTypeModelAdapter((MetadataType) value)));
+                  final MetadataTypeModelAdapter adapter =
+                      createMetadataTypeModelAdapterWithSterotype((MetadataType) value, extensionModelHelper)
+                          .orElse(createParameterizedTypeModelAdapter((MetadataType) value, extensionModelHelper));
+                  componentModel.setMetadataTypeModelAdapter(adapter);
                 }
               }
             });
@@ -593,7 +596,7 @@ public class ApplicationModel implements ArtifactAst {
           String classParameter = componentModel.getParameters().get(CLASS_ATTRIBUTE);
           if (classParameter != null) {
             try {
-              componentModel.setType(ClassUtils.loadClass(classParameter, Thread.currentThread().getContextClassLoader()));
+              componentModel.setType(ClassUtils.loadClass(classParameter, currentThread().getContextClassLoader()));
             } catch (ClassNotFoundException e) {
               throw new RuntimeConfigurationException(createStaticMessage(e.getMessage()), e);
             }
