@@ -46,8 +46,8 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
+
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.DateType;
@@ -57,7 +57,6 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.ExpressionSupport;
@@ -124,8 +123,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeValue
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
-import com.google.common.collect.ImmutableList;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -146,6 +143,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
+import com.google.common.collect.ImmutableList;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 import org.springframework.core.convert.ConversionService;
@@ -917,12 +915,6 @@ public abstract class ExtensionDefinitionParser {
       definitionBuilder = fromSimpleReferenceParameter(name);
 
     } else if (acceptsReferences && type instanceof ObjectType) {
-      definitionBuilder = fromSimpleReferenceParameter(name, typeConverter);
-
-    }
-    // Parameter is defined as Object therefore AnyType from Metadata
-    else if (acceptsReferences && type instanceof AnyType && type.getAnnotation(ClassInformationAnnotation.class)
-        .map(annotation -> annotation.getClassname().equals(Object.class.getName())).orElse(false)) {
       definitionBuilder = fromSimpleReferenceParameter(name, typeConverter);
 
     } else {
