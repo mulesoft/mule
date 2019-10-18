@@ -35,6 +35,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
@@ -54,6 +55,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -64,10 +66,11 @@ import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.retry.RetryExhaustedException;
+import reactor.util.context.Context;
 
 /**
- * UntilSuccessful attempts to downstreamFlux a message to the message processor it contains. Routing is considered successful if
- * no exception has been raised and, optionally, if the response matches an expression.
+ * UntilSuccessful attempts to innerFlux a message to the message processor it contains. Routing is considered successful if no
+ * exception has been raised and, optionally, if the response matches an expression.
  */
 public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
@@ -185,9 +188,12 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   class UntilSuccessfulRouter {
 
     Flux<CoreEvent> upstreamFlux;
-    FluxSinkRecorder<CoreEvent> recorder = new FluxSinkRecorder<>();
     Flux<CoreEvent> downstreamFlux;
+    FluxSinkRecorder<CoreEvent> innerRecorder = new FluxSinkRecorder<>();
+    FluxSinkRecorder<Either<CoreEvent, Throwable>> downstreamRecorder = new FluxSinkRecorder<>();
+    Flux<CoreEvent> innerFlux;
     RetryContext currentContext;
+    AtomicReference<reactor.util.context.Context> downstreamCtxRef = new AtomicReference<>();
 
     UntilSuccessfulRouter(Publisher<CoreEvent> publisher) {
       upstreamFlux = Flux.from(publisher)
@@ -196,21 +202,23 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
             currentContext = new RetryContext(event);
 
-            recorder.next(event);
+            innerRecorder.next(event);
           })
           .doOnComplete(() -> {
             // complete next stage of chain
             currentContext = null;
-            recorder.complete();
+            innerRecorder.complete();
           });
 
       final LazyValue<Boolean> isTransactional = new LazyValue<>(() -> isTransactionActive());
       reactor.core.scheduler.Scheduler reactorRetryScheduler =
           fromExecutorService(new ConditionalExecutorServiceDecorator(timer, s -> isTransactional.get()));
 
-      downstreamFlux = Flux.create(recorder)
+      innerFlux = Flux.create(innerRecorder)
           .transform(publisher1 -> applyWithChildContext(Flux.from(publisher1), nestedChain,
                                                          Optional.of(UntilSuccessful.this.getLocation())))
+          // Success, inject into downstream publisher
+          .doOnNext(successEvent -> downstreamRecorder.next(Either.left(successEvent)))
           // Have to check if the context reaches the onErrorContinue
           .onErrorContinue(getRetryPredicate(), (error, failureEvent) -> {
             int retriesLeft =
@@ -218,27 +226,56 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
             if (retriesLeft > 0) { // Retry
               LOGGER.error("Retrying execution of event, attempt {} of {}.", currentContext.maxRetries - retriesLeft + 1,
                            maxRetriesAsInteger != RETRY_COUNT_FOREVER ? currentContext.maxRetries : "unlimited");
-              recorder.next(currentContext.event);
+              innerRecorder.next(currentContext.event);
             } else { // Retries exhausted
               LOGGER.error("Retry attempts exhausted. Failing...");
-              throw propagate(new RetryExhaustedException(error));
+              Throwable resolvedError = getThrowableFunction(currentContext.event).apply(new RetryExhaustedException(error));
+              downstreamRecorder.next(Either.right(CoreEvent.class, resolvedError));
             }
           })
           .onErrorMap(RetryExhaustedException.class,
                       re -> getThrowableFunction(currentContext.event).apply(unwrap(re.getCause())))
-          // .concatMap(event -> Mono.just(event).delayElement(currentContext.delay, reactorRetryScheduler))
-          .doOnComplete(() -> System.out.println("hola perris"));
+          // TODO: Check how to implement this delay without the concatMap operator?
+          .concatMap(event -> Mono.just(event).delayElement(currentContext.delay, reactorRetryScheduler))
+          .doOnComplete(() -> downstreamRecorder.complete());
+
+      downstreamFlux = Flux.create(downstreamRecorder)
+          .map(either -> {
+            if (either.isLeft()) {
+              return either.getLeft();
+            } else {
+              throw propagate(either.getRight());
+            }
+          });
+
+
+      innerFlux =
+          routeSubscriptionAffectingCtxWith(upstreamFlux, innerFlux, innerCtx -> Context.empty().putAll(downstreamCtxRef.get()));
+
+      // Decorate all fluxes
+      downstreamFlux = routeSubscriptionAffectingCtxWith(innerFlux, downstreamFlux, downstreamCtx -> {
+        downstreamCtxRef.set(downstreamCtx);
+        return Context.empty().putAll(downstreamCtx);
+      });
+
     }
+  }
+
+
+  private Flux<CoreEvent> routeSubscriptionAffectingCtxWith(Flux<CoreEvent> upstream, Flux<CoreEvent> downstream,
+                                                            Function<Context, Context> contextFunction) {
+    return downstream.compose(eventPub -> Mono.subscriberContext()
+        .flatMapMany(ctx -> eventPub.doOnSubscribe(s -> upstream.subscriberContext(contextFunction).subscribe())));
   }
 
 
   public Publisher<CoreEvent> alternativeApply(Publisher<CoreEvent> publisher) {
     UntilSuccessfulRouter router = new UntilSuccessfulRouter(publisher);
+    return router.downstreamFlux;
 
-    return router.downstreamFlux.compose(eventPub -> Mono.subscriberContext()
-        .flatMapMany(ctx -> eventPub.doOnSubscribe(s -> router.upstreamFlux.subscriberContext(ctx).subscribe())));
+    // return router.downstreamFlux;
 
-    // return subscribeFluxOnPublisherSubscription(router.downstreamFlux, router.upstreamFlux);
+    // return subscribeFluxOnPublisherSubscription(router.innerFlux, router.upstreamFlux);
   }
 
   @Override
@@ -275,7 +312,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   }
 
   /**
-   * @return the number of retries to process the downstreamFlux when failing. Default value is 5.
+   * @return the number of retries to process the innerFlux when failing. Default value is 5.
    */
   public String getMaxRetries() {
     return maxRetries;
@@ -283,7 +320,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   /**
    *
-   * @param maxRetries the number of retries to process the downstreamFlux when failing. Default value is 5.
+   * @param maxRetries the number of retries to process the innerFlux when failing. Default value is 5.
    */
   public void setMaxRetries(final String maxRetries) {
     this.maxRetries = maxRetries;
