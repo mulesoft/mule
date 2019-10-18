@@ -266,11 +266,11 @@
 /mule-standalone-${productVersion}/lib/opt/geronimo-stax-api_1.0_spec-1.0.1.jar
 /mule-standalone-${productVersion}/lib/opt/grabbag-1.8.1.jar
 /mule-standalone-${productVersion}/lib/opt/grizzly-http-client-1.14-MULE-010.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-framework-2.3.36-MULE-010.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-http-2.3.36-MULE-010.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-http-server-2.3.36-MULE-010.jar
-/mule-standalone-${productVersion}/lib/opt/grizzly-websockets-2.3.36-MULE-010.jar
-/mule-standalone-${productVersion}/lib/opt/connection-pool-2.3.36-MULE-010.jar
+/mule-standalone-${productVersion}/lib/opt/grizzly-framework-2.3.36-MULE-012.jar
+/mule-standalone-${productVersion}/lib/opt/grizzly-http-2.3.36-MULE-012.jar
+/mule-standalone-${productVersion}/lib/opt/grizzly-http-server-2.3.36-MULE-012.jar
+/mule-standalone-${productVersion}/lib/opt/grizzly-websockets-2.3.36-MULE-012.jar
+/mule-standalone-${productVersion}/lib/opt/connection-pool-2.3.36-MULE-012.jar
 /mule-standalone-${productVersion}/lib/opt/groovy-all-2.4.15-indy.jar
 /mule-standalone-${productVersion}/lib/opt/guava-26.0-android.jar
 /mule-standalone-${productVersion}/lib/opt/hamcrest-core-1.3.jar
