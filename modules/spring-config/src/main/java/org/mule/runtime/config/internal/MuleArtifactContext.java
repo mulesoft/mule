@@ -34,15 +34,6 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -85,6 +76,15 @@ import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -214,7 +214,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     validateAllConfigElementHaveParsers();
 
     this.configurationDependencyResolver =
-        new ConfigurationDependencyResolver(applicationModel, componentBuildingDefinitionRegistry);
+        new ConfigurationDependencyResolver(applicationModel, componentBuildingDefinitionRegistry,
+                                            componentIdentifier -> beanDefinitionFactory
+                                                .isLanguageConstructComponent(componentIdentifier));
   }
 
 

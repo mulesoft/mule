@@ -18,6 +18,7 @@ import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.TOP
 import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.UNNAMED_TOP_LEVEL;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.util.Reference;
@@ -54,10 +55,11 @@ public class ConfigurationDependencyResolver {
    *        must be resolved.
    */
   public ConfigurationDependencyResolver(ApplicationModel applicationModel,
-                                         ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
+                                         ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
+                                         Predicate<ComponentIdentifier> isLanguageConstructComponentPredicate) {
     this.applicationModel = applicationModel;
-    this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
-    fillAlwaysEnabledComponents();
+    this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;;
+    fillAlwaysEnabledComponents(isLanguageConstructComponentPredicate);
   }
 
   private Set<DependencyNode> resolveComponentModelDependencies(ComponentModel componentModel) {
@@ -235,21 +237,34 @@ public class ConfigurationDependencyResolver {
     return alwaysEnabledComponents;
   }
 
-  private void fillAlwaysEnabledComponents() {
+  private void fillAlwaysEnabledComponents(Predicate<ComponentIdentifier> isLanguageConstructComponentPredicate) {
     this.applicationModel.executeOnEveryRootElement(componentModel -> {
       Optional<ComponentBuildingDefinition<?>> buildingDefinition =
           this.componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
-      buildingDefinition.ifPresent(definition -> {
+      ComponentModel alwaysEnabledComponentModel = buildingDefinition.map(definition -> {
         if (definition.isAlwaysEnabled()) {
-          if (componentModel.getNameAttribute() != null) {
-            alwaysEnabledComponents
-                .add(new DependencyNode(componentModel.getNameAttribute(), componentModel.getIdentifier(), TOP_LEVEL));
-          } else if (componentModel.isRoot()) {
-            alwaysEnabledComponents.add(new DependencyNode(null, componentModel.getIdentifier(), UNNAMED_TOP_LEVEL));
-          }
+          return componentModel;
         }
+        return null;
+      }).orElseGet(() -> {
+        if (isLanguageConstructComponentPredicate.test(componentModel.getIdentifier())) {
+          return componentModel;
+        }
+        return null;
       });
+      if (alwaysEnabledComponentModel != null) {
+        addAlwaysEnabledComponent(alwaysEnabledComponentModel);
+      }
     });
+  }
+
+  private void addAlwaysEnabledComponent(ComponentModel componentModel) {
+    if (componentModel.getNameAttribute() != null) {
+      alwaysEnabledComponents
+          .add(new DependencyNode(componentModel.getNameAttribute(), componentModel.getIdentifier(), TOP_LEVEL));
+    } else if (componentModel.isRoot()) {
+      alwaysEnabledComponents.add(new DependencyNode(null, componentModel.getIdentifier(), UNNAMED_TOP_LEVEL));
+    }
   }
 
   public List<DependencyNode> getMissingDependencies() {

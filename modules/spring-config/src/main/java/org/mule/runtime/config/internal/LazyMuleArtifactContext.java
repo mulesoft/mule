@@ -61,8 +61,6 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.TypeDefinition;
 import org.mule.runtime.dsl.api.component.TypeDefinitionVisitor;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -138,7 +136,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     this.parentComponentModelInitializer = parentComponentModelInitializer;
 
-    dependencyResolver = new ConfigurationDependencyResolver(this.applicationModel, componentBuildingDefinitionRegistry);
+    dependencyResolver = new ConfigurationDependencyResolver(this.applicationModel, componentBuildingDefinitionRegistry,
+                                                             componentIdentifier -> beanDefinitionFactory
+                                                                 .isLanguageConstructComponent(componentIdentifier));
 
 
     muleContext.getCustomizationService().overrideDefaultServiceImpl(CONNECTIVITY_TESTING_SERVICE_KEY,
@@ -176,7 +176,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    */
   private void enableMuleObjects() {
     ConfigurationDependencyResolver dependencyResolver = new ConfigurationDependencyResolver(this.applicationModel,
-                                                                                             componentBuildingDefinitionRegistry);
+                                                                                             componentBuildingDefinitionRegistry,
+                                                                                             componentIdentifier -> beanDefinitionFactory
+                                                                                                 .isLanguageConstructComponent(componentIdentifier));
     MinimalApplicationModelGenerator minimalApplicationModelGenerator =
         new MinimalApplicationModelGenerator(dependencyResolver, true);
     minimalApplicationModelGenerator
