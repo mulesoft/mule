@@ -221,7 +221,10 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       throws ConfigurationException {
     Map<String, String> aliasedParameterNames = new HashMap<>();
     parameterModels.forEach(p -> {
-      if (!p.isComponentId() || p.getModelProperty(ExtensionParameterDescriptorModelProperty.class).isPresent()) {
+      if (!p.isComponentId()
+          // This model property exists only for non synthetic parameters, in which case the value resolver has to be created,
+          // regarless of the parameter being the componentId
+          || p.getModelProperty(ExtensionParameterDescriptorModelProperty.class).isPresent()) {
         final String parameterName = getMemberName(p, p.getName());
         if (!parameterName.equals(p.getName())) {
           aliasedParameterNames.put(parameterName, p.getName());
