@@ -123,7 +123,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
         assertEquals(list, obj);
     }
 
-    @Test
+    @Test(timeout = 5000)
     public void testCpuBombWhileParsingSessionHeader() throws IOException, MuleException
     {
         DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
