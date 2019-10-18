@@ -15,6 +15,7 @@ import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
+import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapterWithSterotype;
 import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createParameterizedTypeModelAdapter;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -266,13 +267,14 @@ public abstract class ComponentModel {
               .map(childComp -> (ComponentModel) childComp)
               .forEach(childComp -> childComp
                   .setMetadataTypeModelAdapter(extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
-                      .map(paramModel -> createParameterizedTypeModelAdapter(paramModel.getType()))
+                      .map(paramModel -> createParameterizedTypeModelAdapter(paramModel.getType(), extensionModelHelper))
                       .orElseGet(() -> {
                         final Optional<? extends MetadataType> childMetadataType =
                             extensionModelHelper.findMetadataType(childComp.getType());
                         return childMetadataType
-                            .flatMap(MetadataTypeModelAdapter::createMetadataTypeModelAdapterWithSterotype)
-                            .orElseGet(() -> childMetadataType.map(MetadataTypeModelAdapter::createParameterizedTypeModelAdapter)
+                            .flatMap(type -> createMetadataTypeModelAdapterWithSterotype(type, extensionModelHelper))
+                            .orElseGet(() -> childMetadataType
+                                .map(type -> createParameterizedTypeModelAdapter(type, extensionModelHelper))
                                 .orElse(null));
                       })));
         };
@@ -282,7 +284,7 @@ public abstract class ComponentModel {
       // Last resort to try to find a matching metadata type for this component
       if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
         extensionModelHelper.findMetadataType(componentModel.getType())
-            .flatMap(MetadataTypeModelAdapter::createMetadataTypeModelAdapterWithSterotype)
+            .flatMap(type -> createMetadataTypeModelAdapterWithSterotype(type, extensionModelHelper))
             .ifPresent(componentModel::setMetadataTypeModelAdapter);
       }
 

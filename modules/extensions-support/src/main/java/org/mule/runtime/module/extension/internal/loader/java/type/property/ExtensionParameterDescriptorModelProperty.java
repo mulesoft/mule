@@ -17,7 +17,9 @@ import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter
  */
 public class ExtensionParameterDescriptorModelProperty implements ModelProperty {
 
-  private ExtensionParameter extensionParameter;
+  private static final long serialVersionUID = -4201515069957560449L;
+
+  private final ExtensionParameter extensionParameter;
 
   public ExtensionParameterDescriptorModelProperty(ExtensionParameter extensionParameter) {
     this.extensionParameter = extensionParameter;

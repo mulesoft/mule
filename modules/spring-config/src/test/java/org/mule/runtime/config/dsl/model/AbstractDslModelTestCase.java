@@ -102,6 +102,9 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
   protected ParameterModel anotherContentParameter;
 
   @Mock(lenient = true)
+  protected ParameterModel nameParameter;
+
+  @Mock(lenient = true)
   protected ParameterModel behaviourParameter;
 
   @Mock(lenient = true)
@@ -133,6 +136,15 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     initMocks(this);
 
     initializeExtensionMock(mockExtension);
+
+    when(nameParameter.getName()).thenReturn("name");
+    when(nameParameter.getExpressionSupport()).thenReturn(ExpressionSupport.NOT_SUPPORTED);
+    when(nameParameter.getModelProperty(any())).thenReturn(empty());
+    when(nameParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
+    when(nameParameter.getLayoutModel()).thenReturn(empty());
+    when(nameParameter.getRole()).thenReturn(BEHAVIOUR);
+    when(nameParameter.getType()).thenReturn(TYPE_LOADER.load(String.class));
+    when(nameParameter.isComponentId()).thenReturn(true);
 
     when(behaviourParameter.getName()).thenReturn(BEHAVIOUR_NAME);
     when(behaviourParameter.getExpressionSupport()).thenReturn(ExpressionSupport.NOT_SUPPORTED);
@@ -169,7 +181,7 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     when(contentParameter.getType()).thenReturn(type.build());
     when(anotherContentParameter.getType()).thenReturn(type.build());
 
-    this.defaultGroupParameterModels = asList(contentParameter, behaviourParameter, listParameter);
+    this.defaultGroupParameterModels = asList(nameParameter, contentParameter, behaviourParameter, listParameter);
     when(parameterGroupModel.getName()).thenReturn(DEFAULT_GROUP_NAME);
     when(parameterGroupModel.isShowInDsl()).thenReturn(false);
     when(parameterGroupModel.getParameterModels()).thenReturn(defaultGroupParameterModels);

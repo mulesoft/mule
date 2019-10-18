@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.roleOf;
@@ -148,6 +149,16 @@ public final class ParameterModelsLoaderDelegate {
       parseParameterDsl(extensionParameter, parameter);
       contributors.forEach(contributor -> contributor.contribute(extensionParameter, parameter, declarationContext));
       declarerList.add(parameter);
+    }
+
+    if (declarerList.stream().noneMatch(p -> p.getDeclaration().isComponentId())) {
+      declarerList.stream()
+          .filter(p -> p.getDeclaration().getName().equals("name")
+              && p.getDeclaration().isRequired()
+              && p.getDeclaration().getExpressionSupport() == NOT_SUPPORTED
+              && p.getDeclaration().getType().equals(typeLoader.load(String.class))
+              && p.getDeclaration().getAllowedStereotypeModels().isEmpty())
+          .forEach(p -> p.asComponentId());
     }
 
     return declarerList;
