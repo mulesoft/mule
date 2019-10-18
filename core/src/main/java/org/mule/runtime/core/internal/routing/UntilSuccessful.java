@@ -14,7 +14,6 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
-import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
@@ -65,7 +64,6 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.retry.RetryExhaustedException;
 import reactor.util.context.Context;
 
 /**
@@ -229,12 +227,10 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
               innerRecorder.next(currentContext.event);
             } else { // Retries exhausted
               LOGGER.error("Retry attempts exhausted. Failing...");
-              Throwable resolvedError = getThrowableFunction(currentContext.event).apply(new RetryExhaustedException(error));
+              Throwable resolvedError = getThrowableFunction(currentContext.event).apply(error);
               downstreamRecorder.next(Either.right(CoreEvent.class, resolvedError));
             }
           })
-          .onErrorMap(RetryExhaustedException.class,
-                      re -> getThrowableFunction(currentContext.event).apply(unwrap(re.getCause())))
           // TODO: Check how to implement this delay without the concatMap operator?
           .concatMap(event -> Mono.just(event).delayElement(currentContext.delay, reactorRetryScheduler))
           .doOnComplete(() -> downstreamRecorder.complete());
