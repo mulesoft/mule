@@ -39,7 +39,13 @@ import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionPar
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.locateParsingDelegate;
 import static org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping.getNameMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
-
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isLiteral;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTargetParameter;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
@@ -51,7 +57,6 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.BasicTypeMetadataVisitor;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
-import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.ExpressionSupport;
@@ -99,6 +104,17 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.NativeQueryPa
 import org.mule.runtime.module.extension.internal.runtime.resolver.ProcessorChainValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
+import com.google.common.collect.ImmutableList;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -112,7 +128,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
-import com.google.common.collect.ImmutableList;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 
 /**
  * Base class for parsers delegates which generate {@link ComponentBuildingDefinition} instances for the specific components types
@@ -732,11 +751,6 @@ public abstract class ExtensionDefinitionParser {
     } else if (acceptsReferences && expressionSupport == NOT_SUPPORTED && type instanceof ObjectType) {
       definitionBuilder = fromSimpleReferenceParameter(name);
     } else if (acceptsReferences && type instanceof ObjectType) {
-      definitionBuilder = fromSimpleReferenceParameter(name, typeConverter);
-    }
-    // Parameter is defined as Object therefore AnyType from Metadata
-    else if (acceptsReferences && type instanceof AnyType && type.getAnnotation(ClassInformationAnnotation.class)
-        .map(annotation -> annotation.getClassname().equals(Object.class.getName())).orElse(false)) {
       definitionBuilder = fromSimpleReferenceParameter(name, typeConverter);
     } else {
       definitionBuilder = fromSimpleParameter(name, typeConverter);
