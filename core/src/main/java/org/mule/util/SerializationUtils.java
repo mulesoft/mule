@@ -71,7 +71,7 @@ public class SerializationUtils extends org.apache.commons.lang.SerializationUti
         try
         {
             // stream closed in the finally
-            in = objectInputStreamProvider.get(cl, inputStream); //new ClassLoaderObjectInputStream(cl, inputStream);
+            in = objectInputStreamProvider.get(cl, inputStream);
             Object obj = in.readObject();
             if (obj instanceof DeserializationPostInitialisable)
             {
