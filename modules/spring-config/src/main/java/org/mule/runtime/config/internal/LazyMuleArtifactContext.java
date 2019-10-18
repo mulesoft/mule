@@ -17,6 +17,7 @@ import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNE
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.NON_LAZY_METADATA_SERVICE_KEY;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
@@ -37,7 +38,9 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.metadata.MetadataService;
+import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
@@ -51,8 +54,10 @@ import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
 import org.mule.runtime.core.internal.lifecycle.phases.DefaultLifecycleObjectSorter;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
+import org.mule.runtime.core.internal.metadata.cache.DefaultPersistentMetadataCacheManager;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore;
+import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
@@ -76,6 +81,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
@@ -137,7 +143,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     this.parentComponentModelInitializer = parentComponentModelInitializer;
 
-    dependencyResolver = new ConfigurationDependencyResolver(this.applicationModel, componentBuildingDefinitionRegistry);
+    dependencyResolver = new ConfigurationDependencyResolver(this.applicationModel, componentBuildingDefinitionRegistry,
+                                                             componentIdentifier -> beanDefinitionFactory
+                                                                 .isLanguageConstructComponent(componentIdentifier));
 
 
     muleContext.getCustomizationService().overrideDefaultServiceImpl(CONNECTIVITY_TESTING_SERVICE_KEY,
@@ -175,7 +183,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    */
   private void enableMuleObjects() {
     ConfigurationDependencyResolver dependencyResolver = new ConfigurationDependencyResolver(this.applicationModel,
-                                                                                             componentBuildingDefinitionRegistry);
+                                                                                             componentBuildingDefinitionRegistry,
+                                                                                             componentIdentifier -> beanDefinitionFactory
+                                                                                                 .isLanguageConstructComponent(componentIdentifier));
     MinimalApplicationModelGenerator minimalApplicationModelGenerator =
         new MinimalApplicationModelGenerator(dependencyResolver, true);
     minimalApplicationModelGenerator

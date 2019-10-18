@@ -74,6 +74,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
+import com.google.common.collect.ImmutableSet;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -446,6 +447,15 @@ public class BeanDefinitionFactory {
         .forEach(collectWrappersConsumer);
     buildingDefinition.getConstructorAttributeDefinition().stream().forEach(collectWrappersConsumer);
     return wrapperIdentifierAndTypeMap;
+  }
+
+  /**
+   * @param componentIdentifier the component identifier to check
+   * @return {@code true} if the component identifier is one of the current language construct that have specific bean definitions parsers since we don't want to include
+   * them in the parsing API.
+   */
+  public boolean isLanguageConstructComponent(ComponentIdentifier componentIdentifier) {
+    return customBuildersComponentIdentifiers.contains(componentIdentifier);
   }
 
 }
