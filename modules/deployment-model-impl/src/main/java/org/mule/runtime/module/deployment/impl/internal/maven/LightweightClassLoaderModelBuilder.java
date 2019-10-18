@@ -50,7 +50,6 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
 
   private MavenClient mavenClient;
   private Set<BundleDependency> nonProvidedDependencies;
-  private File temporaryFolder;
   private Map<Pair<String, String>, Boolean> sharedLibraryAlreadyExported = new HashMap<>();
 
   public LightweightClassLoaderModelBuilder(File artifactFolder, BundleDescriptor artifactBundleDescriptor,
@@ -58,8 +57,6 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
     super(artifactFolder, artifactBundleDescriptor);
     this.mavenClient = mavenClient;
     this.nonProvidedDependencies = nonProvidedDependencies;
-    File localMavenRepositoryLocation = mavenClient.getMavenConfiguration().getLocalMavenRepositoryLocation();
-    this.temporaryFolder = new File(localMavenRepositoryLocation, ".mule");
   }
 
   @Override
@@ -180,11 +177,6 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
 
   @Override
   protected Map<BundleDescriptor, Set<BundleDescriptor>> doProcessAdditionalPluginLibraries(Plugin packagingPlugin) {
-    if (!temporaryFolder.exists() && !temporaryFolder.mkdirs()) {
-      throw new MuleRuntimeException(createStaticMessage("Could not create temporary folder under "
-          + temporaryFolder.getAbsolutePath()));
-    }
-
     Map<BundleDescriptor, Set<BundleDescriptor>> deployableArtifactAdditionalLibrariesMap =
         super.doProcessAdditionalPluginLibraries(packagingPlugin);
     Map<BundleDescriptor, Set<BundleDescriptor>> effectivePluginsAdditionalLibrariesMap =
@@ -194,7 +186,7 @@ public class LightweightClassLoaderModelBuilder extends ArtifactClassLoaderModel
         .forEach(bundleDependency -> {
           Model effectiveModel;
           try {
-            effectiveModel = mavenClient.getEffectiveModel(toFile(bundleDependency.getBundleUri().toURL()), of(temporaryFolder));
+            effectiveModel = mavenClient.getEffectiveModel(toFile(bundleDependency.getBundleUri().toURL()), empty());
           } catch (MalformedURLException e) {
             throw new MuleRuntimeException(e);
           }
