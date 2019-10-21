@@ -229,16 +229,7 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
   public void stoppedApplicationsAreNotStartedWhenDomainIsRedeployed() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     deploymentService.addDeploymentListener(mockDeploymentListener);
-
-    // Add domain 1.0.0
-    addExplodedDomainFromBuilder(emptyDomain100FileBuilder, emptyDomain100FileBuilder.getId());
-
-    // Deploy an application (exploded)
-    addExplodedAppFromBuilder(appDependingOnDomain100FileBuilder);
-    startDeployment();
-
-    // Application was deployed
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, appDependingOnDomain100FileBuilder.getId());
+    deployDomainAndApplication(emptyDomain100FileBuilder, appDependingOnDomain100FileBuilder);
 
     // Stop application and check status
     assertApplicationStatus(appDependingOnDomain100FileBuilder.getId(), STARTED);
@@ -264,16 +255,7 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
   public void startedApplicationsAreStartedWhenDomainIsRedeployed() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     deploymentService.addDeploymentListener(mockDeploymentListener);
-
-    // Add domain 1.0.0
-    addExplodedDomainFromBuilder(emptyDomain100FileBuilder, emptyDomain100FileBuilder.getId());
-
-    // Deploy an application (exploded)
-    addExplodedAppFromBuilder(appDependingOnDomain100FileBuilder);
-    startDeployment();
-
-    // Application was deployed
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, appDependingOnDomain100FileBuilder.getId());
+    deployDomainAndApplication(emptyDomain100FileBuilder, appDependingOnDomain100FileBuilder);
 
     // Check status
     assertApplicationStatus(appDependingOnDomain100FileBuilder.getId(), STARTED);
@@ -289,5 +271,22 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
   private void assertApplicationStatus(String appName, ApplicationStatus expectedStatus) {
     Application application = deploymentService.findApplication(appName);
     assertThat(application.getStatus(), is(expectedStatus));
+  }
+
+  private void deployDomainAndApplication(DomainFileBuilder domainFileBuilder,
+                                          ApplicationFileBuilder applicationFileBuilder)
+      throws Exception {
+    assertThat("Application should depend on domain",
+               applicationFileBuilder.getDependencies().contains(domainFileBuilder), is(true));
+
+    // Add domain
+    addExplodedDomainFromBuilder(domainFileBuilder, domainFileBuilder.getId());
+
+    // Deploy an application (exploded)
+    addExplodedAppFromBuilder(applicationFileBuilder);
+    startDeployment();
+
+    // Application was deployed
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
   }
 }
