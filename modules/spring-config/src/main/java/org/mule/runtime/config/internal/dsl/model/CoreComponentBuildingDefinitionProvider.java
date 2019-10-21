@@ -575,6 +575,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                            .build())
         .withSetterParameterDefinition("notificationListeners",
                                        fromChildCollectionConfiguration(ListenerSubscriptionPair.class).build())
+        .alwaysEnabled(true)
         .build());
 
     ComponentBuildingDefinition.Builder baseNotificationDefinition =
