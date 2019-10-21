@@ -6,6 +6,7 @@
  */
 package org.mule.serialization.internal;
 
+import static java.lang.String.format;
 import static org.mule.util.Preconditions.checkArgument;
 import org.mule.api.serialization.ObjectSerializer;
 import org.mule.util.ObjectInputStreamProvider;
@@ -84,7 +85,7 @@ public class ClassSpecificObjectSerializer extends JavaObjectSerializer
                 return resolved;
             }
 
-            throw new InvalidClassException("Nope, babe");
+            throw new InvalidClassException(format("Expecting an instance of '%s' but '%s' found", classToAccept.getName(), resolved.getName()));
         }
 
     }
