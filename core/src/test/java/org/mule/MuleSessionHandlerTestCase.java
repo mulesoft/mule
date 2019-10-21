@@ -14,7 +14,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
-import static org.mule.util.IOUtils.getResourceAsString;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -33,14 +32,16 @@ import org.mule.session.DefaultMuleSession;
 import org.mule.session.LegacySessionHandler;
 import org.mule.session.SerializeAndEncodeSessionHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.util.SerializationUtils;
 
 import com.google.common.base.Charsets;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
+import org.apache.xmlbeans.impl.util.Base64;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -123,31 +124,15 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
         assertEquals(list, obj);
     }
 
-    @Test(timeout = 5000)
-    public void testCpuBombWhileParsingSessionHeader() throws IOException, MuleException
-    {
-        DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
-        SessionHandler handler = new SerializeAndEncodeSessionHandler();
-
-        String encodedBomb = getResourceAsString("cpu-bomb.base64", this.getClass());
-
-        message.setInboundProperty(MULE_SESSION_PROPERTY, encodedBomb);
-        message.setOutboundProperty(MULE_SESSION_PROPERTY, encodedBomb);
-
-        MuleSession session = handler.retrieveSessionInfoFromMessage(message);
-        assertNull(session);
-    }
-
     @Test
-    public void testOOMWhileParsingSessionHeader() throws MuleException
+    public void testDontDeserializeOtherThanMuleSession() throws MuleException
     {
         DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
         SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
-        String encodedBomb = "rO0ABXVyABNbTGphdmEubGFuZy5PYmplY3Q7kM5YnxBzKWwCAAB4cH////c=";
+        String encodedSet = new String(Base64.encode(SerializationUtils.serialize(new HashSet<String>())));
 
-        message.setInboundProperty(MULE_SESSION_PROPERTY, encodedBomb);
-        message.setOutboundProperty(MULE_SESSION_PROPERTY, encodedBomb);
+        message.setInboundProperty(MULE_SESSION_PROPERTY, encodedSet);
 
         MuleSession session = handler.retrieveSessionInfoFromMessage(message);
         assertNull(session);
