@@ -26,6 +26,7 @@ import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ComponentModelVisitor;
+import org.mule.runtime.api.meta.model.ComposableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -364,6 +365,13 @@ public class ExtensionModelHelper {
               }
             }
 
+            @Override
+            protected void onNestable(ComposableModel owner, NestableElementModel model) {
+              if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
+                delegate.onNestableElement(model);
+              }
+            }
+
           }.walk(currentExtension);
         });
   }
@@ -401,6 +409,8 @@ public class ExtensionModelHelper {
     void onSource(SourceModel model);
 
     void onConstruct(ConstructModel model);
+
+    void onNestableElement(NestableElementModel model);
 
   }
 

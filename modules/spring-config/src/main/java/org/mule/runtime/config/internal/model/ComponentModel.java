@@ -25,6 +25,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.nested.NestableElementModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -82,6 +83,7 @@ public abstract class ComponentModel {
   private DefaultComponentLocation componentLocation;
   private TypedComponentIdentifier.ComponentType componentType;
   private org.mule.runtime.api.meta.model.ComponentModel componentModel;
+  private NestableElementModel nestableElementModel;
   private ConfigurationModel configurationModel;
   private ConnectionProviderModel connectionProviderModel;
   private MetadataTypeModelAdapter metadataTypeModelAdapter;
@@ -219,6 +221,12 @@ public abstract class ComponentModel {
       }
     }
 
+    if (nestableElementModel != null) {
+      if (modelClass.isAssignableFrom(nestableElementModel.getClass())) {
+        return Optional.of((M) nestableElementModel);
+      }
+    }
+
     if (metadataTypeModelAdapter != null) {
       if (modelClass.isAssignableFrom(metadataTypeModelAdapter.getClass())) {
         return Optional.of((M) metadataTypeModelAdapter);
@@ -262,6 +270,14 @@ public abstract class ComponentModel {
           processPojoParameters(extensionModelHelper, model);
         }
 
+        @Override
+        public void onNestableElement(NestableElementModel model) {
+          componentModel.setNestableElementModel(model);
+          if (model instanceof ParameterizedModel) {
+            processPojoParameters(extensionModelHelper, (ParameterizedModel) model);
+          }
+        }
+
         private void processPojoParameters(ExtensionModelHelper extensionModelHelper, ParameterizedModel model) {
           ((ComponentAst) componentModel).recursiveStream()
               .map(childComp -> (ComponentModel) childComp)
@@ -302,6 +318,10 @@ public abstract class ComponentModel {
 
   public void setComponentModel(org.mule.runtime.api.meta.model.ComponentModel model) {
     this.componentModel = model;
+  }
+
+  public void setNestableElementModel(NestableElementModel nestableElementModel) {
+    this.nestableElementModel = nestableElementModel;
   }
 
   public void setConfigurationModel(ConfigurationModel model) {
