@@ -25,7 +25,8 @@ public class ClassSpecificObjectSerializer extends JavaObjectSerializer
 {
     private Class classToAccept;
 
-    public ClassSpecificObjectSerializer(ObjectSerializer baseSerializer, Class classToAccept) {
+    public ClassSpecificObjectSerializer(ObjectSerializer baseSerializer, Class classToAccept)
+    {
         super(baseSerializer);
         this.classToAccept = classToAccept;
     }

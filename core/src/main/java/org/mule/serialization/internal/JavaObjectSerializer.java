@@ -27,7 +27,8 @@ public class JavaObjectSerializer extends AbstractObjectSerializer
 
     public JavaObjectSerializer() {}
 
-    JavaObjectSerializer(ObjectSerializer other) {
+    JavaObjectSerializer(ObjectSerializer other)
+    {
         super(other);
     }
 
