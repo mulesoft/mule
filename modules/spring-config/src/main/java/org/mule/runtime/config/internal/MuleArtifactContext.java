@@ -555,7 +555,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
     Optional<ComponentModel> configurationOptional =
-        applicationModel.findComponentDefinitionModel(CONFIGURATION_IDENTIFIER);
+        applicationModel.findComponentDefinitionModels(CONFIGURATION_IDENTIFIER).stream().findFirst();
     if (configurationOptional.isPresent()) {
       return;
     }
