@@ -122,8 +122,8 @@ public class MinimalApplicationModelGenerator {
     alwaysEnabledComponents.stream()
         .filter(dependencyNode -> dependencyNode.isUnnamedTopLevel() && dependencyNode.getComponentIdentifier().isPresent())
         .forEach(dependencyNode -> dependencyResolver.getApplicationModel()
-            .findComponentDefinitionModel(dependencyNode.getComponentIdentifier().get())
-            .ifPresent(componentModel -> {
+            .findComponentDefinitionModels(dependencyNode.getComponentIdentifier().get())
+            .forEach(componentModel -> {
               componentModel.setEnabled(true);
               componentModel.executedOnEveryInnerComponent(innerComponent -> innerComponent.setEnabled(true));
             }));

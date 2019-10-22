@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.model;
 import static com.google.common.base.Joiner.on;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
@@ -40,6 +41,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -85,9 +87,6 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -103,6 +102,8 @@ import java.util.function.Consumer;
 
 import javax.xml.namespace.QName;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.ClassUtils;
 import org.slf4j.Logger;
 import org.w3c.dom.Node;
@@ -707,21 +708,12 @@ public class ApplicationModel {
     return new GlobalPropertyConfigurationPropertiesProvider(globalProperties);
   }
 
-  /**
-   * @param element element which was the source of the {@code ComponentModel}.
-   * @return the {@code ComponentModel} created from the element.
-   */
-  // TODO MULE-9638: remove once the old parsing mechanism is not needed anymore
-  public ComponentModel findComponentDefinitionModel(Node element) {
-    return innerFindComponentDefinitionModel(element, muleComponentModels);
-  }
-
-  public Optional<ComponentModel> findComponentDefinitionModel(ComponentIdentifier componentIdentifier) {
+  public List<ComponentModel> findComponentDefinitionModels(ComponentIdentifier componentIdentifier) {
     if (muleComponentModels.isEmpty()) {
-      return empty();
+      return emptyList();
     }
     return muleComponentModels.get(0).getInnerComponents().stream().filter(ComponentModel::isRoot)
-        .filter(componentModel -> componentModel.getIdentifier().equals(componentIdentifier)).findFirst();
+        .filter(componentModel -> componentModel.getIdentifier().equals(componentIdentifier)).collect(toList());
   }
 
   private void convertConfigFileToComponentModel(ArtifactConfig artifactConfig) {
@@ -1028,19 +1020,6 @@ public class ApplicationModel {
     component.getInnerComponents().forEach((innerComponent) -> {
       executeOnComponentTree(innerComponent, task);
     });
-  }
-
-  private ComponentModel innerFindComponentDefinitionModel(Node element, List<ComponentModel> componentModels) {
-    for (ComponentModel componentModel : componentModels) {
-      if (XmlCustomAttributeHandler.from(componentModel).getNode().equals(element)) {
-        return componentModel;
-      }
-      ComponentModel childComponentModel = innerFindComponentDefinitionModel(element, componentModel.getInnerComponents());
-      if (childComponentModel != null) {
-        return childComponentModel;
-      }
-    }
-    return null;
   }
 
   private void validateSingleElementsExistence() {
