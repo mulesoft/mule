@@ -32,6 +32,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper.ExtensionWalkerModelDelegate;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -75,6 +76,7 @@ public abstract class ComponentModel {
   private boolean root = false;
   private ComponentIdentifier identifier;
   private final Map<String, String> parameters = new HashMap<>();
+  private final Map<String, ComponentParameterAst> parameterAsts = new HashMap<>();
   private final Set<String> schemaValueParameter = new HashSet<>();
   // TODO MULE-9638 This must go away from component model once it's immutable.
   private ComponentModel parent;
@@ -238,74 +240,154 @@ public abstract class ComponentModel {
 
   public void resolveTypedComponentIdentifier(ExtensionModelHelper extensionModelHelper) {
     executeOnComponentTree(this, componentModel -> {
-      extensionModelHelper.walkToComponent(componentModel.getIdentifier(), new ExtensionWalkerModelDelegate() {
+      componentModel.doResolveTypedComponentIdentifier(extensionModelHelper);
+    });
+  }
 
-        @Override
-        public void onConfiguration(ConfigurationModel model) {
-          componentModel.setConfigurationModel(model);
-          processPojoParameters(extensionModelHelper, model);
-        }
+  private void doResolveTypedComponentIdentifier(ExtensionModelHelper extensionModelHelper) {
+    extensionModelHelper.walkToComponent(getIdentifier(), new ExtensionWalkerModelDelegate() {
 
-        @Override
-        public void onConnectionProvider(ConnectionProviderModel model) {
-          componentModel.setConnectionProviderModel(model);
-          processPojoParameters(extensionModelHelper, model);
-        }
-
-        @Override
-        public void onOperation(OperationModel model) {
-          componentModel.setComponentModel(model);
-          processPojoParameters(extensionModelHelper, model);
-        }
-
-        @Override
-        public void onSource(SourceModel model) {
-          componentModel.setComponentModel(model);
-          processPojoParameters(extensionModelHelper, model);
-        }
-
-        @Override
-        public void onConstruct(ConstructModel model) {
-          componentModel.setComponentModel(model);
-          processPojoParameters(extensionModelHelper, model);
-        }
-
-        @Override
-        public void onNestableElement(NestableElementModel model) {
-          componentModel.setNestableElementModel(model);
-          if (model instanceof ParameterizedModel) {
-            processPojoParameters(extensionModelHelper, (ParameterizedModel) model);
-          }
-        }
-
-        private void processPojoParameters(ExtensionModelHelper extensionModelHelper, ParameterizedModel model) {
-          ((ComponentAst) componentModel).recursiveStream()
-              .map(childComp -> (ComponentModel) childComp)
-              .forEach(childComp -> childComp
-                  .setMetadataTypeModelAdapter(extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
-                      .map(paramModel -> createParameterizedTypeModelAdapter(paramModel.getType(), extensionModelHelper))
-                      .orElseGet(() -> {
-                        final Optional<? extends MetadataType> childMetadataType =
-                            extensionModelHelper.findMetadataType(childComp.getType());
-                        return childMetadataType
-                            .flatMap(type -> createMetadataTypeModelAdapterWithSterotype(type, extensionModelHelper))
-                            .orElseGet(() -> childMetadataType
-                                .map(type -> createParameterizedTypeModelAdapter(type, extensionModelHelper))
-                                .orElse(null));
-                      })));
-        };
-
-      });
-
-      // Last resort to try to find a matching metadata type for this component
-      if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
-        extensionModelHelper.findMetadataType(componentModel.getType())
-            .flatMap(type -> createMetadataTypeModelAdapterWithSterotype(type, extensionModelHelper))
-            .ifPresent(componentModel::setMetadataTypeModelAdapter);
+      @Override
+      public void onConfiguration(ConfigurationModel model) {
+        setConfigurationModel(model);
+        onParameterizedModel(model);
       }
 
-      componentModel.setComponentType(resolveComponentType((ComponentAst) componentModel, extensionModelHelper));
+      @Override
+      public void onConnectionProvider(ConnectionProviderModel model) {
+        setConnectionProviderModel(model);
+        onParameterizedModel(model);
+      }
+
+      @Override
+      public void onOperation(OperationModel model) {
+        setComponentModel(model);
+        onParameterizedModel(model);
+      }
+
+      @Override
+      public void onSource(SourceModel model) {
+        setComponentModel(model);
+        onParameterizedModel(model);
+      }
+
+      @Override
+      public void onConstruct(ConstructModel model) {
+        setComponentModel(model);
+        onParameterizedModel(model);
+      }
+
+      @Override
+      public void onNestableElement(NestableElementModel model) {
+        setNestableElementModel(model);
+        if (model instanceof ParameterizedModel) {
+          onParameterizedModel((ParameterizedModel) model);
+        }
+      }
+
+      private void onParameterizedModel(ParameterizedModel model) {
+        handleNestedParameters(extensionModelHelper, model);
+
+        ((ComponentAst) ComponentModel.this).recursiveStream()
+            .map(childComp -> (ComponentModel) childComp)
+            .forEach(childComp -> childComp
+                .setMetadataTypeModelAdapter(findParameterModel(extensionModelHelper, model, childComp)));
+
+
+        //        for (Entry<String, String> paramEntry : parameters.entrySet()) {
+        //          final String paramName = paramEntry.getKey();
+        //
+        //          final ParameterModel parameterModel = getModel(ParameterizedModel.class)
+        //              .flatMap(parameterizedModel -> parameterizedModel.getAllParameterModels()
+        //                  .stream()
+        //                  .filter(pm -> pm.getName().equals(paramName))
+        //                  .findFirst())
+        //              .orElseGet(() -> {
+        //                if (!getModel(ParameterizedModel.class).isPresent()) {
+        //                  throw new NoSuchElementException(" >>>> Wanted paramName '" + paramName + "'. The model is not parametrizable ("
+        //                      + getModel(NamedObject.class) + ")");
+        //                } else {
+        //                  throw new NoSuchElementException(" >>>> Wanted paramName '" + paramName + "'. Available: "
+        //                      + getModel(ParameterizedModel.class).get().getAllParameterModels().stream()
+        //                          .map(pm -> pm.getName()).collect(toList())
+        //                      + "");
+        //                }
+        //              });
+        //
+        //          parameterAsts.put(paramEntry.getKey(), new ComponentParameterAst() {
+        //
+        //            @Override
+        //            public String getRawValue() {
+        //              return paramEntry.getValue();
+        //            }
+        //
+        //            @Override
+        //            public ParameterModel getModel() {
+        //              return parameterModel;
+        //            }
+        //
+        //            @Override
+        //            public Optional<ComponentMetadataAst> getMetadata() {
+        //              // TODO Auto-generated method stub
+        //              return null;
+        //            }
+        //          });
+        // }
+      }
+
+      private void handleNestedParameters(ExtensionModelHelper extensionModelHelper, ParameterizedModel model) {
+        Set<ComponentAst> paramChildren = new HashSet<>();
+
+        ((ComponentAst) ComponentModel.this).recursiveStream().forEach(childComp -> {
+          extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
+              .filter(paramModel -> paramModel.getDslConfiguration().allowsInlineDefinition())
+              .ifPresent(paramModel -> {
+                if (childComp.directChildrenStream().count() == 0) {
+                  paramChildren.add(childComp);
+
+                  childComp.getMetadata();
+
+                  setParameter(paramModel.getName(), ((ComponentModel) childComp).getTextContent());
+                }
+              });
+        });
+        // for (ComponentModel childComp : ComponentModel.this.innerComponents) {
+        // }
+
+        // ComponentModel.this.innerComponents.removeAll(paramChildren);
+      }
+
+      private MetadataTypeModelAdapter findParameterModel(ExtensionModelHelper extensionModelHelper, ParameterizedModel model,
+                                                          ComponentModel childComp) {
+        final Optional<? extends MetadataType> childMetadataType =
+            extensionModelHelper.findMetadataType(childComp.getType());
+        return childMetadataType
+            .flatMap(type -> createMetadataTypeModelAdapterWithSterotype(type, extensionModelHelper))
+            .orElseGet(() -> childMetadataType
+                .map(type -> createParameterizedTypeModelAdapter(type, extensionModelHelper))
+                .orElse(null));
+      };
+
     });
+
+    // if (this.getParent() != null
+    // && this.getIdentifier().getNamespace().equals(this.getParent().getIdentifier().getNamespace())
+    // && this.getParent().getModel(ParameterizedModel.class)
+    // .map(pm -> pm.getAllParameterModels().stream()
+    // .anyMatch(param -> param.getName().equals(toCamelCase(this.getIdentifier().getName(), "-"))))
+    // .orElse(false)) {
+    // this.getParent().getInnerComponents().remove(this);
+    // this.getParent().setParameter(toCamelCase(this.getIdentifier().getName(), "-"), getTextContent());
+    // }
+
+    // Last resort to try to find a matching metadata type for this component
+    if (!getModel(HasStereotypeModel.class).isPresent()) {
+      extensionModelHelper.findMetadataType(getType())
+          .flatMap(type -> createMetadataTypeModelAdapterWithSterotype(type, extensionModelHelper))
+          .ifPresent(this::setMetadataTypeModelAdapter);
+    }
+
+    setComponentType(resolveComponentType((ComponentAst) this, extensionModelHelper));
   }
 
   private void executeOnComponentTree(final ComponentModel component, final Consumer<ComponentModel> task)
