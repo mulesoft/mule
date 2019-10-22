@@ -88,7 +88,13 @@ public class CursorManager {
     private final Cache<Integer, WeakReference<ManagedCursorProvider>> providers = Caffeine.newBuilder().build();
 
     private ManagedCursorProvider addProvider(ManagedCursorProvider provider) {
-      return providers.get(identityHashCode(provider.getDelegate()), hash -> ghostBuster.track(provider)).get();
+      int hash = identityHashCode(provider.getDelegate());
+      ManagedCursorProvider managedProvider;
+      do {
+        managedProvider = providers.get(hash, k -> ghostBuster.track(provider)).get();
+      } while (managedProvider == null);
+
+      return managedProvider;
     }
 
     private void dispose() {
