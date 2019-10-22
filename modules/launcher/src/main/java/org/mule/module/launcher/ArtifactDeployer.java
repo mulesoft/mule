@@ -23,12 +23,19 @@ public interface ArtifactDeployer<T extends Artifact>
     /**
      * Deploys an artifact.
      *
-     * The deployer executes the artifact installation
-     * phases until the artifact is deployed
-     * After this method call the Artifact will be installed in the container
-     * and started.
+     * The deployer executes the artifact installation phases until the artifact is deployed After this method call the Artifact
+     * will be installed in the container and started.
+     *  @param artifact artifact to be deployed
+     *  @param startArtifact whether the artifact should be started after initialisation
+     */
+    void deploy(final T artifact, boolean startArtifact);
+
+    /**
+     * Deploys an artifact.
      *
-     * @param artifact artifact to be deployed
+     * The deployer executes the artifact installation phases until the artifact is deployed After this method call the Artifact
+     * will be installed in the container and started.
+     *  @param artifact artifact to be deployed
      */
     void deploy(final T artifact);
 

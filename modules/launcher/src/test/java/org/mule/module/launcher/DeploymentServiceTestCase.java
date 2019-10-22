@@ -31,9 +31,13 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mule.module.launcher.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
+import static org.mule.module.launcher.application.ApplicationStatus.CREATED;
+import static org.mule.module.launcher.application.ApplicationStatus.STARTED;
+import static org.mule.module.launcher.application.ApplicationStatus.STOPPED;
 import static org.mule.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
 import static org.mule.util.FileUtils.deleteFile;
@@ -94,7 +98,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -843,17 +846,17 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     {
         Properties deploymentProperties = new Properties();
         deploymentProperties.put("httpPort", httpPortAlternative.getValue());
-        deploymentService.deployDomain(sharedHttpDomainFileBuilder.getArtifactFile().toURI().toURL(), deploymentProperties);        
-        DefaultHttpListenerConfig httpListenerConfig = testDomainDeploymentListener.getMuleContext().getRegistry().get("http-listener-config");        
+        deploymentService.deployDomain(sharedHttpDomainFileBuilder.getArtifactFile().toURI().toURL(), deploymentProperties);
+        DefaultHttpListenerConfig httpListenerConfig = testDomainDeploymentListener.getMuleContext().getRegistry().get("http-listener-config");
         assertThat(httpListenerConfig.getPort(), equalTo(httpPortAlternative.getNumber()));
         assertPropertyValue(testDomainDeploymentListener, "httpPort", httpPortAlternative.getValue());
-        
+
         // Redeploys without deployment properties (remains the same, as it takes the deployment properties from the persisted file)
         deploymentService.redeployDomain(sharedHttpDomainFileBuilder.getId());
         httpListenerConfig = testDomainDeploymentListener.getMuleContext().getRegistry().get("http-listener-config");
         assertThat(httpListenerConfig.getPort(), equalTo(httpPortAlternative.getNumber()));
         assertPropertyValue(testDomainDeploymentListener, "httpPort", httpPortAlternative.getValue());
-        
+
         // Redeploy with new deployment properties
         deploymentProperties.put("httpPort", httpPort.getValue());
         deploymentService.redeployDomain(sharedHttpDomainFileBuilder.getId(), deploymentProperties);
@@ -861,7 +864,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertThat(httpListenerConfig.getPort(), equalTo(httpPort.getNumber()));
         assertPropertyValue(testDomainDeploymentListener, "httpPort", httpPort.getValue());
     }
-    
+
     @Test
     public void redeployModifiedDomainAndRedeployFailedApps() throws Exception
     {
@@ -1153,7 +1156,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
         final Application app = findApp(emptyAppFileBuilder.getId(), 1);
         app.stop();
-        assertStatus(app, ApplicationStatus.STOPPED);
+        assertStatus(app, STOPPED);
 
         deploymentService.undeploy(app);
     }
@@ -1212,7 +1215,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertTrue("Unable to remove anchor file", removeAppAnchorFile(emptyAppFileBuilder.getId()));
 
         assertUndeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
-        assertStatus(app, ApplicationStatus.STOPPED);
+        assertStatus(app, STOPPED);
         assertAppFolderIsDeleted(emptyAppFileBuilder.getId());
     }
 
@@ -1521,13 +1524,13 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         System.setProperty(PORT_PROPERTY_NAME, SYSTEM_PROPERTY_PORT);
         Properties deploymentProperties = new Properties();
         deploymentProperties.put(PORT_PROPERTY_NAME, deploymentPropertiesPort.getValue());
-        deploymentService.deploy(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI().toURL(), deploymentProperties); 
+        deploymentService.deploy(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI().toURL(), deploymentProperties);
         assertMuleContextCreated(applicationDeploymentListener, dummyAppDescriptorWithPropsFileBuilder.getId());
         assertPropertyValue(testDeploymentListener, PORT_PROPERTY_NAME, deploymentPropertiesPort.getValue());
-        DefaultHttpListenerConfig httpListenerConfig = testDeploymentListener.getMuleContext().getRegistry().get("listenerConfig");        
+        DefaultHttpListenerConfig httpListenerConfig = testDeploymentListener.getMuleContext().getRegistry().get("listenerConfig");
         assertThat(httpListenerConfig.getPort(), equalTo(deploymentPropertiesPort.getNumber()));
     }
-    
+
     @Test
     public void propertiesInSpringFileAreResolvedIntoDeploymentProperties() throws Exception
     {
@@ -1541,44 +1544,44 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     public void noPropsAreOverridenOnDeployThenTheyAreOverridenWhenRedeployWithNewPropertiesSet() throws Exception
     {
         deploymentService.deploy(dummyCascadingPropsAppDescriptorFileBuilder.getArtifactFile().toURI().toURL());
-        assertPropertyValue(testDeploymentListener, "prop1", "value1");                
+        assertPropertyValue(testDeploymentListener, "prop1", "value1");
 
         Properties deploymentProperties = new Properties();
         deploymentProperties.put("prop1", "DUMMY_VALUE");
         deploymentService.redeploy(dummyCascadingPropsAppDescriptorFileBuilder.getId(), deploymentProperties);
-        assertPropertyValue(testDeploymentListener, "prop1", "DUMMY_VALUE");        
+        assertPropertyValue(testDeploymentListener, "prop1", "DUMMY_VALUE");
     }
-    
+
     @Test
     public void propsAreMantainedInRedeployThenChangedWhenNewPropertiesAreSet() throws Exception
     {
         Properties deploymentProperties = new Properties();
         deploymentProperties.put("prop1", "DUMMY_VALUE");
         deploymentService.deploy(dummyCascadingPropsAppDescriptorFileBuilder.getArtifactFile().toURI().toURL(), deploymentProperties);
-        assertPropertyValue(testDeploymentListener, "prop1", "DUMMY_VALUE");        
+        assertPropertyValue(testDeploymentListener, "prop1", "DUMMY_VALUE");
 
         deploymentService.redeploy(dummyCascadingPropsAppDescriptorFileBuilder.getId());
         assertPropertyValue(testDeploymentListener, "prop1", "DUMMY_VALUE");
-        
+
         deploymentProperties.clear();
         deploymentService.redeploy(dummyCascadingPropsAppDescriptorFileBuilder.getId(), deploymentProperties);
-        assertPropertyValue(testDeploymentListener, "prop1", "value1");        
+        assertPropertyValue(testDeploymentListener, "prop1", "value1");
     }
-    
+
     @Test
     public void cascadingPropsAreOverridenIntoConfigurationThenTakesGlobalpropertyOnRedeployWithDeploymentProperties() throws Exception
     {
         Properties deploymentProperties = new Properties();
         deploymentProperties.put("prop1", "DUMMY_VALUE");
         deploymentService.deploy(dummyCascadingPropsAppDescriptorFileBuilder.getArtifactFile().toURI().toURL(), deploymentProperties);
-        assertPropertyValue(testDeploymentListener, "prop1", "DUMMY_VALUE");        
+        assertPropertyValue(testDeploymentListener, "prop1", "DUMMY_VALUE");
 
         deploymentProperties.clear();
         deploymentService.redeploy(dummyCascadingPropsAppDescriptorFileBuilder.getId(), deploymentProperties);
-        assertPropertyValue(testDeploymentListener, "prop1", "value1");        
+        assertPropertyValue(testDeploymentListener, "prop1", "value1");
     }
 
-    
+
     @Test
     public void propertiesInFileAreOverriddenIntoDeploymentProperties() throws Exception
     {
@@ -1602,11 +1605,11 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         deploymentProperties2.put("myCustomProp", "DUMMY_VALUE2");
         deploymentService.deploy(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI().toURL(), deploymentProperties2);
         MuleContext muleContextApp2 = testDeploymentListener.getMuleContext();
-        
+
         assertThat((String) muleContextApp1.getRegistry().get("myCustomProp"), equalTo("DUMMY_VALUE"));
         assertThat((String) muleContextApp2.getRegistry().get("myCustomProp"), equalTo("DUMMY_VALUE2"));
     }
-    
+
     private void assertPropertyValue(final TestDeploymentListener listener, final String propertyName, final String propertyValue)
     {
         Prober prober = new PollingProber(DEPLOYMENT_TIMEOUT, 100);
@@ -1653,7 +1656,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         System.setProperty(PORT_PROPERTY_NAME, SYSTEM_PROPERTY_PORT);
         Properties deploymentProperties = new Properties();
         deploymentProperties.put(PORT_PROPERTY_NAME, deploymentPropertiesPort.getValue());
-        deploymentService.deploy(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI().toURL(), deploymentProperties); 
+        deploymentService.deploy(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI().toURL(), deploymentProperties);
         assertMuleContextCreated(applicationDeploymentListener, dummyAppDescriptorWithPropsFileBuilder.getId());
         assertPropertyValue(testDeploymentListener, PORT_PROPERTY_NAME, deploymentPropertiesPort.getValue());
         deploymentProperties.put(PORT_PROPERTY_NAME, deploymentPropertiesOverriddenPort.getValue());
@@ -3172,7 +3175,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
     private void assertApplicationDeploymentSuccess(DeploymentListener listener, String artifactName)
     {
         assertDeploymentSuccess(listener, artifactName);
-        assertStatus(artifactName, ApplicationStatus.STARTED);
+        assertStatus(artifactName, STARTED);
     }
 
     private void assertDeploymentSuccess(final DeploymentListener listener, final String artifactName)
@@ -3814,5 +3817,63 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         {
             return invoked;
         }
+    }
+
+    @Test
+    public void stoppedApplicationsAreNotStartedWhenDomainIsRedeployed() throws Exception
+    {
+        DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
+        deploymentService.addDeploymentListener(mockDeploymentListener);
+
+        deployDomainAndApplication(dummyDomainFileBuilder, dummyDomainApp1FileBuilder);
+
+        // Stop application and check status
+        assertStatus(dummyDomainApp1FileBuilder.getId(), STARTED);
+        deploymentService.findApplication(dummyDomainApp1FileBuilder.getId()).stop();
+        assertStatus(dummyDomainApp1FileBuilder.getId(), STOPPED);
+
+        // Redeploy domain
+        deploymentService.redeployDomain(dummyDomainFileBuilder.getId());
+
+        // Application was redeployed but it is not started
+        assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
+
+        // Redeploy domain again
+        deploymentService.redeployDomain(dummyDomainFileBuilder.getId());
+
+        // Application was redeployed twice but it is not started
+        assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
+    }
+
+    @Test
+    public void startedApplicationsAreStartedWhenDomainIsRedeployed() throws Exception
+    {
+        DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
+        deploymentService.addDeploymentListener(mockDeploymentListener);
+        deployDomainAndApplication(dummyDomainFileBuilder, dummyDomainApp1FileBuilder);
+
+        // Check status
+        assertStatus(dummyDomainApp1FileBuilder.getId(), STARTED);
+
+        // Redeploy domain
+        deploymentService.redeployDomain(dummyDomainFileBuilder.getId());
+
+        // Application was redeployed and started
+        assertStatus(dummyDomainApp1FileBuilder.getId(), STARTED);
+    }
+
+    private void deployDomainAndApplication(DomainFileBuilder domainFileBuilder,
+                                            ApplicationFileBuilder applicationFileBuilder)
+            throws Exception
+    {
+        // Add domain
+        addExplodedDomainFromBuilder(domainFileBuilder, domainFileBuilder.getId());
+
+        // Deploy an application (exploded)
+        addExplodedAppFromBuilder(applicationFileBuilder, applicationFileBuilder.getId());
+        deploymentService.start();
+
+        // Application was deployed
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
     }
 }
