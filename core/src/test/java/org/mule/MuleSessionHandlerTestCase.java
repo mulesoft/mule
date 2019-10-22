@@ -47,7 +47,9 @@ import org.apache.xmlbeans.impl.util.Base64;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
 {
@@ -55,6 +57,9 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     private static String originalEncoding;
 
     private MuleContext muleContext;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setUp() throws Exception
@@ -136,6 +141,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
 
         message.setInboundProperty(MULE_SESSION_PROPERTY, encodedSet);
 
+        expectedException.expect(SerializationException.class);
         MuleSession session = handler.retrieveSessionInfoFromMessage(message);
         assertNull(session);
     }
