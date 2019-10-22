@@ -29,7 +29,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -208,12 +207,11 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
             innerRecorder.complete();
           });
 
-      final LazyValue<Boolean> isTransactional = new LazyValue<>(() -> isTransactionActive());
-      reactor.core.scheduler.Scheduler reactorRetryScheduler =
-          fromExecutorService(new ConditionalExecutorServiceDecorator(timer, s -> isTransactional.get()));
-
       innerFlux = Flux.create(innerRecorder)
-          .concatMap(event -> {
+          .flatMap(event -> {
+            reactor.core.scheduler.Scheduler reactorRetryScheduler =
+                fromExecutorService(new ConditionalExecutorServiceDecorator(timer, s -> isTransactionActive()));
+
             if (currentContext.retryCount.get() != currentContext.maxRetries) {
               return Mono.just(event)
                   .doOnNext(event1 -> LOGGER.error("Waiting for a delay of {}", currentContext.delay.toMillis()))
