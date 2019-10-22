@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.util;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.EventContext;
@@ -38,12 +39,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+
 /**
  * Utilities for handling {@link Cursor} instances
  *
  * @since 4.0
  */
 public final class StreamingUtils {
+
+  private static final String TROUBLESHOOT_PREFIX = ">> TROUBLESHOOT <<";
+  private static final Logger LOGGER = getLogger(StreamingUtils.class);
 
   /**
    * Executes the given function {@code f} considering that the given {@code event} might have a {@link CursorProvider} as
@@ -315,6 +321,12 @@ public final class StreamingUtils {
         if (cursorProvider == payload) {
           return value;
         } else {
+          if (value.getDataType() == null) {
+            LOGGER.error(TROUBLESHOOT_PREFIX + " NULL DataType!");
+          }
+          if (cursorProvider == null) {
+            LOGGER.error(TROUBLESHOOT_PREFIX + " NULL cursor provider for event", event);
+          }
           DataType dataType = DataType.builder(value.getDataType()).type(cursorProvider.getClass()).build();
           return new TypedValue<>(cursorProvider, dataType, value.getByteLength());
         }
