@@ -31,6 +31,16 @@ public abstract class AbstractObjectSerializer implements ObjectSerializer, Mule
 
     protected MuleContext muleContext;
 
+    public AbstractObjectSerializer() {}
+
+    AbstractObjectSerializer(ObjectSerializer other)
+    {
+        if (other instanceof AbstractObjectSerializer)
+        {
+            this.muleContext = ((AbstractObjectSerializer) other).muleContext;
+        }
+    }
+
     /**
      * Serializes the given object. Should not care about error handling
      *
