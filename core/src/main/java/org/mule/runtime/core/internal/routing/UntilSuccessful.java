@@ -213,6 +213,15 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
           fromExecutorService(new ConditionalExecutorServiceDecorator(timer, s -> isTransactional.get()));
 
       innerFlux = Flux.create(innerRecorder)
+          .concatMap(event -> {
+            if (currentContext.retryCount.get() != currentContext.maxRetries) {
+              return Mono.just(event)
+                  .doOnNext(event1 -> LOGGER.error("Waiting for a delay of {}", currentContext.delay.toMillis()))
+                  .delayElement(currentContext.delay, reactorRetryScheduler);
+            } else {
+              return Mono.just(event);
+            }
+          })
           .transform(publisher1 -> applyWithChildContext(Flux.from(publisher1), nestedChain,
                                                          Optional.of(UntilSuccessful.this.getLocation())))
           // Success, inject into downstream publisher
@@ -232,7 +241,6 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
             }
           })
           // TODO: Check how to implement this delay without the concatMap operator?
-          .concatMap(event -> Mono.just(event).delayElement(currentContext.delay, reactorRetryScheduler))
           .doOnComplete(() -> downstreamRecorder.complete());
 
       downstreamFlux = Flux.create(downstreamRecorder)
