@@ -7,10 +7,12 @@
 package org.mule.session;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
 import org.mule.api.serialization.DefaultObjectSerializer;
 import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.serialization.SerializationException;
 import org.mule.api.transport.SessionHandler;
+import org.mule.serialization.internal.ClassSpecificObjectSerializer;
 import org.mule.util.store.DeserializationPostInitialisable;
 
 import javax.inject.Inject;
@@ -24,12 +26,14 @@ import javax.inject.Inject;
  */
 public abstract class AbstractSessionHandler implements SessionHandler
 {
-
     private ObjectSerializerLocator objectSerializerLocator = new FromMessageObjectSerializerLocator();
+
+    private ObjectSerializer wrappedSerializer = null;
 
     protected <T> T deserialize(MuleMessage message, byte[] bytes)
     {
-        T object = objectSerializerLocator.getObjectSerializer(message).deserialize(bytes, message.getMuleContext().getExecutionClassLoader());
+        ObjectSerializer objectSerializer = wrapSerializer(objectSerializerLocator.getObjectSerializer(message));
+        T object = objectSerializer.deserialize(bytes, message.getMuleContext().getExecutionClassLoader());
         if (object instanceof DeserializationPostInitialisable)
         {
             try
@@ -43,6 +47,23 @@ public abstract class AbstractSessionHandler implements SessionHandler
         }
 
         return object;
+    }
+
+    private ObjectSerializer wrapSerializer(ObjectSerializer serializer)
+    {
+        if (wrappedSerializer == null)
+        {
+            if (serializer instanceof ClassSpecificObjectSerializer)
+            {
+                wrappedSerializer = serializer;
+            }
+            else
+            {
+                wrappedSerializer = new ClassSpecificObjectSerializer(serializer, MuleSession.class);
+            }
+        }
+
+        return wrappedSerializer;
     }
 
     protected byte[] serialize(MuleMessage message, Object object)
@@ -65,7 +86,6 @@ public abstract class AbstractSessionHandler implements SessionHandler
 
     private class FixedObjectSerializerLocator implements ObjectSerializerLocator
     {
-
         private final ObjectSerializer objectSerializer;
 
         private FixedObjectSerializerLocator(ObjectSerializer objectSerializer)
@@ -82,7 +102,6 @@ public abstract class AbstractSessionHandler implements SessionHandler
 
     private class FromMessageObjectSerializerLocator implements ObjectSerializerLocator
     {
-
         @Override
         public ObjectSerializer getObjectSerializer(MuleMessage message)
         {

@@ -14,7 +14,6 @@ import static org.mule.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 
 import java.io.InvalidClassException;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -23,8 +22,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.serialization.SerializationException;
+import org.mule.serialization.internal.ClassSpecificObjectSerializer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -43,7 +42,7 @@ public class SerializeAndEncodeSessionHandlerTestCase extends AbstractMuleTestCa
     private MuleContext context;
 
     @Mock
-    private ObjectSerializer serializer;
+    private ClassSpecificObjectSerializer serializer;
 
     @Test
     public void returnNullSessionWhenIncompatibleClass() throws Exception
