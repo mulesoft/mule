@@ -22,11 +22,13 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
 
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
-  public void deploy(T artifact) {
+  public void deploy(T artifact, boolean startArtifact) {
     try {
       artifact.install();
       doInit(artifact);
-      artifact.start();
+      if (startArtifact) {
+        artifact.start();
+      }
     } catch (Throwable t) {
       artifact.dispose();
 
