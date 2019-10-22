@@ -6,6 +6,8 @@
  */
 package org.mule;
 
+import static org.apache.commons.lang.SerializationUtils.serialize;
+import static org.apache.xmlbeans.impl.util.Base64.encode;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -130,7 +132,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
         DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
         SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
-        String encodedSet = new String(Base64.encode(SerializationUtils.serialize(new HashSet<String>())));
+        String encodedSet = new String(encode(serialize(new HashSet<String>())));
 
         message.setInboundProperty(MULE_SESSION_PROPERTY, encodedSet);
 

@@ -52,7 +52,7 @@ public class ClassSpecificObjectSerializer extends JavaObjectSerializer
 
         private Class classToAccept;
 
-        private boolean firstClass;
+        private boolean firstClass = true;
 
         /**
          * Constructs a new ClassLoaderObjectInputStream.
@@ -66,7 +66,6 @@ public class ClassSpecificObjectSerializer extends JavaObjectSerializer
         {
             super(classLoader, inputStream);
             this.classToAccept = classToAccept;
-            this.firstClass = true;
         }
 
         @Override
