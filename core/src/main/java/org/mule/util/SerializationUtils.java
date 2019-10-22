@@ -49,12 +49,15 @@ public class SerializationUtils extends org.apache.commons.lang.SerializationUti
      *
      * @param inputStream the serialized object input stream, must not be null
      * @param cl          classloader which can load custom classes from the stream
+     * @param muleContext mule context
+     * @param objectInputStreamProvider to provide the {@link ObjectInputStream} used for deserialization
      * @return the deserialized object
      * @throws IllegalArgumentException if <code>inputStream</code> is <code>null</code>
      * @throws org.apache.commons.lang.SerializationException
      *                                  (runtime) if the serialization fails
      */
-    public static Object deserialize(InputStream inputStream, ClassLoader cl, MuleContext muleContext)
+    public static Object deserialize(InputStream inputStream, ClassLoader cl, MuleContext muleContext,
+                                     ObjectInputStreamProvider objectInputStreamProvider)
     {
         if (inputStream == null)
         {
@@ -68,7 +71,7 @@ public class SerializationUtils extends org.apache.commons.lang.SerializationUti
         try
         {
             // stream closed in the finally
-            in = new ClassLoaderObjectInputStream(cl, inputStream);
+            in = objectInputStreamProvider.get(cl, inputStream);
             Object obj = in.readObject();
             if (obj instanceof DeserializationPostInitialisable)
             {
@@ -102,6 +105,36 @@ public class SerializationUtils extends org.apache.commons.lang.SerializationUti
                 // ignore close exception
             }
         }
+    }
+
+    /**
+     * <p>Deserializes an <code>Object</code> from the specified stream.</p>
+     * <p/>
+     * <p>The stream will be closed once the object is written. This
+     * avoids the need for a finally clause, and maybe also exception
+     * handling, in the application code.</p>
+     * <p/>
+     * <p>The stream passed in is not buffered internally within this method.
+     * This is the responsibility of your application if desired.</p>
+     *
+     * @param inputStream the serialized object input stream, must not be null
+     * @param cl          classloader which can load custom classes from the stream
+     * @param muleContext mule context
+     * @return the deserialized object
+     * @throws IllegalArgumentException if <code>inputStream</code> is <code>null</code>
+     * @throws org.apache.commons.lang.SerializationException
+     *                                  (runtime) if the serialization fails
+     */
+    public static Object deserialize(InputStream inputStream, ClassLoader cl, MuleContext muleContext)
+    {
+        return deserialize(inputStream, cl, muleContext, new ObjectInputStreamProvider()
+        {
+            @Override
+            public ObjectInputStream get(ClassLoader classLoader, InputStream inputStream) throws IOException
+            {
+                return new ClassLoaderObjectInputStream(classLoader, inputStream);
+            }
+        });
     }
 
     /**
