@@ -13,9 +13,13 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.model.SessionException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.Base64;
+import org.mule.util.ClassSpecificObjectInputStream;
+import org.mule.util.ObjectInputStreamProvider;
 import org.mule.util.SerializationUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 
 /**
  * A session handler used to store and retrieve session information on an
@@ -37,7 +41,8 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
             byte[] serializedSession = Base64.decode(serializedEncodedSession);            
             if (serializedSession != null)
             {
-                session = (MuleSession) SerializationUtils.deserialize(serializedSession, message.getMuleContext());
+                ObjectInputStreamProvider provider = new ClassSpecificObjectInputStream.Provider(MuleSession.class);
+                session = (MuleSession) SerializationUtils.deserialize(serializedSession, message.getMuleContext(), provider);
             }
         }
         return session;

@@ -34,7 +34,17 @@ public class SerializationUtils extends org.apache.commons.lang.SerializationUti
         {
             throw new IllegalArgumentException("The MuleContext must not be null");
         }
-        return deserialize(objectData, muleContext.getExecutionClassLoader(), muleContext);        
+        return deserialize(objectData, muleContext.getExecutionClassLoader(), muleContext);
+    }
+
+    public static Object deserialize(byte[] objectData, MuleContext muleContext,
+                                     ObjectInputStreamProvider objectInputStreamProvider)
+    {
+        if (muleContext == null)
+        {
+            throw new IllegalArgumentException("The MuleContext must not be null");
+        }
+        return deserialize(objectData, muleContext.getExecutionClassLoader(), muleContext, objectInputStreamProvider);
     }
     
     /**
@@ -49,12 +59,15 @@ public class SerializationUtils extends org.apache.commons.lang.SerializationUti
      *
      * @param inputStream the serialized object input stream, must not be null
      * @param cl          classloader which can load custom classes from the stream
+     * @param muleContext mule context
+     * @param objectInputStreamProvider to provide the {@link ObjectInputStream} used for deserialization
      * @return the deserialized object
      * @throws IllegalArgumentException if <code>inputStream</code> is <code>null</code>
      * @throws org.apache.commons.lang.SerializationException
      *                                  (runtime) if the serialization fails
      */
-    private static Object deserialize(InputStream inputStream, ClassLoader cl, MuleContext muleContext)
+    public static Object deserialize(InputStream inputStream, ClassLoader cl, MuleContext muleContext,
+                                     ObjectInputStreamProvider objectInputStreamProvider)
     {
         if (inputStream == null)
         {
@@ -68,7 +81,7 @@ public class SerializationUtils extends org.apache.commons.lang.SerializationUti
         try
         {
             // stream closed in the finally
-            in = new ClassLoaderObjectInputStream(cl, inputStream);
+            in = objectInputStreamProvider.get(cl, inputStream);
             Object obj = in.readObject();
             if (obj instanceof DeserializationPostInitialisable)
             {
@@ -104,6 +117,37 @@ public class SerializationUtils extends org.apache.commons.lang.SerializationUti
         }
     }
 
+
+    /**
+     * <p>Deserializes an <code>Object</code> from the specified stream.</p>
+     * <p/>
+     * <p>The stream will be closed once the object is written. This
+     * avoids the need for a finally clause, and maybe also exception
+     * handling, in the application code.</p>
+     * <p/>
+     * <p>The stream passed in is not buffered internally within this method.
+     * This is the responsibility of your application if desired.</p>
+     *
+     * @param inputStream the serialized object input stream, must not be null
+     * @param cl          classloader which can load custom classes from the stream
+     * @param muleContext mule context
+     * @return the deserialized object
+     * @throws IllegalArgumentException if <code>inputStream</code> is <code>null</code>
+     * @throws org.apache.commons.lang.SerializationException
+     *                                  (runtime) if the serialization fails
+     */
+    public static Object deserialize(InputStream inputStream, ClassLoader cl, MuleContext muleContext)
+    {
+        return deserialize(inputStream, cl, muleContext, new ObjectInputStreamProvider()
+        {
+            @Override
+            public ObjectInputStream get(ClassLoader classLoader, InputStream inputStream) throws IOException
+            {
+                return new ClassLoaderObjectInputStream(classLoader, inputStream);
+            }
+        });
+    }
+
     /**
      * <p>Deserializes a single <code>Object</code> from an array of bytes.</p>
      *
@@ -122,7 +166,18 @@ public class SerializationUtils extends org.apache.commons.lang.SerializationUti
         ByteArrayInputStream bais = new ByteArrayInputStream(objectData);
         return deserialize(bais, cl, muleContext);
     }
-    
+
+    private static Object deserialize(byte[] objectData, ClassLoader cl, MuleContext muleContext,
+                                      ObjectInputStreamProvider objectInputStreamProvider)
+    {
+        if (objectData == null)
+        {
+            throw new IllegalArgumentException("The byte[] must not be null");
+        }
+        ByteArrayInputStream bais = new ByteArrayInputStream(objectData);
+        return deserialize(bais, cl, muleContext, objectInputStreamProvider);
+    }
+
     /**
      * @deprecated Call deserialize(InputStream inputStream, MuleContext muleContext) instead
      */
