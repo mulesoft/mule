@@ -6,13 +6,25 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.model.ComponentModel;
+import org.mule.runtime.config.internal.model.DefaultComponentParameterAst;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.function.Consumer;
@@ -28,6 +40,8 @@ import org.springframework.beans.factory.config.BeanReference;
  * @since 4.0
  */
 public class SpringComponentModel extends ComponentModel implements ComponentAst {
+
+  private final Map<String, ComponentParameterAst> parameterAsts = new HashMap<>();
 
   // TODO MULE-9688 Remove this attributes since should not be part of this class. This class should be immutable.
   private BeanReference beanReference;
@@ -78,6 +92,95 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
     } else {
       return ofNullable(getParameters().get(paramName));
     }
+  }
+
+  /**
+   * @param parameterName name of the configuration parameter.
+   * @param value value contained by the configuration parameter.
+   */
+  @Override
+  public void setParameter(ParameterModel parameterModel, ComponentParameterAst value) {
+    setParameter(parameterModel.getName(), value.getRawValue());
+    this.parameterAsts.put(parameterModel.getName(), value);
+  }
+
+  /**
+   * @param paramName the name of the parameter to get AST for.
+   * @return the AST of the parameter if present, or {@link Optional#empty()} if not present.
+   */
+  @Override
+  public Optional<ComponentParameterAst> getParameter(String paramName) {
+    if (parameterAsts.containsKey(paramName)) {
+      return of(parameterAsts.get(paramName));
+    }
+
+    Optional<ParameterModel> parameterModel = findParameterModel(paramName);
+    // parameterModel.orElseGet(() -> {
+    // validateParameter(paramName);
+    // return null;
+    // });
+
+    return parameterModel.map(paramModel -> getRawParameterValue(paramName)
+        .map(rawParamValue -> {
+          return new DefaultComponentParameterAst(rawParamValue, () -> parameterModel.orElseGet(() -> {
+            validateParameter(paramName);
+            return null;
+          }));
+        })
+        .orElseGet(() -> new DefaultComponentParameterAst(null, () -> parameterModel.orElseGet(() -> {
+          validateParameter(paramName);
+          return null;
+        }))));
+  }
+
+  private void validateParameter(String paramName) {
+    if (!SpringComponentModel.this.getModel(ParameterizedModel.class).isPresent()) {
+      throw new NoSuchElementException(" >>>> Wanted paramName '" + paramName + "'. The model is not parametrizable ("
+          + SpringComponentModel.this.getModel(NamedObject.class) + ")");
+    } else {
+      throw new NoSuchElementException(" >>>> Wanted paramName '" + paramName + "'. Available: "
+          + SpringComponentModel.this.getModel(ParameterizedModel.class).get().getAllParameterModels().stream()
+              .map(pm -> pm.getName()).collect(toList())
+          + "");
+    }
+  }
+
+  private Optional<ParameterModel> findParameterModel(String paramName) {
+    // For sources, we need to account for the case where parameters in the callbacks may have colliding names.
+    // This logic ensures that the parameter fetching logic is consistent with the logic that handles this scenario in previous
+    // implementations.
+    Optional<ParameterModel> parameterModel = getModel(SourceModel.class)
+        .flatMap(sourceModel -> {
+          if (sourceModel.getErrorCallback().isPresent()) {
+            final Optional<ParameterModel> findFirst = sourceModel.getErrorCallback().get().getAllParameterModels()
+                .stream()
+                .filter(pm -> pm.getName().equals(paramName))
+                .findFirst();
+
+            if (findFirst.isPresent()) {
+              return findFirst;
+            }
+          }
+
+          if (sourceModel.getSuccessCallback().isPresent()) {
+            return sourceModel.getSuccessCallback().get().getAllParameterModels()
+                .stream()
+                .filter(pm -> pm.getName().equals(paramName))
+                .findFirst();
+          }
+
+          return empty();
+        });
+
+    if (!parameterModel.isPresent()) {
+      parameterModel = getModel(ParameterizedModel.class)
+          .flatMap(parameterizedModel -> parameterizedModel.getAllParameterModels()
+              .stream()
+              .filter(pm -> pm.getName().equals(paramName))
+              .findFirst());
+    }
+
+    return parameterModel;
   }
 
   @Override

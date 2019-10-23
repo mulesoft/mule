@@ -27,6 +27,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
@@ -76,7 +77,6 @@ public abstract class ComponentModel {
   private boolean root = false;
   private ComponentIdentifier identifier;
   private final Map<String, String> parameters = new HashMap<>();
-  private final Map<String, ComponentParameterAst> parameterAsts = new HashMap<>();
   private final Set<String> schemaValueParameter = new HashSet<>();
   // TODO MULE-9638 This must go away from component model once it's immutable.
   private ComponentModel parent;
@@ -176,6 +176,14 @@ public abstract class ComponentModel {
    */
   public void setParameter(String parameterName, String value) {
     this.parameters.put(parameterName, value);
+  }
+
+  /**
+   * @param parameterName name of the configuration parameter.
+   * @param value value contained by the configuration parameter.
+   */
+  public void setParameter(ParameterModel parameterModel, ComponentParameterAst value) {
+    this.parameters.put(parameterModel.getName(), value.getRawValue());
   }
 
   /**
@@ -292,68 +300,25 @@ public abstract class ComponentModel {
             .map(childComp -> (ComponentModel) childComp)
             .forEach(childComp -> childComp
                 .setMetadataTypeModelAdapter(findParameterModel(extensionModelHelper, model, childComp)));
-
-
-        //        for (Entry<String, String> paramEntry : parameters.entrySet()) {
-        //          final String paramName = paramEntry.getKey();
-        //
-        //          final ParameterModel parameterModel = getModel(ParameterizedModel.class)
-        //              .flatMap(parameterizedModel -> parameterizedModel.getAllParameterModels()
-        //                  .stream()
-        //                  .filter(pm -> pm.getName().equals(paramName))
-        //                  .findFirst())
-        //              .orElseGet(() -> {
-        //                if (!getModel(ParameterizedModel.class).isPresent()) {
-        //                  throw new NoSuchElementException(" >>>> Wanted paramName '" + paramName + "'. The model is not parametrizable ("
-        //                      + getModel(NamedObject.class) + ")");
-        //                } else {
-        //                  throw new NoSuchElementException(" >>>> Wanted paramName '" + paramName + "'. Available: "
-        //                      + getModel(ParameterizedModel.class).get().getAllParameterModels().stream()
-        //                          .map(pm -> pm.getName()).collect(toList())
-        //                      + "");
-        //                }
-        //              });
-        //
-        //          parameterAsts.put(paramEntry.getKey(), new ComponentParameterAst() {
-        //
-        //            @Override
-        //            public String getRawValue() {
-        //              return paramEntry.getValue();
-        //            }
-        //
-        //            @Override
-        //            public ParameterModel getModel() {
-        //              return parameterModel;
-        //            }
-        //
-        //            @Override
-        //            public Optional<ComponentMetadataAst> getMetadata() {
-        //              // TODO Auto-generated method stub
-        //              return null;
-        //            }
-        //          });
-        // }
       }
 
       private void handleNestedParameters(ExtensionModelHelper extensionModelHelper, ParameterizedModel model) {
         Set<ComponentAst> paramChildren = new HashSet<>();
 
-        ((ComponentAst) ComponentModel.this).recursiveStream().forEach(childComp -> {
-          extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
-              .filter(paramModel -> paramModel.getDslConfiguration().allowsInlineDefinition())
-              .ifPresent(paramModel -> {
-                if (childComp.directChildrenStream().count() == 0) {
-                  paramChildren.add(childComp);
+        ((ComponentAst) ComponentModel.this).recursiveStream()
+            .forEach(childComp -> {
+              extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
+                  .filter(paramModel -> paramModel.getDslConfiguration().allowsInlineDefinition())
+                  .ifPresent(paramModel -> {
+                    if (childComp.directChildrenStream().count() == 0) {
+                      paramChildren.add(childComp);
+                      setParameter(paramModel, new DefaultComponentParameterAst(((ComponentModel) childComp).getTextContent(),
+                                                                                () -> paramModel, childComp.getMetadata()));
+                    }
+                  });
+            });
 
-                  childComp.getMetadata();
-
-                  setParameter(paramModel.getName(), ((ComponentModel) childComp).getTextContent());
-                }
-              });
-        });
-        // for (ComponentModel childComp : ComponentModel.this.innerComponents) {
-        // }
-
+        // TODO
         // ComponentModel.this.innerComponents.removeAll(paramChildren);
       }
 
@@ -369,16 +334,6 @@ public abstract class ComponentModel {
       };
 
     });
-
-    // if (this.getParent() != null
-    // && this.getIdentifier().getNamespace().equals(this.getParent().getIdentifier().getNamespace())
-    // && this.getParent().getModel(ParameterizedModel.class)
-    // .map(pm -> pm.getAllParameterModels().stream()
-    // .anyMatch(param -> param.getName().equals(toCamelCase(this.getIdentifier().getName(), "-"))))
-    // .orElse(false)) {
-    // this.getParent().getInnerComponents().remove(this);
-    // this.getParent().setParameter(toCamelCase(this.getIdentifier().getName(), "-"), getTextContent());
-    // }
 
     // Last resort to try to find a matching metadata type for this component
     if (!getModel(HasStereotypeModel.class).isPresent()) {
