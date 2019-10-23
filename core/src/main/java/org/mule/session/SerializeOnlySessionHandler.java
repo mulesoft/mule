@@ -12,6 +12,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.SessionHandler;
+import org.mule.util.ClassSpecificObjectInputStream;
+import org.mule.util.ObjectInputStreamProvider;
 import org.mule.util.SerializationUtils;
 
 import org.apache.commons.logging.Log;
@@ -34,7 +36,8 @@ public class SerializeOnlySessionHandler implements SessionHandler
 
         if (serializedSession != null)
         {
-            session = (MuleSession) SerializationUtils.deserialize(serializedSession, message.getMuleContext());
+            ObjectInputStreamProvider provider = new ClassSpecificObjectInputStream.Provider(MuleSession.class);
+            session = (MuleSession) SerializationUtils.deserialize(serializedSession, message.getMuleContext(), provider);
         }
         return session;
     }
