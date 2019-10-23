@@ -9,8 +9,6 @@ package org.mule.module.launcher;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.artifact.Artifact;
 
-import java.util.Properties;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -64,13 +62,16 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
     }
 
     @Override
-    public void deploy(Artifact artifact)
+    public void deploy(Artifact artifact, boolean startArtifact)
     {
         try
         {
             artifact.install();
             artifact.init();
-            artifact.start();
+            if (startArtifact)
+            {
+                artifact.start();
+            }
         }
         catch (Throwable t)
         {
@@ -84,6 +85,12 @@ public class DefaultArtifactDeployer<T extends Artifact> implements ArtifactDepl
             final String msg = String.format("Failed to deploy artifact [%s]", artifact.getArtifactName());
             throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
         }
+    }
+
+    @Override
+    public void deploy(Artifact artifact)
+    {
+        deploy(artifact, true);
     }
 
 }
