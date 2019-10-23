@@ -44,6 +44,8 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
+import org.mule.tck.junit4.FlakinessDetectorTestRunner;
+import org.mule.tck.junit4.FlakyTest;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
@@ -51,11 +53,13 @@ import org.hamcrest.Matcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mule.test.runner.RunnerDelegateTo;
 
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
 
+@RunnerDelegateTo(FlakinessDetectorTestRunner.class)
 public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   public static final int TIMEOUT_MILLIS = 50000;
@@ -213,6 +217,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     assertThat(queueHandler.read(OUT, RECEIVE_TIMEOUT).getMessage(), hasPayload(equalTo("Expected.")));
   }
 
+  @FlakyTest(times=1000)
   @Test
   public void sourceFailsOnSuccessAndOnErrorParametersCallsOnTerminate() throws Exception {
     startFlow("sourceWithInvalidSuccessAndErrorParameters");

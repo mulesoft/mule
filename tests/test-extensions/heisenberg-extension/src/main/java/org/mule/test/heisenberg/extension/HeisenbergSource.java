@@ -67,6 +67,8 @@ import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.test.heisenberg.extension.model.Methylamine;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
@@ -82,6 +84,7 @@ import javax.inject.Inject;
 @Deprecated(message = "This source is being tapped by the DEA, it's usage is discouraged.", since = "1.6.0", toRemoveIn = "3.0.0")
 public class HeisenbergSource extends Source<String, Object> {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(HeisenbergSource.class);
   public static final String CORE_POOL_SIZE_ERROR_MESSAGE = "corePoolSize cannot be a negative value";
   public static final String INITIAL_BATCH_NUMBER_ERROR_MESSAGE = "initialBatchNumber cannot be a negative value";
   private static final String BATCH_NUMBER = "batchNumber";
@@ -187,7 +190,7 @@ public class HeisenbergSource extends Source<String, Object> {
     receivedGroupOnSource = ricin != null && ricin.getNextDoor().getAddress() != null;
     receivedInlineOnSuccess = successInfo != null && successInfo.getAge() != null && successInfo.getKnownAddresses() != null;
     executedOnSuccess = true;
-
+    LOGGER.debug(Thread.currentThread().getStackTrace().toString());
     notificationEmitter.fireLazy(BATCH_DELIVERED, () -> payment, fromType(Long.class));
 
     if (fail) {
@@ -205,6 +208,7 @@ public class HeisenbergSource extends Source<String, Object> {
     receivedGroupOnSource = ricin != null && ricin.getNextDoor() != null && ricin.getNextDoor().getAddress() != null;
     receivedInlineOnError = infoError != null && infoError.getName() != null && !infoError.getName().equals(HEISENBERG);
     executedOnError = true;
+    LOGGER.debug(Thread.currentThread().getStackTrace().toString());
     notificationEmitter.fireLazy(BATCH_DELIVERY_FAILED, () -> infoError, DataType.fromType(PersonalInfo.class));
     if (propagateError) {
       throw new RuntimeException("Some internal exception");
@@ -213,6 +217,7 @@ public class HeisenbergSource extends Source<String, Object> {
 
   @OnTerminate
   public void onTerminate(SourceResult sourceResult, NotificationEmitter notificationEmitter) {
+    LOGGER.debug(Thread.currentThread().getStackTrace().toString());
     if (sourceResult.isSuccess()) {
       terminateStatus = SUCCESS;
       error = empty();
@@ -241,6 +246,7 @@ public class HeisenbergSource extends Source<String, Object> {
 
   @Override
   public void onStop() {
+    LOGGER.debug(Thread.currentThread().getStackTrace().toString());
     if (executor != null) {
       scheduledFuture.cancel(true);
       executor.stop();
