@@ -50,10 +50,11 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -152,6 +153,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
     CoreEvent event;
     private AtomicInteger retryCount = new AtomicInteger();
     private Duration delay;
+    private reactor.core.scheduler.Scheduler delayScheduler;
 
     RetryContext(CoreEvent event) {
       this.event = event;
@@ -179,6 +181,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
       retryCount.set(maxRetriesEvaluated);
       maxRetries = maxRetriesEvaluated;
       delay = chosenDuration;
+      delayScheduler = fromExecutorService(new ConditionalExecutorServiceDecorator(timer, s -> isTransactionActive()));
     }
   }
 
@@ -190,36 +193,23 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
     FluxSinkRecorder<Either<CoreEvent, Throwable>> downstreamRecorder = new FluxSinkRecorder<>();
     Flux<CoreEvent> innerFlux;
     RetryContext currentContext;
-    AtomicReference<reactor.util.context.Context> downstreamCtxRef = new AtomicReference<>();
+    private FluxSinkRecorder<CoreEvent> companionSink;
 
     UntilSuccessfulRouter(Publisher<CoreEvent> publisher) {
       upstreamFlux = Flux.from(publisher)
           .doOnNext(event -> {
             // publish event
-
             currentContext = new RetryContext(event);
-
             innerRecorder.next(event);
           })
           .doOnComplete(() -> {
             // complete next stage of chain
             currentContext = null;
             innerRecorder.complete();
+            companionSink.complete();
           });
 
       innerFlux = Flux.create(innerRecorder)
-          .flatMap(event -> {
-            reactor.core.scheduler.Scheduler reactorRetryScheduler =
-                fromExecutorService(new ConditionalExecutorServiceDecorator(timer, s -> isTransactionActive()));
-
-            if (currentContext.retryCount.get() != currentContext.maxRetries) {
-              return Mono.just(event)
-                  .doOnNext(event1 -> LOGGER.error("Waiting for a delay of {}", currentContext.delay.toMillis()))
-                  .delayElement(currentContext.delay, reactorRetryScheduler);
-            } else {
-              return Mono.just(event);
-            }
-          })
           .transform(publisher1 -> applyWithChildContext(Flux.from(publisher1), nestedChain,
                                                          Optional.of(UntilSuccessful.this.getLocation())))
           // Success, inject into downstream publisher
@@ -231,7 +221,10 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
             if (retriesLeft > 0) { // Retry
               LOGGER.error("Retrying execution of event, attempt {} of {}.", currentContext.maxRetries - retriesLeft + 1,
                            maxRetriesAsInteger != RETRY_COUNT_FOREVER ? currentContext.maxRetries : "unlimited");
-              innerRecorder.next(currentContext.event);
+
+              // Schedule the event injection for retrial
+              currentContext.delayScheduler.schedule(() -> innerRecorder.next(currentContext.event),
+                                                     currentContext.delay.toMillis(), TimeUnit.MILLISECONDS);
             } else { // Retries exhausted
               LOGGER.error("Retry attempts exhausted. Failing...");
               Throwable resolvedError = getThrowableFunction(currentContext.event).apply(error);
@@ -250,16 +243,19 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
             }
           });
 
+    }
 
-      innerFlux =
-          routeSubscriptionAffectingCtxWith(upstreamFlux, innerFlux, innerCtx -> Context.empty().putAll(downstreamCtxRef.get()));
+    Publisher<CoreEvent> getDownstreamPublisher() {
+      companionSink = new FluxSinkRecorder();
+      Flux<CoreEvent> companionSubscriber = Flux.create(companionSink)
+          .compose(companionPublisher -> Mono.subscriberContext()
+              .flatMapMany(downstreamCtx -> companionPublisher.doOnSubscribe(s -> {
+                innerFlux.subscriberContext(downstreamCtx).subscribe();
+                upstreamFlux.subscriberContext(downstreamCtx).subscribe();
+              })));
 
-      // Decorate all fluxes
-      downstreamFlux = routeSubscriptionAffectingCtxWith(innerFlux, downstreamFlux, downstreamCtx -> {
-        downstreamCtxRef.set(downstreamCtx);
-        return Context.empty().putAll(downstreamCtx);
-      });
 
+      return Flux.merge(Arrays.asList(downstreamFlux, companionSubscriber));
     }
   }
 
@@ -273,7 +269,8 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   public Publisher<CoreEvent> alternativeApply(Publisher<CoreEvent> publisher) {
     UntilSuccessfulRouter router = new UntilSuccessfulRouter(publisher);
-    return router.downstreamFlux;
+    return router.getDownstreamPublisher();
+    // return router.downstreamFlux;
 
     // return router.downstreamFlux;
 
