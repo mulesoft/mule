@@ -7,8 +7,14 @@
 package org.mule.module.launcher;
 
 import static com.google.common.base.Optional.absent;
+import static com.google.common.base.Optional.of;
+import static java.lang.String.valueOf;
+import static org.mule.module.launcher.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+import static org.mule.module.launcher.application.ApplicationStatus.DEPLOYMENT_FAILED;
+import static org.mule.module.launcher.application.ApplicationStatus.STARTED;
 
 import org.mule.module.launcher.application.Application;
+import org.mule.module.launcher.application.ApplicationStatus;
 import org.mule.module.launcher.artifact.ArtifactFactory;
 import org.mule.module.launcher.domain.Domain;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
@@ -19,6 +25,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -210,8 +217,10 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
     public void redeploy(Domain artifact, Optional<Properties> deploymentProperties) throws DeploymentException
     {
         Collection<Application> domainApplications = findApplicationsAssociated(artifact);
+        Map<Application, ApplicationStatus> appStatusPreRedeployment = new HashMap<>();
         for (Application domainApplication : domainApplications)
         {
+            appStatusPreRedeployment.put(domainApplication, domainApplication.getStatus());
             applicationDeployer.undeployArtifactWithoutUninstall(domainApplication);
         }
         try
@@ -227,7 +236,9 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
         {
             try
             {
-                applicationDeployer.deployArtifact(domainApplication, deploymentProperties);
+                Optional<Properties> modifiedProperties = addShouldStartProperty(deploymentProperties,
+                                                                                 appStatusPreRedeployment.get(domainApplication));
+                applicationDeployer.deployArtifact(domainApplication, modifiedProperties);
             }
             catch (Exception e)
             {
@@ -237,6 +248,24 @@ public class DomainArchiveDeployer implements ArchiveDeployer<Domain>
                 }
             }
         }
+    }
+
+    private Optional<Properties> addShouldStartProperty(Optional<Properties> deploymentProperties,
+                                                        ApplicationStatus applicationStatus)
+    {
+        Properties newProperties;
+        if (deploymentProperties.isPresent())
+        {
+            newProperties = new Properties(deploymentProperties.get());
+        }
+        else
+        {
+            newProperties = new Properties();
+        }
+
+        boolean startArtifact = applicationStatus.equals(STARTED) || applicationStatus.equals(DEPLOYMENT_FAILED);
+        newProperties.setProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, valueOf(startArtifact));
+        return of(newProperties);
     }
 
     @Override
