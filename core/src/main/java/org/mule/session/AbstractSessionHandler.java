@@ -59,7 +59,7 @@ public abstract class AbstractSessionHandler implements SessionHandler
             }
             else
             {
-                wrappedSerializer = new ClassSpecificObjectSerializer(serializer, MuleSession.class);
+                wrappedSerializer = new ClassSpecificObjectSerializer(serializer, DefaultMuleSession.class);
             }
         }
 
