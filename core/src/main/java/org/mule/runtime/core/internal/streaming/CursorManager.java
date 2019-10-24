@@ -91,9 +91,10 @@ public class CursorManager {
       final int hash = identityHashCode(provider.getDelegate());
       ManagedCursorProvider managedProvider = getOrAddManagedProvider(provider, hash);
 
-      // this can happen in cases like when foreach splits a text document using a stream. N+1 iterations might
-      // try to manage the same root provider, but the managed decorator from iteration N has been collected
-      // in which case we simply track it again.
+      // This can happen when a foreach component splits a text document using a stream.
+      // Iteration N might try to manage the same root provider that was already managed in iteration N-1, but the
+      // managed decorator from that previous iteration has been collected, which causes the weak reference to yield
+      // a null value. In which case we simply track it again.
       if (managedProvider == null) {
         synchronized (provider.getDelegate()) {
           managedProvider = getOrAddManagedProvider(provider, hash);
