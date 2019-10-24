@@ -50,7 +50,7 @@ public class ClassSpecificObjectInputStream extends ClassLoaderObjectInputStream
             return resolved;
         }
 
-        if (classToAccept.isAssignableFrom(resolved))
+        if (classToAccept.equals(resolved))
         {
             firstClass = false;
             return resolved;
