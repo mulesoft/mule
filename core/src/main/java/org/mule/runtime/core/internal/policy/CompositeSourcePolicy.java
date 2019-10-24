@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
@@ -154,7 +155,13 @@ public class CompositeSourcePolicy
 
     return from(eventPub)
         .transform(flowExecutionProcessor)
-        .map(flowExecutionResponse -> policyEventMapper.onFlowFinish(flowExecutionResponse, getParametersTransformer()))
+        .map(flowExecutionResponse -> {
+          try {
+            return policyEventMapper.onFlowFinish(flowExecutionResponse, getParametersTransformer());
+          } catch (MessagingException e) {
+            throw Exceptions.propagateWrappingFatal(e);
+          }
+        })
         .onErrorContinue(MessagingException.class, (error, v) -> {
 
           PolicyNotificationHelper notificationHelper =
