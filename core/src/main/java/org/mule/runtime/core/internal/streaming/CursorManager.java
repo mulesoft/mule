@@ -88,7 +88,28 @@ public class CursorManager {
     private final Cache<Integer, WeakReference<ManagedCursorProvider>> providers = Caffeine.newBuilder().build();
 
     private ManagedCursorProvider addProvider(ManagedCursorProvider provider) {
-      return providers.get(identityHashCode(provider.getDelegate()), hash -> ghostBuster.track(provider)).get();
+      final int hash = identityHashCode(provider.getDelegate());
+      ManagedCursorProvider managedProvider = getOrAddManagedProvider(provider, hash);
+
+      // This can happen when a foreach component splits a text document using a stream.
+      // Iteration N might try to manage the same root provider that was already managed in iteration N-1, but the
+      // managed decorator from that previous iteration has been collected, which causes the weak reference to yield
+      // a null value. In which case we simply track it again.
+      if (managedProvider == null) {
+        synchronized (provider.getDelegate()) {
+          managedProvider = getOrAddManagedProvider(provider, hash);
+          if (managedProvider == null) {
+            providers.invalidate(hash);
+            managedProvider = getOrAddManagedProvider(provider, hash);
+          }
+        }
+      }
+
+      return managedProvider;
+    }
+
+    private ManagedCursorProvider getOrAddManagedProvider(ManagedCursorProvider provider, int hash) {
+      return providers.get(hash, k -> ghostBuster.track(provider)).get();
     }
 
     private void dispose() {
