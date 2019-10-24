@@ -90,6 +90,10 @@ public class CursorManager {
     private ManagedCursorProvider addProvider(ManagedCursorProvider provider) {
       final int hash = identityHashCode(provider.getDelegate());
       ManagedCursorProvider managedProvider = getOrAddManagedProvider(provider, hash);
+
+      // this can happen in cases like when foreach splits a text document using a stream. N+1 iterations might
+      // try to manage the same root provider, but the managed decorator from iteration N has been collected
+      // in which case we simply track it again.
       if (managedProvider == null) {
         synchronized (provider.getDelegate()) {
           managedProvider = getOrAddManagedProvider(provider, hash);
