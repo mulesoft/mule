@@ -275,7 +275,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
         message.setInboundProperty(MULE_SESSION_PROPERTY, encodedSet);
 
         expectedException.expect(SerializationException.class);
-        expectedException.expectMessage("Expecting an instance of 'org.mule.api.MuleSession' but 'java.util.HashSet' found");
+        expectedException.expectMessage("Expecting an instance of 'org.mule.session.DefaultMuleSession' but 'java.util.HashSet' found");
 
         MuleSession session = handler.retrieveSessionInfoFromMessage(message);
         assertNull(session);

@@ -41,7 +41,7 @@ public class SerializeAndEncodeSessionHandler extends SerializeOnlySessionHandle
             byte[] serializedSession = Base64.decode(serializedEncodedSession);            
             if (serializedSession != null)
             {
-                ObjectInputStreamProvider provider = new ClassSpecificObjectInputStream.Provider(MuleSession.class);
+                ObjectInputStreamProvider provider = new ClassSpecificObjectInputStream.Provider(DefaultMuleSession.class);
                 session = (MuleSession) SerializationUtils.deserialize(serializedSession, message.getMuleContext(), provider);
             }
         }
