@@ -79,7 +79,7 @@ public class ClassSpecificObjectSerializer extends JavaObjectSerializer
                 return resolved;
             }
 
-            if (classToAccept.isAssignableFrom(resolved))
+            if (classToAccept.equals(resolved))
             {
                 firstClass = false;
                 return resolved;
