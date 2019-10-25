@@ -12,6 +12,8 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_METADATA_AVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
+import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -33,6 +35,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Default implementation of the {@link MetadataService}, which provides access to the Metadata of any Component in the
@@ -55,6 +58,7 @@ public class MuleMetadataService implements MetadataService {
   private ConfigurationComponentLocator componentLocator;
 
   @Inject
+  @Named(METADATA_CACHE_MANAGER_KEY)
   private MetadataCacheManager cacheManager;
 
   /**
