@@ -15,13 +15,18 @@ import static org.mule.runtime.core.internal.policy.CompositeOperationPolicy.POL
 import static org.mule.runtime.core.internal.policy.CompositeSourcePolicy.POLICY_SOURCE_ORIGINAL_FAILURE_RESPONSE_PARAMETERS;
 import static org.mule.runtime.core.internal.policy.CompositeSourcePolicy.POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_EVENT_CTX_IDS;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+
+import com.google.common.collect.ImmutableSet;
+import org.slf4j.Logger;
 
 import java.util.Map;
 import java.util.Optional;
@@ -37,6 +42,7 @@ public class PolicyEventMapper {
   private static final String POLICY_VARS_PREFIX = "policy.vars.";
   private static final String POLICY_SOURCE_ORIGINAL_EVENT = "policy.source.originalEvent";
   private static final String POLICY_OPERATION_ORIGINAL_EVENT = "policy.operation.originalEvent";
+  private static final Logger LOGGER = getLogger(PolicyEventMapper.class);
 
   private final String policyId;
   private final String policyVarsInternalParameterName;
@@ -208,21 +214,29 @@ public class PolicyEventMapper {
    * @param parametersTransformer does the transformation from flow's response parameters into a {@link Message}.
    */
   public CoreEvent onFlowFinish(CoreEvent flowResult,
-                                Optional<SourcePolicyParametersTransformer> parametersTransformer) {
-    Map<String, Object> originalResponseParameters =
-        getResponseParamsProcessor(flowResult)
-            .getSuccessfulExecutionResponseParametersFunction()
-            .apply(flowResult);
+                                Optional<SourcePolicyParametersTransformer> parametersTransformer)
+      throws MessagingException {
+    try {
+      Map<String, Object> originalResponseParameters =
+          getResponseParamsProcessor(flowResult)
+              .getSuccessfulExecutionResponseParametersFunction()
+              .apply(flowResult);
 
-    Message message =
-        parametersTransformer
-            .map(t -> t.fromSuccessResponseParametersToMessage(originalResponseParameters))
-            .orElseGet(flowResult::getMessage);
+      Message message =
+          parametersTransformer
+              .map(t -> t.fromSuccessResponseParametersToMessage(originalResponseParameters))
+              .orElseGet(flowResult::getMessage);
 
-    return InternalEvent.builder(flowResult)
-        .message(message)
-        .addInternalParameter(POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS, originalResponseParameters)
-        .build();
+      return InternalEvent.builder(flowResult)
+          .message(message)
+          .addInternalParameter(POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS, originalResponseParameters)
+          .build();
+    } catch (Exception e) {
+      if (LOGGER.isWarnEnabled()) {
+        LOGGER.warn("Error after Flow finished execution", e);
+      }
+      throw new MessagingException(flowResult, e);
+    }
   }
 
   /**
