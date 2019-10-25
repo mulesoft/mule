@@ -97,10 +97,6 @@ public abstract class AbstractObjectSerializer implements ObjectSerializer, Mule
         {
             throw new SerializationException("Could not write to output stream", e);
         }
-        finally
-        {
-            IOUtils.closeQuietly(out);
-        }
     }
 
     /**
@@ -119,7 +115,15 @@ public abstract class AbstractObjectSerializer implements ObjectSerializer, Mule
     public <T> T deserialize(byte[] bytes, ClassLoader classLoader) throws SerializationException
     {
         checkArgument(bytes != null, "The byte[] must not be null");
-        return deserialize(new ByteArrayInputStream(bytes), classLoader);
+        ByteArrayInputStream inputStream = null;
+        try {
+            inputStream = new ByteArrayInputStream(bytes);
+            return deserialize(inputStream, classLoader);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(inputStream);
+        }
     }
 
     /**
@@ -147,10 +151,6 @@ public abstract class AbstractObjectSerializer implements ObjectSerializer, Mule
         catch (Exception e)
         {
             throw new SerializationException("Could not deserialize object", e);
-        }
-        finally
-        {
-            IOUtils.closeQuietly(inputStream);
         }
     }
 

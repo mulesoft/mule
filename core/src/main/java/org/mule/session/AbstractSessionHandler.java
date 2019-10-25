@@ -6,16 +6,31 @@
  */
 package org.mule.session;
 
+import static java.lang.String.valueOf;
+import static java.lang.System.currentTimeMillis;
+import static java.lang.System.getProperty;
+import static java.util.Collections.unmodifiableSet;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.inject.Inject;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleSession;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.serialization.DefaultObjectSerializer;
 import org.mule.api.serialization.ObjectSerializer;
 import org.mule.api.serialization.SerializationException;
 import org.mule.api.transport.SessionHandler;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.serialization.internal.ClassSpecificObjectSerializer;
+import org.mule.serialization.internal.MuleSessionWithNativeTypesSerializer;
 import org.mule.util.store.DeserializationPostInitialisable;
-
-import javax.inject.Inject;
 
 /**
  * Base class for implementations of {@link SessionHandler}
@@ -26,14 +41,40 @@ import javax.inject.Inject;
  */
 public abstract class AbstractSessionHandler implements SessionHandler
 {
+    public static final String ACTIVATE_NATIVE_SESSION_SERIALIZATION_PROPERTY = SYSTEM_PROPERTY_PREFIX
+            + "session.serialization.native.enable";
+
+    protected boolean ACTIVATE_NATIVE_SESSION_SERIALIZATION = Boolean
+            .getBoolean(ACTIVATE_NATIVE_SESSION_SERIALIZATION_PROPERTY);
+
+
+    private ObjectSerializer nativeObjectSerializer = new MuleSessionWithNativeTypesSerializer();
     private ObjectSerializerLocator objectSerializerLocator = new FromMessageObjectSerializerLocator();
 
     private ObjectSerializer wrappedSerializer = null;
 
     protected <T> T deserialize(MuleMessage message, byte[] bytes)
     {
-        ObjectSerializer objectSerializer = wrapSerializer(objectSerializerLocator.getObjectSerializer(message));
-        T object = objectSerializer.deserialize(bytes, message.getMuleContext().getExecutionClassLoader());
+        return deserialize(message, bytes, nativeObjectSerializer);
+    }
+
+    private boolean isNativeSerializationActivated(String endpoint)
+    {
+        return ACTIVATE_NATIVE_SESSION_SERIALIZATION;
+    }
+
+    private <T> T deserialize(MuleMessage message, byte[] bytes, ObjectSerializer objectSerializer)
+    {
+        T object;
+        if (isNativeSerializationActivated(getEndpoint(message)))
+        {
+            object = nativeObjectSerializer.deserialize(bytes, message.getMuleContext().getExecutionClassLoader());
+        }
+        else
+        {
+            object = objectSerializerLocator.getObjectSerializer(message).deserialize(bytes, message.getMuleContext().getExecutionClassLoader());
+        }
+
         if (object instanceof DeserializationPostInitialisable)
         {
             try
@@ -49,26 +90,21 @@ public abstract class AbstractSessionHandler implements SessionHandler
         return object;
     }
 
-    private ObjectSerializer wrapSerializer(ObjectSerializer serializer)
-    {
-        if (wrappedSerializer == null)
-        {
-            if (serializer instanceof ClassSpecificObjectSerializer)
-            {
-                wrappedSerializer = serializer;
-            }
-            else
-            {
-                wrappedSerializer = new ClassSpecificObjectSerializer(serializer, DefaultMuleSession.class);
-            }
-        }
-
-        return wrappedSerializer;
-    }
-
     protected byte[] serialize(MuleMessage message, Object object)
     {
-        return objectSerializerLocator.getObjectSerializer(message).serialize(object);
+        if (isNativeSerializationActivated(getEndpoint(message)))
+        {
+            return nativeObjectSerializer.serialize(object);
+        }
+        else
+        {
+            return objectSerializerLocator.getObjectSerializer(message).serialize(object);
+        }
+    }
+
+    protected String getEndpoint(MuleMessage message)
+    {
+        return valueOf(message.getInboundProperty("MULE_ENDPOINT"));
     }
 
     @Inject

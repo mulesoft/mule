@@ -8,7 +8,11 @@ package org.mule.util;
 
 import static java.lang.Boolean.TRUE;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.session.SerializeAndEncodeSessionHandler.SESSION_SIGN_CH_SECRET_KEY;
+import static org.mule.session.SerializeAndEncodeSessionHandler.SESSION_SIGN_SECRET_KEY;
+
 import org.mule.api.MuleContext;
+import org.mule.session.SerializeAndEncodeSessionHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -101,7 +105,14 @@ public abstract class SplashScreen
             doBody(description);
             for (String key : map.keySet())
             {
-                doBody(String.format(KEY_VALUE_FORMAT, key, map.get(key)));
+                if(key.equals(SESSION_SIGN_SECRET_KEY) || key.equals(SESSION_SIGN_CH_SECRET_KEY))
+                {
+                    doBody(String.format(KEY_VALUE_FORMAT, key, "*****"));
+                }
+                else 
+                {
+                    doBody(String.format(KEY_VALUE_FORMAT, key, map.get(key)));
+                }
             }
         }
     }
