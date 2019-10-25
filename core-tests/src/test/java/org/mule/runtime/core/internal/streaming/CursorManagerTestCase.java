@@ -9,9 +9,12 @@ package org.mule.runtime.core.internal.streaming;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.probe.PollingProber.check;
@@ -33,6 +36,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -45,6 +49,9 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
 
   @Mock
   private StreamingGhostBuster ghostBuster;
+
+  @Mock
+  private BaseEventContext ctx;
 
   private CursorManager cursorManager;
   private ExecutorService executorService;
@@ -70,7 +77,6 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
     executorService = Executors.newFixedThreadPool(threadCount);
 
     final CursorProvider cursorProvider = mock(CursorStreamProvider.class);
-    final BaseEventContext ctx = mock(BaseEventContext.class);
 
     for (int i = 0; i < threadCount; i++) {
       executorService.submit(() -> {
@@ -96,5 +102,20 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
     assertThat(managedProviders.stream().allMatch(p -> p == managedProvider), is(true));
 
     verify(ghostBuster).track(managedProvider);
+  }
+
+  @Test
+  public void remanageCollectedDecorator() {
+    CursorStreamProvider provider = mock(CursorStreamProvider.class);
+    when(ghostBuster.track(any())).thenReturn(new WeakReference<>(null));
+
+    cursorManager.manage(provider, ctx);
+
+    ArgumentCaptor<ManagedCursorProvider> managedDecoratorCaptor = forClass(ManagedCursorProvider.class);
+    verify(ghostBuster, times(2)).track(managedDecoratorCaptor.capture());
+
+    List<ManagedCursorProvider> captured = managedDecoratorCaptor.getAllValues();
+    assertThat(captured, hasSize(2));
+    assertThat(captured.get(0), is(sameInstance(captured.get(1))));
   }
 }
