@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -29,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
@@ -58,6 +60,7 @@ public class CompositeSourcePolicy
   private final ReactiveProcessor flowExecutionProcessor;
 
   private final PolicyEventMapper policyEventMapper;
+  private Optional<Function<MessagingException, MessagingException>> resolver;
 
   /**
    * Creates a new source policies composed by several {@link Policy} that will be chain together.
@@ -71,11 +74,28 @@ public class CompositeSourcePolicy
                                ReactiveProcessor flowExecutionProcessor,
                                Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
                                SourcePolicyProcessorFactory sourcePolicyProcessorFactory) {
+    this(parameterizedPolicies, flowExecutionProcessor, sourcePolicyParametersTransformer, sourcePolicyProcessorFactory, null);
+  }
+
+  /**
+   * Creates a new source policies composed by several {@link Policy} that will be chain together.
+   *
+   * @param parameterizedPolicies the list of policies to use in this composite policy.
+   * @param flowExecutionProcessor the operation that executes the flow
+   * @param sourcePolicyParametersTransformer a transformer from a source response parameters to a message and vice versa
+   * @param sourcePolicyProcessorFactory factory to create a {@link Processor} from each {@link Policy}
+   */
+  public CompositeSourcePolicy(List<Policy> parameterizedPolicies,
+                               ReactiveProcessor flowExecutionProcessor,
+                               Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
+                               SourcePolicyProcessorFactory sourcePolicyProcessorFactory,
+                               Function<MessagingException, MessagingException> resolver) {
     super(parameterizedPolicies, sourcePolicyParametersTransformer);
     this.flowExecutionProcessor = flowExecutionProcessor;
     this.sourcePolicyProcessorFactory = sourcePolicyProcessorFactory;
     this.commonPolicy = new CommonSourcePolicy(new SourceWithPoliciesFluxObjectFactory(), sourcePolicyParametersTransformer);
     this.policyEventMapper = new PolicyEventMapper();
+    this.resolver = ofNullable(resolver);
   }
 
   private final class SourceWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
@@ -159,7 +179,7 @@ public class CompositeSourcePolicy
           try {
             return policyEventMapper.onFlowFinish(flowExecutionResponse, getParametersTransformer());
           } catch (MessagingException e) {
-            throw Exceptions.propagateWrappingFatal(e);
+            throw Exceptions.propagateWrappingFatal(resolver.orElse(exc -> exc).apply(e));
           }
         })
         .onErrorContinue(MessagingException.class, (error, v) -> {
