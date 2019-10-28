@@ -15,17 +15,18 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToCreate;
 import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.runtime.core.internal.util.store.MuleObjectStoreManager.UNBOUNDED;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.serialization.ObjectSerializer;
+import org.mule.runtime.api.store.ExpirableObjectStore;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
-import org.mule.runtime.api.store.ExpirableObjectStore;
 import org.mule.runtime.core.api.util.UUID;
+import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -82,6 +83,11 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
     serializer = muleContext.getObjectSerializer();
     this.partitionDirectory = partitionDirectory;
     this.partitionName = readPartitionFileName(partitionDirectory);
+  }
+
+  protected PersistentObjectStorePartition() {
+    muleContext = null;
+    serializer = null;
   }
 
   private String readPartitionFileName(File partitionDirectory) throws ObjectStoreNotAvailableException {
@@ -290,6 +296,10 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
                                                                   partitionDirectory.getAbsolutePath())));
       }
     }
+  }
+
+  public File getPartitionDirectory() {
+    return partitionDirectory;
   }
 
   private File[] listValuesFiles() {
