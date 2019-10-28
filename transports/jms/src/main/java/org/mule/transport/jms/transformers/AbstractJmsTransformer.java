@@ -6,6 +6,7 @@
  */
 package org.mule.transport.jms.transformers;
 
+import static org.mule.util.ClassUtils.getSimpleName;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transaction.Transaction;
@@ -30,8 +31,8 @@ import javax.jms.Session;
 
 /**
  * <code>AbstractJmsTransformer</code> is an abstract class that should be used for
- * all transformers where a JMS message will be the transformed or transformee
- * object. It provides services for compressing and uncompressing messages.
+ * all transformers where a JMS message will be the transformed or transformee object. It provides services for
+ * compressing and uncompressing messages.
  */
 
 public abstract class AbstractJmsTransformer extends AbstractMessageTransformer implements DiscoverableTransformer
@@ -125,7 +126,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
         if (logger.isDebugEnabled())
         {
             logger.debug("Message type received is: " +
-                         ClassUtils.getSimpleName(source.getClass()));
+                         getSimpleName(source.getClass()));
         }
 
         // Try to figure out our endpoint's JMS Specification and fall back to
@@ -186,7 +187,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
             if (logger.isDebugEnabled())
             {
                 logger.debug("Unable to set property '" + key + "' of type "
-                             + ClassUtils.getSimpleName(value.getClass())
+                             + getSimpleName(value.getClass())
                              + "': " + e.getMessage());
             }
         }

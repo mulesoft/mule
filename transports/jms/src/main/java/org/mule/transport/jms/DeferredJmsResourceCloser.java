@@ -92,8 +92,7 @@ class DeferredJmsResourceCloser extends Thread
         {
             awaitForEmptyQueueSync.release();
         }
-        // TODO: Change this logger to debug level
-        LOGGER.warn("Stopping Deferred JMS Resource closer thread");
+        LOGGER.debug("Stopping Deferred JMS Resource closer thread");
     }
 
     private boolean isTerminateRequested()

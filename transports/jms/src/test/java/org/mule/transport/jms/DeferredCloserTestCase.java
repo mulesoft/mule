@@ -32,6 +32,8 @@ import org.mockito.stubbing.Answer;
 public class DeferredCloserTestCase
 {
 
+    private static final int PROBE_EMPTIED_TIMEOUT_MILLIS = 10000;
+    private static final int PROBE_EMPTIED_DELAY_MILLIS = 1000;
     private BlockingQueue queue = new LinkedBlockingQueue();
     private DeferredJmsResourceCloser thread;
     private JmsConnector connector;
@@ -187,7 +189,7 @@ public class DeferredCloserTestCase
 
     private void probeGetsEmptied()
     {
-        new PollingProber(10000, 1000).check(new Probe()
+        new PollingProber(PROBE_EMPTIED_TIMEOUT_MILLIS, PROBE_EMPTIED_DELAY_MILLIS).check(new Probe()
         {
             @Override
             public boolean isSatisfied()

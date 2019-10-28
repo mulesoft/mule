@@ -239,7 +239,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         logger.debug("doDisconnect()");
 
         SubReceiver sub;
-        for (Iterator<SubReceiver> it = consumers.iterator(); it.hasNext(); )
+        for (Iterator<SubReceiver> it = consumers.iterator(); it.hasNext();)
         {
             sub = it.next();
             try

@@ -6,6 +6,10 @@
  */
 package org.mule.transport.jms;
 
+import static org.mule.transport.jms.JmsConstants.JMS_MESSAGE_ID;
+import static org.mule.transport.jms.JmsConstants.PERSISTENT_DELIVERY_PROPERTY;
+import static org.mule.transport.jms.JmsConstants.PRIORITY_PROPERTY;
+import static org.mule.transport.jms.JmsConstants.TIME_TO_LIVE_PROPERTY;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -35,13 +39,10 @@ import javax.jms.Topic;
 
 /**
  * <code>JmsReplyToHandler</code> will process a JMS replyTo or hand off to the
- * default replyTo handler if the replyTo is a URL.
- * The purpose of this class is to send a result on a ReplyTo destination if one
- * has been set.
- * Note that the {@link JmsMessageDispatcher} also contains logic for handling ReplyTo. However,
- * the dispatcher is responsible attaching the replyTo information to the message and also
- * receiving on the same replyTo if 'remoteSync' is set. The {@link JmsMessageDispatcher} never
- * writes to the 'replyTo' destination.
+ * default replyTo handler if the replyTo is a URL. The purpose of this class is to send a result on a ReplyTo
+ * destination if one has been set. Note that the {@link JmsMessageDispatcher} also contains logic for handling ReplyTo.
+ * However, the dispatcher is responsible attaching the replyTo information to the message and also receiving on the
+ * same replyTo if 'remoteSync' is set. The {@link JmsMessageDispatcher} never writes to the 'replyTo' destination.
  */
 public class JmsReplyToHandler extends DefaultReplyToHandler
 {
@@ -123,14 +124,14 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
 
             // QoS support
             MuleMessage eventMsg = event.getMessage();
-            String ttlString = (String) eventMsg.getOutboundProperty(JmsConstants.TIME_TO_LIVE_PROPERTY);
-            String priorityString = (String) eventMsg.getOutboundProperty(JmsConstants.PRIORITY_PROPERTY);
-            String persistentDeliveryString = (String) eventMsg.getOutboundProperty(JmsConstants.PERSISTENT_DELIVERY_PROPERTY);
+            String ttlString = (String) eventMsg.getOutboundProperty(TIME_TO_LIVE_PROPERTY);
+            String priorityString = (String) eventMsg.getOutboundProperty(PRIORITY_PROPERTY);
+            String persistentDeliveryString = (String) eventMsg.getOutboundProperty(PERSISTENT_DELIVERY_PROPERTY);
 
             String correlationIDString = replyToMessage.getJMSCorrelationID();
             if (StringUtils.isBlank(correlationIDString))
             {
-                correlationIDString = eventMsg.getInboundProperty(JmsConstants.JMS_MESSAGE_ID);
+                correlationIDString = eventMsg.getInboundProperty(JMS_MESSAGE_ID);
                 replyToMessage.setJMSCorrelationID(correlationIDString);
             }
 
