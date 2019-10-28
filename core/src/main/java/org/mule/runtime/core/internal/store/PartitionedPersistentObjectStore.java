@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.store;
 
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.store.ObjectStoreException;
@@ -35,7 +36,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
   private static final Logger LOGGER = getLogger(PartitionedPersistentObjectStore.class);
   public static final String OBJECT_STORE_DIR = "objectstore";
 
-  private MuleContext muleContext;
+  protected MuleContext muleContext;
   private File storeDirectory;
   private Map<String, PersistentObjectStorePartition> partitionsByName = new HashMap<>();
   private boolean initialized = false;
@@ -47,6 +48,10 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
   public PartitionedPersistentObjectStore(MuleContext context) {
     super();
     muleContext = context;
+  }
+
+  protected PartitionedPersistentObjectStore(Map<String, PersistentObjectStorePartition> getPartitionsByName) {
+    this.partitionsByName = getPartitionsByName;
   }
 
   @Override
@@ -80,7 +85,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
     PersistentObjectStorePartition persistentObjectStorePartition =
         new PersistentObjectStorePartition(muleContext, partitionName, getNewPartitionDirectory(partitionName));
     persistentObjectStorePartition.open();
-    partitionsByName.put(partitionName, persistentObjectStorePartition);
+    partitionsByName.putIfAbsent(partitionName, persistentObjectStorePartition);
   }
 
   private File getNewPartitionDirectory(String partitionName) {
@@ -132,7 +137,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
     getPartitionObjectStore(partitionName).clear();
   }
 
-  private PersistentObjectStorePartition<T> getPartitionObjectStore(String partitionName) throws ObjectStoreException {
+  protected PersistentObjectStorePartition<T> getPartitionObjectStore(String partitionName) throws ObjectStoreException {
     if (!partitionsByName.containsKey(partitionName)) {
       throw new ObjectStoreException(CoreMessages.createStaticMessage("No partition named: " + partitionName));
     }
@@ -189,7 +194,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
         PersistentObjectStorePartition persistentObjectStorePartition =
             new PersistentObjectStorePartition(muleContext, partitionDirectory);
         persistentObjectStorePartition.open();
-        partitionsByName.put(persistentObjectStorePartition.getPartitionName(), persistentObjectStorePartition);
+        partitionsByName.putIfAbsent(persistentObjectStorePartition.getPartitionName(), persistentObjectStorePartition);
       } catch (Exception e) {
         LOGGER.error("Could not restore partition under directory " + partitionDirectory.getAbsolutePath());
       }
