@@ -56,6 +56,7 @@ import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingSer
 import org.mule.runtime.core.internal.lifecycle.phases.DefaultLifecycleObjectSorter;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.metadata.cache.DefaultPersistentMetadataCacheManager;
+import org.mule.runtime.core.internal.metadata.cache.DelegateMetadataCacheManager;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
@@ -82,7 +83,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
@@ -104,6 +104,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   public static final String SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH = "_sharedPartitionatedPersistentObjectStorePath";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LazyMuleArtifactContext.class);
+  private static final String DEFAULT_METADATA_CACHE_MANAGER_KEY = "_defaultPersistentMetadataCacheManager";
+  private static final String LAZY_MULE_OBJECT_STORE_MANAGER = "_muleLazyObjectStoreManager";
 
   private List<String> beansCreated = new ArrayList<>();
 
@@ -181,25 +183,31 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       muleContext.getCustomizationService().overrideDefaultServiceImpl(SHARED_PERSISTENT_OBJECT_STORE_KEY,
                                                                        new SharedPartitionedPersistentObjectStore<>(new File(sharedPartitionatedPersistentObjectStorePath),
                                                                                                                     runtimeLockFactory));
-      // Create a custom ObjectStoreManager that defines a different key for persistent object store
-      Supplier<ObjectStoreManager> osmSupplier = () -> {
-        MuleObjectStoreManager osm = new MuleObjectStoreManager();
-        osm.setBasePersistentStoreKey(SHARED_PERSISTENT_OBJECT_STORE_KEY);
-        osm.setBaseTransientStoreKey(BASE_IN_MEMORY_OBJECT_STORE_KEY);
-        osm.setSchedulerService(muleContext.getSchedulerService());
-        osm.setMuleContext(muleContext);
-        try {
-          // We have to manually initialise this component
-          this.muleContext.getRegistry().applyLifecycle(osm, Initialisable.PHASE_NAME);
-        } catch (MuleException e) {
-          throw new MuleRuntimeException(createStaticMessage("Error while initializing a shared object store manager"), e);
-        }
-        return osm;
-      };
+      MuleObjectStoreManager osm = new MuleObjectStoreManager();
+      osm.setBasePersistentStoreKey(SHARED_PERSISTENT_OBJECT_STORE_KEY);
+      osm.setBaseTransientStoreKey(BASE_IN_MEMORY_OBJECT_STORE_KEY);
+      try {
+        this.muleContext.getRegistry().registerObject(LAZY_MULE_OBJECT_STORE_MANAGER, osm);
+      } catch (RegistrationException e) {
+        throw new MuleRuntimeException(e);
+      }
 
+      muleContext.getCustomizationService().registerCustomServiceClass(DEFAULT_METADATA_CACHE_MANAGER_KEY,
+                                                                       DefaultPersistentMetadataCacheManager.class);
       muleContext.getCustomizationService().overrideDefaultServiceImpl(METADATA_CACHE_MANAGER_KEY,
-                                                                       new DefaultPersistentMetadataCacheManager(osmSupplier,
-                                                                                                                 runtimeLockFactory));
+                                                                       new DelegateMetadataCacheManager(() -> {
+                                                                         DefaultPersistentMetadataCacheManager defaultPersistentMetadataCacheManager =
+                                                                             (DefaultPersistentMetadataCacheManager) getRegistry()
+                                                                                 .lookupByName(DEFAULT_METADATA_CACHE_MANAGER_KEY)
+                                                                                 .get();
+                                                                         defaultPersistentMetadataCacheManager
+                                                                             .setLockFactory(runtimeLockFactory);
+                                                                         defaultPersistentMetadataCacheManager
+                                                                             .setObjectStoreManager(getRegistry()
+                                                                                 .<ObjectStoreManager>lookupByName(LAZY_MULE_OBJECT_STORE_MANAGER)
+                                                                                 .get());
+                                                                         return defaultPersistentMetadataCacheManager;
+                                                                       }));
     }
   }
 
