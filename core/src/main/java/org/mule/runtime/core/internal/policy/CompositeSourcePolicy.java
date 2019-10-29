@@ -84,6 +84,7 @@ public class CompositeSourcePolicy
    * @param flowExecutionProcessor the operation that executes the flow
    * @param sourcePolicyParametersTransformer a transformer from a source response parameters to a message and vice versa
    * @param sourcePolicyProcessorFactory factory to create a {@link Processor} from each {@link Policy}
+   * @param resolver a mapper to update the eventual errors in source policy                                     
    */
   public CompositeSourcePolicy(List<Policy> parameterizedPolicies,
                                ReactiveProcessor flowExecutionProcessor,
