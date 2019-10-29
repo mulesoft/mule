@@ -246,23 +246,34 @@ public class PolicyEventMapper {
    */
   public CoreEvent onFlowError(CoreEvent event, String policyId,
                                Optional<SourcePolicyParametersTransformer> parametersTransformer) {
-    Map<String, Object> originalFailureResponseParameters =
-        getResponseParamsProcessor(event)
-            .getFailedExecutionResponseParametersFunction()
-            .apply(event);
+    try {
+      Map<String, Object> originalFailureResponseParameters =
+          getResponseParamsProcessor(event)
+              .getFailedExecutionResponseParametersFunction()
+              .apply(event);
 
-    Message message =
-        parametersTransformer
-            .map(t -> t.fromFailureResponseParametersToMessage(originalFailureResponseParameters))
-            .orElse(event.getMessage());
+      Message message =
+          parametersTransformer
+              .map(t -> t.fromFailureResponseParametersToMessage(originalFailureResponseParameters))
+              .orElse(event.getMessage());
 
-    Map<String, TypedValue<?>> variables = loadVars(event, policyId);
+      Map<String, TypedValue<?>> variables = loadVars(event, policyId);
 
-    return InternalEvent.builder(event)
-        .message(message)
-        .addInternalParameter(POLICY_SOURCE_ORIGINAL_FAILURE_RESPONSE_PARAMETERS, originalFailureResponseParameters)
-        .variablesTyped(variables != null ? variables : emptyMap())
-        .build();
+      return InternalEvent.builder(event)
+          .message(message)
+          .addInternalParameter(POLICY_SOURCE_ORIGINAL_FAILURE_RESPONSE_PARAMETERS, originalFailureResponseParameters)
+          .variablesTyped(variables != null ? variables : emptyMap())
+          .build();
+    } catch (Exception e) {
+      if (LOGGER.isWarnEnabled()) {
+        LOGGER.warn("Error after Flow finished execution", e);
+      }
+      Map<String, TypedValue<?>> variables = loadVars(event, policyId);
+
+      return InternalEvent.builder(event)
+          .variablesTyped(variables != null ? variables : emptyMap())
+          .build();
+    }
   }
 
   private CoreEvent onPolicyNext(CoreEvent event, boolean propagate) {

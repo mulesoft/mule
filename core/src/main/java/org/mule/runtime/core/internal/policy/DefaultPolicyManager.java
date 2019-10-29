@@ -30,6 +30,7 @@ import org.mule.runtime.core.api.policy.PolicyProvider;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.policy.api.OperationPolicyPointcutParametersFactory;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
@@ -140,7 +141,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
                  ? new NoSourcePolicy(flowExecutionProcessor)
                  : new CompositeSourcePolicy(innerKey.getSecond(), flowExecutionProcessor,
                                              lookupSourceParametersTransformer(sourceIdentifier),
-                                             sourcePolicyProcessorFactory)));
+                                             sourcePolicyProcessorFactory, exception -> new MessagingExceptionResolver(source)
+                                                 .resolve(exception, muleContext))));
   }
 
   @Override
