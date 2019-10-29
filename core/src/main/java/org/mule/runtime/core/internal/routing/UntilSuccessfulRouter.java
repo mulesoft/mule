@@ -15,6 +15,7 @@ import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
@@ -59,7 +60,7 @@ class UntilSuccessfulRouter {
   private static final String UNTIL_SUCCESSFUL_MSG_PREFIX =
       "'until-successful' retries exhausted. Last exception message was: %s";
 
-  private UntilSuccessful untilSuccessful;
+  private Component owner;
   FluxSinkRecorder<CoreEvent> innerRecorder = new FluxSinkRecorder<>();
   FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
 
@@ -69,34 +70,34 @@ class UntilSuccessfulRouter {
   private String maxRetries;
   private String millisBetweenRetries;
   Flux<CoreEvent> innerFlux;
-  private MessageProcessorChain nestedChain;
   private ExtendedExpressionManager expressionManager;
   Flux<CoreEvent> downstreamFlux;
 
-  UntilSuccessfulRouter(UntilSuccessful untilSuccessful, Publisher<CoreEvent> publisher, MessageProcessorChain nestedChain,
+  UntilSuccessfulRouter(Component owner, Publisher<CoreEvent> publisher, MessageProcessorChain nestedChain,
                         ExtendedExpressionManager expressionManager, Predicate<CoreEvent> shouldRetry, Scheduler delayScheduler,
                         String maxRetries, String millisBetweenRetries) {
-    this.untilSuccessful = untilSuccessful;
-    upstreamFlux = Flux.from(publisher)
-        .doOnNext(event -> {
-          // publish event
-          LOGGER.error("Setting new context for event {} and injecting in router {}", event.getCorrelationId(),
-                       this.toString());
-          innerRecorder.next(eventWithCtx(event, new RetryContext(event)));
-        })
-        .doOnComplete(() -> {
-          // complete next stage of chain
-          innerRecorder.complete();
-          downstreamRecorder.complete();
-        });
+    this.owner = owner;
     this.shouldRetry = shouldRetry;
     this.delayScheduler = delayScheduler;
     this.maxRetries = maxRetries;
     this.millisBetweenRetries = millisBetweenRetries;
+    this.expressionManager = expressionManager;
 
+    // Upstream side of until successful chain. Injects events into retrial chain.
+    upstreamFlux = Flux.from(publisher)
+        .doOnNext(event -> {
+          // Inject event into retrial execution chain
+          innerRecorder.next(eventWithCtx(event, new RetryContext(event)));
+        })
+        .doOnComplete(() -> {
+          innerRecorder.complete();
+          downstreamRecorder.complete();
+        });
+
+    // Inner chain. Contains all retrial and error handling logic.
     innerFlux = Flux.create(innerRecorder)
         .transform(innerPublisher -> applyWithChildContext(innerPublisher, nestedChain,
-                                                           Optional.of(untilSuccessful.getLocation())))
+                                                           Optional.of(owner.getLocation())))
         .doOnNext(successfulEvent -> downstreamRecorder.next(Either.right(Throwable.class, successfulEvent)))
         .onErrorContinue(getRetryPredicate(), (error, offendingEvent) -> {
           MessagingException messagingError = (MessagingException) error;
@@ -117,9 +118,8 @@ class UntilSuccessfulRouter {
             downstreamRecorder.next(Either.left(resolvedError, CoreEvent.class));
           }
         });
-    this.nestedChain = nestedChain;
-    this.expressionManager = expressionManager;
 
+    // Downstream chain. Unpacks and publishes successful events and errors downstream.
     downstreamFlux = Flux.create(downstreamRecorder)
         .map(either -> {
           if (either.isLeft()) {
@@ -151,7 +151,9 @@ class UntilSuccessfulRouter {
    * @return the {@link CoreEvent} with the retry context saved as internal parameter
    */
   private CoreEvent eventWithCtx(CoreEvent event, RetryContext ctx) {
+
     // TODO: There must be cleaner way to do this
+
     Map<String, Object> parametersWithCtx = new HashMap<>();
     parametersWithCtx.put(RETRY_CTX_INTERNAL_PARAM_KEY, ctx);
     return quickCopy(event, parametersWithCtx);
@@ -172,8 +174,8 @@ class UntilSuccessfulRouter {
       return new MessagingException(exceptionEvent,
                                     new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX,
                                                                                           cause.getMessage()),
-                                                                      cause, untilSuccessful),
-                                    untilSuccessful);
+                                                                      cause, owner),
+                                    owner);
     };
   }
 
@@ -195,7 +197,7 @@ class UntilSuccessfulRouter {
       this.event = event;
 
       ExpressionManagerSession session =
-          expressionManager.openSession(untilSuccessful.getLocation(), event, NULL_BINDING_CONTEXT);
+          expressionManager.openSession(owner.getLocation(), event, NULL_BINDING_CONTEXT);
 
       // Max retries: Expression or literal
       if (expressionManager.isExpression(UntilSuccessfulRouter.this.maxRetries)) {
