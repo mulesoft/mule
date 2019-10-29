@@ -37,6 +37,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -55,7 +56,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -207,8 +207,9 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
     Flux<CoreEvent> upstreamFlux;
     FluxSinkRecorder<CoreEvent> innerRecorder = new FluxSinkRecorder<>();
+    FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
     Flux<CoreEvent> innerFlux;
-    RetryContext currentContext;
+    Flux<CoreEvent> downstreamFlux;
     private FluxSinkRecorder<CoreEvent> companionSink;
 
     UntilSuccessfulRouter(Publisher<CoreEvent> publisher) {
@@ -217,21 +218,18 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
             // publish event
             LOGGER.error("Setting new context for event {} and injecting in router {}", event.getCorrelationId(),
                          this.toString());
-            currentContext = new RetryContext(event);
-
             innerRecorder.next(eventWithCtx(event, new RetryContext(event)));
           })
           .doOnComplete(() -> {
             // complete next stage of chain
-            currentContext = null;
             innerRecorder.complete();
-            companionSink.complete();
+            downstreamRecorder.complete();
           });
 
       innerFlux = Flux.create(innerRecorder)
           .transform(publisher1 -> applyWithChildContext(Flux.from(publisher1), nestedChain,
                                                          Optional.of(UntilSuccessful.this.getLocation())))
-          // Have to check if the context reaches the onErrorContinue
+          .doOnNext(successfulEvent -> downstreamRecorder.next(Either.right(Throwable.class, successfulEvent)))
           .onErrorContinue(getRetryPredicate(), (error, offendingEvent) -> {
             MessagingException messagingError = (MessagingException) error;
             RetryContext ctx = ((InternalEvent) messagingError.getEvent()).getInternalParameter(RETRY_CTX_INTERNAL_PARAM_KEY);
@@ -247,21 +245,25 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
             } else { // Retries exhausted
               LOGGER.error("Retry attempts exhausted. Failing...");
               Throwable resolvedError = getThrowableFunction(ctx.event).apply(error);
-              throw propagate(resolvedError);
+              downstreamRecorder.next(Either.left(resolvedError, CoreEvent.class));
+            }
+          });
+
+      downstreamFlux = Flux.create(downstreamRecorder)
+          .map(either -> {
+            if (either.isLeft()) {
+              throw propagate(either.getLeft());
+            } else {
+              return either.getRight();
             }
           });
     }
 
     Publisher<CoreEvent> getDownstreamPublisher() {
-      companionSink = new FluxSinkRecorder();
-      Flux<CoreEvent> companionSubscriber = Flux.create(companionSink)
-          .compose(companionPublisher -> Mono.subscriberContext()
-              .flatMapMany(downstreamCtx -> companionPublisher.doOnSubscribe(s -> {
-                upstreamFlux.subscriberContext(downstreamCtx).subscribe();
-              })));
-
-
-      return Flux.merge(Arrays.asList(innerFlux, companionSubscriber));
+      return downstreamFlux.compose(downstream -> Mono.subscriberContext().flatMapMany(dsCtx -> downstream.doOnSubscribe(s -> {
+        innerFlux.subscriberContext(dsCtx).subscribe();
+        upstreamFlux.subscriberContext(dsCtx).subscribe();
+      })));
     }
   }
 
