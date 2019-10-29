@@ -1,4 +1,10 @@
 /*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+/*
 
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
@@ -33,11 +39,14 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
+import org.mule.runtime.core.internal.event.EventQuickCopy;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 import org.mule.runtime.core.privileged.processor.Scope;
@@ -47,6 +56,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -67,6 +77,7 @@ import reactor.core.publisher.Mono;
  */
 public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
+  private static final String RETRY_CTX_INTERNAL_PARAM_KEY = "RETRY_CTX";
   private final Logger LOGGER = getLogger(UntilSuccessful.class);
 
   private static final String UNTIL_SUCCESSFUL_MSG_PREFIX =
@@ -97,7 +108,9 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
       throw new InitialisationException(createStaticMessage("One message processor must be configured within 'until-successful'."),
                                         this);
     }
-    this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, getRootContainerLocation()), processors);
+    Optional<ProcessingStrategy> parentProcessingStrategy = getProcessingStrategy(locator, getRootContainerLocation());
+    parentProcessingStrategy.map(pe -> (ProcessingStrategy) (flowConstruct, pipeline) -> pe.createSink(flowConstruct, pipeline));
+    this.nestedChain = buildNewChainWithListOfProcessors(parentProcessingStrategy, processors);
     super.initialise();
     timer = schedulerService.cpuLightScheduler();
 
@@ -142,6 +155,8 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   class RetryContext {
 
+    // TODO: Should handle nested Until Successful scope executions in some way
+
     private int maxRetries;
     CoreEvent event;
     private AtomicInteger retryCount = new AtomicInteger();
@@ -178,6 +193,16 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
     }
   }
 
+  private CoreEvent eventWithCtx(CoreEvent event, RetryContext ctx) {
+    return EventQuickCopy.quickCopy(event, new HashMap<String, Object>() {
+
+      {
+        put(RETRY_CTX_INTERNAL_PARAM_KEY, ctx);
+      }
+    });
+
+  }
+
   class UntilSuccessfulRouter {
 
     Flux<CoreEvent> upstreamFlux;
@@ -190,14 +215,17 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
       upstreamFlux = Flux.from(publisher)
           .doOnNext(event -> {
             // publish event
+            LOGGER.error("Setting new context for event {} and injecting in router {}", event.getCorrelationId(),
+                         this.toString());
             currentContext = new RetryContext(event);
-            innerRecorder.next(event);
+
+            innerRecorder.next(eventWithCtx(event, new RetryContext(event)));
           })
           .doOnComplete(() -> {
             // complete next stage of chain
             currentContext = null;
             innerRecorder.complete();
-            // companionSink.complete();
+            companionSink.complete();
           });
 
       innerFlux = Flux.create(innerRecorder)
@@ -205,18 +233,20 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
                                                          Optional.of(UntilSuccessful.this.getLocation())))
           // Have to check if the context reaches the onErrorContinue
           .onErrorContinue(getRetryPredicate(), (error, offendingEvent) -> {
+            MessagingException messagingError = (MessagingException) error;
+            RetryContext ctx = ((InternalEvent) messagingError.getEvent()).getInternalParameter(RETRY_CTX_INTERNAL_PARAM_KEY);
             int retriesLeft =
-                currentContext.retryCount.getAndDecrement();
+                ctx.retryCount.getAndDecrement();
             if (retriesLeft > 0) { // Retry
-              LOGGER.error("Retrying execution of event, attempt {} of {}.", currentContext.maxRetries - retriesLeft + 1,
-                           maxRetriesAsInteger != RETRY_COUNT_FOREVER ? currentContext.maxRetries : "unlimited");
+              LOGGER.error("Retrying execution of event, attempt {} of {}.", ctx.maxRetries - retriesLeft + 1,
+                           maxRetriesAsInteger != RETRY_COUNT_FOREVER ? ctx.maxRetries : "unlimited");
 
               // Schedule the event injection for retrial
-              currentContext.delayScheduler.schedule(() -> innerRecorder.next(currentContext.event),
-                                                     currentContext.delay.toMillis(), TimeUnit.MILLISECONDS);
+              ctx.delayScheduler.schedule(() -> innerRecorder.next(eventWithCtx(ctx.event, ctx)),
+                                          ctx.delay.toMillis(), TimeUnit.MILLISECONDS);
             } else { // Retries exhausted
               LOGGER.error("Retry attempts exhausted. Failing...");
-              Throwable resolvedError = getThrowableFunction(currentContext.event).apply(error);
+              Throwable resolvedError = getThrowableFunction(ctx.event).apply(error);
               throw propagate(resolvedError);
             }
           });
