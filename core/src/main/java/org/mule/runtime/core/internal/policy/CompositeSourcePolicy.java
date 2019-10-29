@@ -63,7 +63,7 @@ public class CompositeSourcePolicy
   private Optional<Function<MessagingException, MessagingException>> resolver;
 
   /**
-   * Creates a new source policies composed by several {@link Policy} that will be chain together.
+   * Creates a new source policy composed by several {@link Policy} that will be chain together.
    *
    * @param parameterizedPolicies the list of policies to use in this composite policy.
    * @param flowExecutionProcessor the operation that executes the flow
@@ -78,13 +78,13 @@ public class CompositeSourcePolicy
   }
 
   /**
-   * Creates a new source policies composed by several {@link Policy} that will be chain together.
+   * Creates a new source policy composed by several {@link Policy} that will be chain together.
    *
    * @param parameterizedPolicies the list of policies to use in this composite policy.
    * @param flowExecutionProcessor the operation that executes the flow
    * @param sourcePolicyParametersTransformer a transformer from a source response parameters to a message and vice versa
    * @param sourcePolicyProcessorFactory factory to create a {@link Processor} from each {@link Policy}
-   * @param resolver a mapper to update the eventual errors in source policy                                     
+   * @param resolver a mapper to update the eventual errors in source policy
    */
   public CompositeSourcePolicy(List<Policy> parameterizedPolicies,
                                ReactiveProcessor flowExecutionProcessor,
