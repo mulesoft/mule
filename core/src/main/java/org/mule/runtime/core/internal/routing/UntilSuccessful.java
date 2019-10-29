@@ -19,15 +19,10 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
-import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.Exceptions.propagate;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
@@ -37,39 +32,25 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
-import org.mule.runtime.core.internal.event.EventQuickCopy;
-import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
-import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
-import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * UntilSuccessful attempts to innerFlux a message to the message processor it contains. Routing is considered successful if no
@@ -77,11 +58,8 @@ import reactor.core.publisher.Mono;
  */
 public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
-  private static final String RETRY_CTX_INTERNAL_PARAM_KEY = "RETRY_CTX";
   private final Logger LOGGER = getLogger(UntilSuccessful.class);
 
-  private static final String UNTIL_SUCCESSFUL_MSG_PREFIX =
-      "'until-successful' retries exhausted. Last exception message was: %s";
   private static final String DEFAULT_MILLIS_BETWEEN_RETRIES = "60000";
   private static final String DEFAULT_RETRIES = "5";
 
@@ -100,7 +78,6 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
       newBuilder().build(p -> new SimpleRetryPolicyTemplate(p.getFirst(), p.getSecond()));
   private Scheduler timer;
   private List<Processor> processors;
-  private int maxRetriesAsInteger;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -126,7 +103,6 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
         long millisBetweenRetries = Long.parseLong(this.millisBetweenRetries);
         policyTemplate = of(new SimpleRetryPolicyTemplate(millisBetweenRetries, maxRetries));
       }
-      maxRetriesAsInteger = maxRetries;
     }
     shouldRetry = event -> event.getError().isPresent();
   }
@@ -153,150 +129,11 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
     return policyTemplate.orElseGet(() -> createRetryPolicyTemplate(event));
   }
 
-  class RetryContext {
-
-    // TODO: Should handle nested Until Successful scope executions in some way
-
-    private int maxRetries;
-    CoreEvent event;
-    private AtomicInteger retryCount = new AtomicInteger();
-    private Duration delay;
-    private ConditionalExecutorServiceDecorator delayScheduler;
-
-    RetryContext(CoreEvent event) {
-      this.event = event;
-
-      Integer maxRetriesEvaluated;
-      Duration chosenDuration;
-
-      ExpressionManagerSession session = expressionManager.openSession(getLocation(), event, NULL_BINDING_CONTEXT);
-
-      if (expressionManager.isExpression(UntilSuccessful.this.maxRetries)) {
-        Integer maxRetries = (Integer) session.evaluate(UntilSuccessful.this.maxRetries, DataType.NUMBER).getValue();
-        maxRetriesEvaluated = maxRetries;
-      } else {
-        maxRetriesEvaluated = maxRetriesAsInteger;
-      }
-
-      if (expressionManager.isExpression(millisBetweenRetries)) {
-        Integer millisBetweenRetries =
-            (Integer) session.evaluate(UntilSuccessful.this.millisBetweenRetries, DataType.NUMBER).getValue();
-        chosenDuration = Duration.ofMillis(millisBetweenRetries);
-      } else {
-        chosenDuration = Duration.ofMillis(Integer.parseInt(millisBetweenRetries));
-      }
-
-      retryCount.set(maxRetriesEvaluated);
-      maxRetries = maxRetriesEvaluated;
-      delay = chosenDuration;
-      delayScheduler = new ConditionalExecutorServiceDecorator(timer, s -> isTransactionActive());
-    }
-  }
-
-  private CoreEvent eventWithCtx(CoreEvent event, RetryContext ctx) {
-    return EventQuickCopy.quickCopy(event, new HashMap<String, Object>() {
-
-      {
-        put(RETRY_CTX_INTERNAL_PARAM_KEY, ctx);
-      }
-    });
-
-  }
-
-  class UntilSuccessfulRouter {
-
-    Flux<CoreEvent> upstreamFlux;
-    FluxSinkRecorder<CoreEvent> innerRecorder = new FluxSinkRecorder<>();
-    FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
-    Flux<CoreEvent> innerFlux;
-    Flux<CoreEvent> downstreamFlux;
-    private FluxSinkRecorder<CoreEvent> companionSink;
-
-    UntilSuccessfulRouter(Publisher<CoreEvent> publisher) {
-      upstreamFlux = Flux.from(publisher)
-          .doOnNext(event -> {
-            // publish event
-            LOGGER.error("Setting new context for event {} and injecting in router {}", event.getCorrelationId(),
-                         this.toString());
-            innerRecorder.next(eventWithCtx(event, new RetryContext(event)));
-          })
-          .doOnComplete(() -> {
-            // complete next stage of chain
-            innerRecorder.complete();
-            downstreamRecorder.complete();
-          });
-
-      innerFlux = Flux.create(innerRecorder)
-          .transform(publisher1 -> applyWithChildContext(Flux.from(publisher1), nestedChain,
-                                                         Optional.of(UntilSuccessful.this.getLocation())))
-          .doOnNext(successfulEvent -> downstreamRecorder.next(Either.right(Throwable.class, successfulEvent)))
-          .onErrorContinue(getRetryPredicate(), (error, offendingEvent) -> {
-            MessagingException messagingError = (MessagingException) error;
-            RetryContext ctx = ((InternalEvent) messagingError.getEvent()).getInternalParameter(RETRY_CTX_INTERNAL_PARAM_KEY);
-            int retriesLeft =
-                ctx.retryCount.getAndDecrement();
-            if (retriesLeft > 0) { // Retry
-              LOGGER.error("Retrying execution of event, attempt {} of {}.", ctx.maxRetries - retriesLeft + 1,
-                           maxRetriesAsInteger != RETRY_COUNT_FOREVER ? ctx.maxRetries : "unlimited");
-
-              // Schedule the event injection for retrial
-              ctx.delayScheduler.schedule(() -> innerRecorder.next(eventWithCtx(ctx.event, ctx)),
-                                          ctx.delay.toMillis(), TimeUnit.MILLISECONDS);
-            } else { // Retries exhausted
-              LOGGER.error("Retry attempts exhausted. Failing...");
-              Throwable resolvedError = getThrowableFunction(ctx.event).apply(error);
-              downstreamRecorder.next(Either.left(resolvedError, CoreEvent.class));
-            }
-          });
-
-      downstreamFlux = Flux.create(downstreamRecorder)
-          .map(either -> {
-            if (either.isLeft()) {
-              throw propagate(either.getLeft());
-            } else {
-              return either.getRight();
-            }
-          });
-    }
-
-    Publisher<CoreEvent> getDownstreamPublisher() {
-      return downstreamFlux.compose(downstream -> Mono.subscriberContext().flatMapMany(dsCtx -> downstream.doOnSubscribe(s -> {
-        innerFlux.subscriberContext(dsCtx).subscribe();
-        upstreamFlux.subscriberContext(dsCtx).subscribe();
-      })));
-    }
-  }
-
-
-  public Publisher<CoreEvent> alternativeApply(Publisher<CoreEvent> publisher) {
-    UntilSuccessfulRouter router = new UntilSuccessfulRouter(publisher);
-    return router.getDownstreamPublisher();
-  }
-
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return alternativeApply(publisher);
-    // return mule4xApply(publisher);
+    return new UntilSuccessfulRouter(this, publisher, nestedChain, expressionManager, shouldRetry, timer, maxRetries, millisBetweenRetries).getDownstreamPublisher();
   }
 
-  private Predicate<Throwable> getRetryPredicate() {
-    return e -> (e instanceof MessagingException && shouldRetry.test(((MessagingException) e).getEvent()));
-  }
-
-  private Function<Throwable, Throwable> getThrowableFunction(CoreEvent event) {
-    return throwable -> {
-      Throwable cause = getMessagingExceptionCause(throwable);
-      CoreEvent exceptionEvent = event;
-      if (throwable instanceof MessagingException) {
-        exceptionEvent = ((MessagingException) throwable).getEvent();
-      }
-      return new MessagingException(exceptionEvent,
-                                    new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX,
-                                                                                          cause.getMessage()),
-                                                                      cause, this),
-                                    this);
-    };
-  }
 
   /**
    * @return the number of retries to process the innerFlux when failing. Default value is 5.
