@@ -41,6 +41,15 @@ import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * 
+ * Router with {@link UntilSuccessful} retry logic.
+ * 
+ * The retrial chain isolation is implemented using two {@link reactor.core.publisher.FluxSink}s, one for the entry inside the
+ * retrial chain, and another for publishing successful events, or exhaustion errors.
+ * 
+ * @since 4.3.0
+ */
 class UntilSuccessfulRouter {
 
   private final Logger LOGGER = getLogger(UntilSuccessfulRouter.class);
@@ -121,6 +130,11 @@ class UntilSuccessfulRouter {
         });
   }
 
+  /**
+   * Assembles and returns the downstream {@link Publisher<CoreEvent>}.
+   * 
+   * @return the successful {@link CoreEvent} or retries exhaustion errors {@link Publisher}
+   */
   Publisher<CoreEvent> getDownstreamPublisher() {
     return downstreamFlux.compose(downstream -> Mono.subscriberContext().flatMapMany(dsCtx -> downstream.doOnSubscribe(s -> {
       innerFlux.subscriberContext(dsCtx).subscribe();
@@ -129,6 +143,13 @@ class UntilSuccessfulRouter {
   }
 
 
+  /**
+   * Saves the {@link RetryContext} inside the event being routed through the retrial chain.
+   * 
+   * @param event the current retrial {@link CoreEvent}
+   * @param ctx the current {@link RetryContext}
+   * @return the {@link CoreEvent} with the retry context saved as internal parameter
+   */
   private CoreEvent eventWithCtx(CoreEvent event, RetryContext ctx) {
     // TODO: There must be cleaner way to do this
     Map<String, Object> parametersWithCtx = new HashMap<>();
@@ -156,6 +177,9 @@ class UntilSuccessfulRouter {
     };
   }
 
+  /**
+   * Context carrying all retrials information.
+   */
   class RetryContext {
 
     // TODO: Should handle nested Until Successful scope executions in some way
