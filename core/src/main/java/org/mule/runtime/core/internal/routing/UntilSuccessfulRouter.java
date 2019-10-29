@@ -56,22 +56,25 @@ class UntilSuccessfulRouter {
   private final Logger LOGGER = getLogger(UntilSuccessfulRouter.class);
 
   private static final String RETRY_CTX_INTERNAL_PARAM_KEY = "RETRY_CTX";
-
   private static final String UNTIL_SUCCESSFUL_MSG_PREFIX =
       "'until-successful' retries exhausted. Last exception message was: %s";
 
   private Component owner;
-  FluxSinkRecorder<CoreEvent> innerRecorder = new FluxSinkRecorder<>();
-  FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
-
-  Flux<CoreEvent> upstreamFlux;
   private Predicate<CoreEvent> shouldRetry;
   private Scheduler delayScheduler;
-  private String maxRetries;
-  private String millisBetweenRetries;
-  Flux<CoreEvent> innerFlux;
   private ExtendedExpressionManager expressionManager;
-  Flux<CoreEvent> downstreamFlux;
+
+  private Flux<CoreEvent> upstreamFlux;
+  private Flux<CoreEvent> innerFlux;
+  private Flux<CoreEvent> downstreamFlux;
+  private FluxSinkRecorder<CoreEvent> innerRecorder = new FluxSinkRecorder<>();
+  private FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
+
+  private String maxRetries;
+  private Function<ExpressionManagerSession, Integer> maxRetriesSupplier;
+  private String millisBetweenRetries;
+  private Function<ExpressionManagerSession, Integer> delaySupplier;
+  private Function<CoreEvent, ExpressionManagerSession> sessionSupplier;
 
   UntilSuccessfulRouter(Component owner, Publisher<CoreEvent> publisher, MessageProcessorChain nestedChain,
                         ExtendedExpressionManager expressionManager, Predicate<CoreEvent> shouldRetry, Scheduler delayScheduler,
@@ -128,6 +131,26 @@ class UntilSuccessfulRouter {
             return either.getRight();
           }
         });
+
+    if (expressionManager.isExpression(maxRetries)) {
+      maxRetriesSupplier = expressionToIntegerSupplier(maxRetries);
+    } else {
+      Integer asInteger = Integer.parseInt(maxRetries);
+      maxRetriesSupplier = session -> asInteger;
+    }
+
+    if (expressionManager.isExpression(millisBetweenRetries)) {
+      delaySupplier = expressionToIntegerSupplier(millisBetweenRetries);
+    } else {
+      Integer asInteger = Integer.parseInt(millisBetweenRetries);
+      delaySupplier = session -> asInteger;
+    }
+
+    if (!expressionManager.isExpression(maxRetries) && !expressionManager.isExpression(millisBetweenRetries)) {
+      sessionSupplier = event -> null;
+    } else {
+      sessionSupplier = event -> expressionManager.openSession(owner.getLocation(), event, NULL_BINDING_CONTEXT);
+    }
   }
 
   /**
@@ -196,23 +219,11 @@ class UntilSuccessfulRouter {
     RetryContext(CoreEvent event) {
       this.event = event;
 
-      ExpressionManagerSession session =
-          expressionManager.openSession(owner.getLocation(), event, NULL_BINDING_CONTEXT);
+      ExpressionManagerSession session = sessionSupplier.apply(event);
 
-      // Max retries: Expression or literal
-      if (expressionManager.isExpression(UntilSuccessfulRouter.this.maxRetries)) {
-        maxRetries = (Integer) session.evaluate(UntilSuccessfulRouter.this.maxRetries, DataType.NUMBER).getValue();
-      } else {
-        maxRetries = Integer.parseInt(UntilSuccessfulRouter.this.maxRetries);
-      }
+      maxRetries = maxRetriesSupplier.apply(session);
 
-      // Delay between retries: Expression or literal
-      if (expressionManager.isExpression(millisBetweenRetries)) {
-        delayInMillis =
-            (Integer) session.evaluate(UntilSuccessfulRouter.this.millisBetweenRetries, DataType.NUMBER).getValue();
-      } else {
-        delayInMillis = Integer.parseInt(millisBetweenRetries);
-      }
+      delayInMillis = delaySupplier.apply(session);
 
       retryCount.set(maxRetries);
 
@@ -224,6 +235,11 @@ class UntilSuccessfulRouter {
     int getRetriesLeft() {
       return maxRetries - retryCount.get() + 1;
     }
+  }
+
+  Function<ExpressionManagerSession, Integer> expressionToIntegerSupplier(String expression) {
+    return session -> (Integer) session.evaluate(expression, DataType.NUMBER).getValue();
+
   }
 
 
