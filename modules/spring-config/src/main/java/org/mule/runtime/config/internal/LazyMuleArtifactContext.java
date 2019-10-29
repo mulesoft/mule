@@ -360,6 +360,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
               .map(comp -> comp.getLocation().getLocation())
               .collect(toSet()));
 
+
       if (copyOf(currentComponentLocationsRequested).equals(copyOf(requestedLocations)) &&
           appliedStartedPhaseRequest == applyStartPhase) {
         // Same minimalApplication has been requested, so we don't need to recreate the same beans.
@@ -572,7 +573,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   @Override
   public void close() {
+    unregisterBeans(beansCreated);
     beansCreated.clear();
+    appliedStartedPhaseRequest = false;
+    currentComponentLocationsRequested.clear();
+
     super.close();
   }
 
