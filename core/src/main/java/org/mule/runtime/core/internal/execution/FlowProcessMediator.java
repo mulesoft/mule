@@ -193,21 +193,15 @@ public class FlowProcessMediator implements Initialisable {
 
                                  @Override
                                  public void complete(Either<SourcePolicyFailureResult, SourcePolicySuccessResult> value) {
-                                   //TODO: Remove this if when MULE-17386 is fixed
-                                   if (ctx.result == null) {
-                                     ctx.result = value;
-                                     dispatchResponse(ctx);
-                                   }
+                                   ctx.result = value;
+                                   dispatchResponse(ctx);
                                  }
 
                                  @Override
                                  public void error(Throwable e) {
-                                   //TODO: Remove this if when MULE-17386 is fixed
-                                   if (ctx.result == null) {
-                                     ctx.result = left(new SourcePolicyFailureResult(new MessagingException(ctx.event, e),
-                                                                                     () -> emptyMap()));
-                                     dispatchResponse(ctx);
-                                   }
+                                   ctx.result = left(new SourcePolicyFailureResult(new MessagingException(ctx.event, e),
+                                                                                   () -> emptyMap()));
+                                   dispatchResponse(ctx);
                                  }
                                });
     } catch (Exception e) {

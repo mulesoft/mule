@@ -96,7 +96,9 @@ public class NoSourcePolicyTestCase extends AbstractMuleTestCase {
 
     assertThat(result.getRight(), nullValue());
     assertThat(result.getLeft().getErrorResponseParameters().get(), is(errorParameters));
-    assertThat(result.getLeft().getMessagingException().getEvent(), is(updatedEvent));
+    MessagingException messagingException = result.getLeft().getMessagingException();
+    assertThat(messagingException.getEvent(), is(updatedEvent));
+    assertThat(messagingException.handled(), is(true));
   }
 
   @Test

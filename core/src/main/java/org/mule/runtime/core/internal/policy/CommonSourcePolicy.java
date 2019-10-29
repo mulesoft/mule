@@ -100,11 +100,18 @@ class CommonSourcePolicy {
 
   public void finishFlowProcessing(CoreEvent event, Either<SourcePolicyFailureResult, SourcePolicySuccessResult> result,
                                    Throwable error) {
-    if (!((BaseEventContext) event.getContext()).isComplete()) {
-      ((BaseEventContext) event.getContext()).error(error);
-    }
+    boolean isMessagingException = error instanceof MessagingException;
+    if (!(isMessagingException && ((MessagingException) error).handled())) {
 
-    recoverCallback(event).complete(result);
+      if (!((BaseEventContext) event.getContext()).isComplete()) {
+        ((BaseEventContext) event.getContext()).error(error);
+      }
+
+      recoverCallback(event).complete(result);
+      if (isMessagingException) {
+        ((MessagingException) error).setHandled(Boolean.TRUE);
+      }
+    }
   }
 
   private CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> recoverCallback(CoreEvent event) {
