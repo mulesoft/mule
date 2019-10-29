@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import static com.google.common.collect.ImmutableMap.of;
+import static java.lang.Boolean.TRUE;
 import static java.lang.Runtime.getRuntime;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -109,7 +110,7 @@ class CommonSourcePolicy {
 
       recoverCallback(event).complete(result);
       if (isMessagingException) {
-        ((MessagingException) error).setHandled(Boolean.TRUE);
+        ((MessagingException) error).setHandled(TRUE);
       }
     }
   }
