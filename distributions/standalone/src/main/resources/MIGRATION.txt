@@ -17,6 +17,9 @@ MULE-14381: By default, the File Connector processes empty files. For disabling 
 MULE-14507: The HTTP Requester now sends a zero content length in empty payloads scenarios. For disabling this behavior use the mule.http.client.avoidZeroContentLength=true system property.
 MULE-14878: The HTTP Listener now sets the message correlation ID as an outbound property as well. To disable this behavior use the mule.http.server.ignoreCorrelationId=true system property.
 MULE-16763: The mule.expressionFilter.nonBooleanReturnsTrue system property was added. To keep the previous behavior it should be set to the opposite of nullReturnsTrue attribute.
+MULE-8817: Spring Framework was upgraded from 4.1.9 to 4.3.16 and Spring Security from 4.2.3 to 4.2.5. Minor incompatibilities might be found in the following components:
+   * The getConnectionFactory() method in JmsConnector will now return a DefaultXAConnectionFactoryWrapper, regardless of the specific ConnectionFactory. If you are depending on this, you should use the ConnectionFactory interface to avoid problems.
+   * The CxfInboundMessageProcessor will no longer include a newline character in the response stream by default. This may be troublesome only if you are writing the raw response to an OutputStream in a custom implementation.
 
 Migration changes from 3.8.6 to 3.8.x
 MULE-8817: spring-messaging was upgraded from 4.1.9 to 4.3.17

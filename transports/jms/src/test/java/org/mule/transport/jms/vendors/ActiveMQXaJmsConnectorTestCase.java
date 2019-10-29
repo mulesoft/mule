@@ -20,7 +20,6 @@ import java.lang.reflect.Proxy;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 
-import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.junit.Test;
 
 public class ActiveMQXaJmsConnectorTestCase extends FunctionalTestCase
@@ -38,11 +37,9 @@ public class ActiveMQXaJmsConnectorTestCase extends FunctionalTestCase
         assertNotNull(c);
         
         ConnectionFactory cf = c.getConnectionFactory();
-        assertTrue(cf instanceof ActiveMQXAConnectionFactory);
+        assertTrue(cf instanceof DefaultXAConnectionFactoryWrapper);
 
-        DefaultXAConnectionFactoryWrapper wrapper = new DefaultXAConnectionFactoryWrapper(cf);
-        // can be a proxy
-        Connection connection = wrapper.createConnection();
+        Connection connection = cf.createConnection();
         assertNotNull(connection);
         assertTrue(Proxy.isProxyClass(connection.getClass()));
 

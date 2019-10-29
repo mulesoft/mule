@@ -81,7 +81,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
             {
                 payload = event.getMessage().getPayload();
                 assertEquals("echo", payload);
-                event.getMessage().setPayload("echo");
+                event.getMessage().setPayload(ANOTHER_VALUE);
                 gotEvent = true;
                 return event;
             }
@@ -91,11 +91,10 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
         MuleEvent event = getTestEvent(msg, getTestInboundEndpoint(REQUEST_RESPONSE));
         
         MuleEvent response = processor.process(event);
-        
         Object payload = response.getMessage().getPayload();
-        assertTrue(payload instanceof OutputHandler);
         
-        ((OutputHandler) payload).write(response, System.out);
+        assertThat(payload, instanceOf(OutputHandler.class));
+        assertThat(response.getMessage().getPayloadAsString(), is(responseMsg));
         assertTrue(gotEvent);
     }
     
@@ -130,13 +129,13 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
         CxfConfiguration config = new CxfConfiguration();
         config.setMuleContext(muleContext);
         config.initialise();
-        
+
         // Build a CXF MessageProcessor
         WebServiceMessageProcessorBuilder builder = new WebServiceMessageProcessorBuilder();
         builder.setConfiguration(config);
         builder.setServiceClass(Echo.class);
         builder.setMuleContext(muleContext);
-        
+
         CxfInboundMessageProcessor processor = builder.build();
         processor.start();
         return processor;

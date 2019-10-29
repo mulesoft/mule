@@ -6,6 +6,7 @@
  */
 package org.mule.config.spring.factories;
 
+import static java.lang.reflect.Proxy.isProxyClass;
 import static org.mule.config.i18n.CoreMessages.failedToCreate;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 
@@ -18,6 +19,7 @@ import javax.transaction.TransactionManager;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * {@link FactoryBean} adapter for the configured {@link TransactionManagerFactory}.
@@ -40,6 +42,7 @@ public class TransactionManagerFactoryBean implements FactoryBean<TransactionMan
     @Autowired(required = false)
     private TransactionManagerFactory txManagerFactory;
 
+    @Lazy
     @Autowired(required = false)
     private TransactionManager customTxManager;
 
@@ -55,7 +58,7 @@ public class TransactionManagerFactoryBean implements FactoryBean<TransactionMan
             // At that point, there is no need to create the txManager.
             return null;
         }
-        if (txManagerFactory != null && customTxManager != null)
+        if (txManagerFactory != null && customTxManager != null && !isProxyClass(customTxManager.getClass()))
         {
             throw new MuleRuntimeException(createStaticMessage(WRONG_DEFINITION_ERROR));
         }
