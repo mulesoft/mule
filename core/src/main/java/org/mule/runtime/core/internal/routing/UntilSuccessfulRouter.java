@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.routing;
 
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
@@ -16,7 +17,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.apply
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -62,7 +62,6 @@ class UntilSuccessfulRouter {
   private Component owner;
   private Predicate<CoreEvent> shouldRetry;
   private Scheduler delayScheduler;
-  private ExtendedExpressionManager expressionManager;
 
   private Flux<CoreEvent> upstreamFlux;
   private Flux<CoreEvent> innerFlux;
@@ -70,9 +69,10 @@ class UntilSuccessfulRouter {
   private FluxSinkRecorder<CoreEvent> innerRecorder = new FluxSinkRecorder<>();
   private FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
 
-  private String maxRetries;
+  // Retry settings, such as the maximum number of retries, and the delay between them
+  // are managed by suppliers. By doing this, the implementations remains agnostic of whether
+  // they are expressions or not.
   private Function<ExpressionManagerSession, Integer> maxRetriesSupplier;
-  private String millisBetweenRetries;
   private Function<ExpressionManagerSession, Integer> delaySupplier;
   private Function<CoreEvent, ExpressionManagerSession> sessionSupplier;
 
@@ -82,9 +82,6 @@ class UntilSuccessfulRouter {
     this.owner = owner;
     this.shouldRetry = shouldRetry;
     this.delayScheduler = delayScheduler;
-    this.maxRetries = maxRetries;
-    this.millisBetweenRetries = millisBetweenRetries;
-    this.expressionManager = expressionManager;
 
     // Upstream side of until successful chain. Injects events into retrial chain.
     upstreamFlux = Flux.from(publisher)
@@ -133,19 +130,21 @@ class UntilSuccessfulRouter {
         });
 
     if (expressionManager.isExpression(maxRetries)) {
-      maxRetriesSupplier = expressionToIntegerSupplier(maxRetries);
+      maxRetriesSupplier = expressionToIntegerSupplierFor(maxRetries);
     } else {
       Integer asInteger = Integer.parseInt(maxRetries);
       maxRetriesSupplier = session -> asInteger;
     }
 
     if (expressionManager.isExpression(millisBetweenRetries)) {
-      delaySupplier = expressionToIntegerSupplier(millisBetweenRetries);
+      delaySupplier = expressionToIntegerSupplierFor(millisBetweenRetries);
     } else {
       Integer asInteger = Integer.parseInt(millisBetweenRetries);
       delaySupplier = session -> asInteger;
     }
 
+    // If neither is an expression, we won't need an expression session at all. To keep type consistency, use a
+    // no-op expressionSessionSupplier
     if (!expressionManager.isExpression(maxRetries) && !expressionManager.isExpression(millisBetweenRetries)) {
       sessionSupplier = event -> null;
     } else {
@@ -159,10 +158,12 @@ class UntilSuccessfulRouter {
    * @return the successful {@link CoreEvent} or retries exhaustion errors {@link Publisher}
    */
   Publisher<CoreEvent> getDownstreamPublisher() {
-    return downstreamFlux.compose(downstream -> Mono.subscriberContext().flatMapMany(dsCtx -> downstream.doOnSubscribe(s -> {
-      innerFlux.subscriberContext(dsCtx).subscribe();
-      upstreamFlux.subscriberContext(dsCtx).subscribe();
-    })));
+    return downstreamFlux
+        .compose(downstreamPublisher -> Mono.subscriberContext()
+            .flatMapMany(downstreamContext -> downstreamPublisher.doOnSubscribe(s -> {
+              innerFlux.subscriberContext(downstreamContext).subscribe();
+              upstreamFlux.subscriberContext(downstreamContext).subscribe();
+            })));
   }
 
 
@@ -180,7 +181,6 @@ class UntilSuccessfulRouter {
     Map<String, Object> parametersWithCtx = new HashMap<>();
     parametersWithCtx.put(RETRY_CTX_INTERNAL_PARAM_KEY, ctx);
     return quickCopy(event, parametersWithCtx);
-
   }
 
   private Predicate<Throwable> getRetryPredicate() {
@@ -237,11 +237,8 @@ class UntilSuccessfulRouter {
     }
   }
 
-  Function<ExpressionManagerSession, Integer> expressionToIntegerSupplier(String expression) {
-    return session -> (Integer) session.evaluate(expression, DataType.NUMBER).getValue();
-
+  private Function<ExpressionManagerSession, Integer> expressionToIntegerSupplierFor(String anExpression) {
+    return session -> (Integer) session.evaluate(anExpression, NUMBER).getValue();
   }
-
-
 
 }
