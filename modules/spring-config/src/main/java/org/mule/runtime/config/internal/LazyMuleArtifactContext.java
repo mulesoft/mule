@@ -548,8 +548,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   @Override
   public void close() {
     beansCreated.clear();
-    appliedStartedPhaseRequest = false;
-    currentComponentLocationsRequested.clear();
+    appliedStartedPhase = false;
+    applicationComponentLocationsCreated.clear();
 
     super.close();
   }
