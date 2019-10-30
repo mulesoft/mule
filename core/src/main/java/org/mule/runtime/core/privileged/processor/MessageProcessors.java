@@ -497,6 +497,7 @@ public class MessageProcessors {
         if (throwable != null) {
           final MessagingException error = (MessagingException) throwable;
           errorSwitchSinkSinkRef.next(left(new MessagingException(toParentContext(error.getEvent()), error)));
+          error.setHandled(Boolean.TRUE);
         } else if (response == null && completeParentIfEmpty) {
           getParentContext(eventChildCtx).success();
           errorSwitchSinkSinkRef.next();
