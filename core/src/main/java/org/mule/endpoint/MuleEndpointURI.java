@@ -60,7 +60,7 @@ public class MuleEndpointURI implements EndpointURI
 
     public static boolean isMuleUri(String url)
     {
-        return url.indexOf(":/") != -1;
+        return url != null && url.indexOf(":/") != -1;
     }
 
     private String address;
