@@ -32,8 +32,10 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -87,7 +89,7 @@ class UntilSuccessfulRouter {
     upstreamFlux = Flux.from(publisher)
         .doOnNext(event -> {
           // Inject event into retrial execution chain
-          innerRecorder.next(eventWithCtx(event, new RetryContext(event)));
+          innerRecorder.next(pushRetryContext(event, new RetryContext(event)));
         })
         .doOnComplete(() -> {
           innerRecorder.complete();
@@ -99,35 +101,11 @@ class UntilSuccessfulRouter {
         .transform(innerPublisher -> applyWithChildContext(innerPublisher, nestedChain,
                                                            Optional.of(owner.getLocation())))
         .doOnNext(successfulEvent -> downstreamRecorder.next(Either.right(Throwable.class, successfulEvent)))
-        .onErrorContinue(getRetryPredicate(), (error, offendingEvent) -> {
-          MessagingException messagingError = (MessagingException) error;
-          RetryContext ctx =
-              ((InternalEvent) messagingError.getEvent()).getInternalParameter(RETRY_CTX_INTERNAL_PARAM_KEY);
-          int retriesLeft =
-              ctx.retryCount.getAndDecrement();
-          if (retriesLeft > 0) {
-            LOGGER.error("Retrying execution of event, attempt {} of {}.", ctx.getRetriesLeft(),
-                         ctx.maxRetries != RETRY_COUNT_FOREVER ? ctx.maxRetries : "unlimited");
-
-            // Schedule retry with delay
-            ctx.delayScheduler.schedule(() -> innerRecorder.next(eventWithCtx(ctx.event, ctx)),
-                                        ctx.delayInMillis, TimeUnit.MILLISECONDS);
-          } else { // Retries exhausted
-            LOGGER.error("Retry attempts exhausted. Failing...");
-            Throwable resolvedError = getThrowableFunction(ctx.event).apply(error);
-            downstreamRecorder.next(Either.left(resolvedError, CoreEvent.class));
-          }
-        });
+        .onErrorContinue(getRetryPredicate(), getRetryHandler());
 
     // Downstream chain. Unpacks and publishes successful events and errors downstream.
     downstreamFlux = Flux.create(downstreamRecorder)
-        .map(either -> {
-          if (either.isLeft()) {
-            throw propagate(either.getLeft());
-          } else {
-            return either.getRight();
-          }
-        });
+        .map(getScopeResultMapper());
 
     if (expressionManager.isExpression(maxRetries)) {
       maxRetriesSupplier = expressionToIntegerSupplierFor(maxRetries);
@@ -152,6 +130,38 @@ class UntilSuccessfulRouter {
     }
   }
 
+  private Function<Either<Throwable, CoreEvent>, CoreEvent> getScopeResultMapper() {
+    return either -> {
+      if (either.isLeft()) {
+        throw propagate(either.getLeft());
+      } else {
+        return either.getRight();
+      }
+    };
+  }
+
+  private BiConsumer<Throwable, Object> getRetryHandler() {
+    return (error, offendingEvent) -> {
+      MessagingException messagingError = (MessagingException) error;
+      RetryContext ctx = popRetryContext(messagingError.getEvent());
+      int retriesLeft =
+          ctx.retryCount.getAndDecrement();
+      if (retriesLeft > 0) {
+        LOGGER.error("Retrying execution of event, attempt {} of {}.", ctx.getRetriesLeft(),
+                     ctx.maxRetries != RETRY_COUNT_FOREVER ? ctx.maxRetries : "unlimited");
+
+        // Schedule retry with delay
+        ctx.delayScheduler.schedule(() -> innerRecorder.next(pushRetryContext(ctx.event, ctx)),
+                                    ctx.delayInMillis, TimeUnit.MILLISECONDS);
+      } else { // Retries exhausted
+        // Current context already pooped. No need to re-insert it
+        LOGGER.error("Retry attempts exhausted. Failing...");
+        Throwable resolvedError = getThrowableFunction(ctx.event).apply(error);
+        downstreamRecorder.next(Either.left(resolvedError, CoreEvent.class));
+      }
+    };
+  }
+
   /**
    * Assembles and returns the downstream {@link Publisher<CoreEvent>}.
    * 
@@ -168,19 +178,36 @@ class UntilSuccessfulRouter {
 
 
   /**
-   * Saves the {@link RetryContext} inside the event being routed through the retrial chain.
+   * Pushes the {@link RetryContext} inside the event being routed through the retrial chain.
    * 
    * @param event the current retrial {@link CoreEvent}
    * @param ctx the current {@link RetryContext}
    * @return the {@link CoreEvent} with the retry context saved as internal parameter
    */
-  private CoreEvent eventWithCtx(CoreEvent event, RetryContext ctx) {
+  private CoreEvent pushRetryContext(CoreEvent event, RetryContext ctx) {
+    // Requires: The ctx that corresponds to this router execution is not in the stack, or there's no stack yet
+    // Assures: The ctx that corresponds to this router execution is the one on top of the stack
 
     // TODO: There must be cleaner way to do this
 
+    Stack<RetryContext> currentStack;
+
+    // Check if I'm already inside another until-successful scope
+    currentStack = ((InternalEvent) event).getInternalParameter(RETRY_CTX_INTERNAL_PARAM_KEY);
+    if (currentStack == null) {
+      // First scope
+      currentStack = new Stack<>();
+    }
+
+    currentStack.push(ctx);
+
     Map<String, Object> parametersWithCtx = new HashMap<>();
-    parametersWithCtx.put(RETRY_CTX_INTERNAL_PARAM_KEY, ctx);
+    parametersWithCtx.put(RETRY_CTX_INTERNAL_PARAM_KEY, currentStack);
     return quickCopy(event, parametersWithCtx);
+  }
+
+  private RetryContext popRetryContext(CoreEvent event) {
+    return ((Stack<RetryContext>) ((InternalEvent) event).getInternalParameter(RETRY_CTX_INTERNAL_PARAM_KEY)).pop();
   }
 
   private Predicate<Throwable> getRetryPredicate() {
