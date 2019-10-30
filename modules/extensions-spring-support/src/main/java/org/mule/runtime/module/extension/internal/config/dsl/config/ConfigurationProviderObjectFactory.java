@@ -79,9 +79,9 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
       expirationPolicy = muleContext.getConfiguration().getDynamicConfigExpiration().getExpirationPolicy();
     }
 
-    ResolverSet resolverSet = getParametersResolver().getParametersAsHashedResolverSet(configurationModel, muleContext);
-    final ConnectionProviderValueResolver connectionProviderResolver = getConnectionProviderResolver();
     return withContextClassLoader(getExtensionClassLoader(), () -> {
+      ResolverSet resolverSet = getParametersResolver().getParametersAsHashedResolverSet(configurationModel, muleContext);
+      final ConnectionProviderValueResolver connectionProviderResolver = getConnectionProviderResolver();
       connectionProviderResolver.getResolverSet()
           .ifPresent((CheckedConsumer) resolver -> initialiseIfNeeded(resolver, true, muleContext));
 
@@ -110,7 +110,8 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
         }
 
       } catch (Exception e) {
-        throw new MuleRuntimeException(createStaticMessage(format("Could not create an implicit configuration '%s' for the extension '%s'",
+        throw new MuleRuntimeException(
+                                       createStaticMessage(format("Could not create an implicit configuration '%s' for the extension '%s'",
                                                                   configurationModel.getName(), extensionModel.getName())),
                                        e);
       }
