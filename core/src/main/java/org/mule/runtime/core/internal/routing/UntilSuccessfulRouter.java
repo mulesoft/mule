@@ -64,7 +64,7 @@ class UntilSuccessfulRouter {
 
   private Component owner;
   private Predicate<CoreEvent> shouldRetry;
-  private Scheduler delayScheduler;
+  private ConditionalExecutorServiceDecorator delayScheduler;
 
   private Flux<CoreEvent> upstreamFlux;
   private Flux<CoreEvent> innerFlux;
@@ -90,7 +90,7 @@ class UntilSuccessfulRouter {
                         String maxRetries, String millisBetweenRetries) {
     this.owner = owner;
     this.shouldRetry = shouldRetry;
-    this.delayScheduler = delayScheduler;
+    this.delayScheduler = new ConditionalExecutorServiceDecorator(delayScheduler, s -> isTransactionActive());
 
     // Upstream side of until successful chain. Injects events into retrial chain.
     upstreamFlux = Flux.from(publisher)
@@ -173,8 +173,8 @@ class UntilSuccessfulRouter {
                      ctx.maxRetries != RETRY_COUNT_FOREVER ? ctx.maxRetries : "unlimited");
 
         // Schedule retry with delay
-        ctx.delayScheduler.schedule(() -> innerRecorder.next(pushRetryContext(ctx.event, ctx)),
-                                    ctx.delayInMillis, TimeUnit.MILLISECONDS);
+        UntilSuccessfulRouter.this.delayScheduler.schedule(() -> innerRecorder.next(pushRetryContext(ctx.event, ctx)),
+                                                           ctx.delayInMillis, TimeUnit.MILLISECONDS);
       } else { // Retries exhausted
         // Current context already pooped. No need to re-insert it
         LOGGER.error("Retry attempts exhausted. Failing...");
