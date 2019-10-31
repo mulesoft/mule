@@ -81,6 +81,7 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -232,10 +233,32 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       if (getMuleContext().isInitialised()) {
         initializeComponents(components);
       }
-      if (applyStartPhase && getMuleContext().isStarted()) {
-        startComponent(components);
+      if (getMuleContext().isStarted()) {
+        if (applyStartPhase) {
+          startComponent(components);
+        } else {
+          startConfigurationProviders(components);
+        }
       }
     });
+  }
+
+  /**
+   * Starts {@link ConfigurationProvider} components as they should be started no matter if the request has set to not apply start
+   * phase in the rest of the components.
+   *
+   * @param components list of components created
+   */
+  private void startConfigurationProviders(List<Object> components) {
+    components.stream()
+        .filter(component -> component instanceof ConfigurationProvider)
+        .forEach(configurationProviders -> {
+          try {
+            getMuleRegistry().applyLifecycle(configurationProviders, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
+          } catch (MuleException e) {
+            throw new RuntimeException(e);
+          }
+        });
   }
 
   private void initializeComponents(List<Object> components) {
