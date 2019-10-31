@@ -237,17 +237,24 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         if (applyStartPhase) {
           startComponent(components);
         } else {
-          startConfigurationProviders();
+          startConfigurationProviders(components);
         }
       }
     });
   }
 
-  private void startConfigurationProviders() {
-    getMuleRegistry().lookupObjects(ConfigurationProvider.class).stream()
-        .forEach(connectionProvider -> {
+  /**
+   * Starts {@link ConfigurationProvider} components as they should be started no matter if the request has set to not apply start
+   * phase in the rest of the components.
+   *
+   * @param components list of components created
+   */
+  private void startConfigurationProviders(List<Object> components) {
+    components.stream()
+        .filter(component -> ConfigurationProvider.class.isAssignableFrom(component.getClass()))
+        .forEach(configurationProviders -> {
           try {
-            getMuleRegistry().applyLifecycle(connectionProvider, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
+            getMuleRegistry().applyLifecycle(configurationProviders, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
           } catch (MuleException e) {
             throw new RuntimeException(e);
           }
