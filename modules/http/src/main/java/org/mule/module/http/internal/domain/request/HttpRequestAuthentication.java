@@ -18,7 +18,6 @@ public class HttpRequestAuthentication
     private String domain;
     private String workstation;
     private boolean preemptive;
-    private boolean credentialsMayVary;
 
     public HttpRequestAuthentication(HttpAuthenticationType type)
     {
@@ -80,13 +79,5 @@ public class HttpRequestAuthentication
         this.preemptive = preemptive;
     }
 
-    public boolean credentialsMayVary()
-    {
-        return credentialsMayVary;
-    }
 
-    public void setCredentialsMayVary(boolean areCredentialsVariable)
-    {
-        this.credentialsMayVary = areCredentialsVariable;
-    }
 }
