@@ -285,14 +285,10 @@ class UntilSuccessfulRouter {
       this.event = event;
 
       ExpressionManagerSession session = sessionSupplier.apply(event);
-
       maxRetries = maxRetriesSupplier.apply(session);
-
       delayInMillis = delaySupplier.apply(session);
-
       retryCount.set(maxRetries);
 
-      // TODO: Is it necessary to create this executor in each retry ctx?
       delayScheduler =
           new ConditionalExecutorServiceDecorator(UntilSuccessfulRouter.this.delayScheduler, s -> isTransactionActive());
     }
