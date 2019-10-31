@@ -25,7 +25,6 @@ import org.junit.Test;
 
 public class HttpRequestsWithNtlmAuthenticationConnectionPersistenceTestCase extends AbstractNtlmTestCase
 {
-
     private static final String STATIC_CONFIGURED_NTLM_AUTH_FLOW = "staticConfiguredNtlmAuth";
     private static final String DYNAMIC_CONFIGURED_NTLM_AUTH_FLOW = "dynamicConfiguredNtlmAuth";
     private final String NTLM_PASSWORD = "Beeblebrox";

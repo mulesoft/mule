@@ -19,7 +19,6 @@ import org.mule.util.AttributeEvaluator;
 
 public class DefaultHttpAuthentication implements HttpAuthentication, MuleContextAware, Initialisable
 {
-
     private final HttpAuthenticationType type;
 
     private AttributeEvaluator username = new AttributeEvaluator(null);
@@ -114,10 +113,6 @@ public class DefaultHttpAuthentication implements HttpAuthentication, MuleContex
         authentication.setDomain(domain.resolveStringValue(event));
         authentication.setWorkstation(workstation.resolveStringValue(event));
         authentication.setPreemptive(preemptive.resolveBooleanValue(event));
-        authentication.setCredentialsMayVary(username.isExpression() ||
-                                             password.isExpression() ||
-                                             domain.isExpression() ||
-                                             workstation.isExpression());
         return authentication;
     }
 
