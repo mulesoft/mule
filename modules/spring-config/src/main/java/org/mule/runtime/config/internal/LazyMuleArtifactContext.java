@@ -68,6 +68,7 @@ import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.TypeDefinition;
 import org.mule.runtime.dsl.api.component.TypeDefinitionVisitor;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -267,20 +268,42 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           }
         }
       }
-      if (applyStartPhase && muleContext.isStarted()) {
-        for (Object object : components) {
-          try {
-            if (object instanceof MessageProcessorChain) {
-              // Has to be ignored as when it is registered it will be started too
-            } else {
-              muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
+      if (muleContext.isStarted()) {
+        if (applyStartPhase) {
+          for (Object object : components) {
+            try {
+              if (object instanceof MessageProcessorChain) {
+                // Has to be ignored as when it is registered it will be started too
+              } else {
+                muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
+              }
+            } catch (MuleException e) {
+              throw new RuntimeException(e);
             }
-          } catch (MuleException e) {
-            throw new RuntimeException(e);
           }
+        } else {
+          startConfigurationProviders(components);
         }
       }
     });
+  }
+
+  /**
+   * Starts {@link ConfigurationProvider} components as they should be started no matter if the request has set to not apply start
+   * phase in the rest of the components.
+   *
+   * @param components list of components created
+   */
+  private void startConfigurationProviders(List<Object> components) {
+    components.stream()
+        .filter(component -> component instanceof ConfigurationProvider)
+        .forEach(configurationProviders -> {
+          try {
+            muleContext.getRegistry().applyLifecycle(configurationProviders, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
+          } catch (MuleException e) {
+            throw new RuntimeException(e);
+          }
+        });
   }
 
   private static BeanDependencyResolver getBeanDependencyResolver(ConfigurationDependencyResolver configurationDependencyResolver,

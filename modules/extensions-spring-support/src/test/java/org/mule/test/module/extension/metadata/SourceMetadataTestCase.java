@@ -15,7 +15,8 @@ import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
-import static org.mule.test.metadata.extension.resolver.TestInputOutputSourceResolverWithKeyResolver.STARTED_KEY_MASK;
+import static org.mule.test.metadata.extension.resolver.TestInputOutputSourceResolverWithKeyResolver.STARTED_CONNECTION_PROVIDER_KEY_MASK;
+import static org.mule.test.metadata.extension.resolver.TestInputOutputSourceResolverWithKeyResolver.STARTED_SOURCE_KEY_MASK;
 import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.EXPLICIT_RESOLUTION;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -24,20 +25,30 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.tck.message.StringAttributes;
+import org.mule.test.metadata.extension.MetadataConnectionProvider;
+import org.mule.test.metadata.extension.MetadataSource;
 
 import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<SourceModel> {
 
-  private static final String EXPECTED_STARTED_KEY_ID = format(STARTED_KEY_MASK, false);
+  private static final String EXPECTED_STARTED_SOURCE_KEY_ID = format(STARTED_SOURCE_KEY_MASK, false);
+  private static final String EXPECTED_STARTED_CONNECTION_PROVIDER_KEY_ID = format(STARTED_CONNECTION_PROVIDER_KEY_MASK, true);
 
   public SourceMetadataTestCase(ResolutionType resolutionType) {
     super(resolutionType);
     this.provider = resolutionType == EXPLICIT_RESOLUTION ? MetadataService::getSourceMetadata
         : (metadataService, componentId, key) -> metadataService.getSourceMetadata(componentId);
     this.location = builder().globalName(SOURCE_METADATA).addSourcePart().build();
+  }
+
+  @Before
+  public void before() {
+    MetadataConnectionProvider.STARTED = false;
+    MetadataSource.STARTED = false;
   }
 
   @Override
@@ -50,9 +61,10 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
     final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService.getMetadataKeys(location);
     assertThat(metadataKeysResult.isSuccess(), is(true));
     final Set<MetadataKey> metadataKeys = getKeysFromContainer(metadataKeysResult.get());
-    assertThat(metadataKeys.size(), is(4));
+    assertThat(metadataKeys.size(), is(5));
     assertThat(metadataKeys, hasItems(metadataKeyWithId(PERSON), metadataKeyWithId(CAR),
-                                      metadataKeyWithId(HOUSE), metadataKeyWithId(EXPECTED_STARTED_KEY_ID)));
+                                      metadataKeyWithId(HOUSE), metadataKeyWithId(EXPECTED_STARTED_SOURCE_KEY_ID),
+                                      metadataKeyWithId(EXPECTED_STARTED_CONNECTION_PROVIDER_KEY_ID)));
   }
 
   @Test
@@ -72,7 +84,17 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
   public void sourcesMustNotStartWhenResolvingMetadata() {
     final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService.getMetadataKeys(location);
     final Set<MetadataKey> metadataKeys = getKeysFromContainer(metadataKeysResult.get());
-    assertThat(metadataKeys.size(), is(4));
-    assertThat(metadataKeys, hasItems(metadataKeyWithId(EXPECTED_STARTED_KEY_ID)));
+    assertThat(metadataKeys, hasItems(metadataKeyWithId(EXPECTED_STARTED_SOURCE_KEY_ID)));
+  }
+
+  /**
+   * Since the classloader for this tests is different from the one that actually initialize the components
+   * the STARTED/STOPPED information is retrieved building a key with the source status in the correct environment.
+   */
+  @Test
+  public void sourcesMustStartConnectionProvidersWhenResolvingMetadata() {
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService.getMetadataKeys(location);
+    final Set<MetadataKey> metadataKeys = getKeysFromContainer(metadataKeysResult.get());
+    assertThat(metadataKeys, hasItems(metadataKeyWithId(EXPECTED_STARTED_CONNECTION_PROVIDER_KEY_ID)));
   }
 }
