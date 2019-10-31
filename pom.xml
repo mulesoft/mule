@@ -298,7 +298,7 @@
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>validate</formatterGoal>
-        <oldMuleArtifactVersion>4.2.2-SNAPSHOT</oldMuleArtifactVersion>
+        <oldMuleArtifactVersion>4.2.2</oldMuleArtifactVersion>
     </properties>
 
     <dependencies>
