@@ -98,9 +98,14 @@ class UntilSuccessfulRouter {
 
     // Inner chain. Contains all retrial and error handling logic.
     innerFlux = Flux.create(innerRecorder)
+        // Assume: popRetryContext(publishedEvent) is current context
         .transform(innerPublisher -> applyWithChildContext(innerPublisher, nestedChain,
                                                            Optional.of(owner.getLocation())))
-        .doOnNext(successfulEvent -> downstreamRecorder.next(Either.right(Throwable.class, successfulEvent)))
+        .doOnNext(successfulEvent -> {
+          // Scope execution was successful, pop current ctx
+          popRetryContext(successfulEvent);
+          downstreamRecorder.next(Either.right(Throwable.class, successfulEvent));
+        })
         .onErrorContinue(getRetryPredicate(), getRetryHandler());
 
     // Downstream chain. Unpacks and publishes successful events and errors downstream.
