@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -78,6 +79,12 @@ class UntilSuccessfulRouter {
   private Function<ExpressionManagerSession, Integer> delaySupplier;
   private Function<CoreEvent, ExpressionManagerSession> sessionSupplier;
 
+  // When using an until successful scope in a blocking flow (for example, calling the owner flow with a Processor#process call),
+  // this leads to a reactor completion signal being emitted while the event is being re-injected for retrials. This is solved by
+  // deferring the downstream publisher completion until all events have evacuated the scope.
+  private final AtomicInteger inflightEvents = new AtomicInteger(0);
+  private final AtomicBoolean completeDeferred = new AtomicBoolean(false);
+
   UntilSuccessfulRouter(Component owner, Publisher<CoreEvent> publisher, MessageProcessorChain nestedChain,
                         ExtendedExpressionManager expressionManager, Predicate<CoreEvent> shouldRetry, Scheduler delayScheduler,
                         String maxRetries, String millisBetweenRetries) {
@@ -89,11 +96,19 @@ class UntilSuccessfulRouter {
     upstreamFlux = Flux.from(publisher)
         .doOnNext(event -> {
           // Inject event into retrial execution chain
-          innerRecorder.next(pushRetryContext(event, new RetryContext(event)));
+          RetryContext ctx = new RetryContext(event);
+          inflightEvents.getAndIncrement();
+          innerRecorder.next(pushRetryContext(event, ctx));
         })
+        // Handle errors caused by retry ctx initialization
+        .doOnError(RetryContextInitializationException.class,
+                   error -> downstreamRecorder.next(Either.left(error.getCause(), CoreEvent.class)))
         .doOnComplete(() -> {
-          innerRecorder.complete();
-          downstreamRecorder.complete();
+          if (inflightEvents.get() == 0) {
+            completeRouter();
+          } else {
+            completeDeferred.set(true);
+          }
         });
 
     // Inner chain. Contains all retrial and error handling logic.
@@ -105,11 +120,13 @@ class UntilSuccessfulRouter {
           // Scope execution was successful, pop current ctx
           popRetryContext(successfulEvent);
           downstreamRecorder.next(Either.right(Throwable.class, successfulEvent));
+          completeRouterIfNecessary();
         })
         .onErrorContinue(getRetryPredicate(), getRetryHandler());
 
     // Downstream chain. Unpacks and publishes successful events and errors downstream.
     downstreamFlux = Flux.create(downstreamRecorder)
+        .doOnNext(event -> inflightEvents.decrementAndGet())
         .map(getScopeResultMapper());
 
     if (expressionManager.isExpression(maxRetries)) {
@@ -163,8 +180,26 @@ class UntilSuccessfulRouter {
         LOGGER.error("Retry attempts exhausted. Failing...");
         Throwable resolvedError = getThrowableFunction(ctx.event).apply(error);
         downstreamRecorder.next(Either.left(resolvedError, CoreEvent.class));
+        completeRouterIfNecessary();
       }
     };
+  }
+
+  /**
+   * If there are no events in-flight and the upstream publisher has received a completion signal, complete downstream publishers.
+   */
+  private void completeRouterIfNecessary() {
+    if (completeDeferred.get() && inflightEvents.get() == 0) {
+      completeRouter();
+    }
+  }
+
+  /**
+   * Complete both downstream publishers.
+   */
+  private void completeRouter() {
+    innerRecorder.complete();
+    downstreamRecorder.complete();
   }
 
   /**
@@ -239,8 +274,6 @@ class UntilSuccessfulRouter {
    */
   class RetryContext {
 
-    // TODO: Should handle nested Until Successful scope executions in some way
-
     CoreEvent event;
     AtomicInteger retryCount = new AtomicInteger();
 
@@ -270,7 +303,23 @@ class UntilSuccessfulRouter {
   }
 
   private Function<ExpressionManagerSession, Integer> expressionToIntegerSupplierFor(String anExpression) {
-    return session -> (Integer) session.evaluate(anExpression, NUMBER).getValue();
+    return session -> {
+      try {
+        return (Integer) session.evaluate(anExpression, NUMBER).getValue();
+      } catch (Exception evaluationException) {
+        throw new RetryContextInitializationException(evaluationException);
+      }
+    };
+  }
+
+  /**
+   * Wrap all exceptions caused in {@link RetryContext} initialization, so that they can be propagated outside of the innerFlux.
+   */
+  class RetryContextInitializationException extends RuntimeException {
+
+    public RetryContextInitializationException(Throwable cause) {
+      super(cause);
+    }
   }
 
 }
