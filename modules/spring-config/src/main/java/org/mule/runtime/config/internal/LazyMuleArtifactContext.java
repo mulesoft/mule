@@ -251,7 +251,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    */
   private void startConfigurationProviders(List<Object> components) {
     components.stream()
-        .filter(component -> ConfigurationProvider.class.isAssignableFrom(component.getClass()))
+        .filter(component -> component instanceof ConfigurationProvider)
         .forEach(configurationProviders -> {
           try {
             getMuleRegistry().applyLifecycle(configurationProviders, Initialisable.PHASE_NAME, Startable.PHASE_NAME);

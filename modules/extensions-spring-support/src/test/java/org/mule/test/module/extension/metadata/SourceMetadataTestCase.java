@@ -27,9 +27,12 @@ import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.tck.message.StringAttributes;
+import org.mule.test.metadata.extension.MetadataConnectionProvider;
+import org.mule.test.metadata.extension.MetadataSource;
 
 import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<SourceModel> {
@@ -42,6 +45,12 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
     this.provider = resolutionType == EXPLICIT_RESOLUTION ? MetadataService::getSourceMetadata
         : (metadataService, componentId, key) -> metadataService.getSourceMetadata(componentId);
     this.location = builder().globalName(SOURCE_METADATA).addSourcePart().build();
+  }
+
+  @Before
+  public void before() {
+    MetadataConnectionProvider.STARTED = false;
+    MetadataSource.STARTED = false;
   }
 
   @Override
