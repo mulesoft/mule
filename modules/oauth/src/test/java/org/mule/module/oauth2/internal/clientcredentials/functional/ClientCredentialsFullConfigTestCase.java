@@ -18,6 +18,16 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.oauth2.internal.AbstractGrantType.buildAuthorizationHeaderContent;
+import org.mule.api.MuleRuntimeException;
+import org.mule.construct.Flow;
+import org.mule.module.http.api.HttpHeaders;
+import org.mule.module.oauth2.AbstractOAuthAuthorizationTestCase;
+import org.mule.module.oauth2.asserter.OAuthContextFunctionAsserter;
+import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
+import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.util.store.SimpleMemoryObjectStore;
+
+import com.google.common.collect.ImmutableMap;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -32,16 +42,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mule.api.MuleRuntimeException;
-import org.mule.construct.Flow;
-import org.mule.module.http.api.HttpHeaders;
-import org.mule.module.oauth2.AbstractOAuthAuthorizationTestCase;
-import org.mule.module.oauth2.asserter.OAuthContextFunctionAsserter;
-import org.mule.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
-import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.util.store.SimpleMemoryObjectStore;
-
-import com.google.common.collect.ImmutableMap;
 
 @RunWith(Parameterized.class)
 public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizationTestCase
@@ -57,6 +57,8 @@ public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizat
     public SystemProperty customTokenResponseParameter1Name = new SystemProperty("custom.param.extractor1", "token-resp-param1");
     @Rule
     public SystemProperty customTokenResponseParameter2Name = new SystemProperty("custom.param.extractor2", "token-resp-param2");
+    @Rule
+    public SystemProperty maxRetriesProperty;
 
     private String configFile;
 
@@ -66,16 +68,19 @@ public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizat
         return configFile;
     }
 
-    public ClientCredentialsFullConfigTestCase(String configFile)
+    public ClientCredentialsFullConfigTestCase(String configFile, String clientMaxRetries)
     {
         this.configFile = configFile;
+        this.maxRetriesProperty = new SystemProperty("mule.http.client.maxRetries", clientMaxRetries);
     }
 
     @Parameterized.Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[] {"client-credentials/client-credentials-full-config-tls-global.xml"},
-                             new Object[] {"client-credentials/client-credentials-full-config-tls-nested.xml"});
+        return Arrays.asList(new Object[] {"client-credentials/client-credentials-full-config-tls-global.xml", "0"},
+                             new Object[] {"client-credentials/client-credentials-full-config-tls-nested.xml", "0"},
+                             new Object[] {"client-credentials/client-credentials-full-config-tls-global.xml", "3"},
+                             new Object[] {"client-credentials/client-credentials-full-config-tls-nested.xml", "3"});
     }
 
     @Override
@@ -110,18 +115,6 @@ public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizat
 
     @Test
     public void authenticationFailedTriggersRefreshAccessToken() throws Exception
-    {
-        assertAuthenticationFailedTriggersRefreshAccessToken();
-    }
-
-    @Test
-    public void authenticationFailedTriggersRefreshAccessTokenWithMaxRetriesSetToZero() throws Exception
-    {
-        System.setProperty("mule.http.client.maxRetries", "0");
-        assertAuthenticationFailedTriggersRefreshAccessToken();
-    }
-
-    private void assertAuthenticationFailedTriggersRefreshAccessToken() throws Exception
     {
         configureWireMockToExpectTokenPathRequestForClientCredentialsGrantTypeWithMapResponse(NEW_ACCESS_TOKEN);
 
