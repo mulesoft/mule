@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.lang.Integer.parseInt;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
@@ -18,6 +19,7 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptio
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Mono.subscriberContext;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
@@ -34,7 +36,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
@@ -44,7 +45,6 @@ import java.util.function.Predicate;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * Router with {@link UntilSuccessful} retry logic.
@@ -58,7 +58,7 @@ class UntilSuccessfulRouter {
 
   private final Logger LOGGER = getLogger(UntilSuccessfulRouter.class);
 
-  private static final String RETRY_CTX_INTERNAL_PARAM_KEY = "RETRY_CTX";
+  private static final String RETRY_CTX_INTERNAL_PARAM_KEY = "untilSuccessful.router.retryContext";
   private static final String UNTIL_SUCCESSFUL_MSG_PREFIX =
       "'until-successful' retries exhausted. Last exception message was: %s";
   private final EventInternalContextResolver<Map<String, RetryContext>> retryContextResolver;
@@ -93,7 +93,7 @@ class UntilSuccessfulRouter {
     this.shouldRetry = shouldRetry;
     this.delayScheduler = new ConditionalExecutorServiceDecorator(delayScheduler, s -> isTransactionActive());
     this.retryContextResolver = new EventInternalContextResolver<>(RETRY_CTX_INTERNAL_PARAM_KEY,
-                                                                   () -> new HashMap<>());
+                                                                   HashMap::new);
 
     // Upstream side of until successful chain. Injects events into retrial chain.
     upstreamFlux = Flux.from(publisher)
@@ -174,7 +174,7 @@ class UntilSuccessfulRouter {
 
         // Schedule retry with delay
         UntilSuccessfulRouter.this.delayScheduler.schedule(() -> innerRecorder.next(eventWithCurrentContext(ctx.event, ctx)),
-                                                           ctx.delayInMillis, TimeUnit.MILLISECONDS);
+                                                           ctx.delayInMillis, MILLISECONDS);
       } else { // Retries exhausted
         // Current context already pooped. No need to re-insert it
         LOGGER.error("Retry attempts exhausted. Failing...");
@@ -211,7 +211,7 @@ class UntilSuccessfulRouter {
    */
   Publisher<CoreEvent> getDownstreamPublisher() {
     return downstreamFlux
-        .compose(downstreamPublisher -> Mono.subscriberContext()
+        .compose(downstreamPublisher -> subscriberContext()
             .flatMapMany(downstreamContext -> downstreamPublisher.doOnSubscribe(s -> {
               innerFlux.subscriberContext(downstreamContext).subscribe();
               upstreamFlux.subscriberContext(downstreamContext).subscribe();
