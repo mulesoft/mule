@@ -179,6 +179,8 @@ class UntilSuccessfulRouter {
         // Current context already pooped. No need to re-insert it
         LOGGER.error("Retry attempts exhausted. Failing...");
         Throwable resolvedError = getThrowableFunction(ctx.event).apply(error);
+        // Delete current context from event
+        eventWithCurrentContextDeleted(messagingError.getEvent());
         downstreamRecorder.next(left(resolvedError, CoreEvent.class));
         completeRouterIfNecessary();
       }
