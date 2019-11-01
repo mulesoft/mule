@@ -162,10 +162,6 @@ class UntilSuccessfulRouter {
     };
   }
 
-  private RetryContext getRetryContextForEvent(CoreEvent event) {
-    return retryContextResolver.getCurrentContextFromEvent(event).get(event.getContext().getId());
-  }
-
   private BiConsumer<Throwable, Object> getRetryHandler() {
     return (error, offendingEvent) -> {
       MessagingException messagingError = (MessagingException) error;
@@ -220,8 +216,12 @@ class UntilSuccessfulRouter {
             })));
   }
 
+  private RetryContext getRetryContextForEvent(CoreEvent event) {
+    return retryContextResolver.getCurrentContextFromEvent(event).get(event.getContext().getId());
+  }
+
   /**
-   * Pushes the {@link RetryContext} inside the event being routed through the retrial chain.
+   * Insert the ctx as the event's current {@link RetryContext}, and updates the {@link CoreEvent} internal parameters.
    * 
    * @param event the current retrial {@link CoreEvent}
    * @param ctx the current {@link RetryContext}
@@ -235,13 +235,16 @@ class UntilSuccessfulRouter {
     retryCtxContainer.put(event.getContext().getId(), ctx);
 
     return retryContextResolver.eventWithContext(event, retryCtxContainer);
-
   }
 
+  /**
+   * @param event the event from whom to delete the {@link RetryContext}
+   * @return the event with the {@link RetryContext} deleted
+   */
   private CoreEvent eventWithCurrentContextDeleted(CoreEvent event) {
-    Map<String, RetryContext> retryCtxsContainer = retryContextResolver.getCurrentContextFromEvent(event);
-    retryCtxsContainer.remove(event.getContext().getId());
-    return retryContextResolver.eventWithContext(event, retryCtxsContainer);
+    Map<String, RetryContext> retryCtxContainer = retryContextResolver.getCurrentContextFromEvent(event);
+    retryCtxContainer.remove(event.getContext().getId());
+    return retryContextResolver.eventWithContext(event, retryCtxContainer);
   }
 
   private Predicate<Throwable> getRetryPredicate() {
