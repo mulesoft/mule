@@ -24,6 +24,8 @@ import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.drugs.Drug;
+import org.mule.test.heisenberg.extension.model.drugs.DrugBatch;
+import org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes;
 import org.mule.test.heisenberg.extension.model.drugs.Meta;
 
 import java.util.Map;
@@ -78,5 +80,11 @@ public class ExtensionTypesDeclarationEnricherTestCase extends AbstractMuleTestC
   @Description("Checks that types that are declared in the extension but not used explicitly are added")
   public void addsUnusedDeclaredTypes() throws Exception {
     assertTypes(extensionModel.getTypes(), true, "Type %s was not present", Drug.class, Meta.class);
+  }
+
+  @Test
+  @Description("Checks that POJOs declared in structures like PagingProvider<Connnection C,Result<POJO,Void>> or List<Result<Void,POJO>> are added as Types in the model.")
+  public void addsPOJOsInsideAListOfResultsAsTypes() throws Exception {
+    assertTypes(extensionModel.getTypes(), true, "Type %s was not present", DrugBatch.class, DEAOfficerAttributes.class);
   }
 }

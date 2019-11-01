@@ -8,29 +8,29 @@ package org.mule.test.heisenberg.extension.model.drugs;
 
 public class DrugBatch {
 
-    private String drugType;
-    private Integer batchSize;
+  private String drugType;
+  private Integer batchSize;
 
-    public DrugBatch() {}
+  public DrugBatch() {}
 
-    public String getDrugType() {
-        return drugType;
-    }
+  public String getDrugType() {
+    return drugType;
+  }
 
-    public DrugBatch(String drugType, Integer batchSize) {
-        this.drugType = drugType;
-        this.batchSize = batchSize;
-    }
+  public DrugBatch(String drugType, Integer batchSize) {
+    this.drugType = drugType;
+    this.batchSize = batchSize;
+  }
 
-    public void setDrugType(String drugType) {
-        this.drugType = drugType;
-    }
+  public void setDrugType(String drugType) {
+    this.drugType = drugType;
+  }
 
-    public Integer getBatchSize() {
-        return batchSize;
-    }
+  public Integer getBatchSize() {
+    return batchSize;
+  }
 
-    public void setBatchSize(Integer batchSize) {
-        this.batchSize = batchSize;
-    }
+  public void setBatchSize(Integer batchSize) {
+    this.batchSize = batchSize;
+  }
 }
