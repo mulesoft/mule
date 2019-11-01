@@ -31042,43 +31042,7 @@
                   "required": "true"
                 },
                 "model": {
-                  "type": "Object",
-                  "annotations": {
-                    "typeId": "org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes",
-                    "classInformation": {
-                      "classname": "org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes",
-                      "hasDefaultConstructor": false,
-                      "isInterface": false,
-                      "isInstantiable": false,
-                      "isAbstract": false,
-                      "isFinal": false,
-                      "implementedInterfaces": [
-                        "java.io.Serializable"
-                      ],
-                      "parent": "",
-                      "genericTypes": [],
-                      "isMap": false
-                    },
-                    "typeAlias": {
-                      "value": "DEAOfficerAttributes"
-                    }
-                  },
-                  "fields": [
-                    {
-                      "key": {
-                        "name": "hank"
-                      },
-                      "model": {
-                        "type": "Boolean",
-                        "annotations": {
-                          "typeId": "boolean"
-                        }
-                      },
-                      "annotations": {
-                        "visibility": "READ_ONLY"
-                      }
-                    }
-                  ]
+                  "type": "@ref:org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes"
                 }
               }
             ]
@@ -37102,6 +37066,46 @@
             "expressionSupport": {
               "value": "SUPPORTED"
             }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes",
+        "classInformation": {
+          "classname": "org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes",
+          "hasDefaultConstructor": false,
+          "isInterface": false,
+          "isInstantiable": false,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "java.io.Serializable"
+          ],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "DEAOfficerAttributes"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "hank"
+          },
+          "model": {
+            "type": "Boolean",
+            "annotations": {
+              "typeId": "boolean"
+            }
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
           }
         }
       ]
