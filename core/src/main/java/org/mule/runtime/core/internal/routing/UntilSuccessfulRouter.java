@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.lang.Integer.parseInt;
-import static java.util.Collections.singletonMap;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
@@ -16,7 +15,6 @@ import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
-import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
@@ -27,14 +25,15 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
+import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -62,6 +61,7 @@ class UntilSuccessfulRouter {
   private static final String RETRY_CTX_INTERNAL_PARAM_KEY = "RETRY_CTX";
   private static final String UNTIL_SUCCESSFUL_MSG_PREFIX =
       "'until-successful' retries exhausted. Last exception message was: %s";
+  private final EventInternalContextResolver<Map<String, RetryContext>> retryContextResolver;
 
   private Component owner;
   private Predicate<CoreEvent> shouldRetry;
@@ -92,6 +92,8 @@ class UntilSuccessfulRouter {
     this.owner = owner;
     this.shouldRetry = shouldRetry;
     this.delayScheduler = new ConditionalExecutorServiceDecorator(delayScheduler, s -> isTransactionActive());
+    this.retryContextResolver = new EventInternalContextResolver<>(RETRY_CTX_INTERNAL_PARAM_KEY,
+                                                                   () -> new HashMap<>());
 
     // Upstream side of until successful chain. Injects events into retrial chain.
     upstreamFlux = Flux.from(publisher)
@@ -99,7 +101,7 @@ class UntilSuccessfulRouter {
           // Inject event into retrial execution chain
           RetryContext ctx = new RetryContext(event, sessionSupplier, maxRetriesSupplier, delaySupplier);
           inflightEvents.getAndIncrement();
-          innerRecorder.next(pushRetryContext(event, ctx));
+          innerRecorder.next(eventWithCurrentContext(event, ctx));
         })
         // Handle errors caused by retry ctx initialization
         .doOnError(RetryContextInitializationException.class,
@@ -114,13 +116,12 @@ class UntilSuccessfulRouter {
 
     // Inner chain. Contains all retrial and error handling logic.
     innerFlux = Flux.create(innerRecorder)
-        // Assume: popRetryContext(publishedEvent) is current context
+        // Assume: resolver.currentContextForEvent(publishedEvent) is current context
         .transform(innerPublisher -> applyWithChildContext(innerPublisher, nestedChain,
                                                            Optional.of(owner.getLocation())))
         .doOnNext(successfulEvent -> {
           // Scope execution was successful, pop current ctx
-          popRetryContext(successfulEvent);
-          downstreamRecorder.next(right(Throwable.class, successfulEvent));
+          downstreamRecorder.next(right(Throwable.class, eventWithCurrentContextDeleted(successfulEvent)));
           completeRouterIfNecessary();
         })
         .onErrorContinue(getRetryPredicate(), getRetryHandler());
@@ -161,10 +162,14 @@ class UntilSuccessfulRouter {
     };
   }
 
+  private RetryContext getRetryContextForEvent(CoreEvent event) {
+    return retryContextResolver.getCurrentContextFromEvent(event).get(event.getContext().getId());
+  }
+
   private BiConsumer<Throwable, Object> getRetryHandler() {
     return (error, offendingEvent) -> {
       MessagingException messagingError = (MessagingException) error;
-      RetryContext ctx = popRetryContext(messagingError.getEvent());
+      RetryContext ctx = getRetryContextForEvent(messagingError.getEvent());
       int retriesLeft =
           ctx.retryCount.getAndDecrement();
       if (retriesLeft > 0) {
@@ -172,7 +177,7 @@ class UntilSuccessfulRouter {
                      ctx.maxRetries != RETRY_COUNT_FOREVER ? ctx.maxRetries : "unlimited");
 
         // Schedule retry with delay
-        UntilSuccessfulRouter.this.delayScheduler.schedule(() -> innerRecorder.next(pushRetryContext(ctx.event, ctx)),
+        UntilSuccessfulRouter.this.delayScheduler.schedule(() -> innerRecorder.next(eventWithCurrentContext(ctx.event, ctx)),
                                                            ctx.delayInMillis, TimeUnit.MILLISECONDS);
       } else { // Retries exhausted
         // Current context already pooped. No need to re-insert it
@@ -215,7 +220,6 @@ class UntilSuccessfulRouter {
             })));
   }
 
-
   /**
    * Pushes the {@link RetryContext} inside the event being routed through the retrial chain.
    * 
@@ -223,28 +227,21 @@ class UntilSuccessfulRouter {
    * @param ctx the current {@link RetryContext}
    * @return the {@link CoreEvent} with the retry context saved as internal parameter
    */
-  private CoreEvent pushRetryContext(CoreEvent event, RetryContext ctx) {
+  private CoreEvent eventWithCurrentContext(CoreEvent event, RetryContext ctx) {
     // Requires: The ctx that corresponds to this router execution is not in the stack, or there's no stack yet
     // Assures: The ctx that corresponds to this router execution is the one on top of the stack
 
-    // TODO: There must be cleaner way to do this
+    Map<String, RetryContext> retryCtxContainer = retryContextResolver.getCurrentContextFromEvent(event);
+    retryCtxContainer.put(event.getContext().getId(), ctx);
 
-    Stack<RetryContext> currentStack;
+    return retryContextResolver.eventWithContext(event, retryCtxContainer);
 
-    // Check if I'm already inside another until-successful scope
-    currentStack = ((InternalEvent) event).getInternalParameter(RETRY_CTX_INTERNAL_PARAM_KEY);
-    if (currentStack == null) {
-      // First scope
-      currentStack = new Stack<>();
-    }
-
-    currentStack.push(ctx);
-
-    return quickCopy(event, singletonMap(RETRY_CTX_INTERNAL_PARAM_KEY, currentStack));
   }
 
-  private RetryContext popRetryContext(CoreEvent event) {
-    return ((Stack<RetryContext>) ((InternalEvent) event).getInternalParameter(RETRY_CTX_INTERNAL_PARAM_KEY)).pop();
+  private CoreEvent eventWithCurrentContextDeleted(CoreEvent event) {
+    Map<String, RetryContext> retryCtxsContainer = retryContextResolver.getCurrentContextFromEvent(event);
+    retryCtxsContainer.remove(event.getContext().getId());
+    return retryContextResolver.eventWithContext(event, retryCtxsContainer);
   }
 
   private Predicate<Throwable> getRetryPredicate() {
