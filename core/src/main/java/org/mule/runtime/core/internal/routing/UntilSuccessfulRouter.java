@@ -6,9 +6,13 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static java.lang.Integer.parseInt;
+import static java.util.Collections.singletonMap;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
+import static org.mule.runtime.core.api.functional.Either.left;
+import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
@@ -29,8 +33,6 @@ import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
@@ -46,13 +48,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * 
  * Router with {@link UntilSuccessful} retry logic.
  * 
  * The retrial chain isolation is implemented using two {@link reactor.core.publisher.FluxSink}s, one for the entry inside the
  * retrial chain, and another for publishing successful events, or exhaustion errors.
  * 
- * @since 4.3.0
+ * @since 4.2.3, 4.3.0
  */
 class UntilSuccessfulRouter {
 
@@ -96,13 +97,13 @@ class UntilSuccessfulRouter {
     upstreamFlux = Flux.from(publisher)
         .doOnNext(event -> {
           // Inject event into retrial execution chain
-          RetryContext ctx = new RetryContext(event);
+          RetryContext ctx = new RetryContext(event, sessionSupplier, maxRetriesSupplier, delaySupplier);
           inflightEvents.getAndIncrement();
           innerRecorder.next(pushRetryContext(event, ctx));
         })
         // Handle errors caused by retry ctx initialization
         .doOnError(RetryContextInitializationException.class,
-                   error -> downstreamRecorder.next(Either.left(error.getCause(), CoreEvent.class)))
+                   error -> downstreamRecorder.next(left(error.getCause(), CoreEvent.class)))
         .doOnComplete(() -> {
           if (inflightEvents.get() == 0) {
             completeRouter();
@@ -119,7 +120,7 @@ class UntilSuccessfulRouter {
         .doOnNext(successfulEvent -> {
           // Scope execution was successful, pop current ctx
           popRetryContext(successfulEvent);
-          downstreamRecorder.next(Either.right(Throwable.class, successfulEvent));
+          downstreamRecorder.next(right(Throwable.class, successfulEvent));
           completeRouterIfNecessary();
         })
         .onErrorContinue(getRetryPredicate(), getRetryHandler());
@@ -132,15 +133,13 @@ class UntilSuccessfulRouter {
     if (expressionManager.isExpression(maxRetries)) {
       maxRetriesSupplier = expressionToIntegerSupplierFor(maxRetries);
     } else {
-      Integer asInteger = Integer.parseInt(maxRetries);
-      maxRetriesSupplier = session -> asInteger;
+      maxRetriesSupplier = session -> (Integer) parseInt(maxRetries);
     }
 
     if (expressionManager.isExpression(millisBetweenRetries)) {
       delaySupplier = expressionToIntegerSupplierFor(millisBetweenRetries);
     } else {
-      Integer asInteger = Integer.parseInt(millisBetweenRetries);
-      delaySupplier = session -> asInteger;
+      delaySupplier = session -> (Integer) parseInt(millisBetweenRetries);
     }
 
     // If neither is an expression, we won't need an expression session at all. To keep type consistency, use a
@@ -179,7 +178,7 @@ class UntilSuccessfulRouter {
         // Current context already pooped. No need to re-insert it
         LOGGER.error("Retry attempts exhausted. Failing...");
         Throwable resolvedError = getThrowableFunction(ctx.event).apply(error);
-        downstreamRecorder.next(Either.left(resolvedError, CoreEvent.class));
+        downstreamRecorder.next(left(resolvedError, CoreEvent.class));
         completeRouterIfNecessary();
       }
     };
@@ -241,9 +240,7 @@ class UntilSuccessfulRouter {
 
     currentStack.push(ctx);
 
-    Map<String, Object> parametersWithCtx = new HashMap<>();
-    parametersWithCtx.put(RETRY_CTX_INTERNAL_PARAM_KEY, currentStack);
-    return quickCopy(event, parametersWithCtx);
+    return quickCopy(event, singletonMap(RETRY_CTX_INTERNAL_PARAM_KEY, currentStack));
   }
 
   private RetryContext popRetryContext(CoreEvent event) {
@@ -272,25 +269,24 @@ class UntilSuccessfulRouter {
   /**
    * Context carrying all retrials information.
    */
-  class RetryContext {
+  private static class RetryContext {
 
     CoreEvent event;
     AtomicInteger retryCount = new AtomicInteger();
 
     Integer delayInMillis;
     Integer maxRetries;
-    ConditionalExecutorServiceDecorator delayScheduler;
 
-    RetryContext(CoreEvent event) {
+    RetryContext(CoreEvent event,
+                 Function<CoreEvent, ExpressionManagerSession> sessionSupplier,
+                 Function<ExpressionManagerSession, Integer> maxRetriesSupplier,
+                 Function<ExpressionManagerSession, Integer> delayTimeSupplier) {
       this.event = event;
 
       ExpressionManagerSession session = sessionSupplier.apply(event);
       maxRetries = maxRetriesSupplier.apply(session);
-      delayInMillis = delaySupplier.apply(session);
+      delayInMillis = delayTimeSupplier.apply(session);
       retryCount.set(maxRetries);
-
-      delayScheduler =
-          new ConditionalExecutorServiceDecorator(UntilSuccessfulRouter.this.delayScheduler, s -> isTransactionActive());
     }
 
     int getRetriesLeft() {
@@ -311,7 +307,7 @@ class UntilSuccessfulRouter {
   /**
    * Wrap all exceptions caused in {@link RetryContext} initialization, so that they can be propagated outside of the innerFlux.
    */
-  class RetryContextInitializationException extends RuntimeException {
+  private static class RetryContextInitializationException extends RuntimeException {
 
     public RetryContextInitializationException(Throwable cause) {
       super(cause);

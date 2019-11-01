@@ -30,7 +30,7 @@ import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 
 /**
- * UntilSuccessful attempts to innerFlux a message to the message processor it contains. Routing is considered successful if no
+ * UntilSuccessful attempts to route a message to the message processor it contains. Routing is considered successful if no
  * exception has been raised and, optionally, if the response matches an expression.
  */
 public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
@@ -85,7 +85,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
 
   /**
-   * @return the number of retries to process the innerFlux when failing. Default value is 5.
+   * @return the number of times the scope will retry before failing. Default value is 5.
    */
   public String getMaxRetries() {
     return maxRetries;
@@ -93,7 +93,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   /**
    *
-   * @param maxRetries the number of retries to process the innerFlux when failing. Default value is 5.
+   * @param maxRetries the number of times the scope will retry before failing. Default value is 5.
    */
   public void setMaxRetries(final String maxRetries) {
     this.maxRetries = maxRetries;
