@@ -111,6 +111,18 @@ public class ClientCredentialsFullConfigTestCase extends AbstractOAuthAuthorizat
     @Test
     public void authenticationFailedTriggersRefreshAccessToken() throws Exception
     {
+        assertAuthenticationFailedTriggersRefreshAccessToken();
+    }
+
+    @Test
+    public void authenticationFailedTriggersRefreshAccessTokenWithMaxRetriesSetToZero() throws Exception
+    {
+        System.setProperty("mule.http.client.maxRetries", "0");
+        assertAuthenticationFailedTriggersRefreshAccessToken();
+    }
+
+    private void assertAuthenticationFailedTriggersRefreshAccessToken() throws Exception
+    {
         configureWireMockToExpectTokenPathRequestForClientCredentialsGrantTypeWithMapResponse(NEW_ACCESS_TOKEN);
 
         wireMockRule.stubFor(post(urlEqualTo(RESOURCE_PATH))
