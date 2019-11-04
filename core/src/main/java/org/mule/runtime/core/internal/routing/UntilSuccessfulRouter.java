@@ -103,9 +103,6 @@ class UntilSuccessfulRouter {
           inflightEvents.getAndIncrement();
           innerRecorder.next(eventWithCurrentContext(event, ctx));
         })
-        // Handle errors caused by retry ctx initialization
-        .doOnError(RetryContextInitializationException.class,
-                   error -> downstreamRecorder.next(left(error.getCause(), CoreEvent.class)))
         .doOnComplete(() -> {
           if (inflightEvents.get() == 0) {
             completeRouter();
