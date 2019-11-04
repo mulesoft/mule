@@ -13,9 +13,11 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -26,7 +28,6 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.getI
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -37,8 +38,13 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.io.ByteArrayInputStream;
+import java.util.Collection;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Rule;
@@ -48,12 +54,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import java.io.ByteArrayInputStream;
-import java.util.Collection;
-import java.util.Map;
-
 @RunWith(Parameterized.class)
 public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
+
+  private static final String RETRY_CTX_INTERNAL_PARAMETER_KEY = "untilSuccessful.router.retryContext";
 
   public static class ConfigurableMessageProcessor implements Processor, InternalProcessor {
 
@@ -123,15 +127,33 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   }
 
   private UntilSuccessful buildUntilSuccessful(String millisBetweenRetries) throws Exception {
+    targetMessageProcessor = new ConfigurableMessageProcessor();
+    return buildUntilSuccessfulWithProcessors(millisBetweenRetries, "2", targetMessageProcessor);
+
+  }
+
+  private UntilSuccessful buildUntilSuccessfulWithProcessors(String millisBetweenRetries, String maxRetries,
+                                                             Processor... processors)
+      throws Exception {
     UntilSuccessful untilSuccessful = new UntilSuccessful();
-    untilSuccessful.setMaxRetries("2");
+    untilSuccessful.setMaxRetries(maxRetries);
     untilSuccessful.setAnnotations(getAppleFlowComponentLocationAnnotations());
     if (millisBetweenRetries != null) {
       untilSuccessful.setMillisBetweenRetries(millisBetweenRetries);
     }
 
+    untilSuccessful.setMessageProcessors(asList(processors));
+    muleContext.getInjector().inject(untilSuccessful);
+    return untilSuccessful;
+  }
+
+  private UntilSuccessful buildNestedUntilSuccessful() throws Exception {
+    UntilSuccessful untilSuccessful = new UntilSuccessful();
+    untilSuccessful.setMaxRetries("1");
+    untilSuccessful.setAnnotations(getAppleFlowComponentLocationAnnotations());
+
     targetMessageProcessor = new ConfigurableMessageProcessor();
-    untilSuccessful.setMessageProcessors(singletonList(targetMessageProcessor));
+    untilSuccessful.setMessageProcessors(singletonList(buildUntilSuccessfulWithProcessors("100", "1", targetMessageProcessor)));
     muleContext.getInjector().inject(untilSuccessful);
     return untilSuccessful;
   }
@@ -265,6 +287,74 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     expected.expect(ExpressionRuntimeException.class);
     expected.expectMessage(containsString("You called the function '+' with these arguments"));
     untilSuccessful.process(testEvent);
+  }
+
+  @Test
+  public void testRetryContextIsClearedAfterSuccessfulScopeExecution() throws Exception {
+    targetMessageProcessor.setNumberOfFailuresToSimulate(1);
+    untilSuccessful.setMaxRetries("1");
+    untilSuccessful.setMillisBetweenRetries("100");
+    untilSuccessful.initialise();
+    untilSuccessful.start();
+
+    final CoreEvent testEvent = eventBuilder(muleContext).message(of("queso")).build();
+    CoreEvent response = untilSuccessful.process(testEvent);
+    assertThat(getPayloadAsString(response.getMessage()), is("queso"));
+    Map<String, Object> retryCtxContainer = ((InternalEvent) response).getInternalParameter(RETRY_CTX_INTERNAL_PARAMETER_KEY);
+    assertThat(retryCtxContainer.isEmpty(), is(true));
+  }
+
+  @Test
+  public void testRetryContextIsClearedAfterNestedSuccessfulScopeExecution() throws Exception {
+    untilSuccessful = buildNestedUntilSuccessful();
+    targetMessageProcessor.setNumberOfFailuresToSimulate(1);
+    untilSuccessful.setMaxRetries("1");
+    untilSuccessful.setMillisBetweenRetries("100");
+    untilSuccessful.initialise();
+    untilSuccessful.start();
+
+    final CoreEvent testEvent = eventBuilder(muleContext).message(of("queso")).build();
+    CoreEvent response = untilSuccessful.process(testEvent);
+    assertThat(getPayloadAsString(response.getMessage()), is("queso"));
+    Map<String, Object> retryCtxContainer = ((InternalEvent) response).getInternalParameter(RETRY_CTX_INTERNAL_PARAMETER_KEY);
+    assertThat(retryCtxContainer.isEmpty(), is(true));
+  }
+
+  @Test
+  public void testRetryContextIsClearedAfterExhaustedScopeExecution() throws Exception {
+    targetMessageProcessor.setNumberOfFailuresToSimulate(2);
+    untilSuccessful.setMaxRetries("1");
+    untilSuccessful.setMillisBetweenRetries("100");
+    untilSuccessful.initialise();
+    untilSuccessful.start();
+
+    assertNoRetryContextAfterScopeExecutions(2);
+  }
+
+  @Test
+  public void testRetryContextIsClearedAfterNestedExhaustedScopeExecution() throws Exception {
+    untilSuccessful = buildNestedUntilSuccessful();
+    targetMessageProcessor.setNumberOfFailuresToSimulate(4);
+    untilSuccessful.setMaxRetries("1");
+    untilSuccessful.setMillisBetweenRetries("100");
+    untilSuccessful.initialise();
+    untilSuccessful.start();
+
+    assertNoRetryContextAfterScopeExecutions(4);
+  }
+
+  protected void assertNoRetryContextAfterScopeExecutions(int expectedExecutions) throws MuleException {
+    final CoreEvent testEvent = eventBuilder(muleContext).message(of("queso")).build();
+    try {
+      untilSuccessful.process(testEvent);
+      fail("An exhaustion error was expected from an until successful scope");
+    } catch (Exception e) {
+      MessagingException messagingException = (MessagingException) e;
+      Map<String, Object> retryCtxContainer =
+          ((InternalEvent) messagingException.getEvent()).getInternalParameter(RETRY_CTX_INTERNAL_PARAMETER_KEY);
+      assertThat(retryCtxContainer.isEmpty(), is(true));
+      assertThat(targetMessageProcessor.eventCount, is(expectedExecutions));
+    }
   }
 
   private void assertTargetEventReceived(CoreEvent request) throws MuleException {
