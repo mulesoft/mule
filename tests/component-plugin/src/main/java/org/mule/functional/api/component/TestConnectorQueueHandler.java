@@ -58,7 +58,7 @@ public class TestConnectorQueueHandler {
    * @param queueName
    * @return
    */
-  public int countPendingMessages(String queueName) {
+  public int countPendingEvents(String queueName) {
     return getTestConnectorConfig().countPendingMessages(queueName);
   }
 
