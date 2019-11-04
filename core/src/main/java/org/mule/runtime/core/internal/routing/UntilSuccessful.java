@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.routing;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
@@ -19,14 +18,10 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
@@ -37,7 +32,6 @@ import java.util.function.Predicate;
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 /**
  * UntilSuccessful attempts to route a message to the message processor it contains. Routing is considered successful if no
@@ -57,7 +51,6 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   private Long millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
   private MessageProcessorChain nestedChain;
   private Predicate<CoreEvent> shouldRetry;
-  private RetryPolicyTemplate policyTemplate;
   private Scheduler timer;
   private List<Processor> processors;
 
@@ -67,11 +60,12 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
       throw new InitialisationException(createStaticMessage("One message processor must be configured within 'until-successful'."),
                                         this);
     }
+
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, getRootContainerLocation()), processors);
+
     super.initialise();
+
     timer = schedulerService.cpuLightScheduler();
-    policyTemplate =
-        maxRetries != 0 ? new SimpleRetryPolicyTemplate(millisBetweenRetries, maxRetries) : new NoRetryPolicyTemplate();
     shouldRetry = event -> event.getError().isPresent();
   }
 
@@ -88,33 +82,13 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return from(publisher)
-        .flatMap(event -> Mono.from(processWithChildContextDontComplete(event, nestedChain, ofNullable(getLocation())))
-            .transform(p -> policyTemplate.applyPolicy(p, getRetryPredicate(), e -> {
-            }, getThrowableFunction(event), timer)));
+    return new UntilSuccessfulRouter(this, publisher, nestedChain, shouldRetry, timer, maxRetries,
+                                     millisBetweenRetries).getDownstreamPublisher();
   }
 
-  private Predicate<Throwable> getRetryPredicate() {
-    return e -> (e instanceof MessagingException && shouldRetry.test(((MessagingException) e).getEvent()));
-  }
-
-  private Function<Throwable, Throwable> getThrowableFunction(CoreEvent event) {
-    return throwable -> {
-      Throwable cause = getMessagingExceptionCause(throwable);
-      CoreEvent exceptionEvent = event;
-      if (throwable instanceof MessagingException) {
-        exceptionEvent = ((MessagingException) throwable).getEvent();
-      }
-      return new MessagingException(exceptionEvent,
-                                    new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX,
-                                                                                          cause.getMessage()),
-                                                                      cause, this),
-                                    this);
-    };
-  }
 
   /**
-   * @return the number of retries to process the route when failing. Default value is 5.
+   * @return the number of times the scope will retry before failing. Default value is 5.
    */
   public int getMaxRetries() {
     return maxRetries;
@@ -122,7 +96,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   /**
    *
-   * @param maxRetries the number of retries to process the route when failing. Default value is 5.
+   * @param maxRetries the number of times the scope will retry before failing. Default value is 5.
    */
   public void setMaxRetries(final int maxRetries) {
     this.maxRetries = maxRetries;

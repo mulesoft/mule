@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.singleton;
+import static java.util.Collections.emptySet;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.policy.CommonSourcePolicy.POLICY_SOURCE_PARAMETERS_PROCESSOR;
 import static org.mule.runtime.core.internal.policy.CompositeOperationPolicy.POLICY_OPERATION_NEXT_OPERATION_RESPONSE;
@@ -16,23 +16,22 @@ import static org.mule.runtime.core.internal.policy.CompositeSourcePolicy.POLICY
 import static org.mule.runtime.core.internal.policy.CompositeSourcePolicy.POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_EVENT_CTX_IDS;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
+import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import com.google.common.collect.ImmutableSet;
-import org.slf4j.Logger;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableSet;
+import org.slf4j.Logger;
 
 /**
  * Knows how to modify events when jumping between policies and between a policy and the flow/operation
@@ -46,9 +45,12 @@ public class PolicyEventMapper {
 
   private final String policyId;
   private final String policyVarsInternalParameterName;
+  private EventInternalContextResolver<Set<String>> nextEventIdCtxResolver;
 
   public PolicyEventMapper() {
     this(null);
+    nextEventIdCtxResolver = new EventInternalContextResolver<>(POLICY_NEXT_EVENT_CTX_IDS,
+                                                                () -> emptySet());
   }
 
   public PolicyEventMapper(String policyId) {
@@ -281,18 +283,18 @@ public class PolicyEventMapper {
   }
 
   private CoreEvent onPolicyNext(CoreEvent event, boolean propagate) {
-    final Set<String> eventCtxIds = ((InternalEvent) event).getInternalParameter(POLICY_NEXT_EVENT_CTX_IDS);
-
     PrivilegedEvent originalEvent = getOriginalEvent(event);
+
+    Set<String> currentNextEventIdCtx = nextEventIdCtxResolver.getCurrentContextFromEvent(event);
 
     return InternalEvent
         .builder(event)
         .message(propagate ? event.getMessage() : originalEvent.getMessage())
         .variables(originalEvent.getVariables())
         .addInternalParameter(policyVarsInternalParameterName(), event.getVariables())
-        .addInternalParameter(POLICY_NEXT_EVENT_CTX_IDS, eventCtxIds == null
-            ? singleton(event.getContext().getId())
-            : ImmutableSet.builder().addAll(eventCtxIds).add(event.getContext().getId()).build())
+        .addInternalParameter(POLICY_NEXT_EVENT_CTX_IDS,
+                              ImmutableSet.<String>builder().addAll(currentNextEventIdCtx).add(event.getContext().getId())
+                                  .build())
         .build();
   }
 
