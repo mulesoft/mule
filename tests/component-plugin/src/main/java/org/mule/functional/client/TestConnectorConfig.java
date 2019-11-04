@@ -89,7 +89,7 @@ public class TestConnectorConfig {
    * @param queueName name of the queue from which to count messages. Non empty
    * @return
    */
-  public int countPendingMessages(String queueName) {
+  public int countPendingEvents(String queueName) {
     BlockingQueue<CoreEvent> queue = queues.get(queueName);
     return queue.size();
   }
