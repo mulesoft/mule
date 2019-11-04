@@ -13,6 +13,7 @@ import static java.util.Optional.of;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
 import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapterWithSterotype;
@@ -310,27 +311,38 @@ public abstract class ComponentModel {
               extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
                   .filter(paramModel -> paramModel.getDslConfiguration().allowsInlineDefinition())
                   .ifPresent(paramModel -> {
-                    if (childComp.directChildrenStream().count() == 0) {
-                      paramChildren.add(childComp);
+                    // if (childComp.directChildrenStream().count() == 0) {
+                    paramChildren.add(childComp);
+
+                    if (paramModel.getExpressionSupport() == NOT_SUPPORTED) {
+                      setParameter(paramModel, new DefaultComponentParameterAst(childComp,
+                                                                                () -> paramModel, childComp.getMetadata()));
+                    } else {
                       setParameter(paramModel, new DefaultComponentParameterAst(((ComponentModel) childComp).getTextContent(),
                                                                                 () -> paramModel, childComp.getMetadata()));
                     }
+                    // }
                   });
             });
 
         // TODO
+        // When these are removed, the ast parameters may need to be traversed with recursive/direct spliterators
         // ComponentModel.this.innerComponents.removeAll(paramChildren);
       }
 
       private MetadataTypeModelAdapter findParameterModel(ExtensionModelHelper extensionModelHelper, ParameterizedModel model,
                                                           ComponentModel childComp) {
-        final Optional<? extends MetadataType> childMetadataType =
-            extensionModelHelper.findMetadataType(childComp.getType());
-        return childMetadataType
-            .flatMap(type -> createMetadataTypeModelAdapterWithSterotype(type, extensionModelHelper))
-            .orElseGet(() -> childMetadataType
-                .map(type -> createParameterizedTypeModelAdapter(type, extensionModelHelper))
-                .orElse(null));
+
+        return childComp.getModel(MetadataTypeModelAdapter.class)
+            .orElseGet(() -> {
+              final Optional<? extends MetadataType> childMetadataType =
+                  extensionModelHelper.findMetadataType(childComp.getType());
+              return childMetadataType
+                  .flatMap(type -> createMetadataTypeModelAdapterWithSterotype(type, extensionModelHelper))
+                  .orElseGet(() -> childMetadataType
+                      .map(type -> createParameterizedTypeModelAdapter(type, extensionModelHelper))
+                      .orElse(null));
+            });
       };
 
     });

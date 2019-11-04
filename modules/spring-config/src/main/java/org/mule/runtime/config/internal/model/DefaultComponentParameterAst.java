@@ -10,6 +10,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 
@@ -20,6 +21,7 @@ import java.util.function.Supplier;
 public class DefaultComponentParameterAst implements ComponentParameterAst {
 
   private final String rawValue;
+  private final ComponentAst complexValue;
   private final Supplier<ParameterModel> model;
   private final ComponentMetadataAst metadata;
 
@@ -29,14 +31,26 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
 
   public DefaultComponentParameterAst(String rawValue, Supplier<ParameterModel> model, ComponentMetadataAst metadata) {
     this.rawValue = rawValue;
+    this.complexValue = null;
+    this.model = model;
+    this.metadata = metadata;
+  }
+
+  public DefaultComponentParameterAst(ComponentAst complexValue, Supplier<ParameterModel> model, ComponentMetadataAst metadata) {
+    this.rawValue = null;
+    this.complexValue = complexValue;
     this.model = model;
     this.metadata = metadata;
   }
 
   @Override
-  public Object getValue() {
-    // previous implementations were assuming that an empty string was the same as the param not being present...
-    return isEmpty(rawValue) ? getModel().getDefaultValue() : rawValue;
+  public <T> T getValue() {
+    if (complexValue != null) {
+      return (T) complexValue;
+    } else {
+      // previous implementations were assuming that an empty string was the same as the param not being present...
+      return isEmpty(rawValue) ? (T) getModel().getDefaultValue() : (T) rawValue;
+    }
   }
 
   @Override
