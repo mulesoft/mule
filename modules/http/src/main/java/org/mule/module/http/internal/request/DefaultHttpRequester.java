@@ -309,7 +309,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                     resetMuleEventForNewThread(muleEvent);
 
 
-                    if (resendRequest(muleEvent, retryCount, authentication))
+                    if (authenticationRequiresRetry(muleEvent, authentication))
                     {
                         consumePayload(muleEvent);
                         muleEvent.setMessage(originalMuleMessage);
@@ -413,7 +413,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         httpResponseToMuleEvent.convert(muleEvent, response, httpRequest.getUri());
         notificationHelper.fireNotification(muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
 
-        if (resendRequest(muleEvent, retryCount, authentication))
+        if (authenticationRequiresRetry(muleEvent, authentication))
         {
             consumePayload(muleEvent);
             muleEvent.setMessage(originalMuleMessage);
@@ -436,9 +436,9 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         responseValidator.validate(muleEvent);
     }
 
-    private boolean resendRequest(MuleEvent muleEvent, int retryCount, HttpAuthentication authentication) throws MuleException
+    private boolean authenticationRequiresRetry(MuleEvent muleEvent, HttpAuthentication authentication) throws MuleException
     {
-        return retryCount > 0 && authentication != null && authentication.shouldRetry(muleEvent);
+        return authentication != null && authentication.shouldRetry(muleEvent);
     }
 
     private HttpRequest createHttpRequest(MuleEvent muleEvent, HttpAuthentication authentication) throws MuleException
