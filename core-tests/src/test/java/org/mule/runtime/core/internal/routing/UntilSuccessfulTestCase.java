@@ -57,7 +57,7 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
-  private static final String RETRY_CTX_INTERNAL_PARAMETER_KEY = "RETRY_CTX";
+  private static final String RETRY_CTX_INTERNAL_PARAMETER_KEY = "untilSuccessful.router.retryContext";
 
   public static class ConfigurableMessageProcessor implements Processor, InternalProcessor {
 
@@ -347,7 +347,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     final CoreEvent testEvent = eventBuilder(muleContext).message(of("queso")).build();
     try {
       untilSuccessful.process(testEvent);
-      fail();
+      fail("An exhaustion error was expected from an until successful scope");
     } catch (Exception e) {
       MessagingException messagingException = (MessagingException) e;
       Map<String, Object> retryCtxContainer =

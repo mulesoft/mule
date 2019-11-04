@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.policy.CommonSourcePolicy.POLICY_SOURCE_PARAMETERS_PROCESSOR;
 import static org.mule.runtime.core.internal.policy.CompositeOperationPolicy.POLICY_OPERATION_NEXT_OPERATION_RESPONSE;
@@ -26,7 +27,6 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import com.google.common.collect.ImmutableSet;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -50,7 +50,7 @@ public class PolicyEventMapper {
   public PolicyEventMapper() {
     this(null);
     nextEventIdCtxResolver = new EventInternalContextResolver<>(POLICY_NEXT_EVENT_CTX_IDS,
-                                                                () -> Collections.emptySet());
+                                                                () -> emptySet());
   }
 
   public PolicyEventMapper(String policyId) {
