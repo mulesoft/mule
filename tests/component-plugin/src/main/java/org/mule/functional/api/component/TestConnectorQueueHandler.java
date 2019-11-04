@@ -59,7 +59,7 @@ public class TestConnectorQueueHandler {
    * @return
    */
   public int countPendingEvents(String queueName) {
-    return getTestConnectorConfig().countPendingMessages(queueName);
+    return getTestConnectorConfig().countPendingEvents(queueName);
   }
 
   protected TestConnectorConfig getTestConnectorConfig() {
