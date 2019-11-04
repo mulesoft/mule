@@ -83,6 +83,17 @@ public class TestConnectorConfig {
     }
   }
 
+  /**
+   * Count the number of outstanding {@link CoreEvent} in a queue.
+   * 
+   * @param queueName name of the queue from which to count messages. Non empty
+   * @return
+   */
+  public int countPendingEvents(String queueName) {
+    BlockingQueue<CoreEvent> queue = queues.get(queueName);
+    return queue.size();
+  }
+
   private BlockingQueue<CoreEvent> getQueue(String queueName) {
     BlockingQueue<CoreEvent> queue = queues.get(queueName);
     if (queue == null) {
