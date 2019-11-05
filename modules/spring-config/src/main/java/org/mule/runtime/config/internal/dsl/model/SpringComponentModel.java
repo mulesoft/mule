@@ -211,7 +211,7 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
         }
 
         if (innerSpliterator == null) {
-          innerSpliterator = getInnerComponents().stream().map(ic -> (ComponentAst) ic).spliterator();
+          innerSpliterator = directChildrenStream().map(ic -> ic).spliterator();
         }
 
         if (currentChildSpliterator != null) {
@@ -235,15 +235,15 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
       @Override
       public Spliterator<ComponentAst> trySplit() {
         if (innerSpliterator == null) {
-          innerSpliterator = getInnerComponents().stream().map(ic -> (ComponentAst) ic).spliterator();
+          innerSpliterator = directChildrenStream().map(ic -> ic).spliterator();
         }
         return null;
       }
 
       @Override
       public long estimateSize() {
-        return 1 + getInnerComponents().stream()
-            .mapToLong(inner -> ((ComponentAst) inner).recursiveSpliterator().estimateSize())
+        return 1 + directChildrenStream()
+            .mapToLong(inner -> inner.recursiveSpliterator().estimateSize())
             .sum();
       }
 
@@ -257,8 +257,7 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
 
   @Override
   public Stream<ComponentAst> directChildrenStream() {
-    return getInnerComponents().stream()
-        .map(cm -> (ComponentAst) cm);
+    return getInnerComponents().stream().map(cm -> (ComponentAst) cm);
   }
 
   @Override

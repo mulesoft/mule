@@ -311,22 +311,21 @@ public abstract class ComponentModel {
               extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
                   .filter(paramModel -> paramModel.getDslConfiguration().allowsInlineDefinition())
                   .ifPresent(paramModel -> {
-                    // if (childComp.directChildrenStream().count() == 0) {
                     paramChildren.add(childComp);
 
                     if (paramModel.getExpressionSupport() == NOT_SUPPORTED) {
+                      // TODO MULE-17710 do a recursive navigation to set the field metadata on the inner ComponentAsts of
+                      // childComp
                       setParameter(paramModel, new DefaultComponentParameterAst(childComp,
                                                                                 () -> paramModel, childComp.getMetadata()));
                     } else {
                       setParameter(paramModel, new DefaultComponentParameterAst(((ComponentModel) childComp).getTextContent(),
                                                                                 () -> paramModel, childComp.getMetadata()));
                     }
-                    // }
                   });
             });
 
-        // TODO
-        // When these are removed, the ast parameters may need to be traversed with recursive/direct spliterators
+        // TODO MULE-17711 When these are removed, the ast parameters may need to be traversed with recursive/direct spliterators
         // ComponentModel.this.innerComponents.removeAll(paramChildren);
       }
 
