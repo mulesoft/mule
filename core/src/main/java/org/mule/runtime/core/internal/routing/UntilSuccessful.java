@@ -17,8 +17,10 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.routing.UntilSuccessfulRouter.RetryContextInitializationException;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
@@ -74,7 +76,19 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
-    return processToApply(event, this);
+    try {
+      return processToApply(event, this);
+    } catch (Exception error) {
+      Throwable cause = error.getCause();
+      if (cause instanceof RetryContextInitializationException &&
+          cause.getCause() instanceof ExpressionRuntimeException) {
+        // Runtime exception caused by Retry Ctx initialization, propagating
+        throw ((ExpressionRuntimeException) cause.getCause());
+      } else {
+        // Not caused by context initialization. Throwing as raised.
+        throw error;
+      }
+    }
   }
 
   @Override
