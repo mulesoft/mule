@@ -239,7 +239,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private ReactiveProcessor dispatchToFlow() {
     return publisher -> from(publisher)
         .doOnNext(assertStarted())
-        .flatMap(routeThroughProcessingStrategy()).compose(pub -> pub.subscriberContext(context -> {
+        .flatMap(routeThroughProcessingStrategy())
+        // This replaces the onErrorContinue key if it exists, to prevent it from being propagated within the flow
+        .compose(pub -> pub.subscriberContext(context -> {
           Optional<Object> onErrorStrategy = context.getOrEmpty(KEY_ON_NEXT_ERROR_STRATEGY);
           if (onErrorStrategy.isPresent()
               && onErrorStrategy.get().toString().contains(ON_NEXT_FAILURE_STRATEGY)) {
