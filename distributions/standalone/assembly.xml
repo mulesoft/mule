@@ -291,6 +291,7 @@
 
                 <exclude>com.mulesoft.muleesb.patches:SE-12551-${mule.version}</exclude>
                 <exclude>com.mulesoft.muleesb.patches:SE-12562-${mule.version}</exclude>
+                <exclude>com.mulesoft.muleesb.patches:SE-13712-${mule.version}</exclude>
 
                 <!-- lib/boot -->
                 <exclude>commons-cli:commons-cli</exclude>
@@ -337,6 +338,7 @@
             <includes>
                 <include>com.mulesoft.muleesb.patches:SE-12562-${mule.version}</include>
                 <include>com.mulesoft.muleesb.patches:SE-12551-${mule.version}</include>
+                <include>com.mulesoft.muleesb.patches:SE-13712-${mule.version}</include>
             </includes>
         </dependencySet>
 

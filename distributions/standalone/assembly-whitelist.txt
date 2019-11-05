@@ -452,6 +452,7 @@
 #
 /mule-standalone-${productVersion}/lib/user/SE-12551-3.8.1-4.0.jar
 /mule-standalone-${productVersion}/lib/user/SE-12562-3.8.1-1.0.jar
+/mule-standalone-${productVersion}/lib/user/SE-13712-3.8.1-1.0.jar
 
 #
 # /lib/src

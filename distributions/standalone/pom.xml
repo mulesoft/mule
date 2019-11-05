@@ -187,6 +187,11 @@
             <artifactId>SE-12562-${mule.version}</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.mulesoft.muleesb.patches</groupId>
+            <artifactId>SE-13712-${mule.version}</artifactId>
+            <version>1.0</version>
+        </dependency>
 
         <!-- Mule Core -->
         <dependency>
