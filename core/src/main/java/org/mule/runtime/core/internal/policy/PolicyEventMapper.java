@@ -45,12 +45,12 @@ public class PolicyEventMapper {
 
   private final String policyId;
   private final String policyVarsInternalParameterName;
-  private EventInternalContextResolver<Set<String>> nextEventIdCtxResolver;
+  private EventInternalContextResolver<Set<String>> nextEventIdCtxResolver =
+      new EventInternalContextResolver<>(POLICY_NEXT_EVENT_CTX_IDS,
+                                         () -> emptySet());
 
   public PolicyEventMapper() {
     this(null);
-    nextEventIdCtxResolver = new EventInternalContextResolver<>(POLICY_NEXT_EVENT_CTX_IDS,
-                                                                () -> emptySet());
   }
 
   public PolicyEventMapper(String policyId) {
