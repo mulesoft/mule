@@ -226,7 +226,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     @Override
     protected MuleEvent processBlocking(final MuleEvent muleEvent) throws MuleException
     {
-        return innerProcess(muleEvent, retryAttempts);
+        return innerProcess(muleEvent, retryAttempts, false);
     }
 
     @Override
@@ -381,7 +381,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         }
     }
 
-    private MuleEvent innerProcess(MuleEvent muleEvent, int retryCount) throws MuleException
+    private MuleEvent innerProcess(MuleEvent muleEvent, int retryCount, boolean alreadyRetriedByAuth) throws MuleException
     {
         HttpAuthentication authentication = requestConfig.getAuthentication();
         HttpRequest httpRequest = createHttpRequest(muleEvent, authentication);
@@ -398,7 +398,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
             // a "IOException: Remotely Closed"
             if(shouldRetryRemotelyClosed(e, retryCount, httpRequest.getMethod()))
             {
-                return innerProcess(muleEvent, retryCount - 1);
+                return innerProcess(muleEvent, retryCount - 1, alreadyRetriedByAuth);
             }
             else
             {
@@ -410,11 +410,11 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         httpResponseToMuleEvent.convert(muleEvent, response, httpRequest.getUri());
         notificationHelper.fireNotification(muleEvent, httpRequest.getUri(), muleEvent.getFlowConstruct(), MESSAGE_REQUEST_END);
 
-        if (authenticationRequiresRetry(muleEvent, authentication))
+        if (!alreadyRetriedByAuth && authenticationRequiresRetry(muleEvent, authentication))
         {
             consumePayload(muleEvent);
             muleEvent.setMessage(originalMuleMessage);
-            muleEvent = innerProcess(muleEvent, 0);
+            muleEvent = innerProcess(muleEvent, 0, true);
         }
         else
         {
