@@ -9,6 +9,7 @@ package org.mule.runtime.deployment.model.internal.domain;
 import static java.util.Collections.emptyList;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
@@ -93,6 +94,52 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
 
     assertThat(domainClassLoader.getClassLoader(), instanceOf(MuleSharedDomainClassLoader.class));
     assertThat(domainClassLoader.getArtifactId(), equalTo(artifactId));
+  }
+
+  @Test
+  public void secondClassLoaderCreationReturnsCachedInstance() {
+    final String domainName = "custom-domain";
+    DomainDescriptor descriptor = getTestDescriptor(domainName);
+    descriptor.setRootFolder(createDomainDir(MULE_DOMAIN_FOLDER, domainName));
+    DomainClassLoaderFactory factory = new DomainClassLoaderFactory(getClass().getClassLoader());
+
+    final ArtifactClassLoader firstDomainClassLoader = factory.create(null, containerClassLoader, descriptor, emptyList());
+    final ArtifactClassLoader secondDomainClassLoader = factory.create(null, containerClassLoader, descriptor, emptyList());
+
+    assertThat(secondDomainClassLoader, is(firstDomainClassLoader));
+  }
+
+  @Test
+  public void secondClassLoaderCreationDoesntReturnDisposedInstance() {
+    final String domainName = "custom-domain";
+    DomainDescriptor descriptor = getTestDescriptor(domainName);
+    descriptor.setRootFolder(createDomainDir(MULE_DOMAIN_FOLDER, domainName));
+    DomainClassLoaderFactory factory = new DomainClassLoaderFactory(getClass().getClassLoader());
+
+    final ArtifactClassLoader firstDomainClassLoader = factory.create(null, containerClassLoader, descriptor, emptyList());
+    firstDomainClassLoader.dispose();
+    final ArtifactClassLoader secondDomainClassLoader = factory.create(null, containerClassLoader, descriptor, emptyList());
+
+    assertThat(secondDomainClassLoader, is(not(firstDomainClassLoader)));
+  }
+
+  @Test
+  public void severalCreationsReturnCachedInstancesWhenNotDisposed() {
+    final String domainName = "custom-domain";
+    DomainDescriptor descriptor = getTestDescriptor(domainName);
+    descriptor.setRootFolder(createDomainDir(MULE_DOMAIN_FOLDER, domainName));
+    DomainClassLoaderFactory factory = new DomainClassLoaderFactory(getClass().getClassLoader());
+
+    final ArtifactClassLoader firstDomainClassLoader = factory.create(null, containerClassLoader, descriptor, emptyList());
+    assertThat(factory.create(null, containerClassLoader, descriptor, emptyList()), is(firstDomainClassLoader));
+    assertThat(factory.create(null, containerClassLoader, descriptor, emptyList()), is(firstDomainClassLoader));
+
+    firstDomainClassLoader.dispose();
+
+    final ArtifactClassLoader secondDomainClassLoader = factory.create(null, containerClassLoader, descriptor, emptyList());
+    assertThat(secondDomainClassLoader, is(not(firstDomainClassLoader)));
+    assertThat(factory.create(null, containerClassLoader, descriptor, emptyList()), is(secondDomainClassLoader));
+    assertThat(factory.create(null, containerClassLoader, descriptor, emptyList()), is(secondDomainClassLoader));
   }
 
   private DomainDescriptor getTestDescriptor(String name) {
