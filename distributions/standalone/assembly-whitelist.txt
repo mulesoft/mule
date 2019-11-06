@@ -364,7 +364,7 @@
 /mule-standalone-${productVersion}/lib/opt/jsr305-3.0.2.jar
 /mule-standalone-${productVersion}/lib/opt/juli-6.0.53.jar
 /mule-standalone-${productVersion}/lib/opt/juniversalchardet-1.0.3.jar
-/mule-standalone-${productVersion}/lib/opt/jython-standalone-2.7.1.jar
+/mule-standalone-${productVersion}/lib/opt/jython-standalone-2.7.2b2.jar
 /mule-standalone-${productVersion}/lib/opt/jzlib-1.1.3.jar
 /mule-standalone-${productVersion}/lib/opt/libphonenumber-8.0.0.jar
 /mule-standalone-${productVersion}/lib/opt/mchange-commons-java-0.2.15.jar
