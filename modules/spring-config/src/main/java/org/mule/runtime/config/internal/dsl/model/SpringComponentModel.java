@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
+import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -22,6 +23,7 @@ import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.model.DefaultComponentParameterAst;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -109,39 +111,24 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
    */
   @Override
   public ComponentParameterAst getParameter(String paramName) {
-    if (parameterAsts.containsKey(paramName)) {
-      return parameterAsts.get(paramName);
-    }
+    return parameterAsts.computeIfAbsent(paramName, paramNameKey -> findParameterModel(paramNameKey)
+        .map(paramModel -> getRawParameterValue(paramNameKey)
+            .map(rawParamValue -> new DefaultComponentParameterAst(rawParamValue, () -> paramModel))
+            .orElseGet(() -> new DefaultComponentParameterAst(null, () -> paramModel)))
+        .orElseThrow(() -> {
+          // Try to provide as much troubleshooting information as possible
+          final String mxgPrefix = format("Wanted paramName '%s' from object '%s'.", paramNameKey,
+                                          getModel(NamedObject.class).map(n -> n.getName()).orElse("(null)"));
 
-    Optional<ParameterModel> parameterModel = findParameterModel(paramName);
-    parameterModel.orElseGet(() -> {
-      validateParameter(paramName);
-      return null;
-    });
-
-    return parameterModel.map(paramModel -> getRawParameterValue(paramName)
-        .map(rawParamValue -> {
-          return new DefaultComponentParameterAst(rawParamValue, () -> parameterModel.orElseGet(() -> {
-            validateParameter(paramName);
-            return null;
-          }));
-        })
-        .orElseGet(() -> new DefaultComponentParameterAst(null, () -> parameterModel.orElseGet(() -> {
-          validateParameter(paramName);
-          return null;
-        }))))
-        .get();
-  }
-
-  private void validateParameter(String paramName) {
-    if (!SpringComponentModel.this.getModel(ParameterizedModel.class).isPresent()) {
-      throw new NoSuchElementException(" >>>> Wanted paramName '" + paramName + "'. The model is not parameterizable ("
-          + SpringComponentModel.this.getModel(NamedObject.class) + ")");
-    } else {
-      throw new NoSuchElementException(" >>>> Wanted paramName '" + paramName + "'. Available: "
-          + SpringComponentModel.this.getModel(ParameterizedModel.class).get().getAllParameterModels().stream()
-              .map(pm -> pm.getName()).collect(toList()));
-    }
+          if (!getModel(ParameterizedModel.class).isPresent()) {
+            return new NoSuchElementException(mxgPrefix + " The model is not parameterizable.");
+          } else {
+            final List<String> availableParams = getModel(ParameterizedModel.class).get().getAllParameterModels()
+                .stream()
+                .map(pm -> pm.getName()).collect(toList());
+            return new NoSuchElementException(mxgPrefix + " Available: " + availableParams);
+          }
+        }));
   }
 
   private Optional<ParameterModel> findParameterModel(String paramName) {
