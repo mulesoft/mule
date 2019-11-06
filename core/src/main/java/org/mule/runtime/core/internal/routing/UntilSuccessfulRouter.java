@@ -306,7 +306,7 @@ class UntilSuccessfulRouter {
   /**
    * Wrap all exceptions caused in {@link RetryContext} initialization, so that they can be propagated outside of the innerFlux.
    */
-  private static class RetryContextInitializationException extends RuntimeException {
+  static class RetryContextInitializationException extends RuntimeException {
 
     public RetryContextInitializationException(Throwable cause) {
       super(cause);
