@@ -80,7 +80,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
       return processToApply(event, this);
     } catch (Exception error) {
       Throwable cause = error.getCause();
-      if (cause instanceof RetryContextInitializationException &&
+      if (cause != null && cause instanceof RetryContextInitializationException &&
           cause.getCause() instanceof ExpressionRuntimeException) {
         // Runtime exception caused by Retry Ctx initialization, propagating
         throw ((ExpressionRuntimeException) cause.getCause());
