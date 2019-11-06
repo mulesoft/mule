@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
@@ -27,11 +28,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
+import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static reactor.core.publisher.Mono.just;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -49,6 +53,7 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.WorkQueueStreamProcessingStrategyFactory;
 import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer;
@@ -59,6 +64,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -71,6 +77,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.InOrder;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 
 @RunWith(Parameterized.class)
 public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
@@ -341,7 +349,6 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     }
   }
 
-
   @Test
   public void workQueueSchedulerRejectsDoesntStartFlow() throws Exception {
     Processor processor = mock(Processor.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
@@ -373,6 +380,42 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
       flow.start();
     } finally {
       verify(rejectingScheduler).shutdownNow();
+    }
+  }
+
+  @Test
+  @Issue("MULE-17386")
+  public void doNotExecuteOnErrorContinueDefinedOutsideTheFlow() throws MuleException {
+    AtomicBoolean nonExpectedError = new AtomicBoolean();
+    final BiFunction<Processor, CoreEvent, CoreEvent> triggerFunction =
+        (listener, event) -> just(event).transform(listener).onErrorContinue((e, o) -> nonExpectedError.set(true)).block();
+
+    flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
+        .source(flow.getSource())
+        .processors(singletonList(new ErrorProcessor()))
+        .processingStrategyFactory(new BlockingProcessingStrategyFactory())
+        .build();
+    flow.initialise();
+    flow.start();
+
+    CoreEvent response = triggerFunction.apply(directInboundMessageSource.getListener(), testEvent());
+    assertThat(response, nullValue());
+    assertThat(nonExpectedError.get(), is(false));
+  }
+
+  public static class ErrorProcessor implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      throw new MessagingException(createStaticMessage("Test error"), event);
+    }
+
+    @Override
+    public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+      return Flux.from(publisher)
+          .doOnNext(event -> {
+            throw propagateWrappingFatal(new MessagingException(createStaticMessage("message"), event));
+          });
     }
   }
 }
