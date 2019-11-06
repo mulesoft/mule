@@ -7,7 +7,6 @@
 package org.mule.runtime.config.internal.dsl.model;
 
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
@@ -109,16 +108,16 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
    * @return the AST of the parameter if present, or {@link Optional#empty()} if not present.
    */
   @Override
-  public Optional<ComponentParameterAst> getParameter(String paramName) {
+  public ComponentParameterAst getParameter(String paramName) {
     if (parameterAsts.containsKey(paramName)) {
-      return of(parameterAsts.get(paramName));
+      return parameterAsts.get(paramName);
     }
 
     Optional<ParameterModel> parameterModel = findParameterModel(paramName);
-    // parameterModel.orElseGet(() -> {
-    // validateParameter(paramName);
-    // return null;
-    // });
+    parameterModel.orElseGet(() -> {
+      validateParameter(paramName);
+      return null;
+    });
 
     return parameterModel.map(paramModel -> getRawParameterValue(paramName)
         .map(rawParamValue -> {
@@ -130,18 +129,18 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
         .orElseGet(() -> new DefaultComponentParameterAst(null, () -> parameterModel.orElseGet(() -> {
           validateParameter(paramName);
           return null;
-        }))));
+        }))))
+        .get();
   }
 
   private void validateParameter(String paramName) {
     if (!SpringComponentModel.this.getModel(ParameterizedModel.class).isPresent()) {
-      throw new NoSuchElementException(" >>>> Wanted paramName '" + paramName + "'. The model is not parametrizable ("
+      throw new NoSuchElementException(" >>>> Wanted paramName '" + paramName + "'. The model is not parameterizable ("
           + SpringComponentModel.this.getModel(NamedObject.class) + ")");
     } else {
       throw new NoSuchElementException(" >>>> Wanted paramName '" + paramName + "'. Available: "
           + SpringComponentModel.this.getModel(ParameterizedModel.class).get().getAllParameterModels().stream()
-              .map(pm -> pm.getName()).collect(toList())
-          + "");
+              .map(pm -> pm.getName()).collect(toList()));
     }
   }
 

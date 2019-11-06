@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.model;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;
@@ -59,7 +60,6 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
       // previous implementations were assuming that an empty string was the same as the param not being present...
       return (T) getModel().getDefaultValue();
     } else {
-      // return (T) rawValue;
       AtomicReference<T> value = new AtomicReference<>();
 
       getModel().getType().accept(new MetadataTypeVisitor() {
@@ -71,17 +71,29 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
 
         @Override
         public void visitBoolean(BooleanType booleanType) {
-          value.set((T) Boolean.valueOf(rawValue));
+          if (isExpression(rawValue)) {
+            defaultVisit(booleanType);
+          } else {
+            value.set((T) Boolean.valueOf(rawValue));
+          }
         }
 
         @Override
         public void visitNumber(NumberType numberType) {
-          value.set((T) Integer.valueOf(rawValue));
+          if (isExpression(rawValue)) {
+            defaultVisit(numberType);
+          } else {
+            value.set((T) Integer.valueOf(rawValue));
+          }
         }
 
         @Override
         public void visitString(StringType stringType) {
-          value.set((T) rawValue);
+          if (isExpression(rawValue)) {
+            defaultVisit(stringType);
+          } else {
+            value.set((T) rawValue);
+          }
         }
 
         @Override
@@ -95,10 +107,6 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
           }
         }
       });
-
-      if (value.get() == null) {
-        System.out.println("param value not visited: " + getModel());
-      }
 
       return value.get();
     }

@@ -8,7 +8,6 @@ package org.mule.runtime.config.internal.dsl.model.extension.xml;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
@@ -22,7 +21,6 @@ import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMess
 import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -32,6 +30,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.model.ApplicationModel;
@@ -39,7 +38,6 @@ import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
-import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 
 import java.util.ArrayList;
@@ -472,32 +470,9 @@ public class MacroExpansionModuleModel {
   private Map<String, String> extractParameters(ComponentAst componentModel, List<ParameterModel> parameters) {
     Map<String, String> valuesMap = new HashMap<>();
     for (ParameterModel parameterExtension : parameters) {
-      String paramName = parameterExtension.getName();
-      String value = null;
-
-      switch (parameterExtension.getRole()) {
-        case BEHAVIOUR:
-          value = componentModel.getRawParameterValue(paramName).orElse(null);
-          break;
-        case CONTENT:
-        case PRIMARY_CONTENT:
-          final DslResolvingContext dslResolvingContext = DslResolvingContext.getDefault(emptySet());
-          final DslSyntaxResolver dslSyntaxResolver = DslSyntaxResolver.getDefault(extensionModel, dslResolvingContext);
-          final String resolvedName = dslSyntaxResolver.resolve(parameterExtension).getElementName();
-
-          value = componentModel.directChildrenStream()
-              .filter(cm -> resolvedName.equals(cm.getIdentifier().getName()))
-              .map(cm -> cm.getRawParameterValue(ComponentAst.BODY_RAW_PARAM_NAME).orElse(null))
-              .findFirst()
-              .orElse(null);
-          break;
-      }
-
-      if (value == null && (parameterExtension.getDefaultValue() != null)) {
-        value = String.valueOf(parameterExtension.getDefaultValue());
-      }
-      if (value != null) {
-        valuesMap.put(paramName, value);
+      final ComponentParameterAst param = componentModel.getParameter(parameterExtension.getName());
+      if (param.getValue() != null) {
+        valuesMap.put(parameterExtension.getName(), param.getValue().toString());
       }
     }
     return valuesMap;
