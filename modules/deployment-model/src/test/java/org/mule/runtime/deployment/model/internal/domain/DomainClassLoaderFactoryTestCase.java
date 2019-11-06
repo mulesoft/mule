@@ -123,6 +123,25 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
     assertThat(secondDomainClassLoader, is(not(firstDomainClassLoader)));
   }
 
+  @Test
+  public void severalCreationsReturnCachedInstancesWhenNotDisposed() {
+    final String domainName = "custom-domain";
+    DomainDescriptor descriptor = getTestDescriptor(domainName);
+    descriptor.setRootFolder(createDomainDir(MULE_DOMAIN_FOLDER, domainName));
+    DomainClassLoaderFactory factory = new DomainClassLoaderFactory(getClass().getClassLoader());
+
+    final ArtifactClassLoader firstDomainClassLoader = factory.create(null, containerClassLoader, descriptor, emptyList());
+    assertThat(factory.create(null, containerClassLoader, descriptor, emptyList()), is(firstDomainClassLoader));
+    assertThat(factory.create(null, containerClassLoader, descriptor, emptyList()), is(firstDomainClassLoader));
+
+    firstDomainClassLoader.dispose();
+
+    final ArtifactClassLoader secondDomainClassLoader = factory.create(null, containerClassLoader, descriptor, emptyList());
+    assertThat(secondDomainClassLoader, is(not(firstDomainClassLoader)));
+    assertThat(factory.create(null, containerClassLoader, descriptor, emptyList()), is(secondDomainClassLoader));
+    assertThat(factory.create(null, containerClassLoader, descriptor, emptyList()), is(secondDomainClassLoader));
+  }
+
   private DomainDescriptor getTestDescriptor(String name) {
     DomainDescriptor descriptor = new DomainDescriptor(name);
     descriptor.setRedeploymentEnabled(false);
