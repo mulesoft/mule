@@ -69,6 +69,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -82,6 +83,9 @@ import reactor.core.publisher.Mono;
  * If no message processors are configured then the source message is simply returned.
  */
 public abstract class AbstractPipeline extends AbstractFlowConstruct implements Pipeline {
+
+  private static final String KEY_ON_NEXT_ERROR_STRATEGY = "reactor.onNextError.localStrategy";
+  private static final String ON_NEXT_FAILURE_STRATEGY = "reactor.core.publisher.OnNextFailureStrategy$ResumeStrategy";
 
   private final NotificationDispatcher notificationFirer;
 
@@ -235,7 +239,17 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private ReactiveProcessor dispatchToFlow() {
     return publisher -> from(publisher)
         .doOnNext(assertStarted())
-        .flatMap(routeThroughProcessingStrategy());
+        .flatMap(routeThroughProcessingStrategy())
+        // This replaces the onErrorContinue key if it exists, to prevent it from being propagated within the flow
+        .compose(pub -> pub.subscriberContext(context -> {
+          Optional<Object> onErrorStrategy = context.getOrEmpty(KEY_ON_NEXT_ERROR_STRATEGY);
+          if (onErrorStrategy.isPresent()
+              && onErrorStrategy.get().toString().contains(ON_NEXT_FAILURE_STRATEGY)) {
+            BiFunction<Throwable, Object, Throwable> onErrorContinue = (e, o) -> null;
+            return context.put(KEY_ON_NEXT_ERROR_STRATEGY, onErrorContinue);
+          }
+          return context;
+        }));
   }
 
   protected Function<CoreEvent, Publisher<? extends CoreEvent>> routeThroughProcessingStrategy() {
