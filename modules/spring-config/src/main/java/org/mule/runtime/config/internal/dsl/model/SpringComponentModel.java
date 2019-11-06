@@ -99,7 +99,7 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
    */
   @Override
   public void setParameter(ParameterModel parameterModel, ComponentParameterAst value) {
-    setParameter(parameterModel.getName(), value.getRawValue());
+    super.setParameter(parameterModel, value);
     this.parameterAsts.put(parameterModel.getName(), value);
   }
 

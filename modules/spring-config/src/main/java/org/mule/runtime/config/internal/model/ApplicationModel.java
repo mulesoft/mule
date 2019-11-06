@@ -319,7 +319,6 @@ public class ApplicationModel implements ArtifactAst {
     createConfigurationAttributeResolver(artifactConfig, parentConfigurationProperties, deploymentProperties);
     convertConfigFileToComponentModel(artifactConfig);
     convertArtifactDeclarationToComponentModel(extensionModels, artifactDeclaration);
-    resolveRegistrationNames();
     createEffectiveModel();
     indexComponentModels();
     validateModel(componentBuildingDefinitionRegistry);
@@ -837,7 +836,6 @@ public class ApplicationModel implements ArtifactAst {
           }
         }
         existingObjectsWithName.put(nameAttributeValue, componentModel);
-        componentModel.setParameter(ApplicationModel.NAME_ATTRIBUTE, componentBuildingDefinition.getRegistrationName());
       }
     }));
   }
@@ -1118,14 +1116,6 @@ public class ApplicationModel implements ArtifactAst {
    */
   public ConfigurationProperties getConfigurationProperties() {
     return configurationProperties;
-  }
-
-  private void resolveRegistrationNames() {
-    executeOnEveryRootElementWithBuildingDefinition((componentModel, componentBuildingDefinition) -> {
-      if (componentBuildingDefinition.getRegistrationName() != null) {
-        componentModel.setParameter(NAME_ATTRIBUTE, componentBuildingDefinition.getRegistrationName());
-      }
-    });
   }
 
   private void executeOnEveryRootElementWithBuildingDefinition(BiConsumer<ComponentModel, ComponentBuildingDefinition> action) {
