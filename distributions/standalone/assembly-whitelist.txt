@@ -218,7 +218,7 @@
 /mule-standalone-${productVersion}/lib/opt/cometd-api-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/cometd-server-6.1.26.jar
 /mule-standalone-${productVersion}/lib/opt/commons-beanutils-1.9.3.jar
-/mule-standalone-${productVersion}/lib/opt/commons-codec-1.9.jar
+/mule-standalone-${productVersion}/lib/opt/commons-codec-1.13.jar
 /mule-standalone-${productVersion}/lib/opt/commons-collections-3.2.2.jar
 /mule-standalone-${productVersion}/lib/opt/commons-dbutils-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/commons-digester-1.8.1.jar
