@@ -65,7 +65,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
   @Override
   public ArtifactClassLoader create(String artifactId, ArtifactClassLoader parent, DomainDescriptor descriptor,
                                     List<ArtifactClassLoader> artifactClassLoaders) {
-    String domainId = getDomainId(descriptor.getName());
+    final String domainId = getDomainId(descriptor.getName());
 
     ArtifactClassLoader domainClassLoader = domainArtifactClassLoaders.get(domainId);
     if (domainClassLoader != null) {
@@ -79,6 +79,12 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
           } else {
             domainClassLoader = getCustomDomainClassLoader(parent, descriptor, artifactClassLoaders);
           }
+
+          domainClassLoader.addShutdownListener(() -> {
+            synchronized (DomainClassLoaderFactory.this) {
+              domainArtifactClassLoaders.remove(domainId);
+            }
+          });
 
           domainArtifactClassLoaders.put(domainId, domainClassLoader);
         }
