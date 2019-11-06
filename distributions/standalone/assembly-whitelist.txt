@@ -207,7 +207,6 @@
 /mule-standalone-${productVersion}/lib/opt/aspectjweaver-1.9.1.jar
 /mule-standalone-${productVersion}/lib/opt/axiom-api-1.2.14.jar
 /mule-standalone-${productVersion}/lib/opt/axiom-impl-1.2.14.jar
-/mule-standalone-${productVersion}/lib/opt/backport9-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/bcpg-jdk15on-1.60.jar
 /mule-standalone-${productVersion}/lib/opt/bcprov-ext-jdk15on-1.60.jar
 /mule-standalone-${productVersion}/lib/opt/bcprov-jdk15on-1.60.jar
@@ -355,7 +354,6 @@
 /mule-standalone-${productVersion}/lib/opt/joda-time-2.9.7.jar
 /mule-standalone-${productVersion}/lib/opt/joni-2.1.26.jar
 /mule-standalone-${productVersion}/lib/opt/jopt-simple-5.0.3.jar
-/mule-standalone-${productVersion}/lib/opt/jruby-core-9.2.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/jruby-stdlib-9.2.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/jsch-0.1.54.jar
 /mule-standalone-${productVersion}/lib/opt/js-engine-1.1-jdk14.jar
