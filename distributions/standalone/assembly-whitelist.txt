@@ -207,10 +207,10 @@
 /mule-standalone-${productVersion}/lib/opt/aspectjweaver-1.8.5.jar
 /mule-standalone-${productVersion}/lib/opt/axiom-api-1.2.14.jar
 /mule-standalone-${productVersion}/lib/opt/axiom-impl-1.2.14.jar
-/mule-standalone-${productVersion}/lib/opt/bcpg-jdk15on-1.60.jar
-/mule-standalone-${productVersion}/lib/opt/bcprov-ext-jdk15on-1.60.jar
-/mule-standalone-${productVersion}/lib/opt/bcprov-jdk15on-1.60.jar
-/mule-standalone-${productVersion}/lib/opt/bcpkix-jdk15on-1.60.jar
+/mule-standalone-${productVersion}/lib/opt/bcpg-jdk15on-1.64.jar
+/mule-standalone-${productVersion}/lib/opt/bcprov-ext-jdk15on-1.64.jar
+/mule-standalone-${productVersion}/lib/opt/bcprov-jdk15on-1.64.jar
+/mule-standalone-${productVersion}/lib/opt/bcpkix-jdk15on-1.64.jar
 /mule-standalone-${productVersion}/lib/opt/btf-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/bytelist-1.0.15.jar
 /mule-standalone-${productVersion}/lib/opt/cglib-nodep-2.2.jar
