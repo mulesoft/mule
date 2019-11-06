@@ -418,7 +418,7 @@ public class MacroExpansionModuleModel {
               .filter(componentModel -> componentModel.getIdentifier().getNamespace()
                   .equals(extensionModel.getXmlDslModel().getPrefix()))
               .filter(componentModel -> componentModel.getModel(ConfigurationModel.class).isPresent()
-                  && configParameter.equals(componentModel.getName().orElse(null)))
+                  && configParameter.equals(componentModel.getComponentId().orElse(null)))
               .findFirst()
               .orElseThrow(() -> new IllegalArgumentException(format("There's no <%s:config> named [%s] in the current mule app",
                                                                      extensionModel.getXmlDslModel().getPrefix(),

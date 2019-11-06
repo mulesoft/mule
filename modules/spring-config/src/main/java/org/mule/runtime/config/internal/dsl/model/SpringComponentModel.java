@@ -80,7 +80,7 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
   }
 
   @Override
-  public Optional<String> getName() {
+  public Optional<String> getComponentId() {
     return ofNullable(getParameters().get(NAME_ATTRIBUTE_NAME));
   }
 
@@ -266,7 +266,7 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
 
   @Override
   public String toString() {
-    return getName().map(n -> "" + n + "(" + getIdentifier().toString() + ")").orElse(getIdentifier().toString())
+    return getComponentId().map(n -> "" + n + "(" + getIdentifier().toString() + ")").orElse(getIdentifier().toString())
         + (getLocation() != null ? (" @ " + getLocation().getLocation()) : "");
   }
 }
