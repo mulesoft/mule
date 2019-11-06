@@ -167,7 +167,7 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
     });
   }
 
-  private void setRootResolver(ConfigurationPropertiesResolver rootResolver) {
+  public void setRootResolver(ConfigurationPropertiesResolver rootResolver) {
     this.rootResolver = of(rootResolver);
     propagateRootResolver(rootResolver);
   }
