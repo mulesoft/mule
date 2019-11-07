@@ -198,13 +198,13 @@ public class BeanDefinitionFactory {
             addAnnotation(ANNOTATION_NAME, componentModel.getIdentifier(), componentModel);
             // We need to use a mutable map since spring will resolve the properties placeholder present in the value if needed
             // and it will be done by mutating the same map.
-            addAnnotation(ANNOTATION_PARAMETERS, new HashMap<>(componentModel.getParameters()), componentModel);
+            addAnnotation(ANNOTATION_PARAMETERS, new HashMap<>(componentModel.getRawParameters()), componentModel);
             // add any error mappings if present
             List<ComponentModel> errorMappingComponents = componentModel.getInnerComponents().stream()
                 .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER.equals(innerComponent.getIdentifier())).collect(toList());
             if (!errorMappingComponents.isEmpty()) {
               addAnnotation(ANNOTATION_ERROR_MAPPINGS, errorMappingComponents.stream().map(innerComponent -> {
-                Map<String, String> parameters = innerComponent.getParameters();
+                Map<String, String> parameters = innerComponent.getRawParameters();
                 ComponentIdentifier source = parameters.containsKey(SOURCE_TYPE)
                     ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE))
                     : ANY;
@@ -231,7 +231,7 @@ public class BeanDefinitionFactory {
 
   private void processRaiseError(ComponentModel componentModel) {
     if (componentModel.getIdentifier().equals(RAISE_ERROR_IDENTIFIER)) {
-      resolveErrorType(componentModel.getParameters().get("type"));
+      resolveErrorType(componentModel.getRawParameters().get("type"));
     }
   }
 
@@ -275,7 +275,7 @@ public class BeanDefinitionFactory {
           expressionLanguage.set(((SpringComponentModel) childComponentModel).getBeanDefinition());
         }
       });
-      String defaultObjectSerializer = componentModel.getParameters().get("defaultObjectSerializer-ref");
+      String defaultObjectSerializer = componentModel.getRawParameters().get("defaultObjectSerializer-ref");
       if (defaultObjectSerializer != null) {
         if (defaultObjectSerializer != DEFAULT_OBJECT_SERIALIZER_NAME) {
           registry.removeBeanDefinition(DEFAULT_OBJECT_SERIALIZER_NAME);

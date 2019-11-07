@@ -91,8 +91,8 @@ public class ConfigurationDependencyResolver {
                 @Override
                 public void onReferenceConfigurationParameter(String parameterName, Object defaultValue,
                                                               Optional<TypeConverter> typeConverter) {
-                  if (requestedComponentModel.getParameters().containsKey(parameterName)
-                      && !isExpression(requestedComponentModel.getParameters().get(parameterName))) {
+                  if (requestedComponentModel.getRawParameters().containsKey(parameterName)
+                      && !isExpression(requestedComponentModel.getRawParameters().get(parameterName))) {
                     parametersReferencingDependencies.add(parameterName);
                   }
                 }
@@ -101,7 +101,7 @@ public class ConfigurationDependencyResolver {
             }));
 
     for (String parametersReferencingDependency : parametersReferencingDependencies) {
-      if (requestedComponentModel.getParameters().containsKey(parametersReferencingDependency)) {
+      if (requestedComponentModel.getRawParameters().containsKey(parametersReferencingDependency)) {
         appendTopLevelDependency(otherDependencies, requestedComponentModel, parametersReferencingDependency);
       }
     }
@@ -111,7 +111,7 @@ public class ConfigurationDependencyResolver {
       appendTopLevelDependency(otherDependencies, requestedComponentModel, "name");
     } else if (isAggregatorComponent(requestedComponentModel, "aggregatorName")) {
       // TODO (MULE-14429): use extensionModel to get the dependencies instead of ComponentBuildingDefinition to solve cases like this (flow-ref)
-      String name = requestedComponentModel.getParameters().get("aggregatorName");
+      String name = requestedComponentModel.getRawParameters().get("aggregatorName");
       DependencyNode dependency = new DependencyNode(name, INNER);
       if (applicationModel.findNamedElement(name).isPresent()) {
         otherDependencies.add(dependency);
@@ -146,7 +146,7 @@ public class ConfigurationDependencyResolver {
   private void appendTopLevelDependency(Set<DependencyNode> otherDependencies, ComponentModel requestedComponentModel,
                                         String parametersReferencingDependency) {
     DependencyNode dependency =
-        new DependencyNode(requestedComponentModel.getParameters().get(parametersReferencingDependency), TOP_LEVEL);
+        new DependencyNode(requestedComponentModel.getRawParameters().get(parametersReferencingDependency), TOP_LEVEL);
     if (applicationModel.findTopLevelNamedComponent(dependency.getComponentName()).isPresent()) {
       otherDependencies.add(dependency);
     } else {
@@ -160,7 +160,7 @@ public class ConfigurationDependencyResolver {
 
   private boolean isAggregatorComponent(ComponentModel componentModel, String referenceNameParameter) {
     return componentModel.getIdentifier().getNamespace().equals("aggregators")
-        && componentModel.getParameters().containsKey(referenceNameParameter);
+        && componentModel.getRawParameters().containsKey(referenceNameParameter);
   }
 
   private ComponentModel findRequiredComponentModel(String name) {

@@ -15,7 +15,6 @@ import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
 
@@ -40,8 +39,8 @@ class ObjectBeanDefinitionCreator extends BeanDefinitionCreator {
     if (!componentModel.getIdentifier().equals(buildFromStringRepresentation("mule:object"))) {
       return false;
     }
-    String refParameterValue = componentModel.getParameters().get(REF_PARAMETER);
-    String classParameterValue = componentModel.getParameters().get(CLASS_PARAMETER);
+    String refParameterValue = componentModel.getRawParameters().get(REF_PARAMETER);
+    String classParameterValue = componentModel.getRawParameters().get(CLASS_PARAMETER);
     if (refParameterValue != null && classParameterValue != null) {
       throw new RuntimeConfigurationException(createStaticMessage(format("Object cannot contain both '%s' and '%s' parameters. Offending resource is '%s'",
                                                                          REF_PARAMETER, CLASS_PARAMETER,

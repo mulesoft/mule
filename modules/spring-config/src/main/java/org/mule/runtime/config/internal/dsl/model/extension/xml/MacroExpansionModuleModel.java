@@ -26,11 +26,8 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.model.ApplicationModel;
@@ -194,9 +191,9 @@ public class MacroExpansionModuleModel {
         if (configRefModel.getIdentifier().getNamespace().equals(extensionModel.getXmlDslModel().getPrefix())) {
           ((ComponentAst) configRefModel).getModel(ConfigurationModel.class)
               .ifPresent(configurationModel -> {
-                Map<String, String> propertiesMap = extractParameters((ComponentAst) configRefModel,
-                                                                      configurationModel
-                                                                          .getAllParameterModels());
+                Map<String, String> propertiesMap = ((ComponentAst) configRefModel).getParameters().stream()
+                    .filter(paramAst -> paramAst.getValue() != null)
+                    .collect(toMap(paramAst -> paramAst.getModel().getName(), paramAst -> paramAst.getValue().toString()));
                 Map<String, String> connectionPropertiesMap =
                     extractConnectionProperties((ComponentAst) configRefModel, configurationModel);
                 propertiesMap.putAll(connectionPropertiesMap);
@@ -270,9 +267,10 @@ public class MacroExpansionModuleModel {
     processorChainBuilder.setIdentifier(operationRefModel.getIdentifier());
 
     Map<String, String> propertiesMap = extractProperties(configRefName);
-    Map<String, String> parametersMap =
-        extractParameters((ComponentAst) operationRefModel, operationModel.getAllParameterModels());
-    operationRefModel.getParameters().forEach((paramName, paramValue) -> {
+    Map<String, String> parametersMap = ((ComponentAst) operationRefModel).getParameters().stream()
+        .filter(paramAst -> paramAst.getValue() != null)
+        .collect(toMap(paramAst -> paramAst.getModel().getName(), paramAst -> paramAst.getValue().toString()));
+    operationRefModel.getRawParameters().forEach((paramName, paramValue) -> {
       processorChainBuilder.addParameter(paramName, paramValue, operationRefModel.isParameterValueProvidedBySchema(paramName));
     });
 
@@ -326,8 +324,8 @@ public class MacroExpansionModuleModel {
    * @return the suffix needed to be used when macro expanding elements, or {@link Optional#empty()} otherwise.
    */
   private Optional<String> getConfigRefName(ComponentModel operationRefModel) {
-    return operationRefModel.getParameters().containsKey(MODULE_OPERATION_CONFIG_REF)
-        ? of(operationRefModel.getParameters().get(MODULE_OPERATION_CONFIG_REF))
+    return operationRefModel.getRawParameters().containsKey(MODULE_OPERATION_CONFIG_REF)
+        ? of(operationRefModel.getRawParameters().get(MODULE_OPERATION_CONFIG_REF))
         : defaultGlobalElementName();
   }
 
@@ -355,7 +353,7 @@ public class MacroExpansionModuleModel {
    */
   private ComponentModel copyComponentModel(ComponentModel modelToCopy) {
     ComponentModel.Builder operationReplacementModel = getComponentModelBuilderFrom(modelToCopy);
-    for (Map.Entry<String, String> entry : modelToCopy.getParameters().entrySet()) {
+    for (Map.Entry<String, String> entry : modelToCopy.getRawParameters().entrySet()) {
       operationReplacementModel.addParameter(entry.getKey(), entry.getValue(), false);
     }
     for (ComponentModel operationChildModel : modelToCopy.getInnerComponents()) {
@@ -423,9 +421,11 @@ public class MacroExpansionModuleModel {
               .orElseThrow(() -> new IllegalArgumentException(format("There's no <%s:config> named [%s] in the current mule app",
                                                                      extensionModel.getXmlDslModel().getPrefix(),
                                                                      configParameter)));
-          // as configParameter != null, a ConfigurationModel must exists
+          // as configParameter != null, a ConfigurationModel must exist
           final ConfigurationModel configurationModel = getConfigurationModel().get();
-          valuesMap.putAll(extractParameters(configRefComponentModel, configurationModel.getAllParameterModels()));
+          configRefComponentModel.getParameters().stream()
+              .filter(paramAst -> paramAst.getValue() != null)
+              .forEach(paramAst -> valuesMap.put(paramAst.getModel().getName(), paramAst.getValue()));
           valuesMap.putAll(extractConnectionProperties(configRefComponentModel, configurationModel));
         });
     return valuesMap;
@@ -442,40 +442,15 @@ public class MacroExpansionModuleModel {
    */
   private Map<String, String> extractConnectionProperties(ComponentAst configRefComponentModel,
                                                           ConfigurationModel configurationModel) {
-    Map<String, String> connectionValuesMap = new HashMap<>();
-    configurationModel.getConnectionProviderModel(MODULE_CONNECTION_GLOBAL_ELEMENT_NAME)
-        .ifPresent(connectionProviderModel -> configRefComponentModel.directChildrenStream()
+    return configurationModel.getConnectionProviderModel(MODULE_CONNECTION_GLOBAL_ELEMENT_NAME)
+        .flatMap(connectionProviderModel -> configRefComponentModel.directChildrenStream()
             .filter(componentModel -> MODULE_CONNECTION_GLOBAL_ELEMENT_NAME
                 .equals(componentModel.getIdentifier().getName()))
             .findFirst()
-            .map(connectionComponentModel -> extractParameters(connectionComponentModel,
-                                                               connectionProviderModel.getAllParameterModels()))
-            .ifPresent(connectionValuesMap::putAll));
-
-    return connectionValuesMap;
-  }
-
-  /**
-   * Iterates over the collection of {@link ParameterModel}s making a clear distinction between {@link ParameterRole#BEHAVIOUR}
-   * and {@link ParameterRole#CONTENT} or {@link ParameterRole#PRIMARY_CONTENT} roles, where the former maps to simple attributes
-   * while the latter are child elements.
-   * <p/>
-   * If the value of the parameter is missing, then it will try to pick up a default value (also from the
-   * {@link ParameterModel#getDefaultValue()})
-   *
-   * @param componentModel to look for the values
-   * @param parameters collection of parameters to look for in the parameterized {@link ComponentAst}
-   * @return a {@link Map} with the values to be macro expanded in the final mule application
-   */
-  private Map<String, String> extractParameters(ComponentAst componentModel, List<ParameterModel> parameters) {
-    Map<String, String> valuesMap = new HashMap<>();
-    for (ParameterModel parameterExtension : parameters) {
-      final ComponentParameterAst param = componentModel.getParameter(parameterExtension.getName());
-      if (param.getValue() != null) {
-        valuesMap.put(parameterExtension.getName(), param.getValue().toString());
-      }
-    }
-    return valuesMap;
+            .map(connectionComponentModel -> connectionComponentModel.getParameters().stream()
+                .filter(paramAst -> paramAst.getValue() != null)
+                .collect(toMap(paramAst -> paramAst.getModel().getName(), paramAst -> paramAst.getValue().toString()))))
+        .orElse(emptyMap());
   }
 
   /**
@@ -498,7 +473,7 @@ public class MacroExpansionModuleModel {
                                                          Map<String, String> literalsParameters) {
     ComponentModel.Builder globalElementReplacementModel = getComponentModelBuilderFrom(modelToCopy);
 
-    for (Map.Entry<String, String> entry : modelToCopy.getParameters().entrySet()) {
+    for (Map.Entry<String, String> entry : modelToCopy.getRawParameters().entrySet()) {
       String value =
           calculateAttributeValue(configRefName, moduleGlobalElementsNames, entry.getValue());
       final String optimizedValue = literalsParameters.getOrDefault(value, value);
@@ -534,7 +509,7 @@ public class MacroExpansionModuleModel {
                                                      Set<String> moduleGlobalElementsNames,
                                                      Map<String, String> literalsParameters, String containerName) {
     ComponentModel.Builder operationReplacementModel = getComponentModelBuilderFrom(modelToCopy);
-    for (Map.Entry<String, String> entry : modelToCopy.getParameters().entrySet()) {
+    for (Map.Entry<String, String> entry : modelToCopy.getRawParameters().entrySet()) {
       String value = configRefName
           .map(s -> calculateAttributeValue(s, moduleGlobalElementsNames, entry.getValue()))
           .orElseGet(entry::getValue);

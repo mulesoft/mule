@@ -132,7 +132,7 @@ public abstract class ComponentModel {
   /**
    * @return a {@code java.util.Map} with the simple parameters of the configuration.
    */
-  public Map<String, String> getParameters() {
+  public Map<String, String> getRawParameters() {
     return unmodifiableMap(parameters);
   }
 

@@ -599,7 +599,7 @@ public class ApplicationModel implements ArtifactAst {
 
           return definition;
         }).orElseGet(() -> {
-          String classParameter = componentModel.getParameters().get(CLASS_ATTRIBUTE);
+          String classParameter = componentModel.getRawParameters().get(CLASS_ATTRIBUTE);
           if (classParameter != null) {
             try {
               componentModel.setType(ClassUtils.loadClass(classParameter, currentThread().getContextClassLoader()));
@@ -784,7 +784,7 @@ public class ApplicationModel implements ArtifactAst {
 
   private void validateParameterAndChildForSameAttributeAreNotDefinedTogether() {
     executeOnEveryMuleComponentTree(componentModel -> {
-      for (String parameterName : componentModel.getParameters().keySet()) {
+      for (String parameterName : componentModel.getRawParameters().keySet()) {
         if (!componentModel.isParameterValueProvidedBySchema(parameterName)) {
           String mapChildName = hyphenize(pluralize(parameterName));
           String listOrPojoChildName = hyphenize(parameterName);
@@ -893,7 +893,7 @@ public class ApplicationModel implements ArtifactAst {
         } else if (anyMappings.size() == 1 && !isErrorMappingWithSourceAny(errorMappings.get(errorMappings.size() - 1))) {
           throw new MuleRuntimeException(createStaticMessage("Only the last error mapping can have 'ANY' or an empty source type."));
         }
-        List<String> sources = errorMappings.stream().map(model -> model.getParameters().get(SOURCE_TYPE)).collect(toList());
+        List<String> sources = errorMappings.stream().map(model -> model.getRawParameters().get(SOURCE_TYPE)).collect(toList());
         List<String> distinctSources = sources.stream().distinct().collect(toList());
         if (sources.size() != distinctSources.size()) {
           throw new MuleRuntimeException(createStaticMessage(format("Repeated source types are not allowed. Offending types are '%s'.",
@@ -904,7 +904,7 @@ public class ApplicationModel implements ArtifactAst {
   }
 
   private boolean isErrorMappingWithSourceAny(ComponentModel model) {
-    String sourceType = model.getParameters().get(SOURCE_TYPE);
+    String sourceType = model.getRawParameters().get(SOURCE_TYPE);
     return sourceType == null || sourceType.equals(ANY_IDENTIFIER);
   }
 
@@ -919,13 +919,13 @@ public class ApplicationModel implements ArtifactAst {
   }
 
   private void validateRefOrOnErrorsExclusiveness(ComponentModel component) {
-    if (component.getParameters().get(REFERENCE_ATTRIBUTE) != null && !component.getInnerComponents().isEmpty()) {
+    if (component.getRawParameters().get(REFERENCE_ATTRIBUTE) != null && !component.getInnerComponents().isEmpty()) {
       throw new MuleRuntimeException(createStaticMessage("A reference error-handler cannot have on-errors."));
     }
   }
 
   private void validateNoMoreThanOneOnErrorPropagateWithRedelivery(ComponentModel component) {
-    if (component.getInnerComponents().stream().filter(exceptionStrategyComponent -> exceptionStrategyComponent.getParameters()
+    if (component.getInnerComponents().stream().filter(exceptionStrategyComponent -> exceptionStrategyComponent.getRawParameters()
         .get(MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE) != null).count() > 1) {
       throw new MuleRuntimeException(createStaticMessage(
                                                          "Only one on-error-propagate within a error-handler can handle message redelivery. Remove one of the maxRedeliveryAttempts attributes"));
@@ -936,7 +936,7 @@ public class ApplicationModel implements ArtifactAst {
     List<ComponentModel> innerComponents = component.getInnerComponents();
     for (int i = 0; i < innerComponents.size() - 1; i++) {
       ComponentModel componentModel = getOnErrorComponentModel(innerComponents.get(i));
-      Map<String, String> parameters = componentModel.getParameters();
+      Map<String, String> parameters = componentModel.getRawParameters();
       if (parameters.get(WHEN_CHOICE_ES_ATTRIBUTE) == null && parameters.get(TYPE_ES_ATTRIBUTE) == null) {
         throw new MuleRuntimeException(createStaticMessage(
                                                            "Every handler (except for the last one) within an 'error-handler' must specify a 'when' or 'type' attribute."));
@@ -946,7 +946,7 @@ public class ApplicationModel implements ArtifactAst {
 
   private ComponentModel getOnErrorComponentModel(ComponentModel onErrorModel) {
     if (ON_ERROR_IDENTIFIER.equals(onErrorModel.getIdentifier())) {
-      String sharedOnErrorName = onErrorModel.getParameters().get(REFERENCE_ATTRIBUTE);
+      String sharedOnErrorName = onErrorModel.getRawParameters().get(REFERENCE_ATTRIBUTE);
       return findTopLevelNamedComponent(sharedOnErrorName).orElseThrow(
                                                                        () -> new MuleRuntimeException(createStaticMessage(format("Could not find on-error reference named '%s'",
                                                                                                                                  sharedOnErrorName))));
@@ -958,7 +958,7 @@ public class ApplicationModel implements ArtifactAst {
   private void validateExceptionStrategyWhenAttributeIsOnlyPresentInsideChoice() {
     executeOnEveryMuleComponentTree(component -> {
       if (component.getIdentifier().getName().endsWith(EXCEPTION_STRATEGY_REFERENCE_ELEMENT)) {
-        if (component.getParameters().get(WHEN_CHOICE_ES_ATTRIBUTE) != null
+        if (component.getRawParameters().get(WHEN_CHOICE_ES_ATTRIBUTE) != null
             && !component.getParent().getIdentifier().getName().equals(ERROR_HANDLER)
             && !component.getParent().getIdentifier().getName().equals(MULE_ROOT_ELEMENT)) {
           throw new MuleRuntimeException(

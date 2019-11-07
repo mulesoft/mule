@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.dsl.spring;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
@@ -21,7 +22,7 @@ import java.util.Optional;
  * <p>
  * <p>
  * Elements that represent a simple type always have the form
- * 
+ *
  * <pre>
  *  <element value="simpleValue"/>
  * </pre>
@@ -38,7 +39,7 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
     if (isSimpleType(type)) {
       SpringComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
       componentModel.setType(type);
-      Map<String, String> parameters = componentModel.getParameters();
+      Map<String, String> parameters = componentModel.getRawParameters();
 
       if (parameters.size() >= 2) {
         // Component model has more than one parameter when it's supposed to have at most one parameter

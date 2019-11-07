@@ -15,8 +15,8 @@ import static org.springframework.beans.factory.xml.BeanDefinitionParserDelegate
 import static org.springframework.beans.factory.xml.BeanDefinitionParserDelegate.MAP_ELEMENT;
 import static org.springframework.beans.factory.xml.BeanDefinitionParserDelegate.VALUE_REF_ATTRIBUTE;
 
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 
 import java.util.HashMap;
 
@@ -65,9 +65,10 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator {
 
   private void processAndAddMapProperty(ComponentModel componentModel, ManagedMap<Object, Object> managedMap) {
     Object key =
-        resolveValue(componentModel.getParameters().get(KEY_ELEMENT), componentModel.getParameters().get(KEY_REF_ATTRIBUTE));
-    Object value = resolveValue(componentModel.getParameters().get(VALUE_ATTRIBUTE),
-                                componentModel.getParameters().get(VALUE_REF_ATTRIBUTE));
+        resolveValue(componentModel.getRawParameters().get(KEY_ELEMENT),
+                     componentModel.getRawParameters().get(KEY_REF_ATTRIBUTE));
+    Object value = resolveValue(componentModel.getRawParameters().get(VALUE_ATTRIBUTE),
+                                componentModel.getRawParameters().get(VALUE_REF_ATTRIBUTE));
     if (value == null) {
       value = resolveValueFromChild(componentModel.getInnerComponents().get(0));
     }
@@ -88,7 +89,7 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator {
       if (childComponent.getIdentifier().getName().equals(VALUE_ATTRIBUTE)) {
         managedList.add(childComponent.getTextContent());
       } else {
-        managedList.add(new RuntimeBeanReference(childComponent.getParameters().get(BEAN_REF_ATTRIBUTE)));
+        managedList.add(new RuntimeBeanReference(childComponent.getRawParameters().get(BEAN_REF_ATTRIBUTE)));
       }
     });
     return managedList;
