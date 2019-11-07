@@ -275,7 +275,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     Properties deploymentProperties = new Properties();
     deploymentProperties.put(OVERWRITTEN_PROPERTY, OVERWRITTEN_PROPERTY_DEPLOYMENT_VALUE);
     startDeployment();
-    deployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI(), deploymentProperties,
+    deployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsDependencyFileBuilder.getArtifactFile().toURI(),
+                                      deploymentProperties,
                                       (registry) -> registry.lookupByName(OVERWRITTEN_PROPERTY).get()
                                           .equals(OVERWRITTEN_PROPERTY_DEPLOYMENT_VALUE));
   }
