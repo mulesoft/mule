@@ -218,7 +218,7 @@
         <ognlVersion>2.7.3</ognlVersion>
         <oroVersion>2.0.8</oroVersion>
         <powermockVersion>1.6.6</powermockVersion>
-        <quartzVersion>2.2.1</quartzVersion>
+        <quartzVersion>2.3.2</quartzVersion>
         <reflectionsVersion>0.9.9</reflectionsVersion>
         <rhinoVersion>1.7R4</rhinoVersion>
         <rhinoJsr223Version>1.1</rhinoJsr223Version>
@@ -1470,6 +1470,10 @@
                     <exclusion>
                         <groupId>c3p0</groupId>
                         <artifactId>c3p0</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.zaxxer</groupId>
+                        <artifactId>HikariCP-java7</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
