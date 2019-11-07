@@ -11,6 +11,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 
+
 /**
  * A {@link ComponentAst} based implementation of a {@link MetadataCacheIdGeneratorFactory}
  *

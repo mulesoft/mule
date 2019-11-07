@@ -11,6 +11,10 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.getModelName;
+import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.getSourceElementName;
+import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.resolveConfigName;
+import static org.mule.runtime.config.api.dsl.model.metadata.DslElementIdHelper.sourceElementNameFromSimpleValue;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
@@ -44,14 +48,11 @@ import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotat
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
-import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -220,25 +221,9 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
         .map(id -> new MetadataCacheId(id.hashCode(), id.toString()));
   }
 
-  private String getSourceElementName(DslElementModel<?> elementModel) {
-    return elementModel.getDsl().getPrefix() + ":" +
-        getModelName(elementModel.getModel()).orElse(elementModel.getDsl().getElementName()) +
-        elementModel.getConfiguration()
-            .map(c -> c.getParameters().get("name")).filter(Objects::nonNull)
-            .map(n -> "[" + n + "]").orElse("");
-  }
-
   private Optional<MetadataCacheId> resolveConfigId(DslElementModel<?> elementModel) {
     // TODO Migrate to Stereotypes when config-ref is part of model
-    Optional<ComponentConfiguration> configuration = elementModel.getConfiguration();
-    if (configuration.isPresent()) {
-      String configRef = configuration.get().getParameters().get(CONFIG_ATTRIBUTE_NAME);
-      if (!isBlank(configRef)) {
-        return getHashedGlobal(configRef);
-      }
-    }
-
-    return empty();
+    return resolveConfigName(elementModel).flatMap(this::getHashedGlobal);
   }
 
   private Optional<MetadataCacheId> resolveGlobalElement(DslElementModel<?> elementModel) {
@@ -306,9 +291,7 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
     }
 
     final String value = element.getValue().get();
-    final String sourceElementName = getModelName(element.getModel())
-        .map(modelName -> isBlank(element.getDsl().getPrefix()) ? modelName : element.getDsl().getPrefix() + ":" + modelName)
-        .orElseGet(() -> element.getIdentifier().map(Object::toString).orElse(null));
+    final String sourceElementName = sourceElementNameFromSimpleValue(element);
 
     final MetadataCacheId valuePart = new MetadataCacheId(value.hashCode(), sourceElementName);
     if (value.contains(DEFAULT_EXPRESSION_PREFIX)) {
@@ -384,18 +367,6 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
       return locator.get(Location.builder().globalName(name).build())
           .map(global -> getIdForComponentMetadata(global).orElse(null));
     }
-    return empty();
-  }
-
-  private Optional<String> getModelName(Object model) {
-    if (model instanceof NamedObject) {
-      return of(((NamedObject) model).getName());
-    }
-
-    if (model instanceof ObjectType) {
-      return ExtensionMetadataTypeUtils.getId((MetadataType) model);
-    }
-
     return empty();
   }
 }
