@@ -391,8 +391,8 @@
 /mule-standalone-${productVersion}/lib/opt/reflections-0.9.9.jar
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
 /mule-standalone-${productVersion}/lib/opt/rhino-1.7.11.jar
-/mule-standalone-${productVersion}/lib/opt/rome-1.5.0.jar
-/mule-standalone-${productVersion}/lib/opt/rome-utils-1.5.0.jar
+/mule-standalone-${productVersion}/lib/opt/rome-1.12.2.jar
+/mule-standalone-${productVersion}/lib/opt/rome-utils-1.12.2.jar
 /mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.6.0-10.jar
 /mule-standalone-${productVersion}/lib/opt/Saxon-HE-9.6.0-10-xqj.jar
 /mule-standalone-${productVersion}/lib/opt/saaj-impl-1.3.23.jar
