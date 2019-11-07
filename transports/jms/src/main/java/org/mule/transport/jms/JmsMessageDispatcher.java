@@ -6,6 +6,7 @@
  */
 package org.mule.transport.jms;
 
+import static java.lang.String.format;
 import static javax.jms.Message.DEFAULT_PRIORITY;
 import static javax.jms.Message.DEFAULT_TIME_TO_LIVE;
 import static org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY;
@@ -13,6 +14,8 @@ import static org.mule.transport.jms.JmsConstants.PERSISTENT_DELIVERY_PROPERTY;
 import static org.mule.transport.jms.JmsConstants.PRIORITY_PROPERTY;
 import static org.mule.transport.jms.JmsConstants.TIME_TO_LIVE_PROPERTY;
 import static org.mule.util.NumberUtils.toInt;
+
+import org.apache.commons.lang3.time.StopWatch;
 import org.mule.api.CompletionHandler;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -22,6 +25,7 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
@@ -292,7 +296,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         final MessageConsumer consumer = createReplyToConsumer(jmsMessage, event, session, replyTo, topic);
         try
         {
+            StopWatch timeoutValidator = new StopWatch();
+            timeoutValidator.start();
             Message result = consumer.receive(timeout);
+            timeoutValidator.stop();
+            if (result == null && timeoutValidator.getTime() >= timeout) {
+                throw new ResponseTimeoutException(CoreMessages.responseTimedOutWaitingForId(timeout, event.getMessage().getCorrelationId()), event, null);
+            }
             return createResponseMuleMessage(result, replyTo);
         }
         finally
