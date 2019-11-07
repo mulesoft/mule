@@ -354,7 +354,7 @@
 /mule-standalone-${productVersion}/lib/opt/joda-time-2.9.7.jar
 /mule-standalone-${productVersion}/lib/opt/joni-2.1.26.jar
 /mule-standalone-${productVersion}/lib/opt/jopt-simple-5.0.3.jar
-/mule-standalone-${productVersion}/lib/opt/jruby-stdlib-9.2.7.0.jar
+/mule-standalone-${productVersion}/lib/opt/jruby-stdlib-9.2.9.0.jar
 /mule-standalone-${productVersion}/lib/opt/jsch-0.1.54.jar
 /mule-standalone-${productVersion}/lib/opt/js-engine-1.1-jdk14.jar
 /mule-standalone-${productVersion}/lib/opt/json-schema-core-1.2.8.jar
