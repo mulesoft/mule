@@ -240,7 +240,7 @@
         <wrapperVersion>3.2.3</wrapperVersion>
         <xmlPullVersion>1.1.3.4.O</xmlPullVersion>
         <xmlSecurityVersion>1.5.8</xmlSecurityVersion>
-        <xstreamVersion>1.4.10</xstreamVersion>
+        <xstreamVersion>1.4.11.1</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
     </properties>
 
