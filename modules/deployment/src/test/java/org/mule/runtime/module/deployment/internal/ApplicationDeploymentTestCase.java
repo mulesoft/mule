@@ -59,6 +59,7 @@ import static org.mule.runtime.module.extension.api.loader.java.DefaultJavaExten
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -80,6 +81,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileB
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.util.CompilerUtils;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 
@@ -115,6 +117,9 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   private static final String PRIVILEGED_EXTENSION_ARTIFACT_FULL_ID = "org.mule.test:" + PRIVILEGED_EXTENSION_ARTIFACT_ID;
   private static final String APP_WITH_PRIVILEGED_EXTENSION_PLUGIN_CONFIG = "app-with-privileged-extension-plugin-config.xml";
   private static final String BROKEN_CONFIG_XML = "/broken-config.xml";
+  private static final String OVERWRITTEN_PROPERTY = "configFile";
+  private static final String OVERWRITTEN_PROPERTY_SYSTEM_VALUE = "nonExistent.yaml";
+  private static final String OVERWRITTEN_PROPERTY_DEPLOYMENT_VALUE = "someProps.yaml";
 
   private static final Matcher<File> exists = new BaseMatcher<File>() {
 
@@ -152,6 +157,7 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
   private ApplicationFileBuilder brokenAppWithFunkyNameAppFileBuilder;
   private ApplicationFileBuilder waitAppFileBuilder;
   private ApplicationFileBuilder dummyAppDescriptorWithPropsFileBuilder;
+  protected ApplicationFileBuilder dummyAppDescriptorWithPropsDependencyFileBuilder;
 
   // Application plugin artifact builders
   private ArtifactPluginFileBuilder echoPluginWithLib1;
@@ -184,6 +190,8 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
         .definedBy("dummy-app-with-props-config.xml")
         .containingClass(echoTestClassFile,
                          "org/foo/EchoTest.class");
+    dummyAppDescriptorWithPropsDependencyFileBuilder = appFileBuilder("dummy-app-with-props-dependencies")
+        .definedBy("dummy-app-with-props-dependencies-config.xml");
 
     // Application plugin artifact builders
     echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
@@ -317,6 +325,17 @@ public class ApplicationDeploymentTestCase extends AbstractDeploymentTestCase {
     redeployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsFileBuilder.getId(), deploymentProperties,
                                         (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get()
                                             .equals(FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY));
+  }
+
+  @Test
+  public void deploymentPropertiesUsedInConfigurationProperties() throws Exception {
+    Properties deploymentProperties = new Properties();
+    deploymentProperties.put(OVERWRITTEN_PROPERTY, OVERWRITTEN_PROPERTY_DEPLOYMENT_VALUE);
+    startDeployment();
+    deployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsDependencyFileBuilder.getArtifactFile().toURI(),
+                                      deploymentProperties,
+                                      (registry) -> registry.lookupByName(OVERWRITTEN_PROPERTY).get()
+                                          .equals(OVERWRITTEN_PROPERTY_DEPLOYMENT_VALUE));
   }
 
   /**

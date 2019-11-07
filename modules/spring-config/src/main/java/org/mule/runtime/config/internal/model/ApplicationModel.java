@@ -399,14 +399,21 @@ public class ApplicationModel {
 
     DefaultConfigurationPropertiesResolver environmentPropertiesConfigurationPropertiesResolver =
         new DefaultConfigurationPropertiesResolver(empty(), environmentPropertiesConfigurationProvider);
+
+    DefaultConfigurationPropertiesResolver parentLocalResolver;
+    if (deploymentPropertiesConfigurationProperties != null) {
+      parentLocalResolver = new DefaultConfigurationPropertiesResolver(of(environmentPropertiesConfigurationPropertiesResolver),
+                                                                       deploymentPropertiesConfigurationProperties);
+    } else {
+      parentLocalResolver = environmentPropertiesConfigurationPropertiesResolver;
+    }
+
     DefaultConfigurationPropertiesResolver localResolver =
-        new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(
-                                                                                                 deploymentPropertiesConfigurationProperties != null
-                                                                                                     ? of(new DefaultConfigurationPropertiesResolver(of(environmentPropertiesConfigurationPropertiesResolver),
-                                                                                                                                                     deploymentPropertiesConfigurationProperties))
-                                                                                                     : of(environmentPropertiesConfigurationPropertiesResolver),
+        new DefaultConfigurationPropertiesResolver(of(new DefaultConfigurationPropertiesResolver(of(parentLocalResolver),
                                                                                                  globalPropertiesConfigurationAttributeProvider)),
                                                    environmentPropertiesConfigurationProvider);
+    localResolver.setRootResolver(parentLocalResolver);
+
     List<ConfigurationPropertiesProvider> configConfigurationPropertiesProviders =
         getConfigurationPropertiesProvidersFromComponents(artifactConfig, localResolver);
     FileConfigurationPropertiesProvider externalPropertiesConfigurationProvider =
