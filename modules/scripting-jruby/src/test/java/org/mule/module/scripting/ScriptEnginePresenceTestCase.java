@@ -40,7 +40,7 @@ public class ScriptEnginePresenceTestCase extends AbstractMuleTestCase
     public static Collection<Object[]> data()
     {
         return Arrays.asList(new Object[][] {
-                {"jruby", "rb", "JSR 223 JRuby Engine", "9.2.7.0", "1.+ 2"}
+                {"jruby", "rb", "JSR 223 JRuby Engine", "9.2.9.0", "1.+ 2"}
         });
     }
 
