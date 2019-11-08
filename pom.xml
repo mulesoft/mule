@@ -100,7 +100,7 @@
         <module>core</module>
         <module>modules</module>
         <module>patterns</module>
-        <module>tools</module>
+<!--        <module>tools</module>-->
         <module>transports</module>
         <module>tests</module>
         <module>extensions</module>
