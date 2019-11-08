@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.streaming.bytes;
 
 import static java.lang.Math.toIntExact;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
-import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -18,6 +17,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.util.DataUnit.BYTE;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
+
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.DataSize;
@@ -33,7 +33,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -66,7 +65,6 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   private CursorStreamProvider streamProvider;
   private CountDownLatch controlLatch;
   private CountDownLatch mainThreadLatch;
-  private ExecutorService allocationScheduler;
   protected PoolingByteBufferManager bufferManager;
 
   public CursorStreamProviderTestCase(String name, int dataSize, int bufferSize, int maxBufferSize) {
@@ -81,8 +79,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
 
   @Before
   public void before() {
-    allocationScheduler = newSingleThreadExecutor();
-    bufferManager = new PoolingByteBufferManager(allocationScheduler);
+    bufferManager = new PoolingByteBufferManager();
     final ByteArrayInputStream dataStream = new ByteArrayInputStream(data.getBytes());
     streamProvider = createStreamProvider(bufferSize, maxBufferSize, dataStream);
   }
@@ -101,7 +98,6 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     streamProvider.close();
     executorService.shutdownNow();
     bufferManager.dispose();
-    allocationScheduler.shutdownNow();
   }
 
   @Test
