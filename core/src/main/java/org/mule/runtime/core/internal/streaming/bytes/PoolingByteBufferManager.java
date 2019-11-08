@@ -9,11 +9,13 @@ package org.mule.runtime.core.internal.streaming.bytes;
 import static java.lang.Math.round;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
+import static java.lang.System.identityHashCode;
+import static java.util.Collections.newSetFromMap;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_WAIT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_MAX_MEMORY;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_MAX_MEMORY;
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.DEFAULT_BUFFER_BUCKET_SIZE;
 import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -26,15 +28,16 @@ import org.mule.runtime.core.internal.streaming.DefaultMemoryManager;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
 
 import java.nio.ByteBuffer;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.cache.RemovalListener;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.RemovalListener;
 import org.apache.commons.pool2.KeyedObjectPool;
 import org.slf4j.Logger;
 import org.vibur.objectpool.ConcurrentPool;
@@ -61,9 +64,11 @@ import org.vibur.objectpool.util.MultithreadConcurrentQueueCollection;
 public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
 
   private static final Logger LOGGER = getLogger(PoolingByteBufferManager.class);
+  private static final int DEFAULT_CORE_SIZE = 100;
   static final double MAX_STREAMING_PERCENTILE = 0.7;
 
   private final AtomicLong streamingMemory = new AtomicLong(0);
+  private final int size;
   private final long maxStreamingMemory;
   private final long waitTimeoutMillis;
 
@@ -75,43 +80,38 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
    * of a reaper thread (those performance test did not include such a reaper, so it's very possible that this is more
    * than just slightly faster)
    */
-  private final LoadingCache<Integer, BufferPool> customSizePools = CacheBuilder.newBuilder()
+  private final LoadingCache<Integer, BufferPool> customSizePools = Caffeine.newBuilder()
       .expireAfterAccess(5, MINUTES)
-      .removalListener((RemovalListener<Integer, BufferPool>) notification -> {
+      .removalListener((RemovalListener<Integer, BufferPool>) (key, value, cause) -> {
         try {
-          notification.getValue().close();
+          value.close();
         } catch (Exception e) {
           if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Found exception trying to dispose buffer pool for capacity " + notification.getKey(), e);
+            LOGGER.debug("Found exception trying to dispose buffer pool for capacity " + key, e);
           }
         }
-      }).build(new CacheLoader<Integer, BufferPool>() {
-
-        @Override
-        public BufferPool load(Integer capacity) {
-          return newBufferPool(capacity);
-        }
-      });
+      }).build(capacity -> newBufferPool(capacity));
 
   /**
    * Creates a new instance which allows the pool to grow up to 70% of the runtime's max memory and has a wait timeout of 10
    * seconds. The definition of max memory is that of {@link MemoryManager#getMaxMemory()}
    */
   public PoolingByteBufferManager() {
-    this(new DefaultMemoryManager(), DEFAULT_MAX_POOL_WAIT);
+    this(new DefaultMemoryManager(), DEFAULT_CORE_SIZE, DEFAULT_BUFFER_BUCKET_SIZE, DEFAULT_MAX_POOL_WAIT);
   }
 
   /**
    * Creates a new instance which allows the pool to grow up to 50% of calling {@link MemoryManager#getMaxMemory()} on the given
    * {@code memoryManager}, and has {@code waitTimeoutMillis} as wait timeout.
    *
-   * @param memoryManager a {@link MemoryManager} used to determine the runtime's max memory
+   * @param memoryManager     a {@link MemoryManager} used to determine the runtime's max memory
    * @param waitTimeoutMillis how long to wait when the pool is exhausted
    */
-  public PoolingByteBufferManager(MemoryManager memoryManager, long waitTimeoutMillis) {
+  public PoolingByteBufferManager(MemoryManager memoryManager, int size, int bufferSize, long waitTimeoutMillis) {
     maxStreamingMemory = calculateMaxStreamingMemory(memoryManager);
     this.waitTimeoutMillis = waitTimeoutMillis;
-    defaultSizePool = newBufferPool(DEFAULT_BUFFER_BUCKET_SIZE);
+    this.size = size;
+    defaultSizePool = newBufferPool(bufferSize);
   }
 
   private long calculateMaxStreamingMemory(MemoryManager memoryManager) {
@@ -123,18 +123,17 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
         return Long.valueOf(maxMemoryProperty);
       } catch (Exception e) {
         throw new IllegalArgumentException(format("Invalid value for system property '%s'. A memory size (in bytes) was "
-            + "expected, got '%s' instead",
-                                                  MULE_STREAMING_MAX_MEMORY, maxMemoryProperty));
+            + "expected, got '%s' instead", MULE_STREAMING_MAX_MEMORY, maxMemoryProperty));
       }
     }
   }
 
   private BufferPool newBufferPool(Integer capacity) {
-    return new BufferPool(capacity);
+    return new BufferPool(size, capacity);
   }
 
   private BufferPool getBufferPool(int capacity) {
-    return capacity == DEFAULT_BUFFER_BUCKET_SIZE ? defaultSizePool : customSizePools.getUnchecked(capacity);
+    return capacity == DEFAULT_BUFFER_BUCKET_SIZE ? defaultSizePool : customSizePools.get(capacity);
   }
 
   /**
@@ -189,11 +188,13 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
     private final PoolService<ByteBuffer> pool;
     private final Lock lock = new ReentrantLock();
     private final Condition poolNotFull = lock.newCondition();
+    private final PoolObjectFactory<ByteBuffer> factory;
+    private final Set<Integer> ephemeralBufferIds = newSetFromMap(new ConcurrentHashMap<>());
 
-    private BufferPool(int bufferCapacity) {
+    private BufferPool(int coreSize, int bufferCapacity) {
       this.bufferCapacity = bufferCapacity;
 
-      PoolObjectFactory<ByteBuffer> factory = new PoolObjectFactory<ByteBuffer>() {
+      factory = new PoolObjectFactory<ByteBuffer>() {
 
         @Override
         public ByteBuffer create() {
@@ -203,8 +204,8 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
 
           streamingMemory.addAndGet(-bufferCapacity);
           throw new MaxStreamingMemoryExceededException(createStaticMessage(format(
-              "Max streaming memory limit of %d bytes was exceeded",
-              maxStreamingMemory)));
+                                                                                   "Max streaming memory limit of %d bytes was exceeded",
+                                                                                   maxStreamingMemory)));
         }
 
         @Override
@@ -226,34 +227,42 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
         }
       };
 
-
-      pool = new ConcurrentPool<>(new MultithreadConcurrentQueueCollection<>(1000),
-                                                          factory,
-                                                          0, 1000, false);
+      //TODO: initial size must be variable
+      pool = new ConcurrentPool<>(new MultithreadConcurrentQueueCollection<>(coreSize),
+                                  factory, coreSize, coreSize, false);
     }
 
-    private ByteBuffer take() throws Exception {
+    private ByteBuffer take() {
       ByteBuffer buffer = null;
-      do {
-        try {
-          buffer = pool.take();
-        } catch (MaxStreamingMemoryExceededException e) {
-          signal(() -> {
-            while (streamingMemory.get() >= maxStreamingMemory) {
-              if (!poolNotFull.await(waitTimeoutMillis, MILLISECONDS)) {
-                throw e;
-              }
-            }
-          });
+      try {
+        buffer = pool.tryTake();
+        if (buffer == null) {
+          buffer = factory.create();
+          ephemeralBufferIds.add(identityHashCode(buffer));
         }
-      } while (buffer == null);
+      } catch (MaxStreamingMemoryExceededException e) {
+        signal(() -> {
+          while (streamingMemory.get() >= maxStreamingMemory) {
+            if (!poolNotFull.await(waitTimeoutMillis, MILLISECONDS)) {
+              throw e;
+            }
+          }
+        });
+      }
 
       return buffer;
     }
 
-    private void returnBuffer(ByteBuffer buffer) throws Exception {
-      pool.restore(buffer);
-      signalPoolNotFull();
+    private void returnBuffer(ByteBuffer buffer) {
+      try {
+        if (ephemeralBufferIds.remove(identityHashCode(buffer))) {
+          factory.destroy(buffer);
+        } else {
+          pool.restore(buffer);
+        }
+      } finally {
+        signalPoolNotFull();
+      }
     }
 
     private void signalPoolNotFull() {

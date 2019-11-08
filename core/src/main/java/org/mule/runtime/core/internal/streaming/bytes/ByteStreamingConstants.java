@@ -7,8 +7,9 @@
 package org.mule.runtime.core.internal.streaming.bytes;
 
 import static java.lang.Integer.valueOf;
+import static java.lang.System.getProperty;
 import static org.mule.runtime.api.util.DataUnit.KB;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_BUCKET_SIZE;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_BUCKET_SIZE;
 
 /**
  * Constants around byte streaming
@@ -23,7 +24,7 @@ public final class ByteStreamingConstants {
   public static final int DEFAULT_BUFFER_BUCKET_SIZE = getDefaultBucketSize();
 
   private static int getDefaultBucketSize() {
-    String bucketSize = System.getProperty(MULE_STREAMING_BUCKET_SIZE);
+    String bucketSize = getProperty(MULE_STREAMING_BUCKET_SIZE);
     return bucketSize != null ? valueOf(bucketSize) : KB.toBytes(8);
   }
 
