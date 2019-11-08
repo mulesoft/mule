@@ -74,6 +74,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -232,24 +233,35 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     initialiseIfNeeded(pipeline, muleContext);
   }
 
-  /*
+  /**
    * Processor that dispatches incoming source Events to the internal pipeline the Sink. The way in which the Event is dispatched
    * and how overload is handled depends on the Source back-pressure strategy.
+   * 
+   * @return the into-flow dispatching {@link ReactiveProcessor}
    */
   private ReactiveProcessor dispatchToFlow() {
     return publisher -> from(publisher)
         .doOnNext(assertStarted())
         .flatMap(routeThroughProcessingStrategy())
         // This replaces the onErrorContinue key if it exists, to prevent it from being propagated within the flow
-        .compose(pub -> pub.subscriberContext(context -> {
-          Optional<Object> onErrorStrategy = context.getOrEmpty(KEY_ON_NEXT_ERROR_STRATEGY);
-          if (onErrorStrategy.isPresent()
-              && onErrorStrategy.get().toString().contains(ON_NEXT_FAILURE_STRATEGY)) {
-            BiFunction<Throwable, Object, Throwable> onErrorContinue = (e, o) -> null;
-            return context.put(KEY_ON_NEXT_ERROR_STRATEGY, onErrorContinue);
-          }
-          return context;
-        }));
+        .compose(clearSubscribersErrorStrategy());
+  }
+
+  /**
+   * If an <b>Error Strategy</b> is being propagated in the subscription {@link reactor.util.context.Context}, clear it.
+   * 
+   * @return the transformed flux that clears the context if necessary
+   */
+  private Function<Flux<CoreEvent>, Publisher<CoreEvent>> clearSubscribersErrorStrategy() {
+    return pub -> pub.subscriberContext(context -> {
+      Optional<Object> onErrorStrategy = context.getOrEmpty(KEY_ON_NEXT_ERROR_STRATEGY);
+      if (onErrorStrategy.isPresent()
+          && onErrorStrategy.get().toString().contains(ON_NEXT_FAILURE_STRATEGY)) {
+        BiFunction<Throwable, Object, Throwable> onErrorContinue = (e, o) -> null;
+        return context.put(KEY_ON_NEXT_ERROR_STRATEGY, onErrorContinue);
+      }
+      return context;
+    });
   }
 
   protected Function<CoreEvent, Publisher<? extends CoreEvent>> routeThroughProcessingStrategy() {
