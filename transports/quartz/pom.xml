@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.transports</groupId>
         <artifactId>mule-transports</artifactId>
-        <version>3.9.4-SNAPSHOT</version>
+        <version>3.9.5-SNAPSHOT</version>
     </parent>
     <artifactId>mule-transport-quartz</artifactId>
     <packaging>jar</packaging>
