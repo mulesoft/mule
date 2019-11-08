@@ -192,8 +192,8 @@ public class MacroExpansionModuleModel {
           ((ComponentAst) configRefModel).getModel(ConfigurationModel.class)
               .ifPresent(configurationModel -> {
                 Map<String, String> propertiesMap = ((ComponentAst) configRefModel).getParameters().stream()
-                    .filter(paramAst -> paramAst.getValue() != null)
-                    .collect(toMap(paramAst -> paramAst.getModel().getName(), paramAst -> paramAst.getValue().toString()));
+                    .filter(paramAst -> paramAst.getRawValue() != null)
+                    .collect(toMap(paramAst -> paramAst.getModel().getName(), paramAst -> paramAst.getRawValue()));
                 Map<String, String> connectionPropertiesMap =
                     extractConnectionProperties((ComponentAst) configRefModel, configurationModel);
                 propertiesMap.putAll(connectionPropertiesMap);
@@ -268,8 +268,8 @@ public class MacroExpansionModuleModel {
 
     Map<String, String> propertiesMap = extractProperties(configRefName);
     Map<String, String> parametersMap = ((ComponentAst) operationRefModel).getParameters().stream()
-        .filter(paramAst -> paramAst.getValue() != null)
-        .collect(toMap(paramAst -> paramAst.getModel().getName(), paramAst -> paramAst.getValue().toString()));
+        .filter(paramAst -> paramAst.getRawValue() != null)
+        .collect(toMap(paramAst -> paramAst.getModel().getName(), paramAst -> paramAst.getRawValue()));
     operationRefModel.getRawParameters().forEach((paramName, paramValue) -> {
       processorChainBuilder.addParameter(paramName, paramValue, operationRefModel.isParameterValueProvidedBySchema(paramName));
     });
@@ -424,8 +424,8 @@ public class MacroExpansionModuleModel {
           // as configParameter != null, a ConfigurationModel must exist
           final ConfigurationModel configurationModel = getConfigurationModel().get();
           configRefComponentModel.getParameters().stream()
-              .filter(paramAst -> paramAst.getValue() != null)
-              .forEach(paramAst -> valuesMap.put(paramAst.getModel().getName(), paramAst.getValue()));
+              .filter(paramAst -> paramAst.getRawValue() != null)
+              .forEach(paramAst -> valuesMap.put(paramAst.getModel().getName(), paramAst.getRawValue()));
           valuesMap.putAll(extractConnectionProperties(configRefComponentModel, configurationModel));
         });
     return valuesMap;
@@ -448,8 +448,8 @@ public class MacroExpansionModuleModel {
                 .equals(componentModel.getIdentifier().getName()))
             .findFirst()
             .map(connectionComponentModel -> connectionComponentModel.getParameters().stream()
-                .filter(paramAst -> paramAst.getValue() != null)
-                .collect(toMap(paramAst -> paramAst.getModel().getName(), paramAst -> paramAst.getValue().toString()))))
+                .filter(paramAst -> paramAst.getRawValue() != null)
+                .collect(toMap(paramAst -> paramAst.getModel().getName(), paramAst -> paramAst.getRawValue()))))
         .orElse(emptyMap());
   }
 

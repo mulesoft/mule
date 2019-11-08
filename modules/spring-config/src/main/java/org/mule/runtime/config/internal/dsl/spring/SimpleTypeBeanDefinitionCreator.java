@@ -45,7 +45,7 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
         // Component model has more than one parameter when it's supposed to have at most one parameter
         return false;
       }
-      if (componentModel.getTextContent() != null && !componentModel.getParameters().isEmpty()) {
+      if (componentModel.getTextContent() != null && !componentModel.getRawParameters().isEmpty()) {
         // Component model has both a parameter and an inner content
         return false;
       }

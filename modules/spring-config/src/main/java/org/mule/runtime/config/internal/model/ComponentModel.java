@@ -290,6 +290,7 @@ public abstract class ComponentModel {
         handleNestedParameters(extensionModelHelper, model);
 
         ((ComponentAst) ComponentModel.this).recursiveStream()
+            // .filter(childComp -> childComp != ComponentModel.this)
             .map(childComp -> (ComponentModel) childComp)
             .forEach(childComp -> childComp
                 .setMetadataTypeModelAdapter(findParameterModel(extensionModelHelper, model, childComp)));
@@ -299,8 +300,22 @@ public abstract class ComponentModel {
         Set<ComponentAst> paramChildren = new HashSet<>();
 
         ((ComponentAst) ComponentModel.this).recursiveStream()
+            // .filter(childComp -> childComp != ComponentModel.this)
             .forEach(childComp -> {
               extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
+                  // do not handle the callback parameters from the sources
+                  .filter(paramModel -> {
+                    if (model instanceof SourceModel) {
+                      return !(((SourceModel) model).getSuccessCallback()
+                          .map(sc -> sc.getAllParameterModels().contains(paramModel))
+                          .orElse(false) ||
+                          ((SourceModel) model).getErrorCallback()
+                              .map(ec -> ec.getAllParameterModels().contains(paramModel))
+                              .orElse(false));
+                    } else {
+                      return true;
+                    }
+                  })
                   .filter(paramModel -> paramModel.getDslConfiguration().allowsInlineDefinition())
                   .ifPresent(paramModel -> {
                     paramChildren.add(childComp);
@@ -310,6 +325,10 @@ public abstract class ComponentModel {
                       // childComp
                       setParameter(paramModel, new DefaultComponentParameterAst(childComp,
                                                                                 () -> paramModel, childComp.getMetadata()));
+
+                      ((ComponentModel) childComp)
+                          .setMetadataTypeModelAdapter(createParameterizedTypeModelAdapter(paramModel.getType(),
+                                                                                           extensionModelHelper));
                     } else {
                       setParameter(paramModel, new DefaultComponentParameterAst(((ComponentModel) childComp).getTextContent(),
                                                                                 () -> paramModel, childComp.getMetadata()));
@@ -378,9 +397,16 @@ public abstract class ComponentModel {
 
   /**
    * @return the value of the name attribute.
+   * @deprecated Use {@link ComponentAst#getComponentId()} instead.
    */
+  @Deprecated
   public String getNameAttribute() {
-    return parameters.get(ApplicationModel.NAME_ATTRIBUTE);
+    if (this instanceof ComponentAst) {
+      return ((ComponentAst) this).getComponentId()
+          .orElseGet(() -> parameters.get(ApplicationModel.NAME_ATTRIBUTE));
+    } else {
+      return parameters.get(ApplicationModel.NAME_ATTRIBUTE);
+    }
   }
 
   /**

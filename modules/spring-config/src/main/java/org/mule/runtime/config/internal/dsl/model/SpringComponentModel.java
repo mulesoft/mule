@@ -8,13 +8,16 @@ package org.mule.runtime.config.internal.dsl.model;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -22,6 +25,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.model.DefaultComponentParameterAst;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -87,7 +91,21 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
 
   @Override
   public Optional<String> getComponentId() {
-    return ofNullable(getRawParameters().get(NAME_ATTRIBUTE_NAME));
+    if (getType() != null && MuleConfiguration.class.isAssignableFrom(getType())) {
+      return of(OBJECT_MULE_CONFIGURATION);
+    } else if (getModel(ConstructModel.class)
+        .map(cm -> cm.getName().equals("object"))
+        .orElse(false)) {
+      return ofNullable(getRawParameters().get(NAME_ATTRIBUTE_NAME));
+    } else if (getModel(ParameterizedModel.class).isPresent()) {
+      return getParameters().stream()
+          .filter(param -> param.getModel().isComponentId())
+          .findAny()
+          .map(param -> (String) param.getValue().getRight());
+    } else {
+      // fallback for dsl elements that do not have an extension model declaration
+      return ofNullable(getRawParameters().get(NAME_ATTRIBUTE_NAME));
+    }
   }
 
   @Override
@@ -124,7 +142,10 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
   @Override
   public Collection<ComponentParameterAst> getParameters() {
     populateParameterAsts();
-    return parameterAsts.values().stream().filter(param -> param.getValue() != null).collect(toSet());
+    return parameterAsts.values()
+        .stream()
+        .filter(param -> param.getValue().isLeft() || param.getValue().isRight())
+        .collect(toSet());
   }
 
   private void populateParameterAsts() {
@@ -132,26 +153,34 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
       return;
     }
 
-    getModel(ParameterizedModel.class).get().getAllParameterModels()
-        .forEach(paramModel -> parameterAsts.computeIfAbsent(paramModel
-            .getName(), paramNameKey -> findParameterModel(paramNameKey)
-                .map(foundParamModel -> getRawParameterValue(paramNameKey)
-                    .map(rawParamValue -> new DefaultComponentParameterAst(rawParamValue, () -> foundParamModel))
-                    .orElseGet(() -> new DefaultComponentParameterAst(null, () -> foundParamModel)))
-                .orElseThrow(() -> {
-                  // Try to provide as much troubleshooting information as possible
-                  final String mxgPrefix = format("Wanted paramName '%s' from object '%s'.", paramNameKey,
-                                                  getModel(NamedObject.class).map(n -> n.getName()).orElse("(null)"));
+    if (!getModel(ParameterizedModel.class).isPresent()) {
+      throw new IllegalStateException("Model for '" + this.toString() + "' (a '"
+          + getModel(NamedObject.class).map(NamedObject::getName) + ")' is not parameterizable.");
+    }
 
-                  if (!getModel(ParameterizedModel.class).isPresent()) {
-                    return new NoSuchElementException(mxgPrefix + " The model is not parameterizable.");
-                  } else {
-                    final List<String> availableParams = getModel(ParameterizedModel.class).get().getAllParameterModels()
-                        .stream()
-                        .map(pm -> pm.getName()).collect(toList());
-                    return new NoSuchElementException(mxgPrefix + " Available: " + availableParams);
-                  }
-                })));
+    getModel(ParameterizedModel.class)
+        .ifPresent(parameterizedModel -> {
+          parameterizedModel.getAllParameterModels()
+              .forEach(paramModel -> parameterAsts.computeIfAbsent(paramModel
+                  .getName(), paramNameKey -> findParameterModel(paramNameKey)
+                      .map(foundParamModel -> getRawParameterValue(paramNameKey)
+                          .map(rawParamValue -> new DefaultComponentParameterAst(rawParamValue, () -> foundParamModel))
+                          .orElseGet(() -> new DefaultComponentParameterAst(null, () -> foundParamModel)))
+                      .orElseThrow(() -> {
+                        // Try to provide as much troubleshooting information as possible
+                        final String mxgPrefix = format("Wanted paramName '%s' from object '%s'.", paramNameKey,
+                                                        getModel(NamedObject.class).map(n -> n.getName()).orElse("(null)"));
+
+                        if (!getModel(ParameterizedModel.class).isPresent()) {
+                          return new NoSuchElementException(mxgPrefix + " The model is not parameterizable.");
+                        } else {
+                          final List<String> availableParams = getModel(ParameterizedModel.class).get().getAllParameterModels()
+                              .stream()
+                              .map(pm -> pm.getName()).collect(toList());
+                          return new NoSuchElementException(mxgPrefix + " Available: " + availableParams);
+                        }
+                      })));
+        });
   }
 
   private Optional<ParameterModel> findParameterModel(String paramName) {
