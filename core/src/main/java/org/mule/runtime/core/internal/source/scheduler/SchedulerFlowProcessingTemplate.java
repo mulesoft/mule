@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.internal.source.scheduler;
 
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.FlowProcessingTemplate;
@@ -22,7 +22,7 @@ import java.util.List;
  */
 final class SchedulerFlowProcessingTemplate extends FlowProcessingTemplate {
 
-  private DefaultSchedulerMessageSource defaultSchedulerMessageSource;
+  private final DefaultSchedulerMessageSource defaultSchedulerMessageSource;
 
   SchedulerFlowProcessingTemplate(Processor messageProcessor,
                                   List<NotificationFunction> notificationFunctions,

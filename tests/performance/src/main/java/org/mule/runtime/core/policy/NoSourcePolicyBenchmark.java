@@ -12,10 +12,10 @@ import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.block;
 
 import org.mule.AbstractBenchmark;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
-import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
 import org.mule.runtime.core.internal.policy.NoSourcePolicy;
@@ -32,6 +32,7 @@ import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.Threads;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

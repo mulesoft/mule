@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.lifecycle;
 
-import org.mule.runtime.core.api.functional.Either;
+import org.mule.runtime.api.functional.Either;
 
 import java.util.Collection;
 

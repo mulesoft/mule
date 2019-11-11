@@ -8,7 +8,7 @@ package org.mule.tck.junit4.matcher;
 
 import static org.hamcrest.Matchers.nullValue;
 
-import org.mule.runtime.core.api.functional.Either;
+import org.mule.runtime.api.functional.Either;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -21,8 +21,8 @@ import org.hamcrest.TypeSafeMatcher;
  */
 public class EitherMatcher<L, R> extends TypeSafeMatcher<Either<L, R>> {
 
-  private Matcher<L> leftMatcher;
-  private Matcher<R> rightMatcher;
+  private final Matcher<L> leftMatcher;
+  private final Matcher<R> rightMatcher;
 
   public EitherMatcher(Matcher<L> leftMatcher, Matcher<R> rightMatcher) {
     this.leftMatcher = leftMatcher;
