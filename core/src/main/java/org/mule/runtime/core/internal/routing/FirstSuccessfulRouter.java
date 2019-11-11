@@ -1,0 +1,176 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.runtime.core.internal.routing;
+
+import com.google.common.collect.ImmutableMap;
+import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.functional.Either;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.event.EventInternalContextResolver;
+import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
+import org.mule.runtime.core.privileged.routing.CouldNotRouteOutboundMessageException;
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import reactor.core.publisher.Flux;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static java.util.Optional.*;
+import static org.mule.runtime.api.functional.Either.left;
+import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
+import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Mono.subscriberContext;
+
+public class FirstSuccessfulRouter {
+
+  private final Logger LOGGER = getLogger(FirstSuccessfulRouter.class);
+  private static final String FIRST_SUCCESSFUL_START_EVENT = "_firstSuccessfulStartEvent";
+
+  private final Component owner;
+  private final Flux<CoreEvent> upstreamFlux;
+  private final List<Flux<CoreEvent>> innerFluxes = new ArrayList<>();
+  private final List<FluxSinkRecorder<CoreEvent>> innerRecorders;
+  private final Flux<CoreEvent> downstreamFlux;
+  private final FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
+  private final EventInternalContextResolver<Stack<CoreEvent>> nextExecutionContextResolver =
+      new EventInternalContextResolver<>(FIRST_SUCCESSFUL_START_EVENT, Stack::new);
+
+  // When using an until successful scope in a blocking flow (for example, calling the owner flow with a Processor#process call),
+  // this leads to a reactor completion signal being emitted while the event is being re-injected for retrials. This is solved by
+  // deferring the downstream publisher completion until all events have evacuated the scope.
+  private final AtomicInteger inflightEvents = new AtomicInteger(0);
+  private final AtomicBoolean completeDeferred = new AtomicBoolean(false);
+
+  public FirstSuccessfulRouter(Component owner, Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
+    this.owner = owner;
+
+    innerRecorders =
+        IntStream.range(0, routes.size()).mapToObj(x -> new FluxSinkRecorder<CoreEvent>()).collect(Collectors.toList());
+
+    // Upstream side of until successful chain. Injects events into retrial chain.
+    upstreamFlux = Flux.from(publisher)
+        .doOnNext(event -> {
+          // Inject event into retrial execution chain
+          inflightEvents.getAndIncrement();
+          innerRecorders.get(0).next(startEvent(event));
+        })
+        .doOnComplete(() -> {
+          if (inflightEvents.get() == 0) {
+            completeRouter();
+          } else {
+            completeDeferred.set(true);
+          }
+        });
+
+    for (int i = 0; i < routes.size(); i++) {
+      FluxSinkRecorder<CoreEvent> nextRecorder = i < routes.size() - 1 ? innerRecorders.get(i + 1) : null;
+      innerFluxes.add(createMidFlux(routes.get(i), innerRecorders.get(i), ofNullable(nextRecorder)));
+    }
+
+    downstreamFlux = Flux.create(downstreamRecorder)
+        .doOnNext(event -> inflightEvents.decrementAndGet())
+        .map(getScopeResultMapper());
+
+  }
+
+  private Function<Either<Throwable, CoreEvent>, CoreEvent> getScopeResultMapper() {
+    return either -> {
+      if (either.isLeft()) {
+        throw propagate(either.getLeft());
+      } else {
+        return either.getRight();
+      }
+    };
+  }
+
+  private void completeRouter() {
+    for (FluxSinkRecorder<CoreEvent> innerRecorder : innerRecorders) {
+      innerRecorder.complete();
+    }
+    downstreamRecorder.complete();
+  }
+
+  private void completeRouterIfNecessary() {
+    if (completeDeferred.get() && inflightEvents.get() == 0) {
+      completeRouter();
+    }
+  }
+
+  /**
+   * Assembles and returns the downstream {@link Publisher<CoreEvent>}.
+   *
+   * @return the successful {@link CoreEvent} or retries exhaustion errors {@link Publisher}
+   */
+  Publisher<CoreEvent> getDownstreamPublisher() {
+    return downstreamFlux
+        .compose(downstreamPublisher -> subscriberContext().flatMapMany(downstreamContext -> downstreamPublisher
+            .doOnSubscribe(s -> {
+              for (Flux<CoreEvent> innerFlux : innerFluxes) {
+                innerFlux.subscriberContext(downstreamContext).subscribe();
+              }
+              upstreamFlux.subscriberContext(downstreamContext).subscribe();
+            })));
+  }
+
+
+  private CoreEvent startEvent(CoreEvent event) {
+    Stack<CoreEvent> nextEventContainer = nextExecutionContextResolver.getCurrentContextFromEvent(event);
+    nextEventContainer.push(event);
+    return nextExecutionContextResolver.eventWithContext(event, nextEventContainer);
+  }
+
+  private void executeNext(Optional<FluxSinkRecorder<CoreEvent>> next, CoreEvent event, Throwable error) {
+    Stack<CoreEvent> nextEventContainer = nextExecutionContextResolver.getCurrentContextFromEvent(event);
+    CoreEvent nextEvent = nextEventContainer.pop();
+    if (next.isPresent()) {
+      next.get().next(startEvent(nextEvent));
+    } else {
+      downstreamRecorder
+          .next(left(new MessagingException(nextEvent, new CouldNotRouteOutboundMessageException((Processor) owner, error)),
+                     CoreEvent.class));
+    }
+  }
+
+  private Flux<CoreEvent> createMidFlux(ProcessorRoute route, FluxSinkRecorder<CoreEvent> innerRecorder,
+                                        Optional<FluxSinkRecorder<CoreEvent>> next) {
+    return Flux.create(innerRecorder)
+        .transform(innerPublisher -> applyWithChildContext(innerPublisher, route.getProcessor(), of(owner.getLocation())))
+        .doOnNext(successfulEvent -> {
+          if (successfulEvent.getError().isPresent()) {
+            executeNext(next, successfulEvent, successfulEvent.getError().get().getCause());
+            return;
+          }
+          // Scope execution was successful
+          inflightEvents.decrementAndGet();
+          completeRouterIfNecessary();
+          Stack<CoreEvent> nextEventContainer = nextExecutionContextResolver.getCurrentContextFromEvent(successfulEvent);
+          nextEventContainer.pop();
+          downstreamRecorder
+              .next(right(Throwable.class, nextExecutionContextResolver.eventWithContext(successfulEvent, nextEventContainer)));
+        }).onErrorContinue((error, object) -> {
+          if (object instanceof CoreEvent) {
+            executeNext(next, (CoreEvent) object, error);
+          } else if (error instanceof MessagingException) {
+            executeNext(next, ((MessagingException) error).getEvent(), error.getCause());
+          }
+        });
+  }
+
+
+
+}

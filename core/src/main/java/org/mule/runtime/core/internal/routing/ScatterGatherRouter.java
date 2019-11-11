@@ -10,13 +10,16 @@ package org.mule.runtime.core.internal.routing;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotCopyStreamPayload;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noEndpointsForRouter;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
-import static org.mule.runtime.core.internal.routing.FirstSuccessfulRoutingStrategy.validateMessageIsNotConsumable;
 import static reactor.core.publisher.Flux.fromIterable;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -94,5 +97,19 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
 
   private boolean isLazyInit() {
     return configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
+  }
+
+  /**
+   * Validates that the payload is not consumable so it can be copied.
+   *
+   * If validation fails then throws a MessagingException
+   *
+   * @param message
+   * @throws MuleException if the payload is consumable
+   */
+  public static void validateMessageIsNotConsumable(Message message) {
+    if (message.getPayload().getDataType().isStreamType()) {
+      throw new MuleRuntimeException(cannotCopyStreamPayload(message.getPayload().getDataType().getType().getName()));
+    }
   }
 }

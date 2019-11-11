@@ -7,16 +7,18 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -38,6 +40,9 @@ import org.junit.Test;
 public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   private static final String EXCEPTION_SEEN = "EXCEPTION WAS SEEN";
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   public FirstSuccessfulTestCase() {
     setStartContext(true);
@@ -61,28 +66,13 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  public void testRouteReturnsNullEvent() throws Exception {
-    Processor nullReturningMp = event -> null;
-    FirstSuccessful fs = createFirstSuccessfulRouter(nullReturningMp);
-    fs.setAnnotations(getAppleFlowComponentLocationAnnotations());
-    fs.initialise();
-
-    assertThat(fs.process(testEvent()), nullValue());
-  }
-
-  @Test
   public void testRouteReturnsNullMessage() throws Exception {
     Processor nullEventMp = event -> CoreEvent.builder(event).message(c -> null).build();
     FirstSuccessful fs = createFirstSuccessfulRouter(nullEventMp);
     fs.setAnnotations(getAppleFlowComponentLocationAnnotations());
     fs.initialise();
-
-    try {
-      fs.process(testEvent());
-      fail("Exception expected");
-    } catch (CouldNotRouteOutboundMessageException e) {
-      // this one was expected
-    }
+    expectedException.expectCause(instanceOf(CouldNotRouteOutboundMessageException.class));
+    fs.process(testEvent());
   }
 
   private FirstSuccessful createFirstSuccessfulRouter(Processor... processors) throws Exception {
