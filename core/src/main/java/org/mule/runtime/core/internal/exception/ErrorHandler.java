@@ -13,6 +13,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -31,10 +32,12 @@ import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAccep
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 /**
  * Selects which "on error" handler to execute based on filtering. Replaces the choice-exception-strategy from Mule 3. On error
@@ -44,6 +47,8 @@ import org.reactivestreams.Publisher;
  */
 public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor>
     implements MessagingExceptionHandlerAcceptor, MuleContextAware, Lifecycle {
+
+  private final Logger LOGGER = getLogger(ErrorHandler.class);
 
   private static final String MUST_ACCEPT_ANY_EVENT_MESSAGE = "Default error handler must accept any event.";
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
@@ -74,6 +79,25 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
       }
     }
     throw new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE));
+  }
+
+  @Override
+  public void routeMessagingError(MessagingException error, Consumer<CoreEvent> handledConsumer,
+                                  Consumer<Throwable> failureConsumer) {
+    CoreEvent event = error.getEvent();
+    error.setProcessedEvent(event);
+    try {
+      for (MessagingExceptionHandlerAcceptor errorListener : exceptionListeners) {
+        if (errorListener.accept(event)) {
+          errorListener.routeMessagingError(error, handledConsumer, failureConsumer);
+          return;
+        }
+      }
+      throw new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE));
+    } catch (Exception e) {
+      failureConsumer.accept(new MessagingExceptionResolver(this).resolve(new MessagingException(event, e, this),
+                                                                          muleContext));
+    }
   }
 
   @Override
@@ -195,7 +219,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   public void setExceptionListenersLocation(Location flowLocation) {
     List<MessagingExceptionHandlerAcceptor> listeners =
         this.getExceptionListeners().stream().map(exceptionListener -> (exceptionListener instanceof TemplateOnErrorHandler)
-            ? ((TemplateOnErrorHandler) exceptionListener).duplicateFor(flowLocation) : exceptionListener).collect(toList());
+            ? ((TemplateOnErrorHandler) exceptionListener).duplicateFor(flowLocation)
+            : exceptionListener).collect(toList());
     this.setExceptionListeners(listeners);
   }
 

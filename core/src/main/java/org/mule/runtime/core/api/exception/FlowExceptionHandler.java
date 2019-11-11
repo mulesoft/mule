@@ -13,6 +13,7 @@ import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
@@ -50,5 +51,8 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
       return error(propagateWrappingFatal(throwable));
     }
   }
+
+  default void routeMessagingError(MessagingException error, Consumer<CoreEvent> handledConsumer,
+                                   Consumer<Throwable> failureConsumer) {}
 }
 
