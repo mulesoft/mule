@@ -64,7 +64,7 @@ import org.vibur.objectpool.util.MultithreadConcurrentQueueCollection;
 public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
 
   private static final Logger LOGGER = getLogger(PoolingByteBufferManager.class);
-  private static final int DEFAULT_CORE_SIZE = 100;
+  private static final int DEFAULT_CORE_SIZE = 2000;
   static final double MAX_STREAMING_PERCENTILE = 0.7;
 
   private final AtomicLong streamingMemory = new AtomicLong(0);
