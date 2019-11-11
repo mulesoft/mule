@@ -53,6 +53,8 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
   }
 
   default void routeMessagingError(MessagingException error, Consumer<CoreEvent> handledConsumer,
-                                   Consumer<Throwable> failureConsumer) {}
+                                   Consumer<Throwable> failureConsumer) {
+    failureConsumer.accept(error);
+  }
 }
 
