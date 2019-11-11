@@ -10,8 +10,8 @@ import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.newSetFromMap;
 import static java.util.Optional.empty;
-import static org.mule.runtime.core.api.functional.Either.left;
-import static org.mule.runtime.core.api.functional.Either.right;
+import static org.mule.runtime.api.functional.Either.left;
+import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
@@ -28,16 +28,15 @@ import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
-import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
-import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
@@ -62,6 +61,7 @@ import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -630,6 +630,7 @@ public class MessageProcessors {
    * @since 4.1
    * @deprecated Use {@link RxUtils} instead
    */
+  @Deprecated
   public static Publisher<CoreEvent> transform(Publisher<CoreEvent> publisher, ReactiveProcessor processor) {
     return RxUtils.transform(publisher, processor);
   }
@@ -644,6 +645,7 @@ public class MessageProcessors {
    * @since 4.2
    * @deprecated Use {@link RxUtils} instead
    */
+  @Deprecated
   public static Publisher<CoreEvent> map(Publisher<CoreEvent> publisher, Function<CoreEvent, CoreEvent> mapper) {
     return RxUtils.map(publisher, mapper);
   }
@@ -659,6 +661,7 @@ public class MessageProcessors {
    * @since 4.1
    * @deprecated Use {@link RxUtils} instead
    */
+  @Deprecated
   public static Publisher<CoreEvent> flatMap(Publisher<CoreEvent> publisher,
                                              Function<CoreEvent, Publisher<CoreEvent>> function, Component component) {
     return RxUtils.flatMap(publisher, function, component);
@@ -673,6 +676,7 @@ public class MessageProcessors {
    * @since 4.2
    * @deprecated Use {@link RxUtils} instead
    */
+  @Deprecated
   public static Publisher<CoreEvent> justPublishOn(CoreEvent event, ExecutorService executor) {
     return RxUtils.justPublishOn(event, executor);
   }

@@ -7,16 +7,16 @@
 package org.mule.runtime.core.internal.policy;
 
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.api.functional.Either.left;
-import static org.mule.runtime.core.api.functional.Either.right;
+import static org.mule.runtime.api.functional.Either.left;
+import static org.mule.runtime.api.functional.Either.right;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.execution.CompletableCallback;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
@@ -35,6 +35,7 @@ import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -60,7 +61,7 @@ public class CompositeSourcePolicy
   private final ReactiveProcessor flowExecutionProcessor;
 
   private final PolicyEventMapper policyEventMapper;
-  private Optional<Function<MessagingException, MessagingException>> resolver;
+  private final Optional<Function<MessagingException, MessagingException>> resolver;
 
   /**
    * Creates a new source policy composed by several {@link Policy} that will be chain together.

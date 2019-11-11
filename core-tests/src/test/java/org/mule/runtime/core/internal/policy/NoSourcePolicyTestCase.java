@@ -19,8 +19,8 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.block;
 import static reactor.core.publisher.Mono.error;
 
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -29,19 +29,21 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
 import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import com.google.common.collect.ImmutableMap;
+
 import reactor.core.publisher.Flux;
 
 public class NoSourcePolicyTestCase extends AbstractMuleTestCase {
 
   private NoSourcePolicy noSourcePolicy;
 
-  private CoreEvent initialEvent = mock(InternalEvent.class, RETURNS_DEEP_STUBS);
-  private MessageSourceResponseParametersProcessor respParametersProcessor =
+  private final CoreEvent initialEvent = mock(InternalEvent.class, RETURNS_DEEP_STUBS);
+  private final MessageSourceResponseParametersProcessor respParametersProcessor =
       mock(MessageSourceResponseParametersProcessor.class, RETURNS_DEEP_STUBS);
 
   private CoreEvent updatedEvent;

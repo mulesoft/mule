@@ -25,7 +25,10 @@ import java.util.function.Function;
  *
  * @param <L> the type of the left value
  * @param <R> the type of the right value
+ *
+ * @deprecated Use {@link org.mule.runtime.api.functional.Either} instead.
  */
+@Deprecated
 final public class Either<L, R> {
 
   /**

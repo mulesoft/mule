@@ -30,9 +30,9 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
@@ -46,12 +46,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
+
+import com.google.common.collect.ImmutableMap;
+
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 

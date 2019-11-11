@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static org.mule.runtime.core.api.functional.Either.left;
+import static org.mule.runtime.api.functional.Either.left;
+
 import org.mule.runtime.api.component.execution.CompletableCallback;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
