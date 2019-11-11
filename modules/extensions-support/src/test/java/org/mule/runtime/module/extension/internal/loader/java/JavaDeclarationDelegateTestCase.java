@@ -472,7 +472,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(extensionDeclaration.getOperations(), hasSize(57));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
-    assertThat(withOperationsDeclaration.getOperations().size(), is(20));
+    assertThat(withOperationsDeclaration.getOperations().size(), is(21));
     assertOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION, "");
     assertOperation(withOperationsDeclaration, NAME_AS_STREAM, "");
     assertOperation(withOperationsDeclaration, GET_ENEMY_OPERATION, "");
@@ -508,6 +508,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertOperation(extensionDeclaration, "executeRemoteKill", "");
     assertOperation(extensionDeclaration, "callGusFringNonBlocking", "");
     assertOperation(withOperationsDeclaration, "pagedOperationWithExtensionClassLoader", "");
+    assertOperation(withOperationsDeclaration, "getDrugs", "");
 
     OperationDeclaration operation = getOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION);
     assertThat(operation, is(notNullValue()));
