@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import static java.lang.Integer.valueOf;
+import static java.lang.Integer.getInteger;
 import static java.lang.System.getProperty;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_BUCKET_SIZE;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_BUFFER_POOL_SIZE;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_MAX_MEMORY_PERCENTAGE;
 
 /**
  * Constants around byte streaming
@@ -21,11 +23,15 @@ public final class ByteStreamingConstants {
   /**
    * The default size of a chunk/bucket for buffers which grow elastically
    */
-  public static final int DEFAULT_BUFFER_BUCKET_SIZE = getDefaultBucketSize();
+  public static final int DEFAULT_BUFFER_BUCKET_SIZE = getInteger(MULE_STREAMING_BUCKET_SIZE, KB.toBytes(8));
 
-  private static int getDefaultBucketSize() {
-    String bucketSize = getProperty(MULE_STREAMING_BUCKET_SIZE);
-    return bucketSize != null ? valueOf(bucketSize) : KB.toBytes(8);
+  public static final double MAX_STREAMING_MEMORY_PERCENTAGE = getMaxStreamingMemoryPercentage();
+
+  public static final int DEFAULT_BUFFER_POOL_SIZE = getInteger(MULE_STREAMING_BUFFER_POOL_SIZE, 2048);
+
+  private static double getMaxStreamingMemoryPercentage() {
+    String v = getProperty(MULE_STREAMING_MAX_MEMORY_PERCENTAGE);
+    return v != null ? Double.valueOf(v) : 0.7;
   }
 
   private ByteStreamingConstants() {}

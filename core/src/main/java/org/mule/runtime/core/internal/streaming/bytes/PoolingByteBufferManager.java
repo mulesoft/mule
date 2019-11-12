@@ -6,34 +6,25 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import static java.lang.Math.round;
-import static java.lang.String.format;
-import static java.lang.System.getProperty;
+import static java.lang.Math.min;
+import static java.lang.Runtime.getRuntime;
 import static java.lang.System.identityHashCode;
 import static java.util.Collections.newSetFromMap;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
-import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_WAIT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_MAX_MEMORY;
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.DEFAULT_BUFFER_BUCKET_SIZE;
-import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
+import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.DEFAULT_BUFFER_POOL_SIZE;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
-import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.streaming.DefaultMemoryManager;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
 
 import java.nio.ByteBuffer;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
@@ -61,15 +52,11 @@ import org.vibur.objectpool.util.MultithreadConcurrentQueueCollection;
  *
  * @since 4.0
  */
-public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
+public class PoolingByteBufferManager extends MemoryBoundByteBufferManager implements Disposable {
 
   private static final Logger LOGGER = getLogger(PoolingByteBufferManager.class);
-  private static final int DEFAULT_CORE_SIZE = 2000;
-  static final double MAX_STREAMING_PERCENTILE = 0.7;
 
-  private final AtomicLong streamingMemory = new AtomicLong(0);
   private final int size;
-  private final long maxStreamingMemory;
   private final long waitTimeoutMillis;
 
   private BufferPool defaultSizePool;
@@ -97,7 +84,7 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
    * seconds. The definition of max memory is that of {@link MemoryManager#getMaxMemory()}
    */
   public PoolingByteBufferManager() {
-    this(new DefaultMemoryManager(), DEFAULT_CORE_SIZE, DEFAULT_BUFFER_BUCKET_SIZE, DEFAULT_MAX_POOL_WAIT);
+    this(new DefaultMemoryManager(), DEFAULT_BUFFER_POOL_SIZE, DEFAULT_BUFFER_BUCKET_SIZE, 50);
   }
 
   /**
@@ -108,24 +95,10 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
    * @param waitTimeoutMillis how long to wait when the pool is exhausted
    */
   public PoolingByteBufferManager(MemoryManager memoryManager, int size, int bufferSize, long waitTimeoutMillis) {
-    maxStreamingMemory = calculateMaxStreamingMemory(memoryManager);
+    super(memoryManager);
     this.waitTimeoutMillis = waitTimeoutMillis;
     this.size = size;
     defaultSizePool = newBufferPool(bufferSize);
-  }
-
-  private long calculateMaxStreamingMemory(MemoryManager memoryManager) {
-    String maxMemoryProperty = getProperty(MULE_STREAMING_MAX_MEMORY);
-    if (maxMemoryProperty == null) {
-      return round(memoryManager.getMaxMemory() * MAX_STREAMING_PERCENTILE);
-    } else {
-      try {
-        return Long.valueOf(maxMemoryProperty);
-      } catch (Exception e) {
-        throw new IllegalArgumentException(format("Invalid value for system property '%s'. A memory size (in bytes) was "
-            + "expected, got '%s' instead", MULE_STREAMING_MAX_MEMORY, maxMemoryProperty));
-      }
-    }
   }
 
   private BufferPool newBufferPool(Integer capacity) {
@@ -180,32 +153,24 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
         LOGGER.warn("Error disposing mixed capacity byte buffers pool", e);
       }
     }
+
+    super.dispose();
   }
 
   private class BufferPool {
 
-    private final int bufferCapacity;
     private final PoolService<ByteBuffer> pool;
-    private final Lock lock = new ReentrantLock();
-    private final Condition poolNotFull = lock.newCondition();
     private final PoolObjectFactory<ByteBuffer> factory;
+    private final int bufferCapacity;
     private final Set<Integer> ephemeralBufferIds = newSetFromMap(new ConcurrentHashMap<>());
 
-    private BufferPool(int coreSize, int bufferCapacity) {
+    private BufferPool(int size, int bufferCapacity) {
       this.bufferCapacity = bufferCapacity;
-
       factory = new PoolObjectFactory<ByteBuffer>() {
 
         @Override
         public ByteBuffer create() {
-          if (streamingMemory.addAndGet(bufferCapacity) <= maxStreamingMemory) {
-            return ByteBuffer.allocate(bufferCapacity);
-          }
-
-          streamingMemory.addAndGet(-bufferCapacity);
-          throw new MaxStreamingMemoryExceededException(createStaticMessage(format(
-                                                                                   "Max streaming memory limit of %d bytes was exceeded",
-                                                                                   maxStreamingMemory)));
+          return allocateIfFits(ByteBuffer::allocate, bufferCapacity);
         }
 
         @Override
@@ -221,34 +186,27 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
 
         @Override
         public void destroy(ByteBuffer buffer) {
-          if (streamingMemory.addAndGet(-bufferCapacity) < maxStreamingMemory) {
-            signalPoolNotFull();
-          }
+          PoolingByteBufferManager.super.deallocate(buffer);
         }
       };
 
-      //TODO: initial size must be variable
-      pool = new ConcurrentPool<>(new MultithreadConcurrentQueueCollection<>(coreSize),
-                                  factory, coreSize, coreSize, false);
+      pool = new ConcurrentPool<>(new MultithreadConcurrentQueueCollection<>(size),
+                                  factory, min(getRuntime().availableProcessors(), size), size, false);
     }
 
     private ByteBuffer take() {
       ByteBuffer buffer = null;
-      try {
-        buffer = pool.tryTake();
-        if (buffer == null) {
-          buffer = factory.create();
-          ephemeralBufferIds.add(identityHashCode(buffer));
-        }
-      } catch (MaxStreamingMemoryExceededException e) {
-        signal(() -> {
-          while (streamingMemory.get() >= maxStreamingMemory) {
-            if (!poolNotFull.await(waitTimeoutMillis, MILLISECONDS)) {
-              throw e;
-            }
+      do {
+        try {
+          buffer = pool.tryTake();
+          if (buffer == null) {
+            buffer = allocateIfFits(c -> factory.create(), bufferCapacity);
+            ephemeralBufferIds.add(identityHashCode(buffer));
           }
-        });
-      }
+        } catch (MaxStreamingMemoryExceededException e) {
+          signal(() -> awaitNotFull(waitTimeoutMillis, e));
+        }
+      } while (buffer == null);
 
       return buffer;
     }
@@ -265,21 +223,8 @@ public class PoolingByteBufferManager implements ByteBufferManager, Disposable {
       }
     }
 
-    private void signalPoolNotFull() {
-      signal(poolNotFull::signal);
-    }
-
     private void close() {
-      streamingMemory.addAndGet(-bufferCapacity * pool.createdTotal());
-      try {
-        pool.close();
-      } finally {
-        signal(poolNotFull::signalAll);
-      }
-    }
-
-    private void signal(CheckedRunnable task) {
-      withLock(lock, task);
+      pool.close();
     }
   }
 }

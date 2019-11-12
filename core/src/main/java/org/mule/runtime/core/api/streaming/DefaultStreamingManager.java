@@ -7,10 +7,13 @@
 package org.mule.runtime.core.api.streaming;
 
 import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
 import static java.lang.System.getProperty;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STREAMING_STATISTICS;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -26,6 +29,7 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
+import org.mule.runtime.core.api.streaming.bytes.ByteBufferManagerFactory;
 import org.mule.runtime.core.api.streaming.bytes.ByteStreamingManager;
 import org.mule.runtime.core.api.streaming.object.ObjectStreamingManager;
 import org.mule.runtime.core.internal.streaming.AtomicStreamingStatistics;
@@ -35,8 +39,9 @@ import org.mule.runtime.core.internal.streaming.MutableStreamingStatistics;
 import org.mule.runtime.core.internal.streaming.NullStreamingStatistics;
 import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager;
-import org.mule.runtime.core.internal.streaming.bytes.PoolingByteBufferManager;
+import org.mule.runtime.core.internal.streaming.bytes.factory.PoolingByteBufferManagerFactory;
 import org.mule.runtime.core.internal.streaming.object.DefaultObjectStreamingManager;
+import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.io.Closeable;
@@ -50,6 +55,9 @@ import org.slf4j.Logger;
 public class DefaultStreamingManager implements StreamingManager, Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(DefaultStreamingManager.class);
+
+  private static final String BUFFER_MANAGER_FACTORY_CLASS = getProperty(ByteBufferManagerFactory.class.getName(),
+                                                                         PoolingByteBufferManagerFactory.class.getName());
 
   private ByteBufferManager bufferManager;
   private ByteStreamingManager byteStreamingManager;
@@ -76,7 +84,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
       statistics = createStatistics();
 
       cursorManager = new CursorManager(statistics, ghostBuster);
-      bufferManager = new PoolingByteBufferManager();
+      bufferManager = createByteBufferManager();
       byteStreamingManager = createByteStreamingManager();
       objectStreamingManager = createObjectStreamingManager();
 
@@ -86,8 +94,25 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
     }
   }
 
+  private ByteBufferManager createByteBufferManager() throws InitialisationException {
+    CompositeClassLoader classLoader =
+        new CompositeClassLoader(getClass().getClassLoader(), muleContext.getExecutionClassLoader());
+    ByteBufferManagerFactory factory;
+    try {
+      factory = (ByteBufferManagerFactory) instantiateClass(BUFFER_MANAGER_FACTORY_CLASS, new Object[] {}, classLoader);
+    } catch (Exception e) {
+      throw new InitialisationException(createStaticMessage(format("Could not create %s of type %s",
+                                                                   ByteBufferManagerFactory.class.getName(),
+                                                                   BUFFER_MANAGER_FACTORY_CLASS)),
+                                        e, this);
+    }
+
+    return factory.create();
+  }
+
   private MutableStreamingStatistics createStatistics() {
-    return parseBoolean(getProperty(MULE_ENABLE_STREAMING_STATISTICS)) ? new AtomicStreamingStatistics()
+    return parseBoolean(getProperty(MULE_ENABLE_STREAMING_STATISTICS))
+        ? new AtomicStreamingStatistics()
         : new NullStreamingStatistics();
   }
 

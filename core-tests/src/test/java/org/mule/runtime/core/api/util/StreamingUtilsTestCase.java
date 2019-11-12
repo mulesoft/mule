@@ -32,7 +32,7 @@ import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
 import org.mule.runtime.core.internal.streaming.bytes.ByteArrayCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.object.InMemoryCursorIteratorProvider;
-import org.mule.tck.core.streaming.SimpleByteBufferManager;
+import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

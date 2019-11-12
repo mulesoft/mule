@@ -4,9 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.tck.core.streaming;
+package org.mule.runtime.core.internal.streaming.bytes;
 
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
+import org.mule.runtime.core.internal.streaming.MemoryManager;
 
 import java.nio.ByteBuffer;
 
@@ -15,22 +16,19 @@ import java.nio.ByteBuffer;
  *
  * @since 4.0
  */
-public class SimpleByteBufferManager implements ByteBufferManager {
+public class SimpleByteBufferManager extends MemoryBoundByteBufferManager {
+
+  public SimpleByteBufferManager() {}
+
+  public SimpleByteBufferManager(MemoryManager memoryManager) {
+    super(memoryManager);
+  }
 
   /**
    * {@inheritDoc}
    */
   @Override
   public ByteBuffer allocate(int capacity) {
-    return ByteBuffer.allocate(capacity);
-  }
-
-  /**
-   * No - Op operation
-   * {@inheritDoc}
-   */
-  @Override
-  public void deallocate(ByteBuffer byteBuffer) {
-
+    return allocateIfFits(ByteBuffer::allocate, capacity);
   }
 }
