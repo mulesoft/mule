@@ -14,10 +14,10 @@ import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
 
-import org.reactivestreams.Publisher;
-
 import java.util.Optional;
 import java.util.function.BiConsumer;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Context representing a message that is received by a Mule Runtime via a connector source. This context is immutable and
@@ -63,9 +63,6 @@ public interface BaseEventContext extends EventContext {
   /**
    * Events have a stack of executed flows (same as a call stack), so that at any given instant an application developer can
    * determine where this event came from.
-   * <p>
-   * This will only be enabled if {@link DefaultMuleConfiguration#isFlowTrace()} is {@code true}. If {@code false}, the stack will
-   * always be empty.
    *
    * @return the flow stack associated to this event.
    *

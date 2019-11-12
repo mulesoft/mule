@@ -7,7 +7,6 @@
 package org.mule.runtime.core.api.context.notification;
 
 import org.mule.api.annotation.NoImplement;
-import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 
 import java.io.Serializable;
 import java.util.List;
@@ -15,15 +14,14 @@ import java.util.List;
 /**
  * Keeps context information about the executing flows and its callers in order to provide augmented troubleshooting information
  * for an application developer.
- * 
+ *
  * @since 3.8.0
  */
 @NoImplement
 public interface FlowCallStack extends Serializable, Cloneable {
 
   /**
-   * @return the current elements of this stack as a list, ordered from top to bottom, if
-   *         {@link DefaultMuleConfiguration#isFlowTrace()} is {@code true}. Empty list otherwise.
+   * @return the current elements of this stack as a list, ordered from top to bottom.
    */
   List<FlowStackElement> getElements();
 

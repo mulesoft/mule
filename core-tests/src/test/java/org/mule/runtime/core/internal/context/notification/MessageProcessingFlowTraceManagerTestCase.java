@@ -93,6 +93,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
     MuleConfiguration config = mock(MuleConfiguration.class);
     when(config.getId()).thenReturn(APP_ID);
     when(context.getConfiguration()).thenReturn(config);
+
     manager.setMuleContext(context);
 
     rootFlowConstruct = mock(FlowConstruct.class);
