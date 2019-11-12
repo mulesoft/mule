@@ -104,7 +104,7 @@ public class ExecutableComponentTestCase extends AbstractMuleContextTestCase {
 
       BaseEventContext eventContext = (BaseEventContext) componentInEvent.get().getContext();
 
-      assertThat(eventContext.isTerminated(), is(false));
+      assertThat(eventContext.isTerminated(), is(true));
     }
   }
 

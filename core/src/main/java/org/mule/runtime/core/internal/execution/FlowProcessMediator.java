@@ -207,6 +207,7 @@ public class FlowProcessMediator implements Initialisable {
     } catch (Exception e) {
       e = (Exception) Exceptions.unwrap(e);
       if (e instanceof FlowBackPressureException) {
+        ((BaseEventContext) ctx.event.getContext()).error(e);
         ctx.result = mapBackPressureExceptionToPolicyFailureResult(ctx.template, ctx.event, (FlowBackPressureException) e);
         dispatchResponse(ctx);
       } else {

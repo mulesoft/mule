@@ -15,6 +15,7 @@ import static org.mule.runtime.core.privileged.transformer.TransformerUtils.chec
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -25,6 +26,7 @@ import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.client.MuleClientFlowConstruct;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.nio.charset.Charset;
 
@@ -129,20 +131,29 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
       message = event.getMessage();
     }
 
-    Object result;
-    // TODO MULE-9342 Clean up transformer vs message transformer confusion
-    if (event == null) {
-      ComponentLocation location = getLocation() != null ? getLocation() : fromSingleComponent("AbstractMessageTransformer");
-      event = InternalEvent.builder(create(flowConstruct, location)).message(message).build();
-    }
+    EventContext eventCtx = null;
 
-    result = transformMessage(event, enc);
+    try {
+      Object result;
+      // TODO MULE-9342 Clean up transformer vs message transformer confusion
+      if (event == null) {
+        ComponentLocation location = getLocation() != null ? getLocation() : fromSingleComponent("AbstractMessageTransformer");
+        eventCtx = create(flowConstruct, location);
+        event = InternalEvent.builder(eventCtx).message(message).build();
+      }
 
-    if (logger.isDebugEnabled()) {
-      logger.debug(format("Object after transform: %s", StringMessageUtils.toString(result)));
+      result = transformMessage(event, enc);
+
+      if (logger.isDebugEnabled()) {
+        logger.debug(format("Object after transform: %s", StringMessageUtils.toString(result)));
+      }
+      result = checkReturnClass(result, event);
+      return result;
+    } finally {
+      if (eventCtx != null) {
+        ((BaseEventContext) eventCtx).success();
+      }
     }
-    result = checkReturnClass(result, event);
-    return result;
   }
 
   /**

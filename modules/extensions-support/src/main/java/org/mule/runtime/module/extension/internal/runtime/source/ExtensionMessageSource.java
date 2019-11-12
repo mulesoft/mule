@@ -40,8 +40,8 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -59,14 +59,14 @@ import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
+import org.mule.runtime.core.internal.execution.MessageProcessContext;
+import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
-import org.mule.runtime.core.internal.execution.MessageProcessContext;
-import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
@@ -91,6 +91,7 @@ import java.util.function.Consumer;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -133,7 +134,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   private SourceConnectionManager sourceConnectionManager;
   private Processor messageProcessor;
-  private LazyValue<TransactionConfig> transactionConfig = new LazyValue<>(this::buildTransactionConfig);
+  private final LazyValue<TransactionConfig> transactionConfig = new LazyValue<>(this::buildTransactionConfig);
 
   private SourceAdapter sourceAdapter;
   private RetryPolicyTemplate retryPolicyTemplate;
@@ -142,11 +143,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private LazyValue<FlowConstruct> flowConstruct;
   private MessageProcessContext messageProcessContext;
 
-  private NotificationDispatcher notificationDispatcher;
-  private SingleResourceTransactionFactoryManager transactionFactoryManager;
-  private String applicationName;
+  private final NotificationDispatcher notificationDispatcher;
+  private final SingleResourceTransactionFactoryManager transactionFactoryManager;
+  private final String applicationName;
 
-  private AtomicBoolean started = new AtomicBoolean(false);
+  private final AtomicBoolean started = new AtomicBoolean(false);
 
   public ExtensionMessageSource(ExtensionModel extensionModel,
                                 SourceModel sourceModel,
@@ -225,8 +226,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   private void stopSource() throws MuleException {
     if (sourceAdapter != null) {
+      CoreEvent initialiserEvent = null;
       try {
-        CoreEvent initialiserEvent = getInitialiserEvent(muleContext);
+        initialiserEvent = getInitialiserEvent(muleContext);
         stopUsingConfiguration(initialiserEvent);
         sourceAdapter.stop();
         if (usesDynamicConfiguration()) {
@@ -237,6 +239,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                                               sourceAdapter.getName(),
                                               getLocation().getRootContainerName()),
                                        e);
+      } finally {
+        if (initialiserEvent != null) {
+          ((BaseEventContext) initialiserEvent.getContext()).success();
+        }
       }
     }
   }

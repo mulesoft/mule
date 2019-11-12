@@ -59,27 +59,32 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
         .variables(inputEvent.getVariables())
         .build();
     return doProcess(event)
+        .doOnError(e -> completableFuture.complete(null))
         .<ExecutionResult>map(result -> new ExecutionResultImplementation(result, completableFuture))
         .toFuture();
   }
 
   @Override
   public final CompletableFuture<Event> execute(Event event) {
-    CoreEvent internalEvent;
+    boolean localEventCtx = false;
+    CoreEvent internalEvent = null;
     if (event instanceof CoreEvent) {
       BaseEventContext child = createChildEventContext(event.getContext());
       internalEvent = quickCopy(child, (CoreEvent) event);
     } else {
+      localEventCtx = true;
       internalEvent = CoreEvent.builder(createEventContext(null))
           .message(event.getMessage())
           .error(event.getError().orElse(null))
           .variables(event.getVariables())
           .build();
     }
-    return doProcess(internalEvent)
+
+    final CompletableFuture<Event> future = doProcess(internalEvent)
         .map(r -> quickCopy(event.getContext(), r))
         .cast(Event.class)
         .toFuture();
+    return localEventCtx ? future : withCallbacks(future, internalEvent.getContext());
   }
 
   /**
@@ -95,11 +100,13 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
    * @throws ComponentExecutionException if there is an unhandled error within the execution
    */
   public final CompletableFuture<Event> execute(Event event, Consumer<CoreEvent.Builder> childEventContributor) {
-    EventContext child;
+    boolean localEventCtx = false;
+    EventContext child = null;
     if (event instanceof CoreEvent) {
       child = createChildEventContext(event.getContext());
     } else {
       child = createEventContext(null);
+      localEventCtx = true;
     }
 
     final Builder internalEventBuilder = CoreEvent.builder(child)
@@ -108,10 +115,23 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
         .variables(event.getVariables());
     childEventContributor.accept(internalEventBuilder);
 
-    return doProcess(internalEventBuilder.build())
+    final CompletableFuture<Event> future = doProcess(internalEventBuilder.build())
         .map(r -> quickCopy(event.getContext(), r))
         .cast(Event.class)
         .toFuture();
+    return localEventCtx ? future : withCallbacks(future, child);
+  }
+
+  private CompletableFuture<Event> withCallbacks(CompletableFuture<Event> future, EventContext context) {
+    future.whenComplete((e, t) -> {
+      if (t != null) {
+        ((BaseEventContext) context).error(t);
+      } else {
+        ((BaseEventContext) context).success();
+      }
+    });
+
+    return future;
   }
 
   protected EventContext createEventContext(Optional<CompletableFuture<Void>> externalCompletion) {
