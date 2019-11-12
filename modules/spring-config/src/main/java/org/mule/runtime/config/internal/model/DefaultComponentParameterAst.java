@@ -56,14 +56,13 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
   }
 
   @Override
-  public <T> Either<String, T> getValue() {
+  public <T> T getValue() {
     if (complexValue != null) {
-      return right((T) complexValue);
+      return (T) complexValue;
     } else if (isEmpty(rawValue)) {
       // previous implementations were assuming that an empty string was the same as the param not being present...
-      return right((T) getModel().getDefaultValue());
+      return (T) getModel().getDefaultValue();
     } else {
-      AtomicReference<String> expression = new AtomicReference<>();
       AtomicReference<T> value = new AtomicReference<>();
 
       getModel().getType().accept(new MetadataTypeVisitor() {
@@ -87,7 +86,7 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
           if (isExpression(rawValue)) {
             defaultVisit(numberType);
           } else {
-            value.set((T) Long.valueOf(rawValue));
+            value.set((T) Integer.valueOf(rawValue));
           }
         }
 
@@ -102,21 +101,17 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
 
         @Override
         protected void defaultVisit(MetadataType metadataType) {
-          if (getModel().getName().equals("config-ref")) {
-            // For config-ref, just return the name of the referenced object
+          if (!getModel().getAllowedStereotypes().isEmpty() && rawValue instanceof String) {
+            // For references, just return the name of the referenced object
             value.set((T) rawValue);
           } else if (!NOT_SUPPORTED.equals(getModel().getExpressionSupport())) {
             // For complex types that may be the result of an expression, just return the expression
-            expression.set(rawValue);
+            value.set((T) rawValue);
           }
         }
       });
 
-      if (expression.get() != null) {
-        return left(expression.get());
-      } else {
-        return right(value.get());
-      }
+      return value.get();
     }
   }
 
@@ -124,9 +119,14 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
   public <T> Either<String, T> getValueEither() {
     if (complexValue != null) {
       return right((T) complexValue);
-    } else if (isEmpty(rawValue)) {
       // previous implementations were assuming that an empty string was the same as the param not being present...
-      return right((T) getModel().getDefaultValue());
+    } else if (isEmpty(rawValue)) {
+      final T defaultValue = (T) getModel().getDefaultValue();
+      if (isExpression(defaultValue)) {
+        return left((String) defaultValue);
+      } else {
+        return right(defaultValue);
+      }
     } else {
       AtomicReference<String> expression = new AtomicReference<>();
       AtomicReference<T> value = new AtomicReference<>();
@@ -167,8 +167,8 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
 
         @Override
         protected void defaultVisit(MetadataType metadataType) {
-          if (getModel().getName().equals("config-ref")) {
-            // For config-ref, just return the name of the referenced object
+          if (!getModel().getAllowedStereotypes().isEmpty() && rawValue instanceof String) {
+            // For references, just return the name of the referenced object
             value.set((T) rawValue);
           } else if (!NOT_SUPPORTED.equals(getModel().getExpressionSupport())) {
             // For complex types that may be the result of an expression, just return the expression

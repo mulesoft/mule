@@ -101,7 +101,7 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
       return getParameters().stream()
           .filter(param -> param.getModel().isComponentId())
           .findAny()
-          .map(param -> (String) param.getValue().getRight());
+          .map(param -> (String) param.getValueEither().getRight());
     } else {
       // fallback for dsl elements that do not have an extension model declaration
       return ofNullable(getRawParameters().get(NAME_ATTRIBUTE_NAME));
@@ -144,7 +144,7 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
     populateParameterAsts();
     return parameterAsts.values()
         .stream()
-        .filter(param -> param.getValue().isLeft() || param.getValue().isRight())
+        .filter(param -> param.getValueEither().isLeft() || param.getValueEither().isRight())
         .collect(toSet());
   }
 
