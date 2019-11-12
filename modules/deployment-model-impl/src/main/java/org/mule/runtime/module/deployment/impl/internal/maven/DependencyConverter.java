@@ -11,12 +11,12 @@ import org.mule.maven.client.api.model.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
 
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 public class DependencyConverter {
 
-  private Map<BundleDescriptor, BundleDependency> cache = new HashMap<>();
+  private Map<BundleDescriptor, BundleDependency> cache = new IdentityHashMap<>();
 
   public BundleDependency convert(org.mule.maven.client.api.model.BundleDependency mavenBundleDependency) {
     BundleDependency bundleDependency = cache.get(mavenBundleDependency.getDescriptor());
