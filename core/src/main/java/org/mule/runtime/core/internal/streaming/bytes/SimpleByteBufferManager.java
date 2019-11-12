@@ -9,8 +9,6 @@ package org.mule.runtime.core.internal.streaming.bytes;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
 
-import java.nio.ByteBuffer;
-
 /**
  * Simple implementation of {@link ByteBufferManager}
  *
@@ -20,15 +18,8 @@ public class SimpleByteBufferManager extends MemoryBoundByteBufferManager {
 
   public SimpleByteBufferManager() {}
 
-  public SimpleByteBufferManager(MemoryManager memoryManager) {
-    super(memoryManager);
+  public SimpleByteBufferManager(MemoryManager memoryManager, long memoryExhaustedWaitTimeoutMillis) {
+    super(memoryManager, memoryExhaustedWaitTimeoutMillis);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public ByteBuffer allocate(int capacity) {
-    return allocateIfFits(ByteBuffer::allocate, capacity);
-  }
 }

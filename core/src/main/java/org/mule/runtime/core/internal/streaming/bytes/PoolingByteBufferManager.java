@@ -45,9 +45,9 @@ import org.vibur.objectpool.util.MultithreadConcurrentQueueCollection;
  * <p>
  * Unlike traditional pools which are exhausted in terms of number of instances, we don't care about
  * the number of buffers pooled but in the amount of memory they retain. This pool will be exhausted
- * when a certain threshold of retained memory is reached. When exhausted, invokations to
+ * when a certain threshold of retained memory is reached. When exhausted, invocations to
  * {@link #allocate(int)} will block until more memory becomes available (by invoking {@link #deallocate(ByteBuffer)}).
- * If {@link #allocate(int)} is blocked by more than {@link #waitTimeoutMillis} milliseconds, then a
+ * If {@link #allocate(int)} is blocked by more than {@link #memoryExhaustedWaitTimeoutMillis} milliseconds, then a
  * {@link MaxStreamingMemoryExceededException} is thrown.
  *
  * @since 4.0
@@ -57,7 +57,6 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
   private static final Logger LOGGER = getLogger(PoolingByteBufferManager.class);
 
   private final int size;
-  private final long waitTimeoutMillis;
 
   private BufferPool defaultSizePool;
 
@@ -84,19 +83,18 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
    * seconds. The definition of max memory is that of {@link MemoryManager#getMaxMemory()}
    */
   public PoolingByteBufferManager() {
-    this(new DefaultMemoryManager(), DEFAULT_BUFFER_POOL_SIZE, DEFAULT_BUFFER_BUCKET_SIZE, 50);
+    this(new DefaultMemoryManager(), DEFAULT_BUFFER_POOL_SIZE, DEFAULT_BUFFER_BUCKET_SIZE, DEFAULT_MEMORY_EXHAUSTED_WAIT_TIME);
   }
 
   /**
    * Creates a new instance which allows the pool to grow up to 50% of calling {@link MemoryManager#getMaxMemory()} on the given
    * {@code memoryManager}, and has {@code waitTimeoutMillis} as wait timeout.
    *
-   * @param memoryManager     a {@link MemoryManager} used to determine the runtime's max memory
-   * @param waitTimeoutMillis how long to wait when the pool is exhausted
+   * @param memoryManager                    a {@link MemoryManager} used to determine the runtime's max memory
+   * @param memoryExhaustedWaitTimeoutMillis how long to wait when the pool is exhausted
    */
-  public PoolingByteBufferManager(MemoryManager memoryManager, int size, int bufferSize, long waitTimeoutMillis) {
-    super(memoryManager);
-    this.waitTimeoutMillis = waitTimeoutMillis;
+  public PoolingByteBufferManager(MemoryManager memoryManager, int size, int bufferSize, long memoryExhaustedWaitTimeoutMillis) {
+    super(memoryManager, memoryExhaustedWaitTimeoutMillis);
     this.size = size;
     defaultSizePool = newBufferPool(bufferSize);
   }
@@ -109,11 +107,8 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
     return capacity == DEFAULT_BUFFER_BUCKET_SIZE ? defaultSizePool : customSizePools.get(capacity);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public ByteBuffer allocate(int capacity) {
+  protected ByteBuffer doAllocate(int capacity) {
     try {
       return getBufferPool(capacity).take();
     } catch (Exception e) {
@@ -170,7 +165,7 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
 
         @Override
         public ByteBuffer create() {
-          return allocateIfFits(ByteBuffer::allocate, bufferCapacity);
+          return allocateIfFits(bufferCapacity);
         }
 
         @Override
@@ -195,18 +190,11 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
     }
 
     private ByteBuffer take() {
-      ByteBuffer buffer = null;
-      do {
-        try {
-          buffer = pool.tryTake();
-          if (buffer == null) {
-            buffer = allocateIfFits(c -> factory.create(), bufferCapacity);
-            ephemeralBufferIds.add(identityHashCode(buffer));
-          }
-        } catch (MaxStreamingMemoryExceededException e) {
-          signal(() -> awaitNotFull(waitTimeoutMillis, e));
-        }
-      } while (buffer == null);
+      ByteBuffer buffer = pool.tryTake();
+      if (buffer == null) {
+        buffer = allocateIfFits(bufferCapacity);
+        ephemeralBufferIds.add(identityHashCode(buffer));
+      }
 
       return buffer;
     }
