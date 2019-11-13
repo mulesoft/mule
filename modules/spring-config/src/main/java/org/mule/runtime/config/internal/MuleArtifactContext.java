@@ -329,6 +329,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
     super.prepareBeanFactory(beanFactory);
+    beanFactory.setBeanExpressionResolver(null);
 
     registerEditors(beanFactory);
 
