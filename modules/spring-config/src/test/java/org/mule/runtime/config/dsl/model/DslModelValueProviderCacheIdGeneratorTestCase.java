@@ -49,6 +49,8 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
+import org.mule.runtime.app.declaration.api.ConnectionElementDeclaration;
+import org.mule.runtime.app.declaration.api.GlobalElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
@@ -93,10 +95,14 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
   protected static final String NAMESPACE_URI = "http://www.mulesoft.org/schema/mule/vp-mockns";
   protected static final String SCHEMA_LOCATION = "http://www.mulesoft.org/schema/mule/vp-mockns/current/vp-mule-mockns.xsd";
   protected static final String PARAMETER_IN_GROUP_NAME = "parameterInGroup";
+  protected static final String PARAMETER_IN_GROUP_DEFAULT_VALUE = "parameterInGroup";
   protected static final String CUSTOM_PARAMETER_GROUP_NAME = "customParameterGroupName";
   protected static final String ACTING_PARAMETER_NAME = "actingParameter";
+  protected static final String ACTING_PARAMETER_DEFAULT_VALUE = "actingParameter";
   protected static final String PARAMETER_REQUIRED_FOR_METADATA_NAME = "requiredForMetadata";
+  protected static final String PARAMETER_REQUIRED_FOR_METADATA_DEFAULT_VALUE = "requiredForMetadata";
   protected static final String PROVIDED_PARAMETER_NAME = "providedParameter";
+  protected static final String PROVIDED_PARAMETER_DEFAULT_VALUE = "providedParameter";
   protected static final String EXTENSION_NAME = "extension";
   protected static final String OPERATION_NAME = "mockOperation";
   protected static final String SOURCE_NAME = "source";
@@ -231,11 +237,13 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
       return empty();
     });
 
-    RequiredForMetadataModelProperty requiredForMetadataModelProperty = new RequiredForMetadataModelProperty(asList(PARAMETER_REQUIRED_FOR_METADATA_NAME));
+    RequiredForMetadataModelProperty requiredForMetadataModelProperty =
+        new RequiredForMetadataModelProperty(asList(PARAMETER_REQUIRED_FOR_METADATA_NAME));
 
     when(connectionProvider.getName()).thenReturn(CONNECTION_PROVIDER_NAME);
     when(connectionProvider.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
-    when(connectionProvider.getModelProperty(RequiredForMetadataModelProperty.class)).thenReturn(of(requiredForMetadataModelProperty));
+    when(connectionProvider.getModelProperty(RequiredForMetadataModelProperty.class))
+        .thenReturn(of(requiredForMetadataModelProperty));
 
     when(configuration.getName()).thenReturn(CONFIGURATION_NAME);
     when(configuration.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
@@ -301,52 +309,70 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
     when(extension.getConnectionProviderModel(anyString())).thenReturn(of(connectionProvider));
   }
 
+  private ConfigurationElementDeclaration declareConfig(ConnectionElementDeclaration connectionDeclaration, String name, String parameterRequiredForMetadata, String actingParameter, String providedParameter, String parameterInGroup) {
+    return declarer.newConfiguration(CONFIGURATION_NAME)
+            .withRefName(name)
+            .withParameterGroup(newParameterGroup()
+                                        .withParameter(PARAMETER_REQUIRED_FOR_METADATA_NAME, parameterRequiredForMetadata)
+                                        .withParameter(ACTING_PARAMETER_NAME, actingParameter)
+                                        .withParameter(PROVIDED_PARAMETER_NAME, providedParameter)
+                                        .getDeclaration())
+            .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
+                                        .withParameter(PARAMETER_IN_GROUP_NAME, parameterInGroup)
+                                        .getDeclaration())
+            .withConnection(connectionDeclaration)
+            .getDeclaration();
+  }
+
+  private ConnectionElementDeclaration declareConnection(String parameterRequiredForMetadata, String actingParameter, String providedParameter, String parameterInGroup) {
+    return declarer.newConnection(CONNECTION_PROVIDER_NAME)
+            .withParameterGroup(newParameterGroup()
+                                        .withParameter(PARAMETER_REQUIRED_FOR_METADATA_NAME, parameterRequiredForMetadata)
+                                        .withParameter(ACTING_PARAMETER_NAME, actingParameter)
+                                        .withParameter(PROVIDED_PARAMETER_NAME, providedParameter)
+                                        .getDeclaration())
+            .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
+                                        .withParameter(PARAMETER_IN_GROUP_NAME, parameterInGroup)
+                                        .getDeclaration())
+            .getDeclaration();
+  }
+
 
   private ArtifactDeclaration getBaseApp() {
     return ElementDeclarer.newArtifact()
-        .withGlobalElement(declarer.newConfiguration(CONFIGURATION_NAME)
-            .withRefName(MY_CONFIG)
-            .withParameterGroup(newParameterGroup()
-                .withParameter(PARAMETER_REQUIRED_FOR_METADATA_NAME, "requiredForMetadata")
-                .withParameter(ACTING_PARAMETER_NAME, "actingParameter")
-                .withParameter(PROVIDED_PARAMETER_NAME, "providedParameter")
-                .getDeclaration())
-            .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
-                .withParameter(PARAMETER_IN_GROUP_NAME, "parameterInGroup")
-                .getDeclaration())
-            .withConnection(declarer.newConnection(CONNECTION_PROVIDER_NAME)
-                .withParameterGroup(newParameterGroup()
-                    .withParameter(PARAMETER_REQUIRED_FOR_METADATA_NAME, "requiredForMetadata")
-                    .withParameter(ACTING_PARAMETER_NAME, "actingParameter")
-                    .withParameter(PROVIDED_PARAMETER_NAME, "providedParameter")
-                    .getDeclaration())
-                .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
-                    .withParameter(PARAMETER_IN_GROUP_NAME, "parameterInGroup")
-                    .getDeclaration())
-                .getDeclaration())
-            .getDeclaration())
+        .withGlobalElement(
+                declareConfig(
+                        declareConnection(PARAMETER_REQUIRED_FOR_METADATA_DEFAULT_VALUE,
+                                          ACTING_PARAMETER_DEFAULT_VALUE,
+                                          PROVIDED_PARAMETER_DEFAULT_VALUE,
+                                          PARAMETER_IN_GROUP_DEFAULT_VALUE),
+                        MY_CONFIG,
+                        PARAMETER_REQUIRED_FOR_METADATA_DEFAULT_VALUE,
+                        ACTING_PARAMETER_DEFAULT_VALUE,
+                        PROVIDED_PARAMETER_DEFAULT_VALUE,
+                        PARAMETER_IN_GROUP_DEFAULT_VALUE))
         .withGlobalElement(ElementDeclarer.forExtension(MULE_NAME)
             .newConstruct(FLOW_ELEMENT_IDENTIFIER)
             .withRefName(MY_FLOW)
             .withComponent(
                            declarer.newSource(SOURCE_NAME).withConfig(MY_CONFIG)
                                .withParameterGroup(newParameterGroup()
-                                   .withParameter(ACTING_PARAMETER_NAME, "actingParameter")
-                                   .withParameter(PROVIDED_PARAMETER_NAME, "providedParameter")
+                                   .withParameter(ACTING_PARAMETER_NAME, ACTING_PARAMETER_DEFAULT_VALUE)
+                                   .withParameter(PROVIDED_PARAMETER_NAME, PROVIDED_PARAMETER_DEFAULT_VALUE)
                                    .getDeclaration())
                                .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
-                                   .withParameter(PARAMETER_IN_GROUP_NAME, "parameterInGroup")
+                                   .withParameter(PARAMETER_IN_GROUP_NAME, PARAMETER_IN_GROUP_DEFAULT_VALUE)
                                    .getDeclaration())
                                .getDeclaration())
             .withComponent(
                            declarer.newOperation(OPERATION_NAME)
                                .withConfig(MY_CONFIG)
                                .withParameterGroup(newParameterGroup()
-                                   .withParameter(ACTING_PARAMETER_NAME, "actingParameter")
-                                   .withParameter(PROVIDED_PARAMETER_NAME, "providedParameter")
+                                   .withParameter(ACTING_PARAMETER_NAME, ACTING_PARAMETER_DEFAULT_VALUE)
+                                   .withParameter(PROVIDED_PARAMETER_NAME, PROVIDED_PARAMETER_DEFAULT_VALUE)
                                    .getDeclaration())
                                .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
-                                   .withParameter(PARAMETER_IN_GROUP_NAME, "parameterInGroup")
+                                   .withParameter(PARAMETER_IN_GROUP_NAME, PARAMETER_IN_GROUP_DEFAULT_VALUE)
                                    .getDeclaration())
                                .getDeclaration())
             .getDeclaration())
@@ -388,15 +414,15 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
 
   private String collectLog(ValueProviderCacheId valueProviderCacheId, int level) {
     StringBuilder logId = new StringBuilder();
-    if(level==0) {
+    if (level == 0) {
       logId.append(lineSeparator());
     }
     logId.append(valueProviderCacheId.toString());
-    if(!valueProviderCacheId.getParts().isEmpty()) {
+    if (!valueProviderCacheId.getParts().isEmpty()) {
       int newLevel = level + 1;
       valueProviderCacheId.getParts().forEach(p -> {
         logId.append(lineSeparator());
-        range(0,newLevel).forEach(i -> logId.append(" "));
+        range(0, newLevel).forEach(i -> logId.append(" "));
         logId.append("+-").append(collectLog(p, newLevel));
       });
     }
@@ -404,14 +430,14 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
   }
 
   private void checkIdsAreEqual(Optional<ValueProviderCacheId> id1, Optional<ValueProviderCacheId> id2) {
-    LOGGER.debug("ID1: " + id1.map(i -> collectLog(i,0)).orElse("empty"));
-    LOGGER.debug("ID2: " + id2.map(i -> collectLog(i,0)).orElse("empty"));
+    LOGGER.debug("ID1: " + id1.map(i -> collectLog(i, 0)).orElse("empty"));
+    LOGGER.debug("ID2: " + id2.map(i -> collectLog(i, 0)).orElse("empty"));
     assertThat(id1, equalTo(id2));
   }
 
   private void checkIdsAreDifferent(Optional<ValueProviderCacheId> id1, Optional<ValueProviderCacheId> id2) {
-    LOGGER.debug("ID1: " + id1.map(i -> collectLog(i,0)).orElse("empty"));
-    LOGGER.debug("ID2: " + id2.map(i -> collectLog(i,0)).orElse("empty"));
+    LOGGER.debug("ID1: " + id1.map(i -> collectLog(i, 0)).orElse("empty"));
+    LOGGER.debug("ID2: " + id2.map(i -> collectLog(i, 0)).orElse("empty"));
     assertThat(id1, not(equalTo(id2)));
   }
 
@@ -672,6 +698,32 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
     modifyParameter(app, MY_CONNECTION, PARAMETER_REQUIRED_FOR_METADATA_NAME,
                     p -> p.setValue(ParameterSimpleValue.of("newValue")));
     checkIdsAreDifferent(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+  }
+
+  @Test
+  public void equalConfigsWithDifferentNameGetSameHash() throws Exception{
+    ArtifactDeclaration app = getBaseApp();
+    ConfigurationElementDeclaration config = (ConfigurationElementDeclaration) app.getGlobalElements().get(0);
+    app.addGlobalElement(declareConfig(config.getConnection().get(), "newName",
+                                              PARAMETER_REQUIRED_FOR_METADATA_DEFAULT_VALUE,
+                                              ACTING_PARAMETER_DEFAULT_VALUE,
+                                              PROVIDED_PARAMETER_DEFAULT_VALUE,
+                                              PARAMETER_IN_GROUP_DEFAULT_VALUE)
+    );
+    Optional<ValueProviderCacheId> config1Id = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
+    Optional<ValueProviderCacheId> config2Id = computeIdFor(app, "newName", PROVIDED_PARAMETER_NAME);
+    checkIdsAreEqual(config1Id, config2Id);
+  }
+
+  @Test
+  public void differentValueProviderNameGetsDifferentHash() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    when(valueProviderModel.requiresConnection()).thenReturn(true);
+    when(valueProviderModel.requiresConfiguration()).thenReturn(true);
+    Optional<ValueProviderCacheId> opId1 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    when(valueProviderModel.getProviderName()).thenReturn("newValueProviderName");
+    Optional<ValueProviderCacheId> opId2 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    checkIdsAreDifferent(opId1, opId2);
   }
 
 

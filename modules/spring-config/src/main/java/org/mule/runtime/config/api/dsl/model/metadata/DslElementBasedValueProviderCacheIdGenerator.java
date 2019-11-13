@@ -31,7 +31,7 @@ import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -45,6 +45,7 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
 
   /**
    * {@inheritDoc}
+   * <p/>
    * The returned {@link ValueProviderCacheId} will contain all acting parameters required by the {@link org.mule.runtime.extension.api.values.ValueProvider} as parts.
    * In case the {@link DslElementModel} corresponds to a Source or Operation, if the {@link org.mule.runtime.extension.api.values.ValueProvider} requires a connection or
    * a configuration, their id will be added as part.
@@ -94,12 +95,10 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
                                                                  Map<String, ParameterModelInformation> parameterModelsInformation) {
     List<ValueProviderCacheId> parts = new LinkedList<>();
 
-    resolveDslTagId(containerComponent).ifPresent(parts::add);
-
     parts.add(resolveValueProviderId(valueProviderModel));
     parts.addAll(resolveActingParameterIds(valueProviderModel, parameterModelsInformation));
 
-    return of(aValueProviderCacheId(fromElementWithName(getSourceElementName(containerComponent)).containing(parts)));
+    return of(aValueProviderCacheId(fromElementWithName(resolveDslTag(containerComponent).orElse(getSourceElementName(containerComponent))).containing(parts)));
   }
 
   private Optional<ValueProviderCacheId> resolveForComponentModel(DslElementModel<?> containerComponent,
@@ -107,14 +106,11 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
                                                                   Map<String, ParameterModelInformation> parameterModelsInformation) {
     List<ValueProviderCacheId> parts = new LinkedList<>();
 
-    resolveDslTagId(containerComponent).ifPresent(parts::add);
-
     parts.add(resolveValueProviderId(valueProviderModel));
     parts.addAll(resolveActingParameterIds(valueProviderModel, parameterModelsInformation));
     parts.addAll(resolveIdForInjectedElements(containerComponent, valueProviderModel));
 
-    return of(aValueProviderCacheId(fromElementWithName(getSourceElementName(containerComponent)).containing(parts)));
-
+    return of(aValueProviderCacheId(fromElementWithName(resolveDslTag(containerComponent).orElse(getSourceElementName(containerComponent))).containing(parts)));
   }
 
   private List<ValueProviderCacheId> resolveIdForInjectedElements(DslElementModel<?> containerComponent,
@@ -127,13 +123,13 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
         .flatMap(config -> locator.get(Location.builder().globalName(config).build()));
     if (configDslElementModel.isPresent() && configDslElementModel.get().getModel() instanceof ConfigurationModel) {
       if (valueProviderModel.requiresConfiguration()) {
-        resolveIdForInjectedElement(configDslElementModel.get()).ifPresent(injectableIds::add);
+        resolveIdForInjectedElement(configDslElementModel.get()).ifPresent(id -> injectableIds.add(aValueProviderCacheId(fromElementWithName("config: ").containing(id))));
       }
       if (valueProviderModel.requiresConnection()) {
         configDslElementModel.get().getContainedElements().stream()
             .filter(nested -> nested.getModel() instanceof ConnectionProviderModel).forEach(
                                                                                             connectionProvider -> resolveIdForInjectedElement(connectionProvider)
-                                                                                                .ifPresent(injectableIds::add));
+                                                                                                .ifPresent(id -> injectableIds.add(aValueProviderCacheId(fromElementWithName("connection: ").containing(id)))));
       }
     }
     return injectableIds;
@@ -161,12 +157,13 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
     if (parts.isEmpty()) {
       return empty();
     }
-    return of(aValueProviderCacheId(fromElementWithName(getSourceElementName(injectedElement)).containing(parts)));
+    String sourceElementName = sourceElementNameFromSimpleValue(injectedElement);
+    return of(aValueProviderCacheId(fromElementWithName(sourceElementName).withHashValueFrom(sourceElementName).containing(parts)));
   }
 
   private ValueProviderCacheId resolveValueProviderId(ValueProviderModel valueProviderModel) {
     return aValueProviderCacheId(fromElementWithName("valueProvider: " + valueProviderModel.getProviderName())
-        .withHashValueFrom(valueProviderModel));
+        .withHashValueFrom(valueProviderModel.getProviderName()));
   }
 
   private List<ValueProviderCacheId> resolveActingParameterIds(ValueProviderModel valueProviderModel,
@@ -187,13 +184,12 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
 
   private Optional<ValueProviderCacheId> resolveParameterId(DslElementModel<?> parameterModel) {
     return parameterModel.getValue().map(v -> aValueProviderCacheId(
-                                                                    fromElementWithName(sourceElementNameFromSimpleValue(parameterModel))
+                                                                    fromElementWithName("param:" + sourceElementNameFromSimpleValue(parameterModel))
                                                                         .withHashValueFrom(v)));
   }
 
-  private Optional<ValueProviderCacheId> resolveDslTagId(DslElementModel<?> elementModel) {
-    return elementModel.getIdentifier()
-        .map(id -> aValueProviderCacheId(fromElementWithName(id.toString()).withHashValueFrom(id)));
+  private Optional<String> resolveDslTag(DslElementModel<?> elementModel) {
+    return elementModel.getIdentifier().map(Object::toString);
   }
 
   private class ParameterModelInformation {
