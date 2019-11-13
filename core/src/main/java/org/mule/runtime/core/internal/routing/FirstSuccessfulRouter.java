@@ -16,7 +16,10 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Stack;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -40,7 +43,7 @@ import static reactor.core.publisher.Mono.subscriberContext;
  *
  * @since 4.2.3, 4.3.0
  */
-public class FirstSuccessfulRouter {
+class FirstSuccessfulRouter {
 
   private final Logger LOGGER = getLogger(FirstSuccessfulRouter.class);
   private static final String FIRST_SUCCESSFUL_START_EVENT = "_firstSuccessfulStartEvent";
@@ -63,8 +66,7 @@ public class FirstSuccessfulRouter {
   public FirstSuccessfulRouter(Component owner, Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
     this.owner = owner;
 
-    innerRecorders =
-        IntStream.range(0, routes.size()).mapToObj(x -> new FluxSinkRecorder<CoreEvent>()).collect(Collectors.toList());
+    innerRecorders = routes.stream().map(x -> new FluxSinkRecorder<CoreEvent>()).collect(Collectors.toList());
 
     // Upstream side of until successful chain. Injects events into retrial chain.
     upstreamFlux = Flux.from(publisher)
@@ -120,7 +122,7 @@ public class FirstSuccessfulRouter {
    *
    * @return the successful {@link CoreEvent} or retries exhaustion errors {@link Publisher}
    */
-  public Publisher<CoreEvent> getDownstreamPublisher() {
+  Publisher<CoreEvent> getDownstreamPublisher() {
     return downstreamFlux
         .compose(downstreamPublisher -> subscriberContext().flatMapMany(downstreamContext -> downstreamPublisher
             .doOnSubscribe(s -> {
