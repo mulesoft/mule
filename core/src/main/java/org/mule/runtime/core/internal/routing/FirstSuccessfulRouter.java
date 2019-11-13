@@ -120,7 +120,7 @@ class FirstSuccessfulRouter {
   /**
    * Assembles and returns the downstream {@link Publisher<CoreEvent>}.
    *
-   * @return the successful {@link CoreEvent} or retries exhaustion errors {@link Publisher}
+   * @return the successful {@link CoreEvent} or routing errors {@link Publisher}
    */
   Publisher<CoreEvent> getDownstreamPublisher() {
     return downstreamFlux
