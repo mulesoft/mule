@@ -140,9 +140,7 @@ public class FirstSuccessfulRouter {
     if (next.isPresent()) {
       next.get().next(startEvent(nextEvent));
     } else {
-      downstreamRecorder
-          .next(left(new MessagingException(nextEvent, new CouldNotRouteOutboundMessageException((Processor) owner, error)),
-                     CoreEvent.class));
+      downstreamRecorder.next(left(error, CoreEvent.class));
     }
   }
 
@@ -166,7 +164,7 @@ public class FirstSuccessfulRouter {
           if (object instanceof CoreEvent) {
             executeNext(next, (CoreEvent) object, error);
           } else if (error instanceof MessagingException) {
-            executeNext(next, ((MessagingException) error).getEvent(), error.getCause());
+            executeNext(next, ((MessagingException) error).getEvent(), error);
           }
         });
   }

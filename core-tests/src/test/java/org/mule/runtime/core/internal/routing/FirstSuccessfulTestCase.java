@@ -71,7 +71,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     FirstSuccessful fs = createFirstSuccessfulRouter(nullEventMp);
     fs.setAnnotations(getAppleFlowComponentLocationAnnotations());
     fs.initialise();
-    expectedException.expectCause(instanceOf(CouldNotRouteOutboundMessageException.class));
+    expectedException.expect(NullPointerException.class);
     fs.process(testEvent());
   }
 
