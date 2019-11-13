@@ -10,8 +10,8 @@ import static java.lang.Integer.getInteger;
 import static java.lang.System.getProperty;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_BUCKET_SIZE;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_BUFFER_POOL_SIZE;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_MAX_MEMORY_PERCENTAGE;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_MAX_BUFFER_POOL_SIZE;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_MAX_HEAP_PERCENTAGE;
 
 /**
  * Constants around byte streaming
@@ -37,10 +37,10 @@ public final class ByteStreamingConstants {
    *
    * @since 4.3.0
    */
-  public static final int DEFAULT_BUFFER_POOL_SIZE = getInteger(MULE_STREAMING_BUFFER_POOL_SIZE, 2048);
+  public static final int DEFAULT_BUFFER_POOL_SIZE = getInteger(MULE_STREAMING_MAX_BUFFER_POOL_SIZE, 2048);
 
   private static double getMaxStreamingMemoryPercentage() {
-    String v = getProperty(MULE_STREAMING_MAX_MEMORY_PERCENTAGE);
+    String v = getProperty(MULE_STREAMING_MAX_HEAP_PERCENTAGE);
     return v != null ? Double.valueOf(v) : 0.7;
   }
 

@@ -36,7 +36,7 @@ import org.slf4j.Logger;
  * the {@link ByteBuffer buffers} obtained through this class do not exceed a maximum cap.
  * <p>
  * Said memory cap can be given through either the {@link MuleSystemProperties#MULE_STREAMING_MAX_MEMORY} or
- * {@link MuleSystemProperties#MULE_STREAMING_MAX_MEMORY_PERCENTAGE} system properties. If none is set, the cap will
+ * {@link MuleSystemProperties#MULE_STREAMING_MAX_HEAP_PERCENTAGE} system properties. If none is set, the cap will
  * default to 70% of the total heap.
  * <p>
  * Implementations of this class <b>MUST</b> always implement their allocation logic through the {@link #allocateIfFits(int)}
