@@ -98,7 +98,8 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
     parts.add(resolveValueProviderId(valueProviderModel));
     parts.addAll(resolveActingParameterIds(valueProviderModel, parameterModelsInformation));
 
-    return of(aValueProviderCacheId(fromElementWithName(resolveDslTag(containerComponent).orElse(getSourceElementName(containerComponent))).containing(parts)));
+    return of(aValueProviderCacheId(fromElementWithName(resolveDslTag(containerComponent)
+        .orElse(getSourceElementName(containerComponent))).containing(parts)));
   }
 
   private Optional<ValueProviderCacheId> resolveForComponentModel(DslElementModel<?> containerComponent,
@@ -110,7 +111,8 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
     parts.addAll(resolveActingParameterIds(valueProviderModel, parameterModelsInformation));
     parts.addAll(resolveIdForInjectedElements(containerComponent, valueProviderModel));
 
-    return of(aValueProviderCacheId(fromElementWithName(resolveDslTag(containerComponent).orElse(getSourceElementName(containerComponent))).containing(parts)));
+    return of(aValueProviderCacheId(fromElementWithName(resolveDslTag(containerComponent)
+        .orElse(getSourceElementName(containerComponent))).containing(parts)));
   }
 
   private List<ValueProviderCacheId> resolveIdForInjectedElements(DslElementModel<?> containerComponent,
@@ -123,13 +125,16 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
         .flatMap(config -> locator.get(Location.builder().globalName(config).build()));
     if (configDslElementModel.isPresent() && configDslElementModel.get().getModel() instanceof ConfigurationModel) {
       if (valueProviderModel.requiresConfiguration()) {
-        resolveIdForInjectedElement(configDslElementModel.get()).ifPresent(id -> injectableIds.add(aValueProviderCacheId(fromElementWithName("config: ").containing(id))));
+        resolveIdForInjectedElement(configDslElementModel.get())
+            .ifPresent(id -> injectableIds.add(aValueProviderCacheId(fromElementWithName("config: ").containing(id))));
       }
       if (valueProviderModel.requiresConnection()) {
         configDslElementModel.get().getContainedElements().stream()
             .filter(nested -> nested.getModel() instanceof ConnectionProviderModel).forEach(
                                                                                             connectionProvider -> resolveIdForInjectedElement(connectionProvider)
-                                                                                                .ifPresent(id -> injectableIds.add(aValueProviderCacheId(fromElementWithName("connection: ").containing(id)))));
+                                                                                                .ifPresent(id -> injectableIds
+                                                                                                    .add(aValueProviderCacheId(fromElementWithName("connection: ")
+                                                                                                        .containing(id)))));
       }
     }
     return injectableIds;
@@ -158,7 +163,8 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
       return empty();
     }
     String sourceElementName = sourceElementNameFromSimpleValue(injectedElement);
-    return of(aValueProviderCacheId(fromElementWithName(sourceElementName).withHashValueFrom(sourceElementName).containing(parts)));
+    return of(aValueProviderCacheId(fromElementWithName(sourceElementName).withHashValueFrom(sourceElementName)
+        .containing(parts)));
   }
 
   private ValueProviderCacheId resolveValueProviderId(ValueProviderModel valueProviderModel) {
@@ -184,8 +190,9 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
 
   private Optional<ValueProviderCacheId> resolveParameterId(DslElementModel<?> parameterModel) {
     return parameterModel.getValue().map(v -> aValueProviderCacheId(
-                                                                    fromElementWithName("param:" + sourceElementNameFromSimpleValue(parameterModel))
-                                                                        .withHashValueFrom(v)));
+                                                                    fromElementWithName("param:"
+                                                                        + sourceElementNameFromSimpleValue(parameterModel))
+                                                                            .withHashValueFrom(v)));
   }
 
   private Optional<String> resolveDslTag(DslElementModel<?> elementModel) {
