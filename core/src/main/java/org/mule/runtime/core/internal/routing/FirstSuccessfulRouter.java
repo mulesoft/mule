@@ -7,8 +7,8 @@
 package org.mule.runtime.core.internal.routing;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
@@ -28,8 +28,8 @@ import java.util.stream.IntStream;
 
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.api.functional.Either.left;
-import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.core.api.functional.Either.left;
+import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
