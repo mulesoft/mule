@@ -18,7 +18,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.internal.streaming.DefaultMemoryManager;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
 
@@ -37,18 +36,14 @@ import org.vibur.objectpool.PoolService;
 import org.vibur.objectpool.util.MultithreadConcurrentQueueCollection;
 
 /**
- * {@link ByteBufferManager} implementation which pools instances for better performance.
+ * {@link MemoryBoundByteBufferManager} implementation which pools instances for better performance.
  * <p>
  * Buffers are kept in separate pools depending on their capacity.
  * <p>
- * Idle buffers and capacity pools are automatically expired.
+ * Idle capacity pools are automatically expired, but items in each pool are never reclaimed.
  * <p>
- * Unlike traditional pools which are exhausted in terms of number of instances, we don't care about
- * the number of buffers pooled but in the amount of memory they retain. This pool will be exhausted
- * when a certain threshold of retained memory is reached. When exhausted, invocations to
- * {@link #allocate(int)} will block until more memory becomes available (by invoking {@link #deallocate(ByteBuffer)}).
- * If {@link #allocate(int)} is blocked by more than {@link #memoryExhaustedWaitTimeoutMillis} milliseconds, then a
- * {@link MaxStreamingMemoryExceededException} is thrown.
+ * Unlike traditional pools, if a pool is exhausted then an ephemeral {@link ByteBuffer} will be produced. That instance
+ * must still be returned through the {@link #deallocate(ByteBuffer)} method.
  *
  * @since 4.0
  */
@@ -207,7 +202,7 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
           pool.restore(buffer);
         }
       } finally {
-        signalPoolNotFull();
+        signalMemoryAvailable();
       }
     }
 

@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
 
 /**
- * Simple implementation of {@link ByteBufferManager}
+ * Basic implementation of {@link MemoryBoundByteBufferManager}
  *
- * @since 4.0
+ * @since 4.3.0
  */
 public class SimpleByteBufferManager extends MemoryBoundByteBufferManager {
 
