@@ -32,6 +32,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Mono.subscriberContext;
 
+/**
+ * Router with {@link FirstSuccessful} routing logic.
+ *
+ * The routing chain isolation is implemented using two {@link reactor.core.publisher.FluxSink}s, one for the entry inside the
+ * routing chain, and another for publishing successful events, or exhaustion errors.
+ *
+ * @since 4.2.3, 4.3.0
+ */
 public class FirstSuccessfulRouter {
 
   private final Logger LOGGER = getLogger(FirstSuccessfulRouter.class);
@@ -46,7 +54,7 @@ public class FirstSuccessfulRouter {
   private final EventInternalContextResolver<Stack<CoreEvent>> nextExecutionContextResolver =
       new EventInternalContextResolver<>(FIRST_SUCCESSFUL_START_EVENT, Stack::new);
 
-  // When using an until successful scope in a blocking flow (for example, calling the owner flow with a Processor#process call),
+  // When using a first successful scope in a blocking flow (for example, calling the owner flow with a Processor#process call),
   // this leads to a reactor completion signal being emitted while the event is being re-injected for retrials. This is solved by
   // deferring the downstream publisher completion until all events have evacuated the scope.
   private final AtomicInteger inflightEvents = new AtomicInteger(0);
@@ -112,7 +120,7 @@ public class FirstSuccessfulRouter {
    *
    * @return the successful {@link CoreEvent} or retries exhaustion errors {@link Publisher}
    */
-  Publisher<CoreEvent> getDownstreamPublisher() {
+  public Publisher<CoreEvent> getDownstreamPublisher() {
     return downstreamFlux
         .compose(downstreamPublisher -> subscriberContext().flatMapMany(downstreamContext -> downstreamPublisher
             .doOnSubscribe(s -> {
@@ -133,6 +141,7 @@ public class FirstSuccessfulRouter {
   private void executeNext(Optional<FluxSinkRecorder<CoreEvent>> next, CoreEvent event, Throwable error) {
     Stack<CoreEvent> nextEventContainer = nextExecutionContextResolver.getCurrentContextFromEvent(event);
     CoreEvent nextEvent = nextEventContainer.pop();
+    // If there is another route to execute, use it. If there isn't, then finish with an error
     if (next.isPresent()) {
       next.get().next(startEvent(nextEvent));
     } else {
@@ -145,6 +154,7 @@ public class FirstSuccessfulRouter {
     return Flux.create(innerRecorder)
         .transform(innerPublisher -> applyWithChildContext(innerPublisher, route.getProcessor(), of(owner.getLocation())))
         .doOnNext(successfulEvent -> {
+          // If event finishes with error, then it must be treated as an error
           if (successfulEvent.getError().isPresent()) {
             executeNext(next, successfulEvent, successfulEvent.getError().get().getCause());
             return;
@@ -164,7 +174,5 @@ public class FirstSuccessfulRouter {
           }
         });
   }
-
-
 
 }
