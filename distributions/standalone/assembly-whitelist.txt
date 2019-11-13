@@ -315,7 +315,7 @@
 /mule-standalone-${productVersion}/lib/opt/jaxen-1.1.1.jar
 /mule-standalone-${productVersion}/lib/opt/jboss-logging-3.0.0.Beta5.jar
 /mule-standalone-${productVersion}/lib/opt/jbossjta-4.15.0.Final.jar
-/mule-standalone-${productVersion}/lib/opt/jcifs-1.3.3.jar
+/mule-standalone-${productVersion}/lib/opt/jcifs-1.3.19.jar
 /mule-standalone-${productVersion}/lib/opt/jcodings-1.0.45.jar
 /mule-standalone-${productVersion}/lib/opt/jdom-1.1.3.jar
 /mule-standalone-${productVersion}/lib/opt/jdom2-2.0.6.jar
