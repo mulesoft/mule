@@ -89,7 +89,7 @@
         <dependency>
             <groupId>org.samba.jcifs</groupId>
             <artifactId>jcifs</artifactId>
-            <version>1.3.3</version>
+            <version>${jcifsVersion}</version>
         </dependency>
         <dependency>
             <groupId>joda-time</groupId>
