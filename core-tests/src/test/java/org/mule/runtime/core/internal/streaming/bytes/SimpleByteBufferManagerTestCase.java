@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
+import static org.mule.runtime.core.internal.streaming.bytes.MemoryBoundByteBufferManager.DEFAULT_MEMORY_EXHAUSTED_WAIT_TIME;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 
 import org.mule.runtime.core.internal.streaming.MemoryManager;
@@ -15,15 +16,15 @@ import io.qameta.allure.Feature;
 
 @SmallTest
 @Feature(STREAMING)
-public class PoolingByteBufferManagerTestCase extends MemoryBoundByteBufferManagerContractTestCase {
+public class SimpleByteBufferManagerTestCase extends MemoryBoundByteBufferManagerContractTestCase {
 
   @Override
   protected MemoryBoundByteBufferManager createDefaultBoundBuffer() {
-    return new PoolingByteBufferManager();
+    return new SimpleByteBufferManager();
   }
 
   @Override
   protected MemoryBoundByteBufferManager createBuffer(MemoryManager memoryManager, int capacity, long waitTimeoutMillis) {
-    return new PoolingByteBufferManager(memoryManager, 2, capacity, waitTimeoutMillis);
+    return new SimpleByteBufferManager(memoryManager, DEFAULT_MEMORY_EXHAUSTED_WAIT_TIME);
   }
 }

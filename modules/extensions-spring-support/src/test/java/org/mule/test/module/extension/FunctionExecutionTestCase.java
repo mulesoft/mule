@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.tck.core.streaming.SimpleByteBufferManager;
+import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 
 import java.io.InputStream;
