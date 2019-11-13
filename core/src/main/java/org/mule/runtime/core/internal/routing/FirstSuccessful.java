@@ -6,42 +6,85 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.routing.CouldNotRouteOutboundMessageException;
-import org.mule.runtime.core.privileged.routing.outbound.AbstractOutboundRouter;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.privileged.processor.Router;
+import org.reactivestreams.Publisher;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 
 /**
  * FirstSuccessful routes an event to the first target route that can accept it without throwing or returning an exception. If no
  * such route can be found, an exception is thrown. Note that this works more reliable with synchronous targets, but no such
  * restriction is imposed.
  */
-public class FirstSuccessful extends AbstractOutboundRouter {
+public class FirstSuccessful extends AbstractComponent implements Router, Lifecycle, MuleContextAware {
 
-  private RoutingStrategy routingStrategy;
+  private final List<ProcessorRoute> routes = new ArrayList<>();
+  private MuleContext muleContext;
+
 
   @Override
   public void initialise() throws InitialisationException {
-    super.initialise();
-    routingStrategy =
-        new FirstSuccessfulRoutingStrategy(this::doProcessRoute);
-  }
-
-  /**
-   * Route the given event to one of our targets
-   */
-  @Override
-  public CoreEvent route(CoreEvent event) throws MuleException {
-    try {
-      return routingStrategy.route(event, getRoutes());
-    } catch (RoutingFailedException e) {
-      throw new CouldNotRouteOutboundMessageException(this, e);
+    for (ProcessorRoute route : routes) {
+      initialiseIfNeeded(route, muleContext);
     }
   }
 
   @Override
-  public boolean isMatch(CoreEvent event, CoreEvent.Builder builder) throws MuleException {
-    return true;
+  public void start() throws MuleException {
+    for (ProcessorRoute route : routes) {
+      route.start();
+    }
   }
+
+  @Override
+  public void stop() throws MuleException {
+    for (ProcessorRoute route : routes) {
+      route.stop();
+    }
+  }
+
+  @Override
+  public void dispose() {
+    for (ProcessorRoute route : routes) {
+      route.dispose();
+    }
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
+  }
+
+  @Override
+  public CoreEvent process(CoreEvent event) throws MuleException {
+    return processToApply(event, this);
+  }
+
+  public void addRoute(final Processor processor) {
+    routes.add(new ProcessorRoute(processor));
+  }
+
+  public void setRoutes(Collection<Processor> routes) {
+    routes.forEach(this::addRoute);
+  }
+
+  @Override
+  public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+    return new FirstSuccessfulRouter(this, publisher, routes).getDownstreamPublisher();
+  }
+
+
 }

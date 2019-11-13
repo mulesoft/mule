@@ -432,11 +432,10 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("counterVariableName", fromSimpleParameter("counterVariableName").build())
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(Processor.class).build())
         .build());
-    componentBuildingDefinitions
-        .add(baseDefinition.withIdentifier(FIRST_SUCCESSFUL).withTypeDefinition(fromType(FirstSuccessful.class))
-            .withSetterParameterDefinition(MESSAGE_PROCESSORS,
-                                           fromChildCollectionConfiguration(MessageProcessorChain.class).build())
-            .build());
+    componentBuildingDefinitions.add(baseDefinition.withIdentifier(FIRST_SUCCESSFUL)
+        .withTypeDefinition(fromType(FirstSuccessful.class))
+        .withSetterParameterDefinition("routes", fromChildCollectionConfiguration(MessageProcessorChain.class).build())
+        .build());
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(ROUND_ROBIN)
         .withTypeDefinition(fromType(RoundRobin.class))
         .withSetterParameterDefinition("routes", fromChildCollectionConfiguration(MessageProcessorChain.class).build())
