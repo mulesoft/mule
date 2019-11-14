@@ -208,7 +208,7 @@
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>
-        <muleMvelVersion>2.1.9-MULE-020</muleMvelVersion>
+        <muleMvelVersion>2.1.9-MULE-021</muleMvelVersion>
         <mx4jVersion>2.1.1</mx4jVersion>
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <ognlVersion>2.7.3</ognlVersion>
