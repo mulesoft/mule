@@ -37,6 +37,7 @@ import org.junit.Test;
 public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase {
 
   private static final String PERSON_TYPE_ID = "http://example.com/example.json";
+  private static final String PERSONS_TYPE_ID = "http://example.com/persons.json";
 
   private ExtensionModel extension = loadExtension(MetadataExtension.class);
 
@@ -51,6 +52,15 @@ public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase
   public void withOutputXmlStaticType() throws Exception {
     OperationModel o = getOperation("xmlOutput");
     assertXmlOrder(o.getOutput());
+  }
+
+  @Test
+  public void withListOutputXmlStaticType() throws Exception {
+    OperationModel o = getOperation("xmlOutputList");
+
+    MetadataType type = o.getOutput().getType();
+    assertThat(type, is(instanceOf(ArrayType.class)));
+    ArrayType arrayType = (ArrayType) type;
   }
 
   @Test
@@ -74,15 +84,37 @@ public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase
 
   @Test
   public void withArrayOutputJsonType() throws Exception {
-    OperationModel o = getOperation("jsonOutputArray");
+    OperationModel o = getOperation("jsonArrayOutput");
+
+    MetadataType type = o.getOutput().getType();
+    assertThat(type, is(instanceOf(ArrayType.class)));
+    assertThat(getTypeId(type).get(), equalTo(PERSONS_TYPE_ID));
+
+    assertJsonPerson(((ArrayType) type).getType());
+  }
+
+  @Test
+  public void withOutputJsonTypeList() throws Exception {
+    OperationModel o = getOperation("jsonOutputList");
 
     MetadataType type = o.getOutput().getType();
     assertThat(type, is(instanceOf(ArrayType.class)));
 
-    ArrayType arrayType = (ArrayType) type;
-    assertThat(getTypeId(type).get(), equalTo(PERSON_TYPE_ID));
+    assertJsonPerson(((ArrayType) type).getType());
+  }
 
-    assertJsonPerson(arrayType.getType());
+  @Test
+  public void withOutputJsonArrayTypeList() throws Exception {
+    OperationModel o = getOperation("jsonArrayOutputList");
+
+    MetadataType type = o.getOutput().getType();
+    assertThat(type, is(instanceOf(ArrayType.class)));
+
+    MetadataType innerType = ((ArrayType) type).getType();
+    assertThat(innerType, is(instanceOf(ArrayType.class)));
+    assertThat(getTypeId(innerType).get(), equalTo(PERSONS_TYPE_ID));
+
+    assertJsonPerson(((ArrayType) innerType).getType());
   }
 
   @Test

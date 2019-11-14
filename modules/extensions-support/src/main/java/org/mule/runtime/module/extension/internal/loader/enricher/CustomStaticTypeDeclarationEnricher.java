@@ -17,6 +17,10 @@ import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.INI
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 
 import org.mule.metadata.api.annotation.TypeAnnotation;
+import org.mule.metadata.api.builder.ArrayTypeBuilder;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.metadata.json.api.JsonTypeLoader;
@@ -82,8 +86,10 @@ public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnr
         operation.getModelProperty(ImplementingMethodModelProperty.class)
             .map(ImplementingMethodModelProperty::getMethod)
             .ifPresent(method -> {
-              getOutputType(method).ifPresent(type -> declareCustomType(operation.getOutput(), type));
-              getAttributesType(method).ifPresent(type -> declareCustomType(operation.getOutputAttributes(), type));
+              getOutputType(method, operation.getOutput().getType())
+                  .ifPresent(type -> declareCustomType(operation.getOutput(), type));
+              getAttributesType(method, operation.getOutputAttributes().getType())
+                  .ifPresent(type -> declareCustomType(operation.getOutputAttributes(), type));
             });
         declareParametersCustomStaticTypes(operation);
       }
@@ -93,8 +99,9 @@ public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnr
         source.getModelProperty(ImplementingTypeModelProperty.class)
             .map(ImplementingTypeModelProperty::getType)
             .ifPresent(clazz -> {
-              getOutputType(clazz).ifPresent(type -> declareCustomType(source.getOutput(), type));
-              getAttributesType(clazz).ifPresent(type -> declareCustomType(source.getOutputAttributes(), type));
+              getOutputType(clazz, source.getOutput().getType()).ifPresent(type -> declareCustomType(source.getOutput(), type));
+              getAttributesType(clazz, source.getOutputAttributes().getType())
+                  .ifPresent(type -> declareCustomType(source.getOutputAttributes(), type));
             });
 
         source.getSuccessCallback().ifPresent(this::declareParametersCustomStaticTypes);
@@ -111,14 +118,14 @@ public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnr
     }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
   }
 
-  private Optional<MetadataType> getAttributesType(AnnotatedElement element) {
+  private Optional<MetadataType> getAttributesType(AnnotatedElement element, MetadataType declarationOutputType) {
     AttributesXmlType xml = element.getAnnotation(AttributesXmlType.class);
     if (xml != null) {
-      return getXmlType(xml.schema(), xml.qname());
+      return resolveType(getXmlType(xml.schema(), xml.qname()), declarationOutputType);
     }
     AttributesJsonType json = element.getAnnotation(AttributesJsonType.class);
     if (json != null) {
-      return getJsonType(json.schema());
+      return resolveType(getJsonType(json.schema()), declarationOutputType);
     }
     OutputResolver resolver = element.getAnnotation(OutputResolver.class);
     if (resolver != null && isStaticResolver(resolver.attributes())) {
@@ -131,14 +138,14 @@ public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnr
     return empty();
   }
 
-  private Optional<MetadataType> getOutputType(AnnotatedElement element) {
+  private Optional<MetadataType> getOutputType(AnnotatedElement element, MetadataType declarationOutputType) {
     OutputXmlType xml = element.getAnnotation(OutputXmlType.class);
     if (xml != null) {
-      return getXmlType(xml.schema(), xml.qname());
+      return resolveType(getXmlType(xml.schema(), xml.qname()), declarationOutputType);
     }
     OutputJsonType json = element.getAnnotation(OutputJsonType.class);
     if (json != null) {
-      return getJsonType(json.schema());
+      return resolveType(getJsonType(json.schema()), declarationOutputType);
     }
     OutputResolver resolver = element.getAnnotation(OutputResolver.class);
     if (resolver != null && isStaticResolver(resolver.output())) {
@@ -149,6 +156,15 @@ public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnr
       return getCustomStaticType(scope.outputResolver());
     }
     return empty();
+  }
+
+  private Optional<MetadataType> resolveType(Optional<MetadataType> metadataType, MetadataType declarationOutputType) {
+    if (declarationOutputType instanceof ArrayType) {
+      ArrayTypeBuilder arrayMetadataBuilder = BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType();
+      metadataType.ifPresent(type -> arrayMetadataBuilder.of(type));
+      return Optional.of(arrayMetadataBuilder.build());
+    }
+    return metadataType;
   }
 
   private Optional<MetadataType> getInputType(AnnotatedElement element) {
