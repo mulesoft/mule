@@ -9,18 +9,18 @@ package org.mule.runtime.core.api.transformer;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.noCurrentEventForTransformer;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.privileged.transformer.TransformerUtils.checkTransformerReturnClass;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -105,7 +105,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
             .debug("Source type is incompatible with this transformer and property 'ignoreBadInput' is set to true, so the transformer chain will continue.");
         return src;
       } else {
-        I18nMessage msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(), src.getClass());
+        I18nMessage msg = transformOnObjectUnsupportedTypeOfEndpoint(getName(), src.getClass());
         throw new MessageTransformerException(msg, this, event.getMessage());
       }
     }
@@ -126,7 +126,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
       message = of(src);
     } else {
       if (event == null) {
-        throw new MessageTransformerException(CoreMessages.noCurrentEventForTransformer(), this, null);
+        throw new MessageTransformerException(noCurrentEventForTransformer(), this, null);
       }
       message = event.getMessage();
     }
@@ -137,9 +137,11 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
       Object result;
       // TODO MULE-9342 Clean up transformer vs message transformer confusion
       if (event == null) {
-        ComponentLocation location = getLocation() != null ? getLocation() : fromSingleComponent("AbstractMessageTransformer");
-        eventCtx = create(flowConstruct, location);
-        event = InternalEvent.builder(eventCtx).message(message).build();
+        eventCtx = create(flowConstruct,
+                          getLocation() != null
+                              ? getLocation()
+                              : fromSingleComponent("AbstractMessageTransformer"));
+        event = createTransformationEvent(message, eventCtx);
       }
 
       result = transformMessage(event, enc);
@@ -154,6 +156,10 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
         ((BaseEventContext) eventCtx).success();
       }
     }
+  }
+
+  protected CoreEvent createTransformationEvent(Message message, EventContext eventCtx) {
+    return InternalEvent.builder(eventCtx).message(message).build();
   }
 
   /**

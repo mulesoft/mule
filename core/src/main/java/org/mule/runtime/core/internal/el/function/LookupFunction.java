@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.el.function;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_MAP;
 import static java.util.Optional.of;
@@ -106,6 +107,7 @@ public class LookupFunction implements ExpressionFunction {
                                                                   error.getDescription())),
                                        error.getCause());
       } catch (InterruptedException e) {
+        currentThread().interrupt();
         if (lookupResultFuture != null) {
           lookupResultFuture.cancel(true);
         }
@@ -116,7 +118,8 @@ public class LookupFunction implements ExpressionFunction {
         }
         throw new MuleRuntimeException(createStaticMessage(format("Flow '%s' has timed out after %d millis",
                                                                   flowName,
-                                                                  timeout)));
+                                                                  timeout)),
+                                       e);
       }
     } else {
       throw new IllegalArgumentException(format("Component '%s' is not a flow.", flowName));
