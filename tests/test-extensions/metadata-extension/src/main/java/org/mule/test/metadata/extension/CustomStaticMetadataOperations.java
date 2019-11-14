@@ -26,6 +26,8 @@ import org.mule.test.metadata.extension.resolver.JsonInputStaticTypeResolver;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class CustomStaticMetadataOperations {
@@ -34,11 +36,19 @@ public class CustomStaticMetadataOperations {
   public static final String CSV_VALUE = "Name,LastName\\njuan,desimoni\\nesteban,wasinger";
   public static final String XML_VALUE = IOUtils.toString(cl.getResourceAsStream("order.xml"));
   public static final String JSON_VALUE = "{\"age\":12,\"dni\": 1478231}";
-  public static final String JSON_ARRAY_VALUE = "[{\"age\":12,\"dni\": 1478231}, {\"age\":25,\"dni\": 37562148]";
+  public static final String JSON_ARRAY_VALUE = "[{\"age\":12,\"dni\": 1478231}, {\"age\":25,\"dni\": 37562148}]";
 
   @OutputXmlType(schema = "order.xsd", qname = "shiporder")
   public InputStream xmlOutput() {
     return cl.getResourceAsStream("order.xml");
+  }
+
+  @OutputXmlType(schema = "order.xsd", qname = "shiporder")
+  public List<InputStream> xmlOutputList() {
+    ArrayList xmlList = new ArrayList();
+    xmlList.add(cl.getResourceAsStream("order.xml"));
+    xmlList.add(cl.getResourceAsStream("order.xml"));
+    return xmlList;
   }
 
   @OutputXmlType(schema = "order.xsd", qname = "shiporder")
@@ -52,8 +62,24 @@ public class CustomStaticMetadataOperations {
   }
 
   @OutputJsonType(schema = "persons-schema.json")
-  public InputStream jsonOutputArray() {
+  public InputStream jsonArrayOutput() {
     return new ByteArrayInputStream(JSON_ARRAY_VALUE.getBytes());
+  }
+
+  @OutputJsonType(schema = "person-schema.json")
+  public List<String> jsonOutputList() {
+    ArrayList jsonList = new ArrayList();
+    jsonList.add(JSON_VALUE);
+    jsonList.add(JSON_VALUE);
+    return jsonList;
+  }
+
+  @OutputJsonType(schema = "persons-schema.json")
+  public List<String> jsonArrayOutputList() {
+    ArrayList jsonArrayList = new ArrayList();
+    jsonArrayList.add(JSON_ARRAY_VALUE);
+    jsonArrayList.add(JSON_ARRAY_VALUE);
+    return jsonArrayList;
   }
 
   @MediaType(value = "application/json")

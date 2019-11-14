@@ -24,6 +24,10 @@
         <metadata:xml-output/>
     </flow>
 
+    <flow name="xmlOutputList">
+        <metadata:xml-output-list/>
+    </flow>
+
     <flow name="jsonInputToMap">
         <set-payload value="#[%dw 2.0 output application/json --- {age: 12, dni: 1478231}]"/>
         <metadata:json-input-map json="#[payload]"/>
@@ -36,6 +40,18 @@
 
     <flow name="jsonOutput">
         <metadata:json-output/>
+    </flow>
+
+    <flow name="jsonArrayOutput">
+        <metadata:json-array-output/>
+    </flow>
+
+    <flow name="jsonOutputList">
+        <metadata:json-output-list/>
+    </flow>
+
+    <flow name="jsonArrayOutputList">
+        <metadata:json-array-output-list/>
     </flow>
 
     <flow name="onSuccessCustomType" initialState="stopped">
