@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.component;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -66,14 +67,12 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
 
   @Override
   public final CompletableFuture<Event> execute(Event event) {
-    boolean localEventCtx = false;
     CoreEvent internalEvent = null;
     if (event instanceof CoreEvent) {
       BaseEventContext child = createChildEventContext(event.getContext());
       internalEvent = quickCopy(child, (CoreEvent) event);
     } else {
-      localEventCtx = true;
-      internalEvent = CoreEvent.builder(createEventContext(null))
+      internalEvent = CoreEvent.builder(createEventContext(empty()))
           .message(event.getMessage())
           .error(event.getError().orElse(null))
           .variables(event.getVariables())
@@ -84,7 +83,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
         .map(r -> quickCopy(event.getContext(), r))
         .cast(Event.class)
         .toFuture();
-    return localEventCtx ? future : withCallbacks(future, internalEvent.getContext());
+    return withCallbacks(future, internalEvent.getContext());
   }
 
   /**
@@ -100,13 +99,11 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
    * @throws ComponentExecutionException if there is an unhandled error within the execution
    */
   public final CompletableFuture<Event> execute(Event event, Consumer<CoreEvent.Builder> childEventContributor) {
-    boolean localEventCtx = false;
     EventContext child = null;
     if (event instanceof CoreEvent) {
       child = createChildEventContext(event.getContext());
     } else {
-      child = createEventContext(null);
-      localEventCtx = true;
+      child = createEventContext(empty());
     }
 
     final Builder internalEventBuilder = CoreEvent.builder(child)
@@ -119,7 +116,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
         .map(r -> quickCopy(event.getContext(), r))
         .cast(Event.class)
         .toFuture();
-    return localEventCtx ? future : withCallbacks(future, child);
+    return withCallbacks(future, child);
   }
 
   private CompletableFuture<Event> withCallbacks(CompletableFuture<Event> future, EventContext context) {

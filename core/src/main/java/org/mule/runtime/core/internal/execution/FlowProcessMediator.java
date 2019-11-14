@@ -176,6 +176,9 @@ public class FlowProcessMediator implements Initialisable {
             .resolve(new MessagingException(event, e), muleContext),
                                              template.getFailedExecutionResponseParametersFunction().apply(event),
                                              always(() -> phaseResultNotifier.phaseFailure(e)));
+
+        ((BaseEventContext) event.getContext()).error(e);
+        responseCompletion.complete(null);
       }
     } catch (Exception e) {
       phaseResultNotifier.phaseFailure(e);
