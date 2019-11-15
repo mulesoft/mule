@@ -101,7 +101,7 @@ public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase
 
   @Test
   public void withArrayOutputJsonType() throws Exception {
-    OperationModel o = getOperation("jsonArrayOutput");
+    OperationModel o = getOperation("jsonOutputArray");
 
     MetadataType type = o.getOutput().getType();
     assertThat(type, is(instanceOf(ArrayType.class)));
