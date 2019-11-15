@@ -77,7 +77,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
 
 
 
-  private static final Integer DEFAULT_ASYNC_TEST_CONNECTIVITY_TIMEOUT = 10000;
+  private static final Integer DEFAULT_ASYNC_TEST_CONNECTIVITY_TIMEOUT = 30000;
 
   private static final int ASYNC_TEST_CONNECTIVITY_TIMEOUT =
       getInteger(ASYNC_TEST_CONNECTIVITY_TIMEOUT_PROPERTY, DEFAULT_ASYNC_TEST_CONNECTIVITY_TIMEOUT);
