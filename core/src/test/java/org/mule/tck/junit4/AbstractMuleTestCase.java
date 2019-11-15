@@ -16,12 +16,15 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.DisableOnDebug;
 import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
 import org.mule.RequestContext;
+import org.mule.session.SerializeAndEncodeSessionHandler;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.junit4.rule.WarningTimeout;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
@@ -42,6 +45,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assume.assumeThat;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.session.SerializeAndEncodeSessionHandler.SESSION_SIGN_SECRET_KEY;
 
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule test cases. This
@@ -89,6 +94,9 @@ public abstract class AbstractMuleTestCase
     }
 
     private static final Logger LOGGER = getLogger(AbstractMuleTestCase.class);
+
+    @ClassRule
+    public static SystemProperty sessionSignKey = new SystemProperty(SESSION_SIGN_SECRET_KEY, "HaveYouEverBeenAloneAtNight?");
 
     /**
      * Should be set to a string message describing any prerequisites not met.

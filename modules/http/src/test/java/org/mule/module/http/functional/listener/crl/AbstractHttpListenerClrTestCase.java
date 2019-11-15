@@ -35,7 +35,7 @@ import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 @RunWith(PowerMockRunner.class)
 @PowerMockRunnerDelegate(Parameterized.class)
 @PrepareForTest(GrizzlyServerManager.class)
-@PowerMockIgnore({"javax.management.*", "javax.net.ssl.*"})
+@PowerMockIgnore({"javax.management.*", "javax.net.ssl.*", "javax.crypto.*"})
 public abstract class AbstractHttpListenerClrTestCase extends AbstractHttpTlsRevocationTestCase
 {
     Throwable revocationException ;
