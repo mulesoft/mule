@@ -60,7 +60,9 @@ public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase
 
     MetadataType type = o.getOutput().getType();
     assertThat(type, is(instanceOf(ArrayType.class)));
-    ArrayType arrayType = (ArrayType) type;
+    MetadataType innerType = ((ArrayType) type).getType();
+    assertThat(innerType.getMetadataFormat(), is(XML));
+    assertThat(innerType.toString(), is("#root:shiporder"));
   }
 
   @Test
@@ -74,6 +76,21 @@ public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase
     OperationModel o = getOperation("jsonInputStream");
     ParameterModel param = o.getAllParameterModels().get(0);
     assertJsonPerson(param);
+  }
+
+  @Test
+  public void withInputJsonMapType() throws Exception {
+    OperationModel o = getOperation("jsonInputMap");
+    MetadataType type = o.getAllParameterModels().get(0).getType();
+    assertJsonPerson(type);
+  }
+
+  @Test
+  public void withInputJsonListType() throws Exception {
+    OperationModel o = getOperation("jsonInputList");
+    MetadataType type = o.getAllParameterModels().get(0).getType();
+    assertThat(type, is(instanceOf(ArrayType.class)));
+    assertJsonPerson(((ArrayType) type).getType());
   }
 
   @Test
@@ -104,7 +121,17 @@ public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase
   }
 
   @Test
-  public void withOutputJsonArrayTypeList() throws Exception {
+  public void withOutputJsonTypePagingProvider() throws Exception {
+    OperationModel o = getOperationFromDefaultConfig("jsonOutputPagingProvider");
+
+    MetadataType type = o.getOutput().getType();
+    assertThat(type, is(instanceOf(ArrayType.class)));
+
+    assertJsonPerson(((ArrayType) type).getType());
+  }
+
+  @Test
+  public void withArrayOutputJsonTypeList() throws Exception {
     OperationModel o = getOperation("jsonArrayOutputList");
 
     MetadataType type = o.getOutput().getType();
@@ -121,6 +148,47 @@ public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase
   public void withOutputAttributesJsonType() throws Exception {
     OperationModel o = getOperation("jsonAttributes");
     assertJsonPerson(o.getOutputAttributes());
+  }
+
+  @Test
+  public void withOutputAttributesJsonArrayType() throws Exception {
+    OperationModel o = getOperation("jsonArrayAttributes");
+
+    MetadataType type = o.getOutputAttributes().getType();
+    assertThat(type, is(instanceOf(ArrayType.class)));
+    assertThat(getTypeId(type).get(), equalTo(PERSONS_TYPE_ID));
+
+    assertJsonPerson(((ArrayType) type).getType());
+  }
+
+  @Test
+  public void withOutputAttributesJsonTypeList() throws Exception {
+    OperationModel o = getOperation("jsonAttributesList");
+
+    MetadataType type = o.getOutputAttributes().getType();
+    assertThat(type, is(instanceOf(ArrayType.class)));
+
+    assertJsonPerson(((ArrayType) type).getType());
+  }
+
+  @Test
+  public void withOutputAttributesJsonArrayTypeList() throws Exception {
+    OperationModel o = getOperation("jsonArrayAttributesList");
+
+    MetadataType type = o.getOutputAttributes().getType();
+    assertThat(type, is(instanceOf(ArrayType.class)));
+
+    MetadataType innerType = ((ArrayType) type).getType();
+    assertThat(innerType, is(instanceOf(ArrayType.class)));
+    assertThat(getTypeId(innerType).get(), equalTo(PERSONS_TYPE_ID));
+
+    assertJsonPerson(((ArrayType) innerType).getType());
+  }
+
+  @Test
+  public void withOutputAttributesJsonTypePagingProviderWithResult() throws Exception {
+    OperationModel o = getOperationFromDefaultConfig("jsonAttributesPagingProviderWithResult");
+    assertJsonPerson(o.getOutputAttributes().getType());
   }
 
   @Test
@@ -217,6 +285,11 @@ public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase
 
   private OperationModel getOperation(String ope) {
     return extension.getOperationModel(ope).orElseThrow(() -> new RuntimeException(ope + " not found"));
+  }
+
+  private OperationModel getOperationFromDefaultConfig(String ope) {
+    return extension.getConfigurationModel("config").get().getOperationModel(ope)
+        .orElseThrow(() -> new RuntimeException(ope + " not found"));
   }
 
   private void assertCustomJsonType(Typed typed) {

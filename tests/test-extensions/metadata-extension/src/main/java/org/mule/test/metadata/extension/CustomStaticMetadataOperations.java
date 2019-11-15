@@ -19,6 +19,7 @@ import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputJsonType;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputXmlType;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.test.metadata.extension.resolver.CsvInputStaticTypeResolver;
 import org.mule.test.metadata.extension.resolver.JavaOutputStaticTypeResolver;
@@ -27,6 +28,7 @@ import org.mule.test.metadata.extension.resolver.JsonInputStaticTypeResolver;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -68,15 +70,39 @@ public class CustomStaticMetadataOperations {
 
   @OutputJsonType(schema = "person-schema.json")
   public List<String> jsonOutputList() {
-    ArrayList jsonList = new ArrayList();
-    jsonList.add(JSON_VALUE);
-    jsonList.add(JSON_VALUE);
-    return jsonList;
+    ArrayList jsonArrayList = new ArrayList<>();
+    jsonArrayList.add(JSON_VALUE);
+    jsonArrayList.add(JSON_VALUE);
+    return jsonArrayList;
+  }
+
+  @OutputJsonType(schema = "person-schema.json")
+  public PagingProvider<MetadataConnection, String> jsonOutputPagingProvider() {
+    return new PagingProvider<MetadataConnection, String>() {
+
+      @Override
+      public List<String> getPage(MetadataConnection connection) {
+        ArrayList jsonArrayList = new ArrayList<>();
+        jsonArrayList.add(JSON_VALUE);
+        jsonArrayList.add(JSON_VALUE);
+        return jsonArrayList;
+      }
+
+      @Override
+      public java.util.Optional<Integer> getTotalResults(MetadataConnection connection) {
+        return java.util.Optional.empty();
+      }
+
+      @Override
+      public void close(MetadataConnection connection) {
+
+      }
+    };
   }
 
   @OutputJsonType(schema = "persons-schema.json")
-  public List<String> jsonArrayOutputList() {
-    ArrayList jsonArrayList = new ArrayList();
+  public LinkedList<String> jsonArrayOutputList() {
+    LinkedList jsonArrayList = new LinkedList();
     jsonArrayList.add(JSON_ARRAY_VALUE);
     jsonArrayList.add(JSON_ARRAY_VALUE);
     return jsonArrayList;
@@ -85,6 +111,10 @@ public class CustomStaticMetadataOperations {
   @MediaType(value = "application/json")
   public String jsonInputStream(@InputJsonType(schema = "person-schema.json") InputStream json) {
     return IOUtils.toString(json);
+  }
+
+  public List<String> jsonInputList(@InputJsonType(schema = "person-schema.json") List<String> json) {
+    return json;
   }
 
   public int jsonInputMap(@InputJsonType(schema = "person-schema.json") Map<String, Object> json) {
@@ -121,6 +151,42 @@ public class CustomStaticMetadataOperations {
   @AttributesJsonType(schema = "person-schema.json")
   public Result<Integer, InputStream> jsonAttributes() {
     return Result.<Integer, InputStream>builder().output(1).build();
+  }
+
+  @AttributesJsonType(schema = "persons-schema.json")
+  public Result<Integer, InputStream> jsonArrayAttributes() {
+    return Result.<Integer, InputStream>builder().output(1).build();
+  }
+
+  @AttributesJsonType(schema = "person-schema.json")
+  public Result<Integer, List<InputStream>> jsonAttributesList() {
+    return Result.<Integer, List<InputStream>>builder().output(1).build();
+  }
+
+  @AttributesJsonType(schema = "persons-schema.json")
+  public Result<Integer, ArrayList<InputStream>> jsonArrayAttributesList() {
+    return Result.<Integer, ArrayList<InputStream>>builder().output(1).build();
+  }
+
+  @AttributesJsonType(schema = "person-schema.json")
+  public PagingProvider<MetadataConnection, Result<Integer, InputStream>> jsonAttributesPagingProviderWithResult() {
+    return new PagingProvider<MetadataConnection, Result<Integer, InputStream>>() {
+
+      @Override
+      public List<Result<Integer, InputStream>> getPage(MetadataConnection connection) {
+        return new ArrayList<>();
+      }
+
+      @Override
+      public java.util.Optional<Integer> getTotalResults(MetadataConnection connection) {
+        return java.util.Optional.empty();
+      }
+
+      @Override
+      public void close(MetadataConnection connection) {
+
+      }
+    };
   }
 
   @OutputResolver(output = JavaOutputStaticTypeResolver.class)
