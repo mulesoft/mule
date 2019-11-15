@@ -72,9 +72,22 @@ import org.mule.runtime.core.internal.exception.RecursiveFlowRefException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+import javax.inject.Inject;
+import javax.xml.namespace.QName;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.springframework.beans.BeansException;
@@ -271,8 +284,10 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
       if (resolvedReferencedProcessor instanceof Flow) {
         pub = from(applyForStaticFlow((Flow) resolvedReferencedProcessor, pub, location));
-      } else {
+      } else if (resolvedReferencedProcessor instanceof MessageProcessorChain) {
         pub = from(applyForStaticSubFlow(resolvedReferencedProcessor, pub, location));
+      } else {
+        pub = from(applyForStaticProcessor(resolvedReferencedProcessor, pub, location));
       }
 
       // This onErrorResume here is intended to handle the recursive error when it happens during subscription
@@ -317,6 +332,14 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
       pub = pub.transform(eventPub -> applyWithChildContext(eventPub, wrapInExceptionMapper(resolvedTarget), location,
                                                             popSubFlowFlowStackElement()));
+
+      return decoratePublisher(pub);
+    }
+
+    private Publisher<CoreEvent> applyForStaticProcessor(ReactiveProcessor resolvedTarget, Flux<CoreEvent> pub,
+                                                         Optional<ComponentLocation> location) {
+      pub = pub.transform(eventPub -> eventPub.flatMap(event -> Mono.just(event).transform(resolvedTarget)
+          .doOnError(exception -> ((BaseEventContext) event.getContext()).error(exception))));
 
       return decoratePublisher(pub);
     }
