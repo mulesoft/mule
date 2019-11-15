@@ -176,6 +176,9 @@ public class ModuleFlowProcessingPhase
             .resolve(new MessagingException(templateEvent, e), muleContext),
                                                   template.getFailedExecutionResponseParametersFunction().apply(templateEvent)))
                                                       .doOnTerminate(() -> phaseResultNotifier.phaseFailure(e)).subscribe();
+
+        ((BaseEventContext) templateEvent.getContext()).error(e);
+        responseCompletion.complete(null);
       }
     } catch (Exception t) {
       phaseResultNotifier.phaseFailure(t);

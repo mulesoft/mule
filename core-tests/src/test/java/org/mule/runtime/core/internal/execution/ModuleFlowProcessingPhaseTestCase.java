@@ -12,6 +12,8 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
@@ -59,21 +61,23 @@ import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.matcher.EventMatcher;
 import org.mule.tck.size.SmallTest;
 
-import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import org.hamcrest.Matchers;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mockito.ArgumentCaptor;
 
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoSink;
@@ -259,7 +263,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
     moduleFlowProcessingPhase.runPhase(template, context, notifier);
 
-    verifyFlowError();
+    verifyFlowError(isErrorTypeFlowFailure());
   }
 
   @Test
@@ -268,7 +272,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
     moduleFlowProcessingPhase.runPhase(template, context, notifier);
 
-    verifyFlowError();
+    verifyFlowError(isErrorTypeFlowFailure());
   }
 
   @Test
@@ -285,7 +289,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     moduleFlowProcessingPhase.runPhase(template, context, notifier);
 
     sinkReference.get().success();
-    verifyFlowError();
+    verifyFlowError(isErrorTypeFlowFailure());
   }
 
   @Test
@@ -343,7 +347,8 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
   @Test
   public void failurePolicyManager() throws Exception {
-    when(policyManager.createSourcePolicyInstance(any(Component.class), any(CoreEvent.class), any(Processor.class),
+    final ArgumentCaptor<CoreEvent> eventCaptor = ArgumentCaptor.forClass(CoreEvent.class);
+    when(policyManager.createSourcePolicyInstance(any(Component.class), eventCaptor.capture(), any(Processor.class),
                                                   any(MessageSourceResponseParametersProcessor.class))).thenThrow(mockException);
     when(template.getFailedExecutionResponseParametersFunction()).thenReturn(coreEvent -> emptyMap());
 
@@ -354,6 +359,8 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(template).sendFailureResponseToClient(any(), any());
     verify(notifier, never()).phaseSuccessfully();
     verify(notifier).phaseFailure(argThat(instanceOf(mockException.getClass())));
+
+    assertThat(((BaseEventContext) eventCaptor.getValue().getContext()).isTerminated(), is(true));
   }
 
   private void verifySuccess() {
@@ -366,11 +373,11 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     verify(template).afterPhaseExecution(any());
   }
 
-  private void verifyFlowError() {
+  private void verifyFlowError(EventMatcher errorTypeMatcher) {
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any());
     verify(template).sendFailureResponseToClient(any(), any());
-    verify(template).afterPhaseExecution(argThat(leftMatches(withEventThat(isErrorTypeFlowFailure()))));
+    verify(template).afterPhaseExecution(argThat(leftMatches(withEventThat(errorTypeMatcher))));
     verify(notifier).phaseSuccessfully();
     verify(notifier, never()).phaseFailure(any());
   }

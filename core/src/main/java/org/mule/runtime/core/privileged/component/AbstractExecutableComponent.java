@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.component;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -18,30 +19,27 @@ import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.execution.ComponentExecutionException;
 import org.mule.runtime.api.component.execution.ExecutableComponent;
+import org.mule.runtime.api.component.execution.ExecutionResult;
+import org.mule.runtime.api.component.execution.InputEvent;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.api.component.execution.InputEvent;
-import org.mule.runtime.api.component.execution.ExecutionResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.MessageProcessors;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 
 import javax.inject.Inject;
 
-import org.reactivestreams.Publisher;
-
 /**
  * Abstract implementation of {@link ExecutableComponent}.
- * 
+ *
  * @since 4.0
  */
 public abstract class AbstractExecutableComponent extends AbstractComponent implements ExecutableComponent {
@@ -59,6 +57,8 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
         .build();
     return from(MessageProcessors.process(event, getExecutableFunction()))
         .onErrorMap(throwable -> {
+          completableFuture.complete(null);
+
           MessagingException messagingException = (MessagingException) throwable;
           CoreEvent messagingExceptionEvent = messagingException.getEvent();
           return new ComponentExecutionException(messagingExceptionEvent.getError().get().getCause(),
@@ -70,18 +70,17 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
 
   @Override
   public final CompletableFuture<Event> execute(Event event) {
-    CoreEvent internalEvent;
-    BaseEventContext child = createChildEventContext(event.getContext());
+    CoreEvent internalEvent = null;
     if (event instanceof CoreEvent) {
-      internalEvent = quickCopy(child, (CoreEvent) event);
+      internalEvent = quickCopy(createChildEventContext(event.getContext()), (CoreEvent) event);
     } else {
-      internalEvent = CoreEvent.builder(createEventContext(null))
+      internalEvent = CoreEvent.builder(createEventContext(empty()))
           .message(event.getMessage())
           .error(event.getError().orElse(null))
           .variables(event.getVariables())
           .build();
     }
-    return from(MessageProcessors.process(internalEvent, getExecutableFunction()))
+    final CompletableFuture<Event> future = from(MessageProcessors.process(internalEvent, getExecutableFunction()))
         .onErrorMap(throwable -> {
           MessagingException messagingException = (MessagingException) throwable;
           CoreEvent messagingExceptionEvent = messagingException.getEvent();
@@ -90,6 +89,19 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
         .map(r -> quickCopy(event.getContext(), r))
         .cast(Event.class)
         .toFuture();
+    return withCallbacks(future, internalEvent.getContext());
+  }
+
+  private CompletableFuture<Event> withCallbacks(CompletableFuture<Event> future, EventContext context) {
+    future.whenComplete((e, t) -> {
+      if (t != null) {
+        ((BaseEventContext) context).error(t);
+      } else {
+        ((BaseEventContext) context).success();
+      }
+    });
+
+    return future;
   }
 
   protected EventContext createEventContext(Optional<CompletableFuture<Void>> externalCompletion) {
@@ -104,7 +116,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
   /**
    * Template method that allows to return a function to execute for this component. It may not be redefine by implementation of
    * this class if they are already instances of {@link Function<Publisher<CoreEvent>, Publisher<InternalEvent>>}
-   * 
+   *
    * @return an executable function. It must not be null.
    */
   protected ReactiveProcessor getExecutableFunction() {
@@ -121,14 +133,15 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
 
   private static class ExecutionResultImplementation implements ExecutionResult {
 
-    private Event result;
-    private CompletableFuture<Void> complete;
+    private final Event result;
+    private final CompletableFuture<Void> complete;
 
     private ExecutionResultImplementation(Event result, CompletableFuture<Void> complete) {
       this.result = result;
       this.complete = complete;
     }
 
+    @Override
     public Event getEvent() {
       return result;
     }

@@ -25,7 +25,7 @@ import java.util.Set;
  */
 public class DefaultEventContextService implements EventContextService {
 
-  private Set<DefaultEventContext> currentContexts = newKeySet(512);
+  private final Set<DefaultEventContext> currentContexts = newKeySet(512);
 
   @Override
   public List<FlowStackEntry> getCurrentlyActiveFlowStacks() {
@@ -51,11 +51,13 @@ public class DefaultEventContextService implements EventContextService {
 
     private final String serverId;
     private final String eventId;
+    private final String originatingLocation;
     private final FlowCallStack flowCallStack;
 
     public DefaultFlowStackEntry(BaseEventContext context) {
       this.serverId = context.getServerId();
       this.eventId = context.getId();
+      this.originatingLocation = context.getOriginatingLocation().getLocation();
       this.flowCallStack = context.getFlowCallStack().clone();
     }
 
@@ -76,7 +78,7 @@ public class DefaultEventContextService implements EventContextService {
 
     @Override
     public String toString() {
-      return "eventId: " + eventId + ";" + lineSeparator() + getFlowCallStack().toString();
+      return "eventId: " + eventId + " @ " + originatingLocation + ";" + lineSeparator() + getFlowCallStack().toString();
     }
   }
 }
