@@ -89,7 +89,7 @@ public class AbstractMessageTransformerTestCase extends AbstractMuleContextTestC
   }
 
   @Test
-  public void doesntCreateTransformationEventIfEventProvided() throws MuleException {
+  public void doesNotCreateTransformationEventIfEventProvided() throws MuleException {
     transformer.transform(Message.of(new Object()), defaultCharset(), testEvent());
     assertThat(builTransformationtEvent, nullValue());
   }
