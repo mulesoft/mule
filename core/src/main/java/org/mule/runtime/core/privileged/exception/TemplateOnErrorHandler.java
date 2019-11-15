@@ -84,7 +84,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private static final String ERROR_EXCEPTION = "error.exception.";
   private static final String ERROR_SINK = "error.sink.";
   private static final String ERROR_SUCCESS_CALLBACK = "error.success.";
-  private static final String ERROR_ERROR_CALLBACK = "error.error.";
+  private static final String ERROR_RETHROWN_CALLBACK = "error.error.";
   private static final String ERROR_EVENT = "error.event.";
 
   @Inject
@@ -149,7 +149,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     CoreEvent failureEvent = messagingError.getEvent();
     routingSink.get().next(quickCopy(failureEvent, of(getParameterId(ERROR_EXCEPTION, failureEvent), error,
                                                       getParameterId(ERROR_SUCCESS_CALLBACK, failureEvent), handledConsumer,
-                                                      getParameterId(ERROR_ERROR_CALLBACK, failureEvent), failureConsumer,
+                                                      getParameterId(ERROR_RETHROWN_CALLBACK, failureEvent), failureConsumer,
                                                       getParameterId(ERROR_EVENT, failureEvent), failureEvent)));
   }
 
@@ -167,7 +167,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private void resolveHandling(CoreEvent result) {
     Exception exception = getException(result);
     Consumer<CoreEvent> successfullyHandledConsumer = getInternalParameter(ERROR_SUCCESS_CALLBACK, result);
-    Consumer<Throwable> errorConsumer = getInternalParameter(ERROR_ERROR_CALLBACK, result);
+    Consumer<Throwable> errorConsumer = getInternalParameter(ERROR_RETHROWN_CALLBACK, result);
     if (exception instanceof MessagingException) {
       final MessagingException messagingEx = (MessagingException) exception;
       if (messagingEx.handled()) {
@@ -213,7 +213,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       }
       CoreEvent result = afterRouting().apply(((MessagingException) me).getEvent());
       fireEndNotification(getOriginalEvent(result), result, me);
-      Consumer<Throwable> sink = getInternalParameter(ERROR_ERROR_CALLBACK, result);
+      Consumer<Throwable> sink = getInternalParameter(ERROR_RETHROWN_CALLBACK, result);
       sink.accept(me);
     };
   }
