@@ -9,6 +9,8 @@ package org.mule.runtime.core.internal.transformer.simple;
 import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
@@ -17,6 +19,8 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
 
+import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
@@ -25,19 +29,23 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class AbstractMessageTransformerTestCase extends AbstractMuleContextTestCase {
 
   private static final byte[] BYTES = "transformed".getBytes();
 
-  AbstractMessageTransformer transformer = new AbstractMessageTransformer() {
+  private InternalEvent builTransformationtEvent;
+
+  private final AbstractMessageTransformer transformer = new AbstractMessageTransformer() {
 
     @Override
     public Object transformMessage(CoreEvent event, Charset outputEncoding) throws MessageTransformerException {
@@ -47,6 +55,12 @@ public class AbstractMessageTransformerTestCase extends AbstractMuleContextTestC
     @Override
     public DataType getReturnDataType() {
       return BYTE_ARRAY;
+    }
+
+    @Override
+    protected CoreEvent createTransformationEvent(Message message, EventContext eventCtx) {
+      builTransformationtEvent = InternalEvent.builder(eventCtx).message(message).build();
+      return builTransformationtEvent;
     }
   };
 
@@ -58,18 +72,37 @@ public class AbstractMessageTransformerTestCase extends AbstractMuleContextTestC
     return singletonMap("errorHandlerFromConfig", errorHandler);
   }
 
+  private MuleContext muleContextSpy;
+
+  @Before
+  public void before() {
+    muleContextSpy = spy(muleContext);
+    transformer.setMuleContext(muleContextSpy);
+  }
+
   @Test
   public void reusesDefaultFlowConstruct() throws MessageTransformerException {
-    MuleContext muleContextSpy = spy(muleContext);
-    transformer.setMuleContext(muleContextSpy);
     transform();
     transform();
     transform();
     verify(muleContextSpy, times(1)).getDefaultErrorHandler(any());
   }
 
+  @Test
+  public void doesNotCreateTransformationEventIfEventProvided() throws MuleException {
+    transformer.transform(Message.of(new Object()), defaultCharset(), testEvent());
+    assertThat(builTransformationtEvent, nullValue());
+  }
+
+  @Test
+  public void createsTransformationEventIfEventNotProvided() throws MessageTransformerException {
+    transformer.transform(Message.of(new Object()), defaultCharset(), null);
+    assertThat(builTransformationtEvent, not(nullValue()));
+    assertThat(builTransformationtEvent.getContext().isTerminated(), is(true));
+  }
+
   private void transform() throws MessageTransformerException {
-    assertThat(transformer.transform(Message.of(new Object()), Charset.defaultCharset(), null), is(BYTES));
+    assertThat(transformer.transform(Message.of(new Object()), defaultCharset(), null), is(BYTES));
   }
 
   @Test

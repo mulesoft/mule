@@ -4,6 +4,15 @@
       "ignore": [
         {
           "code": "java.method.added",
+          "new": "method org.mule.runtime.core.api.event.CoreEvent org.mule.runtime.core.api.transformer.AbstractMessageTransformer::createTransformationEvent(org.mule.runtime.api.message.Message, org.mule.runtime.api.event.EventContext)",
+          "package": "org.mule.runtime.core.api.transformer",
+          "classSimpleName": "AbstractMessageTransformer",
+          "methodName": "createTransformationEvent",
+          "elementKind": "method",
+          "justification": "MULE-17747: Added for testability"
+        },
+        {
+          "code": "java.method.added",
           "new": "method org.mule.runtime.core.api.transaction.Transaction org.mule.runtime.core.api.transaction.DelegateTransactionFactory::beginTransaction(java.lang.String, org.mule.runtime.api.notification.NotificationDispatcher, org.mule.runtime.core.api.SingleResourceTransactionFactoryManager, javax.transaction.TransactionManager) throws org.mule.runtime.api.tx.TransactionException",
           "package": "org.mule.runtime.core.api.transaction",
           "classSimpleName": "DelegateTransactionFactory",

@@ -14,6 +14,9 @@ import org.mule.runtime.core.internal.execution.ModuleFlowProcessingTemplate;
 import org.mule.runtime.core.internal.execution.NotificationFunction;
 
 import java.util.List;
+import java.util.Map;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Custom scheduler's flow processing template.
@@ -22,7 +25,7 @@ import java.util.List;
  */
 final class SchedulerFlowProcessingTemplate extends ModuleFlowProcessingTemplate {
 
-  private DefaultSchedulerMessageSource defaultSchedulerMessageSource;
+  private final DefaultSchedulerMessageSource defaultSchedulerMessageSource;
 
   SchedulerFlowProcessingTemplate(Processor messageProcessor,
                                   List<NotificationFunction> notificationFunctions,
@@ -34,5 +37,11 @@ final class SchedulerFlowProcessingTemplate extends ModuleFlowProcessingTemplate
   @Override
   public void afterPhaseExecution(Either<MessagingException, CoreEvent> either) {
     defaultSchedulerMessageSource.setIsExecuting(false);
+  }
+
+  @Override
+  public Publisher<Void> sendResponseToClient(CoreEvent response, Map<String, Object> parameters) {
+    // TODO Auto-generated method stub
+    return super.sendResponseToClient(response, parameters);
   }
 }

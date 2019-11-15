@@ -31,6 +31,7 @@ import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.when;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -82,6 +83,7 @@ import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -170,7 +172,10 @@ public class ModuleFlowProcessingPhase
             // In case backpressure was fired, the exception will be propagated as a SourcePolicyFailureResult, wrapping inside
             // the backpressure exception
             .onErrorResume(FlowBackPressureException.class,
-                           mapBackPressureExceptionToPolicyFailureResult(template, templateEvent))
+                           ex -> {
+                             ((BaseEventContext) templateEvent.getContext()).error(ex);
+                             return mapBackPressureExceptionToPolicyFailureResult(template, templateEvent).apply(ex);
+                           })
             // Perform processing of result by sending success or error response and handle errors that occur.
             // Returns Publisher<Void> to signal when this is complete or if it failed.
             .flatMap(policyResult -> policyResult.reduce(policyFailure(phaseContext, flowConstruct, messageSource),
@@ -185,6 +190,9 @@ public class ModuleFlowProcessingPhase
             .resolve(new MessagingException(templateEvent, e), muleContext),
                                                   template.getFailedExecutionResponseParametersFunction().apply(templateEvent)))
                                                       .doOnTerminate(() -> phaseResultNotifier.phaseFailure(e)).subscribe();
+
+        ((BaseEventContext) templateEvent.getContext()).error(e);
+        responseCompletion.complete(null);
       }
     } catch (Exception t) {
       phaseResultNotifier.phaseFailure(t);

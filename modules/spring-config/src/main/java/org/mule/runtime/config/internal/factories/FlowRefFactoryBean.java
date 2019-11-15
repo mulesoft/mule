@@ -24,6 +24,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -49,14 +50,10 @@ import org.mule.runtime.core.internal.exception.RecursiveSubFlowException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -75,6 +72,12 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
@@ -212,7 +215,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
   /**
    * Flow-ref message processor with a statically (constant along the flow execution) defined target route.
-   * 
+   *
    * @since 4.3.0
    */
   private class StaticFlowRefMessageProcessor extends FlowRefMessageProcessor {
@@ -246,8 +249,10 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
       if (resolvedReferencedProcessor instanceof Flow) {
         return applyForStaticFlow((Flow) resolvedReferencedProcessor, pub, location);
-      } else {
+      } else if (resolvedReferencedProcessor instanceof MessageProcessorChain) {
         return applyForStaticSubFlow(resolvedReferencedProcessor, pub, location);
+      } else {
+        return applyForStaticProcessor(resolvedReferencedProcessor, pub, location);
       }
 
     }
@@ -282,6 +287,14 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       return decoratePublisher(pub);
     }
 
+    private Publisher<CoreEvent> applyForStaticProcessor(ReactiveProcessor resolvedTarget, Flux<CoreEvent> pub,
+                                                         Optional<ComponentLocation> location) {
+      pub = pub.transform(eventPub -> eventPub.flatMap(event -> Mono.just(event).transform(resolvedTarget)
+          .doOnError(exception -> ((BaseEventContext) event.getContext()).error(exception))));
+
+      return decoratePublisher(pub);
+    }
+
     private ReactiveProcessor wrapInExceptionMapper(ReactiveProcessor target) {
       return publisher -> Flux.from(publisher)
           .transform(target)
@@ -303,7 +316,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
      * <li>Result to target variable mapping</li>
      * <li>FlowRef entry cycle detection</li>
      * </ul>
-     * 
+     *
      * @param pub the current publisher
      * @return the decorated publisher
      */
@@ -319,7 +332,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     /**
      * Clears the current subflow marker from the {@link Context} that is being propagated from downstream.
-     * 
+     *
      * @return the after-flowref-is-applied {@link Context} transformer
      */
     protected Function<Context, Context> clearCurrentFlowRefFromCycleDetection() {
@@ -340,7 +353,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
      * hence the cycle.
      * <li>If this is the first time the flowref is visited, sets the marker.</li>
      * </ul>
-     * 
+     *
      * @return the before-flowref-is-applied {@link Context} transformer
      */
     private Function<Context, Context> checkAndMarkCurrentFlowRefForCycleDetection() {
@@ -391,7 +404,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
   /**
    * Flow-ref message processor whose route might change along the flow execution. This means the target route is defined with a
    * data-weave expression.
-   * 
+   *
    * @since 4.3.0
    */
   private class DynamicFlowRefMessageProcessor extends FlowRefMessageProcessor {
@@ -453,7 +466,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
      * Given the current {@link CoreEvent}, resolved which processor is targeted by it, being this a {@link Flow} or a
      * {@link org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder.SubFlowMessageProcessorChain}.
      * Also, caches the fetched {@link Processor} for future calls.
-     * 
+     *
      * @param event the {@link CoreEvent} event
      * @return the {@link Processor} targeted by the current event
      * @throws MuleException
@@ -507,7 +520,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
   /**
    * Commonly used {@link MessagingException} mapper.
-   * 
+   *
    * @return a {@link MessagingException} mapper that maps the input exception to one using the wrapped event's parent context.
    */
   private Function<MessagingException, Throwable> getMessagingExceptionMapper() {
