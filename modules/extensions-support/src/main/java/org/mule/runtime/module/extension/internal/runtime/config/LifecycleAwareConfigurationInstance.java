@@ -11,6 +11,7 @@ import static java.lang.Integer.getInteger;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.ASYNC_TEST_CONNECTIVITY_TIMEOUT_PROPERTY;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -40,7 +41,6 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.time.TimeSupplier;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.retry.RetryCallback;
@@ -75,8 +75,7 @@ import org.slf4j.Logger;
  */
 public final class LifecycleAwareConfigurationInstance extends AbstractInterceptable implements ConfigurationInstance {
 
-  private static final String ASYNC_TEST_CONNECTIVITY_TIMEOUT_PROPERTY =
-      MuleSystemProperties.SYSTEM_PROPERTY_PREFIX + "async.test.connectivity.timeout";
+
 
   private static final Integer DEFAULT_ASYNC_TEST_CONNECTIVITY_TIMEOUT = 10000;
 
