@@ -39,10 +39,18 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.xml.namespace.QName;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -55,12 +63,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.UncheckedExecutionException;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.xml.namespace.QName;
 
 import reactor.core.publisher.Flux;
 
@@ -236,9 +238,12 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
           flux = from(processWithChildContext(event, referencedProcessor,
                                               ofNullable(FlowRefFactoryBean.this.getLocation()),
                                               ((Flow) referencedProcessor).getExceptionListener()));
-        } else {
+        } else if (referencedProcessor instanceof MessageProcessorChain) {
           flux = from(processWithChildContext(event, referencedProcessor,
                                               ofNullable(FlowRefFactoryBean.this.getLocation())));
+        } else {
+          flux = Flux.just(event).transform(referencedProcessor)
+              .doOnError(exception -> ((BaseEventContext) event.getContext()).error(exception));
         }
         return flux.map(outputToTarget(event, target, targetValue, expressionManager));
       });
