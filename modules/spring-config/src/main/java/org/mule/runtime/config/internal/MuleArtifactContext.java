@@ -124,6 +124,7 @@ import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
+import org.springframework.context.expression.StandardBeanExpressionResolver;
 import org.springframework.context.support.AbstractRefreshableConfigApplicationContext;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -329,6 +330,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
     super.prepareBeanFactory(beanFactory);
+    beanFactory.setBeanExpressionResolver(null);
 
     registerEditors(beanFactory);
 
@@ -349,6 +351,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   protected void prepareObjectProviders() {
+    this.getBeanFactory()
+        .setBeanExpressionResolver(new StandardBeanExpressionResolver(this.getBeanFactory().getBeanClassLoader()));
     MuleArtifactObjectProvider muleArtifactObjectProvider = new MuleArtifactObjectProvider(this);
     ImmutableObjectProviderConfiguration providerConfiguration =
         new ImmutableObjectProviderConfiguration(applicationModel.getConfigurationProperties(),
