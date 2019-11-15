@@ -345,8 +345,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   protected void prepareObjectProviders() {
-    this.getBeanFactory()
-        .setBeanExpressionResolver(new StandardBeanExpressionResolver(this.getBeanFactory().getBeanClassLoader()));
     MuleArtifactObjectProvider muleArtifactObjectProvider = new MuleArtifactObjectProvider(this);
     ImmutableObjectProviderConfiguration providerConfiguration =
         new ImmutableObjectProviderConfiguration(applicationModel.getConfigurationProperties(),
