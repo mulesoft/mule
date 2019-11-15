@@ -7,8 +7,9 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.lang.Boolean.valueOf;
+import static java.lang.Integer.getInteger;
 import static java.lang.String.format;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
@@ -39,6 +40,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.time.TimeSupplier;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.retry.RetryCallback;
@@ -73,7 +75,14 @@ import org.slf4j.Logger;
  */
 public final class LifecycleAwareConfigurationInstance extends AbstractInterceptable implements ConfigurationInstance {
 
-  private static final int ASYNC_TEST_CONNECTIVITY_TIMEOUT = 5;
+  private static final String ASYNC_TEST_CONNECTIVITY_TIMEOUT_PROPERTY =
+      MuleSystemProperties.SYSTEM_PROPERTY_PREFIX + "async.test.connectivity.timeout";
+
+  private static final Integer DEFAULT_ASYNC_TEST_CONNECTIVITY_TIMEOUT = 10000;
+
+  private static final int ASYNC_TEST_CONNECTIVITY_TIMEOUT =
+      getInteger(ASYNC_TEST_CONNECTIVITY_TIMEOUT_PROPERTY, DEFAULT_ASYNC_TEST_CONNECTIVITY_TIMEOUT);
+
   private static final Logger LOGGER = getLogger(LifecycleAwareConfigurationInstance.class);
   private static final String DO_TEST_CONNECTIVITY_PROPERTY_NAME = "doTestConnectivity";
 
@@ -255,7 +264,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
     } finally {
       if (retryTemplate.isAsync()) {
         try {
-          latch.await(ASYNC_TEST_CONNECTIVITY_TIMEOUT, SECONDS);
+          latch.await(ASYNC_TEST_CONNECTIVITY_TIMEOUT, MILLISECONDS);
         } catch (InterruptedException e) {
           LOGGER.warn("InterruptedException while waiting for the test connectivity to finish", e);
         }
