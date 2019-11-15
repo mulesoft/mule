@@ -29,7 +29,6 @@ import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
-import static reactor.core.publisher.Mono.from;
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -135,7 +134,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   final public CoreEvent handleException(Exception exception, CoreEvent event) {
     try {
-      return from(applyInternal(exception, event)).block();
+      return Mono.<CoreEvent>from(sink -> routeMessagingError(exception, handledEvent -> sink.onNext(handledEvent),
+                                                              rethrownError -> sink.onError(rethrownError)))
+          .block();
     } catch (Throwable throwable) {
       throw new RuntimeException(unwrap(throwable));
     }
