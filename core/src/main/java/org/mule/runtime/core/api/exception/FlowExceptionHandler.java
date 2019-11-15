@@ -55,11 +55,11 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
   /**
    * Routes the error towards the destination error handler, calling the corresponding callback in case of failure or success.
    * 
-   * @param error the {@link MessagingException} to route
+   * @param error the {@link Exception} to route
    * @param handledConsumer the callback called in case the error is successfully handled
    * @param failureConsumer the callback is called in case the error-handling fails
    */
-  default void routeMessagingError(MessagingException error, Consumer<CoreEvent> handledConsumer,
+  default void routeMessagingError(Exception error, Consumer<CoreEvent> handledConsumer,
                                    Consumer<Throwable> failureConsumer) {
     failureConsumer.accept(error);
   }

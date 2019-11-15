@@ -82,10 +82,11 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   @Override
-  public void routeMessagingError(MessagingException error, Consumer<CoreEvent> handledConsumer,
+  public void routeMessagingError(Exception error, Consumer<CoreEvent> handledConsumer,
                                   Consumer<Throwable> failureConsumer) {
-    CoreEvent event = error.getEvent();
-    error.setProcessedEvent(event);
+    MessagingException messagingError = (MessagingException) error;
+    CoreEvent event = messagingError.getEvent();
+    messagingError.setProcessedEvent(event);
     try {
       for (MessagingExceptionHandlerAcceptor errorListener : exceptionListeners) {
         if (errorListener.accept(event)) {

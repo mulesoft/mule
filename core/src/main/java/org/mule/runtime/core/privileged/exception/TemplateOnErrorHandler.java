@@ -142,9 +142,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   @Override
-  public void routeMessagingError(MessagingException error, Consumer<CoreEvent> handledConsumer,
+  public void routeMessagingError(Exception error, Consumer<CoreEvent> handledConsumer,
                                   Consumer<Throwable> failureConsumer) {
-    CoreEvent failureEvent = error.getEvent();
+    MessagingException messagingError = (MessagingException) error;
+    CoreEvent failureEvent = messagingError.getEvent();
     routingSink.get().next(quickCopy(failureEvent, of(getParameterId(ERROR_EXCEPTION, failureEvent), error,
                                                       getParameterId(ERROR_SUCCESS_CALLBACK, failureEvent), handledConsumer,
                                                       getParameterId(ERROR_ERROR_CALLBACK, failureEvent), failureConsumer,
