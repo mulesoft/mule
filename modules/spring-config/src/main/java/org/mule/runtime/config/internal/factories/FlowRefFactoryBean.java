@@ -98,7 +98,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
   /**
    * Defines the target value expression
    *
-   * @param targetValue the target value expresion
+   * @param targetValue the target value expression
    */
   public void setTargetValue(String targetValue) {
     this.targetValue = targetValue;
