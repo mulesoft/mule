@@ -64,16 +64,13 @@ public class CustomStaticMetadataOperations {
   }
 
   @OutputJsonType(schema = "persons-schema.json")
-  public InputStream jsonArrayOutput() {
+  public InputStream jsonOutputArray() {
     return new ByteArrayInputStream(JSON_ARRAY_VALUE.getBytes());
   }
 
   @OutputJsonType(schema = "person-schema.json")
-  public List<String> jsonOutputList() {
-    ArrayList jsonArrayList = new ArrayList<>();
-    jsonArrayList.add(JSON_VALUE);
-    jsonArrayList.add(JSON_VALUE);
-    return jsonArrayList;
+  public List<InputStream> jsonOutputList() {
+    return new ArrayList<>();
   }
 
   @OutputJsonType(schema = "person-schema.json")
@@ -113,8 +110,8 @@ public class CustomStaticMetadataOperations {
     return IOUtils.toString(json);
   }
 
-  public List<String> jsonInputList(@InputJsonType(schema = "person-schema.json") List<String> json) {
-    return json;
+  public List<InputStream> jsonInputList(@InputJsonType(schema = "person-schema.json") List<InputStream> jsonList) {
+    return jsonList;
   }
 
   public int jsonInputMap(@InputJsonType(schema = "person-schema.json") Map<String, Object> json) {
