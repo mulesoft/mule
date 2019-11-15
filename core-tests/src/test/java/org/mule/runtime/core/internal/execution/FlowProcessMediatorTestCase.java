@@ -39,7 +39,6 @@ import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
 import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
 import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 import static reactor.core.publisher.Mono.error;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -69,6 +68,7 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -148,7 +148,16 @@ public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
     startIfNeeded(flowProcessMediator);
 
     flow = mock(FlowConstruct.class, withSettings().extraInterfaces(Component.class));
-    final FlowExceptionHandler exceptionHandler = mock(FlowExceptionHandler.class);
+    FlowExceptionHandler exceptionHandler = mock(FlowExceptionHandler.class);
+
+    // Call routeMessagingError failure callback for success response sending error test cases
+    doAnswer(invocation -> {
+      Exception error = invocation.getArgument(0);
+      Consumer<Throwable> failureConsumer = invocation.getArgument(2);
+      failureConsumer.accept(error);
+      return null;
+    }).when(exceptionHandler).routeMessagingError(any(Exception.class), any(Consumer.class), any(Consumer.class));
+
     when(flow.getExceptionListener()).thenReturn(exceptionHandler);
     when(exceptionHandler.apply(any()))
         .thenAnswer(invocationOnMock -> error((MessagingException) invocationOnMock.getArgument(0)));
@@ -232,6 +241,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void successResponseParameterAndErrorResponseParameterError() throws Exception {
+    when(successResult.getResponseParameters()).thenReturn(failingParameterSupplier);
     when(successResult.getResponseParameters()).thenReturn(failingParameterSupplier);
     when(successResult.createErrorResponseParameters()).thenReturn(failingParameterFunction);
 
@@ -386,7 +396,8 @@ public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
   }
 
   private void verifyFlowErrorHandler(final EventMatcher errorHandlerEventMatcher) {
-    verify(flow.getExceptionListener()).apply(argThat(withEventThat(errorHandlerEventMatcher)));
+    verify(flow.getExceptionListener()).routeMessagingError(argThat(withEventThat(errorHandlerEventMatcher)), any(Consumer.class),
+                                                            any(Consumer.class));
   }
 
   private EventMatcher isErrorTypeSourceResponseGenerate() {
