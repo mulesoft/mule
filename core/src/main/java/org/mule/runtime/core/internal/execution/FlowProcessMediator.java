@@ -176,6 +176,9 @@ public class FlowProcessMediator implements Initialisable {
             .resolve(new MessagingException(event, e), muleContext),
                                              template.getFailedExecutionResponseParametersFunction().apply(event),
                                              always(() -> phaseResultNotifier.phaseFailure(e)));
+
+        ((BaseEventContext) event.getContext()).error(e);
+        responseCompletion.complete(null);
       }
     } catch (Exception e) {
       phaseResultNotifier.phaseFailure(e);
@@ -207,6 +210,7 @@ public class FlowProcessMediator implements Initialisable {
     } catch (Exception e) {
       e = (Exception) Exceptions.unwrap(e);
       if (e instanceof FlowBackPressureException) {
+        ((BaseEventContext) ctx.event.getContext()).error(e);
         ctx.result = mapBackPressureExceptionToPolicyFailureResult(ctx.template, ctx.event, (FlowBackPressureException) e);
         dispatchResponse(ctx);
       } else {

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.source.scheduler;
 
+import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -14,6 +15,7 @@ import org.mule.runtime.core.internal.execution.FlowProcessingTemplate;
 import org.mule.runtime.core.internal.execution.NotificationFunction;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Custom scheduler's flow processing template.
@@ -34,5 +36,16 @@ final class SchedulerFlowProcessingTemplate extends FlowProcessingTemplate {
   @Override
   public void afterPhaseExecution(Either<MessagingException, CoreEvent> either) {
     defaultSchedulerMessageSource.setIsExecuting(false);
+  }
+
+  @Override
+  public void sendResponseToClient(CoreEvent response, Map<String, Object> parameters, CompletableCallback<Void> callback) {
+    callback.complete(null);
+  }
+
+  @Override
+  public void sendFailureResponseToClient(MessagingException exception, Map<String, Object> parameters,
+                                          CompletableCallback<Void> callback) {
+    callback.error(exception);
   }
 }
