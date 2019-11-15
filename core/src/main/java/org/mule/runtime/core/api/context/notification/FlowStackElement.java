@@ -61,6 +61,14 @@ public final class FlowStackElement implements Serializable {
   @Override
   public String toString() {
     if (processorPath == null) {
+      return flowName;
+    } else {
+      return format("%s(%s)", flowName, processorPath);
+    }
+  }
+
+  public String toStringWithElapsedTime() {
+    if (processorPath == null) {
       return format("%s %d ms", flowName, getElapsedTime());
     } else {
       return format("%s(%s) %d ms", flowName, processorPath, getElapsedTime());

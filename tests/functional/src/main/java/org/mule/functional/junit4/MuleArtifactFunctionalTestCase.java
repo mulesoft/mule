@@ -17,6 +17,7 @@ import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.EventContextService;
@@ -109,7 +110,7 @@ public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalT
     }
     super.doTearDown();
 
-    if (eventContextService != null) {
+    if (eventContextService != null && DefaultMuleConfiguration.isFlowTrace()) {
       new PollingProber(1000, 10).check(new JUnitLambdaProbe(() -> {
         assertThat(eventContextService.getCurrentlyActiveFlowStacks().toString(),
                    eventContextService.getCurrentlyActiveFlowStacks(), is(empty()));

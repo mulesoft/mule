@@ -41,6 +41,8 @@ import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.connector.ConnectException;
 import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.context.notification.FlowCallStack;
+import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.Errors;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
@@ -54,6 +56,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
@@ -74,6 +77,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -328,6 +332,11 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       if (getStatistics().isEnabled()) {
         getStatistics().incReceivedEvents();
       }
+
+      FlowCallStack flowCallStack = event.getFlowCallStack();
+      if (flowCallStack instanceof DefaultFlowCallStack) {
+        ((DefaultFlowCallStack) flowCallStack).push(new FlowStackElement(AbstractPipeline.this.getName(), null));
+      }
       notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this),
                                                                  AbstractPipeline.this.getName(), PROCESS_START));
 
@@ -353,6 +362,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   private void fireCompleteNotification(CoreEvent event, MessagingException messagingException) {
+    FlowCallStack flowCallStack = event.getFlowCallStack();
+    if (flowCallStack instanceof DefaultFlowCallStack) {
+      ((DefaultFlowCallStack) flowCallStack).pop();
+    }
     notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, messagingException, AbstractPipeline.this),
                                                                AbstractPipeline.this.getName(), PROCESS_COMPLETE));
   }

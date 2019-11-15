@@ -19,7 +19,6 @@ import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
@@ -149,18 +148,12 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
 
   @Override
   public void onFlowStart(EnrichedNotificationInfo notificationInfo, String flowName) {
-    FlowCallStack flowCallStack = ((CoreEvent) notificationInfo.getEvent()).getFlowCallStack();
-    if (flowCallStack instanceof DefaultFlowCallStack) {
-      ((DefaultFlowCallStack) flowCallStack).push(new FlowStackElement(flowName, null));
-    }
+    // Nothing to do
   }
 
   @Override
   public void onFlowComplete(EnrichedNotificationInfo notificationInfo) {
-    FlowCallStack flowCallStack = ((CoreEvent) notificationInfo.getEvent()).getFlowCallStack();
-    if (flowCallStack instanceof DefaultFlowCallStack) {
-      ((DefaultFlowCallStack) flowCallStack).pop();
-    }
+    // Nothing to do
   }
 
   @Override
