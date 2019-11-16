@@ -359,8 +359,8 @@ public class FlowProcessMediator implements Initialisable {
                                   }
                                 });
 
-    ctx.flowConstruct.getExceptionListener().routeMessagingError(messagingException, event -> terminationCallback.run(),
-                                                                 error -> terminationCallback.run());
+    ctx.flowConstruct.getExceptionListener().routeError(messagingException, event -> terminationCallback.run(),
+                                                        error -> terminationCallback.run());
   }
 
   /**

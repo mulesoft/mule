@@ -134,8 +134,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   final public CoreEvent handleException(Exception exception, CoreEvent event) {
     try {
-      return Mono.<CoreEvent>from(sink -> routeMessagingError(exception, handledEvent -> sink.onNext(handledEvent),
-                                                              rethrownError -> sink.onError(rethrownError)))
+      return Mono.<CoreEvent>from(sink -> routeError(exception, handledEvent -> sink.onNext(handledEvent),
+                                                     rethrownError -> sink.onError(rethrownError)))
           .block();
     } catch (Throwable throwable) {
       throw new RuntimeException(unwrap(throwable));
@@ -143,13 +143,13 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   @Override
-  public void routeMessagingError(Exception error, Consumer<CoreEvent> handledConsumer,
-                                  Consumer<Throwable> failureConsumer) {
+  public void routeError(Exception error, Consumer<CoreEvent> continueCallback,
+                         Consumer<Throwable> propagateCallback) {
     MessagingException messagingError = (MessagingException) error;
     CoreEvent failureEvent = messagingError.getEvent();
     routingSink.get().next(quickCopy(failureEvent, of(getParameterId(ERROR_EXCEPTION, failureEvent), error,
-                                                      getParameterId(ERROR_SUCCESS_CALLBACK, failureEvent), handledConsumer,
-                                                      getParameterId(ERROR_RETHROWN_CALLBACK, failureEvent), failureConsumer,
+                                                      getParameterId(ERROR_SUCCESS_CALLBACK, failureEvent), continueCallback,
+                                                      getParameterId(ERROR_RETHROWN_CALLBACK, failureEvent), propagateCallback,
                                                       getParameterId(ERROR_EVENT, failureEvent), failureEvent)));
   }
 

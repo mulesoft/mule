@@ -48,7 +48,7 @@ import org.slf4j.Logger;
 public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor>
     implements MessagingExceptionHandlerAcceptor, MuleContextAware, Lifecycle {
 
-  private final Logger LOGGER = getLogger(ErrorHandler.class);
+  private static final Logger LOGGER = getLogger(ErrorHandler.class);
 
   private static final String MUST_ACCEPT_ANY_EVENT_MESSAGE = "Default error handler must accept any event.";
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
@@ -57,6 +57,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   @Inject
   private NotificationDispatcher notificationDispatcher;
+  private MessagingExceptionResolver messagingExceptionResolver = new MessagingExceptionResolver(this);
 
   @Override
   public void initialise() throws InitialisationException {
@@ -82,22 +83,22 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   @Override
-  public void routeMessagingError(Exception error, Consumer<CoreEvent> handledConsumer,
-                                  Consumer<Throwable> failureConsumer) {
+  public void routeError(Exception error, Consumer<CoreEvent> continueCallback,
+                         Consumer<Throwable> propagateCallback) {
     MessagingException messagingError = (MessagingException) error;
     CoreEvent event = messagingError.getEvent();
     messagingError.setProcessedEvent(event);
     try {
       for (MessagingExceptionHandlerAcceptor errorListener : exceptionListeners) {
         if (errorListener.accept(event)) {
-          errorListener.routeMessagingError(error, handledConsumer, failureConsumer);
+          errorListener.routeError(error, continueCallback, propagateCallback);
           return;
         }
       }
       throw new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE));
     } catch (Exception e) {
-      failureConsumer.accept(new MessagingExceptionResolver(this).resolve(new MessagingException(event, e, this),
-                                                                          muleContext));
+      propagateCallback.accept(messagingExceptionResolver.resolve(new MessagingException(event, e, this),
+                                                                  muleContext));
     }
   }
 

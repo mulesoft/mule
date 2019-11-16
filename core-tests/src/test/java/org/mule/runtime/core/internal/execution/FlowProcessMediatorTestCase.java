@@ -150,13 +150,13 @@ public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
     flow = mock(FlowConstruct.class, withSettings().extraInterfaces(Component.class));
     FlowExceptionHandler exceptionHandler = mock(FlowExceptionHandler.class);
 
-    // Call routeMessagingError failure callback for success response sending error test cases
+    // Call routeError failure callback for success response sending error test cases
     doAnswer(invocation -> {
       Exception error = invocation.getArgument(0);
       Consumer<Throwable> failureConsumer = invocation.getArgument(2);
       failureConsumer.accept(error);
       return null;
-    }).when(exceptionHandler).routeMessagingError(any(Exception.class), any(Consumer.class), any(Consumer.class));
+    }).when(exceptionHandler).routeError(any(Exception.class), any(Consumer.class), any(Consumer.class));
 
     when(flow.getExceptionListener()).thenReturn(exceptionHandler);
     when(exceptionHandler.apply(any()))
@@ -396,8 +396,8 @@ public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
   }
 
   private void verifyFlowErrorHandler(final EventMatcher errorHandlerEventMatcher) {
-    verify(flow.getExceptionListener()).routeMessagingError(argThat(withEventThat(errorHandlerEventMatcher)), any(Consumer.class),
-                                                            any(Consumer.class));
+    verify(flow.getExceptionListener()).routeError(argThat(withEventThat(errorHandlerEventMatcher)), any(Consumer.class),
+                                                   any(Consumer.class));
   }
 
   private EventMatcher isErrorTypeSourceResponseGenerate() {

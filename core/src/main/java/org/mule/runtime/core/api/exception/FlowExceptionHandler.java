@@ -31,6 +31,7 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
    * @param event which was being processed when the exception occurred
    * @return new event to route on to the rest of the flow, generally with ExceptionPayload set on the message
    */
+  @Deprecated
   CoreEvent handleException(Exception exception, CoreEvent event);
 
   @Override
@@ -56,12 +57,12 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
    * Routes the error towards the destination error handler, calling the corresponding callback in case of failure or success.
    * 
    * @param error the {@link Exception} to route
-   * @param handledConsumer the callback called in case the error is successfully handled
-   * @param failureConsumer the callback is called in case the error-handling fails
+   * @param continueCallback the callback called in case the error is successfully handled
+   * @param propagateCallback the callback is called in case the error-handling fails
    */
-  default void routeMessagingError(Exception error, Consumer<CoreEvent> handledConsumer,
-                                   Consumer<Throwable> failureConsumer) {
-    failureConsumer.accept(error);
+  default void routeError(Exception error, Consumer<CoreEvent> continueCallback,
+                          Consumer<Throwable> propagateCallback) {
+    propagateCallback.accept(error);
   }
 }
 

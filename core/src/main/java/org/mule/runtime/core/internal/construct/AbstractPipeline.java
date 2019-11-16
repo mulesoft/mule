@@ -236,7 +236,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   /**
    * Processor that dispatches incoming source Events to the internal pipeline the Sink. The way in which the Event is dispatched
    * and how overload is handled depends on the Source back-pressure strategy.
-   * 
+   *
    * @return the into-flow dispatching {@link ReactiveProcessor}
    */
   private ReactiveProcessor dispatchToFlow() {
@@ -249,7 +249,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   /**
    * If an <b>Error Strategy</b> is being propagated in the subscription {@link reactor.util.context.Context}, clear it.
-   * 
+   *
    * @return the transformed flux that clears the context if necessary
    */
   private Function<Flux<CoreEvent>, Publisher<CoreEvent>> clearSubscribersErrorStrategy() {
