@@ -146,6 +146,7 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
       return empty();
     }
     List<ValueProviderCacheId> parts = new LinkedList<>();
+    //TODO: MULE-17761 - Check if this is correct
     List<String> parametersRequiredForMetadata =
         ((EnrichableModel) injectedElement.getModel())
             .getModelProperty(RequiredForMetadataModelProperty.class)
