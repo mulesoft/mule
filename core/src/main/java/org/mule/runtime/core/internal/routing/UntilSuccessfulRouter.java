@@ -76,7 +76,7 @@ class UntilSuccessfulRouter {
   private final Flux<CoreEvent> downstreamFlux;
   private final FluxSinkRecorder<CoreEvent> innerRecorder = new FluxSinkRecorder<>();
   private final FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
-  private final AtomicReference<Runnable> withTransactionSubscriptionCallback;
+  private final AtomicReference<Runnable> transactionAwareUpstreamSubscription;
 
   // Retry settings, such as the maximum number of retries, and the delay between them
   // are managed by suppliers. By doing this, the implementations remains agnostic of whether
@@ -99,7 +99,7 @@ class UntilSuccessfulRouter {
     this.delayScheduler = new ConditionalExecutorServiceDecorator(delayScheduler, s -> isTransactionActive());
     this.retryContextResolver = new EventInternalContextResolver<>(RETRY_CTX_INTERNAL_PARAM_KEY,
                                                                    HashMap::new);
-    this.withTransactionSubscriptionCallback = new AtomicReference<>();
+    this.transactionAwareUpstreamSubscription = new AtomicReference<>();
 
     // Upstream side of until successful chain. Injects events into retrial chain.
     upstreamFlux = Flux.from(publisher)
@@ -132,8 +132,9 @@ class UntilSuccessfulRouter {
     // Downstream chain. Unpacks and publishes successful events and errors downstream.
     downstreamFlux = Flux.<Either<Throwable, CoreEvent>>create(sink -> {
       downstreamRecorder.accept(sink);
-      if (withTransactionSubscriptionCallback.get() != null) {
-        withTransactionSubscriptionCallback.get().run();
+      // This will always run after the `transactionAwareUpstreamSubscription` is set
+      if (transactionAwareUpstreamSubscription.get() != null) {
+        transactionAwareUpstreamSubscription.get().run();
       }
     })
         .doOnNext(event -> inflightEvents.decrementAndGet())
@@ -225,7 +226,7 @@ class UntilSuccessfulRouter {
               // performs the subscription itself. Because of this, the subscription has to be deferred until the
               // downstreamPublisher FluxCreate#subscribe method registers the new sink in the recorder.
               if (isTransactionActive()) {
-                withTransactionSubscriptionCallback.set(() -> {
+                transactionAwareUpstreamSubscription.set(() -> {
                   subscribeUpstreamChains(downstreamContext);
                 });
               } else {
