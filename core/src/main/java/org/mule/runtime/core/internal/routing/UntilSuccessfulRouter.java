@@ -99,11 +99,10 @@ class UntilSuccessfulRouter {
     this.delayScheduler = new ConditionalExecutorServiceDecorator(delayScheduler, s -> isTransactionActive());
     this.retryContextResolver = new EventInternalContextResolver<>(RETRY_CTX_INTERNAL_PARAM_KEY,
                                                                    HashMap::new);
-    this.withTransactionSubscriptionCallback = new AtomicReference<Runnable>();
+    this.withTransactionSubscriptionCallback = new AtomicReference<>();
 
     // Upstream side of until successful chain. Injects events into retrial chain.
     upstreamFlux = Flux.from(publisher)
-        .doOnSubscribe(subs -> System.out.println(""))
         .doOnNext(event -> {
           // Inject event into retrial execution chain
           RetryContext ctx = new RetryContext(event, sessionSupplier, maxRetriesSupplier, delaySupplier);
@@ -220,7 +219,6 @@ class UntilSuccessfulRouter {
    */
   Publisher<CoreEvent> getDownstreamPublisher() {
     return downstreamFlux
-        .doOnSubscribe(subs -> System.out.println("do nothing"))
         .compose(downstreamPublisher -> subscriberContext()
             .flatMapMany(downstreamContext -> downstreamPublisher.doOnSubscribe(s -> {
               // When a transaction is active, the processing strategy executes the whole reactor chain in the same thread that
