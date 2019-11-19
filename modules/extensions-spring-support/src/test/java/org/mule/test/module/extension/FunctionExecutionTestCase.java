@@ -13,13 +13,14 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.DataType.XML_STRING;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
+import org.mule.tck.core.streaming.DummyByteBufferManager;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 
 import java.io.InputStream;
@@ -91,7 +92,7 @@ public class FunctionExecutionTestCase extends AbstractExtensionFunctionalTestCa
     InMemoryCursorStreamProvider streamProvider = new InMemoryCursorStreamProvider(
                                                                                    stream,
                                                                                    InMemoryCursorStreamConfig.getDefault(),
-                                                                                   new SimpleByteBufferManager());
+                                                                                   new DummyByteBufferManager());
     Object value =
         flowRunner("xpathWithDefaultNode")
             .withVariable("xmlPayload", streamProvider)
