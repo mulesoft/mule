@@ -18,6 +18,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Tracks the active streaming resources owned by a particular event.
+ *
+ * @since 4.3.0
+ */
 public class EventStreamingState {
 
   private final AtomicBoolean disposed = new AtomicBoolean(false);
@@ -26,6 +31,15 @@ public class EventStreamingState {
   private CaffeineBuffer<WeakReference<ManagedCursorProvider>> providers = new CaffeineBoundedBuffer<>();
   private List<CaffeineBuffer<WeakReference<ManagedCursorProvider>>> providersOverflow = null;
 
+  /**
+   * Registers the given {@code provider} as one associated to the owning event.
+   * <p>
+   * Consumers of this method must discard the passed {@code provider} and used the returned one instead
+   *
+   * @param provider    a {@link ManagedCursorProvider}
+   * @param ghostBuster the {@link StreamingGhostBuster} used to do early reclamation of the {@code provider}
+   * @return the {@link ManagedCursorProvider} that must continue to be used
+   */
   public ManagedCursorProvider addProvider(ManagedCursorProvider provider, StreamingGhostBuster ghostBuster) {
     WeakReference<ManagedCursorProvider> ref = ghostBuster.track(provider);
     return providersLock.withReadLock(r -> {
@@ -47,6 +61,9 @@ public class EventStreamingState {
     });
   }
 
+  /**
+   * The owning event MUST invoke this method when the event is completed
+   */
   public void dispose() {
     if (disposed.compareAndSet(false, true)) {
       providersLock.withWriteLock(() -> {

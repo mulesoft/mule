@@ -27,6 +27,13 @@ import java.util.function.Consumer;
 import com.github.benmanes.caffeine.base.UnsafeAccess;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * This class is the same as {@link com.github.benmanes.caffeine.cache.StripedBuffer}.
+ * Copied here due to visibility restrictions.
+ *
+ * @param <T> the generic type of the buffer's items
+ * @since 4.3.0
+ */
 public abstract class CaffeineStripedBuffer<T> implements CaffeineBuffer<T> {
 
   /*

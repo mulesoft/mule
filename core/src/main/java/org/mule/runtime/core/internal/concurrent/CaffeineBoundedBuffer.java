@@ -21,13 +21,20 @@
 package org.mule.runtime.core.internal.concurrent;
 
 
-import static org.mule.runtime.core.internal.concurrent.CaffeineBoundedBuffer.*;
+import static org.mule.runtime.core.internal.concurrent.CaffeineBoundedBuffer.OFFSET;
 
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Consumer;
 
 import com.github.benmanes.caffeine.base.UnsafeAccess;
 
+/**
+ * This class is the same as {@link com.github.benmanes.caffeine.cache.BoundedBuffer}.
+ * Copied here due to visibility restrictions.
+ *
+ * @param <T> the generic type of the buffer's items
+ * @since 4.3.0
+ */
 public class CaffeineBoundedBuffer<T> extends CaffeineStripedBuffer<T> {
 
   /*
@@ -49,7 +56,9 @@ public class CaffeineBoundedBuffer<T> extends CaffeineStripedBuffer<T> {
    * whether it found a satisfactory buffer or if resizing is necessary.
    */
 
-  /** The maximum number of elements per buffer. */
+  /**
+   * The maximum number of elements per buffer.
+   */
   static final int BUFFER_SIZE = 16;
 
   // Assume 4-byte references and 64-byte cache line (16 elements per line)
@@ -123,7 +132,9 @@ public class CaffeineBoundedBuffer<T> extends CaffeineStripedBuffer<T> {
 }
 
 
-/** The namespace for field padding through inheritance. */
+/**
+ * The namespace for field padding through inheritance.
+ */
 final class BBHeader {
 
   @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
@@ -133,7 +144,10 @@ final class BBHeader {
     long p10, p11, p12, p13, p14, p15, p16;
   }
 
-  /** Enforces a memory layout to avoid false sharing by padding the read count. */
+
+  /**
+   * Enforces a memory layout to avoid false sharing by padding the read count.
+   */
   abstract static class ReadCounterRef extends PadReadCounter {
 
     static final long READ_OFFSET =
@@ -146,13 +160,17 @@ final class BBHeader {
     }
   }
 
+
   abstract static class PadWriteCounter extends ReadCounterRef {
 
     long p20, p21, p22, p23, p24, p25, p26, p27;
     long p30, p31, p32, p33, p34, p35, p36;
   }
 
-  /** Enforces a memory layout to avoid false sharing by padding the write count. */
+
+  /**
+   * Enforces a memory layout to avoid false sharing by padding the write count.
+   */
   abstract static class ReadAndWriteCounterRef extends PadWriteCounter {
 
     static final long WRITE_OFFSET =

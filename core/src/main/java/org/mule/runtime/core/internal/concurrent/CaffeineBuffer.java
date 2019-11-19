@@ -24,6 +24,12 @@ import java.util.function.Consumer;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+/**
+ * This class is the same as {@link com.github.benmanes.caffeine.cache.Buffer}. Copied here due to visibility restrictions.
+ *
+ * @param <T> the generic type of the buffer's items
+ * @since 4.3.0
+ */
 public interface CaffeineBuffer<T> {
 
   int FULL = 1;
@@ -90,7 +96,8 @@ enum DisabledBuffer implements CaffeineBuffer<Object> {
   }
 
   @Override
-  public void drainTo(Consumer<Object> consumer) {}
+  public void drainTo(Consumer<Object> consumer) {
+  }
 
   @Override
   public int size() {
