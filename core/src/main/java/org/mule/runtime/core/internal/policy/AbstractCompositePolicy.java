@@ -66,7 +66,6 @@ public abstract class AbstractCompositePolicy<ParametersTransformer> {
     }
 
     return chainedPoliciesAndOperation;
-    //return lastPolicy.getPolicyChain().getProcessingStrategy().onPipeline(chainedPoliciesAndOperation);
   }
 
   protected Policy getLastPolicy() {
