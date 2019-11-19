@@ -7,7 +7,7 @@
 package org.mule.runtime.http.api.domain.message.response;
 
 import static java.lang.System.lineSeparator;
-import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.BaseHttpMessage;
 
@@ -20,7 +20,7 @@ class DefaultHttpResponse extends BaseHttpMessage implements HttpResponse {
   private final ResponseStatus responseStatus;
 
 
-  DefaultHttpResponse(ResponseStatus responseStatus, MultiMap<String, String> headers, HttpEntity body) {
+  DefaultHttpResponse(ResponseStatus responseStatus, CaseInsensitiveMultiMap headers, HttpEntity body) {
     super(headers);
     this.responseStatus = responseStatus;
     this.body = body;

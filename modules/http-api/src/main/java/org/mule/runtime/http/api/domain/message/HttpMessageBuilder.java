@@ -27,7 +27,7 @@ import java.util.Optional;
  */
 public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends HttpMessage> {
 
-  protected MultiMap<String, String> headers;
+  protected CaseInsensitiveMultiMap headers;
   protected HttpEntity entity = new EmptyHttpEntity();
 
   public HttpMessageBuilder() {

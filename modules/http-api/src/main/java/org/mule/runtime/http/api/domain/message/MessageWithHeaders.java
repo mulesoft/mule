@@ -7,6 +7,7 @@
 package org.mule.runtime.http.api.domain.message;
 
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 import java.util.Collection;
 
@@ -65,5 +66,5 @@ public interface MessageWithHeaders {
   /**
    * @return an immutable {@link MultiMap} containing all headers
    */
-  MultiMap<String, String> getHeaders();
+  CaseInsensitiveMultiMap getHeaders();
 }

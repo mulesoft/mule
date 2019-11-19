@@ -3,6 +3,54 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.field.typeChanged",
+          "old": "field org.mule.runtime.http.api.domain.message.BaseMessageWithHeaders.headers",
+          "new": "field org.mule.runtime.http.api.domain.message.BaseMessageWithHeaders.headers",
+          "oldType": "org.mule.runtime.api.util.MultiMap<java.lang.String, java.lang.String>",
+          "newType": "org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap",
+          "package": "org.mule.runtime.http.api.domain.message",
+          "classSimpleName": "BaseMessageWithHeaders",
+          "fieldName": "headers",
+          "elementKind": "field",
+          "justification": "MULE-17527: Change HTTP MultiMap parameters to CaseInsensitiveMultiMap"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.api.util.MultiMap<java.lang.String, java.lang.String> org.mule.runtime.http.api.domain.message.BaseMessageWithHeaders::getHeaders()",
+          "new": "method org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap org.mule.runtime.http.api.domain.message.BaseMessageWithHeaders::getHeaders()",
+          "oldType": "org.mule.runtime.api.util.MultiMap<java.lang.String, java.lang.String>",
+          "newType": "org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap",
+          "package": "org.mule.runtime.http.api.domain.message",
+          "classSimpleName": "BaseMessageWithHeaders",
+          "methodName": "getHeaders",
+          "elementKind": "method",
+          "justification": "MULE-17527: Change HTTP MultiMap parameters to CaseInsensitiveMultiMap"
+        },
+        {
+          "code": "java.field.typeChanged",
+          "old": "field org.mule.runtime.http.api.domain.message.HttpMessageBuilder<B extends org.mule.runtime.http.api.domain.message.HttpMessageBuilder, M extends org.mule.runtime.http.api.domain.message.HttpMessage>.headers",
+          "new": "field org.mule.runtime.http.api.domain.message.HttpMessageBuilder<B extends org.mule.runtime.http.api.domain.message.HttpMessageBuilder, M extends org.mule.runtime.http.api.domain.message.HttpMessage>.headers",
+          "oldType": "org.mule.runtime.api.util.MultiMap<java.lang.String, java.lang.String>",
+          "newType": "org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap",
+          "package": "org.mule.runtime.http.api.domain.message",
+          "classSimpleName": "HttpMessageBuilder",
+          "fieldName": "headers",
+          "elementKind": "field",
+          "justification": "MULE-17527: Change HTTP MultiMap parameters to CaseInsensitiveMultiMap"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.api.util.MultiMap<java.lang.String, java.lang.String> org.mule.runtime.http.api.domain.message.MessageWithHeaders::getHeaders()",
+          "new": "method org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap org.mule.runtime.http.api.domain.message.MessageWithHeaders::getHeaders()",
+          "oldType": "org.mule.runtime.api.util.MultiMap<java.lang.String, java.lang.String>",
+          "newType": "org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap",
+          "package": "org.mule.runtime.http.api.domain.message",
+          "classSimpleName": "MessageWithHeaders",
+          "methodName": "getHeaders",
+          "elementKind": "method",
+          "justification": "MULE-17527: Change HTTP MultiMap parameters to CaseInsensitiveMultiMap"
+        },
+        {
           "code": "java.field.constantValueChanged",
           "old": "field org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY @ org.mule.runtime.http.api.server.ServerAlreadyExistsException",
           "new": "field org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY @ org.mule.runtime.http.api.server.ServerAlreadyExistsException",

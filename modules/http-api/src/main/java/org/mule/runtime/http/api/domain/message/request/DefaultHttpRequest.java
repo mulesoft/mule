@@ -8,6 +8,7 @@ package org.mule.runtime.http.api.domain.message.request;
 
 import static java.lang.System.lineSeparator;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 import org.mule.runtime.http.api.domain.message.BaseHttpMessage;
@@ -26,7 +27,7 @@ class DefaultHttpRequest extends BaseHttpMessage implements HttpRequest {
   private final MultiMap<String, String> queryParams;
   private final HttpEntity entity;
 
-  DefaultHttpRequest(URI uri, String path, String method, HttpProtocol protocol, MultiMap<String, String> headers,
+  DefaultHttpRequest(URI uri, String path, String method, HttpProtocol protocol, CaseInsensitiveMultiMap headers,
                      MultiMap<String, String> queryParams, HttpEntity entity) {
     super(headers);
     this.uri = uri;
