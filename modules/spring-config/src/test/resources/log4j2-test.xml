@@ -23,8 +23,6 @@
 
         <AsyncLogger name="com.mulesoft" level="WARN"/>
 
-        <AsyncLogger name="org.mule.runtime.config.dsl.model" level="DEBUG"/>
-
 
         <AsyncRoot level="WARN">
             <AppenderRef ref="Console"/>

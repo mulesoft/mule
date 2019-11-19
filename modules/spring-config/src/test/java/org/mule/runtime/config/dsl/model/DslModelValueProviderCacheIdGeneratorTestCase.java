@@ -28,7 +28,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
-import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
+import static org.mule.runtime.app.declaration.api.fluent.ElementbDeclarer.newParameterGroup;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.slf4j.LoggerFactory.getLogger;

@@ -221,7 +221,6 @@ public class DslElementBasedMetadataCacheIdGenerator implements MetadataCacheIdG
   }
 
   private Optional<MetadataCacheId> resolveConfigId(DslElementModel<?> elementModel) {
-    // TODO Migrate to Stereotypes when config-ref is part of model
     return resolveConfigName(elementModel).flatMap(this::getHashedGlobal);
   }
 
