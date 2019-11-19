@@ -12,6 +12,7 @@ import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 
+
 /**
  * A {@link ComponentModel} based implementation of a {@link MetadataCacheIdGeneratorFactory}
  *
