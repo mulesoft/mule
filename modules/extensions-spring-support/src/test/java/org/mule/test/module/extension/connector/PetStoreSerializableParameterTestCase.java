@@ -11,13 +11,14 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
-import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
+import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
+import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 import org.junit.Test;
 
@@ -52,8 +53,21 @@ public class PetStoreSerializableParameterTestCase extends AbstractExtensionFunc
   public void cursorStreamProviderParameter() throws Exception {
     InputStream inputStream = new ByteArrayInputStream(DONKEY.getBytes());
     CursorStreamProvider provider =
-        new InMemoryCursorStreamProvider(inputStream, InMemoryCursorStreamConfig.getDefault(), new SimpleByteBufferManager());
+        new InMemoryCursorStreamProvider(inputStream, InMemoryCursorStreamConfig.getDefault(), new TestByteBufferManager());
     Message message = flowRunner("dynamicSerializableParameter").withVariable("animal", provider).run().getMessage();
     assertThat(message.getPayload().getValue(), is(DONKEY));
+  }
+
+  private class TestByteBufferManager implements ByteBufferManager {
+
+    @Override
+    public ByteBuffer allocate(int capacity) {
+      return ByteBuffer.allocate(capacity);
+    }
+
+    @Override
+    public void deallocate(ByteBuffer byteBuffer) {
+
+    }
   }
 }
