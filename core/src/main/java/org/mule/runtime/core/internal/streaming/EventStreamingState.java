@@ -15,16 +15,17 @@ import org.mule.runtime.core.internal.concurrent.CaffeineBuffer;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EventStreamingState {
 
-  private final List<CaffeineBuffer<WeakReference<ManagedCursorProvider>>> providersOverflow = new ArrayList<>();
   private final AtomicBoolean disposed = new AtomicBoolean(false);
   private final FunctionalReadWriteLock providersLock = readWriteLock();
 
   private CaffeineBuffer<WeakReference<ManagedCursorProvider>> providers = new CaffeineBoundedBuffer<>();
+  private List<CaffeineBuffer<WeakReference<ManagedCursorProvider>>> providersOverflow = null;
 
   public ManagedCursorProvider addProvider(ManagedCursorProvider provider, StreamingGhostBuster ghostBuster) {
     WeakReference<ManagedCursorProvider> ref = ghostBuster.track(provider);
@@ -33,6 +34,9 @@ public class EventStreamingState {
         r.release();
         providersLock.withWriteLock(() -> {
           if (providers.offer(ref) == FULL) {
+            if (providersOverflow == null) {
+              providersOverflow = new LinkedList<>();
+            }
             providersOverflow.add(providers);
             providers = new CaffeineBoundedBuffer<>();
             providers.offer(ref);
@@ -48,7 +52,9 @@ public class EventStreamingState {
     if (disposed.compareAndSet(false, true)) {
       providersLock.withWriteLock(() -> {
         dispose(providers);
-        providersOverflow.forEach(this::dispose);
+        if (providersOverflow != null) {
+          providersOverflow.forEach(this::dispose);
+        }
       });
     }
   }
