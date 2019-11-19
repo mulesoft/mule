@@ -94,7 +94,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   private final ProcessingTime processingTime;
   private final ProcessorsTrace processorsTrace = new DefaultProcessorsTrace();
 
-  private EventStreamingState streamingState;
+  private transient EventStreamingState streamingState;
 
   @Override
   public String getId() {
