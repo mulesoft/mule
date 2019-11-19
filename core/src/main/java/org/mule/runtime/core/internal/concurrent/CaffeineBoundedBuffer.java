@@ -1,8 +1,22 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- * The software in this package is published under the terms of the CPAL v1.0
- * license, a copy of which has been included with this distribution in the
- * LICENSE.txt file.
+ * Copyright 2015 Ben Manes. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/*
+ * Written by Doug Lea with assistance from members of JCP JSR-166
+ * Expert Group and released to the public domain, as explained at
+ * http://creativecommons.org/publicdomain/zero/1.0/
  */
 package org.mule.runtime.core.internal.concurrent;
 
@@ -49,6 +63,7 @@ public class CaffeineBoundedBuffer<T> extends CaffeineStripedBuffer<T> {
   }
 
   static final class RingBuffer<T> extends BBHeader.ReadAndWriteCounterRef implements CaffeineBuffer<T> {
+
     final AtomicReferenceArray<T> buffer;
 
     @SuppressWarnings({"unchecked", "cast", "rawtypes"})
@@ -107,17 +122,20 @@ public class CaffeineBoundedBuffer<T> extends CaffeineStripedBuffer<T> {
   }
 }
 
+
 /** The namespace for field padding through inheritance. */
 final class BBHeader {
 
   @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
   abstract static class PadReadCounter {
+
     long p00, p01, p02, p03, p04, p05, p06, p07;
     long p10, p11, p12, p13, p14, p15, p16;
   }
 
   /** Enforces a memory layout to avoid false sharing by padding the read count. */
   abstract static class ReadCounterRef extends PadReadCounter {
+
     static final long READ_OFFSET =
         UnsafeAccess.objectFieldOffset(ReadCounterRef.class, "readCounter");
 
@@ -129,12 +147,14 @@ final class BBHeader {
   }
 
   abstract static class PadWriteCounter extends ReadCounterRef {
+
     long p20, p21, p22, p23, p24, p25, p26, p27;
     long p30, p31, p32, p33, p34, p35, p36;
   }
 
   /** Enforces a memory layout to avoid false sharing by padding the write count. */
   abstract static class ReadAndWriteCounterRef extends PadWriteCounter {
+
     static final long WRITE_OFFSET =
         UnsafeAccess.objectFieldOffset(ReadAndWriteCounterRef.class, "writeCounter");
 

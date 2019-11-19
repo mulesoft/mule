@@ -1,8 +1,22 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
- * The software in this package is published under the terms of the CPAL v1.0
- * license, a copy of which has been included with this distribution in the
- * LICENSE.txt file.
+ * Copyright 2015 Ben Manes. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/*
+ * Written by Doug Lea with assistance from members of JCP JSR-166
+ * Expert Group and released to the public domain, as explained at
+ * http://creativecommons.org/publicdomain/zero/1.0/
  */
 package org.mule.runtime.core.internal.concurrent;
 
@@ -220,7 +234,7 @@ public abstract class CaffeineStripedBuffer<T> implements CaffeineBuffer<T> {
           }
           collide = false;
         } else if (!wasUncontended) { // CAS already known to fail
-          wasUncontended = true;      // Continue after rehash
+          wasUncontended = true; // Continue after rehash
         } else if (buffer.offer(e) != FAILED) {
           break;
         } else if (n >= MAXIMUM_TABLE_SIZE || table != buffers) {
