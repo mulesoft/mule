@@ -19903,7 +19903,7 @@
           "type": "Array",
           "annotations": {
             "classInformation": {
-              "classname": "java.util.LinkedList",
+              "classname": "java.util.ArrayList",
               "hasDefaultConstructor": true,
               "isInterface": false,
               "isInstantiable": true,
@@ -19911,11 +19911,11 @@
               "isFinal": false,
               "implementedInterfaces": [
                 "java.util.List",
-                "java.util.Deque",
+                "java.util.RandomAccess",
                 "java.lang.Cloneable",
                 "java.io.Serializable"
               ],
-              "parent": "java.util.AbstractSequentialList",
+              "parent": "java.util.AbstractList",
               "genericTypes": [],
               "isMap": false
             },
@@ -25214,6 +25214,246 @@
       "description": "",
       "modelProperties": {},
       "kind": "operation"
+    },
+    {
+      "blocking": true,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": "java",
+          "type": "Array",
+          "annotations": {
+            "classInformation": {
+              "classname": "java.util.List",
+              "hasDefaultConstructor": false,
+              "isInterface": true,
+              "isInstantiable": false,
+              "isAbstract": true,
+              "isFinal": false,
+              "implementedInterfaces": [
+                "java.util.Collection"
+              ],
+              "parent": "",
+              "genericTypes": [
+                "java.io.InputStream"
+              ],
+              "isMap": false
+            }
+          },
+          "item": {
+            "type": "Binary",
+            "annotations": {
+              "classInformation": {
+                "classname": "java.io.InputStream",
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": false,
+                "implementedInterfaces": [
+                  "java.io.Closeable"
+                ],
+                "parent": "",
+                "genericTypes": [],
+                "isMap": false
+              }
+            }
+          }
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "notifications": [],
+      "nestedComponents": [],
+      "errors": [],
+      "stereotype": {
+        "type": "XML_OUTPUT_LIST_WITH_EMPTY_SCHEMA",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
+      },
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "outputMimeType",
+              "description": "The mime type of the payload that this operation outputs.",
+              "modelProperties": {
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
+                }
+              }
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "outputEncoding",
+              "description": "The encoding of the payload that this operation outputs.",
+              "modelProperties": {
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
+                }
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "xmlOutputListWithEmptySchema",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
     }
   ],
   "functions": [],
@@ -26738,7 +26978,6 @@
       "format": "xml",
       "type": "Object",
       "annotations": {
-        "typeId": "#root:shiporder",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -26752,7 +26991,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "#root:shiporder"
       },
       "fields": [
         {
@@ -26903,7 +27143,6 @@
       "format": "csv",
       "type": "Object",
       "annotations": {
-        "typeId": "csv-object",
         "classInformation": {
           "classname": "java.lang.Integer",
           "hasDefaultConstructor": false,
@@ -26917,7 +27156,8 @@
           "parent": "java.lang.Number",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "csv-object"
       },
       "fields": []
     },
@@ -26925,7 +27165,6 @@
       "format": "java",
       "type": "Object",
       "annotations": {
-        "typeId": "custom-java",
         "classInformation": {
           "classname": "java.lang.Object",
           "hasDefaultConstructor": true,
@@ -26937,7 +27176,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "custom-java"
       },
       "fields": []
     },
@@ -26945,7 +27185,7 @@
       "format": "json",
       "type": "Object",
       "annotations": {
-        "typeId": "http://example.com/example.json",
+        "label": "Person",
         "classInformation": {
           "classname": "void",
           "hasDefaultConstructor": false,
@@ -26958,7 +27198,7 @@
           "genericTypes": [],
           "isMap": false
         },
-        "label": "Person"
+        "typeId": "http://example.com/example.json"
       },
       "open": {
         "type": "Any"
@@ -27002,7 +27242,6 @@
       "format": "json",
       "type": "Object",
       "annotations": {
-        "typeId": "json-object",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -27016,7 +27255,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "json-object"
       },
       "fields": [
         {

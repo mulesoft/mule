@@ -28,7 +28,6 @@ import org.mule.test.metadata.extension.resolver.JsonInputStaticTypeResolver;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -46,14 +45,6 @@ public class CustomStaticMetadataOperations {
   }
 
   @OutputXmlType(schema = "order.xsd", qname = "shiporder")
-  public List<InputStream> xmlOutputList() {
-    ArrayList xmlList = new ArrayList();
-    xmlList.add(cl.getResourceAsStream("order.xml"));
-    xmlList.add(cl.getResourceAsStream("order.xml"));
-    return xmlList;
-  }
-
-  @OutputXmlType(schema = "order.xsd", qname = "shiporder")
   public String xmlInput(@InputXmlType(schema = "order.xsd", qname = "shiporder") InputStream xml) {
     return XML_VALUE;
   }
@@ -68,50 +59,9 @@ public class CustomStaticMetadataOperations {
     return new ByteArrayInputStream(JSON_ARRAY_VALUE.getBytes());
   }
 
-  @OutputJsonType(schema = "person-schema.json")
-  public List<InputStream> jsonOutputList() {
-    return new ArrayList<>();
-  }
-
-  @OutputJsonType(schema = "person-schema.json")
-  public PagingProvider<MetadataConnection, String> jsonOutputPagingProvider() {
-    return new PagingProvider<MetadataConnection, String>() {
-
-      @Override
-      public List<String> getPage(MetadataConnection connection) {
-        ArrayList jsonArrayList = new ArrayList<>();
-        jsonArrayList.add(JSON_VALUE);
-        jsonArrayList.add(JSON_VALUE);
-        return jsonArrayList;
-      }
-
-      @Override
-      public java.util.Optional<Integer> getTotalResults(MetadataConnection connection) {
-        return java.util.Optional.empty();
-      }
-
-      @Override
-      public void close(MetadataConnection connection) {
-
-      }
-    };
-  }
-
-  @OutputJsonType(schema = "persons-schema.json")
-  public LinkedList<String> jsonArrayOutputList() {
-    LinkedList jsonArrayList = new LinkedList();
-    jsonArrayList.add(JSON_ARRAY_VALUE);
-    jsonArrayList.add(JSON_ARRAY_VALUE);
-    return jsonArrayList;
-  }
-
   @MediaType(value = "application/json")
   public String jsonInputStream(@InputJsonType(schema = "person-schema.json") InputStream json) {
     return IOUtils.toString(json);
-  }
-
-  public List<InputStream> jsonInputList(@InputJsonType(schema = "person-schema.json") List<InputStream> jsonList) {
-    return jsonList;
   }
 
   public int jsonInputMap(@InputJsonType(schema = "person-schema.json") Map<String, Object> json) {
@@ -150,6 +100,64 @@ public class CustomStaticMetadataOperations {
     return Result.<Integer, InputStream>builder().output(1).build();
   }
 
+  @OutputResolver(output = JavaOutputStaticTypeResolver.class)
+  public Object customInputAndOutput(@TypeResolver(JsonInputStaticTypeResolver.class) InputStream type) {
+    return null;
+  }
+
+  @OutputJsonType(schema = "person-schema.json")
+  public List<InputStream> jsonOutputList() {
+    return new ArrayList<>();
+  }
+
+  @OutputJsonType(schema = "person-schema.json")
+  public PagingProvider<MetadataConnection, String> jsonOutputPagingProvider() {
+    return new PagingProvider<MetadataConnection, String>() {
+
+      @Override
+      public List<String> getPage(MetadataConnection connection) {
+        ArrayList<String> jsonArrayList = new ArrayList<>();
+        jsonArrayList.add(JSON_VALUE);
+        jsonArrayList.add(JSON_VALUE);
+        return jsonArrayList;
+      }
+
+      @Override
+      public java.util.Optional<Integer> getTotalResults(MetadataConnection connection) {
+        return java.util.Optional.empty();
+      }
+
+      @Override
+      public void close(MetadataConnection connection) {
+
+      }
+    };
+  }
+
+  @OutputJsonType(schema = "persons-schema.json")
+  public ArrayList<String> jsonArrayOutputList() {
+    ArrayList<String> jsonArrayList = new ArrayList();
+    jsonArrayList.add(JSON_ARRAY_VALUE);
+    jsonArrayList.add(JSON_ARRAY_VALUE);
+    return jsonArrayList;
+  }
+
+  @OutputXmlType(schema = "order.xsd", qname = "shiporder")
+  public List<InputStream> xmlOutputList() {
+    ArrayList<InputStream> xmlList = new ArrayList();
+    xmlList.add(cl.getResourceAsStream("order.xml"));
+    xmlList.add(cl.getResourceAsStream("order.xml"));
+    return xmlList;
+  }
+
+  @OutputXmlType(schema = "", qname = "shiporder")
+  public List<InputStream> xmlOutputListWithEmptySchema() {
+    ArrayList<InputStream> xmlList = new ArrayList();
+    xmlList.add(cl.getResourceAsStream("order.xml"));
+    xmlList.add(cl.getResourceAsStream("order.xml"));
+    return xmlList;
+  }
+
   @AttributesJsonType(schema = "persons-schema.json")
   public Result<Integer, InputStream> jsonArrayAttributes() {
     return Result.<Integer, InputStream>builder().output(1).build();
@@ -186,8 +194,7 @@ public class CustomStaticMetadataOperations {
     };
   }
 
-  @OutputResolver(output = JavaOutputStaticTypeResolver.class)
-  public Object customInputAndOutput(@TypeResolver(JsonInputStaticTypeResolver.class) InputStream type) {
-    return null;
+  public List<InputStream> jsonInputList(@InputJsonType(schema = "person-schema.json") List<InputStream> jsonList) {
+    return jsonList;
   }
 }

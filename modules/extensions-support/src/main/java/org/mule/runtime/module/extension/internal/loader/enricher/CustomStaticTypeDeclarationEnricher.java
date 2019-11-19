@@ -123,14 +123,14 @@ public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnr
     }.walk(extensionLoadingContext.getExtensionDeclarer().getDeclaration());
   }
 
-  private Optional<MetadataType> getAttributesType(AnnotatedElement element, MetadataType declarationOutputType) {
+  private Optional<MetadataType> getAttributesType(AnnotatedElement element, MetadataType outputAttributesType) {
     AttributesXmlType xml = element.getAnnotation(AttributesXmlType.class);
     if (xml != null) {
-      return resolveType(getXmlType(xml.schema(), xml.qname()), declarationOutputType);
+      return resolveType(getXmlType(xml.schema(), xml.qname()), outputAttributesType);
     }
     AttributesJsonType json = element.getAnnotation(AttributesJsonType.class);
     if (json != null) {
-      return resolveType(getJsonType(json.schema()), declarationOutputType);
+      return resolveType(getJsonType(json.schema()), outputAttributesType);
     }
     OutputResolver resolver = element.getAnnotation(OutputResolver.class);
     if (resolver != null && isStaticResolver(resolver.attributes())) {
@@ -143,14 +143,14 @@ public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnr
     return empty();
   }
 
-  private Optional<MetadataType> getOutputType(AnnotatedElement element, MetadataType declarationOutputType) {
+  private Optional<MetadataType> getOutputType(AnnotatedElement element, MetadataType outputType) {
     OutputXmlType xml = element.getAnnotation(OutputXmlType.class);
     if (xml != null) {
-      return resolveType(getXmlType(xml.schema(), xml.qname()), declarationOutputType);
+      return resolveType(getXmlType(xml.schema(), xml.qname()), outputType);
     }
     OutputJsonType json = element.getAnnotation(OutputJsonType.class);
     if (json != null) {
-      return resolveType(getJsonType(json.schema()), declarationOutputType);
+      return resolveType(getJsonType(json.schema()), outputType);
     }
     OutputResolver resolver = element.getAnnotation(OutputResolver.class);
     if (resolver != null && isStaticResolver(resolver.output())) {
@@ -179,13 +179,13 @@ public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnr
     return empty();
   }
 
-  private Optional<MetadataType> resolveType(Optional<MetadataType> metadataType, MetadataType declarationOutputType) {
-    if (declarationOutputType instanceof ArrayType) {
+  private Optional<MetadataType> resolveType(Optional<MetadataType> annotationType, MetadataType declarationType) {
+    if (declarationType instanceof ArrayType && annotationType.isPresent()) {
       ArrayTypeBuilder arrayMetadataBuilder = BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType();
-      metadataType.ifPresent(type -> arrayMetadataBuilder.of(type));
+      arrayMetadataBuilder.of(annotationType.get());
       return Optional.of(arrayMetadataBuilder.build());
     }
-    return metadataType;
+    return annotationType;
   }
 
   private <T extends BaseDeclaration & TypedDeclaration> void declareCustomType(T declaration, MetadataType target) {
