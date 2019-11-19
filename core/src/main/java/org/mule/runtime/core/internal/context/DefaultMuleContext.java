@@ -224,6 +224,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private QueueManager queueManager;
 
   private ExtensionManager extensionManager;
+  private SecurityManager securityManager;
 
   private ObjectSerializer objectSerializer;
   private volatile DataTypeConversionResolver dataTypeConversionResolver;
@@ -577,6 +578,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }
+    this.securityManager = securityManager;
   }
 
   /**
@@ -588,16 +590,21 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
    */
   @Override
   public SecurityManager getSecurityManager() {
-    SecurityManager securityManager = muleRegistryHelper.lookupObject(OBJECT_SECURITY_MANAGER);
     if (securityManager == null) {
-      Collection<SecurityManager> temp = muleRegistryHelper.lookupObjects(SecurityManager.class);
-      if (temp.size() > 0) {
-        securityManager = (temp.iterator().next());
+      SecurityManager securityManager = muleRegistryHelper.lookupObject(OBJECT_SECURITY_MANAGER);
+      if (securityManager == null) {
+        Collection<SecurityManager> temp = muleRegistryHelper.lookupObjects(SecurityManager.class);
+        if (temp.size() > 0) {
+          securityManager = (temp.iterator().next());
+        }
       }
+      if (securityManager == null) {
+        throw new MuleRuntimeException(objectIsNull("securityManager"));
+      }
+
+      this.securityManager = securityManager;
     }
-    if (securityManager == null) {
-      throw new MuleRuntimeException(objectIsNull("securityManager"));
-    }
+
     return securityManager;
   }
 
