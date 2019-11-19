@@ -14,6 +14,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
@@ -27,6 +28,9 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.context.notification.DefaultProcessorsTrace;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.streaming.EventStreamingState;
+import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
+import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.io.Serializable;
@@ -88,6 +92,8 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
   private final ProcessingTime processingTime;
   private final ProcessorsTrace processorsTrace = new DefaultProcessorsTrace();
+
+  private EventStreamingState streamingState;
 
   @Override
   public String getId() {
@@ -185,6 +191,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
       eventContextMaintain(flow.getMuleContext().getEventContextService());
     }
     this.flowCallStack = new DefaultFlowCallStack();
+    createStreamingState();
   }
 
   /**
@@ -208,6 +215,16 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     this.processingTime = null;
     this.correlationId = correlationId;
     this.flowCallStack = new DefaultFlowCallStack();
+    createStreamingState();
+  }
+
+  private void createStreamingState() {
+    streamingState = new EventStreamingState();
+    onTerminated((event, e) -> streamingState.dispose());
+  }
+
+  public CursorProvider track(ManagedCursorProvider provider, StreamingGhostBuster ghostBuster) {
+    return streamingState.addProvider(provider, ghostBuster);
   }
 
   private void eventContextMaintain(EventContextService eventContextService) {
