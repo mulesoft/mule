@@ -34,6 +34,11 @@ final class VoidReturnDelegate implements ReturnDelegate {
    */
   @Override
   public CoreEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
-    return CoreEvent.builder(operationContext.getEvent()).securityContext(operationContext.getSecurityContext()).build();
+    CoreEvent event = operationContext.getEvent();
+    if (event.getSecurityContext() != operationContext.getSecurityContext()) {
+      return CoreEvent.builder(event).securityContext(operationContext.getSecurityContext()).build();
+    }
+
+    return event;
   }
 }

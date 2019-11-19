@@ -206,7 +206,7 @@ public final class MessageUtils {
     result.getAttributes().ifPresent(att -> {
       DataType attDataType = result.getAttributesMediaType()
           .map(amt -> builder().type(att.getClass()).mediaType(amt).build())
-          .orElse(DataType.fromObject(att));
+          .orElseGet(() -> DataType.fromObject(att));
       builder.attributes(new TypedValue<>(att, attDataType, OptionalLong.empty()));
     });
 
