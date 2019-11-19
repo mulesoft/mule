@@ -96,8 +96,7 @@ enum DisabledBuffer implements CaffeineBuffer<Object> {
   }
 
   @Override
-  public void drainTo(Consumer<Object> consumer) {
-  }
+  public void drainTo(Consumer<Object> consumer) {}
 
   @Override
   public int size() {
