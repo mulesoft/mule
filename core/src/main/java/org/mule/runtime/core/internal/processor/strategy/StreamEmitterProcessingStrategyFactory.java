@@ -138,7 +138,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     }
 
     @Override
-    public void stop() throws MuleException {
+    public void dispose() {
       if (!sinkCreated) {
         stopSchedulersIfNeeded();
       }

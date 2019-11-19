@@ -465,6 +465,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected void doDispose() {
     disposeIfDisposable(pipeline);
     disposeIfDisposable(source);
+    disposeIfDisposable(processingStrategy);
     super.doDispose();
   }
 
