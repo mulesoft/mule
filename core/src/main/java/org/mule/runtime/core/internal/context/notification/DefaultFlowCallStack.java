@@ -53,7 +53,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
     if (innerStack.size() >= MAX_DEPTH) {
       StringBuilder messageBuilder = new StringBuilder();
 
-      messageBuilder.append("Too many child contexts nested. ")
+      messageBuilder.append("Too many nested child contexts.")
           .append(lineSeparator())
           .append(toString());
 
