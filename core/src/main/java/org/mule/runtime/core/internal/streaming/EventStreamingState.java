@@ -14,7 +14,6 @@ import org.mule.runtime.core.internal.concurrent.CaffeineBoundedBuffer;
 import org.mule.runtime.core.internal.concurrent.CaffeineBuffer;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
