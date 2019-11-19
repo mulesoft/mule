@@ -375,7 +375,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     applicationModel.topLevelComponentsStream().forEach(componentModel -> {
       if (((ComponentModel) componentModel).getType() != null
           && ConfigurableObjectProvider.class.isAssignableFrom(((ComponentModel) componentModel).getType())) {
-        objectProviders.add(new Pair<>((ComponentModel) componentModel, componentModel.getName()));
+        objectProviders.add(new Pair<>((ComponentModel) componentModel, componentModel.getComponentId()));
       }
     });
     return objectProviders;
@@ -454,13 +454,13 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     Set<String> alwaysEnabledTopLevelComponents = applicationModel.topLevelComponentsStream()
         .filter(cm -> this.componentBuildingDefinitionRegistry.getBuildingDefinition(cm.getIdentifier())
             .map(buildingDefinition -> buildingDefinition.isAlwaysEnabled()).orElse(false))
-        .filter(cm -> cm.getName().isPresent())
-        .map(cm -> cm.getName().get())
+        .filter(cm -> cm.getComponentId().isPresent())
+        .map(cm -> cm.getComponentId().get())
         .collect(toSet());
     Set<ComponentIdentifier> alwaysEnabledUnnamedTopLevelComponents = applicationModel.topLevelComponentsStream()
         .filter(cm -> this.componentBuildingDefinitionRegistry.getBuildingDefinition(cm.getIdentifier())
             .map(buildingDefinition -> buildingDefinition.isAlwaysEnabled()).orElse(false))
-        .filter(cm -> !cm.getName().isPresent())
+        .filter(cm -> !cm.getComponentId().isPresent())
         .map(cm -> cm.getIdentifier())
         .collect(toSet());
     Set<String> alwaysEnabledGeneratedTopLevelComponentsName = new HashSet<>();

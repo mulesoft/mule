@@ -43,28 +43,28 @@ public class PropertyComponentUtils {
     String nameKey = getNameAttributeName(propertyComponentModel.getIdentifier());
     if (propertyComponentModel.getInnerComponents().isEmpty()) {
       Object value;
-      if (propertyComponentModel.getParameters().containsKey(refKey)) {
-        value = new RuntimeBeanReference(propertyComponentModel.getParameters().get(refKey));
+      if (propertyComponentModel.getRawParameters().containsKey(refKey)) {
+        value = new RuntimeBeanReference(propertyComponentModel.getRawParameters().get(refKey));
       } else {
-        value = propertyComponentModel.getParameters().get(VALUE_PARAMETER_NAME);
+        value = propertyComponentModel.getRawParameters().get(VALUE_PARAMETER_NAME);
       }
-      if (!propertyComponentModel.getParameters().containsKey(nameKey)) {
+      if (!propertyComponentModel.getRawParameters().containsKey(nameKey)) {
         propertyValue = new Pair<>(PROPERTY_NAME_PROPERTY_ATTRIBUTE,
-                                   new RuntimeBeanReference(propertyComponentModel.getParameters().get("ref")));
+                                   new RuntimeBeanReference(propertyComponentModel.getRawParameters().get("ref")));
       } else {
-        propertyValue = new Pair<>(propertyComponentModel.getParameters().get(nameKey), value);
+        propertyValue = new Pair<>(propertyComponentModel.getRawParameters().get(nameKey), value);
       }
     } else if (propertyComponentModel.getInnerComponents().get(0).getIdentifier().getName().equals("map")) {
       ComponentModel springMap = propertyComponentModel.getInnerComponents().get(0);
       ManagedMap<String, Object> propertiesMap = new ManagedMap<>();
       springMap.getInnerComponents().stream().forEach(mapEntry -> {
         Object value;
-        if (mapEntry.getParameters().containsKey(VALUE_PARAMETER_NAME)) {
-          value = mapEntry.getParameters().get(VALUE_PARAMETER_NAME);
+        if (mapEntry.getRawParameters().containsKey(VALUE_PARAMETER_NAME)) {
+          value = mapEntry.getRawParameters().get(VALUE_PARAMETER_NAME);
         } else {
-          value = new RuntimeBeanReference(mapEntry.getParameters().get(REFERENCE_MULE_PROPERTY_ATTRIBUTE));
+          value = new RuntimeBeanReference(mapEntry.getRawParameters().get(REFERENCE_MULE_PROPERTY_ATTRIBUTE));
         }
-        propertiesMap.put(mapEntry.getParameters().get(PROPERTY_NAME_MULE_PROPERTY_ATTRIBUTE), value);
+        propertiesMap.put(mapEntry.getRawParameters().get(PROPERTY_NAME_MULE_PROPERTY_ATTRIBUTE), value);
       });
       propertyValue = new Pair<>(propertyComponentModel.getNameAttribute(), propertiesMap);
     } else {

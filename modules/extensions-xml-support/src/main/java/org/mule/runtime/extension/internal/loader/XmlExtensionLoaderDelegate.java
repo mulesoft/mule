@@ -436,13 +436,13 @@ public final class XmlExtensionLoaderDelegate {
 
     moduleModel.resolveTypedComponentIdentifier(extensionModelHelper);
 
-    final String name = moduleModel.getParameters().get(MODULE_NAME);
+    final String name = moduleModel.getRawParameters().get(MODULE_NAME);
     final String version = "4.0.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
-    final String category = moduleModel.getParameters().get(CATEGORY);
-    final String vendor = moduleModel.getParameters().get(VENDOR);
+    final String category = moduleModel.getRawParameters().get(CATEGORY);
+    final String vendor = moduleModel.getRawParameters().get(VENDOR);
     final XmlDslModel xmlDslModel = getXmlDslModel(moduleModel, name, version);
     final String description = getDescription(moduleModel);
-    final String xmlnsTnsValue = moduleModel.getParameters().get(XMLNS_TNS);
+    final String xmlnsTnsValue = moduleModel.getRawParameters().get(XMLNS_TNS);
     if (xmlnsTnsValue != null && !xmlDslModel.getNamespace().equals(xmlnsTnsValue)) {
       throw new MuleRuntimeException(createStaticMessage(format("The %s attribute value of the module must be '%s', but found '%s'",
                                                                 XMLNS_TNS,
@@ -536,13 +536,13 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private XmlDslModel getXmlDslModel(ComponentModel moduleModel, String name, String version) {
-    final Optional<String> prefix = ofNullable(moduleModel.getParameters().get(MODULE_PREFIX_ATTRIBUTE));
-    final Optional<String> namespace = ofNullable(moduleModel.getParameters().get(MODULE_NAMESPACE_ATTRIBUTE));
+    final Optional<String> prefix = ofNullable(moduleModel.getRawParameters().get(MODULE_PREFIX_ATTRIBUTE));
+    final Optional<String> namespace = ofNullable(moduleModel.getRawParameters().get(MODULE_NAMESPACE_ATTRIBUTE));
     return createXmlLanguageModel(prefix, namespace, name, version);
   }
 
   private String getDescription(ComponentModel componentModel) {
-    return componentModel.getParameters().getOrDefault(DOC_DESCRIPTION, "");
+    return componentModel.getRawParameters().getOrDefault(DOC_DESCRIPTION, "");
   }
 
   private List<ComponentModel> extractGlobalElementsFrom(ComponentModel moduleModel) {
@@ -646,7 +646,7 @@ public final class XmlExtensionLoaderDelegate {
       testConnectionGlobalElementOptional.ifPresent(
                                                     testConnectionGlobalElement -> {
                                                       final String testConnectionGlobalElementName = testConnectionGlobalElement
-                                                          .getParameters().get(GLOBAL_ELEMENT_NAME_ATTRIBUTE);
+                                                          .getRawParameters().get(GLOBAL_ELEMENT_NAME_ATTRIBUTE);
                                                       connectionProviderDeclarer
                                                           .withModelProperty(new TestConnectionGlobalElementModelProperty(testConnectionGlobalElementName));
                                                     });
@@ -660,7 +660,7 @@ public final class XmlExtensionLoaderDelegate {
     final List<ComponentModel> markedAsTestConnectionGlobalElements =
         globalElementsComponentModel.stream()
             .filter(globalElementComponentModel -> Boolean
-                .parseBoolean(globalElementComponentModel.getParameters().get(MODULE_CONNECTION_MARKER_ATTRIBUTE)))
+                .parseBoolean(globalElementComponentModel.getRawParameters().get(MODULE_CONNECTION_MARKER_ATTRIBUTE)))
             .collect(toList());
 
     if (markedAsTestConnectionGlobalElements.size() > 1) {
@@ -725,7 +725,7 @@ public final class XmlExtensionLoaderDelegate {
     moduleModel.getInnerComponents().stream()
         .filter(child -> child.getIdentifier().equals(OPERATION_IDENTIFIER))
         .filter(operationModel -> OperationVisibility
-            .valueOf(operationModel.getParameters().get(ATTRIBUTE_VISIBILITY)) == visibility)
+            .valueOf(operationModel.getRawParameters().get(ATTRIBUTE_VISIBILITY)) == visibility)
         .forEach(operationModel -> extractOperationExtension(declarer, operationModel, directedGraph, xmlDslModel));
   }
 
@@ -805,7 +805,7 @@ public final class XmlExtensionLoaderDelegate {
           .stream()
           .filter(child -> child.getIdentifier().equals(OPERATION_PARAMETER_IDENTIFIER))
           .forEach(param -> {
-            final String role = param.getParameters().get(ROLE);
+            final String role = param.getRawParameters().get(ROLE);
             extractParameter(operationDeclarer, param, getRole(role));
           });
     }
@@ -816,7 +816,7 @@ public final class XmlExtensionLoaderDelegate {
   }
 
   private void extractParameter(ParameterizedDeclarer parameterizedDeclarer, ComponentModel param, ParameterRole role) {
-    Map<String, String> parameters = param.getParameters();
+    Map<String, String> parameters = param.getRawParameters();
     String receivedInputType = parameters.get(TYPE_ATTRIBUTE);
     final LayoutModel.LayoutModelBuilder layoutModelBuilder = builder();
     if (parseBoolean(parameters.get(PASSWORD))) {
@@ -838,9 +838,9 @@ public final class XmlExtensionLoaderDelegate {
 
   private DisplayModel getDisplayModel(ComponentModel componentModel) {
     final DisplayModel.DisplayModelBuilder displayModelBuilder = DisplayModel.builder();
-    displayModelBuilder.displayName(componentModel.getParameters().get(DISPLAY_NAME_ATTRIBUTE));
-    displayModelBuilder.summary(componentModel.getParameters().get(SUMMARY_ATTRIBUTE));
-    displayModelBuilder.example(componentModel.getParameters().get(EXAMPLE_ATTRIBUTE));
+    displayModelBuilder.displayName(componentModel.getRawParameters().get(DISPLAY_NAME_ATTRIBUTE));
+    displayModelBuilder.summary(componentModel.getRawParameters().get(SUMMARY_ATTRIBUTE));
+    displayModelBuilder.example(componentModel.getRawParameters().get(EXAMPLE_ATTRIBUTE));
     return displayModelBuilder.build();
   }
 
@@ -909,7 +909,7 @@ public final class XmlExtensionLoaderDelegate {
     } else {
       // if tye element is absent, it will default to the VOID type
       if (outputAttributesComponentModel.isPresent()) {
-        String receivedOutputAttributeType = outputAttributesComponentModel.get().getParameters().get(TYPE_ATTRIBUTE);
+        String receivedOutputAttributeType = outputAttributesComponentModel.get().getRawParameters().get(TYPE_ATTRIBUTE);
         metadataType = extractType(receivedOutputAttributeType);
       } else {
         metadataType = BaseTypeBuilder.create(JAVA).voidType().build();
@@ -947,7 +947,7 @@ public final class XmlExtensionLoaderDelegate {
         .filter(child -> child.getIdentifier().equals(OPERATION_ERROR_IDENTIFIER))
         .forEach(param -> {
           final String namespace = xmlDslModel.getPrefix().toUpperCase();
-          final String typeName = param.getParameters().get(ERROR_TYPE_ATTRIBUTE);
+          final String typeName = param.getRawParameters().get(ERROR_TYPE_ATTRIBUTE);
           if (StringUtils.isBlank(typeName)) {
             throw new IllegalModelDefinitionException(format("The operation [%s] cannot have an <error> with an empty 'type' attribute",
                                                              operationName));

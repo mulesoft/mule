@@ -251,8 +251,8 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
   public static List<Pair<String, Object>> getPropertyValueFromPropertiesComponent(ComponentModel propertyComponentModel) {
     List<Pair<String, Object>> propertyValues = new ArrayList<>();
     propertyComponentModel.getInnerComponents().stream().forEach(entryComponentModel -> {
-      propertyValues.add(new Pair<>(entryComponentModel.getParameters().get("key"),
-                                    entryComponentModel.getParameters().get("value")));
+      propertyValues.add(new Pair<>(entryComponentModel.getRawParameters().get("key"),
+                                    entryComponentModel.getRawParameters().get("value")));
     });
     return propertyValues;
   }

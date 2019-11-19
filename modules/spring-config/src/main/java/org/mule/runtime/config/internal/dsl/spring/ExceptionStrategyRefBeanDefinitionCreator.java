@@ -9,8 +9,8 @@ package org.mule.runtime.config.internal.dsl.spring;
 import static org.mule.runtime.config.internal.model.ApplicationModel.EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.REFERENCE_ATTRIBUTE;
 
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -29,7 +29,7 @@ class ExceptionStrategyRefBeanDefinitionCreator extends BeanDefinitionCreator {
     if (componentModel.getIdentifier().equals(EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER)) {
       componentModel.setType(FlowExceptionHandler.class);
       ((SpringComponentModel) componentModel)
-          .setBeanReference(new RuntimeBeanReference(componentModel.getParameters().get(REFERENCE_ATTRIBUTE)));
+          .setBeanReference(new RuntimeBeanReference(componentModel.getRawParameters().get(REFERENCE_ATTRIBUTE)));
       return true;
     }
     return false;

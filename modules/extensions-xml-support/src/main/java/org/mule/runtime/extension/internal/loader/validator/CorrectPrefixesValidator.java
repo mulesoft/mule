@@ -11,6 +11,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENT
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.CORE_ERROR_NS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -97,7 +98,7 @@ public class CorrectPrefixesValidator implements ExtensionModelValidator {
   private void genericValidation(String moduleNamespace, OperationModel operationModel, ComponentModel elementComponentModel,
                                  ProblemsReporter problemsReporter, String attributeToValidate,
                                  ComponentIdentifier workingIdentifier) {
-    final String stringRepresentation = elementComponentModel.getParameters().get(attributeToValidate);
+    final String stringRepresentation = elementComponentModel.getRawParameters().get(attributeToValidate);
     if (StringUtils.isBlank(stringRepresentation)) {
       problemsReporter.addError(new Problem(operationModel, format(
                                                                    EMPTY_TYPE_FORMAT_MESSAGE,

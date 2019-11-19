@@ -646,9 +646,12 @@ class MuleExtensionModelDeclarer {
 
     parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
-        .ofType(typeLoader.load(String.class))
-        .withRole(ParameterRole.BEHAVIOUR)
+        .ofType(typeLoader.load(new TypeToken<Iterable<Object>>() {
+
+        }.getType()))
+        .withRole(BEHAVIOUR)
         .withExpressionSupport(REQUIRED)
+        .defaultingTo("#[payload]")
         .describedAs("Expression that defines the collection of parts to be processed in parallel.");
     parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("timeout")

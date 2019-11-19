@@ -8,6 +8,7 @@ package org.mule.runtime.extension.internal.loader.enricher;
 
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
+
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -150,7 +151,7 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
     private List<StereotypeModel> findStereotypes(ComponentModel componentModel, ParameterDeclaration propertyDeclaration) {
       final String expectedPropertyReference = ExpressionManager.DEFAULT_EXPRESSION_PREFIX + BindingContextUtils.VARS + "."
           + propertyDeclaration.getName() + ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
-      return componentModel.getParameters().entrySet().stream()
+      return componentModel.getRawParameters().entrySet().stream()
           .filter(stringStringEntry -> stringStringEntry.getValue().equals(expectedPropertyReference))
           .map(Map.Entry::getKey)
           .map(attributeName -> findStereotypes(componentModel.getIdentifier(), attributeName))

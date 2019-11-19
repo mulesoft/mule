@@ -197,7 +197,7 @@ public class MacroExpansionModulesModel {
    * @return a collection of used namespaces.
    */
   public static Set<String> getUsedNamespaces(ComponentModel rootComponentModel) {
-    return rootComponentModel.getParameters().entrySet().stream()
+    return rootComponentModel.getRawParameters().entrySet().stream()
         .filter(parameter -> parameter.getKey().startsWith(XMLNS_ATTRIBUTE + ":"))
         .map(Map.Entry::getValue)
         .collect(toSet());

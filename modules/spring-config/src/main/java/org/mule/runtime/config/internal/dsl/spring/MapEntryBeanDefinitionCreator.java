@@ -27,7 +27,7 @@ import org.springframework.beans.factory.support.ManagedList;
 /**
  * {@code BeanDefinitionCreator} that handles component that define a map entry.
  * <p>
- * 
+ *
  * <pre>
  *  <parsers-test:simple-type-entry key="key1" value="1"/>
  * </pre>
@@ -39,7 +39,7 @@ import org.springframework.beans.factory.support.ManagedList;
  * </pre>
  *
  * or
- * 
+ *
  * <pre>
  *  <parsers-test:complex-type-entry key="1">
  *      <parsers-test:parameter-collection-parser firstname="Pablo" lastname="La Greca" age="32"/>
@@ -64,15 +64,15 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
     SpringComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
     ComponentBuildingDefinition componentBuildingDefinition = createBeanDefinitionRequest.getComponentBuildingDefinition();
     componentModel.setType(type);
-    final Object key = componentModel.getParameters().get(ENTRY_TYPE_KEY_PARAMETER_NAME);
+    final Object key = componentModel.getRawParameters().get(ENTRY_TYPE_KEY_PARAMETER_NAME);
     Object keyBeanDefinition = getConvertibleBeanDefinition(objectTypeVisitor.getMapEntryType().get().getKeyType(), key,
                                                             componentBuildingDefinition.getKeyTypeConverter());
 
 
     Object value = null;
     // MULE-11984: Check that generated map entries are not empty
-    if (componentModel.getParameters().get(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME) != null) {
-      value = new RuntimeBeanReference(componentModel.getParameters().get(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME));
+    if (componentModel.getRawParameters().get(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME) != null) {
+      value = new RuntimeBeanReference(componentModel.getRawParameters().get(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME));
     } else {
       value = getValue(objectTypeVisitor, componentModel, componentBuildingDefinition);
     }
@@ -91,11 +91,11 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
     Class valueType = objectTypeVisitor.getMapEntryType().get().getValueType();
     if (isSimpleType(valueType) || componentModel.getInnerComponents().isEmpty()) {
       value = getConvertibleBeanDefinition(objectTypeVisitor.getMapEntryType().get().getValueType(),
-                                           componentModel.getParameters().get(SIMPLE_TYPE_VALUE_PARAMETER_NAME),
+                                           componentModel.getRawParameters().get(SIMPLE_TYPE_VALUE_PARAMETER_NAME),
                                            componentBuildingDefinition.getTypeConverter());
     } else if (List.class.isAssignableFrom(objectTypeVisitor.getMapEntryType().get().getValueType())) {
       if (componentModel.getInnerComponents().isEmpty()) {
-        String valueParameter = componentModel.getParameters().get(SIMPLE_TYPE_VALUE_PARAMETER_NAME);
+        String valueParameter = componentModel.getRawParameters().get(SIMPLE_TYPE_VALUE_PARAMETER_NAME);
         value = getConvertibleBeanDefinition(valueType, valueParameter, componentBuildingDefinition.getTypeConverter());
       } else {
         ManagedList<Object> managedList = componentModel

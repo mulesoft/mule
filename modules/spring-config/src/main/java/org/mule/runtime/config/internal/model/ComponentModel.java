@@ -13,6 +13,7 @@ import static java.util.Optional.of;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
 import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapterWithSterotype;
@@ -25,12 +26,15 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.nested.NestableElementModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper.ExtensionWalkerModelDelegate;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -82,6 +86,7 @@ public abstract class ComponentModel {
   private DefaultComponentLocation componentLocation;
   private TypedComponentIdentifier.ComponentType componentType;
   private org.mule.runtime.api.meta.model.ComponentModel componentModel;
+  private NestableElementModel nestableElementModel;
   private ConfigurationModel configurationModel;
   private ConnectionProviderModel connectionProviderModel;
   private MetadataTypeModelAdapter metadataTypeModelAdapter;
@@ -127,7 +132,7 @@ public abstract class ComponentModel {
   /**
    * @return a {@code java.util.Map} with the simple parameters of the configuration.
    */
-  public Map<String, String> getParameters() {
+  public Map<String, String> getRawParameters() {
     return unmodifiableMap(parameters);
   }
 
@@ -170,8 +175,8 @@ public abstract class ComponentModel {
    * @param parameterName name of the configuration parameter.
    * @param value value contained by the configuration parameter.
    */
-  public void setParameter(String parameterName, String value) {
-    this.parameters.put(parameterName, value);
+  public void setParameter(ParameterModel parameterModel, ComponentParameterAst value) {
+    this.parameters.put(parameterModel.getName(), value.getRawValue());
   }
 
   /**
@@ -219,6 +224,12 @@ public abstract class ComponentModel {
       }
     }
 
+    if (nestableElementModel != null) {
+      if (modelClass.isAssignableFrom(nestableElementModel.getClass())) {
+        return Optional.of((M) nestableElementModel);
+      }
+    }
+
     if (metadataTypeModelAdapter != null) {
       if (modelClass.isAssignableFrom(metadataTypeModelAdapter.getClass())) {
         return Optional.of((M) metadataTypeModelAdapter);
@@ -230,66 +241,130 @@ public abstract class ComponentModel {
 
   public void resolveTypedComponentIdentifier(ExtensionModelHelper extensionModelHelper) {
     executeOnComponentTree(this, componentModel -> {
-      extensionModelHelper.walkToComponent(componentModel.getIdentifier(), new ExtensionWalkerModelDelegate() {
+      componentModel.doResolveTypedComponentIdentifier(extensionModelHelper);
+    });
+  }
 
-        @Override
-        public void onConfiguration(ConfigurationModel model) {
-          componentModel.setConfigurationModel(model);
-          processPojoParameters(extensionModelHelper, model);
-        }
+  private void doResolveTypedComponentIdentifier(ExtensionModelHelper extensionModelHelper) {
+    extensionModelHelper.walkToComponent(getIdentifier(), new ExtensionWalkerModelDelegate() {
 
-        @Override
-        public void onConnectionProvider(ConnectionProviderModel model) {
-          componentModel.setConnectionProviderModel(model);
-          processPojoParameters(extensionModelHelper, model);
-        }
-
-        @Override
-        public void onOperation(OperationModel model) {
-          componentModel.setComponentModel(model);
-          processPojoParameters(extensionModelHelper, model);
-        }
-
-        @Override
-        public void onSource(SourceModel model) {
-          componentModel.setComponentModel(model);
-          processPojoParameters(extensionModelHelper, model);
-        }
-
-        @Override
-        public void onConstruct(ConstructModel model) {
-          componentModel.setComponentModel(model);
-          processPojoParameters(extensionModelHelper, model);
-        }
-
-        private void processPojoParameters(ExtensionModelHelper extensionModelHelper, ParameterizedModel model) {
-          ((ComponentAst) componentModel).recursiveStream()
-              .map(childComp -> (ComponentModel) childComp)
-              .forEach(childComp -> childComp
-                  .setMetadataTypeModelAdapter(extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
-                      .map(paramModel -> createParameterizedTypeModelAdapter(paramModel.getType(), extensionModelHelper))
-                      .orElseGet(() -> {
-                        final Optional<? extends MetadataType> childMetadataType =
-                            extensionModelHelper.findMetadataType(childComp.getType());
-                        return childMetadataType
-                            .flatMap(type -> createMetadataTypeModelAdapterWithSterotype(type, extensionModelHelper))
-                            .orElseGet(() -> childMetadataType
-                                .map(type -> createParameterizedTypeModelAdapter(type, extensionModelHelper))
-                                .orElse(null));
-                      })));
-        };
-
-      });
-
-      // Last resort to try to find a matching metadata type for this component
-      if (!componentModel.getModel(HasStereotypeModel.class).isPresent()) {
-        extensionModelHelper.findMetadataType(componentModel.getType())
-            .flatMap(type -> createMetadataTypeModelAdapterWithSterotype(type, extensionModelHelper))
-            .ifPresent(componentModel::setMetadataTypeModelAdapter);
+      @Override
+      public void onConfiguration(ConfigurationModel model) {
+        setConfigurationModel(model);
+        onParameterizedModel(model);
       }
 
-      componentModel.setComponentType(resolveComponentType((ComponentAst) componentModel, extensionModelHelper));
+      @Override
+      public void onConnectionProvider(ConnectionProviderModel model) {
+        setConnectionProviderModel(model);
+        onParameterizedModel(model);
+      }
+
+      @Override
+      public void onOperation(OperationModel model) {
+        setComponentModel(model);
+        onParameterizedModel(model);
+      }
+
+      @Override
+      public void onSource(SourceModel model) {
+        setComponentModel(model);
+        onParameterizedModel(model);
+      }
+
+      @Override
+      public void onConstruct(ConstructModel model) {
+        setComponentModel(model);
+        onParameterizedModel(model);
+      }
+
+      @Override
+      public void onNestableElement(NestableElementModel model) {
+        setNestableElementModel(model);
+        if (model instanceof ParameterizedModel) {
+          onParameterizedModel((ParameterizedModel) model);
+        }
+      }
+
+      private void onParameterizedModel(ParameterizedModel model) {
+        handleNestedParameters(extensionModelHelper, model);
+
+        ((ComponentAst) ComponentModel.this).recursiveStream()
+            // .filter(childComp -> childComp != ComponentModel.this)
+            .map(childComp -> (ComponentModel) childComp)
+            .forEach(childComp -> childComp
+                .setMetadataTypeModelAdapter(findParameterModel(extensionModelHelper, model, childComp)));
+      }
+
+      private void handleNestedParameters(ExtensionModelHelper extensionModelHelper, ParameterizedModel model) {
+        Set<ComponentAst> paramChildren = new HashSet<>();
+
+        ((ComponentAst) ComponentModel.this).recursiveStream()
+            // .filter(childComp -> childComp != ComponentModel.this)
+            .forEach(childComp -> {
+              extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
+                  // do not handle the callback parameters from the sources
+                  .filter(paramModel -> {
+                    if (model instanceof SourceModel) {
+                      return !(((SourceModel) model).getSuccessCallback()
+                          .map(sc -> sc.getAllParameterModels().contains(paramModel))
+                          .orElse(false) ||
+                          ((SourceModel) model).getErrorCallback()
+                              .map(ec -> ec.getAllParameterModels().contains(paramModel))
+                              .orElse(false));
+                    } else {
+                      return true;
+                    }
+                  })
+                  .filter(paramModel -> paramModel.getDslConfiguration().allowsInlineDefinition())
+                  .ifPresent(paramModel -> {
+                    paramChildren.add(childComp);
+
+                    if (paramModel.getExpressionSupport() == NOT_SUPPORTED) {
+                      // TODO MULE-17710 do a recursive navigation to set the field metadata on the inner ComponentAsts of
+                      // childComp
+                      setParameter(paramModel, new DefaultComponentParameterAst(childComp,
+                                                                                () -> paramModel, childComp.getMetadata()));
+
+                      ((ComponentModel) childComp)
+                          .setMetadataTypeModelAdapter(createParameterizedTypeModelAdapter(paramModel.getType(),
+                                                                                           extensionModelHelper));
+                    } else {
+                      setParameter(paramModel, new DefaultComponentParameterAst(((ComponentModel) childComp).getTextContent(),
+                                                                                () -> paramModel, childComp.getMetadata()));
+                    }
+                  });
+            });
+
+        // TODO MULE-17711 When these are removed, the ast parameters may need to be traversed with recursive/direct spliterators
+        // ComponentModel.this.innerComponents.removeAll(paramChildren);
+      }
+
+      private MetadataTypeModelAdapter findParameterModel(ExtensionModelHelper extensionModelHelper, ParameterizedModel model,
+                                                          ComponentModel childComp) {
+
+        return childComp.getModel(MetadataTypeModelAdapter.class)
+            .orElseGet(() -> {
+              final Optional<? extends MetadataType> childMetadataType =
+                  extensionModelHelper.findMetadataType(childComp.getType());
+              return childMetadataType
+                  .flatMap(type -> createMetadataTypeModelAdapterWithSterotype(type, extensionModelHelper))
+                  .orElseGet(() -> childMetadataType
+                      .map(type -> createParameterizedTypeModelAdapter(type, extensionModelHelper))
+                      .orElse(null));
+            });
+      };
+
     });
+
+    // Last resort to try to find a matching metadata type for this component
+    if (!getModel(HasStereotypeModel.class).isPresent()) {
+      extensionModelHelper.findMetadataType(getType())
+          .flatMap(type -> createMetadataTypeModelAdapterWithSterotype(type, extensionModelHelper))
+          .ifPresent(this::setMetadataTypeModelAdapter);
+    }
+
+    setComponentType(resolveComponentType((ComponentAst) this, extensionModelHelper));
   }
 
   private void executeOnComponentTree(final ComponentModel component, final Consumer<ComponentModel> task)
@@ -302,6 +377,10 @@ public abstract class ComponentModel {
 
   public void setComponentModel(org.mule.runtime.api.meta.model.ComponentModel model) {
     this.componentModel = model;
+  }
+
+  public void setNestableElementModel(NestableElementModel nestableElementModel) {
+    this.nestableElementModel = nestableElementModel;
   }
 
   public void setConfigurationModel(ConfigurationModel model) {
@@ -318,9 +397,16 @@ public abstract class ComponentModel {
 
   /**
    * @return the value of the name attribute.
+   * @deprecated Use {@link ComponentAst#getComponentId()} instead.
    */
+  @Deprecated
   public String getNameAttribute() {
-    return parameters.get(ApplicationModel.NAME_ATTRIBUTE);
+    if (this instanceof ComponentAst) {
+      return ((ComponentAst) this).getComponentId()
+          .orElseGet(() -> parameters.get(ApplicationModel.NAME_ATTRIBUTE));
+    } else {
+      return parameters.get(ApplicationModel.NAME_ATTRIBUTE);
+    }
   }
 
   /**
