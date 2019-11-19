@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.event;
 
 import static java.lang.System.identityHashCode;
 import static java.time.Instant.now;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -26,7 +27,6 @@ import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
-import org.mule.runtime.core.internal.context.notification.DefaultProcessorsTrace;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.streaming.EventStreamingState;
 import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
@@ -91,7 +91,6 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   private final ComponentLocation location;
 
   private final ProcessingTime processingTime;
-  private final ProcessorsTrace processorsTrace = new DefaultProcessorsTrace();
 
   private transient EventStreamingState streamingState;
 
@@ -137,7 +136,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
   @Override
   public ProcessorsTrace getProcessorsTrace() {
-    return processorsTrace;
+    return () -> emptyList();
   }
 
   @Override

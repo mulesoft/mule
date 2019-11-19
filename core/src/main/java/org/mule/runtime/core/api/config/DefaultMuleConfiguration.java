@@ -328,7 +328,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
    *         {@code false} otherwise.
    */
   public static boolean isFlowTrace() {
-    return flowTrace || logger.isDebugEnabled();
+    return flowTrace;
   }
 
   protected void validateEncoding() throws FatalException {
