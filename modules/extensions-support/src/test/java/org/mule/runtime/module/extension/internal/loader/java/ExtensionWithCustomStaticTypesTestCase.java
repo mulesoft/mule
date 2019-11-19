@@ -22,6 +22,7 @@ import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.impl.DefaultBinaryType;
 import org.mule.runtime.api.meta.Typed;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.OutputModel;
@@ -63,6 +64,16 @@ public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase
     MetadataType innerType = ((ArrayType) type).getType();
     assertThat(innerType.getMetadataFormat(), is(XML));
     assertThat(innerType.toString(), is("#root:shiporder"));
+  }
+
+  @Test
+  public void withListOutputAndEmptySchemaXmlStaticType() throws Exception {
+    OperationModel o = getOperation("xmlOutputListWithEmptySchema");
+
+    MetadataType type = o.getOutput().getType();
+    assertThat(type, is(instanceOf(ArrayType.class)));
+    MetadataType innerType = ((ArrayType) type).getType();
+    assertThat(innerType, is(instanceOf(DefaultBinaryType.class)));
   }
 
   @Test
