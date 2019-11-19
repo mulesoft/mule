@@ -11,9 +11,9 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
-import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
+import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
+import org.mule.tck.core.streaming.DummyByteBufferManager;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -52,7 +52,7 @@ public class PetStoreSerializableParameterTestCase extends AbstractExtensionFunc
   public void cursorStreamProviderParameter() throws Exception {
     InputStream inputStream = new ByteArrayInputStream(DONKEY.getBytes());
     CursorStreamProvider provider =
-        new InMemoryCursorStreamProvider(inputStream, InMemoryCursorStreamConfig.getDefault(), new SimpleByteBufferManager());
+        new InMemoryCursorStreamProvider(inputStream, InMemoryCursorStreamConfig.getDefault(), new DummyByteBufferManager());
     Message message = flowRunner("dynamicSerializableParameter").withVariable("animal", provider).run().getMessage();
     assertThat(message.getPayload().getValue(), is(DONKEY));
   }
