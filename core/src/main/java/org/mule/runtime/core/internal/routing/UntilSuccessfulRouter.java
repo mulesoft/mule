@@ -20,6 +20,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.apply
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Mono.subscriberContext;
+import static reactor.util.context.Context.empty;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.functional.Either;
@@ -39,6 +40,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -47,6 +49,7 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 import reactor.core.publisher.Flux;
+import reactor.util.context.Context;
 
 /**
  * Router with {@link UntilSuccessful} retry logic.
@@ -74,6 +77,7 @@ class UntilSuccessfulRouter {
   private final Flux<CoreEvent> downstreamFlux;
   private final FluxSinkRecorder<CoreEvent> innerRecorder = new FluxSinkRecorder<>();
   private final FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
+  private final AtomicReference<Context> downstreamCtxReference = new AtomicReference(empty());
 
   // Retry settings, such as the maximum number of retries, and the delay between them
   // are managed by suppliers. By doing this, the implementations remains agnostic of whether
@@ -126,7 +130,11 @@ class UntilSuccessfulRouter {
         .onErrorContinue(getRetryPredicate(), getRetryHandler());
 
     // Downstream chain. Unpacks and publishes successful events and errors downstream.
-    downstreamFlux = Flux.create(downstreamRecorder)
+    downstreamFlux = Flux.<Either<Throwable, CoreEvent>>create(sink -> {
+      downstreamRecorder.accept(sink);
+      // This will always run after the `downstreamCtxReference` is set
+      subscribeUpstreamChains(downstreamCtxReference.get());
+    })
         .doOnNext(event -> inflightEvents.decrementAndGet())
         .map(getScopeResultMapper());
 
@@ -168,7 +176,7 @@ class UntilSuccessfulRouter {
       int retriesLeft =
           ctx.retryCount.getAndDecrement();
       if (retriesLeft > 0) {
-        LOGGER.error("Retrying execution of event, attempt {} of {}.", ctx.getRetriesLeft(),
+        LOGGER.error("Retrying execution of event, attempt {} of {}.", ctx.getAttemptNumber(),
                      ctx.maxRetries != RETRY_COUNT_FOREVER ? ctx.maxRetries : "unlimited");
 
         // Schedule retry with delay
@@ -212,9 +220,16 @@ class UntilSuccessfulRouter {
     return downstreamFlux
         .compose(downstreamPublisher -> subscriberContext()
             .flatMapMany(downstreamContext -> downstreamPublisher.doOnSubscribe(s -> {
-              innerFlux.subscriberContext(downstreamContext).subscribe();
-              upstreamFlux.subscriberContext(downstreamContext).subscribe();
+              // When a transaction is active, the processing strategy executes the whole reactor chain in the same thread that
+              // performs the subscription itself. Because of this, the subscription has to be deferred until the
+              // downstreamPublisher FluxCreate#subscribe method registers the new sink in the recorder.
+              downstreamCtxReference.set(downstreamContext);
             })));
+  }
+
+  private void subscribeUpstreamChains(Context downstreamContext) {
+    innerFlux.subscriberContext(downstreamContext).subscribe();
+    upstreamFlux.subscriberContext(downstreamContext).subscribe();
   }
 
   private RetryContext getRetryContextForEvent(CoreEvent event) {
@@ -290,8 +305,8 @@ class UntilSuccessfulRouter {
       retryCount.set(maxRetries);
     }
 
-    int getRetriesLeft() {
-      return maxRetries - retryCount.get() + 1;
+    int getAttemptNumber() {
+      return maxRetries - retryCount.get();
     }
   }
 
