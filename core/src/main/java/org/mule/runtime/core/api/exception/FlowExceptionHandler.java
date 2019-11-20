@@ -35,6 +35,7 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
   CoreEvent handleException(Exception exception, CoreEvent event);
 
   @Override
+  @Deprecated
   default Publisher<CoreEvent> apply(Exception exception) {
     try {
       if (exception instanceof MessagingException) {

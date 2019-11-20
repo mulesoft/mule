@@ -134,9 +134,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   final public CoreEvent handleException(Exception exception, CoreEvent event) {
     try {
-      return Mono.<CoreEvent>from(sink -> routeError(exception, handledEvent -> sink.onNext(handledEvent),
-                                                     rethrownError -> sink.onError(rethrownError)))
-          .block();
+      return applyInternal(exception).block();
     } catch (Throwable throwable) {
       throw new RuntimeException(unwrap(throwable));
     }
@@ -145,6 +143,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   public void routeError(Exception error, Consumer<CoreEvent> continueCallback,
                          Consumer<Throwable> propagateCallback) {
+    // All calling methods will end up transforming any error class other than MessagingException into that one
     MessagingException messagingError = (MessagingException) error;
     CoreEvent failureEvent = messagingError.getEvent();
     routingSink.get().next(quickCopy(failureEvent, of(getParameterId(ERROR_EXCEPTION, failureEvent), error,
@@ -155,13 +154,12 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   @Override
   public Publisher<CoreEvent> apply(final Exception exception) {
-    return applyInternal(exception, ((MessagingException) exception).getEvent());
+    return applyInternal(exception);
   }
 
-  private Publisher<CoreEvent> applyInternal(final Exception exception, CoreEvent event) {
-    return Mono.create(sink -> routingSink.get().next(quickCopy(event, of(getParameterId(ERROR_EXCEPTION, event), exception,
-                                                                          getParameterId(ERROR_SINK, event), sink,
-                                                                          getParameterId(ERROR_EVENT, event), event))));
+  private Mono<CoreEvent> applyInternal(final Exception exception) {
+    return Mono.from(sink -> routeError(exception, handledEvent -> sink.onNext(handledEvent),
+                                        rethrownError -> sink.onError(rethrownError)));
   }
 
   private void resolveHandling(CoreEvent result) {
