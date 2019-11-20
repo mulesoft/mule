@@ -219,9 +219,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     createStreamingState();
   }
 
-  private void createStreamingState() {
-    streamingState = new EventStreamingState();
-    onTerminated((event, e) -> streamingState.dispose());
+  void createStreamingState() {
+    if (streamingState == null) {
+      streamingState = new EventStreamingState();
+      onTerminated((event, e) -> streamingState.dispose());
+    }
   }
 
   /**
