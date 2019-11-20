@@ -20,6 +20,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.apply
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Mono.subscriberContext;
+import static reactor.util.context.Context.empty;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.functional.Either;
@@ -76,7 +77,7 @@ class UntilSuccessfulRouter {
   private final Flux<CoreEvent> downstreamFlux;
   private final FluxSinkRecorder<CoreEvent> innerRecorder = new FluxSinkRecorder<>();
   private final FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
-  private final AtomicReference<Runnable> transactionAwareUpstreamSubscription;
+  private final AtomicReference<Context> downstreamCtxReference = new AtomicReference(empty());
 
   // Retry settings, such as the maximum number of retries, and the delay between them
   // are managed by suppliers. By doing this, the implementations remains agnostic of whether
@@ -99,7 +100,6 @@ class UntilSuccessfulRouter {
     this.delayScheduler = new ConditionalExecutorServiceDecorator(delayScheduler, s -> isTransactionActive());
     this.retryContextResolver = new EventInternalContextResolver<>(RETRY_CTX_INTERNAL_PARAM_KEY,
                                                                    HashMap::new);
-    this.transactionAwareUpstreamSubscription = new AtomicReference<>();
 
     // Upstream side of until successful chain. Injects events into retrial chain.
     upstreamFlux = Flux.from(publisher)
@@ -132,10 +132,8 @@ class UntilSuccessfulRouter {
     // Downstream chain. Unpacks and publishes successful events and errors downstream.
     downstreamFlux = Flux.<Either<Throwable, CoreEvent>>create(sink -> {
       downstreamRecorder.accept(sink);
-      // This will always run after the `transactionAwareUpstreamSubscription` is set
-      if (transactionAwareUpstreamSubscription.get() != null) {
-        transactionAwareUpstreamSubscription.get().run();
-      }
+      // This will always run after the `downstreamCtxReference` is set
+      subscribeUpstreamChains(downstreamCtxReference.get());
     })
         .doOnNext(event -> inflightEvents.decrementAndGet())
         .map(getScopeResultMapper());
@@ -225,13 +223,7 @@ class UntilSuccessfulRouter {
               // When a transaction is active, the processing strategy executes the whole reactor chain in the same thread that
               // performs the subscription itself. Because of this, the subscription has to be deferred until the
               // downstreamPublisher FluxCreate#subscribe method registers the new sink in the recorder.
-              if (isTransactionActive()) {
-                transactionAwareUpstreamSubscription.set(() -> {
-                  subscribeUpstreamChains(downstreamContext);
-                });
-              } else {
-                subscribeUpstreamChains(downstreamContext);
-              }
+              downstreamCtxReference.set(downstreamContext);
             })));
   }
 
