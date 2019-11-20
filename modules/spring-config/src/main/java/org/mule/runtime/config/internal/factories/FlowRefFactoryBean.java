@@ -12,7 +12,6 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.config.DefaultMuleConfiguration.isFlowTrace;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -322,9 +321,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     private FlowExceptionHandler popSubFlowFlowStackElement() {
       return (exception, event) -> {
-        if (isFlowTrace()) {
-          ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
-        }
+        ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
         return event;
       };
     }

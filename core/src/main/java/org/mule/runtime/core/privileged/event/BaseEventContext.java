@@ -8,16 +8,15 @@ package org.mule.runtime.core.privileged.event;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
 
-import org.reactivestreams.Publisher;
-
 import java.util.Optional;
 import java.util.function.BiConsumer;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Context representing a message that is received by a Mule Runtime via a connector source. This context is immutable and
@@ -63,9 +62,6 @@ public interface BaseEventContext extends EventContext {
   /**
    * Events have a stack of executed flows (same as a call stack), so that at any given instant an application developer can
    * determine where this event came from.
-   * <p>
-   * This will only be enabled if {@link DefaultMuleConfiguration#isFlowTrace()} is {@code true}. If {@code false}, the stack will
-   * always be empty.
    *
    * @return the flow stack associated to this event.
    *
@@ -76,16 +72,13 @@ public interface BaseEventContext extends EventContext {
   }
 
   /**
-   * Events have a list of message processor paths it went trough so that the execution path of an event can be reconstructed
-   * after it has executed.
-   * <p>
-   * This will only be enabled if {@link DefaultMuleConfiguration#isFlowTrace()} is {@code true}. If {@code false}, the list will
-   * always be empty.
-   *
-   * @return the message processors trace associated to this event.
+   * The list will always be empty.
    *
    * @since 3.8.0
+   *
+   * @deprecated Use the message history functionality form the agent instead.
    */
+  @Deprecated
   ProcessorsTrace getProcessorsTrace();
 
   /**

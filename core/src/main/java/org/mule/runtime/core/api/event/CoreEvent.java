@@ -14,7 +14,6 @@ import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.security.SecurityContext;
-import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
@@ -60,9 +59,6 @@ public interface CoreEvent extends Serializable, Event {
   /**
    * Events have a stack of executed flows (same as a call stack), so that at any given instant an application developer can
    * determine where this event came from.
-   * <p>
-   * This will only be enabled if {@link DefaultMuleConfiguration#isFlowTrace()} is {@code true}. If {@code false}, the stack will
-   * always be empty.
    *
    * @return the flow stack associated to this event.
    *
