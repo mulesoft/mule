@@ -14,7 +14,6 @@ import static java.util.stream.Stream.of;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newObjectValue;
 import static org.mule.runtime.dsl.internal.xml.parser.XmlApplicationParser.IS_CDATA;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
@@ -28,6 +27,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -103,7 +103,7 @@ class DeclarationBasedElementModelFactory {
   private final DslResolvingContext context;
   private final InfrastructureElementModelDelegate infrastructureDelegate;
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-  private Map<ExtensionModel, DslSyntaxResolver> resolvers;
+  private final Map<ExtensionModel, DslSyntaxResolver> resolvers;
   private ExtensionModel currentExtension;
   private DslSyntaxResolver dsl;
 
@@ -628,6 +628,12 @@ class DeclarationBasedElementModelFactory {
                                      InternalComponentConfiguration.Builder parentConfig,
                                      DslElementModel.Builder parentElement, ParameterModel parameterModel, boolean explicit) {
     if (paramDsl.supportsAttributeDeclaration()) {
+      // skip the name attribute for the case where it was already added
+      if (parameterModel.isComponentId()
+          && "name".equals(parameterModel.getName())) {
+        return;
+      }
+
       // attribute parameters imply no further nesting in the configs
       parentConfig.withParameter(paramDsl.getAttributeName(), value.getValue());
       parentElement.containing(DslElementModel.<ParameterModel>builder()
