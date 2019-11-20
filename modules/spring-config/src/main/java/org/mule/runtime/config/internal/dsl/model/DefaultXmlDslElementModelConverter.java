@@ -33,8 +33,8 @@ import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEME
 import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
+
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -296,7 +296,7 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
         });
 
     // write set-variable
-    elementModel.findElement(buildFromStringRepresentation("ee:set-variables"))
+    elementModel.findElement(buildFromStringRepresentation("ee:variables"))
         .ifPresent(variables -> {
           Element variablesList = createElement(elementModel.getDsl(), "variables");
           transform.appendChild(variablesList);
