@@ -29,7 +29,6 @@ import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
-import static reactor.core.publisher.Mono.from;
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -64,6 +63,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -74,7 +74,6 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.MonoSink;
 
 @NoExtend
 public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
@@ -84,6 +83,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile(".*/.*/.*");
   private static final String ERROR_EXCEPTION = "error.exception.";
   private static final String ERROR_SINK = "error.sink.";
+  private static final String ERROR_SUCCESS_CALLBACK = "error.success.";
+  private static final String ERROR_RETHROWN_CALLBACK = "error.error.";
   private static final String ERROR_EVENT = "error.event.";
 
   @Inject
@@ -133,38 +134,50 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   final public CoreEvent handleException(Exception exception, CoreEvent event) {
     try {
-      return from(applyInternal(exception, event)).block();
+      return applyInternal(exception).block();
     } catch (Throwable throwable) {
       throw new RuntimeException(unwrap(throwable));
     }
   }
 
   @Override
-  public Publisher<CoreEvent> apply(final Exception exception) {
-    return applyInternal(exception, ((MessagingException) exception).getEvent());
+  public void routeError(Exception error, Consumer<CoreEvent> continueCallback,
+                         Consumer<Throwable> propagateCallback) {
+    // All calling methods will end up transforming any error class other than MessagingException into that one
+    MessagingException messagingError = (MessagingException) error;
+    CoreEvent failureEvent = messagingError.getEvent();
+    routingSink.get().next(quickCopy(failureEvent, of(getParameterId(ERROR_EXCEPTION, failureEvent), error,
+                                                      getParameterId(ERROR_SUCCESS_CALLBACK, failureEvent), continueCallback,
+                                                      getParameterId(ERROR_RETHROWN_CALLBACK, failureEvent), propagateCallback,
+                                                      getParameterId(ERROR_EVENT, failureEvent), failureEvent)));
   }
 
-  private Publisher<CoreEvent> applyInternal(final Exception exception, CoreEvent event) {
-    return Mono.create(sink -> routingSink.get().next(quickCopy(event, of(getParameterId(ERROR_EXCEPTION, event), exception,
-                                                                          getParameterId(ERROR_SINK, event), sink,
-                                                                          getParameterId(ERROR_EVENT, event), event))));
+  @Override
+  public Publisher<CoreEvent> apply(final Exception exception) {
+    return applyInternal(exception);
+  }
+
+  private Mono<CoreEvent> applyInternal(final Exception exception) {
+    return Mono.from(sink -> routeError(exception, handledEvent -> sink.onNext(handledEvent),
+                                        rethrownError -> sink.onError(rethrownError)));
   }
 
   private void resolveHandling(CoreEvent result) {
     Exception exception = getException(result);
-    MonoSink<CoreEvent> sink = getInternalParameter(ERROR_SINK, result);
+    Consumer<CoreEvent> successfullyHandledConsumer = getInternalParameter(ERROR_SUCCESS_CALLBACK, result);
+    Consumer<Throwable> errorConsumer = getInternalParameter(ERROR_RETHROWN_CALLBACK, result);
     if (exception instanceof MessagingException) {
       final MessagingException messagingEx = (MessagingException) exception;
       if (messagingEx.handled()) {
-        sink.success(result);
+        successfullyHandledConsumer.accept(result);
       } else {
         if (messagingEx.getEvent() != result) {
           messagingEx.setProcessedEvent(result);
         }
-        sink.error(exception);
+        errorConsumer.accept(exception);
       }
     } else {
-      sink.error(exception);
+      errorConsumer.accept(exception);
     }
   }
 
@@ -198,8 +211,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       }
       CoreEvent result = afterRouting().apply(((MessagingException) me).getEvent());
       fireEndNotification(getOriginalEvent(result), result, me);
-      MonoSink<CoreEvent> sink = getInternalParameter(ERROR_SINK, result);
-      sink.error(me);
+      Consumer<Throwable> sink = getInternalParameter(ERROR_RETHROWN_CALLBACK, result);
+      sink.accept(me);
     };
   }
 
@@ -341,8 +354,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   /**
-   * @deprecated Use {@link #createErrorType(ErrorTypeRepository, String, ConfigurationProperties)} which handles correctly
-   * lazy mule artifact contexts.
+   * @deprecated Use {@link #createErrorType(ErrorTypeRepository, String, ConfigurationProperties)} which handles correctly lazy
+   *             mule artifact contexts.
    */
   @Deprecated
   public static ErrorTypeMatcher createErrorType(ErrorTypeRepository errorTypeRepository, String errorTypeNames) {
@@ -435,11 +448,11 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   /**
    * Creates a copy of this ErrorHandler, with the defined location. This location allows to retrieve the
-   * {@link ProcessingStrategy}, and define if a running {@link org.mule.runtime.core.api.transaction.Transaction} is
-   * owned by the {@link org.mule.runtime.core.api.construct.Flow} or {@link org.mule.runtime.core.internal.processor.TryScope}
-   * executing this ErrorHandler.
-   * This is intended to be used when having references to Global ErrorHandlers, since each instance reference
+   * {@link ProcessingStrategy}, and define if a running {@link org.mule.runtime.core.api.transaction.Transaction} is owned by the
+   * {@link org.mule.runtime.core.api.construct.Flow} or {@link org.mule.runtime.core.internal.processor.TryScope} executing this
+   * ErrorHandler. This is intended to be used when having references to Global ErrorHandlers, since each instance reference
    * should run with the processing strategy defined by the flow referencing it, and be able to rollback transactions.
+   * 
    * @param location
    * @return copy of this ErrorHandler with location to retrieve {@link ProcessingStrategy}
    *

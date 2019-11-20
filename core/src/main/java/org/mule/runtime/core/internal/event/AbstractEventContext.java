@@ -11,8 +11,6 @@ import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static reactor.core.publisher.Mono.empty;
-import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
@@ -35,7 +33,6 @@ import java.util.function.Consumer;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoSink;
 
@@ -160,17 +157,13 @@ abstract class AbstractEventContext implements BaseEventContext {
       if (debugLogEnabled) {
         LOGGER.debug("{} handling messaging exception.", this);
       }
-      return just((MessagingException) throwable)
-          .flatMapMany(exceptionHandler)
-          .doOnNext(handled -> success(handled))
-          .doOnError(rethrown -> responseDone(left(rethrown)))
-          // This ensures that both handled and rethrown outcome both result in a Publisher<Void>
-          .materialize().then()
-          .toProcessor();
+
+      exceptionHandler.routeError((MessagingException) throwable, handled -> success(handled),
+                                  rethrown -> responseDone(left(rethrown)));
     } else {
       responseDone(left(throwable));
-      return empty();
     }
+    return empty();
   }
 
   private synchronized void responseDone(Either<Throwable, CoreEvent> result) {

@@ -13,6 +13,7 @@ import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
@@ -29,10 +30,18 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
    * @param exception which occurred
    * @param event which was being processed when the exception occurred
    * @return new event to route on to the rest of the flow, generally with ExceptionPayload set on the message
+   * @deprecated Use {@link FlowExceptionHandler#routeError(Exception, Consumer, Consumer)}
    */
+  @Deprecated
   CoreEvent handleException(Exception exception, CoreEvent event);
 
+  /**
+   * @param exception the exception to handle
+   * @return the publisher with the handling result
+   * @deprecated Use {@link FlowExceptionHandler#routeError(Exception, Consumer, Consumer)}
+   */
   @Override
+  @Deprecated
   default Publisher<CoreEvent> apply(Exception exception) {
     try {
       if (exception instanceof MessagingException) {
@@ -49,6 +58,18 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
     } catch (Throwable throwable) {
       return error(propagateWrappingFatal(throwable));
     }
+  }
+
+  /**
+   * Routes the error towards the destination error handler, calling the corresponding callback in case of failure or success.
+   * 
+   * @param error the {@link Exception} to route
+   * @param continueCallback the callback called in case the error is successfully handled
+   * @param propagateCallback the callback is called in case the error-handling fails
+   */
+  default void routeError(Exception error, Consumer<CoreEvent> continueCallback,
+                          Consumer<Throwable> propagateCallback) {
+    propagateCallback.accept(error);
   }
 }
 
