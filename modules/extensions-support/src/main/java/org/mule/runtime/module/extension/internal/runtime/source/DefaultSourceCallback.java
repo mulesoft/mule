@@ -285,7 +285,9 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
           mediaType = optionalMediaType.get();
           existingEncoding = mediaType.getCharset().orElse(existingEncoding);
         }
-      } else {
+      }
+
+      if (mediaType == null) {
         mediaType = defaultMediaType;
       }
     }
