@@ -79,6 +79,7 @@ import java.util.function.Function;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
 /**
  * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link Processor}s that will be used to process
@@ -260,8 +261,11 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       Optional<Object> onErrorStrategy = context.getOrEmpty(KEY_ON_NEXT_ERROR_STRATEGY);
       if (onErrorStrategy.isPresent()
           && onErrorStrategy.get().toString().contains(ON_NEXT_FAILURE_STRATEGY)) {
-        BiFunction<Throwable, Object, Throwable> onErrorContinue = (e, o) -> null;
-        return context.delete(KEY_ON_NEXT_ERROR_STRATEGY);
+        Context newContext = context.delete(KEY_ON_NEXT_ERROR_STRATEGY);
+        BiFunction<Throwable, Object, Throwable> onErrorContinue = (e, o) -> {
+          throw propagate(e);
+        };
+        return Context.of(KEY_ON_NEXT_ERROR_STRATEGY, onErrorContinue).putAll(newContext);
       }
       return context;
     });
