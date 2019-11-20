@@ -6,23 +6,25 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.probe.PollingProber.check;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.concurrent.Latch;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
+import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -36,7 +38,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -51,14 +52,22 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
   private StreamingGhostBuster ghostBuster;
 
   @Mock
-  private BaseEventContext ctx;
+  private CoreEvent event;
 
+  @Mock
+  private ComponentLocation location;
+
+  @Mock
+  private FlowExceptionHandler exceptionHandler;
+
+  private DefaultEventContext ctx;
   private CursorManager cursorManager;
   private ExecutorService executorService;
 
   @Before
   public void before() {
     cursorManager = new CursorManager(statistics, ghostBuster);
+    ctx = new DefaultEventContext("id", "server", location, "", empty(), exceptionHandler);
     when(ghostBuster.track(any())).thenAnswer(inv -> new WeakReference<>(inv.getArgument(0)));
   }
 
@@ -95,27 +104,19 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
     latch.release();
 
     check(5000, 100, () -> managedProviders.size() == threadCount);
-    assertThat(managedProviders.get(0), is(instanceOf(ManagedCursorProvider.class)));
+    managedProviders.forEach(p -> {
+      ManagedCursorProvider managedProvider = (ManagedCursorProvider) p;
+      assertThat(managedProvider, is(instanceOf(ManagedCursorProvider.class)));
+      assertThat(managedProvider.getDelegate(), is(sameInstance(cursorProvider)));
 
-    ManagedCursorProvider managedProvider = (ManagedCursorProvider) managedProviders.get(0);
-    assertThat(managedProvider.getDelegate(), is(sameInstance(cursorProvider)));
-    assertThat(managedProviders.stream().allMatch(p -> p == managedProvider), is(true));
+      verify(cursorProvider, never()).releaseResources();
+      verify(cursorProvider, never()).close();
+      verify(ghostBuster).track(managedProvider);
+    });
 
-    verify(ghostBuster).track(managedProvider);
-  }
+    ctx.success();
 
-  @Test
-  public void remanageCollectedDecorator() {
-    CursorStreamProvider provider = mock(CursorStreamProvider.class);
-    when(ghostBuster.track(any())).thenReturn(new WeakReference<>(null));
-
-    cursorManager.manage(provider, ctx);
-
-    ArgumentCaptor<ManagedCursorProvider> managedDecoratorCaptor = forClass(ManagedCursorProvider.class);
-    verify(ghostBuster, times(2)).track(managedDecoratorCaptor.capture());
-
-    List<ManagedCursorProvider> captured = managedDecoratorCaptor.getAllValues();
-    assertThat(captured, hasSize(2));
-    assertThat(captured.get(0), is(sameInstance(captured.get(1))));
+    verify(cursorProvider).releaseResources();
+    verify(cursorProvider).close();
   }
 }
