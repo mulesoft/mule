@@ -55,9 +55,9 @@ abstract class AbstractEventContext implements BaseEventContext {
   private transient final List<BaseEventContext> childContexts = new ArrayList<>();
   private transient final FlowExceptionHandler exceptionHandler;
   private transient final CompletableFuture<Void> externalCompletion;
-  private transient final List<BiConsumer<CoreEvent, Throwable>> onResponseConsumerList = new ArrayList<>();
-  private transient final List<BiConsumer<CoreEvent, Throwable>> onCompletionConsumerList = new ArrayList<>(2);
-  private transient final List<BiConsumer<CoreEvent, Throwable>> onTerminatedConsumerList = new ArrayList<>();
+  private transient List<BiConsumer<CoreEvent, Throwable>> onResponseConsumerList = new ArrayList<>();
+  private transient List<BiConsumer<CoreEvent, Throwable>> onCompletionConsumerList = new ArrayList<>(2);
+  private transient List<BiConsumer<CoreEvent, Throwable>> onTerminatedConsumerList = new ArrayList<>();
 
   private final ReadWriteLock childContextsReadWriteLock = new ReentrantReadWriteLock();
 
@@ -90,6 +90,20 @@ abstract class AbstractEventContext implements BaseEventContext {
     this.externalCompletion = externalCompletion.orElse(null);
     externalCompletion.ifPresent(completableFuture -> completableFuture.thenAccept((aVoid) -> tryTerminate()));
     this.exceptionHandler = exceptionHandler;
+  }
+
+  protected void initCompletionLists() {
+    if (onCompletionConsumerList == null) {
+      onResponseConsumerList = new ArrayList<>();
+    }
+
+    if (onCompletionConsumerList == null) {
+      onCompletionConsumerList = new ArrayList<>(2);
+    }
+
+    if (onTerminatedConsumerList == null) {
+      onTerminatedConsumerList = new ArrayList<>();
+    }
   }
 
   void addChildContext(BaseEventContext childContext) {
