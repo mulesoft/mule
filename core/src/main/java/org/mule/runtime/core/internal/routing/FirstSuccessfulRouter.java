@@ -6,15 +6,22 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.core.api.functional.Either.left;
+import static org.mule.runtime.core.api.functional.Either.right;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
+import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Mono.subscriberContext;
+import static reactor.util.context.Context.empty;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,18 +29,13 @@ import java.util.Optional;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.api.functional.Either.left;
-import static org.mule.runtime.core.api.functional.Either.right;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
-import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.Exceptions.propagate;
-import static reactor.core.publisher.Mono.subscriberContext;
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import reactor.core.publisher.Flux;
+import reactor.util.context.Context;
 
 /**
  * Router with {@link FirstSuccessful} routing logic.
@@ -56,6 +58,7 @@ class FirstSuccessfulRouter {
   private final FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
   private final EventInternalContextResolver<Stack<CoreEvent>> nextExecutionContextResolver =
       new EventInternalContextResolver<>(FIRST_SUCCESSFUL_START_EVENT, Stack::new);
+  private final AtomicReference<Context> downstreamContextReference = new AtomicReference<>(empty());
 
   // When using a first successful scope in a blocking flow (for example, calling the owner flow with a Processor#process call),
   // this leads to a reactor completion signal being emitted while the event is being re-injected for retrials. This is solved by
@@ -66,7 +69,7 @@ class FirstSuccessfulRouter {
   public FirstSuccessfulRouter(Component owner, Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
     this.owner = owner;
 
-    innerRecorders = routes.stream().map(x -> new FluxSinkRecorder<CoreEvent>()).collect(Collectors.toList());
+    innerRecorders = routes.stream().map(x -> new FluxSinkRecorder<CoreEvent>()).collect(toList());
 
     // Upstream side of until successful chain. Injects events into retrial chain.
     upstreamFlux = Flux.from(publisher)
@@ -88,7 +91,14 @@ class FirstSuccessfulRouter {
       innerFluxes.add(createMidFlux(routes.get(i), innerRecorders.get(i), ofNullable(nextRecorder)));
     }
 
-    downstreamFlux = Flux.create(downstreamRecorder)
+    downstreamFlux = Flux.<Either<Throwable, CoreEvent>>create(sink -> {
+      downstreamRecorder.accept(sink);
+      // Upstream chains subscription delayed until downstream sink is recorded. This handles the transaction-enabled case, in
+      // which the subscribing thread is the one that runs the whole chain. Check UntilSuccessfulRouter for more implementation
+      // details.
+      subscribeUpstreamChains(downstreamContextReference.get());
+
+    })
         .doOnNext(event -> inflightEvents.decrementAndGet())
         .map(getScopeResultMapper());
 
@@ -125,12 +135,14 @@ class FirstSuccessfulRouter {
   Publisher<CoreEvent> getDownstreamPublisher() {
     return downstreamFlux
         .compose(downstreamPublisher -> subscriberContext().flatMapMany(downstreamContext -> downstreamPublisher
-            .doOnSubscribe(s -> {
-              for (Flux<CoreEvent> innerFlux : innerFluxes) {
-                innerFlux.subscriberContext(downstreamContext).subscribe();
-              }
-              upstreamFlux.subscriberContext(downstreamContext).subscribe();
-            })));
+            .doOnSubscribe(s -> downstreamContextReference.set(downstreamContext))));
+  }
+
+  private void subscribeUpstreamChains(Context downstreamContext) {
+    for (Flux<CoreEvent> innerFlux : innerFluxes) {
+      innerFlux.subscriberContext(downstreamContext).subscribe();
+    }
+    upstreamFlux.subscriberContext(downstreamContext).subscribe();
   }
 
 
