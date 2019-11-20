@@ -19,10 +19,10 @@ import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.SetterAttributeDefinition;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.util.Map;
 import java.util.Optional;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Creates objects form the DSL representation which are required before any other object. Such objects do not support full DI
@@ -64,7 +64,7 @@ class EagerObjectCreator extends BeanDefinitionCreator {
 
           @Override
           public void onUndefinedSimpleParameters() {
-            Map<String, String> parameters = componentModel.getParameters();
+            Map<String, String> parameters = componentModel.getRawParameters();
             String attributeName = setterAttributeDefinition.getAttributeName();
             try {
               setProperty(instance, attributeName, parameters);

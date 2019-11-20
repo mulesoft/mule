@@ -13,8 +13,8 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamProcessingStrategy implements Startable, Stoppable {
+abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamProcessingStrategy implements Startable, Disposable {
 
   private final Supplier<Scheduler> cpuLightSchedulerSupplier;
   private final int parallelism;
@@ -115,7 +115,7 @@ abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamPro
   }
 
   @Override
-  public void stop() throws MuleException {
+  public void dispose() {
     stopSchedulersIfNeeded();
   }
 

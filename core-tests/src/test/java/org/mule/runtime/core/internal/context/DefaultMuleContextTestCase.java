@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -22,6 +23,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_CON
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -29,10 +31,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
+import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.internal.config.ClusterConfiguration;
@@ -40,6 +44,7 @@ import org.mule.runtime.core.internal.config.builders.DefaultsConfigurationBuild
 import org.mule.runtime.core.internal.connector.SchedulerController;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
@@ -193,6 +198,42 @@ public class DefaultMuleContextTestCase extends AbstractMuleTestCase {
     assertThat(dataTypeConverterResolver1, instanceOf(DynamicDataTypeConversionResolver.class));
     assertThat(dataTypeConverterResolver2, sameInstance(dataTypeConverterResolver1));
     verify(muleRegistry).lookupObject(OBJECT_CONVERTER_RESOLVER);
+  }
+
+  @Test
+  public void securityManagerOnlyFetchedOnce() throws Exception {
+    createMuleContext();
+    MuleRegistry registry = ((DefaultMuleContext) context).getRegistry();
+    SecurityManager securityManager = mock(SecurityManager.class);
+    registry.registerObject(OBJECT_SECURITY_MANAGER, securityManager);
+    MuleRegistry muleRegistry = spy(registry);
+
+    ((DefaultMuleContext) context).setRegistry(muleRegistry);
+    for (int i = 0; i < 2; i++) {
+      assertThat(context.getSecurityManager(), is(sameInstance(securityManager)));
+    }
+
+    verify(muleRegistry).lookupObject(OBJECT_SECURITY_MANAGER);
+  }
+
+  @Test
+  public void securityManagerIsRegisteredAndCached() throws Exception {
+    SecurityManager securityManager = mock(SecurityManager.class);
+    context = muleContextFactory.createMuleContext(testServicesConfigurationBuilder,
+                                                   new DefaultsConfigurationBuilder(),
+                                                   new AbstractConfigurationBuilder() {
+
+                                                     @Override
+                                                     protected void doConfigure(MuleContext muleContext) throws Exception {
+                                                       muleContext.setSecurityManager(securityManager);
+                                                     }
+                                                   });
+
+    MuleRegistry registry = ((DefaultMuleContext) context).getRegistry();
+    MuleRegistry muleRegistry = spy(registry);
+
+    assertThat(context.getSecurityManager(), is(sameInstance(securityManager)));
+    verify(muleRegistry, never()).lookupObject(OBJECT_SECURITY_MANAGER);
   }
 
   protected void createMuleContext() throws MuleException {

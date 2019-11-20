@@ -100,6 +100,11 @@ public class CompositeSourcePolicy
     this.resolver = ofNullable(resolver);
   }
 
+  @Override
+  protected ReactiveProcessor getPolicyProcessor() {
+    return getLastPolicy().getPolicyChain().getProcessingStrategy().onPipeline(super.getPolicyProcessor());
+  }
+
   private final class SourceWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
 
     @Override

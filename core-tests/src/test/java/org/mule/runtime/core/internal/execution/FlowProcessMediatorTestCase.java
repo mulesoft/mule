@@ -11,8 +11,11 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -23,11 +26,13 @@ import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_SEND;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -38,11 +43,13 @@ import static org.mule.tck.junit4.matcher.EitherMatcher.rightMatches;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
 import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
 import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
+import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Mono.error;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.util.Reference;
@@ -51,6 +58,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.construct.FlowBackPressureMaxConcurrencyExceededException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
@@ -60,6 +68,7 @@ import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -76,6 +85,7 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+import org.mockito.ArgumentCaptor;
 
 @SmallTest
 public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
@@ -282,7 +292,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
 
     flowProcessMediator.process(template, context, notifier);
 
-    verifyFlowError();
+    verifyFlowError(isErrorTypeFlowFailure());
   }
 
   @Test
@@ -291,7 +301,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
 
     flowProcessMediator.process(template, context, notifier);
 
-    verifyFlowError();
+    verifyFlowError(isErrorTypeFlowFailure());
   }
 
   @Test
@@ -308,7 +318,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
     flowProcessMediator.process(template, context, notifier);
 
     callbackReference.get().complete(null);
-    verifyFlowError();
+    verifyFlowError(isErrorTypeFlowFailure());
   }
 
   @Test
@@ -363,7 +373,8 @@ public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void failurePolicyManager() throws Exception {
-    when(policyManager.createSourcePolicyInstance(any(Component.class), any(CoreEvent.class), any(ReactiveProcessor.class),
+    final ArgumentCaptor<CoreEvent> eventCaptor = ArgumentCaptor.forClass(CoreEvent.class);
+    when(policyManager.createSourcePolicyInstance(any(Component.class), eventCaptor.capture(), any(ReactiveProcessor.class),
                                                   any(MessageSourceResponseParametersProcessor.class))).thenThrow(mockException);
     when(template.getFailedExecutionResponseParametersFunction()).thenReturn(coreEvent -> emptyMap());
 
@@ -374,6 +385,21 @@ public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
     verify(template).sendFailureResponseToClient(any(), any(), any());
     verify(notifier, never()).phaseSuccessfully();
     verify(notifier).phaseFailure(argThat(instanceOf(mockException.getClass())));
+
+    assertThat(((BaseEventContext) eventCaptor.getValue().getContext()).isTerminated(), is(true));
+  }
+
+  @Test
+  public void backpressureCheckFailure() throws MuleException {
+    when(template.getFailedExecutionResponseParametersFunction()).thenReturn(coreEvent -> emptyMap());
+    final ArgumentCaptor<CoreEvent> eventCaptor = ArgumentCaptor.forClass(CoreEvent.class);
+    doThrow(propagate(new FlowBackPressureMaxConcurrencyExceededException("flow", MAX_CONCURRENCY_EXCEEDED))).when(flow)
+        .checkBackpressure(eventCaptor.capture());
+
+    flowProcessMediator.process(template, context, notifier);
+
+    assertThat(((BaseEventContext) eventCaptor.getValue().getContext()).isTerminated(), is(true));
+    verifyFlowError(isErrorTypeBackpressure());
   }
 
   private void verifySuccess() {
@@ -386,11 +412,11 @@ public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
     verify(template).afterPhaseExecution(any());
   }
 
-  private void verifyFlowError() {
+  private void verifyFlowError(EventMatcher errorTypeMatcher) {
     verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
-    verify(template).afterPhaseExecution(argThat(leftMatches(withEventThat(isErrorTypeFlowFailure()))));
+    verify(template).afterPhaseExecution(argThat(leftMatches(withEventThat(errorTypeMatcher))));
     verify(notifier).phaseSuccessfully();
     verify(notifier, never()).phaseFailure(any());
   }
@@ -410,6 +436,10 @@ public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
 
   private EventMatcher isErrorTypeFlowFailure() {
     return hasErrorType(ERROR_FROM_FLOW.getNamespace(), ERROR_FROM_FLOW.getIdentifier());
+  }
+
+  private EventMatcher isErrorTypeBackpressure() {
+    return hasErrorType(FLOW_BACK_PRESSURE.getNamespace(), FLOW_BACK_PRESSURE.getName());
   }
 
   private EventMatcher isErrorTypeSourceErrorResponseGenerate() {

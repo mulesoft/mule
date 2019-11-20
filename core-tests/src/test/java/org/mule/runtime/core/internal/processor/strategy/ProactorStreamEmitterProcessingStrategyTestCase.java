@@ -28,6 +28,7 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
@@ -45,6 +46,7 @@ import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -71,20 +73,22 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InOrder;
-
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
+import org.slf4j.Logger;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(PROACTOR)
 public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
+
+  private static final Logger LOGGER = getLogger(ProactorStreamEmitterProcessingStrategyTestCase.class);
 
   @Rule
   public ExpectedException expectedException = none();
@@ -749,6 +753,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     startIfNeeded(ps);
     stopIfNeeded(ps);
+    disposeIfNeeded(ps, LOGGER);
 
     final InOrder inOrder = inOrder(cpuLight, cpuIntensive, blocking);
     inOrder.verify(cpuLight).stop();

@@ -7,20 +7,21 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.api.metadata.MediaType.parse;
+import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.MediaTypeUtils.getDefaultMediaType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.api.metadata.MediaTypeUtils;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.MuleContext;
@@ -200,8 +201,8 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
   private Charset defaultEncoding;
 
-  private Optional<MediaType> mimeTypeInitParam;
-  private Optional<Charset> encodingParam;
+  private MediaType mimeTypeInitParam;
+  private Charset encodingParam;
 
   private DefaultSourceCallback() {}
 
@@ -210,10 +211,17 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
     Map<String, Object> initialisationParameters = messageSource.getInitialisationParameters();
 
-    encodingParam = ofNullable((String) initialisationParameters.get(ENCODING_PARAMETER_NAME))
-        .map(MediaTypeUtils::parseCharset);
-    mimeTypeInitParam = ofNullable((String) initialisationParameters.get(MIME_TYPE_PARAMETER_NAME))
-        .map(MediaType::parse);
+    String encoding = (String) initialisationParameters.get(ENCODING_PARAMETER_NAME);
+    if (encoding != null) {
+      encodingParam = parseCharset(encoding);
+    } else {
+      encodingParam = defaultEncoding;
+    }
+
+    String mimeType = (String) initialisationParameters.get(MIME_TYPE_PARAMETER_NAME);
+    if (mimeType != null) {
+      mimeTypeInitParam = parse(mimeType);
+    }
   });
 
   /**
@@ -269,17 +277,22 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   }
 
   protected MediaType resolveMediaType(Object value) {
-    Charset existingEncoding = defaultEncoding;
-    MediaType mediaType = defaultMediaType;
-    if (value instanceof Result) {
-      final Optional<MediaType> optionalMediaType = ((Result) value).getMediaType();
-      if (optionalMediaType.isPresent()) {
-        mediaType = optionalMediaType.get();
-        existingEncoding = mediaType.getCharset().orElse(existingEncoding);
+    Charset existingEncoding = encodingParam;
+    MediaType mediaType = mimeTypeInitParam;
+    if (mediaType == null) {
+      if (value instanceof Result) {
+        final Optional<MediaType> optionalMediaType = ((Result) value).getMediaType();
+        if (optionalMediaType.isPresent()) {
+          mediaType = optionalMediaType.get();
+          existingEncoding = mediaType.getCharset().orElse(existingEncoding);
+        }
+      }
+
+      if (mediaType == null) {
+        mediaType = defaultMediaType;
       }
     }
-
-    return mimeTypeInitParam.orElse(mediaType).withCharset(encodingParam.orElse(existingEncoding));
+    return mediaType.withCharset(existingEncoding);
   }
 
   /**

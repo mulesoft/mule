@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.core.internal.event;
 
-import static java.lang.Integer.getInteger;
 import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
@@ -53,8 +51,6 @@ abstract class AbstractEventContext implements BaseEventContext {
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventContext.class);
   private static final FlowExceptionHandler NULL_EXCEPTION_HANDLER = NullExceptionHandler.getInstance();
 
-  private static final int MAX_DEPTH = getInteger(BaseEventContext.class.getName() + ".maxDepth", 25);
-
   private final boolean debugLogEnabled = LOGGER.isDebugEnabled();
   private transient final List<BaseEventContext> childContexts = new ArrayList<>();
   private transient final FlowExceptionHandler exceptionHandler;
@@ -97,23 +93,6 @@ abstract class AbstractEventContext implements BaseEventContext {
   }
 
   void addChildContext(BaseEventContext childContext) {
-    if (getDepthLevel() >= MAX_DEPTH) {
-      StringBuilder messageBuilder = new StringBuilder();
-
-      messageBuilder.append("Too many child contexts nested." + lineSeparator());
-
-      if (debugLogEnabled) {
-        messageBuilder.append("  > " + this.toString() + lineSeparator());
-        Optional<BaseEventContext> current = getParentContext();
-        while (current.isPresent()) {
-          messageBuilder.append("  > " + current.get().toString() + lineSeparator());
-          current = current.get().getParentContext();
-        }
-      }
-
-      throw new EventContextDeepNestingException(messageBuilder.toString());
-    }
-
     childContextsReadWriteLock.writeLock().lock();
     try {
       childContexts.add(childContext);

@@ -444,16 +444,16 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     // Handle orphan named components...
     orphanComponents.stream()
         .filter(cm -> asList(SOURCE, OPERATION, SCOPE).contains(cm.getComponentType()))
-        .filter(cm -> cm.getName().isPresent())
+        .filter(cm -> cm.getComponentId().isPresent())
         .forEach(cm -> {
-          final String nameAttribute = cm.getName().get();
+          final String nameAttribute = cm.getComponentId().get();
           LOGGER.debug("Registering orphan named component '{}'...", nameAttribute);
 
           applicationComponents.add(0, new Pair<>(nameAttribute, cm));
           final BeanDefinition beanDef = ((SpringComponentModel) cm).getBeanDefinition();
           if (beanDef != null) {
-            beanFactory.registerBeanDefinition(cm.getName().get(), beanDef);
-            postProcessBeanDefinition((SpringComponentModel) cm, beanFactory, cm.getName().get());
+            beanFactory.registerBeanDefinition(cm.getComponentId().get(), beanDef);
+            postProcessBeanDefinition((SpringComponentModel) cm, beanFactory, cm.getComponentId().get());
           }
         });
 
@@ -462,7 +462,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         .forEach(cm -> {
           final BeanDefinition beanDef = ((SpringComponentModel) cm).getBeanDefinition();
           if (beanDef != null) {
-            final String beanName = cm.getName().orElse(uniqueValue(beanDef.getBeanClassName()));
+            final String beanName = cm.getComponentId().orElse(uniqueValue(beanDef.getBeanClassName()));
 
             LOGGER.debug("Registering orphan un-named component '{}'...", beanName);
             applicationComponents.add(new Pair<>(beanName, cm));

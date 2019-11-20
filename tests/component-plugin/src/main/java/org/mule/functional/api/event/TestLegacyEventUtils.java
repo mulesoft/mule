@@ -7,11 +7,10 @@
 package org.mule.functional.api.event;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.lang.reflect.Field;
@@ -28,16 +27,6 @@ public final class TestLegacyEventUtils {
   }
 
   public static final FlowExceptionHandler HANDLER = NullExceptionHandler.getInstance();
-
-  /**
-   * Events have a list of message processor paths it went trough so that the execution path of an event can be reconstructed
-   * after it has executed.
-   *
-   * @return the message processors trace associated to the given event.
-   */
-  public static ProcessorsTrace getProcessorsTrace(CoreEvent event) {
-    return ((BaseEventContext) event.getContext()).getProcessorsTrace();
-  }
 
   /**
    * @return the {@link FlowExceptionHandler} to be applied if an exception is unhandled during the processing of the given

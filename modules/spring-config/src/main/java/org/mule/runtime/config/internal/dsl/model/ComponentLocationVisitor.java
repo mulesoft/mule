@@ -102,7 +102,7 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
             .build());
 
     if (((ComponentModel) componentModel).isRoot()) {
-      String componentModelNameAttribute = componentModel.getName().orElse(null);
+      String componentModelNameAttribute = componentModel.getComponentId().orElse(null);
       ImmutableList<DefaultLocationPart> parts =
           ImmutableList.<DefaultLocationPart>builder()
               .add(new DefaultLocationPart(componentModelNameAttribute,

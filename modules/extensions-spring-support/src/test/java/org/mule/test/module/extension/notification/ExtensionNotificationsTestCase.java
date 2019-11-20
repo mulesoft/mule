@@ -259,7 +259,7 @@ public class ExtensionNotificationsTestCase extends AbstractExtensionFunctionalT
 
     public MultiMap<String, ExtensionNotification> getNotifications() {
       synchronized (notifications) {
-        return new MultiMap<>(notifications);
+        return notifications.toImmutableMultiMap();
       }
     }
 

@@ -128,7 +128,11 @@ public class CompositeOperationPolicy
           .onErrorContinue(MessagingException.class, (t, e) -> {
             final MessagingException me = (MessagingException) t;
 
-            me.setProcessedEvent(quickCopy(getStoredChildContext(me.getEvent()).getParentContext().get(),
+            final BaseEventContext childContext = getStoredChildContext(me.getEvent());
+            if (!childContext.isComplete()) {
+              childContext.error(me);
+            }
+            me.setProcessedEvent(quickCopy(childContext.getParentContext().get(),
                                            me.getEvent()));
 
             recoverCallback((InternalEvent) me.getEvent()).error(me);

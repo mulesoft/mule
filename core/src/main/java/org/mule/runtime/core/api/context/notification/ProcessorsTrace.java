@@ -7,22 +7,23 @@
 package org.mule.runtime.core.api.context.notification;
 
 import org.mule.api.annotation.NoImplement;
-import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 
 import java.io.Serializable;
 import java.util.List;
 
 /**
  * Keeps context information about the message processors that were executed as part of the processing of an event.
- * 
+ *
  * @since 3.8.0
+ * 
+ * @deprecated Use the message history functionality form the agent instead.
  */
 @NoImplement
+@Deprecated
 public interface ProcessorsTrace extends Serializable {
 
   /**
-   * @return the paths of the processors that were executed as part of flows that have already been completed, ordered by time of
-   *         execution, if {@link DefaultMuleConfiguration#isFlowTrace()} is {@code true}. Empty list otherwise.
+   * @return an empty list.
    */
   List<String> getExecutedProcessors();
 

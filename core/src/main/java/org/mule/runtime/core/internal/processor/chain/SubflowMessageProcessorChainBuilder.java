@@ -11,8 +11,8 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
-import static org.mule.runtime.core.api.config.DefaultMuleConfiguration.isFlowTrace;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
@@ -89,7 +89,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
    */
   static class SubFlowMessageProcessorChain extends DefaultMessageProcessorChain {
 
-    private String subFlowName;
+    private final String subFlowName;
 
     SubFlowMessageProcessorChain(String name, Processor head, List<Processor> processors,
                                  List<Processor> processorsForLifecycle) {
@@ -98,19 +98,11 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
     }
 
     private Consumer<CoreEvent> pushSubFlowFlowStackElement() {
-      return event -> {
-        if (isFlowTrace()) {
-          ((DefaultFlowCallStack) event.getFlowCallStack()).push(new FlowStackElement(subFlowName, null));
-        }
-      };
+      return event -> ((DefaultFlowCallStack) event.getFlowCallStack()).push(new FlowStackElement(subFlowName, null));
     }
 
     private Consumer<CoreEvent> popSubFlowFlowStackElement() {
-      return event -> {
-        if (isFlowTrace()) {
-          ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
-        }
-      };
+      return event -> ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
     }
 
     @Override

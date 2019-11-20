@@ -209,6 +209,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   private ClusterConfiguration clusterConfiguration = new NullClusterConfiguration();
   private String clusterNodeIdPrefix = "";
+  private String clusterUUID = recalculateClusterUUID(clusterNodeIdPrefix);
 
   private final SingleResourceTransactionFactoryManager singleResourceTransactionFactoryManager =
       new SingleResourceTransactionFactoryManager();
@@ -224,6 +225,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private QueueManager queueManager;
 
   private ExtensionManager extensionManager;
+  private SecurityManager securityManager;
 
   private ObjectSerializer objectSerializer;
   private volatile DataTypeConversionResolver dataTypeConversionResolver;
@@ -577,6 +579,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }
+    this.securityManager = securityManager;
   }
 
   /**
@@ -588,6 +591,18 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
    */
   @Override
   public SecurityManager getSecurityManager() {
+    if (config.isLazyInit()) {
+      return fetchSecurityManager();
+    }
+
+    if (securityManager == null) {
+      this.securityManager = fetchSecurityManager();
+    }
+
+    return securityManager;
+  }
+
+  private SecurityManager fetchSecurityManager() {
     SecurityManager securityManager = muleRegistryHelper.lookupObject(OBJECT_SECURITY_MANAGER);
     if (securityManager == null) {
       Collection<SecurityManager> temp = muleRegistryHelper.lookupObjects(SecurityManager.class);
@@ -852,6 +867,10 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   @Override
   public String getUniqueIdString() {
+    return clusterUUID;
+  }
+
+  private String recalculateClusterUUID(String clusterNodeIdPrefix) {
     return getClusterUUID(clusterNodeIdPrefix);
   }
 
@@ -952,6 +971,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     if (overriddenClusterConfiguration != null) {
       this.clusterConfiguration = overriddenClusterConfiguration;
       this.clusterNodeIdPrefix = overriddenClusterConfiguration.getClusterNodeId() + "-";
+      clusterUUID = recalculateClusterUUID(clusterNodeIdPrefix);
     }
   }
 

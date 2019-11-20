@@ -481,30 +481,38 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
     assertThat(parallelForeach.getAllParameterModels(), hasSize(5));
 
-    assertThat(parallelForeach.getAllParameterModels().get(0).getName(), is("collection"));
-    assertThat(parallelForeach.getAllParameterModels().get(0).getExpressionSupport(), is(REQUIRED));
-    assertThat(parallelForeach.getAllParameterModels().get(0).getType(), instanceOf(DefaultStringType.class));
-    assertThat(parallelForeach.getAllParameterModels().get(0).isRequired(), is(false));
+    final ParameterModel collection = parallelForeach.getAllParameterModels().get(0);
+    assertThat(collection.getName(), is("collection"));
+    assertThat(collection.getExpressionSupport(), is(REQUIRED));
+    assertThat(collection.getType(), instanceOf(ArrayType.class));
+    assertThat(collection.getType().getAnnotation(ClassInformationAnnotation.class)
+        .map(ClassInformationAnnotation::getClassname)
+        .orElse(""), is(Iterable.class.getName()));
+    assertThat(collection.isRequired(), is(false));
 
-    assertThat(parallelForeach.getAllParameterModels().get(1).getName(), is("timeout"));
-    assertThat(parallelForeach.getAllParameterModels().get(1).getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(parallelForeach.getAllParameterModels().get(1).getType(), instanceOf(DefaultNumberType.class));
-    assertThat(parallelForeach.getAllParameterModels().get(1).isRequired(), is(false));
+    final ParameterModel timeout = parallelForeach.getAllParameterModels().get(1);
+    assertThat(timeout.getName(), is("timeout"));
+    assertThat(timeout.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(timeout.getType(), instanceOf(DefaultNumberType.class));
+    assertThat(timeout.isRequired(), is(false));
 
-    assertThat(parallelForeach.getAllParameterModels().get(2).getName(), is("maxConcurrency"));
-    assertThat(parallelForeach.getAllParameterModels().get(2).getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(parallelForeach.getAllParameterModels().get(2).getType(), instanceOf(DefaultNumberType.class));
-    assertThat(parallelForeach.getAllParameterModels().get(2).isRequired(), is(false));
+    final ParameterModel maxConcurrency = parallelForeach.getAllParameterModels().get(2);
+    assertThat(maxConcurrency.getName(), is("maxConcurrency"));
+    assertThat(maxConcurrency.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(maxConcurrency.getType(), instanceOf(DefaultNumberType.class));
+    assertThat(maxConcurrency.isRequired(), is(false));
 
-    assertThat(parallelForeach.getAllParameterModels().get(3).getName(), is(TARGET_PARAMETER_NAME));
-    assertThat(parallelForeach.getAllParameterModels().get(3).getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(parallelForeach.getAllParameterModels().get(3).getType(), instanceOf(DefaultStringType.class));
-    assertThat(parallelForeach.getAllParameterModels().get(3).isRequired(), is(false));
+    final ParameterModel target = parallelForeach.getAllParameterModels().get(3);
+    assertThat(target.getName(), is(TARGET_PARAMETER_NAME));
+    assertThat(target.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(target.getType(), instanceOf(DefaultStringType.class));
+    assertThat(target.isRequired(), is(false));
 
-    assertThat(parallelForeach.getAllParameterModels().get(4).getName(), is(TARGET_VALUE_PARAMETER_NAME));
-    assertThat(parallelForeach.getAllParameterModels().get(4).getExpressionSupport(), is(REQUIRED));
-    assertThat(parallelForeach.getAllParameterModels().get(4).getType(), instanceOf(StringType.class));
-    assertThat(parallelForeach.getAllParameterModels().get(4).isRequired(), is(false));
+    final ParameterModel targetValue = parallelForeach.getAllParameterModels().get(4);
+    assertThat(targetValue.getName(), is(TARGET_VALUE_PARAMETER_NAME));
+    assertThat(targetValue.getExpressionSupport(), is(REQUIRED));
+    assertThat(targetValue.getType(), instanceOf(StringType.class));
+    assertThat(targetValue.isRequired(), is(false));
   }
 
   @Test

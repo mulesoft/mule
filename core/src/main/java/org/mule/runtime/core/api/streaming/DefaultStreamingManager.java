@@ -32,6 +32,7 @@ import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManagerFactory;
 import org.mule.runtime.core.api.streaming.bytes.ByteStreamingManager;
 import org.mule.runtime.core.api.streaming.object.ObjectStreamingManager;
+import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.internal.streaming.AtomicStreamingStatistics;
 import org.mule.runtime.core.internal.streaming.CursorManager;
 import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
@@ -161,7 +162,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
     if (provider instanceof ManagedCursorProvider) {
       return provider;
     }
-    return cursorManager.manage(provider, (BaseEventContext) creatorEventContext);
+    return cursorManager.manage(provider, (DefaultEventContext) creatorEventContext);
   }
 
   /**

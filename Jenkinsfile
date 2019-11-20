@@ -1,6 +1,7 @@
 def UPSTREAM_PROJECTS_LIST = [ "Mule-runtime/metadata-model-api/master",
                                "Mule-runtime/mule-api/master",
                                "Mule-runtime/mule-extensions-api/master",
+                               "Mule-runtime/mule-artifact-ast/master",
                                "Mule-runtime/data-weave/master",
                                "Mule-runtime/mule-maven-client/master" ]
 
