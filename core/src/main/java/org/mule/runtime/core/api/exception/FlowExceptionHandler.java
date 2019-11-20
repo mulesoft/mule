@@ -30,10 +30,16 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
    * @param exception which occurred
    * @param event which was being processed when the exception occurred
    * @return new event to route on to the rest of the flow, generally with ExceptionPayload set on the message
+   * @deprecated Use {@link FlowExceptionHandler#routeError(Exception, Consumer, Consumer)}
    */
   @Deprecated
   CoreEvent handleException(Exception exception, CoreEvent event);
 
+  /**
+   * @param exception the exception to handle
+   * @return the publisher with the handling result
+   * @deprecated Use {@link FlowExceptionHandler#routeError(Exception, Consumer, Consumer)}
+   */
   @Override
   @Deprecated
   default Publisher<CoreEvent> apply(Exception exception) {
