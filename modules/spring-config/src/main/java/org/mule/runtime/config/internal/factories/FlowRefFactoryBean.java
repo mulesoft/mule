@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.factories;
 
+import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -59,6 +60,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -337,7 +339,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
      */
     protected Function<Context, Context> clearCurrentFlowRefFromCycleDetection() {
       return context -> {
-        HashSet<String> currentAppliedFlowrefs = context.getOrDefault(APPLIED_FLOWREFS_KEY, new HashSet<>());
+        Set<String> currentAppliedFlowrefs = new HashSet<>(context.getOrDefault(APPLIED_FLOWREFS_KEY, emptySet()));
         currentAppliedFlowrefs.remove(refName);
         return context.put(APPLIED_FLOWREFS_KEY, currentAppliedFlowrefs);
       };
@@ -358,7 +360,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
      */
     private Function<Context, Context> checkAndMarkCurrentFlowRefForCycleDetection() {
       return context -> {
-        HashSet<String> currentAppliedFlowrefs = context.getOrDefault(APPLIED_FLOWREFS_KEY, new HashSet<>());
+        Set<String> currentAppliedFlowrefs = new HashSet<>(context.getOrDefault(APPLIED_FLOWREFS_KEY, emptySet()));
         if (currentAppliedFlowrefs.contains(refName)) {
           throw propagate(new RecursiveSubFlowException(refName, StaticFlowRefMessageProcessor.this));
         }
