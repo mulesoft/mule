@@ -261,7 +261,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       if (onErrorStrategy.isPresent()
           && onErrorStrategy.get().toString().contains(ON_NEXT_FAILURE_STRATEGY)) {
         BiFunction<Throwable, Object, Throwable> onErrorContinue = (e, o) -> null;
-        return context.put(KEY_ON_NEXT_ERROR_STRATEGY, onErrorContinue);
+        return context.delete(KEY_ON_NEXT_ERROR_STRATEGY);
       }
       return context;
     });
