@@ -74,6 +74,6 @@ public class PayloadMediaTypeResolver {
       existingEncoding = defaultEncoding;
     }
 
-    return mimeType.withCharset(existingEncoding);
+    return mediaType.withCharset(existingEncoding);
   }
 }

@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.api.metadata.MediaType.parse;
+import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
@@ -20,7 +22,6 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.api.metadata.MediaTypeUtils;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.MuleContext;
@@ -212,14 +213,14 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
     String encoding = (String) initialisationParameters.get(ENCODING_PARAMETER_NAME);
     if (encoding != null) {
-      encodingParam = MediaTypeUtils.parseCharset(encoding);
+      encodingParam = parseCharset(encoding);
     } else {
       encodingParam = defaultEncoding;
     }
 
     String mimeType = (String) initialisationParameters.get(MIME_TYPE_PARAMETER_NAME);
     if (mimeType != null) {
-      mimeTypeInitParam = MediaType.parse(mimeType);
+      mimeTypeInitParam = parse(mimeType);
     }
   });
 
