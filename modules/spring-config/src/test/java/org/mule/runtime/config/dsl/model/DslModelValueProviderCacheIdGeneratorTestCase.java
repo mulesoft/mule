@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
@@ -35,7 +36,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -137,6 +137,9 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
   protected ParameterGroupModel actingParametersGroup;
 
   @Mock(lenient = true)
+  protected ParameterModel nameParameter;
+
+  @Mock(lenient = true)
   protected ParameterModel actingParameter;
 
   @Mock(lenient = true)
@@ -167,6 +170,15 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
 
     initializeExtensionMock(mockExtension);
 
+    when(nameParameter.getName()).thenReturn("name");
+    when(nameParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
+    when(nameParameter.getModelProperty(any())).thenReturn(empty());
+    when(nameParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
+    when(nameParameter.getLayoutModel()).thenReturn(empty());
+    when(nameParameter.getRole()).thenReturn(BEHAVIOUR);
+    when(nameParameter.getType()).thenReturn(TYPE_LOADER.load(String.class));
+    when(nameParameter.isComponentId()).thenReturn(true);
+
     when(valueProviderModel.getPartOrder()).thenReturn(0);
     when(valueProviderModel.getProviderName()).thenReturn(VALUE_PROVIDER_NAME);
     when(valueProviderModel.getActingParameters()).thenReturn(asList(ACTING_PARAMETER_NAME, PARAMETER_IN_GROUP_NAME));
@@ -174,7 +186,7 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
     when(valueProviderModel.requiresConnection()).thenReturn(false);
 
     when(parameterInGroup.getName()).thenReturn(PARAMETER_IN_GROUP_NAME);
-    when(parameterInGroup.getExpressionSupport()).thenReturn(ExpressionSupport.NOT_SUPPORTED);
+    when(parameterInGroup.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
     when(parameterInGroup.getModelProperty(any())).thenReturn(empty());
     when(parameterInGroup.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
     when(parameterInGroup.getLayoutModel()).thenReturn(empty());
@@ -182,7 +194,7 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
     when(parameterInGroup.getType()).thenReturn(TYPE_LOADER.load(String.class));
 
     when(actingParameter.getName()).thenReturn(ACTING_PARAMETER_NAME);
-    when(actingParameter.getExpressionSupport()).thenReturn(ExpressionSupport.NOT_SUPPORTED);
+    when(actingParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
     when(actingParameter.getModelProperty(any())).thenReturn(empty());
     when(actingParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
     when(actingParameter.getLayoutModel()).thenReturn(empty());
@@ -190,7 +202,7 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
     when(actingParameter.getType()).thenReturn(TYPE_LOADER.load(String.class));
 
     when(providedParameter.getName()).thenReturn(PROVIDED_PARAMETER_NAME);
-    when(providedParameter.getExpressionSupport()).thenReturn(ExpressionSupport.NOT_SUPPORTED);
+    when(providedParameter.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
     when(providedParameter.getModelProperty(any())).thenReturn(empty());
     when(providedParameter.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
     when(providedParameter.getLayoutModel()).thenReturn(empty());
@@ -199,7 +211,7 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
     when(providedParameter.getValueProviderModel()).thenReturn(of(valueProviderModel));
 
     when(parameterRequiredForMetadata.getName()).thenReturn(PARAMETER_REQUIRED_FOR_METADATA_NAME);
-    when(parameterRequiredForMetadata.getExpressionSupport()).thenReturn(ExpressionSupport.NOT_SUPPORTED);
+    when(parameterRequiredForMetadata.getExpressionSupport()).thenReturn(NOT_SUPPORTED);
     when(parameterRequiredForMetadata.getModelProperty(any())).thenReturn(empty());
     when(parameterRequiredForMetadata.getDslConfiguration()).thenReturn(ParameterDslConfiguration.getDefaultInstance());
     when(parameterRequiredForMetadata.getLayoutModel()).thenReturn(empty());
@@ -218,7 +230,7 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
       return empty();
     });
 
-    this.defaultGroupParameterModels = asList(actingParameter, providedParameter, parameterRequiredForMetadata);
+    this.defaultGroupParameterModels = asList(nameParameter, actingParameter, providedParameter, parameterRequiredForMetadata);
     when(parameterGroup.getName()).thenReturn(DEFAULT_GROUP_NAME);
     when(parameterGroup.isShowInDsl()).thenReturn(false);
     when(parameterGroup.getParameterModels()).thenReturn(defaultGroupParameterModels);
