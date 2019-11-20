@@ -10,8 +10,8 @@ package org.mule.runtime.core.internal.routing;
 import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import org.reactivestreams.Publisher;
 
@@ -31,16 +31,16 @@ import org.reactivestreams.Publisher;
  * emitted only once all results are available, or if it emits the event immediately and then makes the results available via an
  * {@link java.util.Iterator} or {@link Publisher< InternalEvent >} payload. Implementations may also return the original
  * {@link CoreEvent} therefore performing a simple join with no aggregation.
- * 
+ *
  * @since 4.0
  */
 public interface ForkJoinStrategy {
 
   /**
    * Processes {@code n} routing pairs and aggregates the result as defined in the strategy implementation.
-   * 
+   *
    * @param original the original event
-   * @param routingPairs the routing paris to be processed
+   * @param routingPairs the routing pairs to be processed
    * @return the aggregated result of processing the routing pairs
    */
   Publisher<CoreEvent> forkJoin(CoreEvent original, Publisher<RoutingPair> routingPairs);
@@ -52,8 +52,8 @@ public interface ForkJoinStrategy {
    */
   final class RoutingPair {
 
-    private MessageProcessorChain route;
-    private CoreEvent event;
+    private final MessageProcessorChain route;
+    private final CoreEvent event;
 
     public static RoutingPair of(CoreEvent event, MessageProcessorChain route) {
       return new RoutingPair(event, route);

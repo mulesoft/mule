@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.factories;
 
+import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -55,11 +56,11 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBui
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -345,7 +346,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
      */
     protected Function<Context, Context> clearCurrentFlowRefFromCycleDetection() {
       return context -> {
-        List<String> currentAppliedFlowrefs = context.getOrDefault(APPLIED_FLOWREFS_KEY, new ArrayList<>());
+        Set<String> currentAppliedFlowrefs = new HashSet<>(context.getOrDefault(APPLIED_FLOWREFS_KEY, emptySet()));
         currentAppliedFlowrefs.remove(refName);
         return context.put(APPLIED_FLOWREFS_KEY, currentAppliedFlowrefs);
       };
@@ -366,7 +367,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
      */
     private Function<Context, Context> checkAndMarkCurrentFlowRefForCycleDetection() {
       return context -> {
-        List<String> currentAppliedFlowrefs = context.getOrDefault(APPLIED_FLOWREFS_KEY, new ArrayList<>());
+        Set<String> currentAppliedFlowrefs = new HashSet<>(context.getOrDefault(APPLIED_FLOWREFS_KEY, emptySet()));
         if (currentAppliedFlowrefs.contains(refName)) {
           throw propagate(new RecursiveFlowRefException(currentAppliedFlowrefs.stream()
               .collect(joining("' -> '", "'", "'")), StaticFlowRefMessageProcessor.this));
