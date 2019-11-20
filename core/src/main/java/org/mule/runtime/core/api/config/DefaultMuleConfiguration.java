@@ -17,7 +17,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -35,13 +34,8 @@ import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.NetworkUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.UUID;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.BooleanUtils;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
-import org.slf4j.Logger;
 
-import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -52,6 +46,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.slf4j.Logger;
+
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes immutable after starting the MuleContext. TODO
  * MULE-13121 Cleanup MuleConfiguration removing redundant config in Mule 4
@@ -61,7 +61,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
   protected static final Logger logger = getLogger(DefaultMuleConfiguration.class);
 
-  private boolean lazyInit;
+  private boolean lazyInit = false;
 
   /**
    * When true, each event will keep trace information of the flows and components it traverses to be shown as part of an
@@ -491,6 +491,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     }
   }
 
+  @Override
   public boolean isLazyInit() {
     return lazyInit;
   }

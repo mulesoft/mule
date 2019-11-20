@@ -48,6 +48,12 @@ public interface MuleConfiguration {
 
   boolean isValidateExpressions();
 
+  /**
+   * @return Whether this context was deployed in lazy init mode
+   * @since 4.3.0
+   */
+  boolean isLazyInit();
+
   @Deprecated
   int getDefaultQueueTimeout();
 
@@ -58,7 +64,7 @@ public interface MuleConfiguration {
 
   /**
    * The approximated maximum space in megabytes used by the transaction log files for transactional persistent queues.
-   *
+   * <p>
    * Take into account that this number applies both to the set of transaction log files for XA and for local transactions. If
    * both type of transactions are used then the approximated maximum space used will be twice the configured value.
    *
@@ -73,7 +79,7 @@ public interface MuleConfiguration {
    * <li>Thread names have app name in the prefix to guarantee uniqueness</li>
    * </ul>
    * etc.
-   *
+   * <p>
    * Note that e.g. a WAR-embedded Mule will run in container mode, but will still be considerd embedded for management purposes.
    *
    * @see #isStandalone()
@@ -99,7 +105,7 @@ public interface MuleConfiguration {
 
   /**
    * @param extensionType class instance of the extension type
-   * @param <T> type of the extension
+   * @param <T>           type of the extension
    * @return extension configured of type extensionType, if there's no such extension then null.
    */
   <T> T getExtension(final Class<T> extensionType);
