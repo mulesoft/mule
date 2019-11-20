@@ -591,21 +591,28 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
    */
   @Override
   public SecurityManager getSecurityManager() {
-    if (securityManager == null) {
-      SecurityManager securityManager = muleRegistryHelper.lookupObject(OBJECT_SECURITY_MANAGER);
-      if (securityManager == null) {
-        Collection<SecurityManager> temp = muleRegistryHelper.lookupObjects(SecurityManager.class);
-        if (temp.size() > 0) {
-          securityManager = (temp.iterator().next());
-        }
-      }
-      if (securityManager == null) {
-        throw new MuleRuntimeException(objectIsNull("securityManager"));
-      }
-
-      this.securityManager = securityManager;
+    if (config.isLazyInit()) {
+      return fetchSecurityManager();
     }
 
+    if (securityManager == null) {
+      this.securityManager = fetchSecurityManager();
+    }
+
+    return securityManager;
+  }
+
+  private SecurityManager fetchSecurityManager() {
+    SecurityManager securityManager = muleRegistryHelper.lookupObject(OBJECT_SECURITY_MANAGER);
+    if (securityManager == null) {
+      Collection<SecurityManager> temp = muleRegistryHelper.lookupObjects(SecurityManager.class);
+      if (temp.size() > 0) {
+        securityManager = (temp.iterator().next());
+      }
+    }
+    if (securityManager == null) {
+      throw new MuleRuntimeException(objectIsNull("securityManager"));
+    }
     return securityManager;
   }
 
