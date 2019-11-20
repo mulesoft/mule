@@ -173,7 +173,7 @@ public class HeisenbergSource extends Source<String, Object> {
         context.fireOnHandle(NEXT_BATCH, TypedValue.of(frequency));
         sourceCallback.handle(result, context);
       }
-    }, 0, frequency, MILLISECONDS);
+    }, 0, 4000, MILLISECONDS);
   }
 
   @OnSuccess
