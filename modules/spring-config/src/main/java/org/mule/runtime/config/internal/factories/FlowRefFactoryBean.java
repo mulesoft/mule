@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.factories;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -353,7 +354,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
      */
     protected Function<Context, Context> clearCurrentFlowRefFromCycleDetection() {
       return context -> {
-        List<String> currentAppliedFlowrefs = context.getOrDefault(APPLIED_FLOWREFS_KEY, new ArrayList<>());
+        List<String> currentAppliedFlowrefs = new ArrayList<>(context.getOrDefault(APPLIED_FLOWREFS_KEY, emptyList()));
         currentAppliedFlowrefs.remove(refName);
         return context.put(APPLIED_FLOWREFS_KEY, currentAppliedFlowrefs);
       };
@@ -374,7 +375,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
      */
     private Function<Context, Context> checkAndMarkCurrentFlowRefForCycleDetection() {
       return context -> {
-        List<String> currentAppliedFlowrefs = context.getOrDefault(APPLIED_FLOWREFS_KEY, new ArrayList<>());
+        List<String> currentAppliedFlowrefs = new ArrayList<>(context.getOrDefault(APPLIED_FLOWREFS_KEY, emptyList()));
         if (currentAppliedFlowrefs.contains(refName)) {
           throw propagate(new RecursiveFlowRefException(currentAppliedFlowrefs.stream()
               .collect(joining("' -> '", "'", "'")), StaticFlowRefMessageProcessor.this));
