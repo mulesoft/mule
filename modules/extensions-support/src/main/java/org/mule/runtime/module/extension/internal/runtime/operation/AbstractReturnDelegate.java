@@ -134,7 +134,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
           ? MessageUtils.toMessage(resultValue, mediaType, cursorProviderFactory, event, returnHandler.getDataType())
           : MessageUtils.toMessage(resultValue, mediaType, cursorProviderFactory, event);
     } else {
-      PayloadMediaTypeResolver payloadMediaTypeResolver = new PayloadMediaTypeResolver(getDefaultEncoding(muleContext),
+      PayloadMediaTypeResolver payloadMediaTypeResolver = new PayloadMediaTypeResolver(defaultEncoding,
                                                                                        defaultMediaType,
                                                                                        contextEncodingParam,
                                                                                        contextMimeTypeParam);
