@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.exception;
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static reactor.core.publisher.Flux.error;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -62,10 +63,12 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
 
   /**
    * Routes the error towards the destination error handler, calling the corresponding callback in case of failure or success.
-   * 
+   *
    * @param error the {@link Exception} to route
    * @param continueCallback the callback called in case the error is successfully handled
    * @param propagateCallback the callback is called in case the error-handling fails
+   *
+   * @since 4.3
    */
   default void routeError(Exception error, Consumer<CoreEvent> continueCallback,
                           Consumer<Throwable> propagateCallback) {

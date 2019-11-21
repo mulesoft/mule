@@ -15,7 +15,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
+
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -57,12 +59,16 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   @Inject
   private NotificationDispatcher notificationDispatcher;
-  private MessagingExceptionResolver messagingExceptionResolver = new MessagingExceptionResolver(this);
+
+  @Inject
+  private ErrorTypeRepository errorTypeRepository;
+
+  private final MessagingExceptionResolver messagingExceptionResolver = new MessagingExceptionResolver(this);
 
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
-    anyErrorType = muleContext.getErrorTypeRepository().getAnyErrorType();
+    anyErrorType = errorTypeRepository.getAnyErrorType();
     addCriticalErrorHandler();
     addDefaultErrorHandlerIfRequired();
     validateConfiguredExceptionStrategies();
@@ -87,7 +93,6 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
                          Consumer<Throwable> propagateCallback) {
     MessagingException messagingError = (MessagingException) error;
     CoreEvent event = messagingError.getEvent();
-    messagingError.setProcessedEvent(event);
     try {
       for (MessagingExceptionHandlerAcceptor errorListener : exceptionListeners) {
         if (errorListener.accept(event)) {

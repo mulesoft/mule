@@ -31,4 +31,8 @@ public final class NullExceptionHandler extends BaseExceptionHandler {
     // Do nothing
   }
 
+  @Override
+  public String toString() {
+    return NullExceptionHandler.class.getSimpleName();
+  }
 }

@@ -9,10 +9,10 @@ package org.mule.functional.api.component;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.fail;
 import static org.mule.tck.processor.FlowAssert.addAssertion;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
@@ -23,12 +23,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Flux;
 
 public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
     implements MessagingExceptionHandlerAcceptor, FlowAssertion {
 
-  private List<LogChecker> checkers = new ArrayList<>();
+  private final List<LogChecker> checkers = new ArrayList<>();
   private StringBuilder errors;
   private boolean propagate = false;
   private boolean succeedIfNoLog = false;
@@ -41,10 +42,10 @@ public class OnErrorCheckLogHandler extends TemplateOnErrorHandler
   private boolean handledException = false;
 
   @Override
-  protected void doInitialise(MuleContext muleContext) throws InitialisationException {
+  protected void doInitialise() throws InitialisationException {
     // Add a dummy processor to force the routing logic into the execution chain
     setMessageProcessors(singletonList(event -> event));
-    super.doInitialise(muleContext);
+    super.doInitialise();
   }
 
   @Override

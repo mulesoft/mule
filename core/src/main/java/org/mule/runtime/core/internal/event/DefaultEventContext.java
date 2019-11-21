@@ -7,12 +7,14 @@
 package org.mule.runtime.core.internal.event;
 
 import static java.lang.System.identityHashCode;
+import static java.lang.System.lineSeparator;
 import static java.time.Instant.now;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.streaming.CursorProvider;
@@ -38,12 +40,16 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import org.slf4j.Logger;
+
 /**
  * Default immutable implementation of {@link BaseEventContext}.
  *
  * @since 4.0
  */
 public final class DefaultEventContext extends AbstractEventContext implements Serializable {
+
+  private static final Logger LOGGER = getLogger(DefaultEventContext.class);
 
   private static final long serialVersionUID = -3664490832964509653L;
 
@@ -252,8 +258,17 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + " { id: " + id + "; correlationId: " + correlationId + "; flowName: "
-        + getOriginatingLocation().getRootContainerName() + "; serverId: " + serverId + " }";
+    if (LOGGER.isTraceEnabled()) {
+      return lineSeparator() + detailedToString(0, this) + lineSeparator();
+    } else {
+      return basicToString();
+    }
+  }
+
+  @Override
+  protected String basicToString() {
+    return getClass().getSimpleName() + " { state: " + getState() + "; id: " + id + "; flowName: "
+        + getOriginatingLocation().getRootContainerName() + " }";
   }
 
   private static class ChildEventContext extends AbstractEventContext implements Serializable {
@@ -327,9 +342,17 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
     @Override
     public String toString() {
-      return getClass().getSimpleName() + " { id: " + getId() + "; correlationId: " + parent.getCorrelationId()
-          + "; flowName: " + parent.getOriginatingLocation().getRootContainerName() + "; componentLocation: "
-          + (componentLocation != null ? componentLocation.getLocation() : EMPTY) + ";";
+      if (LOGGER.isTraceEnabled()) {
+        return lineSeparator() + ((AbstractEventContext) root).detailedToString(0, this) + lineSeparator();
+      } else {
+        return basicToString();
+      }
+    }
+
+    @Override
+    public String basicToString() {
+      return getClass().getSimpleName() + " { state: " + getState() + "; id: " + getId() + "; componentLocation: "
+          + (componentLocation != null ? componentLocation.getLocation() : EMPTY) + " }";
     }
 
     @Override

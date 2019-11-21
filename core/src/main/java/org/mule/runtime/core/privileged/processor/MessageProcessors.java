@@ -100,6 +100,15 @@ public class MessageProcessors {
     return defaultMessageProcessorChainBuilder.chain(processors).build();
   }
 
+  public static MessageProcessorChain buildNewChainWithListOfProcessors(Optional<ProcessingStrategy> processingStrategy,
+                                                                        List<Processor> processors,
+                                                                        FlowExceptionHandler messagingExceptionHandler) {
+    DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
+    processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
+    defaultMessageProcessorChainBuilder.setMessagingExceptionHandler(messagingExceptionHandler);
+    return defaultMessageProcessorChainBuilder.chain(processors).build();
+  }
+
   /**
    * Creates a new {@link MessageProcessorChain} from a {@link List} of {@link Processor}'s. Note that this performs chains
    * construction but will not inject {@link MuleContext} or perform any lifecycle.

@@ -8,6 +8,8 @@ package org.mule.runtime.core.api.exception;
 
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
@@ -19,6 +21,7 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
+@NoExtend
 public class LoggingExceptionHandler extends BaseExceptionHandler {
 
   private static final LoggingExceptionHandler INSTANCE = new LoggingExceptionHandler();
@@ -40,4 +43,8 @@ public class LoggingExceptionHandler extends BaseExceptionHandler {
     }
   }
 
+  @Override
+  public String toString() {
+    return LoggingExceptionHandler.class.getSimpleName();
+  }
 }

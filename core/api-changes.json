@@ -4,6 +4,28 @@
       "ignore": [
         {
           "code": "java.annotation.added",
+          "old": "class org.mule.runtime.core.privileged.exception.AbstractExceptionListener",
+          "new": "class org.mule.runtime.core.privileged.exception.AbstractExceptionListener",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "annotation": "@org.mule.api.annotation.NoExtend",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "AbstractExceptionListener",
+          "elementKind": "class",
+          "justification": "Add missing annotation"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.core.api.exception.LoggingExceptionHandler",
+          "new": "class org.mule.runtime.core.api.exception.LoggingExceptionHandler",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "annotation": "@org.mule.api.annotation.NoExtend",
+          "package": "org.mule.runtime.core.api.exception",
+          "classSimpleName": "LoggingExceptionHandler",
+          "elementKind": "class",
+          "justification": "Add missing annotation"
+        },
+        {
+          "code": "java.annotation.added",
           "old": "class org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain",
           "new": "class org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain",
           "annotationType": "org.mule.api.annotation.NoExtend",

@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -20,14 +21,16 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.MessagingExceptionHandlerAware;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Represents a simple route with the {@link Processor} it leads to.
- * 
+ *
  * @Since 4.3.0
  */
 public class ProcessorRoute extends AbstractComponent implements MuleContextAware, Lifecycle {
@@ -35,6 +38,9 @@ public class ProcessorRoute extends AbstractComponent implements MuleContextAwar
   private final static Logger LOGGER = LoggerFactory.getLogger(ProcessorRoute.class);
 
   private final Processor processor;
+
+  // just let the error be propagated to the outer chain...
+  private FlowExceptionHandler messagingExceptionHandler = (exception, event) -> null;
   private MuleContext muleContext;
 
   public ProcessorRoute(Processor processor) {
@@ -59,8 +65,15 @@ public class ProcessorRoute extends AbstractComponent implements MuleContextAwar
     }
   }
 
+  public void setMessagingExceptionHandler(FlowExceptionHandler messagingExceptionHandler) {
+    this.messagingExceptionHandler = messagingExceptionHandler;
+  }
+
   @Override
   public void initialise() throws InitialisationException {
+    if (processor instanceof MessagingExceptionHandlerAware) {
+      ((MessagingExceptionHandlerAware) processor).setMessagingExceptionHandler(messagingExceptionHandler);
+    }
     initialiseIfNeeded(processor, muleContext);
   }
 
