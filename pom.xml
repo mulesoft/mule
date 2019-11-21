@@ -148,7 +148,7 @@
         <antlrVersion>3.5</antlrVersion>
         <asmVersion>3.3.1</asmVersion>
         <aspectjVersion>1.8.5</aspectjVersion>
-        <asyncHttpClientVersion>1.14-MULE-009</asyncHttpClientVersion>
+        <asyncHttpClientVersion>1.14-MULE-014</asyncHttpClientVersion>
         <bshVersion>2.0b4</bshVersion>
         <bouncycastleVersion>1.60</bouncycastleVersion>
         <c3p0Version>0.9.5.4</c3p0Version>
