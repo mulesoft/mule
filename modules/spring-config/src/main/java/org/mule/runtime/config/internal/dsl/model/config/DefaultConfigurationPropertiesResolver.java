@@ -161,7 +161,7 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
   private Object replaceAllPlaceholders(String value) {
     String innerPlaceholderKey;
     String testValue = value;
-      int prefixIndex = prefixIndexConsideringBackslash(value);
+    int prefixIndex = prefixIndexConsideringBackslash(value);
     while (prefixIndex != -1) {
       int suffixIndex = testValue.indexOf(PLACEHOLDER_SUFFIX, prefixIndex + PLACEHOLDER_PREFIX.length());
       innerPlaceholderKey = testValue.substring(prefixIndex + PLACEHOLDER_PREFIX.length(), suffixIndex);
