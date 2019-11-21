@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.internal.dsl.model.config;
 
+import static java.lang.Boolean.valueOf;
+import static java.lang.System.getProperty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -38,7 +40,7 @@ import org.slf4j.Logger;
 public class DefaultConfigurationPropertiesResolver implements ConfigurationPropertiesResolver, Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(DefaultConfigurationPropertiesResolver.class);
-  private static final Boolean CORRECT_USE_OF_BACKSLASH = Boolean.valueOf(System.getProperty("mule.properties.correct.backslash.use", "true"));
+  private static final Boolean CORRECT_USE_OF_BACKSLASH = valueOf(getProperty("mule.properties.correct.backslash.use", "true"));
   public static final String PLACEHOLDER_PREFIX = "${";
   public static final String PLACEHOLDER_SUFFIX = "}";
   private final Optional<ConfigurationPropertiesResolver> parentResolver;
