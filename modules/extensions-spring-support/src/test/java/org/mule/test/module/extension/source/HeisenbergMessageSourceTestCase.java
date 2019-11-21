@@ -163,10 +163,14 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   @Test
-  @FlakyTest
+  @FlakyTest(times = 1000)
   public void reconnectWithEnrichedException() throws Exception {
     startFlow("sourceFailedOnRuntime");
-    probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> sourceTimesStarted > 2);
+    probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> {
+      synchronized (sourceTimesStarted) {
+        return sourceTimesStarted > 2;
+      }
+    });
   }
 
   @Test
