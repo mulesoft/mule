@@ -7,15 +7,18 @@
 package org.mule.module.http.functional.listener;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,9 +45,20 @@ public class HttpRequesterPartsTestCase extends FunctionalTestCase
     @Before
     public void before() throws Exception
     {
+        setCharset(UTF_8);
+    }
+
+    @After
+    public void after() throws Exception
+    {
+        setCharset(US_ASCII);
+    }
+
+    private void setCharset(Charset charset) throws NoSuchFieldException, IllegalAccessException
+    {
         Field headersCharset = PartBase.class.getDeclaredField(HEADERS_CHARSET);
         headersCharset.setAccessible(true);
-        headersCharset.set(null, UTF_8);
+        headersCharset.set(null, charset);
     }
 
     @Override
