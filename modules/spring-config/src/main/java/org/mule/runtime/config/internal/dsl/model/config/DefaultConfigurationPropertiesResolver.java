@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 public class DefaultConfigurationPropertiesResolver implements ConfigurationPropertiesResolver, Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(DefaultConfigurationPropertiesResolver.class);
+  private static final Boolean CORRECT_USE_OF_BACKSLASH = Boolean.valueOf(System.getProperty("mule.properties.correct.backslash.use", "true"));
   public static final String PLACEHOLDER_PREFIX = "${";
   public static final String PLACEHOLDER_SUFFIX = "}";
   private final Optional<ConfigurationPropertiesResolver> parentResolver;
@@ -82,9 +83,9 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
     }
     try {
       return this.resolutionCache.get(value, () -> {
-        int prefixIndex = findPrefixIndex(value);
+        int prefixIndex = prefix_index_considering_backslash(value);
         if (prefixIndex == -1) {
-          return value.replace("\\" + PLACEHOLDER_PREFIX, PLACEHOLDER_PREFIX);
+          return CORRECT_USE_OF_BACKSLASH ? value.replace("\\" + PLACEHOLDER_PREFIX, PLACEHOLDER_PREFIX) : value;
         }
         return replaceAllPlaceholders(value);
       });
@@ -151,10 +152,14 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
     }
   }
 
+  private int prefix_index_considering_backslash(String value) {
+    return CORRECT_USE_OF_BACKSLASH ? findPrefixIndex(value) : value.indexOf(PLACEHOLDER_PREFIX);
+  }
+
   private Object replaceAllPlaceholders(String value) {
     String innerPlaceholderKey;
     String testValue = value;
-    int prefixIndex = findPrefixIndex(value);
+      int prefixIndex = prefix_index_considering_backslash(value);
     while (prefixIndex != -1) {
       int suffixIndex = testValue.indexOf(PLACEHOLDER_SUFFIX, prefixIndex + PLACEHOLDER_PREFIX.length());
       innerPlaceholderKey = testValue.substring(prefixIndex + PLACEHOLDER_PREFIX.length(), suffixIndex);
@@ -165,9 +170,9 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
       }
       testValue = testValue.replace(PLACEHOLDER_PREFIX + innerPlaceholderKey + PLACEHOLDER_SUFFIX,
                                     objectValueFound.toString());
-      prefixIndex = findPrefixIndex(testValue);
+      prefixIndex = prefix_index_considering_backslash(testValue);
     }
-    return testValue.replace("\\" + PLACEHOLDER_PREFIX, PLACEHOLDER_PREFIX);
+    return CORRECT_USE_OF_BACKSLASH ? testValue.replace("\\" + PLACEHOLDER_PREFIX, PLACEHOLDER_PREFIX) : testValue;
   }
 
   private void propagateRootResolver(ConfigurationPropertiesResolver rootResolver) {
