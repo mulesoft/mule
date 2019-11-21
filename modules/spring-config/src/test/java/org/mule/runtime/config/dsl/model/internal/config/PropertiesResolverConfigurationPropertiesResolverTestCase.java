@@ -30,6 +30,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 @Feature(CONFIGURATION_PROPERTIES)
 @Story(CONFIGURATION_PROPERTIES_RESOLVER_STORY)
@@ -147,19 +148,9 @@ public class PropertiesResolverConfigurationPropertiesResolverTestCase extends A
   }
 
   @Test
-  public void resolveWithEscapedPrefix() {
-    assertThat(resolver.resolveValue("Hello \\${child-complex-key2}"), is("Hello ${child-complex-key2}"));
-  }
-
-  @Test
-  public void resolveWithEscapedPrefixNotClosed() {
-    assertThat(resolver.resolveValue("Hello \\${child-complex-key2"), is("Hello ${child-complex-key2"));
-  }
-
-  @Test
-  public void resolveWithEscapedPrefixAndNotEscaped() {
-    assertThat(resolver.resolveValue("Hello \\${${child-complex-key2}"),
-               is("Hello ${child-value1-parent-value1-parent-value2-child-value2"));
+  public void resolveWithEscapedPrefixWithWrongSetupOfBackslash() {
+    assertThat(resolver.resolveValue("Hello \\${child-complex-key2}"),
+               is("Hello \\child-value1-parent-value1-parent-value2-child-value2"));
   }
 
 }
