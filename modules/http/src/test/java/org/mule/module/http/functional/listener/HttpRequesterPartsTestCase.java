@@ -6,13 +6,17 @@
  */
 package org.mule.module.http.functional.listener;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+
+import java.lang.reflect.Field;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mule.tck.junit4.FunctionalTestCase;
@@ -20,40 +24,47 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.IOUtils;
 
+import com.ning.http.client.multipart.PartBase;
+
 public class HttpRequesterPartsTestCase extends FunctionalTestCase
 {
 
-  private static final String AHC_UTF_PROPERTY = "ahc.request.part.headers.allowUtf8";
-  private static final String MIME_UTF_PROPERTY = "mail.mime.allowutf8";
+    private static final String HEADERS_CHARSET = "HEADERS_CHARSET";
 
-  @Rule
-  public DynamicPort listenPort = new DynamicPort("port");
-  
-  @Rule
-  public SystemProperty encodingRequester = new SystemProperty(AHC_UTF_PROPERTY, "true");
-  
-  @Rule
-  public SystemProperty encodingListener = new SystemProperty(MIME_UTF_PROPERTY, "true");
+    private static final String MIME_UTF_PROPERTY = "mail.mime.allowutf8";
 
+    @Rule
+    public DynamicPort listenPort = new DynamicPort("port");
 
-  @Override
-  protected String getConfigFile()
-  {
-    return "http-requester-parts-config.xml";
-  }
+    @Rule
+    public SystemProperty encodingListener = new SystemProperty(MIME_UTF_PROPERTY, "true");
 
-  @Test
-  public void utf8InHeaders() throws Exception
-  {
-
-    try (CloseableHttpClient httpClient = HttpClients.createDefault())
+    @Before
+    public void before() throws Exception
     {
-      HttpGet httpGet = new HttpGet("http://localhost:" + listenPort.getValue() + "/utf");
-      try (CloseableHttpResponse response = httpClient.execute(httpGet))
-      {
-        assertThat(IOUtils.toString(response.getEntity().getContent()), is("Hello"));
-      }
+        Field headersCharset = PartBase.class.getDeclaredField(HEADERS_CHARSET);
+        headersCharset.setAccessible(true);
+        headersCharset.set(null, UTF_8);
     }
-  }
+
+    @Override
+    protected String getConfigFile()
+    {
+        return "http-requester-parts-config.xml";
+    }
+
+    @Test
+    public void utf8InHeaders() throws Exception
+    {
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault())
+        {
+            HttpGet httpGet = new HttpGet("http://localhost:" + listenPort.getValue() + "/utf");
+            try (CloseableHttpResponse response = httpClient.execute(httpGet))
+            {
+                assertThat(IOUtils.toString(response.getEntity().getContent()), is("Hello"));
+            }
+        }
+    }
 
 }
