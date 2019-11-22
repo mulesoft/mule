@@ -12,6 +12,7 @@ import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.createFrom;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.isStopped;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
@@ -24,8 +25,11 @@ import static org.mule.runtime.core.internal.context.thread.notification.ThreadN
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Operators.lift;
+
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -34,6 +38,7 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -41,6 +46,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
@@ -110,6 +116,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private final ProcessingStrategy processingStrategy;
   private final List<ReactiveInterceptorAdapter> additionalInterceptors = new LinkedList<>();
 
+  private boolean canProcessMessage = true;
+
   @Inject
   private InterceptorManager processorInterceptorManager;
 
@@ -120,7 +128,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private ThreadNotificationService threadNotificationService;
   private ThreadNotificationLogger threadNotificationLogger;
 
-  AbstractMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional,
+  AbstractMessageProcessorChain(String name,
+                                Optional<ProcessingStrategy> processingStrategyOptional,
                                 List<Processor> processors) {
     this.name = name;
     this.processingStrategy = processingStrategyOptional.orElse(null);
@@ -269,7 +278,12 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
     // #4 Wrap execution, before processing strategy, on flow thread.
     interceptors.add((processor, next) -> stream -> from(stream)
-        .doOnNext(preNotification(processor))
+        .doOnNext(event -> {
+          if (!canProcessMessage) {
+            throw propagate(new MessagingException(event, new LifecycleException(isStopped(name), event.getMessage())));
+          }
+          preNotification(event, processor);
+        })
         .transform(next)
         .map(result -> {
           postNotification(processor).accept(result);
@@ -279,6 +293,35 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         }));
 
     return interceptors;
+  }
+
+  private void registerStopListener() {
+    if (muleContext instanceof DefaultMuleContext) {
+      MuleContextListener listener = new MuleContextListener() {
+
+        @Override
+        public void onCreation(MuleContext context) {
+
+        }
+
+        @Override
+        public void onInitialization(MuleContext context, Registry registry) {
+
+        }
+
+        @Override
+        public void onStart(MuleContext context, Registry registry) {
+
+        }
+
+        @Override
+        public void onStop(MuleContext context, Registry registry) {
+          canProcessMessage = false;
+          ((DefaultMuleContext) muleContext).removeListener(this);
+        }
+      };
+      ((DefaultMuleContext) muleContext).addListener(listener);
+    }
   }
 
   private Function<? super Publisher<CoreEvent>, ? extends Publisher<CoreEvent>> doOnNextOrErrorWithContext(Consumer<Context> contextConsumer) {
@@ -333,13 +376,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     }
   }
 
-  private Consumer<CoreEvent> preNotification(Processor processor) {
-    return event -> {
-      if (((PrivilegedEvent) event).isNotificationsEnabled()) {
-        fireNotification(muleContext.getNotificationManager(), event, processor, null,
-                         MESSAGE_PROCESSOR_PRE_INVOKE);
-      }
-    };
+  private void preNotification(CoreEvent event, Processor processor) {
+    if (((PrivilegedEvent) event).isNotificationsEnabled()) {
+      fireNotification(muleContext.getNotificationManager(), event, processor, null,
+                       MESSAGE_PROCESSOR_PRE_INVOKE);
+    }
   }
 
   private Consumer<CoreEvent> postNotification(Processor processor) {
@@ -465,10 +506,14 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       stopIfNeeded(getMessageProcessorsForLifecycle());
       throw e;
     }
+
+    registerStopListener();
+    canProcessMessage = true;
   }
 
   @Override
   public void stop() throws MuleException {
+    canProcessMessage = false;
     stopIfNeeded(getMessageProcessorsForLifecycle());
   }
 

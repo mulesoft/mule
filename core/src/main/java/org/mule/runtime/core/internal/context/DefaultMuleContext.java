@@ -128,18 +128,17 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMuleContext {
@@ -246,7 +245,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   private Properties deploymentProperties;
 
-  private List<MuleContextListener> listeners = new ArrayList<>();
+  private List<MuleContextListener> listeners = new CopyOnWriteArrayList<>();
 
   private final LifecycleInterceptor lifecycleInterceptor = new MuleLifecycleInterceptor();
 
@@ -1148,7 +1147,15 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   }
 
   public void setListeners(List<MuleContextListener> listeners) {
-    this.listeners = listeners;
+    this.listeners = new CopyOnWriteArrayList<>(listeners);
+  }
+
+  public void addListener(MuleContextListener listener) {
+    listeners.add(listener);
+  }
+
+  public void removeListener(MuleContextListener listener) {
+    listeners.remove(listener);
   }
 
   private org.mule.runtime.api.artifact.Registry getApiRegistry() {
