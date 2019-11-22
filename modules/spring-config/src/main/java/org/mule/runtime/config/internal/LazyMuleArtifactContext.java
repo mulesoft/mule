@@ -102,6 +102,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 /**
@@ -120,7 +121,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private static final String DEFAULT_METADATA_CACHE_MANAGER_KEY = "_defaultPersistentMetadataCacheManager";
   private static final String LAZY_MULE_OBJECT_STORE_MANAGER = "_muleLazyObjectStoreManager";
 
-  private final List<String> beansCreated = new ArrayList<>();
+  private TrackingPostProcessor trackingPostProcessor;
 
   private final Optional<ComponentModelInitializer> parentComponentModelInitializer;
 
@@ -220,6 +221,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     }
 
     initialize();
+  }
+
+  @Override
+  protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+    super.prepareBeanFactory(beanFactory);
+    trackingPostProcessor = new TrackingPostProcessor();
+    addBeanPostProcessors(beanFactory, trackingPostProcessor);
   }
 
   private static Map<String, String> extendArtifactProperties(Map<String, String> artifactProperties) {
@@ -403,14 +411,14 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       }
 
       // First unregister any already initialized/started component
-      unregisterBeans(beansCreated);
+      unregisterBeans(trackingPostProcessor.getBeansTracked());
 
       currentComponentLocationsRequested.clear();
       currentComponentLocationsRequested.addAll(requestedLocations);
       appliedStartedPhaseRequest = applyStartPhase;
 
       // Clean up resources...
-      beansCreated.clear();
+      trackingPostProcessor.reset();
       objectProviders.clear();
       resetMuleSecurityManager();
 
@@ -487,19 +495,28 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    * @return List beans created for the given component names sorted by precedence.
    */
   private List<Object> createBeans(List<Pair<String, ComponentAst>> applicationComponentNames) {
+    trackingPostProcessor.startTracking();
     Map<Pair<String, ComponentAst>, Object> objects = new LinkedHashMap<>();
     // Create beans only once by calling the lookUp at the Registry
     applicationComponentNames.forEach(componentPair -> {
-      Object object = getRegistry().lookupByName(componentPair.getFirst()).orElse(null);
-      if (object != null) {
-        // MessageProcessorChainBuilder has to be manually created and added to the registry in order to be able
-        // to dispose it later
-        if (object instanceof MessageProcessorChainBuilder) {
-          handleChainBuilder((MessageProcessorChainBuilder) object, componentPair, objects);
-        } else if (object instanceof TransactionManagerFactory) {
-          handleTxManagerFactory((TransactionManagerFactory) object);
+      try {
+        Object object = getRegistry().lookupByName(componentPair.getFirst()).orElse(null);
+        if (object != null) {
+          // MessageProcessorChainBuilder has to be manually created and added to the registry in order to be able
+          // to dispose it later
+          if (object instanceof MessageProcessorChainBuilder) {
+            handleChainBuilder((MessageProcessorChainBuilder) object, componentPair, objects);
+          } else if (object instanceof TransactionManagerFactory) {
+            handleTxManagerFactory((TransactionManagerFactory) object);
+          }
+          objects.put(componentPair, object);
         }
-        objects.put(componentPair, object);
+      } catch (Exception e) {
+        trackingPostProcessor.stopTracking();
+        trackingPostProcessor.intersection(objects.keySet().stream().map(pair -> pair.getFirst()).collect(toList()));
+        unregisterBeans(trackingPostProcessor.getBeansTracked());
+
+        throw new MuleRuntimeException(e);
       }
     });
 
@@ -511,11 +528,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       componentNames.put(object, component);
     });
 
+    trackingPostProcessor.stopTracking();
+    trackingPostProcessor.intersection(objects.keySet().stream().map(pair -> pair.getFirst()).collect(toList()));
+
     // Sort in order to later initialize and start components according to their dependencies
     List<Object> sortedObjects = new ArrayList<>(objects.values());
     sort(sortedObjects, (o1, o2) -> graph.dependencyComparator().compare(componentNames.get(o1).getSecond(),
                                                                          componentNames.get(o2).getSecond()));
-    sortedObjects.forEach(object -> beansCreated.add(componentNames.get(object).getFirst()));
     return sortedObjects;
   }
 
@@ -595,7 +614,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   @Override
   public void close() {
-    beansCreated.clear();
+    trackingPostProcessor.stopTracking();
+    trackingPostProcessor.reset();
+
     appliedStartedPhaseRequest = false;
     currentComponentLocationsRequested.clear();
 
