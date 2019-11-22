@@ -1150,10 +1150,22 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     this.listeners = new CopyOnWriteArrayList<>(listeners);
   }
 
+  /**
+   * Registers the given {@code listener}
+   *
+   * @param listener a {@link MuleContextListener}
+   * @since 4.3.0
+   */
   public void addListener(MuleContextListener listener) {
     listeners.add(listener);
   }
 
+  /**
+   * Removes the given {@code listener}
+   *
+   * @param listener a {@link MuleContextListener}
+   * @since 4.3.0
+   */
   public void removeListener(MuleContextListener listener) {
     listeners.remove(listener);
   }
