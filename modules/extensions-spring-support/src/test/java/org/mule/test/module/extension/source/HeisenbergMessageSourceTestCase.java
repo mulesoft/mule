@@ -55,6 +55,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mule.test.runner.RunnerDelegateTo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -168,6 +170,9 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
     startFlow("sourceFailedOnRuntime");
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> {
       synchronized (sourceTimesStarted) {
+        Logger logger = LoggerFactory.getLogger(HeisenbergSource.class);
+        logger.error("LOGGG");
+        logger.error(sourceTimesStarted.toString());
         return sourceTimesStarted > 2;
       }
     });
