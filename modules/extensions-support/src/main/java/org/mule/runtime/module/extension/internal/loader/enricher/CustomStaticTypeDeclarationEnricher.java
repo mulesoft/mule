@@ -126,11 +126,11 @@ public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnr
   private Optional<MetadataType> getAttributesType(AnnotatedElement element, MetadataType outputAttributesType) {
     AttributesXmlType xml = element.getAnnotation(AttributesXmlType.class);
     if (xml != null) {
-      return resolveType(getXmlType(xml.schema(), xml.qname()), outputAttributesType);
+      return getXmlType(xml.schema(), xml.qname()).map(type -> resolveType(type, outputAttributesType));
     }
     AttributesJsonType json = element.getAnnotation(AttributesJsonType.class);
     if (json != null) {
-      return resolveType(getJsonType(json.schema()), outputAttributesType);
+      return getJsonType(json.schema()).map(type -> resolveType(type, outputAttributesType));
     }
     OutputResolver resolver = element.getAnnotation(OutputResolver.class);
     if (resolver != null && isStaticResolver(resolver.attributes())) {
@@ -146,11 +146,11 @@ public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnr
   private Optional<MetadataType> getOutputType(AnnotatedElement element, MetadataType outputType) {
     OutputXmlType xml = element.getAnnotation(OutputXmlType.class);
     if (xml != null) {
-      return resolveType(getXmlType(xml.schema(), xml.qname()), outputType);
+      return getXmlType(xml.schema(), xml.qname()).map(type -> resolveType(type, outputType));
     }
     OutputJsonType json = element.getAnnotation(OutputJsonType.class);
     if (json != null) {
-      return resolveType(getJsonType(json.schema()), outputType);
+      return getJsonType(json.schema()).map(type -> resolveType(type, outputType));
     }
     OutputResolver resolver = element.getAnnotation(OutputResolver.class);
     if (resolver != null && isStaticResolver(resolver.output())) {
@@ -166,11 +166,11 @@ public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnr
   private Optional<MetadataType> getInputType(AnnotatedElement element, MetadataType parameterType) {
     InputXmlType xml = element.getAnnotation(InputXmlType.class);
     if (xml != null) {
-      return resolveType(getXmlType(xml.schema(), xml.qname()), parameterType);
+      return getXmlType(xml.schema(), xml.qname()).map(type -> resolveType(type, parameterType));
     }
     InputJsonType json = element.getAnnotation(InputJsonType.class);
     if (json != null) {
-      return resolveType(getJsonType(json.schema()), parameterType);
+      return getJsonType(json.schema()).map(type -> resolveType(type, parameterType));
     }
     TypeResolver resolver = element.getAnnotation(TypeResolver.class);
     if (resolver != null && isStaticResolver(resolver.value())) {
@@ -179,11 +179,11 @@ public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnr
     return empty();
   }
 
-  private Optional<MetadataType> resolveType(Optional<MetadataType> annotationType, MetadataType declarationType) {
-    if (declarationType instanceof ArrayType && annotationType.isPresent()) {
+  private MetadataType resolveType(MetadataType annotationType, MetadataType declarationType) {
+    if (declarationType instanceof ArrayType) {
       ArrayTypeBuilder arrayMetadataBuilder = BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType();
-      arrayMetadataBuilder.of(annotationType.get());
-      return Optional.of(arrayMetadataBuilder.build());
+      arrayMetadataBuilder.of(annotationType);
+      return arrayMetadataBuilder.build();
     }
     return annotationType;
   }
