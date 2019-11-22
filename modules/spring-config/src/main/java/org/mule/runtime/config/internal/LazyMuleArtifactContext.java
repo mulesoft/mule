@@ -528,6 +528,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       componentNames.put(object, component);
     });
 
+    //TODO: Once is implemented MULE-17778 we should use graph to get the order for disposing beans
     trackingPostProcessor.stopTracking();
     trackingPostProcessor.intersection(objects.keySet().stream().map(pair -> pair.getFirst()).collect(toList()));
 
