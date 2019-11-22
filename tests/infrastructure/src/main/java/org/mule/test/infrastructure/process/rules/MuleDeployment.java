@@ -17,6 +17,8 @@ import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
 import static org.mule.test.infrastructure.process.MuleStatusProbe.isNotRunning;
+
+import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.privileged.util.MapUtils;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -151,6 +153,15 @@ public class MuleDeployment extends MuleInstallation {
     public Builder withProperty(String property, String value) {
       deployment.properties.put(property, value);
       return this;
+    }
+
+    public Builder withProcessingStrategyFactory(String factoryClassName) {
+      deployment.properties.put("-M-Dorg.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory", factoryClassName);
+      return this;
+    }
+
+    public Builder withProactorProcessingStrategy() {
+      return withProcessingStrategyFactory(ProactorStreamEmitterProcessingStrategyFactory.class.getName());
     }
 
     /**
