@@ -13,6 +13,8 @@ import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.api.metadata.MediaType.create;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
+import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.MediaType;
@@ -116,11 +118,8 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
       if (targetValue == null) { //Return the whole message
         return CoreEvent.builder(event).addVariable(target, resultMessage).build();
       } else { //typeValue was defined by the user
-        return CoreEvent.builder(event).addVariable(target,
-                                                    muleContext.getExpressionManager()
-                                                        .evaluate(targetValue, CoreEvent.builder(event)
-                                                            .message(resultMessage).build()))
-            .build();
+        return outputToTarget(event, target, targetValue, muleContext.getExpressionManager())
+            .apply(CoreEvent.builder(event).message(resultMessage).build());
       }
     }
   }
