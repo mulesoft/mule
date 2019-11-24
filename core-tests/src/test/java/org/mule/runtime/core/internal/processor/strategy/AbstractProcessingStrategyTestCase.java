@@ -440,6 +440,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     assertThat(latch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
 
     flow.stop();
+    cpuLight.stop();
+    blocking.stop();
+    cpuIntensive.stop();
+    ringBuffer.stop();
     cpuLight = new TestScheduler(2, CPU_LIGHT, false);
     blocking = new TestScheduler(4, IO, true);
     cpuIntensive = new TestScheduler(2, CPU_INTENSIVE, true);

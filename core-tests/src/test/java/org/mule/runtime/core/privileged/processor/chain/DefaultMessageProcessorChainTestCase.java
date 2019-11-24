@@ -106,6 +106,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Flux;
 
 @RunWith(Parameterized.class)
@@ -185,9 +186,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
   @After
   public void after() throws MuleException {
-    stopIfNeeded(muleContext.getSchedulerService());
     flow.stop();
     flow.dispose();
+    stopIfNeeded(muleContext.getSchedulerService());
   }
 
   @Test

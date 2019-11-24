@@ -124,9 +124,10 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
   }
 
   @Override
-  protected MessageProcessorChain createInterceptingChain(Processor head, List<Processor> processors,
-                                                          List<Processor> processorForLifecycle) {
-    return new ModuleOperationProcessorChain("wrapping-operation-module-chain", head, processors, processorForLifecycle,
+  protected MessageProcessorChain createSimpleChain(List<Processor> processors,
+                                                    Optional<ProcessingStrategy> processingStrategyOptional) {
+    return new ModuleOperationProcessorChain("wrapping-operation-module-chain",
+                                             processors,
                                              properties, parameters,
                                              extensionModel, operationModel,
                                              expressionManager,
@@ -136,8 +137,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
   /**
    * Generates message processor for a specific set of parameters & properties to be added in a new event.
    */
-  static public class ModuleOperationProcessorChain extends DefaultMessageProcessorChain
-      implements Processor {
+  public static class ModuleOperationProcessorChain extends DefaultMessageProcessorChain {
 
     private final Map<String, Pair<String, MetadataType>> properties;
     private final Map<String, Pair<String, MetadataType>> parameters;
@@ -146,13 +146,12 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
     private final Optional<String> target;
     private final String targetValue;
 
-    ModuleOperationProcessorChain(String name, Processor head, List<Processor> processors,
-                                  List<Processor> processorsForLifecycle,
+    ModuleOperationProcessorChain(String name, List<Processor> processors,
                                   Map<String, String> properties, Map<String, String> parameters,
                                   ExtensionModel extensionModel, OperationModel operationModel,
                                   ExpressionManager expressionManager,
                                   ProcessingStrategy processingStrategy) {
-      super(name, ofNullable(processingStrategy), head, processors, processorsForLifecycle);
+      super(name, ofNullable(processingStrategy), processors);
       final List<ParameterModel> propertiesModels = getAllProperties(extensionModel);
       this.properties = parseParameters(properties, propertiesModels);
       this.target = parameters.containsKey(TARGET_PARAMETER_NAME) ? of(parameters.remove(TARGET_PARAMETER_NAME)) : empty();

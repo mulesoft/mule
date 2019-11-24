@@ -49,6 +49,7 @@ import java.util.function.LongUnaryOperator;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
+
 import reactor.core.publisher.EmitterProcessor;
 
 /**
@@ -71,6 +72,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
                                                isMaxConcurrencyEagerCheck());
   }
 
+  @Override
   protected Supplier<Scheduler> getCpuLightSchedulerSupplier(MuleContext muleContext, String schedulersNamePrefix) {
     return () -> muleContext.getSchedulerService()
         .cpuLightScheduler(muleContext.getSchedulerBaseConfig()
@@ -175,7 +177,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
         AtomicReference<Throwable> failedSubscriptionCause = new AtomicReference<>();
         processor.transform(function)
             .doAfterTerminate(this::stopSchedulersIfNeeded)
-            .subscribe(null, getThrowableConsumer(completionLatch, failedSubscriptionCause),
+            .subscribe(null, getThrowableConsumer(flowConstruct, completionLatch, failedSubscriptionCause),
                        () -> completionLatch.release());
 
         if (!processor.hasDownstreams()) {
@@ -232,9 +234,11 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       return exceptionToThrow;
     }
 
-    protected Consumer<Throwable> getThrowableConsumer(Latch completionLatch,
+    protected Consumer<Throwable> getThrowableConsumer(FlowConstruct flowConstruct, Latch completionLatch,
                                                        AtomicReference<Throwable> failedSubscriptionCause) {
       return e -> {
+        LOGGER.error("Exception reached PS subscriber for flow '" + flowConstruct.getName() + "'", e);
+
         failedSubscriptionCause.set(e);
         completionLatch.release();
       };

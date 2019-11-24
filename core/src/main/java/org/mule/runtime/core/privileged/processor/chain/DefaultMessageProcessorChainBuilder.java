@@ -27,15 +27,15 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.ReferenceProcessor;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -69,12 +69,14 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     LinkedList<Processor> tempList = new LinkedList<>();
 
     final LinkedList<Processor> processorsForLifecycle = new LinkedList<>();
+    boolean atLeastOneIntercepting = false;
 
     // Start from last but one message processor and work backwards
     for (int i = processors.size() - 1; i >= 0; i--) {
       Processor processor = initializeMessageProcessor(processors.get(i));
       if (processor instanceof InterceptingMessageProcessor && (!(processor instanceof ReferenceProcessor)
           || ((ReferenceProcessor) processor).getReferencedProcessor() instanceof InterceptingMessageProcessor)) {
+        atLeastOneIntercepting = true;
         InterceptingMessageProcessor interceptingProcessor = (InterceptingMessageProcessor) processor;
         // Processor is intercepting so we can't simply iterate
         if (i + 1 < processors.size()) {
@@ -92,28 +94,35 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
         tempList.addFirst(processor);
       }
     }
-    // Create the final chain using the current tempList after reserve iteration is complete. This temp
-    // list contains the first n processors in the chain that are not intercepting.. with processor n+1
-    // having been injected as the listener of processor n
-    Processor head = createSimpleChain(tempList, ofNullable(processingStrategy));
-    processorsForLifecycle.addFirst(head);
-    return createInterceptingChain(head, processors, processorsForLifecycle);
+
+    if (atLeastOneIntercepting) {
+      // Create the final chain using the current tempList after reverse iteration is complete. This temp
+      // list contains the first n processors in the chain that are not intercepting.. with processor n+1
+      // having been injected as the listener of processor n
+      MessageProcessorChain head = createSimpleChain(tempList, ofNullable(processingStrategy));
+      processorsForLifecycle.addFirst(head);
+      return createInterceptingChain(head, processors, processorsForLifecycle);
+    } else {
+      return createSimpleChain(tempList, ofNullable(processingStrategy));
+    }
   }
 
   protected MessageProcessorChain createSimpleChain(List<Processor> tempList,
                                                     Optional<ProcessingStrategy> processingStrategyOptional) {
-    if (tempList.size() == 1 && tempList.get(0) instanceof SimpleMessageProcessorChain) {
+    if (tempList.size() == 1 && tempList.get(0) instanceof DefaultMessageProcessorChain) {
       return (MessageProcessorChain) tempList.get(0);
     } else {
-      return new SimpleMessageProcessorChain("(inner chain) of " + name, processingStrategyOptional,
-                                             new ArrayList<>(tempList));
+      return new DefaultMessageProcessorChain(name != null ? "(chain) of " + name : "(chain)",
+                                              processingStrategyOptional,
+                                              new ArrayList<>(tempList));
     }
   }
 
   protected MessageProcessorChain createInterceptingChain(Processor head, List<Processor> processors,
                                                           List<Processor> processorsForLifecycle) {
-    return new DefaultMessageProcessorChain("(outer intercepting chain) of " + name, ofNullable(processingStrategy), head,
-                                            processors, processorsForLifecycle);
+    return new InterceptingMessageProcessorChain(name != null ? "(intercepting chain) of " + name : "(intercepting chain)",
+                                                 ofNullable(processingStrategy), head,
+                                                 processors, processorsForLifecycle);
   }
 
   @Override
@@ -149,23 +158,35 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     return this;
   }
 
-  static class SimpleMessageProcessorChain extends AbstractMessageProcessorChain {
+  protected static class DefaultMessageProcessorChain extends AbstractMessageProcessorChain {
 
-    SimpleMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional,
-                                List<Processor> processors) {
+    protected DefaultMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional,
+                                           List<Processor> processors) {
       super(name, processingStrategyOptional, processors);
     }
 
+    /**
+     * This constructor left for backwards compatibility
+     *
+     * @deprecated Use {@link #DefaultMessageProcessorChainBuilder(String, Optional, List)} instead.
+     */
+    @Deprecated
+    protected DefaultMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional, Processor head,
+                                           List<Processor> processors,
+                                           List<Processor> processorsForLifecycle) {
+      super(name, processingStrategyOptional, processors);
+    }
   }
 
-  protected static class DefaultMessageProcessorChain extends AbstractMessageProcessorChain {
+  static class InterceptingMessageProcessorChain extends AbstractMessageProcessorChain {
 
     private final Processor head;
     private final List<Processor> processorsForLifecycle;
 
-    protected DefaultMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional, Processor head,
-                                           List<Processor> processors,
-                                           List<Processor> processorsForLifecycle) {
+    protected InterceptingMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional,
+                                                Processor head,
+                                                List<Processor> processors,
+                                                List<Processor> processorsForLifecycle) {
       super(name, processingStrategyOptional, processors);
       this.head = head;
       this.processorsForLifecycle = processorsForLifecycle;

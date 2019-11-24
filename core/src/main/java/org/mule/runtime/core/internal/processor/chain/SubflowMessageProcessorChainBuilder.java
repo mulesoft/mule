@@ -19,6 +19,7 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -26,6 +27,7 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import javax.xml.namespace.QName;
@@ -79,21 +81,20 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
   }
 
   @Override
-  protected MessageProcessorChain createInterceptingChain(Processor head, List<Processor> processors,
-                                                          List<Processor> processorForLifecycle) {
-    return new SubFlowMessageProcessorChain(name, head, processors, processorForLifecycle);
+  protected MessageProcessorChain createSimpleChain(List<Processor> processors,
+                                                    Optional<ProcessingStrategy> processingStrategyOptional) {
+    return new SubFlowMessageProcessorChain(name, processors);
   }
 
   /**
    * Generates message processor identifiers specific for subflows.
    */
-  static class SubFlowMessageProcessorChain extends DefaultMessageProcessorChain {
+  private static class SubFlowMessageProcessorChain extends DefaultMessageProcessorChain {
 
     private final String subFlowName;
 
-    SubFlowMessageProcessorChain(String name, Processor head, List<Processor> processors,
-                                 List<Processor> processorsForLifecycle) {
-      super(name, empty(), head, processors, processorsForLifecycle);
+    SubFlowMessageProcessorChain(String name, List<Processor> processors) {
+      super(name, empty(), processors);
       this.subFlowName = name;
     }
 
