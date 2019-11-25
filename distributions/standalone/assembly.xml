@@ -8,6 +8,14 @@
 
     <fileSets>
         <fileSet>
+            <directory>${communityDistDir}/mule-standalone-${mule.version}/src</directory>
+            <outputDirectory>src</outputDirectory>
+            <includes>
+                <include>mule-${mule.version}-src.zip</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
             <directory>src/main/resources</directory>
             <outputDirectory></outputDirectory>
             <excludes>
@@ -347,6 +355,9 @@
                 <exclude>xmlunit:xmlunit</exclude>
                 <exclude>org.mule.tests:mule-tests-functional</exclude>
 
+                <exclude>com.mulesoft.muleesb.patches:SE-12562-${mule.version}</exclude>
+                <exclude>com.mulesoft.muleesb.patches:SE-13712-${mule.version}</exclude>
+
                 <!-- lib/boot -->
                 <exclude>commons-cli:commons-cli</exclude>
                 <exclude>tanukisoft:wrapper</exclude>
@@ -376,6 +387,16 @@
                 <include>junit:junit</include>
                 <include>xmlunit:xmlunit</include>
                 <include>org.mule.tests:mule-tests-functional</include>
+            </includes>
+        </dependencySet>
+
+        <dependencySet>
+            <outputDirectory>lib/user</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
+            <scope>runtime</scope>
+            <includes>
+                <include>com.mulesoft.muleesb.patches:SE-12562-${mule.version}</include>
+                <include>com.mulesoft.muleesb.patches:SE-13712-${mule.version}</include>
             </includes>
         </dependencySet>
 

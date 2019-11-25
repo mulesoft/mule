@@ -8,11 +8,13 @@
     </parent>
     <groupId>org.mule.distributions</groupId>
     <artifactId>mule-distributions</artifactId>
+    <version>3.5.0</version>
     <packaging>pom</packaging>
     <name>Mule Distributions</name>
 
     <properties>
         <licensePath>../LICENSE_HEADER.txt</licensePath>
+        <mule.version>3.5.0</mule.version>
     </properties>
 
     <build>
