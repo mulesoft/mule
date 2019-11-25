@@ -188,7 +188,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   public void after() throws MuleException {
     flow.stop();
     flow.dispose();
-    stopIfNeeded(muleContext.getSchedulerService());
   }
 
   @Test

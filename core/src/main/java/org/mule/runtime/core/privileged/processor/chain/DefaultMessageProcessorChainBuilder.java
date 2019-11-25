@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -49,6 +50,7 @@ import org.slf4j.LoggerFactory;
  * The MessageProcessor instance that this builder builds can be nested in other chains as required.
  * </p>
  */
+@NoExtend
 public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcessorChainBuilder {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMessageProcessorChainBuilder.class);
@@ -158,6 +160,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     return this;
   }
 
+  @NoExtend
   protected static class DefaultMessageProcessorChain extends AbstractMessageProcessorChain {
 
     protected DefaultMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional,
