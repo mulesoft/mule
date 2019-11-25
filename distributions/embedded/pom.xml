@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.distributions</groupId>
@@ -93,22 +93,34 @@
         </plugins>
     </build>
     <dependencies>
+        <!-- Lib Patches -->
+        <dependency>
+            <groupId>com.mulesoft.muleesb.patches</groupId>
+            <artifactId>SE-12562-${mule.version}</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mulesoft.muleesb.patches</groupId>
+            <artifactId>SE-13712-${mule.version}</artifactId>
+            <version>1.0</version>
+        </dependency>
+
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-modules-all</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>org.mule.patterns</groupId>
             <artifactId>mule-patterns-all</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transports-all</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <type>pom</type>
         </dependency>
     </dependencies>

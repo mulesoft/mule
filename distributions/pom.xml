@@ -13,6 +13,7 @@
 
     <properties>
         <licensePath>../LICENSE_HEADER.txt</licensePath>
+        <mule.version>3.6.1</mule.version>
     </properties>
 
     <build>
