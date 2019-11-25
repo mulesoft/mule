@@ -18,6 +18,36 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!--
+                             This has to happen early in the build lifecycle so that plugins running
+                             later in the build lifecycle can work on the unpacked distro.
+                             -->
+                        <id>unpack-dependencies</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${skipDistributions}</skip>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.mule.distributions</groupId>
+                                    <artifactId>mule-standalone</artifactId>
+                                    <version>${mule.version}</version>
+                                    <type>tar.gz</type>
+                                    <outputDirectory>${communityDistDir}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>
@@ -101,7 +131,7 @@
                                 }
 
                                 ant.zip(basedir: tempDir,
-                                        destfile: "$project.build.directory/mule-${project.version}-src.zip")
+                                        destfile: "$project.build.directory/mule-${mule.version}-src.zip")
                             </source>
                         </configuration>
                     </execution>
@@ -144,12 +174,12 @@
         <!-- Lib Patches -->
         <dependency>
             <groupId>com.mulesoft.muleesb.patches</groupId>
-            <artifactId>SE-12551-${mule.version}</artifactId>
-            <version>7.0</version>
+            <artifactId>SE-12562-${mule.version}</artifactId>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>com.mulesoft.muleesb.patches</groupId>
-            <artifactId>SE-12562-${mule.version}</artifactId>
+            <artifactId>SE-13712-${mule.version}</artifactId>
             <version>1.0</version>
         </dependency>
 
