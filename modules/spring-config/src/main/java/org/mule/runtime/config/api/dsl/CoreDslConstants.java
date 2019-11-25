@@ -37,6 +37,7 @@ public interface CoreDslConstants {
   String UNTIL_SUCCESSFUL_ELEMENT = "until-successful";
   String TRY_ELEMENT = "try";
   String FOREACH_ELEMENT = "foreach";
+  String ASYNC_ELEMENT = "async";
   String PARALLEL_FOREACH_ELEMENT = "parallel-" + FOREACH_ELEMENT;
   String SCATTER_GATHER_ELEMENT = "scatter-gather";
 
@@ -76,4 +77,6 @@ public interface CoreDslConstants {
       builder().namespace(CORE_PREFIX).name(PARALLEL_FOREACH_ELEMENT).build();
   ComponentIdentifier SCATTER_GATHER_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(SCATTER_GATHER_ELEMENT).build();
+  ComponentIdentifier ASYNC_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(ASYNC_ELEMENT).build();
 }
