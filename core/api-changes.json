@@ -3,6 +3,28 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain",
+          "new": "class org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "annotation": "@org.mule.api.annotation.NoExtend",
+          "package": "org.mule.runtime.core.privileged.processor.chain",
+          "classSimpleName": "DefaultMessageProcessorChain",
+          "elementKind": "class",
+          "justification": "Add missing annotation"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder",
+          "new": "class org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder",
+          "annotationType": "org.mule.api.annotation.NoExtend",
+          "annotation": "@org.mule.api.annotation.NoExtend",
+          "package": "org.mule.runtime.core.privileged.processor.chain",
+          "classSimpleName": "DefaultMessageProcessorChainBuilder",
+          "elementKind": "class",
+          "justification": "Add missing annotation"
+        },
+        {
           "code": "java.method.finalMethodAddedToNonFinalClass",
           "new": "method java.util.concurrent.CompletableFuture<org.mule.runtime.api.event.Event> org.mule.runtime.core.privileged.component.AbstractExecutableComponent::execute(org.mule.runtime.api.event.Event, java.util.function.Consumer<org.mule.runtime.core.api.event.CoreEvent.Builder>)",
           "package": "org.mule.runtime.core.privileged.component",

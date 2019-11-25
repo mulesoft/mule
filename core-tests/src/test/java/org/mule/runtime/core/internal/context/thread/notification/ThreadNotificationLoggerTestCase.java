@@ -11,30 +11,27 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.mockito.Mockito.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
 import static reactor.core.publisher.Flux.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +45,14 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class ThreadNotificationLoggerTestCase {
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+
+import reactor.core.publisher.Mono;
+
+public class ThreadNotificationLoggerTestCase extends AbstractMuleTestCase {
 
   private static final int TEST_TIMEOUT = 2000;
   private static final int TEST_POLL_DELAY = 10;
@@ -59,17 +63,23 @@ public class ThreadNotificationLoggerTestCase {
   private static final String IO = "io";
   private static final String CPU_LIGHT = "cpuLight";
   private ThreadNotificationLogger logger;
-  private ThreadNotificationService service = mock(ThreadNotificationService.class);
-  private CoreEvent event = mock(CoreEvent.class);
-  private EventContext context = mock(EventContext.class);
-  private Scheduler ioScheduler = new TestScheduler(2, "test", IO);
-  private Scheduler cpuLightScheduler = new TestScheduler(2, "test", CPU_LIGHT);
+  private final ThreadNotificationService service = mock(ThreadNotificationService.class);
+  private final CoreEvent event = mock(CoreEvent.class);
+  private final EventContext context = mock(EventContext.class);
+  private final Scheduler ioScheduler = new TestScheduler(2, "test", IO);
+  private final Scheduler cpuLightScheduler = new TestScheduler(2, "test", CPU_LIGHT);
 
   @Before
   public void setup() {
     logger = new ThreadNotificationLogger(service, true);
     when(event.getContext()).thenReturn(context);
     when(context.getId()).thenReturn("id");
+  }
+
+  @After
+  public void tearDown() {
+    ioScheduler.stop();
+    cpuLightScheduler.stop();
   }
 
   @Test
@@ -140,8 +150,8 @@ public class ThreadNotificationLoggerTestCase {
 
   class TestScheduler extends ScheduledThreadPoolExecutor implements Scheduler {
 
-    private String threadNamePrefix;
-    private ExecutorService executor;
+    private final String threadNamePrefix;
+    private final ExecutorService executor;
 
     public TestScheduler(int threads, String threadNamePrefix, String threadGroupName) {
       super(1, new NamedThreadFactory(threadNamePrefix + ".tasks"));
