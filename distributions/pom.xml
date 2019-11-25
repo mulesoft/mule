@@ -8,7 +8,7 @@
     </parent>
     <groupId>org.mule.distributions</groupId>
     <artifactId>mule-distributions</artifactId>
-    <version>3.5.0</version>
+    <version>3.5.0-hf1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Mule Distributions</name>
 
@@ -38,7 +38,7 @@
     <modules>
         <module>embedded</module>
         <module>profiler</module>
-        <module>scripting</module>
+<!--        <module>scripting</module>-->
         <module>standalone</module>
         <module>standalone-light</module>
         <module>studio</module>

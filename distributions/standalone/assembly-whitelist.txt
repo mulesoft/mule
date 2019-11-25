@@ -126,7 +126,7 @@
 /mule-standalone-${productVersion}/examples/echo/build.xml
 /mule-standalone-${productVersion}/examples/echo/adding-logging-to-a-flow.xml
 /mule-standalone-${productVersion}/examples/echo/mule-deploy.properties
-/mule-standalone-${productVersion}/examples/echo/mule-example-echo-${productVersion}.zip
+/mule-standalone-${productVersion}/examples/echo/mule-example-echo-3.5.0.zip
 /mule-standalone-${productVersion}/examples/echo/pom.xml
 /mule-standalone-${productVersion}/examples/echo/README.txt
 /mule-standalone-${productVersion}/examples/echo/src
@@ -152,7 +152,7 @@
 # /examples/gpswalker
 #
 /mule-standalone-${productVersion}/examples/gpswalker
-/mule-standalone-${productVersion}/examples/gpswalker/mule-example-gpswalker-${productVersion}.zip
+/mule-standalone-${productVersion}/examples/gpswalker/mule-example-gpswalker-3.5.0.zip
 /mule-standalone-${productVersion}/examples/gpswalker/pom.xml
 /mule-standalone-${productVersion}/examples/gpswalker/README.txt
 /mule-standalone-${productVersion}/examples/gpswalker/src
@@ -178,7 +178,7 @@
 #
 /mule-standalone-${productVersion}/examples/hello
 /mule-standalone-${productVersion}/examples/hello/build.xml
-/mule-standalone-${productVersion}/examples/hello/mule-example-hello-${productVersion}.zip
+/mule-standalone-${productVersion}/examples/hello/mule-example-hello-3.5.0.zip
 /mule-standalone-${productVersion}/examples/hello/pom.xml
 /mule-standalone-${productVersion}/examples/hello/README.txt
 /mule-standalone-${productVersion}/examples/hello/src
@@ -226,7 +226,7 @@
 #
 /mule-standalone-${productVersion}/examples/flight-reservation
 /mule-standalone-${productVersion}/examples/flight-reservation/README.txt
-/mule-standalone-${productVersion}/examples/flight-reservation/mule-example-flight-reservation-${productVersion}.zip
+/mule-standalone-${productVersion}/examples/flight-reservation/mule-example-flight-reservation-3.5.0.zip
 /mule-standalone-${productVersion}/examples/flight-reservation/README.txt
 /mule-standalone-${productVersion}/examples/flight-reservation/pom.xml
 /mule-standalone-${productVersion}/examples/flight-reservation/src
@@ -251,7 +251,7 @@
 #
 /mule-standalone-${productVersion}/examples/foreach
 /mule-standalone-${productVersion}/examples/foreach/README.txt
-/mule-standalone-${productVersion}/examples/foreach/mule-example-foreach-${productVersion}.zip
+/mule-standalone-${productVersion}/examples/foreach/mule-example-foreach-3.5.0.zip
 /mule-standalone-${productVersion}/examples/foreach/pom.xml
 /mule-standalone-${productVersion}/examples/foreach/src
 /mule-standalone-${productVersion}/examples/foreach/src/main
@@ -266,7 +266,7 @@
 #/examples/loanbroker-simple
 #
 /mule-standalone-${productVersion}/examples/loanbroker-simple
-/mule-standalone-${productVersion}/examples/loanbroker-simple/mule-example-loanbroker-simple-${productVersion}.zip
+/mule-standalone-${productVersion}/examples/loanbroker-simple/mule-example-loanbroker-simple-3.5.0.zip
 /mule-standalone-${productVersion}/examples/loanbroker-simple/pom.xml
 /mule-standalone-${productVersion}/examples/loanbroker-simple/README.txt
 /mule-standalone-${productVersion}/examples/loanbroker-simple/src
@@ -309,7 +309,7 @@
 #
 /mule-standalone-${productVersion}/examples/scripting
 /mule-standalone-${productVersion}/examples/scripting/build.xml
-/mule-standalone-${productVersion}/examples/scripting/mule-example-scripting-${productVersion}.zip
+/mule-standalone-${productVersion}/examples/scripting/mule-example-scripting-3.5.0.zip
 /mule-standalone-${productVersion}/examples/scripting/pom.xml
 /mule-standalone-${productVersion}/examples/scripting/README.txt
 /mule-standalone-${productVersion}/examples/scripting/src
@@ -342,7 +342,7 @@
 #
 /mule-standalone-${productVersion}/examples/stockquote
 /mule-standalone-${productVersion}/examples/stockquote/build.xml
-/mule-standalone-${productVersion}/examples/stockquote/mule-example-stockquote-${productVersion}.zip
+/mule-standalone-${productVersion}/examples/stockquote/mule-example-stockquote-3.5.0.zip
 /mule-standalone-${productVersion}/examples/stockquote/pom.xml
 /mule-standalone-${productVersion}/examples/stockquote/README.txt
 /mule-standalone-${productVersion}/examples/stockquote/src
@@ -445,7 +445,7 @@
 #
 /mule-standalone-${productVersion}/lib/mule
 /mule-standalone-${productVersion}/lib/mule/mule-common-3.5.0.jar
-/mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}-tests.jar
+/mule-standalone-${productVersion}/lib/mule/mule-core-3.5.0-tests.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-3.5.0.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-annotations-3.5.0.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-atom-3.5.0.jar

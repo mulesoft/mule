@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-distributions</artifactId>
-        <version>3.5.0</version>
+        <version>3.5.0-hf1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-standalone</artifactId>
     <!-- Packaging 'pom' ensures that maven does not try to bind a plugin to the
@@ -180,7 +180,7 @@
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-examples-all</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
             <type>pom</type>
             <exclusions>
                 <exclusion>
@@ -245,7 +245,7 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-logging</artifactId>
-            <version>${project.version}</version>
+            <version>${mule.version}</version>
         </dependency>
 
         <!-- Include all Mule Patterns -->

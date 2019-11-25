@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-distributions</artifactId>
-        <version>3.5.0</version>
+        <version>3.5.0-hf1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-scripting-pack</artifactId>
     <packaging>pom</packaging>

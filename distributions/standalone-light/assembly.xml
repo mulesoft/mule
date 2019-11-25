@@ -40,5 +40,6 @@
             <directory>src/main/resources</directory>
             <outputDirectory></outputDirectory>
         </fileSet>
+
     </fileSets>
 </assembly>
