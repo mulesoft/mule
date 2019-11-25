@@ -22,6 +22,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.extension.api.annotation.ConfigReferences;
 import org.mule.runtime.extension.api.annotation.param.reference.ConfigReference;
 import org.mule.runtime.extension.api.annotation.param.reference.FlowReference;
@@ -126,6 +127,10 @@ public final class ParameterAllowedStereotypesDeclarionEnricher extends Abstract
         } else {
           parameterizedType = ((Parameter) element).getParameterizedType();
           paramType = ((Parameter) element).getType();
+        }
+
+        if (ObjectStore.class.isAssignableFrom(paramType)) {
+          return singletonList(OBJECT_STORE);
         }
 
         if (Collection.class.isAssignableFrom(paramType)) {
