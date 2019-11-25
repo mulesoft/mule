@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
@@ -57,10 +58,8 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.DeferredMonoSinkExecutorCallback;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
@@ -99,6 +98,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -194,18 +194,26 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       return flux
           // This flatMap allows the operation to run in parallel. The processing strategy relies on this
           // (ProactorStreamProcessingStrategy#proactor) to do some performance optimizations.
-          .flatMap(event -> {
-            DeferredMonoSinkExecutorCallback callback = new DeferredMonoSinkExecutorCallback();
-            onEvent(event, callback);
+          .flatMap(event -> subscriberContext()
+              .flatMap(ctx -> {
+                // Force the error mapper from the subscription context to be used.
+                // When using Mono.create with sink.error, the error mapper from the context is ignored, so it has to be
+                // explicitly used here.
+                DeferredMonoSinkExecutorCallback callback =
+                    ctx.<BiFunction<Throwable, Object, Throwable>>getOrEmpty("reactor.onOperatorError.local")
+                        .map(m -> new DeferredMonoSinkExecutorCallback<>(t -> m.apply(t, event)))
+                        .orElseGet(() -> new DeferredMonoSinkExecutorCallback<>());
 
-            return create(callback::setSink);
-          });
+                onEvent(event, callback);
+
+                return create(callback::setSink);
+              }));
     } else {
       return flux.handle((event, sink) -> {
         try {
           onEvent(event, new SynchronousSinkExecutorCallback(sink));
         } catch (Throwable t) {
-          sink.error(mapError(t, event));
+          sink.error(unwrap(t));
         }
       });
     }
@@ -252,7 +260,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         operationExecutionFunction.execute(resolutionResult, event, executorCallback);
       }
     } catch (Throwable t) {
-      executorCallback.error(mapError(t, event));
+      executorCallback.error(unwrap(t));
     }
   }
 
@@ -266,7 +274,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
       @Override
       public void error(Throwable t) {
-        callback.error(mapError(t, event));
+        callback.error(unwrap(t));
       }
     };
   }
@@ -319,14 +327,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   protected void executeOperation(ExecutionContextAdapter<T> operationContext, ExecutorCallback callback) {
     executionMediator.execute(componentExecutor, operationContext, callback);
-  }
-
-  private Throwable mapError(Throwable t, CoreEvent event) {
-    t = Exceptions.unwrap(t);
-    if (!(t instanceof MessagingException)) {
-      t = new MessagingException(event, t, this);
-    }
-    return t;
   }
 
   private ExecutionContextAdapter<T> createExecutionContext(Optional<ConfigurationInstance> configuration,

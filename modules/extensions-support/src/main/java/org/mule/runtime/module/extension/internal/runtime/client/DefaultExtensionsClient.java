@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.client;
 
+import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -14,7 +16,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.rx.Exceptions;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -74,9 +76,18 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extension, String operation, OperationParameters parameters) {
     OperationMessageProcessor processor =
         extensionsClientProcessorsStrategy.getOperationMessageProcessor(extension, operation, parameters);
-    return just(extensionsClientProcessorsStrategy.getEvent(parameters)).transform(processor)
+    final CoreEvent eventFromParams = extensionsClientProcessorsStrategy.getEvent(parameters);
+    return just(eventFromParams)
+        .transform(processor)
         .map(event -> Result.<T, A>builder(event.getMessage()).build())
-        .onErrorMap(Exceptions::unwrap)
+        .onErrorMap(t -> {
+          Throwable unwrapped = unwrap(t);
+          if (!(unwrapped instanceof MessagingException)) {
+            return new MessagingException(eventFromParams, unwrapped, processor);
+          } else {
+            return unwrapped;
+          }
+        })
         .doAfterTerminate(() -> extensionsClientProcessorsStrategy.disposeProcessor(processor))
         .toFuture();
   }
@@ -89,9 +100,17 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
       throws MuleException {
     OperationMessageProcessor processor =
         extensionsClientProcessorsStrategy.getOperationMessageProcessor(extension, operation, params);
+    final CoreEvent eventFromParams = extensionsClientProcessorsStrategy.getEvent(params);
     try {
-      CoreEvent process = processor.process(extensionsClientProcessorsStrategy.getEvent(params));
+      CoreEvent process = processor.process(eventFromParams);
       return Result.<T, A>builder(process.getMessage()).build();
+    } catch (Exception e) {
+      Throwable unwrapped = unwrap(e);
+      if (!(unwrapped instanceof MessagingException)) {
+        throw new MessagingException(eventFromParams, unwrapped, processor);
+      } else {
+        throw propagateWrappingFatal(unwrapped);
+      }
     } finally {
       extensionsClientProcessorsStrategy.disposeProcessor(processor);
     }
