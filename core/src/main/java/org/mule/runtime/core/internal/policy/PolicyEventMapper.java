@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
@@ -16,8 +15,10 @@ import static org.mule.runtime.core.internal.policy.CompositeSourcePolicy.POLICY
 import static org.mule.runtime.core.internal.policy.CompositeSourcePolicy.POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_EVENT_CTX_IDS;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.collection.FastMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.internal.event.EventInternalContextResolver;
@@ -25,12 +26,11 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
 
 /**
@@ -128,8 +128,8 @@ public class PolicyEventMapper {
           .build();
 
       // Additional copy is needed to update next_operation_response to be the just created event
-      return quickCopy(next, of(policyVarsInternalParameterName(), result.getVariables(),
-                                POLICY_OPERATION_NEXT_OPERATION_RESPONSE, next));
+      return quickCopy(next, FastMap.of(policyVarsInternalParameterName(), result.getVariables(),
+                                        POLICY_OPERATION_NEXT_OPERATION_RESPONSE, next));
     }
   }
 

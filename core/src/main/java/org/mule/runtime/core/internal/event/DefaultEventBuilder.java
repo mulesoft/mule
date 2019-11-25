@@ -34,6 +34,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.api.util.collection.FastMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -82,7 +83,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.context = messageContext;
     this.session = new DefaultMuleSession();
     this.originalVars = emptyCaseInsensitiveMap();
-    this.internalParameters = new HashMap<>(INTERNAL_PARAMETERS_INITIAL_CAPACITY);
+    this.internalParameters = new FastMap<>();
     internalParametersInitialized = true;
   }
 
@@ -292,14 +293,14 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   protected void initVariables() {
     if (!varsModified) {
       if (flowVariables == null) {
-        flowVariables = new CaseInsensitiveHashMap<>(originalVars);
+        flowVariables = new CaseInsensitiveHashMap<>(FastMap.of(originalVars));
       }
     }
   }
 
   protected void initInternalParameters() {
     if (!internalParametersInitialized) {
-      internalParameters = new HashMap<>(internalParameters);
+      internalParameters = FastMap.of(internalParameters);
       internalParametersInitialized = true;
     }
   }
@@ -360,7 +361,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.legacyCorrelationId = null;
       this.error = null;
       this.itemSequenceInfo = null;
-      this.internalParameters = new HashMap<>(INTERNAL_PARAMETERS_INITIAL_CAPACITY);
+      this.internalParameters = new FastMap<>();
     }
 
     // Use this constructor from the builder

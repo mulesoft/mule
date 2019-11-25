@@ -8,10 +8,12 @@ package org.mule.runtime.core.internal.processor.interceptor;
 
 import static java.lang.String.valueOf;
 import static java.util.Collections.emptyMap;
+import static org.mule.runtime.api.util.collection.FastMap.of;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_PARAMS;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.interception.ProcessorParameterValue;
 import org.mule.runtime.core.api.MuleContext;
@@ -95,10 +97,8 @@ class AbstractInterceptorAdapter {
   protected InternalEvent setInternalParamsForNotParamResolver(Component component,
                                                                Map<String, ProcessorParameterValue> resolvedParameters,
                                                                InternalEvent event, InternalEvent.Builder builder) {
-    Map<String, Object> interceptionEventParams = new HashMap<>();
-    interceptionEventParams.put(INTERCEPTION_RESOLVED_PARAMS, resolvedParameters);
-    interceptionEventParams.put(INTERCEPTION_COMPONENT, component);
-    return quickCopy(event, interceptionEventParams);
+    return quickCopy(event, of(INTERCEPTION_RESOLVED_PARAMS, resolvedParameters,
+                               INTERCEPTION_COMPONENT, component));
   }
 
   protected MessagingException createMessagingException(CoreEvent event, Throwable cause, Component processor,

@@ -7,9 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
-import static com.google.common.collect.ImmutableMap.of;
 import static java.lang.Runtime.getRuntime;
-import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
@@ -26,6 +24,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.util.collection.FastMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
@@ -48,11 +47,9 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
-import org.reactivestreams.Publisher;
-
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
-
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -198,7 +195,7 @@ public class CompositeOperationPolicy
           });
           return result.getLeft();
         }), doOnNext)
-            .map(response -> quickCopy(response, singletonMap(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)));
+            .map(response -> quickCopy(response, FastMap.of(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)));
   }
 
   private Map<String, Object> resolveOperationParameters(CoreEvent event) {
@@ -259,10 +256,10 @@ public class CompositeOperationPolicy
             .addInternalParameter(POLICY_OPERATION_CHILD_CTX, operationEvent.getContext())
             .addInternalParameter(POLICY_OPERATION_CALLER_CALLBACK, callback)
             .build()
-        : quickCopy(operationEvent, of(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor,
-                                       POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction,
-                                       POLICY_OPERATION_CHILD_CTX, operationEvent.getContext(),
-                                       POLICY_OPERATION_CALLER_CALLBACK, callback));
+        : quickCopy(operationEvent, FastMap.of(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor,
+                                               POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction,
+                                               POLICY_OPERATION_CHILD_CTX, operationEvent.getContext(),
+                                               POLICY_OPERATION_CALLER_CALLBACK, callback));
   }
 
   private static BaseEventContext getStoredChildContext(CoreEvent event) {

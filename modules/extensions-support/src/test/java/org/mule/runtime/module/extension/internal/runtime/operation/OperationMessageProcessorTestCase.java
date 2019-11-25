@@ -33,6 +33,7 @@ import static org.mule.runtime.api.meta.model.operation.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.api.util.collection.FastMap.of;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
@@ -436,8 +437,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
       context.set(spy((PrecalculatedExecutionContextAdapter) ctx));
     });
 
-    messageProcessor.process(quickCopy(event, ImmutableMap.of(INTERCEPTION_RESOLVED_CONTEXT, context.get(),
-                                                              "core:interceptionComponent", messageProcessor)));
+    messageProcessor.process(quickCopy(event, of(INTERCEPTION_RESOLVED_CONTEXT, context.get(),
+                                                         "core:interceptionComponent", messageProcessor)));
 
     verify(operationExecutor).execute(same(context.get()), any());
     verify(context.get(), atLeastOnce()).getConfiguration();
@@ -457,7 +458,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
       context.set(spy((PrecalculatedExecutionContextAdapter) ctx));
     });
 
-    messageProcessor.process(quickCopy(event, singletonMap(INTERCEPTION_RESOLVED_CONTEXT, context.get())));
+    messageProcessor.process(quickCopy(event, of(INTERCEPTION_RESOLVED_CONTEXT, context.get())));
 
     verify(operationExecutor, never()).execute(same(context.get()), any());
     verify(operationExecutor).execute(any(), any());

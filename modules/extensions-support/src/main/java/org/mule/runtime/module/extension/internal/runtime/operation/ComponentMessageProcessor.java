@@ -7,11 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
-import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.ComponentLocationProvider.resolveProcessorRepresentation;
+import static org.mule.runtime.api.util.collection.FastMap.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -105,9 +105,6 @@ import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
-import com.google.common.collect.ImmutableMap;
-
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
@@ -292,13 +289,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         }
         return innerChainCtx;
       };
-      return quickCopy(event, ImmutableMap.<String, Object>builder()
-          .put(INNER_CHAIN_CTX_MAPPING, context)
-          .put(PROCESSOR_SCHEDULER_CONTEXT_KEY, currentScheduler.orElse(IMMEDIATE_SCHEDULER))
-          .build());
-
+      return quickCopy(event, of(INNER_CHAIN_CTX_MAPPING, context,
+                                         PROCESSOR_SCHEDULER_CONTEXT_KEY, currentScheduler.orElse(IMMEDIATE_SCHEDULER)));
     } else if (currentScheduler.isPresent()) {
-      return quickCopy(event, singletonMap(PROCESSOR_SCHEDULER_CONTEXT_KEY, currentScheduler.get()));
+      return quickCopy(event, of(PROCESSOR_SCHEDULER_CONTEXT_KEY, currentScheduler.get()));
     } else {
       return event;
     }
