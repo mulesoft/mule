@@ -48,6 +48,7 @@ import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -641,12 +642,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       try {
         unregisterObject(getMuleContext(), beanName);
       } catch (Exception e) {
-        logger.warn(String
+        logger.error(String
             .format("Exception unregistering an object during lazy initialization of component %s, exception message is %s",
                     beanName, e.getMessage()));
-        if (logger.isDebugEnabled()) {
-          logger.debug(e.getMessage(), e);
-        }
+        throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("There was an error while unregistering component '%s'", beanName), e);
       }
     }
   }
