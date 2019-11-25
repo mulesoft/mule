@@ -40,7 +40,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
-import org.mule.runtime.core.internal.message.DefaultMessageBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalEvent.Builder;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -59,20 +58,16 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class DefaultEventBuilder implements InternalEvent.Builder {
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultMessageBuilder.class);
   private static final int INTERNAL_PARAMETERS_INITIAL_CAPACITY = 4;
 
   private BaseEventContext context;
   private Function<EventContext, Message> messageFactory;
   private boolean varsModified = false;
-  private final CaseInsensitiveHashMap<String, TypedValue<?>> flowVariables = new CaseInsensitiveHashMap<>();
+  private CaseInsensitiveHashMap<String, TypedValue<?>> flowVariables;
   private CaseInsensitiveHashMap<String, TypedValue<?>> originalVars;
-  private final Map<String, Object> internalParameters;
+  private Map<String, Object> internalParameters;
   private Error error;
   private Optional<ItemSequenceInfo> itemSequenceInfo = empty();
   private String legacyCorrelationId;
@@ -80,6 +75,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private SecurityContext securityContext;
   private InternalEvent originalEvent;
   private boolean modified;
+  private boolean internalParametersInitialized = false;
   private boolean notificationsEnabled = true;
 
   public DefaultEventBuilder(BaseEventContext messageContext) {
@@ -87,6 +83,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.session = new DefaultMuleSession();
     this.originalVars = emptyCaseInsensitiveMap();
     this.internalParameters = new HashMap<>(INTERNAL_PARAMETERS_INITIAL_CAPACITY);
+    internalParametersInitialized = true;
   }
 
   public DefaultEventBuilder(InternalEvent event) {
@@ -101,7 +98,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.notificationsEnabled = event.isNotificationsEnabled();
 
     this.originalVars = (CaseInsensitiveHashMap<String, TypedValue<?>>) event.getVariables();
-    this.internalParameters = new HashMap<>(event.getInternalParameters());
+    this.internalParameters = (Map<String, Object>) event.getInternalParameters();
   }
 
   public DefaultEventBuilder(BaseEventContext messageContext, InternalEvent event) {
@@ -128,6 +125,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   @Override
   public DefaultEventBuilder variables(Map<String, ?> flowVariables) {
+    initVariables();
     copyFromTo(flowVariables, this.flowVariables);
     this.varsModified = true;
 
@@ -183,9 +181,12 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   @Override
   public Builder clearVariables() {
-    if (!this.flowVariables.isEmpty() || !this.originalVars.isEmpty()) {
+    boolean flowVarsNotNull = flowVariables != null;
+    boolean flowVarsNotEmpty = flowVarsNotNull && !this.flowVariables.isEmpty();
+    if (flowVarsNotEmpty || !this.originalVars.isEmpty()) {
       this.varsModified = true;
       this.modified = true;
+      initVariables();
       this.flowVariables.clear();
     }
     return this;
@@ -193,6 +194,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   @Override
   public DefaultEventBuilder internalParameters(Map<String, ?> internalParameters) {
+    initInternalParameters();
+
     this.internalParameters.clear();
     this.internalParameters.putAll(internalParameters);
     this.modified = true;
@@ -201,6 +204,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   @Override
   public DefaultEventBuilder addInternalParameter(String key, Object value) {
+    initInternalParameters();
+
     internalParameters.put(key, value);
     this.modified = true;
     return this;
@@ -208,6 +213,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   @Override
   public DefaultEventBuilder removeInternalParameter(String key) {
+    initInternalParameters();
+
     this.modified = internalParameters.remove(key) != null || modified;
     return this;
   }
@@ -285,8 +292,16 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   }
 
   protected void initVariables() {
-    if (!this.varsModified) {
+    if (flowVariables == null) {
+      flowVariables = new CaseInsensitiveHashMap<>();
       this.flowVariables.putAll(originalVars);
+    }
+  }
+
+  protected void initInternalParameters() {
+    if (!internalParametersInitialized) {
+      internalParameters = new HashMap<>(internalParameters);
+      internalParametersInitialized = true;
     }
   }
 
