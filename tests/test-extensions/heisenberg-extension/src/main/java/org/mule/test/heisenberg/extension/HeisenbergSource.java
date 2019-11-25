@@ -246,13 +246,13 @@ public class HeisenbergSource extends Source<String, Object> {
   }
 
   @Override
-  public void onStop() {
-    if (executor != null) {
+  public synchronized void onStop() {
+    if (executor != null && scheduledFuture != null) {
       scheduledFuture.cancel(true);
       executor.stop();
     }
 
-    if (connection != null) {
+    if (connection != null && connectionProvider != null) {
       connectionProvider.disconnect(connection);
     }
 
