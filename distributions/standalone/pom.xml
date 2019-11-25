@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.distributions</groupId>
         <artifactId>mule-distributions</artifactId>
-        <version>3.6.1</version>
+        <version>3.6.1-hf1-SNAPSHOT</version>
     </parent>
     <artifactId>mule-standalone</artifactId>
     <!-- Packaging 'pom' ensures that maven does not try to bind a plugin to the
