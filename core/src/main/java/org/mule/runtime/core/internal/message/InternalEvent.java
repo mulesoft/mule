@@ -83,6 +83,8 @@ public interface InternalEvent extends PrivilegedEvent {
      */
     Builder addInternalParameter(String key, Object value);
 
+    Builder addInternalParameters(Map<String, Object> internalParameters);
+
     /**
      * Remove a internal parameter.
      *

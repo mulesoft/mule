@@ -77,6 +77,7 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
@@ -628,7 +629,7 @@ public final class IntrospectionUtils {
       return stream(searchClass.getGenerics()).map(resolvableType -> resolvableType.getType()).collect(toList());
     }
 
-    Map<String, java.lang.reflect.Type> genericTypes = new HashMap<>();
+    Map<String, java.lang.reflect.Type> genericTypes = new SmallMap<>();
 
     addGenericsToMap(genericTypes, searchClass);
 
@@ -747,7 +748,7 @@ public final class IntrospectionUtils {
                                                 superClass.getName()));
     }
 
-    Map<String, java.lang.reflect.Type> genericTypes = new HashMap<>();
+    Map<String, java.lang.reflect.Type> genericTypes = new SmallMap<>();
 
     while (!Object.class.equals(searchType.getType())) {
 

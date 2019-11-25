@@ -11,16 +11,17 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionCann
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionCannotBindToNullKey;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionSingleResourceOnly;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.TransactionStatusException;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -41,7 +42,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
    *
    * @see javax.transaction.Status
    */
-  protected static Map<Integer, String> txStatusMappings = new HashMap<>(10); // populated later
+  protected static Map<Integer, String> txStatusMappings = new SmallMap<>(); // populated later
 
   protected volatile Object key;
   protected volatile Object resource;
