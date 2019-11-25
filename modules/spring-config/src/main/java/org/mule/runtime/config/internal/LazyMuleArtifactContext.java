@@ -415,6 +415,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    * @return List beans created for the given component names sorted by precedence.
    */
   private List<Object> createBeans(List<String> applicationComponentNames) {
+    trackingPostProcessor.startTracking();
     Map<String, Object> objects = new LinkedHashMap<>();
     // Create beans only once by calling the lookUp at the Registry
     applicationComponentNames.forEach(componentName -> {
