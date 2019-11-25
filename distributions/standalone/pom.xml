@@ -15,6 +15,10 @@
     <name>Full Distribution</name>
     <description>Includes the Mule server with all of its modules and transports.</description>
 
+    <properties>
+        <communityDistDir>${project.build.directory}/ce-distribution</communityDistDir>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
