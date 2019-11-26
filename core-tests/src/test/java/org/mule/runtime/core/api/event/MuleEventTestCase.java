@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api.event;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.sameInstance;
@@ -29,17 +28,11 @@ import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.security.DefaultSecurityContextFactory;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
@@ -49,6 +42,10 @@ import java.util.List;
 import java.util.Map;
 
 import io.qameta.allure.Description;
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 
 public class MuleEventTestCase extends AbstractMuleContextTestCase {
@@ -235,6 +232,26 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     final CoreEvent newEvent = CoreEvent.builder(baseEventWithVars).clearVariables().build();
 
     assertThat(newEvent.getVariables().isEmpty(), is(true));
+  }
+
+  @Test
+  public void varsClearedAndAdded() throws MuleException {
+    CoreEvent baseEventWithVars = getEventBuilder()
+        .message(of("whatever"))
+        .addVariable("foo", "bar")
+        .build();
+
+    String key = "survivor";
+    String value = "Tom Hanks";
+    final CoreEvent newEvent = CoreEvent.builder(baseEventWithVars)
+        .clearVariables()
+        .addVariable(key, value)
+        .build();
+
+    assertThat(newEvent.getVariables().size(), is(1));
+
+    TypedValue<?> actual = newEvent.getVariables().get(key);
+    assertThat(actual.getValue(), is(value));
   }
 
   @Test
