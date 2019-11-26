@@ -4796,7 +4796,7 @@
                             "allowedStereotypes": [
                               {
                                 "type": "OBJECT_STORE",
-                                "namespace": "OS"
+                                "namespace": "MULE"
                               }
                             ]
                           },
@@ -5381,7 +5381,7 @@
                             "allowedStereotypes": [
                               {
                                 "type": "OBJECT_STORE",
-                                "namespace": "OS"
+                                "namespace": "MULE"
                               }
                             ]
                           },
