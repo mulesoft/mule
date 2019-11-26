@@ -65,7 +65,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private BaseEventContext context;
   private Function<EventContext, Message> messageFactory;
   private boolean varsModified = false;
-  private CaseInsensitiveHashMap<String, TypedValue<?>> flowVariables;
+  private final CaseInsensitiveHashMap<String, TypedValue<?>> flowVariables = new CaseInsensitiveHashMap<>();
   private CaseInsensitiveHashMap<String, TypedValue<?>> originalVars;
   private Map<String, Object> internalParameters;
   private Error error;
@@ -125,7 +125,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   @Override
   public DefaultEventBuilder variables(Map<String, ?> flowVariables) {
-    initVariables();
     copyFromTo(flowVariables, this.flowVariables);
     this.varsModified = true;
 
@@ -181,12 +180,9 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   @Override
   public Builder clearVariables() {
-    boolean flowVarsNotNull = flowVariables != null;
-    boolean flowVarsNotEmpty = flowVarsNotNull && !this.flowVariables.isEmpty();
-    if (flowVarsNotEmpty || !this.originalVars.isEmpty()) {
+    if (!this.flowVariables.isEmpty() || !this.originalVars.isEmpty()) {
       this.varsModified = true;
       this.modified = true;
-      initVariables();
       this.flowVariables.clear();
     }
     return this;
@@ -292,8 +288,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   }
 
   protected void initVariables() {
-    if (flowVariables == null) {
-      flowVariables = new CaseInsensitiveHashMap<>();
+    if (!this.varsModified) {
       this.flowVariables.putAll(originalVars);
     }
   }

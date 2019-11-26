@@ -36,7 +36,7 @@ public final class EventQuickCopy {
    * should only be used in some specific scenarios like {@code flow-ref} where a new Flow executing the same {@link CoreEvent}
    * needs a new context.
    *
-   * @param event existing event to use as a template to create builder instance
+   * @param event   existing event to use as a template to create builder instance
    * @param context the context to create event instance with.
    * @return new {@link CoreEvent} instance.
    */
@@ -58,7 +58,7 @@ public final class EventQuickCopy {
    * method should only be used in some specific scenarios like {@code flow-ref} where a new Flow executing the same
    * {@link PrivilegedEvent} needs a new context.
    *
-   * @param event existing event to use as a template to create builder instance
+   * @param event   existing event to use as a template to create builder instance
    * @param context the context to create event instance with.
    * @return new {@link PrivilegedEvent} instance.
    */
@@ -126,29 +126,39 @@ public final class EventQuickCopy {
     }
   }
 
+
   private static class EventQuickCopyInternalParametersDecorator extends BaseEventDecorator {
 
     private static final long serialVersionUID = -8748877786435182694L;
 
-    private final Map<String, Object> internalParameters;
+    private Map<String, Object> internalParameters;
+
+    private transient boolean delegateHasInternalParams;
+    private transient boolean internalParamsConsolidated = false;
 
     public EventQuickCopyInternalParametersDecorator(InternalEvent event, Map<String, Object> internalParameters) {
       super(event);
-      this.internalParameters = unmodifiableMap(internalParameters);
+      if (event.getInternalParameters().isEmpty()) {
+        delegateHasInternalParams = false;
+        this.internalParameters = unmodifiableMap(event.getInternalParameters());
+        internalParamsConsolidated = true;
+      } else {
+        delegateHasInternalParams = true;
+        this.internalParameters = internalParameters;
+      }
     }
 
     @Override
     public Map<String, ?> getInternalParameters() {
-      final Map<String, ?> eventInternalParameters = getEvent().getInternalParameters();
-      if (eventInternalParameters.isEmpty()) {
-        return internalParameters;
+      if (delegateHasInternalParams) {
+        if (!internalParamsConsolidated) {
+          internalParameters.putAll(getEvent().getInternalParameters());
+          internalParameters = unmodifiableMap(internalParameters);
+          internalParamsConsolidated = true;
+        }
       }
 
-      final Map<String, Object> resolvedParams =
-          new HashMap<>(2 * (eventInternalParameters.size() + internalParameters.size()));
-      resolvedParams.putAll(eventInternalParameters);
-      resolvedParams.putAll(internalParameters);
-      return resolvedParams;
+      return internalParameters;
     }
 
     @Override
