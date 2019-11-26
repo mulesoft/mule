@@ -10,7 +10,6 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -25,7 +24,6 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 
 import org.mule.runtime.api.el.BindingContext;
-import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -43,17 +41,17 @@ import org.junit.Test;
 @SmallTest
 public class MELAttributeEvaluatorTestCase extends AbstractMuleTestCase {
 
-  private ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
-  private ExpressionManagerSession session = mock(ExpressionManagerSession.class);
-  private CoreEvent event = mock(CoreEvent.class);
+  private final ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
+  private final ExpressionManagerSession session = mock(ExpressionManagerSession.class);
+  private final CoreEvent event = mock(CoreEvent.class);
 
   @Before
   public void setup() {
     EventContext ctx = mock(EventContext.class);
     when(event.getContext()).thenReturn(ctx);
     when(mockExpressionManager.openSession(any(), any(), any())).thenReturn(session);
-    when(session.evaluate(anyObject())).thenReturn(new TypedValue("something", DataType.STRING));
-    when(session.evaluate(anyObject(), anyObject())).thenReturn(new TypedValue("something", DataType.STRING));
+    when(session.evaluate(anyString())).thenReturn(new TypedValue("something", DataType.STRING));
+    when(session.evaluate(anyString(), any(DataType.class))).thenReturn(new TypedValue("something", DataType.STRING));
   }
 
   @Test

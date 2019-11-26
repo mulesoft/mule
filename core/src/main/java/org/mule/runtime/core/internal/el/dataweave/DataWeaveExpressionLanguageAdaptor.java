@@ -19,10 +19,12 @@ import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX_LENGTH;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.BindingContext.Builder;
+import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
@@ -291,6 +293,32 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       @Override
       public Iterator<TypedValue<?>> split(String expression) {
         return session.split(sanitize(expression));
+      }
+
+      @Override
+      public TypedValue<?> evaluate(CompiledExpression expression) throws ExpressionExecutionException {
+        return session.evaluate(expression);
+      }
+
+      @Override
+      public TypedValue<?> evaluate(CompiledExpression expression, DataType expectedOutputType)
+          throws ExpressionExecutionException {
+        return session.evaluate(expression, expectedOutputType);
+      }
+
+      @Override
+      public TypedValue<?> evaluate(CompiledExpression expression, long timeout) throws ExpressionExecutionException {
+        return session.evaluate(expression, timeout);
+      }
+
+      @Override
+      public TypedValue<?> evaluateLogExpression(CompiledExpression expression) throws ExpressionExecutionException {
+        return session.evaluateLogExpression(expression);
+      }
+
+      @Override
+      public Iterator<TypedValue<?>> split(CompiledExpression expression) {
+        return session.split(expression);
       }
 
       @Override

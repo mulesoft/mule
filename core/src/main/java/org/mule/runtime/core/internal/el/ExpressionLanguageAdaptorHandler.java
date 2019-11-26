@@ -17,8 +17,8 @@ import static org.mule.runtime.core.internal.el.DefaultExpressionManager.MEL_PRE
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionExecutionException;
-import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -26,14 +26,14 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 
-import com.github.benmanes.caffeine.cache.LoadingCache;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
 /**
  * Implementation of an {@link ExtendedExpressionLanguageAdaptor} which adapts MVEL and DW together, deciding via a prefix whether
@@ -203,6 +203,32 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
         return resolveSessionForLanguage(sessions, expression).split(expression);
       }
 
+      @Override
+      public TypedValue<?> evaluate(CompiledExpression expression) throws ExpressionExecutionException {
+        return sessions.get(DW_PREFIX).evaluate(expression);
+      }
+
+      @Override
+      public TypedValue<?> evaluate(CompiledExpression expression, DataType expectedOutputType)
+          throws ExpressionExecutionException {
+        return sessions.get(DW_PREFIX).evaluate(expression, expectedOutputType);
+      }
+
+      @Override
+      public TypedValue<?> evaluate(CompiledExpression expression, long timeout) throws ExpressionExecutionException {
+        return sessions.get(DW_PREFIX).evaluate(expression, timeout);
+      }
+
+      @Override
+      public TypedValue<?> evaluateLogExpression(CompiledExpression expression) throws ExpressionExecutionException {
+        return sessions.get(DW_PREFIX).evaluateLogExpression(expression);
+      }
+
+      @Override
+      public Iterator<TypedValue<?>> split(CompiledExpression expression) {
+        return sessions.get(DW_PREFIX).split(expression);
+      }
+
       protected ExpressionLanguageSessionAdaptor resolveSessionForLanguage(Map<String, ExpressionLanguageSessionAdaptor> sessions,
                                                                            String expression) {
         ExpressionLanguageSessionAdaptor elSession = sessions.get(resolveLanguagePrefix(expression));
@@ -217,6 +243,7 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
       public void close() {
         sessions.values().forEach(es -> es.close());
       }
+
     };
   }
 

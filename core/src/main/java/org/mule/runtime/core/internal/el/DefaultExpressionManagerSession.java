@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.el;
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.resolveBoolean;
 
+import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -21,8 +22,8 @@ import java.util.Iterator;
 
 class DefaultExpressionManagerSession implements ExpressionManagerSession {
 
-  private LazyValue<ExpressionLanguageSessionAdaptor> session;
-  private ClassLoader evaluationClassLoader;
+  private final LazyValue<ExpressionLanguageSessionAdaptor> session;
+  private final ClassLoader evaluationClassLoader;
 
   public DefaultExpressionManagerSession(LazyValue<ExpressionLanguageSessionAdaptor> session, ClassLoader evaluationClassLoader) {
     this.session = session;
@@ -96,9 +97,70 @@ class DefaultExpressionManagerSession implements ExpressionManagerSession {
   }
 
   @Override
+  public TypedValue<?> evaluate(CompiledExpression expression) throws ExpressionExecutionException {
+    ClassLoader originalLoader = currentThread().getContextClassLoader();
+
+    try {
+      currentThread().setContextClassLoader(evaluationClassLoader);
+      return session.get().evaluate(expression);
+    } finally {
+      currentThread().setContextClassLoader(originalLoader);
+    }
+  }
+
+  @Override
+  public TypedValue<?> evaluate(CompiledExpression expression, DataType expectedOutputType) throws ExpressionExecutionException {
+    ClassLoader originalLoader = currentThread().getContextClassLoader();
+
+    try {
+      currentThread().setContextClassLoader(evaluationClassLoader);
+      return session.get().evaluate(expression, expectedOutputType);
+    } finally {
+      currentThread().setContextClassLoader(originalLoader);
+    }
+  }
+
+  @Override
+  public TypedValue<?> evaluate(CompiledExpression expression, long timeout) throws ExpressionExecutionException {
+    ClassLoader originalLoader = currentThread().getContextClassLoader();
+
+    try {
+      currentThread().setContextClassLoader(evaluationClassLoader);
+      return session.get().evaluate(expression, timeout);
+    } finally {
+      currentThread().setContextClassLoader(originalLoader);
+    }
+  }
+
+  @Override
+  public TypedValue<?> evaluateLogExpression(CompiledExpression expression) throws ExpressionExecutionException {
+    ClassLoader originalLoader = currentThread().getContextClassLoader();
+
+    try {
+      currentThread().setContextClassLoader(evaluationClassLoader);
+      return session.get().evaluateLogExpression(expression);
+    } finally {
+      currentThread().setContextClassLoader(originalLoader);
+    }
+  }
+
+  @Override
+  public Iterator<TypedValue<?>> split(CompiledExpression expression) {
+    ClassLoader originalLoader = currentThread().getContextClassLoader();
+
+    try {
+      currentThread().setContextClassLoader(evaluationClassLoader);
+      return session.get().split(expression);
+    } finally {
+      currentThread().setContextClassLoader(originalLoader);
+    }
+  }
+
+  @Override
   public void close() {
     if (session.isComputed()) {
       session.get().close();
     }
   }
+
 }
