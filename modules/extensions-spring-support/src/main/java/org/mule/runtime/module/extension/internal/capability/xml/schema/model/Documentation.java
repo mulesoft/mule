@@ -71,7 +71,7 @@ public class Documentation {
   @XmlAttribute(name = "lang", namespace = "http://www.w3.org/XML/1998/namespace")
   protected String lang;
   @XmlAnyAttribute
-  private Map<QName, String> otherAttributes = new HashMap<QName, String>();
+  private Map<QName, String> otherAttributes = new HashMap<>();
 
   /**
    * Gets the value of the content property.

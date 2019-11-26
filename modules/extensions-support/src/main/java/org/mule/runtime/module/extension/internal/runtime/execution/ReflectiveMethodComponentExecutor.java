@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 import static java.util.Arrays.stream;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.collection.FastMap.forSize;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -16,6 +17,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.ReflectionUtils.invokeMethod;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -28,7 +30,6 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ReactiveReflectiveMethodOperationExecutor;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -60,6 +61,7 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
 
   private final List<ParameterGroupModel> groups;
   private final Method method;
+  private final int parameterCount;
   private final Object componentInstance;
   private final ClassLoader extensionClassLoader;
 
@@ -70,6 +72,7 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
   public ReflectiveMethodComponentExecutor(List<ParameterGroupModel> groups, Method method, Object componentInstance) {
     this.groups = groups;
     this.method = method;
+    parameterCount = method.getParameterCount();
     this.componentInstance = componentInstance;
     extensionClassLoader = method.getDeclaringClass().getClassLoader();
   }
@@ -133,8 +136,8 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
                                           final Object[] resolved =
                                               getParameterValues(ec, method.getParameterTypes());
 
-                                          final Map<String, Object> resolvedParams = new HashMap<>();
-                                          for (int i = 0; i < method.getParameterCount(); ++i) {
+                                          final Map<String, Object> resolvedParams = forSize(parameterCount);
+                                          for (int i = 0; i < parameterCount; ++i) {
                                             resolvedParams.put(method.getParameters()[i].getName(), resolved[i]);
                                           }
                                           return resolvedParams;

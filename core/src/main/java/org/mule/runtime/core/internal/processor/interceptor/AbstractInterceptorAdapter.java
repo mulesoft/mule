@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.processor.interceptor;
 
 import static java.lang.String.valueOf;
 import static java.util.Collections.emptyMap;
+import static org.mule.runtime.api.util.collection.FastMap.forSize;
 import static org.mule.runtime.api.util.collection.FastMap.of;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
@@ -24,7 +25,6 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -75,7 +75,7 @@ class AbstractInterceptorAdapter {
   }
 
   protected InternalEvent resolveParameters(InternalEvent event, Component component, Map<String, String> parameters) {
-    Map<String, ProcessorParameterValue> resolvedParameters = new HashMap<>();
+    Map<String, ProcessorParameterValue> resolvedParameters = forSize(parameters.size());
     for (Map.Entry<String, String> entry : parameters.entrySet()) {
       String providedValue = entry.getValue();
       resolvedParameters.put(entry.getKey(), new DefaultProcessorParameterValue(entry.getKey(), providedValue, () -> {

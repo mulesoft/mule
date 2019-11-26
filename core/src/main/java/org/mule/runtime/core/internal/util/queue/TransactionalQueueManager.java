@@ -35,7 +35,7 @@ public class TransactionalQueueManager extends AbstractQueueManager {
   // Due to current VMConnector and TransactionQueueManager relationship we must close all the recovered queues
   // since queue configuration is applied after recovery and not taking into consideration once queues are created
   // for recovery. See https://www.mulesoft.org/jira/browse/MULE-7420
-  private Map<String, RecoverableQueueStore> queuesAccessedForRecovery = new HashMap<String, RecoverableQueueStore>();
+  private Map<String, RecoverableQueueStore> queuesAccessedForRecovery = new HashMap<>();
 
   /**
    * {@inheritDoc}

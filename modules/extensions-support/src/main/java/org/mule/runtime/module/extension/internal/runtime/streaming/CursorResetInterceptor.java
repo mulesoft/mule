@@ -7,15 +7,16 @@
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.streaming.Cursor;
+import org.mule.runtime.api.util.collection.FastMap;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -38,7 +39,7 @@ public class CursorResetInterceptor implements Interceptor<OperationModel> {
 
   @Override
   public void before(ExecutionContext<OperationModel> ctx) throws Exception {
-    Map<Cursor, Long> cursorPositions = new HashMap<>();
+    Map<Cursor, Long> cursorPositions = new FastMap<>();
     ctx.getParameters().forEach((key, value) -> {
       if (value instanceof Cursor) {
         final Cursor cursor = (Cursor) value;

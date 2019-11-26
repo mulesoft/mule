@@ -16,6 +16,7 @@ import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.util.collection.FastMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
@@ -26,7 +27,6 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,7 +35,6 @@ import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -240,7 +239,7 @@ public class CompositeSourcePolicy
     if (originalResponseParameters == null) {
       return policyResponseParameters;
     } else {
-      Map<String, Object> concatMap = new HashMap<>(originalResponseParameters);
+      Map<String, Object> concatMap = FastMap.copy(originalResponseParameters);
       policyResponseParameters.forEach((k, v) -> concatMap.merge(k, v, (v1, v2) -> v2));
       return concatMap;
     }

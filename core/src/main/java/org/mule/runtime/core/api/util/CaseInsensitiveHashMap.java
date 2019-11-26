@@ -63,6 +63,10 @@ public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
     return EMPTY_MAP;
   }
 
+  public static <K, V> CaseInsensitiveHashMap<K, V> basedOn(Map<K, V> map) {
+    return new CaseInsensitiveHashMap<>(new CaseInsensitiveMapWrapper(map));
+  }
+
   protected Map<K, V> delegate;
 
   /**
@@ -84,6 +88,10 @@ public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
   public CaseInsensitiveHashMap(Map map) {
     delegate = new CaseInsensitiveMapWrapper();
     delegate.putAll(map);
+  }
+
+  private CaseInsensitiveHashMap(CaseInsensitiveMapWrapper delegate) {
+    this.delegate = delegate;
   }
 
   // -----------------------------------------------------------------------

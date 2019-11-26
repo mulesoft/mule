@@ -40,7 +40,6 @@ import org.mule.runtime.core.internal.util.rx.TransactionAwareFluxSinkSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -205,7 +204,7 @@ public class CompositeOperationPolicy
 
     return getParametersTransformer()
         .map(paramsTransformer -> {
-          Map<String, Object> parametersMap = new HashMap<>(operationParameters);
+          Map<String, Object> parametersMap = FastMap.copy(operationParameters);
           parametersMap.putAll(paramsTransformer.fromMessageToParameters(event.getMessage()));
           return parametersMap;
         })

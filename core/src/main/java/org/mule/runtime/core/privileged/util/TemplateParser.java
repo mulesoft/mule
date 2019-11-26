@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.util;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.util.collection.FastMap.of;
 
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
@@ -41,24 +42,19 @@ public final class TemplateParser {
       "\tQuotation (%c) at line %d, column %d is not closed. Remember to use backslash (\\) if you are trying to use that character as a literal";
   private static final String PARSING_TEMPLATE_ERROR = "Error while parsing template:\n";
 
-  private static final Map<String, PatternInfo> patterns = new HashMap<>();
+  private static final Map<String, PatternInfo> patterns = of(
+      ANT_TEMPLATE_STYLE, new PatternInfo(ANT_TEMPLATE_STYLE, "\\$\\{[^\\{\\}]+\\}", "${", "}"),
+      SQUARE_TEMPLATE_STYLE, new PatternInfo(SQUARE_TEMPLATE_STYLE, "\\[[^\\[\\]]+\\]", "[", "]"),
+      CURLY_TEMPLATE_STYLE, new PatternInfo(CURLY_TEMPLATE_STYLE, "\\{[^\\{\\}}]+\\}", "{", "}"),
 
-  static {
-    patterns.put(ANT_TEMPLATE_STYLE, new PatternInfo(ANT_TEMPLATE_STYLE, "\\$\\{[^\\{\\}]+\\}", "${", "}"));
-    patterns.put(SQUARE_TEMPLATE_STYLE, new PatternInfo(SQUARE_TEMPLATE_STYLE, "\\[[^\\[\\]]+\\]", "[", "]"));
-    patterns.put(CURLY_TEMPLATE_STYLE, new PatternInfo(CURLY_TEMPLATE_STYLE, "\\{[^\\{\\}}]+\\}", "{", "}"));
-
-    // Such a complex regex is needed to support nested expressions, otherwise we
-    // have to do this manually or using an ANTLR grammar etc.
-
-    // TODO MULE-14603 - Expression Regex fails on detect expression when this have an unbalanced opening bracket
-    // Support for 6 levels (5 nested)
-    patterns.put(WIGGLY_MULE_TEMPLATE_STYLE,
-                 new PatternInfo(WIGGLY_MULE_TEMPLATE_STYLE,
-                                 "#\\[((?:#?\\[(?:#?\\[(?:#?\\[(?:#?\\[(?:#?\\[.*?\\]|[^\\[\\]])*?\\]|[^\\[\\]])*?\\]|[^\\[\\]])*?\\]|[^\\[\\]])*?\\]|[^\\[\\]])*?)\\]",
-                                 "#[", "]"));
-  }
-
+      // Such a complex regex is needed to support nested expressions, otherwise we
+      // have to do this manually or using an ANTLR grammar etc.
+      // TODO MULE-14603 - Expression Regex fails on detect expression when this have an unbalanced opening bracket
+      // Support for 6 levels (5 nested)
+      WIGGLY_MULE_TEMPLATE_STYLE,
+      new PatternInfo(WIGGLY_MULE_TEMPLATE_STYLE,
+                      "#\\[((?:#?\\[(?:#?\\[(?:#?\\[(?:#?\\[(?:#?\\[.*?\\]|[^\\[\\]])*?\\]|[^\\[\\]])*?\\]|[^\\[\\]])*?\\]|[^\\[\\]])*?\\]|[^\\[\\]])*?)\\]",
+                      "#[", "]"));
   /**
    * logger used by this class
    */

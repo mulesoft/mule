@@ -20,6 +20,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.api.util.collection.FastMap;
 import org.mule.runtime.core.internal.execution.NotificationFunction;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
@@ -30,7 +31,6 @@ import org.mule.runtime.module.extension.internal.runtime.notification.DefaultEx
 import org.mule.runtime.module.extension.internal.runtime.transaction.DefaultTransactionHandle;
 import org.mule.runtime.module.extension.internal.runtime.transaction.NullTransactionHandle;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +47,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
   private static final TransactionHandle DEFAULT_TRANSACTION_HANDLE = new DefaultTransactionHandle();
 
   private final SourceCallbackAdapter sourceCallback;
-  private final Map<String, Object> variables = new HashMap<>();
+  private final Map<String, Object> variables = new FastMap<>();
   private String correlationId;
   private Object connection = null;
   private TransactionHandle transactionHandle = NULL_TRANSACTION_HANDLE;

@@ -24,6 +24,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.api.util.collection.FastMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -37,7 +38,6 @@ import org.mule.runtime.extension.internal.property.TransactionalActionModelProp
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -58,7 +58,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   private final ExtensionModel extensionModel;
   private final Optional<ConfigurationInstance> configuration;
   private final Map<String, Object> parameters;
-  private final Map<String, Object> variables = new HashMap<>();
+  private final Map<String, Object> variables = new FastMap<>();
   private final M componentModel;
   private final MuleContext muleContext;
   private CoreEvent event;

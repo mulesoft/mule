@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.stream.Collectors.toMap;
+import static org.mule.runtime.api.util.collection.FastMap.forSize;
+
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.LazyValue;
@@ -20,7 +22,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -52,7 +53,7 @@ public class LazyExecutionContext<M extends ComponentModel> implements EventedEx
   }
 
   private Map<String, LazyValue<Object>> getValueResolvers(ResolverSet resolverSet) {
-    Map<String, LazyValue<Object>> valueResolvers = new HashMap<>();
+    Map<String, LazyValue<Object>> valueResolvers = forSize(resolverSet.getResolvers().size());
     resolverSet.getResolvers().forEach((key, resolver) -> valueResolvers.put(key, lazy(resolver)));
 
     return valueResolvers;

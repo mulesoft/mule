@@ -58,7 +58,7 @@ public abstract class AbstractConfigParserTestCase extends AbstractHeisenbergCon
   protected static final String SEASON_1_KEY = "s01";
   protected static final String SEASON_2_KEY = "s02";
   protected static final List<Long> MONTHLY_INCOMES = Arrays.asList(ArrayUtils.toObject(new long[] {12000, 500}));
-  protected static final Map<String, List<String>> DEATHS_BY_SEASON = new HashMap<String, List<String>>() {
+  protected static final Map<String, List<String>> DEATHS_BY_SEASON = new HashMap<>() {
 
     {
       put(SEASON_1_KEY, Arrays.asList("emilio", "domingo"));
