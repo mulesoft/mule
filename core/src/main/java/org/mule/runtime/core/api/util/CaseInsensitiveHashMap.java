@@ -178,8 +178,8 @@ public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
   private static class ImmutableCaseInsensitiveHashMap<K, V> extends CaseInsensitiveHashMap<K, V> {
 
     private ImmutableCaseInsensitiveHashMap(CaseInsensitiveHashMap<K, V> caseInsensitiveHashMap) {
-      super(caseInsensitiveHashMap);
-      this.delegate = unmodifiableMap(delegate);
+      super();
+      this.delegate = unmodifiableMap(caseInsensitiveHashMap);
     }
 
     @Override
