@@ -1976,7 +1976,7 @@
                   "allowedStereotypeModels": [
                     {
                       "type": "OBJECT_STORE",
-                      "namespace": "OS"
+                      "namespace": "MULE"
                     }
                   ],
                   "name": "objectStore",
@@ -2818,7 +2818,7 @@
                   "allowedStereotypeModels": [
                     {
                       "type": "OBJECT_STORE",
-                      "namespace": "OS"
+                      "namespace": "MULE"
                     }
                   ],
                   "name": "objectStore",
@@ -4486,7 +4486,7 @@
                   "allowedStereotypeModels": [
                     {
                       "type": "OBJECT_STORE",
-                      "namespace": "OS"
+                      "namespace": "MULE"
                     }
                   ],
                   "name": "objectStore",

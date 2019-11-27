@@ -3776,7 +3776,7 @@
                         "allowedStereotypes": [
                           {
                             "type": "OBJECT_STORE",
-                            "namespace": "OS"
+                            "namespace": "MULE"
                           }
                         ]
                       },
