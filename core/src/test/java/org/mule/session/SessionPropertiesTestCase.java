@@ -6,18 +6,24 @@
  */
 package org.mule.session;
 
+import static java.lang.System.setProperty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
+import static org.mule.session.SerializeOnlySessionHandler.ACTIVATE_NATIVE_SESSION_SERIALIZATION_PROPERTY;
 
+import java.util.Collections;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.MessageProcessor;
@@ -28,13 +34,18 @@ import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.SerializationUtils;
 
-import java.util.Collections;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Test;
-
 public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
 {
+
+    private DefaultMuleMessage message;
+
+    @Before
+    public void setup()
+    {
+        setProperty(ACTIVATE_NATIVE_SESSION_SERIALIZATION_PROPERTY, "true");
+        message = new DefaultMuleMessage("data", muleContext);
+        message.setInboundProperty("MULE_ENDPOINT", "http:whatever");
+    }
 
     /**
      * Session properties set via message API are lost and unavailable via both message and session API's.
@@ -42,7 +53,6 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     @Test
     public void setSessionPropertyNoEvent() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
         try
         {
             message.setProperty("key", "value", PropertyScope.SESSION);
@@ -69,7 +79,6 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     @Test
     public void setSessionPropertyOnMessageGetFromSession() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
 
         Object nonSerializable = new Object();
@@ -91,7 +100,6 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     @Test
     public void setSessionPropertyOnSessionGetFromMessage() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
 
         Object nonSerializable = new Object();
@@ -118,7 +126,6 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
         async.setListener(asyncListener);
         async.start();
 
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
 
         event.getSession().setProperty("key", "value");
@@ -154,13 +161,11 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     @Test
     public void serializationSessionPropertyPropagation() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
 
         event.getSession().setProperty("key", "value");
 
-        MuleEvent deserializedEvent = (MuleEvent) SerializationUtils.deserialize(
-            SerializationUtils.serialize(event), muleContext);
+        MuleEvent deserializedEvent = (MuleEvent) SerializationUtils.deserialize(SerializationUtils.serialize(event));
 
         // Event and session are both copied
         assertNotSame(deserializedEvent, event);
@@ -188,7 +193,6 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     @Test
     public void defaultSessionHandlerSessionPropertyPropagation() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
 
         event.getSession().setProperty("key", "value");
@@ -225,15 +229,13 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     @Test
     public void serializationNonSerializableSessionPropertyPropagation() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
 
         Object nonSerializable = new Object();
         event.getSession().setProperty("key", nonSerializable);
         message.setProperty("key2", "value2", PropertyScope.SESSION);
 
-        MuleEvent deserialized = (MuleEvent) SerializationUtils.deserialize(
-            SerializationUtils.serialize(event), muleContext);
+        MuleEvent deserialized = (MuleEvent) SerializationUtils.deserialize(SerializationUtils.serialize(event));
 
         // Serialization no longer fails as in 3.1.x/3.2.x
 
@@ -252,7 +254,6 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     @Test
     public void defaultSessionHandlerNonSerializableSessionPropertyPropagation() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY, getTestService());
 
         Object nonSerializable = new Object();
@@ -286,7 +287,6 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase
     @Test
     public void processFlowSessionPropertyPropagation() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("data", muleContext);
         MuleEvent event = new DefaultMuleEvent(message, MessageExchangePattern.REQUEST_RESPONSE,
             getTestService());
 
