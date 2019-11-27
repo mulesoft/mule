@@ -43,18 +43,15 @@ public class PolicyEventMapper {
   private static final String POLICY_OPERATION_ORIGINAL_EVENT = "policy.operation.originalEvent";
   private static final Logger LOGGER = getLogger(PolicyEventMapper.class);
 
-  private final String policyId;
   private final String policyVarsInternalParameterName;
   private EventInternalContextResolver<Set<String>> nextEventIdCtxResolver =
-      new EventInternalContextResolver<>(POLICY_NEXT_EVENT_CTX_IDS,
-                                         () -> emptySet());
+      new EventInternalContextResolver<>(POLICY_NEXT_EVENT_CTX_IDS, () -> emptySet());
 
   public PolicyEventMapper() {
     this(null);
   }
 
   public PolicyEventMapper(String policyId) {
-    this.policyId = policyId;
     policyVarsInternalParameterName = POLICY_VARS_PREFIX + policyId;
   }
 
