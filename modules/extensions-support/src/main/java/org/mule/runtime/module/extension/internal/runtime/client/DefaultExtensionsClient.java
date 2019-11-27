@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.client;
 
-import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.just;
 
@@ -82,10 +81,10 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
         .map(event -> Result.<T, A>builder(event.getMessage()).build())
         .onErrorMap(t -> {
           Throwable unwrapped = unwrap(t);
-          if (!(unwrapped instanceof MessagingException)) {
-            return new MessagingException(eventFromParams, unwrapped, processor);
-          } else {
+          if (unwrapped instanceof MessagingException) {
             return unwrapped;
+          } else {
+            return new MessagingException(eventFromParams, unwrapped, processor);
           }
         })
         .doAfterTerminate(() -> extensionsClientProcessorsStrategy.disposeProcessor(processor))
@@ -106,10 +105,10 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
       return Result.<T, A>builder(process.getMessage()).build();
     } catch (Exception e) {
       Throwable unwrapped = unwrap(e);
-      if (!(unwrapped instanceof MessagingException)) {
-        throw new MessagingException(eventFromParams, unwrapped, processor);
+      if (unwrapped instanceof MessagingException) {
+        throw (MessagingException) unwrapped;
       } else {
-        throw propagateWrappingFatal(unwrapped);
+        throw new MessagingException(eventFromParams, unwrapped, processor);
       }
     } finally {
       extensionsClientProcessorsStrategy.disposeProcessor(processor);

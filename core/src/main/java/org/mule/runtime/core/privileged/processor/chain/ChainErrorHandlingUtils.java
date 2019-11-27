@@ -37,7 +37,8 @@ public final class ChainErrorHandlingUtils {
    * the failed Event.
    */
   public static BiFunction<Throwable, Object, Throwable> getLocalOperatorErrorHook(Processor processor, MuleContext muleContext) {
-    final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver((Component) processor);
+    final MessagingExceptionResolver exceptionResolver =
+        (processor instanceof Component) ? new MessagingExceptionResolver((Component) processor) : null;
     final Function<MessagingException, MessagingException> messagingExceptionMapper =
         resolveMessagingException(processor, muleContext, exceptionResolver);
 

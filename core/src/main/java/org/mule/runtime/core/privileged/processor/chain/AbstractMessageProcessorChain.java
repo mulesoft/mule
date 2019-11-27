@@ -178,7 +178,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
    * current EventContext error callback.
    */
   private BiConsumer<Throwable, Object> getContinueStrategyErrorHandler(Processor processor) {
-    final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver((Component) processor);
+    final MessagingExceptionResolver exceptionResolver =
+        (processor instanceof Component) ? new MessagingExceptionResolver((Component) processor) : null;
     final Function<MessagingException, MessagingException> messagingExceptionMapper =
         resolveMessagingException(processor, muleContext, exceptionResolver);
 
