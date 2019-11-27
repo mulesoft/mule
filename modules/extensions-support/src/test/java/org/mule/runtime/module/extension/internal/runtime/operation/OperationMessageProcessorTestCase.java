@@ -438,7 +438,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     });
 
     messageProcessor.process(quickCopy(event, of(INTERCEPTION_RESOLVED_CONTEXT, context.get(),
-                                                         "core:interceptionComponent", messageProcessor)));
+                                                 "core:interceptionComponent", messageProcessor)));
 
     verify(operationExecutor).execute(same(context.get()), any());
     verify(context.get(), atLeastOnce()).getConfiguration();

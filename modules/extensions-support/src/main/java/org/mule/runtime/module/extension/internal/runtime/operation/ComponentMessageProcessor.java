@@ -290,7 +290,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         return innerChainCtx;
       };
       return quickCopy(event, of(INNER_CHAIN_CTX_MAPPING, context,
-                                         PROCESSOR_SCHEDULER_CONTEXT_KEY, currentScheduler.orElse(IMMEDIATE_SCHEDULER)));
+                                 PROCESSOR_SCHEDULER_CONTEXT_KEY, currentScheduler.orElse(IMMEDIATE_SCHEDULER)));
     } else if (currentScheduler.isPresent()) {
       return quickCopy(event, of(PROCESSOR_SCHEDULER_CONTEXT_KEY, currentScheduler.get()));
     } else {
