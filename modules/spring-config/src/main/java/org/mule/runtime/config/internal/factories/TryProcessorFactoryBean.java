@@ -8,17 +8,19 @@ package org.mule.runtime.config.internal.factories;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.internal.processor.TryScope;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
-import org.springframework.beans.factory.FactoryBean;
+
+import java.util.List;
 
 import javax.inject.Inject;
-import java.util.List;
+
+import org.springframework.beans.factory.FactoryBean;
 
 /**
  * Generates an object that wraps the invocation of the next {@link org.mule.runtime.core.api.processor.Processor} with a
@@ -29,7 +31,7 @@ import java.util.List;
  *
  *        TODO MULE-12726 Remove TryProcessorFactoryBean
  */
-public class TryProcessorFactoryBean extends AbstractComponent implements FactoryBean {
+public class TryProcessorFactoryBean extends AbstractComponent implements FactoryBean<TryScope> {
 
   protected List messageProcessors;
   protected FlowExceptionHandler exceptionListener;
@@ -41,7 +43,7 @@ public class TryProcessorFactoryBean extends AbstractComponent implements Factor
 
   @Override
   public Class getObjectType() {
-    return MessageProcessorChain.class;
+    return TryScope.class;
   }
 
   public void setMessageProcessors(List messageProcessors) {
@@ -49,7 +51,7 @@ public class TryProcessorFactoryBean extends AbstractComponent implements Factor
   }
 
   @Override
-  public Object getObject() throws Exception {
+  public TryScope getObject() throws Exception {
     TryScope txProcessor = new TryScope();
     txProcessor.setAnnotations(getAnnotations());
     txProcessor.setExceptionListener(this.exceptionListener);

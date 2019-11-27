@@ -17,8 +17,6 @@ import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NA
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONFIG_GLOBAL_ELEMENT_NAME;
-import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -34,7 +32,6 @@ import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 
 import java.util.ArrayList;
@@ -59,6 +56,24 @@ import javax.xml.namespace.QName;
  * @since 4.0
  */
 public class MacroExpansionModuleModel {
+
+  /**
+   * literal that represents the name of the global element for any given module. If the module's name is math, then the value of
+   * this field will name the global element as <math:config ../>
+   */
+  public static final String MODULE_CONFIG_GLOBAL_ELEMENT_NAME = "config";
+
+  /**
+   * literal that represents the name of the connection element for any given module. If the module's name is github, then the
+   * value of this field will name the global element as <github:connection ../>. As an example, think of the following snippet:
+   *
+   * <code>
+   *    <github:config configParameter="someFood" ...>
+   *      <github:connection username="myUsername" .../>
+   *    </github:config>
+   * </code>
+   */
+  public static final String MODULE_CONNECTION_GLOBAL_ELEMENT_NAME = "connection";
 
   public static final String MODULE_OPERATION_CONFIG_REF = "config-ref";
   /**
@@ -434,7 +449,7 @@ public class MacroExpansionModuleModel {
   /**
    * If the current {@link ExtensionModel} does have a {@link ConnectionProviderModel}, then it will check if the current XML does
    * contain a child of it under the connection name (see
-   * {@link ModuleOperationMessageProcessorChainBuilder#MODULE_CONNECTION_GLOBAL_ELEMENT_NAME}.
+   * {@link ModuleOperationMessageProcessorChain#MODULE_CONNECTION_GLOBAL_ELEMENT_NAME}.
    *
    * @param configRefComponentModel root element of the current XML config (global element of the parameterized operation)
    * @param configurationModel configuration model of the current element
