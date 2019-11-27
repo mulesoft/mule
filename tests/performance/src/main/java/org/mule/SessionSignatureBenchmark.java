@@ -35,7 +35,6 @@ import org.openjdk.jmh.infra.Blackhole;
 
 @State(Benchmark)
 @Fork(1)
-//@BenchmarkMode(Throughput)
 @BenchmarkMode(Throughput)
 @OutputTimeUnit(SECONDS)
 @Warmup(iterations = 5)
