@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static java.util.function.Function.identity;
+
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
+
+import java.util.function.Function;
 
 import reactor.core.publisher.MonoSink;
 
@@ -23,8 +27,18 @@ import reactor.core.publisher.MonoSink;
 public class DeferredMonoSinkExecutorCallback<T> implements ExecutorCallback {
 
   private MonoSink sink;
+  private Function<Throwable, Throwable> errorMapper;
+
   private Object value;
   private Throwable error;
+
+  public DeferredMonoSinkExecutorCallback() {
+    this(identity());
+  }
+
+  public DeferredMonoSinkExecutorCallback(Function<Throwable, Throwable> errorMapper) {
+    this.errorMapper = errorMapper;
+  }
 
   public void setSink(MonoSink sink) {
     synchronized (this) {
@@ -32,7 +46,7 @@ public class DeferredMonoSinkExecutorCallback<T> implements ExecutorCallback {
       if (value != null) {
         sink.success(value);
       } else if (error != null) {
-        sink.error(error);
+        sink.error(errorMapper.apply(error));
       }
     }
   }
@@ -52,7 +66,7 @@ public class DeferredMonoSinkExecutorCallback<T> implements ExecutorCallback {
   public void error(Throwable e) {
     synchronized (this) {
       if (sink != null) {
-        sink.error(e);
+        sink.error(errorMapper.apply(e));
       } else {
         error = e;
       }

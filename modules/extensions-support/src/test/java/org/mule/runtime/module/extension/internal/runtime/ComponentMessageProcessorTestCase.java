@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.util.Optional.of;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertNotNull;
@@ -32,7 +31,6 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
@@ -149,9 +147,7 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
 
       @Override
       public boolean matches(Object o) {
-        Exception e = (Exception) unwrap((Exception) o);
-        assertThat(e, is(instanceOf(MessagingException.class)));
-        assertThat(e.getCause(), is(sameInstance(expect)));
+        assertThat((Exception) unwrap((Exception) o), is(sameInstance(expect)));
 
         return true;
       }

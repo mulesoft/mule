@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
@@ -24,6 +25,7 @@ import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProce
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
@@ -57,10 +59,8 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.DeferredMonoSinkExecutorCallback;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
@@ -99,6 +99,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -117,11 +118,11 @@ import reactor.util.context.Context;
  * {@link #componentExecutor}. This message processor is capable of serving the execution of any {@link } of any
  * {@link ExtensionModel}.
  * <p>
- * A {@link #componentExecutor} is obtained by testing the {@link T} for a {@link CompletableComponentExecutorModelProperty} through which a
- * {@link CompletableComponentExecutorFactory} is obtained. Models with no such property cannot be used with this class. The obtained
- * {@link CompletableComponentExecutor} serve all invocations of {@link #process(CoreEvent)} on {@code this} instance but will not be shared
- * with other instances of {@link ComponentMessageProcessor}. All the {@link Lifecycle} events that {@code this} instance receives
- * will be propagated to the {@link #componentExecutor}.
+ * A {@link #componentExecutor} is obtained by testing the {@link T} for a {@link CompletableComponentExecutorModelProperty}
+ * through which a {@link CompletableComponentExecutorFactory} is obtained. Models with no such property cannot be used with this
+ * class. The obtained {@link CompletableComponentExecutor} serve all invocations of {@link #process(CoreEvent)} on {@code this}
+ * instance but will not be shared with other instances of {@link ComponentMessageProcessor}. All the {@link Lifecycle} events
+ * that {@code this} instance receives will be propagated to the {@link #componentExecutor}.
  * <p>
  * The {@link #componentExecutor} is executed directly but by the means of a {@link DefaultExecutionMediator}
  * <p>
@@ -191,11 +192,17 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         .flatMap(event -> subscriberContext().map(ctx -> addContextToEvent(event, ctx)));
 
     if (isAsync()) {
+      final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook = getLocalOperatorErrorHook(this, muleContext);
       return flux
           // This flatMap allows the operation to run in parallel. The processing strategy relies on this
           // (ProactorStreamProcessingStrategy#proactor) to do some performance optimizations.
           .flatMap(event -> {
-            DeferredMonoSinkExecutorCallback callback = new DeferredMonoSinkExecutorCallback();
+            // Force the error mapper from the chain to be used.
+            // When using Mono.create with sink.error, the error mapper from the context is ignored, so it has to be
+            // explicitly used here.
+            DeferredMonoSinkExecutorCallback callback =
+                new DeferredMonoSinkExecutorCallback<>(t -> localOperatorErrorHook.apply(t, event));
+
             onEvent(event, callback);
 
             return create(callback::setSink);
@@ -205,7 +212,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         try {
           onEvent(event, new SynchronousSinkExecutorCallback(sink));
         } catch (Throwable t) {
-          sink.error(mapError(t, event));
+          sink.error(unwrap(t));
         }
       });
     }
@@ -252,7 +259,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         operationExecutionFunction.execute(resolutionResult, event, executorCallback);
       }
     } catch (Throwable t) {
-      executorCallback.error(mapError(t, event));
+      executorCallback.error(unwrap(t));
     }
   }
 
@@ -266,7 +273,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
       @Override
       public void error(Throwable t) {
-        callback.error(mapError(t, event));
+        callback.error(unwrap(t));
       }
     };
   }
@@ -319,14 +326,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   protected void executeOperation(ExecutionContextAdapter<T> operationContext, ExecutorCallback callback) {
     executionMediator.execute(componentExecutor, operationContext, callback);
-  }
-
-  private Throwable mapError(Throwable t, CoreEvent event) {
-    t = Exceptions.unwrap(t);
-    if (!(t instanceof MessagingException)) {
-      t = new MessagingException(event, t, this);
-    }
-    return t;
   }
 
   private ExecutionContextAdapter<T> createExecutionContext(Optional<ConfigurationInstance> configuration,
