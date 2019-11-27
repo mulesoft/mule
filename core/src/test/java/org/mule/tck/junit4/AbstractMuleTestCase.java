@@ -7,14 +7,7 @@
 package org.mule.tck.junit4;
 
 import static org.junit.Assume.assumeThat;
-import org.mule.RequestContext;
-import org.mule.tck.junit4.rule.WarningTimeout;
-import org.mule.util.ClassUtils;
-import org.mule.util.IOUtils;
-import org.mule.util.MuleUrlStreamHandlerFactory;
-import org.mule.util.StringMessageUtils;
-import org.mule.util.StringUtils;
-import org.mule.util.SystemUtils;
+import static org.mule.session.SerializeAndEncodeSessionHandler.SESSION_SIGN_SECRET_KEY;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,11 +29,21 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.DisableOnDebug;
 import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
+import org.mule.RequestContext;
+import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.tck.junit4.rule.WarningTimeout;
+import org.mule.util.ClassUtils;
+import org.mule.util.IOUtils;
+import org.mule.util.MuleUrlStreamHandlerFactory;
+import org.mule.util.StringMessageUtils;
+import org.mule.util.StringUtils;
+import org.mule.util.SystemUtils;
 
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule test cases. This
@@ -88,6 +91,9 @@ public abstract class AbstractMuleTestCase
     }
 
     protected final transient Log logger = LogFactory.getLog(this.getClass());
+
+    @ClassRule
+    public static SystemProperty sessionSignKey = new SystemProperty(SESSION_SIGN_SECRET_KEY, "HaveYouEverBeenAloneAtNight?");
 
     /**
      * Should be set to a string message describing any prerequisites not met.
