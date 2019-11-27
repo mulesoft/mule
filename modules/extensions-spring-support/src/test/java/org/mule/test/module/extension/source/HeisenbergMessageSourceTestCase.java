@@ -169,12 +169,10 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   public void reconnectWithEnrichedException() throws Exception {
     startFlow("sourceFailedOnRuntime");
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> {
-      synchronized (sourceTimesStarted) {
-        Logger logger = LoggerFactory.getLogger(HeisenbergSource.class);
-        logger.error("LOGGG");
-        logger.error(sourceTimesStarted.toString());
-        return sourceTimesStarted > 2;
-      }
+      Logger logger = LoggerFactory.getLogger(HeisenbergSource.class);
+      logger.error("LOGGG");
+      logger.error(sourceTimesStarted.toString());
+      return sourceTimesStarted > 2;
     });
   }
 
