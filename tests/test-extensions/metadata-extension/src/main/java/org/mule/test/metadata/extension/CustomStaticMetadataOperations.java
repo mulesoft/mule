@@ -135,7 +135,7 @@ public class CustomStaticMetadataOperations {
   }
 
   @OutputJsonType(schema = "persons-schema.json")
-  public ArrayList<String> jsonArrayOutputList() {
+  public List<String> jsonArrayOutputList() {
     ArrayList<String> jsonArrayList = new ArrayList();
     jsonArrayList.add(JSON_ARRAY_VALUE);
     jsonArrayList.add(JSON_ARRAY_VALUE);
@@ -196,5 +196,13 @@ public class CustomStaticMetadataOperations {
 
   public List<InputStream> jsonInputList(@InputJsonType(schema = "person-schema.json") List<InputStream> jsonList) {
     return jsonList;
+  }
+
+  @OutputResolver(output = CsvInputStaticTypeResolver.class)
+  public List<Object> customTypeListOutput() {
+    ArrayList<Object> csvList = new ArrayList();
+    csvList.add(CSV_VALUE);
+    csvList.add(CSV_VALUE);
+    return csvList;
   }
 }

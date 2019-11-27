@@ -213,6 +213,16 @@ public class ExtensionWithCustomStaticTypesTestCase extends AbstractMuleTestCase
   }
 
   @Test
+  public void customTypeListOutput() throws Exception {
+    OperationModel o = getOperation("customTypeListOutput");
+    OutputModel output = o.getOutput();
+    MetadataType type = output.getType();
+    assertThat(output.hasDynamicType(), is(false));
+    assertThat(type.getMetadataFormat(), is(CSV));
+    assertThat(type.toString(), is("csv-object"));
+  }
+
+  @Test
   public void customTypeInput() throws Exception {
     OperationModel o = getOperation("customTypeInput");
     ParameterModel param = o.getAllParameterModels().get(0);
