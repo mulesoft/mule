@@ -23,7 +23,6 @@ import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SER
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -396,7 +395,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
             .initializeComponents(componentModelPredicate, applyStartPhase));
   }
 
-  private List<Object> createComponents(Optional<Predicate> predicateOptional, Optional<Location> locationOptional,
+  private List<Object> createComponents(Optional<Predicate<ComponentModel>> predicateOptional,
+                                        Optional<Location> locationOptional,
                                         boolean applyStartPhase,
                                         Optional<ComponentModelInitializerAdapter> parentComponentModelInitializerAdapter) {
     checkState(predicateOptional.isPresent() != locationOptional.isPresent(), "predicate or location has to be passed");
@@ -405,14 +405,26 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
       MinimalApplicationModelGenerator minimalApplicationModelGenerator =
           new MinimalApplicationModelGenerator(dependencyResolver);
+
+      Predicate<ComponentModel> muleConfigurationComponentPredicate = componentModel -> componentModel.getIdentifier()
+          .equals(CONFIGURATION_IDENTIFIER);
       // User input components to be initialized...
       List<ComponentModel> componentModelsToBuildMinimalModel = new ArrayList<>();
       predicateOptional
           .ifPresent(predicate -> componentModelsToBuildMinimalModel
-              .addAll(minimalApplicationModelGenerator.getComponentModels(predicate)));
+              .addAll(minimalApplicationModelGenerator.getComponentModels(
+                                                                          componentModel -> predicate.test(componentModel)
+                                                                              || muleConfigurationComponentPredicate
+                                                                                  .test(componentModel))));
       locationOptional
           .ifPresent(location -> componentModelsToBuildMinimalModel
-              .add(minimalApplicationModelGenerator.findComponentModel(location)));
+              .addAll(minimalApplicationModelGenerator.getComponentModels(
+                                                                          componentModel -> (componentModel
+                                                                              .getComponentLocation() != null
+                                                                              && componentModel.getComponentLocation()
+                                                                                  .getLocation().equals(location.toString()))
+                                                                              || muleConfigurationComponentPredicate
+                                                                                  .test(componentModel))));
 
       Set<String> applicationComponentLocations = new HashSet<>();
       componentModelsToBuildMinimalModel.stream().forEach(componentModel -> {
@@ -426,6 +438,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         // Same minimalApplication has been requested, so we don't need to recreate the same beans.
         return emptyList();
       }
+
       ApplicationModel minimalApplicationModel =
           minimalApplicationModelGenerator.getMinimalModel(componentModelsToBuildMinimalModel);
 
@@ -447,9 +460,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           }
         });
       }
-
-      // Force initialization of configuration component...
-      resetMuleConfiguration(minimalApplicationModelGenerator);
 
       // First unregister any already initialized/started component
       unregisterBeans(trackingPostProcessor.getBeansTracked());
@@ -563,23 +573,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                        e);
       }
     }
-  }
-
-  private void resetMuleConfiguration(MinimalApplicationModelGenerator minimalApplicationModelGenerator) {
-    // Always unregister first the default configuration from Mule.
-    try {
-      muleContext.getRegistry().unregisterObject(OBJECT_MULE_CONFIGURATION);
-    } catch (Exception e) {
-      // NoSuchBeanDefinitionException can be ignored
-      if (!hasCause(e, NoSuchBeanDefinitionException.class)) {
-        throw new MuleRuntimeException(createStaticMessage("Error while unregistering Mule configuration"),
-                                       e);
-      }
-    }
-    // Just enable the MuleConfiguration componentModel so it values will be applied on this initialization
-    minimalApplicationModelGenerator
-        .getMinimalModel(minimalApplicationModelGenerator
-            .getComponentModels(componentModel -> componentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER)));
   }
 
   @Override
