@@ -11,7 +11,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.TOP_LEVEL;
 
-import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.config.api.LazyComponentInitializer;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
@@ -86,10 +85,6 @@ public class MinimalApplicationModelGenerator {
    */
   public List<ComponentModel> getComponentModels(Predicate<ComponentModel> predicate) {
     return dependencyResolver.findRequiredComponentModels(predicate);
-  }
-
-  public ComponentModel findComponentModel(Location location) {
-    return dependencyResolver.findRequiredComponentModel(location);
   }
 
   /**
