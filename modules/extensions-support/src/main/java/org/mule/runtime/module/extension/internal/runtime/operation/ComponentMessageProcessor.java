@@ -25,6 +25,7 @@ import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProce
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
@@ -117,11 +118,11 @@ import reactor.util.context.Context;
  * {@link #componentExecutor}. This message processor is capable of serving the execution of any {@link } of any
  * {@link ExtensionModel}.
  * <p>
- * A {@link #componentExecutor} is obtained by testing the {@link T} for a {@link CompletableComponentExecutorModelProperty} through which a
- * {@link CompletableComponentExecutorFactory} is obtained. Models with no such property cannot be used with this class. The obtained
- * {@link CompletableComponentExecutor} serve all invocations of {@link #process(CoreEvent)} on {@code this} instance but will not be shared
- * with other instances of {@link ComponentMessageProcessor}. All the {@link Lifecycle} events that {@code this} instance receives
- * will be propagated to the {@link #componentExecutor}.
+ * A {@link #componentExecutor} is obtained by testing the {@link T} for a {@link CompletableComponentExecutorModelProperty}
+ * through which a {@link CompletableComponentExecutorFactory} is obtained. Models with no such property cannot be used with this
+ * class. The obtained {@link CompletableComponentExecutor} serve all invocations of {@link #process(CoreEvent)} on {@code this}
+ * instance but will not be shared with other instances of {@link ComponentMessageProcessor}. All the {@link Lifecycle} events
+ * that {@code this} instance receives will be propagated to the {@link #componentExecutor}.
  * <p>
  * The {@link #componentExecutor} is executed directly but by the means of a {@link DefaultExecutionMediator}
  * <p>
@@ -191,23 +192,21 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         .flatMap(event -> subscriberContext().map(ctx -> addContextToEvent(event, ctx)));
 
     if (isAsync()) {
+      final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook = getLocalOperatorErrorHook(this, muleContext);
       return flux
           // This flatMap allows the operation to run in parallel. The processing strategy relies on this
           // (ProactorStreamProcessingStrategy#proactor) to do some performance optimizations.
-          .flatMap(event -> subscriberContext()
-              .flatMap(ctx -> {
-                // Force the error mapper from the subscription context to be used.
-                // When using Mono.create with sink.error, the error mapper from the context is ignored, so it has to be
-                // explicitly used here.
-                DeferredMonoSinkExecutorCallback callback =
-                    ctx.<BiFunction<Throwable, Object, Throwable>>getOrEmpty("reactor.onOperatorError.local")
-                        .map(m -> new DeferredMonoSinkExecutorCallback<>(t -> m.apply(t, event)))
-                        .orElseGet(() -> new DeferredMonoSinkExecutorCallback<>());
+          .flatMap(event -> {
+            // Force the error mapper from the chain to be used.
+            // When using Mono.create with sink.error, the error mapper from the context is ignored, so it has to be
+            // explicitly used here.
+            DeferredMonoSinkExecutorCallback callback =
+                new DeferredMonoSinkExecutorCallback<>(t -> localOperatorErrorHook.apply(t, event));
 
-                onEvent(event, callback);
+            onEvent(event, callback);
 
-                return create(callback::setSink);
-              }));
+            return create(callback::setSink);
+          });
     } else {
       return flux.handle((event, sink) -> {
         try {
