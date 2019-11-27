@@ -207,7 +207,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
       if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerList) {
         // Support EventBuilderConfigurerList currently used by Batch Module
         return Iterators.transform(((EventBuilderConfigurerList<Object>) payloadValue).eventBuilderConfigurerIterator(),
-                TypedValue::of);
+                                   TypedValue::of);
       } else if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerIterator) {
         // Support EventBuilderConfigurerIterator currently used by Batch Module
         return new EventBuilderConfigurerIteratorWrapper((EventBuilderConfigurerIterator) payloadValue);
