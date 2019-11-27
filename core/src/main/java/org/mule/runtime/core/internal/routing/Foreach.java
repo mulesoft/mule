@@ -16,6 +16,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.getPr
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
+import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.defer;
@@ -148,9 +149,6 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
     // Split into sequence of TypedValue
     return fromIterable(() -> splitRequest(request))
-        // Wrap any exception that occurs during split in a MessagingException. This is required as the
-        // automatic wrapping is only applied when the signal is an Event.
-        .onErrorMap(throwable -> new MessagingException(request, throwable, Foreach.this))
         // If batchSize > 1 then buffer sequence into List<TypedValue<T>> and convert to
         // TypedValue<List<TypedValue<T>>>.
         .transform(p -> batchSize > 1
@@ -204,16 +202,22 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   }
 
   private Iterator<TypedValue<?>> splitRequest(CoreEvent request) {
-    Object payloadValue = request.getMessage().getPayload().getValue();
-    if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerList) {
-      // Support EventBuilderConfigurerList currently used by Batch Module
-      return Iterators.transform(((EventBuilderConfigurerList<Object>) payloadValue).eventBuilderConfigurerIterator(),
-                                 input -> TypedValue.of(input));
-    } else if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerIterator) {
-      // Support EventBuilderConfigurerIterator currently used by Batch Module
-      return new EventBuilderConfigurerIteratorWrapper((EventBuilderConfigurerIterator) payloadValue);
-    } else {
-      return splittingStrategy.split(request);
+    try {
+      Object payloadValue = request.getMessage().getPayload().getValue();
+      if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerList) {
+        // Support EventBuilderConfigurerList currently used by Batch Module
+        return Iterators.transform(((EventBuilderConfigurerList<Object>) payloadValue).eventBuilderConfigurerIterator(),
+                TypedValue::of);
+      } else if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerIterator) {
+        // Support EventBuilderConfigurerIterator currently used by Batch Module
+        return new EventBuilderConfigurerIteratorWrapper((EventBuilderConfigurerIterator) payloadValue);
+      } else {
+        return splittingStrategy.split(request);
+      }
+    } catch (Exception e) {
+      // Wrap any exception that occurs during split in a MessagingException. This is required as the
+      // automatic wrapping is only applied when the signal is an Event.
+      throw propagate(new MessagingException(request, e, Foreach.this));
     }
   }
 
