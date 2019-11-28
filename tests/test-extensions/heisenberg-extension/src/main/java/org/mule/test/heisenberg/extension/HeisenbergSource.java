@@ -124,7 +124,7 @@ public class HeisenbergSource extends Source<String, Object> {
   private int corePoolSize;
 
   @Parameter
-  @Optional(defaultValue = "4000")
+  @Optional(defaultValue = "500")
   private long frequency;
 
   @RefName
