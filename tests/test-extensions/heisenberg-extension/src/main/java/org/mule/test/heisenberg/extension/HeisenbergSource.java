@@ -18,7 +18,6 @@ import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DRO
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_GROUP_NAME;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.sourceTimesStarted;
 import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.BATCH_DELIVERED;
 import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.BATCH_DELIVERY_FAILED;
 import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.BATCH_FAILED;
@@ -68,8 +67,6 @@ import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.test.heisenberg.extension.model.Methylamine;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
@@ -154,9 +151,6 @@ public class HeisenbergSource extends Source<String, Object> {
   @Override
   public synchronized void onStart(SourceCallback<String, Object> sourceCallback) throws MuleException {
     checkArgument(heisenberg != null, "config not injected");
-    Logger logger = LoggerFactory.getLogger(HeisenbergSource.class);
-    logger.error("EUGEEEEEEE");
-    logger.error(sourceTimesStarted.toString());
     HeisenbergExtension.sourceTimesStarted++;
     configName = refName;
     location = componentLocation.getLocation();
