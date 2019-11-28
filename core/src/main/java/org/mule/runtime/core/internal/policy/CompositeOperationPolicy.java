@@ -15,7 +15,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock.readWriteLock;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
-
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -31,6 +31,9 @@ import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.TransactionAwareFluxSinkSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.RemovalCause;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,10 +42,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
-
-import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.github.benmanes.caffeine.cache.RemovalCause;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
@@ -65,6 +64,7 @@ public class CompositeOperationPolicy
   private static final String POLICY_OPERATION_CHILD_CTX = "policy.operation.childContext";
   private static final String POLICY_OPERATION_CALLER_SINK = "policy.operation.callerSink";
 
+  private final Component operation;
   private final OperationPolicyProcessorFactory operationPolicyProcessorFactory;
 
   private final LoadingCache<String, FluxSinkSupplier<CoreEvent>> policySinks;
@@ -81,14 +81,16 @@ public class CompositeOperationPolicy
    * won't be able to change the response parameters of the source and the original response parameters generated from the source
    * will be used.
    *
+   * @param operation the operation on which the policies will be applied
    * @param parameterizedPolicies list of {@link Policy} to chain together.
    * @param operationPolicyParametersTransformer transformer from the operation parameters to a message and vice versa.
    * @param operationPolicyProcessorFactory factory for creating each {@link OperationPolicy} from a {@link Policy}
    */
-  public CompositeOperationPolicy(List<Policy> parameterizedPolicies,
+  public CompositeOperationPolicy(Component operation, List<Policy> parameterizedPolicies,
                                   Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
                                   OperationPolicyProcessorFactory operationPolicyProcessorFactory) {
     super(parameterizedPolicies, operationPolicyParametersTransformer);
+    this.operation = operation;
     this.operationPolicyProcessorFactory = operationPolicyProcessorFactory;
     this.disposed = new AtomicBoolean(false);
     this.readWriteLock = readWriteLock();
