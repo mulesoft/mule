@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.patterns</groupId>
         <artifactId>mule-patterns</artifactId>
-        <version>3.9.4-SNAPSHOT</version>
+        <version>3.9.4</version>
     </parent>
     <artifactId>mule-pattern-core</artifactId>
     <packaging>jar</packaging>

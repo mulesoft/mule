@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>3.9.4-SNAPSHOT</version>
+        <version>3.9.4</version>
     </parent>
     <artifactId>mule-module-spring-extras</artifactId>
     <packaging>jar</packaging>
