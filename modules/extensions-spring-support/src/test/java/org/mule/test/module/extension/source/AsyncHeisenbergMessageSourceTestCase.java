@@ -13,7 +13,6 @@ import static org.junit.Assert.fail;
 import static org.mule.test.heisenberg.extension.AsyncHeisenbergSource.completionCallback;
 
 import org.junit.Test;
-import org.mule.tck.junit4.FlakyTest;
 
 public class AsyncHeisenbergMessageSourceTestCase extends HeisenbergMessageSourceTestCase {
 
@@ -49,7 +48,6 @@ public class AsyncHeisenbergMessageSourceTestCase extends HeisenbergMessageSourc
   }
 
   @Test
-  @FlakyTest
   public void asyncOnException() throws Exception {
     startFlow("sourceFailed");
 
