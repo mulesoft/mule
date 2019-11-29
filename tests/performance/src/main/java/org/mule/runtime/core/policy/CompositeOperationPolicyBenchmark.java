@@ -15,6 +15,7 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.AbstractBenchmark;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
@@ -40,7 +41,7 @@ public class CompositeOperationPolicyBenchmark extends AbstractBenchmark {
 
   @Setup(Level.Trial)
   public void setUp() {
-    handler = new CompositeOperationPolicy(asList(new Policy(new PolicyChain() {
+    handler = new CompositeOperationPolicy(new AbstractComponent() {}, asList(new Policy(new PolicyChain() {
 
       @Override
       public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {

@@ -10,7 +10,6 @@ import static java.lang.Runtime.getRuntime;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
@@ -28,7 +27,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
-
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -58,6 +57,8 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
   public ExpectedException expectedException = none();
 
   private CompositeOperationPolicy compositeOperationPolicy;
+
+  private final Component operation = mock(Component.class, RETURNS_DEEP_STUBS);
 
   private final Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer =
       of(mock(OperationPolicyParametersTransformer.class, RETURNS_DEEP_STUBS));
@@ -108,8 +109,8 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
   }
 
   @Test
-  public void singlePolicy() {
-    compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy),
+  public void singlePolicy() throws Throwable {
+    compositeOperationPolicy = new CompositeOperationPolicy(operation, asList(firstPolicy),
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory);
 
@@ -126,8 +127,8 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
   }
 
   @Test
-  public void compositePolicy() {
-    compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
+  public void compositePolicy() throws Throwable {
+    compositeOperationPolicy = new CompositeOperationPolicy(operation, asList(firstPolicy, secondPolicy),
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory);
 
@@ -145,7 +146,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
 
   @Test(expected = IllegalArgumentException.class)
   public void emptyPolicyList() {
-    compositeOperationPolicy = new CompositeOperationPolicy(emptyList(),
+    compositeOperationPolicy = new CompositeOperationPolicy(operation, emptyList(),
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory);
   }
@@ -165,7 +166,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
           });
       return firstPolicyOperationPolicyProcessor;
     });
-    compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
+    compositeOperationPolicy = new CompositeOperationPolicy(operation, asList(firstPolicy, secondPolicy),
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory);
     expectedException.expect(MuleException.class);
@@ -190,7 +191,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     })
         .when(operationExecutionFunction)
         .execute(any(), any());
-    compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
+    compositeOperationPolicy = new CompositeOperationPolicy(operation, asList(firstPolicy, secondPolicy),
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory);
     expectedException.expect(MuleException.class);
@@ -207,7 +208,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
   public void reactorPipelinesReused() {
     InvocationsRecordingCompositeOperationPolicy.reset();
     final InvocationsRecordingCompositeOperationPolicy operationPolicy =
-        new InvocationsRecordingCompositeOperationPolicy(asList(firstPolicy),
+        new InvocationsRecordingCompositeOperationPolicy(operation, asList(firstPolicy),
                                                          operationPolicyParametersTransformer,
                                                          operationPolicyProcessorFactory);
 
@@ -227,7 +228,7 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
   public void processAfterPolicyDispose() throws MuleException {
     expectedException.expect(MessagingException.class);
 
-    compositeOperationPolicy = new CompositeOperationPolicy(asList(firstPolicy, secondPolicy),
+    compositeOperationPolicy = new CompositeOperationPolicy(operation, asList(firstPolicy, secondPolicy),
                                                             operationPolicyParametersTransformer,
                                                             operationPolicyProcessorFactory);
 
@@ -246,10 +247,10 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     private static final AtomicInteger nextOperation = new AtomicInteger();
     private static final AtomicInteger policy = new AtomicInteger();
 
-    public InvocationsRecordingCompositeOperationPolicy(List<Policy> parameterizedPolicies,
+    public InvocationsRecordingCompositeOperationPolicy(Component operation, List<Policy> parameterizedPolicies,
                                                         Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
                                                         OperationPolicyProcessorFactory operationPolicyProcessorFactory) {
-      super(parameterizedPolicies, operationPolicyParametersTransformer, operationPolicyProcessorFactory);
+      super(operation, parameterizedPolicies, operationPolicyParametersTransformer, operationPolicyProcessorFactory);
     }
 
     public static void reset() {
