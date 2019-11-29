@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.functional.junit4.matchers.ThatMatcher.that;
+import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_MAPPINGS;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
@@ -62,6 +63,21 @@ public class PetStoreErrorMappingsTestCase extends AbstractExtensionFunctionalTe
   public void multipleMappingsRequest() throws Exception {
     verifyWithFailingExpression("multipleMappings", EXPRESSION_ERROR_MESSAGE);
     verify("multipleMappings", CONNECT_ERROR_MESSAGE);
+  }
+
+  @Test
+  public void raiseErrorInFlow() throws Exception {
+    flowRunner("raise-error-in-flow").runExpectingException(errorType("APP", "PERRO"));
+  }
+
+  @Test
+  public void raiseErrorFlowRef() throws Exception {
+    flowRunner("raise-error-flow-ref").runExpectingException(errorType("APP", "PERRO"));
+  }
+
+  @Test
+  public void raiseErrorInSubflow() throws Exception {
+    flowRunner("raise-error-in-subflow").runExpectingException(errorType("APP", "PERRO"));
   }
 
   private void verifyWithFailingExpression(String flowName, String expectedPayload) throws Exception {

@@ -7,8 +7,10 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.util.Optional.of;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -16,6 +18,17 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.just;
+
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -35,15 +48,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import reactor.core.publisher.Mono;
 
 public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCase {
 
@@ -69,7 +75,7 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     componentModel = mock(ComponentModel.class, withSettings().extraInterfaces(EnrichableModel.class));
     when(((EnrichableModel) componentModel).getModelProperty(ComponentExecutorModelProperty.class))
-        .thenReturn(of(new ComponentExecutorModelProperty((cp, params) -> ctx -> Mono.just(response))));
+        .thenReturn(of(new ComponentExecutorModelProperty((cp, params) -> ctx -> just(response))));
     resolverSet = mock(ResolverSet.class);
 
     extensionManager = mock(ExtensionManager.class);
@@ -104,7 +110,7 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     when(resolverSet.resolve(any(ValueResolvingContext.class))).thenReturn(resolverSetResult);
 
-    assertNotNull(Mono.from(processor.apply(Mono.just(testEvent()))).block());
+    assertNotNull(from(processor.apply(just(testEvent()))).block());
   }
 
   @Test
@@ -114,7 +120,7 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
     when(resolverSet.resolve(any(ValueResolvingContext.class))).thenThrow(thrown);
 
     expected.expect(sameInstance(thrown));
-    Mono.from(processor.apply(Mono.just(testEvent()))).block();
+    from(processor.apply(just(testEvent()))).block();
   }
 
   @Test
@@ -125,7 +131,7 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     // the cause is wrapped in a reactor exception
     expected.expectCause(sameInstance(thrown));
-    Mono.from(processor.apply(Mono.just(testEvent()))).block();
+    from(processor.apply(just(testEvent()))).block();
   }
 
   @Test
@@ -134,7 +140,24 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     when(resolverSet.resolve(any(ValueResolvingContext.class))).thenThrow(thrown);
 
-    expected.expect(sameInstance(thrown));
-    Mono.from(processor.apply(Mono.just(testEvent()))).block();
+    expect(thrown);
+    from(processor.apply(just(testEvent()))).block();
+  }
+
+  private void expect(Exception expect) {
+    expected.expect(new BaseMatcher<Exception>() {
+
+      @Override
+      public boolean matches(Object o) {
+        assertThat(unwrap((Exception) o), is(sameInstance(expect)));
+
+        return true;
+      }
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("condition not met");
+      }
+    });
   }
 }
