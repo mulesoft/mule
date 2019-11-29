@@ -154,7 +154,7 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-validation-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-ws-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-xml-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-021.jar
+/mule-standalone-${productVersion}/lib/mule/mule-mvel2-2.1.9-MULE-022.jar
 /mule-standalone-${productVersion}/lib/mule/mule-pattern-core-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-tools-anttasks-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-transport-ajax-${productVersion}.jar
