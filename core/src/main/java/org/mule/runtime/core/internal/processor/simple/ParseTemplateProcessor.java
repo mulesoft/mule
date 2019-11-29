@@ -6,13 +6,17 @@
  */
 package org.mule.runtime.core.internal.processor.simple;
 
+import static java.lang.System.getProperty;
 import static java.nio.charset.Charset.forName;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.api.metadata.MediaType.create;
 import static org.mule.runtime.api.metadata.MediaType.parse;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
+import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.MediaType;
@@ -33,6 +37,8 @@ import javax.activation.MimetypesFileTypeMap;
 public class ParseTemplateProcessor extends SimpleMessageProcessor {
 
   private static final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
+  private static final Boolean KEEP_TYPE_TARGET_AND_TARGET_VAR =
+      new Boolean(getProperty(SYSTEM_PROPERTY_PREFIX + "parse.template.keep.target.var.type", "true"));
 
   private String content;
   private MediaType outputMimeType;
@@ -116,11 +122,16 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
       if (targetValue == null) { //Return the whole message
         return CoreEvent.builder(event).addVariable(target, resultMessage).build();
       } else { //typeValue was defined by the user
-        return CoreEvent.builder(event).addVariable(target,
-                                                    muleContext.getExpressionManager()
-                                                        .evaluate(targetValue, CoreEvent.builder(event)
-                                                            .message(resultMessage).build()))
-            .build();
+        if (KEEP_TYPE_TARGET_AND_TARGET_VAR) {
+          return outputToTarget(event, target, targetValue, muleContext.getExpressionManager())
+              .apply(CoreEvent.builder(event).message(resultMessage).build());
+        } else {
+          return CoreEvent.builder(event).addVariable(target,
+                                                      muleContext.getExpressionManager()
+                                                          .evaluate(targetValue, CoreEvent.builder(event)
+                                                              .message(resultMessage).build()))
+              .build();
+        }
       }
     }
   }
