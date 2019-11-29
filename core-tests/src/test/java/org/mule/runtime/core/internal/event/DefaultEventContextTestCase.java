@@ -49,7 +49,6 @@ import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -692,17 +691,6 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     eventContext.error(new NullPointerException());
 
     assertThat(callbacks, contains("onResponse", "onComplete", "onTerminated"));
-  }
-
-  @Test
-  public void deepNesting() {
-    BaseEventContext lastContext = context.get();
-
-    expectedException.expect(EventContextDeepNestingException.class);
-
-    while (true) {
-      lastContext = DefaultEventContext.child(lastContext, Optional.empty());
-    }
   }
 
   private void assertParent(Matcher<Object> eventMatcher, Matcher<Object> errorMatcher, boolean complete, boolean terminated) {

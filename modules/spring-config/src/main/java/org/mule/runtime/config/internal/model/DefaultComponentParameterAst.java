@@ -19,6 +19,7 @@ import org.mule.metadata.api.model.NumberType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.LazyValue;
@@ -34,7 +35,6 @@ import java.util.function.Supplier;
 public class DefaultComponentParameterAst implements ComponentParameterAst {
 
   private final String rawValue;
-  private final ComponentAst complexValue;
   private final Supplier<ParameterModel> model;
   private final ComponentMetadataAst metadata;
 
@@ -55,7 +55,6 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
   private DefaultComponentParameterAst(String rawValue, ComponentAst complexValue, Supplier<ParameterModel> model,
                                        ComponentMetadataAst metadata) {
     this.rawValue = rawValue;
-    this.complexValue = complexValue;
     this.model = model;
     this.metadata = metadata;
 
@@ -95,7 +94,31 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
             if (isExpression(rawValue)) {
               defaultVisit(numberType);
             } else {
-              value.set(Long.valueOf(rawValue));
+              value.set(numberType.getAnnotation(ClassInformationAnnotation.class)
+                  .map(classInfo -> {
+                    if (classInfo.getClassname()
+                        .equals(Integer.class.getName())) {
+                      return Integer.valueOf(rawValue);
+                    } else if (classInfo.getClassname()
+                        .equals(Float.class.getName())) {
+                      return Float.valueOf(rawValue);
+                    } else if (classInfo.getClassname()
+                        .equals(Long.class.getName())) {
+                      return Long.valueOf(rawValue);
+                    } else if (classInfo.getClassname()
+                        .equals(Byte.class.getName())) {
+                      return Byte.valueOf(rawValue);
+                    } else if (classInfo.getClassname()
+                        .equals(Short.class.getName())) {
+                      return Short.valueOf(rawValue);
+                    } else if (classInfo.getClassname()
+                        .equals(Double.class.getName())) {
+                      return Double.valueOf(rawValue);
+                    } else {
+                      return null;
+                    }
+                  })
+                  .orElseGet(() -> Integer.valueOf(rawValue)));
             }
           }
 

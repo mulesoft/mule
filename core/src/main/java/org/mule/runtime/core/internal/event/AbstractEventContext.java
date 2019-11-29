@@ -6,15 +6,11 @@
  */
 package org.mule.runtime.core.internal.event;
 
-import static java.lang.Integer.getInteger;
 import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static reactor.core.publisher.Mono.empty;
-import static reactor.core.publisher.Mono.just;
-
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
@@ -37,7 +33,6 @@ import java.util.function.Consumer;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoSink;
 
@@ -56,15 +51,13 @@ abstract class AbstractEventContext implements BaseEventContext {
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventContext.class);
   private static final FlowExceptionHandler NULL_EXCEPTION_HANDLER = NullExceptionHandler.getInstance();
 
-  private static final int MAX_DEPTH = getInteger(BaseEventContext.class.getName() + ".maxDepth", 25);
-
   private final boolean debugLogEnabled = LOGGER.isDebugEnabled();
   private transient final List<BaseEventContext> childContexts = new ArrayList<>();
   private transient final FlowExceptionHandler exceptionHandler;
   private transient final CompletableFuture<Void> externalCompletion;
-  private transient final List<BiConsumer<CoreEvent, Throwable>> onResponseConsumerList = new ArrayList<>();
-  private transient final List<BiConsumer<CoreEvent, Throwable>> onCompletionConsumerList = new ArrayList<>(2);
-  private transient final List<BiConsumer<CoreEvent, Throwable>> onTerminatedConsumerList = new ArrayList<>();
+  private transient List<BiConsumer<CoreEvent, Throwable>> onResponseConsumerList = new ArrayList<>();
+  private transient List<BiConsumer<CoreEvent, Throwable>> onCompletionConsumerList = new ArrayList<>(2);
+  private transient List<BiConsumer<CoreEvent, Throwable>> onTerminatedConsumerList = new ArrayList<>();
 
   private final ReadWriteLock childContextsReadWriteLock = new ReentrantReadWriteLock();
 
@@ -99,24 +92,21 @@ abstract class AbstractEventContext implements BaseEventContext {
     this.exceptionHandler = exceptionHandler;
   }
 
-  void addChildContext(BaseEventContext childContext) {
-    if (getDepthLevel() >= MAX_DEPTH) {
-      StringBuilder messageBuilder = new StringBuilder();
-
-      messageBuilder.append("Too many child contexts nested." + lineSeparator());
-
-      if (debugLogEnabled) {
-        messageBuilder.append("  > " + this.toString() + lineSeparator());
-        Optional<BaseEventContext> current = getParentContext();
-        while (current.isPresent()) {
-          messageBuilder.append("  > " + current.get().toString() + lineSeparator());
-          current = current.get().getParentContext();
-        }
-      }
-
-      throw new EventContextDeepNestingException(messageBuilder.toString());
+  protected void initCompletionLists() {
+    if (onCompletionConsumerList == null) {
+      onResponseConsumerList = new ArrayList<>();
     }
 
+    if (onCompletionConsumerList == null) {
+      onCompletionConsumerList = new ArrayList<>(2);
+    }
+
+    if (onTerminatedConsumerList == null) {
+      onTerminatedConsumerList = new ArrayList<>();
+    }
+  }
+
+  void addChildContext(BaseEventContext childContext) {
     childContextsReadWriteLock.writeLock().lock();
     try {
       childContexts.add(childContext);
@@ -181,17 +171,13 @@ abstract class AbstractEventContext implements BaseEventContext {
       if (debugLogEnabled) {
         LOGGER.debug("{} handling messaging exception.", this);
       }
-      return just((MessagingException) throwable)
-          .flatMapMany(exceptionHandler)
-          .doOnNext(handled -> success(handled))
-          .doOnError(rethrown -> responseDone(left(rethrown)))
-          // This ensures that both handled and rethrown outcome both result in a Publisher<Void>
-          .materialize().then()
-          .toProcessor();
+
+      exceptionHandler.routeError((MessagingException) throwable, handled -> success(handled),
+                                  rethrown -> responseDone(left(rethrown)));
     } else {
       responseDone(left(throwable));
-      return empty();
     }
+    return empty();
   }
 
   private synchronized void responseDone(Either<Throwable, CoreEvent> result) {

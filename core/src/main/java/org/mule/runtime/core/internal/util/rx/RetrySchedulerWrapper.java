@@ -127,7 +127,7 @@ public class RetrySchedulerWrapper implements Scheduler {
         }
       }
     }
-    throw new RejectedExecutionException();
+    throw new RejectedExecutionException(this.toString());
   }
 
   @Override
@@ -173,5 +173,10 @@ public class RetrySchedulerWrapper implements Scheduler {
       delegate.execute(command);
       return null;
     });
+  }
+
+  @Override
+  public String toString() {
+    return "RetrySchedulerWrapper{" + delegate.toString() + "}";
   }
 }

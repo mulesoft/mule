@@ -27,9 +27,9 @@ import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
-import org.junit.Rule;
-
 import javax.inject.Inject;
+
+import org.junit.Rule;
 
 /**
  * Base class for mule functional test cases that run tests using class loading isolation. This class will set the default values
@@ -112,7 +112,8 @@ public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalT
 
     if (eventContextService != null && DefaultMuleConfiguration.isFlowTrace()) {
       new PollingProber(1000, 10).check(new JUnitLambdaProbe(() -> {
-        assertThat(eventContextService.getCurrentlyActiveFlowStacks(), is(empty()));
+        assertThat(eventContextService.getCurrentlyActiveFlowStacks().toString(),
+                   eventContextService.getCurrentlyActiveFlowStacks(), is(empty()));
         return true;
       }));
     }

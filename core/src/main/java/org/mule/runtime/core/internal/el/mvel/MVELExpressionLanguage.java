@@ -28,8 +28,8 @@ import org.mule.mvel2.util.CompilerTools;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionExecutionException;
-import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -78,12 +78,12 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
   // Configuration
   private String globalFunctionsString;
   private String globalFunctionsFile;
-  private Map<String, Function> globalFunctions = new HashMap<>();
+  private final Map<String, Function> globalFunctions = new HashMap<>();
   protected Map<String, String> aliases = new HashMap<>();
   protected Map<String, Class<?>> imports = new HashMap<>();
   private boolean autoResolveVariables = true;
   private MvelDataTypeResolver dataTypeResolver = new MvelDataTypeResolver();
-  private MvelEnricherDataTypePropagator dataTypePropagator = new MvelEnricherDataTypePropagator();
+  private final MvelEnricherDataTypePropagator dataTypePropagator = new MvelEnricherDataTypePropagator();
 
   @Inject
   public MVELExpressionLanguage(MuleContext muleContext) {
@@ -428,9 +428,36 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
       }
 
       @Override
+      public TypedValue<?> evaluate(CompiledExpression expression) throws ExpressionExecutionException {
+        return evaluate(expression.expression());
+      }
+
+      @Override
+      public TypedValue<?> evaluate(CompiledExpression expression, DataType expectedOutputType)
+          throws ExpressionExecutionException {
+        return evaluate(expression.expression(), expectedOutputType);
+      }
+
+      @Override
+      public TypedValue<?> evaluate(CompiledExpression expression, long timeout) throws ExpressionExecutionException {
+        return evaluate(expression.expression(), timeout);
+      }
+
+      @Override
+      public TypedValue<?> evaluateLogExpression(CompiledExpression expression) throws ExpressionExecutionException {
+        return evaluateLogExpression(expression.expression());
+      }
+
+      @Override
+      public Iterator<TypedValue<?>> split(CompiledExpression expression) {
+        return split(expression.expression());
+      }
+
+      @Override
       public void close() {
         // Nothing to do
       }
+
     };
   }
 }

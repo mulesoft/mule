@@ -156,7 +156,7 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
   private static final String MESSAGE_GROUP_NAME = "Message";
   private static final String SET_PAYLOAD_PARAM_NAME = "setPayload";
   private static final String SET_ATTRIBUTES_PARAM_NAME = "setAttributes";
-  private static final String SET_VARIABLES_PARAM_NAME = "setVariables";
+  private static final String SET_VARIABLES_PARAM_NAME = "variables";
   private static final String SET_VARIABLES_GROUP_NAME = "Set Variables";
 
   private final DslResolvingContext context;

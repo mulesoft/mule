@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static java.util.Optional.ofNullable;
 import static org.apache.commons.io.IOUtils.EOF;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.core.api.util.StreamingUtils.supportsStreaming;
@@ -116,8 +115,8 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
 
   protected Message toMessage(Object value, ExecutionContextAdapter operationContext) {
     Map<String, Object> params = operationContext.getParameters();
-    Optional<MediaType> contextMimeTypeParam = getContextMimeType(params);
-    Optional<Charset> contextEncodingParam = getContextEncoding(params);
+    MediaType contextMimeTypeParam = getContextMimeType(params);
+    Charset contextEncodingParam = getContextEncoding(params);
     final MediaType mediaType = resolveMediaType(value, contextMimeTypeParam, contextEncodingParam);
     final CoreEvent event = operationContext.getEvent();
 
@@ -135,7 +134,7 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
           ? MessageUtils.toMessage(resultValue, mediaType, cursorProviderFactory, event, returnHandler.getDataType())
           : MessageUtils.toMessage(resultValue, mediaType, cursorProviderFactory, event);
     } else {
-      PayloadMediaTypeResolver payloadMediaTypeResolver = new PayloadMediaTypeResolver(getDefaultEncoding(muleContext),
+      PayloadMediaTypeResolver payloadMediaTypeResolver = new PayloadMediaTypeResolver(defaultEncoding,
                                                                                        defaultMediaType,
                                                                                        contextEncodingParam,
                                                                                        contextMimeTypeParam);
@@ -193,12 +192,14 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     return lazyMessageCollection;
   }
 
-  private Optional<MediaType> getContextMimeType(Map<String, Object> params) {
-    return ofNullable((String) params.get(MIME_TYPE_PARAMETER_NAME)).map(mimeType -> MediaType.parse(mimeType));
+  private MediaType getContextMimeType(Map<String, Object> params) {
+    String mimeType = (String) params.get(MIME_TYPE_PARAMETER_NAME);
+    return mimeType != null ? MediaType.parse(mimeType) : null;
   }
 
-  private Optional<Charset> getContextEncoding(Map<String, Object> params) {
-    return ofNullable((String) params.get(ENCODING_PARAMETER_NAME)).map(encoding -> parseCharset(encoding));
+  private Charset getContextEncoding(Map<String, Object> params) {
+    String encoding = (String) params.get(ENCODING_PARAMETER_NAME);
+    return encoding != null ? parseCharset(encoding) : null;
   }
 
   private Object streamingContent(Object value,
@@ -219,24 +220,31 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
    * If provided, mimeType and encoding configured as operation parameters will take precedence over what comes with the message's
    * {@link DataType}.
    *
-   * @param value
-   * @param operationContext
-   * @return
+   * @param value the operation's value
+   * @param contextMimeType the mimeType specified in the operation
+   * @param contextEncoding the encoding specified in the operation
+   * @return the resolved {@link MediaType}
    */
-  protected MediaType resolveMediaType(Object value, Optional<MediaType> contextMimeType, Optional<Charset> contextEncoding) {
-    Charset existingEncoding = defaultEncoding;
-    MediaType mediaType = defaultMediaType;
-    if (value instanceof Result) {
-      final Optional<MediaType> optionalMediaType = ((Result) value).getMediaType();
-      if (optionalMediaType.isPresent()) {
-        mediaType = optionalMediaType.get();
-        if (mediaType.getCharset().isPresent()) {
-          existingEncoding = mediaType.getCharset().orElse(existingEncoding);
+  protected MediaType resolveMediaType(Object value, MediaType contextMimeType, Charset contextEncoding) {
+    if (contextEncoding == null) {
+      contextEncoding = defaultEncoding;
+    }
+    if (contextMimeType == null) {
+      MediaType mediaType = defaultMediaType;
+      if (value instanceof Result) {
+        final Optional<MediaType> optionalMediaType = ((Result) value).getMediaType();
+        if (optionalMediaType.isPresent()) {
+          mediaType = optionalMediaType.get();
+          if (mediaType.getCharset().isPresent()) {
+            contextEncoding = mediaType.getCharset().orElse(contextEncoding);
+          }
         }
       }
+
+      contextMimeType = mediaType;
     }
 
-    return contextMimeType.orElse(mediaType).withCharset(contextEncoding.orElse(existingEncoding));
+    return contextMimeType.withCharset(contextEncoding);
   }
 
   protected class ConnectedInputStreamWrapper extends ProxyInputStream {

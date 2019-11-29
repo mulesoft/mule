@@ -8,7 +8,10 @@ package org.mule.runtime.core.api.exception;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 
+import java.util.function.Consumer;
+
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -32,4 +35,9 @@ public abstract class BaseExceptionHandler implements FlowExceptionHandler {
 
   protected abstract void onError(Exception exception);
 
+  @Override
+  public void routeError(Exception error, Consumer<CoreEvent> continueCallback, Consumer<Throwable> propagateCallback) {
+    onError(error);
+    FlowExceptionHandler.super.routeError(error, continueCallback, propagateCallback);
+  }
 }

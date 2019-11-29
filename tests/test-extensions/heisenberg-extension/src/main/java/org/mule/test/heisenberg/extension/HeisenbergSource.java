@@ -127,7 +127,7 @@ public class HeisenbergSource extends Source<String, Object> {
   private int corePoolSize;
 
   @Parameter
-  @Optional(defaultValue = "300")
+  @Optional(defaultValue = "500")
   private long frequency;
 
   @RefName
@@ -179,7 +179,7 @@ public class HeisenbergSource extends Source<String, Object> {
         context.fireOnHandle(NEXT_BATCH, TypedValue.of(frequency));
         sourceCallback.handle(result, context);
       }
-    }, 0, 4000, MILLISECONDS);
+    }, 0, frequency, MILLISECONDS);
   }
 
   @OnSuccess

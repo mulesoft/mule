@@ -100,7 +100,11 @@ public class HeisenbergExtension implements Lifecycle {
   private int start = 0;
   private int stop = 0;
   private int dispose = 0;
+<<<<<<< HEAD
   public static volatile Integer sourceTimesStarted = 0;
+=======
+  public static volatile int sourceTimesStarted = 0;
+>>>>>>> 15d41646061bf1eeac1103cdfa8a154c809b76c7
 
   @Inject
   private ExtensionManager extensionManager;

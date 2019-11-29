@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.config.internal.factories;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.config.DefaultMuleConfiguration.isFlowTrace;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -322,9 +322,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     private FlowExceptionHandler popSubFlowFlowStackElement() {
       return (exception, event) -> {
-        if (isFlowTrace()) {
-          ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
-        }
+        ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
         return event;
       };
     }
@@ -356,7 +354,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
      */
     protected Function<Context, Context> clearCurrentFlowRefFromCycleDetection() {
       return context -> {
-        List<String> currentAppliedFlowrefs = context.getOrDefault(APPLIED_FLOWREFS_KEY, new ArrayList<>());
+        List<String> currentAppliedFlowrefs = new ArrayList<>(context.getOrDefault(APPLIED_FLOWREFS_KEY, emptyList()));
         currentAppliedFlowrefs.remove(refName);
         return context.put(APPLIED_FLOWREFS_KEY, currentAppliedFlowrefs);
       };
@@ -377,7 +375,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
      */
     private Function<Context, Context> checkAndMarkCurrentFlowRefForCycleDetection() {
       return context -> {
-        List<String> currentAppliedFlowrefs = context.getOrDefault(APPLIED_FLOWREFS_KEY, new ArrayList<>());
+        List<String> currentAppliedFlowrefs = new ArrayList<>(context.getOrDefault(APPLIED_FLOWREFS_KEY, emptyList()));
         if (currentAppliedFlowrefs.contains(refName)) {
           throw propagate(new RecursiveFlowRefException(currentAppliedFlowrefs.stream()
               .collect(joining("' -> '", "'", "'")), StaticFlowRefMessageProcessor.this));

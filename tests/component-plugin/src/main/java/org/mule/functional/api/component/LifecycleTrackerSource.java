@@ -36,6 +36,10 @@ public class LifecycleTrackerSource extends AbstractComponent implements Lifecyc
     return sources;
   }
 
+  public static void clearSources() {
+    sources.clear();
+  }
+
   @Override
   public void setListener(Processor listener) {
     this.listener = listener;

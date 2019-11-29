@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.config;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FLOW_TRACE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleBase;
@@ -296,7 +297,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     if (p != null) {
       autoWrapMessageAwareTransform = BooleanUtils.toBoolean(p);
     }
-    p = getProperty(MuleProperties.MULE_FLOW_TRACE);
+    p = getProperty(MULE_FLOW_TRACE);
     if (p != null) {
       flowTrace = BooleanUtils.toBoolean(p);
     } else {
@@ -327,7 +328,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
    *         {@code false} otherwise.
    */
   public static boolean isFlowTrace() {
-    return flowTrace || logger.isDebugEnabled();
+    return flowTrace;
   }
 
   protected void validateEncoding() throws FatalException {
