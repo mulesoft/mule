@@ -13,6 +13,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.api.metadata.MediaType.create;
 import static org.mule.runtime.api.metadata.MediaType.parse;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
 
@@ -37,7 +38,7 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
 
   private static final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
   private static final Boolean KEEP_TYPE_TARGET_AND_TARGET_VAR =
-      new Boolean(getProperty("mule.parse.template.keep.target.var.type", "true"));
+      new Boolean(getProperty(SYSTEM_PROPERTY_PREFIX + "parse.template.keep.target.var.type", "true"));
 
   private String content;
   private MediaType outputMimeType;
