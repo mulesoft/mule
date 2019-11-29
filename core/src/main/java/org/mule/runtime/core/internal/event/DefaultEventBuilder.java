@@ -14,9 +14,11 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
+import static org.mule.runtime.api.util.collection.SmallMap.copy;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsBytes;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsString;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
+import static org.mule.runtime.core.api.util.CaseInsensitiveHashMap.basedOn;
 import static org.mule.runtime.core.api.util.CaseInsensitiveHashMap.emptyCaseInsensitiveMap;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
@@ -186,7 +188,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     if ((flowVariables != null && !this.flowVariables.isEmpty()) || !this.originalVars.isEmpty()) {
       this.varsModified = true;
       this.modified = true;
-      flowVariables = new CaseInsensitiveHashMap<>();
+      flowVariables = basedOn(new SmallMap<>());
     }
     return this;
   }
@@ -206,6 +208,15 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     initInternalParameters();
 
     internalParameters.put(key, value);
+    this.modified = true;
+    return this;
+  }
+
+  @Override
+  public Builder addInternalParameters(Map<String, Object> internalParameters) {
+    initInternalParameters();
+
+    this.internalParameters.putAll(internalParameters);
     this.modified = true;
     return this;
   }
@@ -293,14 +304,14 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   protected void initVariables() {
     if (!varsModified) {
       if (flowVariables == null) {
-        flowVariables = new CaseInsensitiveHashMap<>(originalVars);
+        flowVariables = basedOn(copy(originalVars));
       }
     }
   }
 
   protected void initInternalParameters() {
     if (!internalParametersInitialized) {
-      internalParameters = SmallMap.copy(internalParameters);
+      internalParameters = copy(internalParameters);
       internalParametersInitialized = true;
     }
   }

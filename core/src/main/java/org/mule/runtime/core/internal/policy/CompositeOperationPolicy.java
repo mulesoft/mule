@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock.readWriteLock;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
@@ -24,7 +25,6 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
@@ -40,6 +40,7 @@ import org.mule.runtime.core.internal.util.rx.TransactionAwareFluxSinkSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -86,10 +87,10 @@ public class CompositeOperationPolicy
    * won't be able to change the response parameters of the source and the original response parameters generated from the source
    * will be used.
    *
-   * @param operation the operation on which the policies will be applied
-   * @param parameterizedPolicies list of {@link Policy} to chain together.
+   * @param operation                            the operation on which the policies will be applied
+   * @param parameterizedPolicies                list of {@link Policy} to chain together.
    * @param operationPolicyParametersTransformer transformer from the operation parameters to a message and vice versa.
-   * @param operationPolicyProcessorFactory factory for creating each {@link OperationPolicy} from a {@link Policy}
+   * @param operationPolicyProcessorFactory      factory for creating each {@link OperationPolicy} from a {@link Policy}
    */
   public CompositeOperationPolicy(Component operation, List<Policy> parameterizedPolicies,
                                   Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
@@ -194,7 +195,7 @@ public class CompositeOperationPolicy
           });
           return result.getLeft();
         }), doOnNext)
-            .map(response -> quickCopy(response, SmallMap.of(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)));
+            .map(response -> quickCopy(response, of(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)));
   }
 
   private Map<String, Object> resolveOperationParameters(CoreEvent event) {
@@ -204,7 +205,7 @@ public class CompositeOperationPolicy
 
     return getParametersTransformer()
         .map(paramsTransformer -> {
-          Map<String, Object> parametersMap = SmallMap.copy(operationParameters);
+          Map<String, Object> parametersMap = new HashMap<>(operationParameters);
           parametersMap.putAll(paramsTransformer.fromMessageToParameters(event.getMessage()));
           return parametersMap;
         })
@@ -215,9 +216,9 @@ public class CompositeOperationPolicy
    * Always uses the stored result of {@code processNextOperation} so all the chains after the operation execution are executed
    * with the actual operation result and not a modified version from another policy.
    *
-   * @param policy the policy to execute.
+   * @param policy        the policy to execute.
    * @param nextProcessor the processor to execute when the policy next-processor gets executed
-   * @param eventPub the event to use to execute the policy chain.
+   * @param eventPub      the event to use to execute the policy chain.
    */
   @Override
   protected Publisher<CoreEvent> applyPolicy(Policy policy, ReactiveProcessor nextProcessor, Publisher<CoreEvent> eventPub) {
@@ -250,15 +251,15 @@ public class CompositeOperationPolicy
     return getParametersTransformer().isPresent()
         ? InternalEvent.builder(operationEvent)
             .message(getParametersTransformer().get().fromParametersToMessage(parametersProcessor.getOperationParameters()))
-            .addInternalParameter(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor)
-            .addInternalParameter(POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction)
-            .addInternalParameter(POLICY_OPERATION_CHILD_CTX, operationEvent.getContext())
-            .addInternalParameter(POLICY_OPERATION_CALLER_CALLBACK, callback)
+            .addInternalParameters(of(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor,
+                                      POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction,
+                                      POLICY_OPERATION_CHILD_CTX, operationEvent.getContext(),
+                                      POLICY_OPERATION_CALLER_CALLBACK, callback))
             .build()
-        : quickCopy(operationEvent, SmallMap.of(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor,
-                                                POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction,
-                                                POLICY_OPERATION_CHILD_CTX, operationEvent.getContext(),
-                                                POLICY_OPERATION_CALLER_CALLBACK, callback));
+        : quickCopy(operationEvent, of(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor,
+                                       POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction,
+                                       POLICY_OPERATION_CHILD_CTX, operationEvent.getContext(),
+                                       POLICY_OPERATION_CALLER_CALLBACK, callback));
   }
 
   private static BaseEventContext getStoredChildContext(CoreEvent event) {

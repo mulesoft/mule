@@ -7,12 +7,12 @@
 package org.mule.runtime.config.internal.factories;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -251,7 +251,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
           .subscriberContext(clearCurrentFlowRefFromCycleDetection());
 
       if (target != null) {
-        pub = pub.map(event -> quickCopy(event, of(originalEventKey(event), event)))
+        pub = pub.map(event -> quickCopy(event, singletonMap(originalEventKey(event), event)))
             .cast(CoreEvent.class);
       }
 

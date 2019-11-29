@@ -9,14 +9,12 @@ package org.mule.runtime.core.internal.event;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
 
 import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -87,10 +85,7 @@ public final class EventQuickCopy {
     if (event instanceof EventQuickCopyInternalParametersDecorator) {
       final EventQuickCopyInternalParametersDecorator quickCopy = (EventQuickCopyInternalParametersDecorator) event;
 
-      int initialSize = quickCopy.internalParameters.size() + internalParameters.size();
-      final Map<String, Object> resolvedParams = initialSize > 5 ? new HashMap<>(2 * initialSize) : new SmallMap<>();
-
-      resolvedParams.putAll(quickCopy.internalParameters);
+      final Map<String, Object> resolvedParams = (Map<String, Object>) copy(quickCopy.internalParameters);
       resolvedParams.putAll(internalParameters);
 
       return quickCopy(quickCopy.getEvent(), resolvedParams);

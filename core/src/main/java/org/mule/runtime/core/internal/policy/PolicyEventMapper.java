@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
+import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.policy.CommonSourcePolicy.POLICY_SOURCE_PARAMETERS_PROCESSOR;
 import static org.mule.runtime.core.internal.policy.CompositeOperationPolicy.POLICY_OPERATION_NEXT_OPERATION_RESPONSE;
@@ -18,7 +19,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.internal.event.EventInternalContextResolver;
@@ -125,8 +125,8 @@ public class PolicyEventMapper {
           .build();
 
       // Additional copy is needed to update next_operation_response to be the just created event
-      return quickCopy(next, SmallMap.of(policyVarsInternalParameterName(), result.getVariables(),
-                                         POLICY_OPERATION_NEXT_OPERATION_RESPONSE, next));
+      return quickCopy(next, of(policyVarsInternalParameterName(), result.getVariables(),
+                                POLICY_OPERATION_NEXT_OPERATION_RESPONSE, next));
     }
   }
 
