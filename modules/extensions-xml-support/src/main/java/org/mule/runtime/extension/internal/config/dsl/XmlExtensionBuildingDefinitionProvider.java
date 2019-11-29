@@ -38,7 +38,7 @@ import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.extension.internal.factories.ModuleOperationMessageProcessorChainFactoryBean;
+import org.mule.runtime.extension.internal.factories.ModuleOperationMessageProcessorFactoryBean;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
 
 import java.util.ArrayList;
@@ -133,7 +133,7 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
 
     definitions.add(baseDefinition.withIdentifier(dslSyntaxResolver.resolve(operationModel).getElementName())
         .withTypeDefinition(fromType(AnnotatedProcessor.class))
-        .withObjectFactoryType(ModuleOperationMessageProcessorChainFactoryBean.class)
+        .withObjectFactoryType(ModuleOperationMessageProcessorFactoryBean.class)
         .withSetterParameterDefinition("parameters",
                                        fromMultipleDefinitions(paramsDefinitions
                                            .toArray(new KeyAttributeDefinitionPair[paramsDefinitions.size()]))

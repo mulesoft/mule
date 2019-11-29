@@ -189,8 +189,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     return getInternalParameter(ERROR_EVENT, event);
   }
 
-  private String getParameterId(String errorException, CoreEvent event) {
-    return errorException + event.getContext().getId();
+  private String getParameterId(String keyPrefix, CoreEvent event) {
+    return keyPrefix + event.getContext().getId();
   }
 
   private <T> T getInternalParameter(String keyPrefix, CoreEvent event) {

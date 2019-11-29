@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.extension.internal.config.dsl;
 
-import static org.mule.runtime.core.internal.processor.chain.ModuleOperationMessageProcessorChainBuilder.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
+import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.event.Event;
