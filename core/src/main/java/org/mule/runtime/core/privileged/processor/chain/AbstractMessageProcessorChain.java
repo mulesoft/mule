@@ -23,6 +23,7 @@ import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentM
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Operators.lift;
@@ -141,7 +142,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       // along with the interceptors that decorate it.
       stream = stream.transform(applyInterceptors(interceptors, processor))
           // #1 Register local error hook to wrap exceptions in a MessagingException maintaining failed event.
-          .subscriberContext(context -> context.put(REACTOR_ON_OPERATOR_ERROR_LOCAL, getLocalOperatorErrorHook(processor)))
+          .subscriberContext(context -> context.put(REACTOR_ON_OPERATOR_ERROR_LOCAL,
+                                                    getLocalOperatorErrorHook(processor, muleContext)))
           // #2 Register continue error strategy to handle errors without stopping the stream.
           .onErrorContinue(exception -> !(exception instanceof LifecycleException),
                            getContinueStrategyErrorHandler(processor));
@@ -160,29 +162,15 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   }
 
   /*
-   * Used to catch exceptions emitted by reactor operators and wrap these in a MessagingException while conserving a reference to
-   * the failed Event.
-   */
-  private BiFunction<Throwable, Object, Throwable> getLocalOperatorErrorHook(Processor processor) {
-    return (throwable, event) -> {
-      throwable = unwrap(throwable);
-      if (event instanceof CoreEvent) {
-        if (throwable instanceof MessagingException) {
-          return resolveMessagingException(processor).apply((MessagingException) throwable);
-        } else {
-          return resolveException(processor, (CoreEvent) event, throwable);
-        }
-      } else {
-        return throwable;
-      }
-    };
-  }
-
-  /*
    * Used to process failed events which are dropped from the reactor stream due to error. Errors are processed by invoking the
    * current EventContext error callback.
    */
   private BiConsumer<Throwable, Object> getContinueStrategyErrorHandler(Processor processor) {
+    final MessagingExceptionResolver exceptionResolver =
+        (processor instanceof Component) ? new MessagingExceptionResolver((Component) processor) : null;
+    final Function<MessagingException, MessagingException> messagingExceptionMapper =
+        resolveMessagingException(processor, muleContext, exceptionResolver);
+
     return (throwable, object) -> {
       throwable = unwrap(throwable);
 
@@ -194,7 +182,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       if (object != null && !(object instanceof CoreEvent) && throwable instanceof MessagingException) {
         notifyError(processor,
                     (BaseEventContext) ((MessagingException) throwable).getEvent().getContext(),
-                    resolveMessagingException(processor).apply((MessagingException) throwable));
+                    messagingExceptionMapper.apply((MessagingException) throwable));
       } else {
         CoreEvent event = (CoreEvent) object;
         if (throwable instanceof MessagingException) {
@@ -203,11 +191,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                       (BaseEventContext) (event != null
                           ? event.getContext()
                           : ((MessagingException) throwable).getEvent().getContext()),
-                      resolveMessagingException(processor).apply((MessagingException) throwable));
+                      messagingExceptionMapper.apply((MessagingException) throwable));
         } else {
           notifyError(processor,
                       ((BaseEventContext) event.getContext()),
-                      resolveException(processor, event, throwable));
+                      resolveException(processor, event, throwable, muleContext, exceptionResolver));
         }
       }
     };
@@ -315,19 +303,19 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     });
   }
 
-  private MessagingException resolveException(Processor processor, CoreEvent event, Throwable throwable) {
+  private MessagingException resolveException(Processor processor, CoreEvent event, Throwable throwable, MuleContext context,
+                                              MessagingExceptionResolver exceptionResolver) {
     if (processor instanceof Component) {
-      MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver((Component) processor);
-      return exceptionResolver.resolve(new MessagingException(event, throwable, (Component) processor), muleContext);
+      return exceptionResolver.resolve(new MessagingException(event, throwable, (Component) processor), context);
     } else {
       return new MessagingException(event, throwable);
     }
   }
 
-  private Function<MessagingException, MessagingException> resolveMessagingException(Processor processor) {
+  private Function<MessagingException, MessagingException> resolveMessagingException(Processor processor, MuleContext context,
+                                                                                     MessagingExceptionResolver exceptionResolver) {
     if (processor instanceof Component) {
-      MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver((Component) processor);
-      return exception -> exceptionResolver.resolve(exception, muleContext);
+      return exception -> exceptionResolver.resolve(exception, context);
     } else {
       return exception -> exception;
     }
