@@ -15,7 +15,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.api.util.collection.FastMap;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.TransactionStatusException;
@@ -42,7 +42,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
    *
    * @see javax.transaction.Status
    */
-  protected static Map<Integer, String> txStatusMappings = new FastMap<>(); // populated later
+  protected static Map<Integer, String> txStatusMappings = new SmallMap<>(); // populated later
 
   protected volatile Object key;
   protected volatile Object resource;

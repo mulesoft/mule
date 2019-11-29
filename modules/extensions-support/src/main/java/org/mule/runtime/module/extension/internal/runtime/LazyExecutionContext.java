@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.api.util.collection.FastMap.forSize;
+import static org.mule.runtime.api.util.collection.SmallMap.forSize;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;

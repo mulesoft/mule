@@ -11,7 +11,7 @@ import static org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
-import org.mule.runtime.api.util.collection.FastMap;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
@@ -32,7 +32,7 @@ public class MessagingExceptionLocationProvider extends LocationExecutionContext
 
   @Override
   public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
-    Map<String, Object> contextInfo = new FastMap<>();
+    Map<String, Object> contextInfo = new SmallMap<>();
 
     contextInfo.put(INFO_LOCATION_KEY, resolveProcessorRepresentation(muleContext.getConfiguration().getId(),
                                                                       lastProcessed.getLocation() != null

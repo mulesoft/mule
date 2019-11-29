@@ -10,7 +10,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.ServiceLoader.load;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.tx.TransactionType;
-import org.mule.runtime.api.util.collection.FastMap;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.transaction.TypedTransactionFactory;
 
@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public final class TransactionFactoryLocator implements Disposable {
 
-  private final Map<TransactionType, TransactionFactory> factories = new FastMap<>();
+  private final Map<TransactionType, TransactionFactory> factories = new SmallMap<>();
   private final ReadWriteLock lock = new ReentrantReadWriteLock();
   private boolean initialized = false;
 

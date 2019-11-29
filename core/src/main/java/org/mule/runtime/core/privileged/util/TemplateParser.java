@@ -7,7 +7,7 @@
 package org.mule.runtime.core.privileged.util;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.util.collection.FastMap.of;
+import static org.mule.runtime.api.util.collection.SmallMap.of;
 
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;

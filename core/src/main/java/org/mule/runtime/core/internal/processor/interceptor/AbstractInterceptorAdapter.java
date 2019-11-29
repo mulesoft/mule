@@ -8,8 +8,8 @@ package org.mule.runtime.core.internal.processor.interceptor;
 
 import static java.lang.String.valueOf;
 import static java.util.Collections.emptyMap;
-import static org.mule.runtime.api.util.collection.FastMap.forSize;
-import static org.mule.runtime.api.util.collection.FastMap.of;
+import static org.mule.runtime.api.util.collection.SmallMap.forSize;
+import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;

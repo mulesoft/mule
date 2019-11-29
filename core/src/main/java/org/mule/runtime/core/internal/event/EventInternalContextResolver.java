@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.event;
 
-import static org.mule.runtime.api.util.collection.FastMap.of;
+import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 
 import org.mule.runtime.core.api.event.CoreEvent;

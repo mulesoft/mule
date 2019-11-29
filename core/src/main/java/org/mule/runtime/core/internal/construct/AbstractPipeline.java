@@ -35,7 +35,7 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.PipelineMessageNotification;
-import org.mule.runtime.api.util.collection.FastMap;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
@@ -199,7 +199,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doInitialise() throws MuleException {
-    final Map<BackPressureReason, FlowBackPressureException> backPressureExceptions = new FastMap<>();
+    final Map<BackPressureReason, FlowBackPressureException> backPressureExceptions = new SmallMap<>();
 
     backPressureExceptions.put(EVENTS_ACCUMULATED,
                                new FlowBackPressureEventsAccumulatedException(getName(), EVENTS_ACCUMULATED));

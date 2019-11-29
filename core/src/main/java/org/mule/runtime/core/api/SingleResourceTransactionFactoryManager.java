@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.util.collection.FastMap;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 
@@ -18,8 +18,8 @@ import java.util.Map;
  */
 public final class SingleResourceTransactionFactoryManager {
 
-  private Map<Class, TransactionFactory> transactionFactories = new FastMap<>();
-  private Map<Class, TransactionFactory> transactionFactoriesCache = new FastMap<>();
+  private Map<Class, TransactionFactory> transactionFactories = new SmallMap<>();
+  private Map<Class, TransactionFactory> transactionFactoriesCache = new SmallMap<>();
 
   public void registerTransactionFactory(Class supportedType, TransactionFactory transactionFactory) {
     this.transactionFactories.put(supportedType, transactionFactory);

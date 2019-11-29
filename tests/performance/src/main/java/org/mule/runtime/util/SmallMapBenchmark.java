@@ -10,7 +10,7 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.util.collection.FastMap;
+import org.mule.runtime.api.util.collection.SmallMap;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +45,7 @@ public class SmallMapBenchmark extends AbstractBenchmark {
 
   @Benchmark
   public Object smallMapOf3() {
-    Map<String, String> map = new FastMap<>();
+    Map<String, String> map = new SmallMap<>();
     populate3(map);
 
     map.get(IRON_MAN);
@@ -62,7 +62,7 @@ public class SmallMapBenchmark extends AbstractBenchmark {
 
   //@Benchmark
   public Object fullSmallMap() {
-    Map<String, String> map = new FastMap<>();
+    Map<String, String> map = new SmallMap<>();
     populateFive(map);
     return map;
   }

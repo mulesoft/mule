@@ -34,7 +34,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.api.util.collection.FastMap;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -83,7 +83,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.context = messageContext;
     this.session = new DefaultMuleSession();
     this.originalVars = emptyCaseInsensitiveMap();
-    this.internalParameters = new FastMap<>();
+    this.internalParameters = new SmallMap<>();
     internalParametersInitialized = true;
   }
 
@@ -300,7 +300,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   protected void initInternalParameters() {
     if (!internalParametersInitialized) {
-      internalParameters = FastMap.copy(internalParameters);
+      internalParameters = SmallMap.copy(internalParameters);
       internalParametersInitialized = true;
     }
   }
@@ -361,7 +361,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.legacyCorrelationId = null;
       this.error = null;
       this.itemSequenceInfo = null;
-      this.internalParameters = new FastMap<>();
+      this.internalParameters = new SmallMap<>();
     }
 
     // Use this constructor from the builder

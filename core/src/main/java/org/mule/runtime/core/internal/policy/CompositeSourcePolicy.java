@@ -16,7 +16,7 @@ import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.util.collection.FastMap;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
@@ -239,7 +239,7 @@ public class CompositeSourcePolicy
     if (originalResponseParameters == null) {
       return policyResponseParameters;
     } else {
-      Map<String, Object> concatMap = FastMap.copy(originalResponseParameters);
+      Map<String, Object> concatMap = SmallMap.copy(originalResponseParameters);
       policyResponseParameters.forEach((k, v) -> concatMap.merge(k, v, (v1, v2) -> v2));
       return concatMap;
     }

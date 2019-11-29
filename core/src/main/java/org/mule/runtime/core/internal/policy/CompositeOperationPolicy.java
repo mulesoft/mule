@@ -24,7 +24,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.util.collection.FastMap;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
@@ -194,7 +194,7 @@ public class CompositeOperationPolicy
           });
           return result.getLeft();
         }), doOnNext)
-            .map(response -> quickCopy(response, FastMap.of(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)));
+            .map(response -> quickCopy(response, SmallMap.of(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)));
   }
 
   private Map<String, Object> resolveOperationParameters(CoreEvent event) {
@@ -204,7 +204,7 @@ public class CompositeOperationPolicy
 
     return getParametersTransformer()
         .map(paramsTransformer -> {
-          Map<String, Object> parametersMap = FastMap.copy(operationParameters);
+          Map<String, Object> parametersMap = SmallMap.copy(operationParameters);
           parametersMap.putAll(paramsTransformer.fromMessageToParameters(event.getMessage()));
           return parametersMap;
         })
@@ -255,10 +255,10 @@ public class CompositeOperationPolicy
             .addInternalParameter(POLICY_OPERATION_CHILD_CTX, operationEvent.getContext())
             .addInternalParameter(POLICY_OPERATION_CALLER_CALLBACK, callback)
             .build()
-        : quickCopy(operationEvent, FastMap.of(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor,
-                                               POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction,
-                                               POLICY_OPERATION_CHILD_CTX, operationEvent.getContext(),
-                                               POLICY_OPERATION_CALLER_CALLBACK, callback));
+        : quickCopy(operationEvent, SmallMap.of(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor,
+                                                POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction,
+                                                POLICY_OPERATION_CHILD_CTX, operationEvent.getContext(),
+                                                POLICY_OPERATION_CALLER_CALLBACK, callback));
   }
 
   private static BaseEventContext getStoredChildContext(CoreEvent event) {

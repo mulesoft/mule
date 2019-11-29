@@ -15,7 +15,7 @@ import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.functional.Either;
-import org.mule.runtime.api.util.collection.FastMap;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock;
@@ -69,8 +69,8 @@ class CommonSourcePolicy {
 
     readWriteLock.withReadLock(() -> {
       if (!disposed.get()) {
-        policySink.get().next(quickCopy(sourceEvent, FastMap.of(POLICY_SOURCE_PARAMETERS_PROCESSOR, respParamProcessor,
-                                                                POLICY_SOURCE_PROCESS_CALLBACK, callback)));
+        policySink.get().next(quickCopy(sourceEvent, SmallMap.of(POLICY_SOURCE_PARAMETERS_PROCESSOR, respParamProcessor,
+                                                                 POLICY_SOURCE_PROCESS_CALLBACK, callback)));
       } else {
         MessagingException me = new MessagingException(createStaticMessage("Source policy already disposed"), sourceEvent);
         me.setProcessedEvent(CoreEvent.builder(sourceEvent)
