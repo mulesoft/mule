@@ -3,6 +3,14 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils",
+          "package": "org.mule.runtime.core.privileged.processor.chain",
+          "classSimpleName": "ChainErrorHandlingUtils",
+          "elementKind": "class",
+          "justification": "MULE-17765: Validation module does not map MULE:EXPRESSION errors to custom application errors and error logging differs when error is raised in sub-flow"
+        },
+        {
           "code": "java.method.added",
           "new": "method org.mule.runtime.core.api.event.CoreEvent org.mule.runtime.core.api.transformer.AbstractMessageTransformer::createTransformationEvent(org.mule.runtime.api.message.Message, org.mule.runtime.api.event.EventContext)",
           "package": "org.mule.runtime.core.api.transformer",

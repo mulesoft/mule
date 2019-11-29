@@ -48,6 +48,9 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+
 /**
  * Default implementation of {@link PolicyManager}.
  *
@@ -178,7 +181,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
         .get(policyProvider.findOperationParameterizedPolicies(outerKey.getSecond()),
              innerKey -> innerKey.isEmpty()
                  ? NO_POLICY_OPERATION
-                 : new CompositeOperationPolicy(innerKey,
+                 : new CompositeOperationPolicy(operation, innerKey,
                                                 lookupOperationParametersTransformer(outerKey.getFirst()),
                                                 operationPolicyProcessorFactory)));
   }
