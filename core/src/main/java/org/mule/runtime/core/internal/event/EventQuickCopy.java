@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.event;
 
-import static java.util.Collections.unmodifiableMap;
+import static org.mule.runtime.api.util.collection.SmallMap.copy;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.util.collection.SmallMap;
@@ -132,23 +132,21 @@ public final class EventQuickCopy {
 
     private static final long serialVersionUID = -8748877786435182694L;
 
-    private final Map<String, Object> internalParameters;
+    private final Map<String, ?> internalParameters;
 
     public EventQuickCopyInternalParametersDecorator(InternalEvent event, Map<String, Object> internalParameters) {
       super(event);
-      this.internalParameters = unmodifiableMap(internalParameters);
+      this.internalParameters = internalParameters;
     }
 
     @Override
     public Map<String, ?> getInternalParameters() {
-      final Map<String, ?> eventInternalParameters = getEvent().getInternalParameters();
+      final Map<String, Object> eventInternalParameters = (Map<String, Object>) getEvent().getInternalParameters();
       if (eventInternalParameters.isEmpty()) {
         return internalParameters;
       }
 
-      final Map<String, Object> resolvedParams =
-          new HashMap<>(2 * (eventInternalParameters.size() + internalParameters.size()));
-      resolvedParams.putAll(eventInternalParameters);
+      final Map<String, Object> resolvedParams = copy(eventInternalParameters);
       resolvedParams.putAll(internalParameters);
       return resolvedParams;
     }
