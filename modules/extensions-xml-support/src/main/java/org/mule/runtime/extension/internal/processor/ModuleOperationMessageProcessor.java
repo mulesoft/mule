@@ -173,24 +173,29 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
-        .doOnNext(event -> {
-          final DefaultFlowCallStack flowCallStack = (DefaultFlowCallStack) event.getFlowCallStack();
-
-          final ComponentIdentifier identifier = (ComponentIdentifier) getAnnotation(ANNOTATION_NAME);
-          if (identifier.getNamespace() == null || "tns".equals(identifier.getNamespace())) {
-            final String[] peekedWithNamespace = flowCallStack.peek().getFlowName().split("\\:");
-            String peekedNamespace = peekedWithNamespace[0];
-
-            flowCallStack.push(new FlowStackElement(peekedNamespace + ":" + identifier.getName(), null));
-          } else {
-            flowCallStack.push(new FlowStackElement(identifier.getNamespace() + ":" + identifier.getName(), null));
-          }
-        })
-
+        .doOnNext(this::pushFlowStackEntry)
         .transform(eventPub -> applyWithChildContext(from(eventPub).map(this::createEventWithParameters),
                                                      nestedChain, ofNullable(getLocation()), errorHandler()))
         .doOnNext(event -> ((DefaultFlowCallStack) event.getFlowCallStack()).pop())
         .map(eventResult -> processResult(getInternalParameter(ORIGINAL_EVENT_KEY, eventResult), eventResult));
+  }
+
+  private void pushFlowStackEntry(CoreEvent event) {
+    final DefaultFlowCallStack flowCallStack = (DefaultFlowCallStack) event.getFlowCallStack();
+
+    flowCallStack.push(createFlowStackEntry(flowCallStack.peek()));
+  }
+
+  private FlowStackElement createFlowStackEntry(FlowStackElement top) {
+    final ComponentIdentifier identifier = (ComponentIdentifier) getAnnotation(ANNOTATION_NAME);
+    if (identifier.getNamespace() == null || "tns".equals(identifier.getNamespace())) {
+      final String[] peekedWithNamespace = top.getFlowName().split("\\:");
+      String peekedNamespace = peekedWithNamespace[0];
+
+      return new FlowStackElement(peekedNamespace + ":" + identifier.getName(), null);
+    } else {
+      return new FlowStackElement(identifier.getNamespace() + ":" + identifier.getName(), null);
+    }
   }
 
   private BaseExceptionHandler errorHandler() {
