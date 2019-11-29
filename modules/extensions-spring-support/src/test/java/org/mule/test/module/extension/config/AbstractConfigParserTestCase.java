@@ -58,8 +58,8 @@ public abstract class AbstractConfigParserTestCase extends AbstractHeisenbergCon
   protected static final String SEASON_2_KEY = "s02";
   protected static final List<Long> MONTHLY_INCOMES = asList(toObject(new long[] {12000, 500}));
   protected static final Map<String, List<String>> DEATHS_BY_SEASON = SmallMap.of(
-                                                                                 SEASON_1_KEY, asList("emilio", "domingo"),
-                                                                                 SEASON_2_KEY, asList("tuco", "tortuga"));
+                                                                                  SEASON_1_KEY, asList("emilio", "domingo"),
+                                                                                  SEASON_2_KEY, asList("tuco", "tortuga"));
 
   private static Registry staticRegistry;
 
