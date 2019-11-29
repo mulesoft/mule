@@ -24,6 +24,8 @@ import static org.mule.runtime.core.internal.context.thread.notification.ThreadN
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
+import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.resolveException;
+import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.resolveMessagingException;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Operators.lift;
@@ -301,24 +303,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         subscriber.onSubscribe(s);
       }
     });
-  }
-
-  private MessagingException resolveException(Processor processor, CoreEvent event, Throwable throwable, MuleContext context,
-                                              MessagingExceptionResolver exceptionResolver) {
-    if (processor instanceof Component) {
-      return exceptionResolver.resolve(new MessagingException(event, throwable, (Component) processor), context);
-    } else {
-      return new MessagingException(event, throwable);
-    }
-  }
-
-  private Function<MessagingException, MessagingException> resolveMessagingException(Processor processor, MuleContext context,
-                                                                                     MessagingExceptionResolver exceptionResolver) {
-    if (processor instanceof Component) {
-      return exception -> exceptionResolver.resolve(exception, context);
-    } else {
-      return exception -> exception;
-    }
   }
 
   private Consumer<CoreEvent> preNotification(Processor processor) {
