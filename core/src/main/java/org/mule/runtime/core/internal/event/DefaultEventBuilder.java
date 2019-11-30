@@ -8,13 +8,13 @@ package org.mule.runtime.core.internal.event;
 
 
 import static java.lang.System.lineSeparator;
-import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
+import static org.mule.runtime.api.util.collection.SmallMap.unmodifiable;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsBytes;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsString;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
@@ -550,7 +550,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     @Override
     public Map<String, ?> getInternalParameters() {
-      return unmodifiableMap(internalParameters);
+      return unmodifiable(internalParameters);
     }
 
     @Override
