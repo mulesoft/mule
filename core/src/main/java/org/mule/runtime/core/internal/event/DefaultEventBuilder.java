@@ -15,6 +15,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
+import static org.mule.runtime.api.util.collection.SmallMap.forSize;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsBytes;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsString;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
@@ -302,10 +303,9 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   }
 
   protected void initVariables() {
-    if (!varsModified) {
-      if (flowVariables == null) {
-        flowVariables = basedOn(copy(originalVars));
-      }
+    if (!varsModified && flowVariables == null) {
+      flowVariables = basedOn(forSize(originalVars.size()));
+      flowVariables.putAll(originalVars);
     }
   }
 
@@ -341,7 +341,9 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     private static final long serialVersionUID = 1L;
 
-    /** Immutable MuleEvent state **/
+    /**
+     * Immutable MuleEvent state
+     **/
 
     private final BaseEventContext context;
     // TODO MULE-10013 make this final
@@ -457,7 +459,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     /**
      * Returns the message contents for logging
      *
-     * @param encoding the encoding to use when converting bytes to a string, if necessary
+     * @param encoding    the encoding to use when converting bytes to a string, if necessary
      * @param muleContext the Mule node.
      * @return the message contents as a string
      * @throws MuleException if the message cannot be converted into a string
