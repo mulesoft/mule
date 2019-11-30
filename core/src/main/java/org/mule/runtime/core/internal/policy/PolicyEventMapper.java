@@ -8,12 +8,10 @@ package org.mule.runtime.core.internal.policy;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
-import static org.mule.runtime.api.util.collection.SmallMap.of;
-import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.policy.CommonSourcePolicy.POLICY_SOURCE_PARAMETERS_PROCESSOR;
-import static org.mule.runtime.core.internal.policy.CompositeOperationPolicy.POLICY_OPERATION_NEXT_OPERATION_RESPONSE;
 import static org.mule.runtime.core.internal.policy.CompositeSourcePolicy.POLICY_SOURCE_ORIGINAL_FAILURE_RESPONSE_PARAMETERS;
 import static org.mule.runtime.core.internal.policy.CompositeSourcePolicy.POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS;
+import static org.mule.runtime.core.internal.policy.OperationPolicyContext.from;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_EVENT_CTX_IDS;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -77,10 +75,10 @@ public class PolicyEventMapper {
    */
   public CoreEvent onOperationPolicyBegin(CoreEvent event) {
     Map<String, TypedValue<?>> variables = loadVars(event);
+    from(event).setOriginalEvent(event);
 
     return InternalEvent
         .builder(event)
-        .addInternalParameter(POLICY_OPERATION_ORIGINAL_EVENT, event)
         .variablesTyped(variables != null ? variables : emptyMap())
         .build();
   }
@@ -107,13 +105,13 @@ public class PolicyEventMapper {
    * @param propagate whether changes done after the operation was executed should be propagated or not
    */
   public CoreEvent onOperationPolicyFinish(CoreEvent result, boolean propagate) {
-    final InternalEvent operationResult =
-        ((InternalEvent) result).getInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE);
+    OperationPolicyContext ctx = from(result);
+    final InternalEvent operationResult = ctx.getNextOperationResponse();
 
     if (operationResult == null) {
       return InternalEvent.builder(result)
           .addInternalParameter(policyVarsInternalParameterName(), result.getVariables())
-          .variablesTyped(getOperationOriginalEvent(result).getVariables())
+          .variablesTyped(ctx.getOriginalEvent().getVariables())
           .build();
 
     } else {
@@ -124,9 +122,8 @@ public class PolicyEventMapper {
           .variables(operationResult.getVariables())
           .build();
 
-      // Additional copy is needed to update next_operation_response to be the just created event
-      return quickCopy(next, of(policyVarsInternalParameterName(), result.getVariables(),
-                                POLICY_OPERATION_NEXT_OPERATION_RESPONSE, next));
+      ctx.setNextOperationResponse((InternalEvent) next);
+      return next;
     }
   }
 
@@ -149,8 +146,8 @@ public class PolicyEventMapper {
    * @param result the event after the operation policy error handler was executed
    */
   public CoreEvent onOperationPolicyError(CoreEvent result) {
-    final InternalEvent nextOperationResponse =
-        ((InternalEvent) result).getInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE);
+    final OperationPolicyContext ctx = from(result);
+    final InternalEvent nextOperationResponse = ctx.getNextOperationResponse();
 
     if (nextOperationResponse == null) {
       // Operation was not executed or failed, so variables from the initial event are used
@@ -160,9 +157,9 @@ public class PolicyEventMapper {
           .build();
     } else {
       // Operation was successfully executed, so variables from the operation response are used
+      ctx.setNextOperationResponse(nextOperationResponse);
       return InternalEvent.builder(result)
           .addInternalParameter(policyVarsInternalParameterName(), result.getVariables())
-          .addInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, nextOperationResponse)
           .variablesTyped(nextOperationResponse.getVariables())
           .build();
     }

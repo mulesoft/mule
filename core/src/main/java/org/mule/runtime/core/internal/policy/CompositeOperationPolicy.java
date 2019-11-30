@@ -15,6 +15,8 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock.readWriteLock;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static org.mule.runtime.core.internal.policy.OperationPolicyContext.OPERATION_POLICY_CONTEXT;
+import static org.mule.runtime.core.internal.policy.OperationPolicyContext.from;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
 import static reactor.core.Exceptions.propagate;
@@ -63,12 +65,6 @@ import reactor.core.publisher.FluxSink;
 public class CompositeOperationPolicy
     extends AbstractCompositePolicy<OperationPolicyParametersTransformer>
     implements OperationPolicy, Disposable {
-
-  public static final String POLICY_OPERATION_NEXT_OPERATION_RESPONSE = "policy.operation.nextOperationResponse";
-  public static final String POLICY_OPERATION_PARAMETERS_PROCESSOR = "policy.operation.parametersProcessor";
-  public static final String POLICY_OPERATION_OPERATION_EXEC_FUNCTION = "policy.operation.operationExecutionFunction";
-  private static final String POLICY_OPERATION_CHILD_CTX = "policy.operation.childContext";
-  private static final String POLICY_OPERATION_CALLER_CALLBACK = "policy.operation.callerCallback";
 
   private final Component operation;
   private final OperationPolicyProcessorFactory operationPolicyProcessorFactory;
@@ -121,32 +117,29 @@ public class CompositeOperationPolicy
       Flux<CoreEvent> policyFlux = create(sinkRef)
           .transform(getExecutionProcessor())
           .doOnNext(result -> {
-            final BaseEventContext childContext = getStoredChildContext(result);
+            OperationPolicyContext ctx = from((InternalEvent) result);
+            final BaseEventContext childContext = ctx.getOperationChildContext();
             if (!childContext.isComplete()) {
               childContext.success(result);
             }
-            recoverCallback((InternalEvent) result).complete(quickCopy(childContext.getParentContext().get(), result));
+            ctx.getOperationCallerCallback().complete(quickCopy(childContext.getParentContext().get(), result));
           })
           .onErrorContinue(MessagingException.class, (t, e) -> {
             final MessagingException me = (MessagingException) t;
+            OperationPolicyContext ctx = from((InternalEvent) me.getEvent());
 
-            final BaseEventContext childContext = getStoredChildContext(me.getEvent());
+            final BaseEventContext childContext = ctx.getOperationChildContext();
             if (!childContext.isComplete()) {
               childContext.error(me);
             }
-            me.setProcessedEvent(quickCopy(childContext.getParentContext().get(),
-                                           me.getEvent()));
+            me.setProcessedEvent(quickCopy(childContext.getParentContext().get(), me.getEvent()));
 
-            recoverCallback((InternalEvent) me.getEvent()).error(me);
+            ctx.getOperationCallerCallback().error(me);
           });
 
       policyFlux.subscribe();
       return sinkRef.getFluxSink();
     }
-  }
-
-  private ExecutorCallback recoverCallback(InternalEvent result) {
-    return (ExecutorCallback) result.getInternalParameter(POLICY_OPERATION_CALLER_CALLBACK);
   }
 
   /**
@@ -160,10 +153,10 @@ public class CompositeOperationPolicy
     FluxSinkRecorder<Either<CoreEvent, Throwable>> sinkRecorder = new FluxSinkRecorder<>();
     final Flux<CoreEvent> doOnNext = from(eventPub)
         .doOnNext(event -> {
-          OperationExecutionFunction operationExecutionFunction =
-              ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_OPERATION_EXEC_FUNCTION);
+          OperationPolicyContext ctx = from(event);
+          OperationExecutionFunction operationExecutionFunction = ctx.getOperationExecutionFunction();
 
-          operationExecutionFunction.execute(resolveOperationParameters(event), event, new ExecutorCallback() {
+          operationExecutionFunction.execute(resolveOperationParameters(event, ctx), event, new ExecutorCallback() {
 
             @Override
             public void complete(Object value) {
@@ -189,18 +182,17 @@ public class CompositeOperationPolicy
         .doOnComplete(() -> sinkRecorder.complete());
 
     return subscribeFluxOnPublisherSubscription(create(sinkRecorder)
-        .map(result -> {
-          result.applyRight(t -> {
-            throw propagate(t);
-          });
-          return result.getLeft();
-        }), doOnNext)
-            .map(response -> quickCopy(response, of(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)));
+                                                    .map(result -> {
+                                                      result.applyRight(t -> {
+                                                        throw propagate(t);
+                                                      });
+                                                      return result.getLeft();
+                                                    }), doOnNext)
+        .doOnNext(response -> from(response).setNextOperationResponse((InternalEvent) response));
   }
 
-  private Map<String, Object> resolveOperationParameters(CoreEvent event) {
-    OperationParametersProcessor parametersProcessor =
-        ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_PARAMETERS_PROCESSOR);
+  private Map<String, Object> resolveOperationParameters(CoreEvent event, OperationPolicyContext ctx) {
+    OperationParametersProcessor parametersProcessor = ctx.getOperationParametersProcessor();
     final Map<String, Object> operationParameters = parametersProcessor.getOperationParameters();
 
     return getParametersTransformer()
@@ -248,22 +240,18 @@ public class CompositeOperationPolicy
 
   private CoreEvent operationEventForPolicy(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
                                             OperationParametersProcessor parametersProcessor, ExecutorCallback callback) {
-    return getParametersTransformer().isPresent()
-        ? InternalEvent.builder(operationEvent)
-            .message(getParametersTransformer().get().fromParametersToMessage(parametersProcessor.getOperationParameters()))
-            .addInternalParameters(of(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor,
-                                      POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction,
-                                      POLICY_OPERATION_CHILD_CTX, operationEvent.getContext(),
-                                      POLICY_OPERATION_CALLER_CALLBACK, callback))
-            .build()
-        : quickCopy(operationEvent, of(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor,
-                                       POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction,
-                                       POLICY_OPERATION_CHILD_CTX, operationEvent.getContext(),
-                                       POLICY_OPERATION_CALLER_CALLBACK, callback));
-  }
-
-  private static BaseEventContext getStoredChildContext(CoreEvent event) {
-    return ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_CHILD_CTX);
+    OperationPolicyContext ctx = new OperationPolicyContext(parametersProcessor,
+                                                            operationExecutionFunction,
+                                                            (BaseEventContext) operationEvent.getContext(),
+                                                            callback);
+    if (getParametersTransformer().isPresent()) {
+      return InternalEvent.builder(operationEvent)
+          .message(getParametersTransformer().get().fromParametersToMessage(parametersProcessor.getOperationParameters()))
+          .addInternalParameter(OPERATION_POLICY_CONTEXT, ctx)
+          .build();
+    } else {
+      return quickCopy(operationEvent, of(OPERATION_POLICY_CONTEXT, ctx));
+    }
   }
 
   @Override
