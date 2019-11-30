@@ -38,7 +38,6 @@ public class PolicyEventMapper {
 
   private static final String POLICY_VARS_PREFIX = "policy.vars.";
   private static final String POLICY_SOURCE_ORIGINAL_EVENT = "policy.source.originalEvent";
-  private static final String POLICY_OPERATION_ORIGINAL_EVENT = "policy.operation.originalEvent";
   private static final Logger LOGGER = getLogger(PolicyEventMapper.class);
 
   private final String policyVarsInternalParameterName;
@@ -153,7 +152,7 @@ public class PolicyEventMapper {
       // Operation was not executed or failed, so variables from the initial event are used
       return InternalEvent.builder(result)
           .addInternalParameter(policyVarsInternalParameterName(), result.getVariables())
-          .variablesTyped(getOperationOriginalEvent(result).getVariables())
+          .variablesTyped(ctx.getOriginalEvent().getVariables())
           .build();
     } else {
       // Operation was successfully executed, so variables from the operation response are used
@@ -306,7 +305,8 @@ public class PolicyEventMapper {
   }
 
   private PrivilegedEvent getOperationOriginalEvent(CoreEvent event) {
-    return ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_ORIGINAL_EVENT);
+    OperationPolicyContext ctx = from(event);
+    return ctx != null ? (PrivilegedEvent) ctx.getOriginalEvent() : null;
   }
 
   private PrivilegedEvent getSourceOriginalEvent(CoreEvent event) {
