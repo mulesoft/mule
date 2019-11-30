@@ -8,9 +8,6 @@ package org.mule.runtime.core.internal.policy;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
-import static org.mule.runtime.core.internal.policy.CommonSourcePolicy.POLICY_SOURCE_PARAMETERS_PROCESSOR;
-import static org.mule.runtime.core.internal.policy.CompositeSourcePolicy.POLICY_SOURCE_ORIGINAL_FAILURE_RESPONSE_PARAMETERS;
-import static org.mule.runtime.core.internal.policy.CompositeSourcePolicy.POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS;
 import static org.mule.runtime.core.internal.policy.OperationPolicyContext.from;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_EVENT_CTX_IDS;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -37,7 +34,6 @@ import org.slf4j.Logger;
 public class PolicyEventMapper {
 
   private static final String POLICY_VARS_PREFIX = "policy.vars.";
-  private static final String POLICY_SOURCE_ORIGINAL_EVENT = "policy.source.originalEvent";
   private static final Logger LOGGER = getLogger(PolicyEventMapper.class);
 
   private final String policyVarsInternalParameterName;
@@ -59,9 +55,10 @@ public class PolicyEventMapper {
    * @param event the event at the start of the source policy
    */
   public CoreEvent onSourcePolicyBegin(CoreEvent event) {
+    SourcePolicyContext.from(event).setOriginalEvent(event);
+
     return InternalEvent
         .builder(event)
-        .addInternalParameter(POLICY_SOURCE_ORIGINAL_EVENT, event)
         .clearVariables()
         .build();
   }
@@ -212,10 +209,13 @@ public class PolicyEventMapper {
                                 Optional<SourcePolicyParametersTransformer> parametersTransformer)
       throws MessagingException {
     try {
+      SourcePolicyContext ctx = SourcePolicyContext.from(flowResult);
       Map<String, Object> originalResponseParameters =
-          getResponseParamsProcessor(flowResult)
+          ctx.getResponseParametersProcessor()
               .getSuccessfulExecutionResponseParametersFunction()
               .apply(flowResult);
+
+      ctx.setOriginalResponseParameters(originalResponseParameters);
 
       Message message =
           parametersTransformer
@@ -224,7 +224,6 @@ public class PolicyEventMapper {
 
       return InternalEvent.builder(flowResult)
           .message(message)
-          .addInternalParameter(POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS, originalResponseParameters)
           .build();
     } catch (Exception e) {
       if (LOGGER.isWarnEnabled()) {
@@ -246,10 +245,12 @@ public class PolicyEventMapper {
   public CoreEvent onFlowError(CoreEvent event, String policyId,
                                Optional<SourcePolicyParametersTransformer> parametersTransformer) {
     try {
-      Map<String, Object> originalFailureResponseParameters =
-          getResponseParamsProcessor(event)
+      SourcePolicyContext ctx = SourcePolicyContext.from(event);
+
+      Map<String, Object> originalFailureResponseParameters = ctx.getResponseParametersProcessor()
               .getFailedExecutionResponseParametersFunction()
               .apply(event);
+      ctx.setOriginalFailureResponseParameters(originalFailureResponseParameters);
 
       Message message =
           parametersTransformer
@@ -260,7 +261,6 @@ public class PolicyEventMapper {
 
       return InternalEvent.builder(event)
           .message(message)
-          .addInternalParameter(POLICY_SOURCE_ORIGINAL_FAILURE_RESPONSE_PARAMETERS, originalFailureResponseParameters)
           .variablesTyped(variables != null ? variables : emptyMap())
           .build();
     } catch (Exception e) {
@@ -310,7 +310,8 @@ public class PolicyEventMapper {
   }
 
   private PrivilegedEvent getSourceOriginalEvent(CoreEvent event) {
-    return ((InternalEvent) event).getInternalParameter(POLICY_SOURCE_ORIGINAL_EVENT);
+    SourcePolicyContext ctx = SourcePolicyContext.from(event);
+    return ctx != null ? (PrivilegedEvent) ctx.getOriginalEvent() : null;
   }
 
   private Map<String, TypedValue<?>> loadVars(CoreEvent event) {
@@ -319,9 +320,5 @@ public class PolicyEventMapper {
 
   private Map<String, TypedValue<?>> loadVars(CoreEvent event, String policyId) {
     return ((InternalEvent) event).getInternalParameter(policyVarsInternalParameterName(policyId));
-  }
-
-  private MessageSourceResponseParametersProcessor getResponseParamsProcessor(CoreEvent event) {
-    return ((InternalEvent) event).getInternalParameter(POLICY_SOURCE_PARAMETERS_PROCESSOR);
   }
 }

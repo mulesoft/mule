@@ -20,8 +20,9 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.internal.policy.PolicyPointcutParametersManager.POLICY_SOURCE_POINTCUT_PARAMETERS;
+import static org.mule.runtime.core.internal.policy.SourcePolicyContext.SOURCE_POLICY_CONTEXT;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -121,10 +122,15 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
     policiesChangeCallbackCaptor.getValue().run();
 
     final InternalEvent event1 = mock(InternalEvent.class);
-    when(event1.getInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS)).thenReturn(policyParams1);
+
+    SourcePolicyContext ctx = mock(SourcePolicyContext.class);
+    when(ctx.getPointcutParameters()).thenReturn(policyParams1);
+    when(event1.getInternalParameter(SOURCE_POLICY_CONTEXT)).thenReturn(ctx);
 
     final InternalEvent event2 = mock(InternalEvent.class);
-    when(event2.getInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS)).thenReturn(policyParams2);
+    ctx = mock(SourcePolicyContext.class);
+    when(ctx.getPointcutParameters()).thenReturn(policyParams2);
+    when(event2.getInternalParameter(SOURCE_POLICY_CONTEXT)).thenReturn(ctx);
 
     final SourcePolicy policy1 = policyManager.createSourcePolicyInstance(flow1Component, event1, ePub -> ePub,
                                                                           mock(MessageSourceResponseParametersProcessor.class));
@@ -150,7 +156,9 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
     policiesChangeCallbackCaptor.getValue().run();
 
     final InternalEvent event = mock(InternalEvent.class);
-    when(event.getInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS)).thenReturn(policyParams);
+    SourcePolicyContext ctx = mock(SourcePolicyContext.class);
+    when(event.getInternalParameter(SOURCE_POLICY_CONTEXT)).thenReturn(ctx);
+    when(ctx.getPointcutParameters()).thenReturn(policyParams);
 
     final SourcePolicy policy1 = policyManager.createSourcePolicyInstance(flow1Component, event, ePub -> ePub,
                                                                           mock(MessageSourceResponseParametersProcessor.class));
@@ -214,9 +222,14 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
     final PolicyPointcutParameters sourcePolicyParams2 = mock(PolicyPointcutParameters.class);
 
     final InternalEvent event1 = mock(InternalEvent.class);
-    when(event1.getInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS)).thenReturn(sourcePolicyParams1);
+    SourcePolicyContext ctx = mock(SourcePolicyContext.class);
+    when(event1.getInternalParameter(SOURCE_POLICY_CONTEXT)).thenReturn(ctx);
+    when(ctx.getPointcutParameters()).thenReturn(sourcePolicyParams1);
+
     final InternalEvent event2 = mock(InternalEvent.class);
-    when(event2.getInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS)).thenReturn(sourcePolicyParams2);
+    ctx = mock(SourcePolicyContext.class);
+    when(event2.getInternalParameter(SOURCE_POLICY_CONTEXT)).thenReturn(ctx);
+    when(ctx.getPointcutParameters()).thenReturn(sourcePolicyParams2);
 
     final OperationPolicy operationPolicy1 = policyManager.createOperationPolicy(operation1Component, event1,
                                                                                  mock(OperationParametersProcessor.class));

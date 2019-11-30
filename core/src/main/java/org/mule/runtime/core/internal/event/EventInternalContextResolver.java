@@ -11,13 +11,14 @@ import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.policy.PolicyEventMapper;
 
 import java.util.function.Supplier;
 
 /**
  * Resolves initial and mutated event-wide internal Contexts.
  * 
- * For example, this is used for {@link org.mule.runtime.core.internal.policy.PolicyEventMapper} handling nested policies, or
+ * For example, this is used for {@link PolicyEventMapper} handling nested policies, or
  * {@link org.mule.runtime.core.internal.routing.UntilSuccessfulRouter} for handling nested retrial contexts.
  * 
  * @param <CTX> The context type
