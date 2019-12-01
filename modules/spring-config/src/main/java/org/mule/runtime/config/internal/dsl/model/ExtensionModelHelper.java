@@ -333,6 +333,7 @@ public class ExtensionModelHelper {
             protected void onConfiguration(ConfigurationModel model) {
               if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                 delegate.onConfiguration(model);
+                stop();
               }
             }
 
@@ -341,6 +342,7 @@ public class ExtensionModelHelper {
                                                 ConnectionProviderModel model) {
               if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                 delegate.onConnectionProvider(model);
+                stop();
               }
             };
 
@@ -348,6 +350,7 @@ public class ExtensionModelHelper {
             protected void onOperation(HasOperationModels owner, OperationModel model) {
               if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                 delegate.onOperation(model);
+                stop();
               }
             }
 
@@ -355,6 +358,7 @@ public class ExtensionModelHelper {
             protected void onSource(HasSourceModels owner, SourceModel model) {
               if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                 delegate.onSource(model);
+                stop();
               }
             }
 
@@ -362,6 +366,7 @@ public class ExtensionModelHelper {
             protected void onConstruct(HasConstructModels owner, ConstructModel model) {
               if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                 delegate.onConstruct(model);
+                stop();
               }
             }
 
@@ -369,6 +374,7 @@ public class ExtensionModelHelper {
             protected void onNestable(ComposableModel owner, NestableElementModel model) {
               if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                 delegate.onNestableElement(model);
+                stop();
               }
             }
 

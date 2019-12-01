@@ -50,6 +50,7 @@ import org.springframework.beans.factory.config.BeanReference;
 public class SpringComponentModel extends ComponentModel implements ComponentAst {
 
   private final Map<String, ComponentParameterAst> parameterAsts = new HashMap<>();
+  private String componentId;
   private final AtomicBoolean parameterAstsPopulated = new AtomicBoolean(false);
 
   // TODO MULE-9688 Remove this attributes since should not be part of this class. This class should be immutable.
@@ -98,10 +99,8 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
         .orElse(false)) {
       return ofNullable(getRawParameters().get(NAME_ATTRIBUTE_NAME));
     } else if (getModel(ParameterizedModel.class).isPresent()) {
-      return getParameters().stream()
-          .filter(param -> param.getModel().isComponentId())
-          .findAny()
-          .map(param -> (String) param.getValue().getRight());
+      populateParameterAsts();
+      return ofNullable(componentId);
     } else {
       // fallback for dsl elements that do not have an extension model declaration
       return ofNullable(getRawParameters().get(NAME_ATTRIBUTE_NAME));
@@ -159,28 +158,31 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
     }
 
     getModel(ParameterizedModel.class)
-        .ifPresent(parameterizedModel -> {
-          parameterizedModel.getAllParameterModels()
-              .forEach(paramModel -> parameterAsts.computeIfAbsent(paramModel
-                  .getName(), paramNameKey -> findParameterModel(paramNameKey)
-                      .map(foundParamModel -> getRawParameterValue(paramNameKey)
-                          .map(rawParamValue -> new DefaultComponentParameterAst(rawParamValue, () -> foundParamModel))
-                          .orElseGet(() -> new DefaultComponentParameterAst(null, () -> foundParamModel)))
-                      .orElseThrow(() -> {
-                        // Try to provide as much troubleshooting information as possible
-                        final String mxgPrefix = format("Wanted paramName '%s' from object '%s'.", paramNameKey,
-                                                        getModel(NamedObject.class).map(n -> n.getName()).orElse("(null)"));
+        .ifPresent(parameterizedModel -> parameterizedModel.getAllParameterModels().forEach(paramModel -> {
+          final ComponentParameterAst computedParam = parameterAsts.computeIfAbsent(paramModel
+              .getName(), paramNameKey -> findParameterModel(paramNameKey)
+                  .map(foundParamModel -> getRawParameterValue(paramNameKey)
+                      .map(rawParamValue -> new DefaultComponentParameterAst(rawParamValue, () -> foundParamModel))
+                      .orElseGet(() -> new DefaultComponentParameterAst(null, () -> foundParamModel)))
+                  .orElseThrow(() -> {
+                    // Try to provide as much troubleshooting information as possible
+                    final String msgPrefix = format("Wanted paramName '%s' from object '%s'.", paramNameKey,
+                                                    getModel(NamedObject.class).map(n -> n.getName()).orElse("(null)"));
 
-                        if (!getModel(ParameterizedModel.class).isPresent()) {
-                          return new NoSuchElementException(mxgPrefix + " The model is not parameterizable.");
-                        } else {
-                          final List<String> availableParams = getModel(ParameterizedModel.class).get().getAllParameterModels()
-                              .stream()
-                              .map(pm -> pm.getName()).collect(toList());
-                          return new NoSuchElementException(mxgPrefix + " Available: " + availableParams);
-                        }
-                      })));
-        });
+                    if (!getModel(ParameterizedModel.class).isPresent()) {
+                      return new NoSuchElementException(msgPrefix + " The model is not parameterizable.");
+                    } else {
+                      final List<String> availableParams = getModel(ParameterizedModel.class).get().getAllParameterModels()
+                          .stream()
+                          .map(pm -> pm.getName()).collect(toList());
+                      return new NoSuchElementException(msgPrefix + " Available: " + availableParams);
+                    }
+                  }));
+
+          if (paramModel.isComponentId()) {
+            componentId = (String) computedParam.getValue().getRight();
+          }
+        }));
   }
 
   private Optional<ParameterModel> findParameterModel(String paramName) {
@@ -238,32 +240,26 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
 
       @Override
       public boolean tryAdvance(Consumer<? super ComponentAst> action) {
-        return doTryAdvance(action);
-      }
-
-      protected boolean doTryAdvance(Consumer<? super ComponentAst> action) {
         if (!rootProcessed) {
           rootProcessed = true;
           action.accept(SpringComponentModel.this);
           return true;
         }
 
-        if (innerSpliterator == null) {
-          innerSpliterator = directChildrenStream().map(ic -> ic).spliterator();
-        }
+        trySplit();
 
         if (currentChildSpliterator != null) {
           if (currentChildSpliterator.tryAdvance(action)) {
             return true;
           } else {
             currentChildSpliterator = null;
-            return doTryAdvance(action);
+            return tryAdvance(action);
           }
         } else {
           if (innerSpliterator.tryAdvance(cm -> {
             currentChildSpliterator = cm.recursiveSpliterator();
           })) {
-            return doTryAdvance(action);
+            return tryAdvance(action);
           } else {
             return false;
           }
@@ -273,7 +269,7 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
       @Override
       public Spliterator<ComponentAst> trySplit() {
         if (innerSpliterator == null) {
-          innerSpliterator = directChildrenStream().map(ic -> ic).spliterator();
+          innerSpliterator = directChildrenStream().spliterator();
         }
         return null;
       }
