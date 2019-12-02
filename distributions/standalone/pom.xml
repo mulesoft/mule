@@ -277,7 +277,7 @@
         <dependency>
             <groupId>org.mule.tools</groupId>
             <artifactId>mule-tools-anttasks</artifactId>
-            <version>${project.version}</version>
+            <version>3.9.3</version>
             <type>jar</type>
         </dependency>
 
