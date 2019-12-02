@@ -13043,7 +13043,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "300",
+                  "defaultValue": "500",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -15070,7 +15070,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "300",
+                  "defaultValue": "500",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -17130,7 +17130,7 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "300",
+                  "defaultValue": "500",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
