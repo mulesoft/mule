@@ -15,6 +15,7 @@ import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class ConfigurationDependencyResolver {
@@ -39,8 +40,9 @@ public class ConfigurationDependencyResolver {
     return appModelDependencyGraph
         .minimalArtifactFor(new ComponentNamePredicate(componentName))
         .recursiveStream()
-        .filter(comp -> comp.getComponentId().isPresent())
-        .map(comp -> comp.getComponentId().get())
+        .map(ComponentAst::getComponentId)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .filter(name -> !name.equals(componentName))
         .collect(toList());
   }
