@@ -11,7 +11,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
-import static org.mule.runtime.api.util.collection.SmallMap.forSize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
@@ -41,6 +40,7 @@ import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -192,7 +192,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
 
   @Override
   protected InternalEvent resolveParameters(InternalEvent event, Component component, Map<String, String> parameters) {
-    Map<String, ProcessorParameterValue> resolvedParameters = forSize(parameters.size());
+    Map<String, ProcessorParameterValue> resolvedParameters = new HashMap<>();
     for (Map.Entry<String, String> entry : parameters.entrySet()) {
       String providedValue = entry.getValue();
       resolvedParameters.put(entry.getKey(), new DefaultProcessorParameterValue(entry.getKey(), providedValue, () -> {

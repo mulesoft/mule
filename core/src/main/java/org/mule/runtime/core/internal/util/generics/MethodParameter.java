@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.core.internal.util.generics;
 
-import org.mule.runtime.api.util.collection.SmallMap;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -330,7 +329,7 @@ public class MethodParameter {
    */
   private Map<Integer, Integer> getTypeIndexesPerLevel() {
     if (this.typeIndexesPerLevel == null) {
-      this.typeIndexesPerLevel = new SmallMap<>();
+      this.typeIndexesPerLevel = new HashMap<Integer, Integer>(4);
     }
     return this.typeIndexesPerLevel;
   }

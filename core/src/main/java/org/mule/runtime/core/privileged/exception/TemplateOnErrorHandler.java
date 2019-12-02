@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.exception;
 
+import static com.google.common.collect.ImmutableMap.of;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Runtime.getRuntime;
 import static java.util.Arrays.stream;
@@ -19,7 +20,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_START;
-import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher.WILDCARD_TOKEN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -29,7 +29,6 @@ import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
-
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -108,7 +107,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private ComponentLocation location;
 
   private Supplier<FluxSink<CoreEvent>> routingSink;
-
 
   private final class OnErrorHandlerFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
 
@@ -327,13 +325,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
               // When lazy init deployment is used an error-mapping may not be initialized due to the component that declares it
               // could not be part of the minimal application model. So, whenever we found that scenario we have to create the
               // errorType if not present in the repository already.
-              if (configurationProperties
-                  .resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false)) {
-                return errorTypeRepository.addErrorType(errorTypeComponentIdentifier,
-                                                        errorTypeRepository.getAnyErrorType());
+              if (configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false)) {
+                return errorTypeRepository.addErrorType(errorTypeComponentIdentifier, errorTypeRepository.getAnyErrorType());
               }
-              throw new MuleRuntimeException(
-                                             createStaticMessage("Could not find ErrorType for the given identifier: '%s'",
+              throw new MuleRuntimeException(createStaticMessage("Could not find ErrorType for the given identifier: '%s'",
                                                                  parsedIdentifier));
             }));
       }
@@ -360,7 +355,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   /**
    * @deprecated Use {@link #createErrorType(ErrorTypeRepository, String, ConfigurationProperties)} which handles correctly lazy
-   * mule artifact contexts.
+   *             mule artifact contexts.
    */
   @Deprecated
   public static ErrorTypeMatcher createErrorType(ErrorTypeRepository errorTypeRepository, String errorTypeNames) {
@@ -460,6 +455,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
    *
    * @param location
    * @return copy of this ErrorHandler with location to retrieve {@link ProcessingStrategy}
+   *
    * @since 4.3.0
    */
   public abstract TemplateOnErrorHandler duplicateFor(Location location);

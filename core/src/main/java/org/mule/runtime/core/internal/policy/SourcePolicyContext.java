@@ -14,12 +14,27 @@ import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.util.Map;
 
+/**
+ * Holds all the context information for an operation policy to function
+ *
+ * @since 4.3.0
+ */
 public class SourcePolicyContext {
 
+  /**
+   * The key under which an instance of this class is stored as an internal parameter in a {@link InternalEvent}
+   */
   public static final String SOURCE_POLICY_CONTEXT = "source.policy.context";
 
-  public static SourcePolicyContext from(CoreEvent result) {
-    return ((InternalEvent) result).getInternalParameter(SOURCE_POLICY_CONTEXT);
+  /**
+   * Extracts an instance stored as an internal parameter in the given {@code result} under the {@link #SOURCE_POLICY_CONTEXT}
+   * key
+   *
+   * @param event
+   * @return an {@link OperationPolicyContext} or {@code null} if none was set on the event
+   */
+  public static SourcePolicyContext from(CoreEvent event) {
+    return ((InternalEvent) event).getInternalParameter(SOURCE_POLICY_CONTEXT);
   }
 
   private final PolicyPointcutParameters pointcutParameters;

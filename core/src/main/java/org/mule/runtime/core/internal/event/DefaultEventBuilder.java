@@ -8,13 +8,12 @@ package org.mule.runtime.core.internal.event;
 
 
 import static java.lang.System.lineSeparator;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
-import static org.mule.runtime.api.util.collection.SmallMap.copy;
-import static org.mule.runtime.api.util.collection.SmallMap.unmodifiable;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsBytes;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsString;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
@@ -35,7 +34,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -84,7 +82,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.context = messageContext;
     this.session = new DefaultMuleSession();
     this.originalVars = emptyCaseInsensitiveMap();
-    this.internalParameters = new SmallMap<>();
+    this.internalParameters = new HashMap<>(INTERNAL_PARAMETERS_INITIAL_CAPACITY);
     internalParametersInitialized = true;
   }
 
@@ -187,7 +185,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     if ((flowVariables != null && !this.flowVariables.isEmpty()) || !this.originalVars.isEmpty()) {
       this.varsModified = true;
       this.modified = true;
-      //flowVariables = basedOn(new SmallMap<>());
       flowVariables = new CaseInsensitiveHashMap<>();
     }
     return this;
@@ -208,15 +205,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     initInternalParameters();
 
     internalParameters.put(key, value);
-    this.modified = true;
-    return this;
-  }
-
-  @Override
-  public Builder addInternalParameters(Map<String, Object> internalParameters) {
-    initInternalParameters();
-
-    this.internalParameters.putAll(internalParameters);
     this.modified = true;
     return this;
   }
@@ -302,16 +290,16 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   }
 
   protected void initVariables() {
-    if (!varsModified && flowVariables == null) {
-      flowVariables = new CaseInsensitiveHashMap<>(originalVars);
-      //flowVariables = basedOn(forSize(originalVars.size()));
-      //flowVariables.putAll(originalVars);
+    if (!varsModified) {
+      if (flowVariables == null) {
+        flowVariables = new CaseInsensitiveHashMap<>(originalVars);
+      }
     }
   }
 
   protected void initInternalParameters() {
     if (!internalParametersInitialized) {
-      internalParameters = copy(internalParameters);
+      internalParameters = new HashMap<>(internalParameters);
       internalParametersInitialized = true;
     }
   }
@@ -341,9 +329,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Immutable MuleEvent state
-     **/
+    /** Immutable MuleEvent state **/
 
     private final BaseEventContext context;
     // TODO MULE-10013 make this final
@@ -374,7 +360,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.legacyCorrelationId = null;
       this.error = null;
       this.itemSequenceInfo = null;
-      this.internalParameters = new SmallMap<>();
+      this.internalParameters = new HashMap<>(INTERNAL_PARAMETERS_INITIAL_CAPACITY);
     }
 
     // Use this constructor from the builder
@@ -459,7 +445,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     /**
      * Returns the message contents for logging
      *
-     * @param encoding    the encoding to use when converting bytes to a string, if necessary
+     * @param encoding the encoding to use when converting bytes to a string, if necessary
      * @param muleContext the Mule node.
      * @return the message contents as a string
      * @throws MuleException if the message cannot be converted into a string
@@ -550,7 +536,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     @Override
     public Map<String, ?> getInternalParameters() {
-      return unmodifiable(internalParameters);
+      return unmodifiableMap(internalParameters);
     }
 
     @Override

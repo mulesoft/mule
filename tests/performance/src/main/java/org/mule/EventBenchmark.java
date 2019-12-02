@@ -6,8 +6,8 @@
  */
 package org.mule;
 
+import static java.util.Collections.singletonMap;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
@@ -175,7 +175,7 @@ public class EventBenchmark extends AbstractBenchmark {
 
   @Benchmark
   public CoreEvent quickCopyInternalParameters() {
-    return InternalEvent.builder(quickCopy(quickCopy(event, of("k1", "v1")), of("k2", "v2")))
+    return InternalEvent.builder(quickCopy(quickCopy(event, singletonMap("k1", "v1")), singletonMap("k2", "v2")))
         .addInternalParameter("k3", "v3")
         .build();
   }

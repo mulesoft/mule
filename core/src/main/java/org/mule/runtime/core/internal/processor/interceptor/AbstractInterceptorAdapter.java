@@ -8,13 +8,10 @@ package org.mule.runtime.core.internal.processor.interceptor;
 
 import static java.lang.String.valueOf;
 import static java.util.Collections.emptyMap;
-import static org.mule.runtime.api.util.collection.SmallMap.forSize;
-import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_PARAMS;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.interception.ProcessorParameterValue;
 import org.mule.runtime.core.api.MuleContext;
@@ -25,6 +22,7 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -75,7 +73,7 @@ class AbstractInterceptorAdapter {
   }
 
   protected InternalEvent resolveParameters(InternalEvent event, Component component, Map<String, String> parameters) {
-    Map<String, ProcessorParameterValue> resolvedParameters = forSize(parameters.size());
+    Map<String, ProcessorParameterValue> resolvedParameters = new HashMap<>();
     for (Map.Entry<String, String> entry : parameters.entrySet()) {
       String providedValue = entry.getValue();
       resolvedParameters.put(entry.getKey(), new DefaultProcessorParameterValue(entry.getKey(), providedValue, () -> {
@@ -97,8 +95,10 @@ class AbstractInterceptorAdapter {
   protected InternalEvent setInternalParamsForNotParamResolver(Component component,
                                                                Map<String, ProcessorParameterValue> resolvedParameters,
                                                                InternalEvent event, InternalEvent.Builder builder) {
-    return quickCopy(event, of(INTERCEPTION_RESOLVED_PARAMS, resolvedParameters,
-                               INTERCEPTION_COMPONENT, component));
+    Map<String, Object> interceptionEventParams = new HashMap<>();
+    interceptionEventParams.put(INTERCEPTION_RESOLVED_PARAMS, resolvedParameters);
+    interceptionEventParams.put(INTERCEPTION_COMPONENT, component);
+    return quickCopy(event, interceptionEventParams);
   }
 
   protected MessagingException createMessagingException(CoreEvent event, Throwable cause, Component processor,

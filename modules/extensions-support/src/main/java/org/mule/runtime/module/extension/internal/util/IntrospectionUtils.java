@@ -77,7 +77,6 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
@@ -174,7 +173,7 @@ public final class IntrospectionUtils {
 
   /**
    * Set caches in spring so that they are weakly (and not softly) referenced by default.
-   * 
+   *
    * For example, {@link ResolvableType} or {@link CachedIntrospectionResults} may retain classloaders when introspection is used.
    */
   private static void setWeakHashCaches() {
@@ -287,7 +286,7 @@ public final class IntrospectionUtils {
 
   /**
    * Based on a {@link ExtensionModel}, determines if this one has been created using the Java AST.
-   * 
+   *
    * @param model Extension model to introspect
    * @return a boolean indicating whether the {@link ExtensionModel} was created using the Java AST or using compiled classes
    */
@@ -298,7 +297,7 @@ public final class IntrospectionUtils {
 
   /**
    * Based on a {@link BaseDeclaration}, determines if this one has been created using the Java AST.
-   * 
+   *
    * @param model Base Declaration to introspect
    * @return a boolean indicating whether the {@link BaseDeclaration} was created using the Java AST or using compiled classes
    */
@@ -629,7 +628,7 @@ public final class IntrospectionUtils {
       return stream(searchClass.getGenerics()).map(resolvableType -> resolvableType.getType()).collect(toList());
     }
 
-    Map<String, java.lang.reflect.Type> genericTypes = new SmallMap<>();
+    Map<String, java.lang.reflect.Type> genericTypes = new HashMap<>();
 
     addGenericsToMap(genericTypes, searchClass);
 
@@ -748,7 +747,7 @@ public final class IntrospectionUtils {
                                                 superClass.getName()));
     }
 
-    Map<String, java.lang.reflect.Type> genericTypes = new SmallMap<>();
+    Map<String, java.lang.reflect.Type> genericTypes = new HashMap<>();
 
     while (!Object.class.equals(searchType.getType())) {
 

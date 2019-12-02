@@ -6,8 +6,6 @@
  */
 package org.mule.test.module.extension.config;
 
-import static java.util.Arrays.asList;
-import static org.apache.commons.lang3.ArrayUtils.toObject;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
@@ -15,7 +13,6 @@ import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEA
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -24,8 +21,12 @@ import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.module.extension.AbstractHeisenbergConfigTestCase;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 public abstract class AbstractConfigParserTestCase extends AbstractHeisenbergConfigTestCase {
 
@@ -56,10 +57,14 @@ public abstract class AbstractConfigParserTestCase extends AbstractHeisenbergCon
 
   protected static final String SEASON_1_KEY = "s01";
   protected static final String SEASON_2_KEY = "s02";
-  protected static final List<Long> MONTHLY_INCOMES = asList(toObject(new long[] {12000, 500}));
-  protected static final Map<String, List<String>> DEATHS_BY_SEASON = SmallMap.of(
-                                                                                  SEASON_1_KEY, asList("emilio", "domingo"),
-                                                                                  SEASON_2_KEY, asList("tuco", "tortuga"));
+  protected static final List<Long> MONTHLY_INCOMES = Arrays.asList(ArrayUtils.toObject(new long[] {12000, 500}));
+  protected static final Map<String, List<String>> DEATHS_BY_SEASON = new HashMap<String, List<String>>() {
+
+    {
+      put(SEASON_1_KEY, Arrays.asList("emilio", "domingo"));
+      put(SEASON_2_KEY, Arrays.asList("tuco", "tortuga"));
+    }
+  };
 
   private static Registry staticRegistry;
 

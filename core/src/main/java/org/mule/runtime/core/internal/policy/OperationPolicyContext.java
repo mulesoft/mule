@@ -11,12 +11,27 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
+/**
+ * Holds all the context information for an operation policy to function
+ *
+ * @since 4.3.0
+ */
 public class OperationPolicyContext {
 
+  /**
+   * The key under which an instance of this class is stored as an internal parameter in a {@link InternalEvent}
+   */
   public static final String OPERATION_POLICY_CONTEXT = "operation.policy.context";
 
-  public static OperationPolicyContext from(CoreEvent result) {
-    return ((InternalEvent) result).getInternalParameter(OPERATION_POLICY_CONTEXT);
+  /**
+   * Extracts an instance stored as an internal parameter in the given {@code result} under the {@link #OPERATION_POLICY_CONTEXT}
+   * key
+   *
+   * @param event
+   * @return an {@link OperationPolicyContext} or {@code null} if none was set on the event
+   */
+  public static OperationPolicyContext from(CoreEvent event) {
+    return ((InternalEvent) event).getInternalParameter(OPERATION_POLICY_CONTEXT);
   }
 
   private CoreEvent originalEvent;
