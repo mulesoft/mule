@@ -13,7 +13,7 @@ import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_START;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
 
@@ -35,7 +35,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.List;
@@ -78,7 +77,7 @@ public class PolicyChain extends AbstractComponent
 
   @Override
   public final void initialise() throws InitialisationException {
-    processorChain = newChain(ofNullable(processingStrategy), processors);
+    processorChain = buildNewChainWithListOfProcessors(ofNullable(processingStrategy), processors);
     initialiseIfNeeded(processorChain, muleContext);
 
     notificationHelper = new PolicyNotificationHelper(notificationManager, muleContext.getConfiguration().getId(), this);
@@ -121,14 +120,16 @@ public class PolicyChain extends AbstractComponent
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
-        .doOnNext(pushBeforeNextFlowStackElement()
-            .andThen(req -> ((BaseEventContext) req.getContext())
-                .onResponse((resp, t) -> popFlowFlowStackElement().accept(req)))
-            .andThen(notificationHelper.notification(PROCESS_START)))
-        .compose(eventPub -> applyWithChildContext(eventPub, processorChain,
+        .compose(eventPub -> applyWithChildContext(eventPub,
+                                                   p -> from(p)
+                                                       .doOnNext(pushBeforeNextFlowStackElement()
+                                                           .andThen(notificationHelper.notification(PROCESS_START)))
+                                                       .transform(processorChain)
+                                                       .doOnNext(popFlowFlowStackElement()
+                                                           .andThen(e -> notificationHelper.fireNotification(e, null,
+                                                                                                             PROCESS_END))),
                                                    ofNullable(getLocation()),
-                                                   policyChainErrorHandler()))
-        .doOnNext(e -> notificationHelper.fireNotification(e, null, PROCESS_END));
+                                                   policyChainErrorHandler()));
   }
 
   public MuleContext getMuleContext() {
@@ -142,6 +143,7 @@ public class PolicyChain extends AbstractComponent
       public void onError(Exception exception) {
         MessagingException t = (MessagingException) exception;
         notificationHelper.fireNotification(t.getEvent(), t, PROCESS_END);
+        popFlowFlowStackElement().accept(t.getEvent());
         onError.ifPresent(onError -> onError.accept(t));
       }
     };

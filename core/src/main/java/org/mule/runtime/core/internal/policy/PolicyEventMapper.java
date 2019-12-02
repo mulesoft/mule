@@ -7,25 +7,20 @@
 package org.mule.runtime.core.internal.policy;
 
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
 import static org.mule.runtime.core.internal.policy.OperationPolicyContext.from;
-import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_EVENT_CTX_IDS;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
-import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
-import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
 
 /**
@@ -37,8 +32,6 @@ public class PolicyEventMapper {
   private static final Logger LOGGER = getLogger(PolicyEventMapper.class);
 
   private final String policyVarsInternalParameterName;
-  private EventInternalContextResolver<Set<String>> nextEventIdCtxResolver =
-      new EventInternalContextResolver<>(POLICY_NEXT_EVENT_CTX_IDS, () -> emptySet());
 
   public PolicyEventMapper() {
     this(null);
@@ -279,16 +272,11 @@ public class PolicyEventMapper {
   private CoreEvent onPolicyNext(CoreEvent event, boolean propagate) {
     PrivilegedEvent originalEvent = getOriginalEvent(event);
 
-    Set<String> currentNextEventIdCtx = nextEventIdCtxResolver.getCurrentContextFromEvent(event);
-
     return InternalEvent
         .builder(event)
         .message(propagate ? event.getMessage() : originalEvent.getMessage())
         .variables(originalEvent.getVariables())
         .addInternalParameter(policyVarsInternalParameterName(), event.getVariables())
-        .addInternalParameter(POLICY_NEXT_EVENT_CTX_IDS,
-                              ImmutableSet.<String>builder().addAll(currentNextEventIdCtx).add(event.getContext().getId())
-                                  .build())
         .build();
   }
 

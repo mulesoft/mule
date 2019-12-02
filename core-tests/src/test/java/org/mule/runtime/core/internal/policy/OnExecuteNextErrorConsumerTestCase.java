@@ -13,7 +13,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
-import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_EVENT_CTX_IDS;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.LocationPart;
@@ -22,8 +21,6 @@ import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import com.google.common.collect.ImmutableSet;
 
 import java.util.function.Function;
 
@@ -59,7 +56,6 @@ public class OnExecuteNextErrorConsumerTestCase extends AbstractMuleTestCase {
     MessagingException messagingException = mock(MessagingException.class);
 
     when(initialEvent.getContext().getId()).thenReturn(EVENT_ID);
-    when(initialEvent.getInternalParameter(POLICY_NEXT_EVENT_CTX_IDS)).thenReturn(ImmutableSet.of(EVENT_ID));
     when(updatedEvent.getFlowCallStack()).thenReturn(flowCallStack);
     when(messagingException.getEvent()).thenReturn(initialEvent);
     when(location.getParts()).thenReturn(newArrayList(mock(LocationPart.class), mock(LocationPart.class)));
@@ -67,7 +63,6 @@ public class OnExecuteNextErrorConsumerTestCase extends AbstractMuleTestCase {
     consumer.accept(messagingException);
 
     verify(notificationHelper).fireNotification(updatedEvent, messagingException, AFTER_NEXT);
-    verify(updatedEvent.getContext()).error(messagingException);
     verify(flowCallStack).push(any());
   }
 }

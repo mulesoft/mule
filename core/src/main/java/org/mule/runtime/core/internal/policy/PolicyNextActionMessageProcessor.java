@@ -26,6 +26,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.function.Consumer;
 
@@ -47,7 +48,6 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   private static final Logger LOGGER = getLogger(PolicyNextActionMessageProcessor.class);
 
   public static final String POLICY_NEXT_OPERATION = "policy.nextOperation";
-  public static final String POLICY_NEXT_EVENT_CTX_IDS = "policy.next.eventCtxIds";
   public static final String POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS = "policy.isPropagateMessageTransformations";
 
   @Inject
@@ -95,7 +95,10 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
                               getPolicyId());
         })
         .map(policyEventMapper::fromPolicyNext)
-        .onErrorContinue(MessagingException.class, (error, v) -> onExecuteNextErrorConsumer.accept(error));
+        .onErrorContinue(MessagingException.class, (error, v) -> {
+          onExecuteNextErrorConsumer.accept(error);
+          ((BaseEventContext) ((MessagingException) error).getEvent().getContext()).error(error);
+        });
   }
 
   private Consumer<CoreEvent> pushAfterNextFlowStackElement() {
