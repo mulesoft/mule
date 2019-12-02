@@ -173,10 +173,15 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
-        .doOnNext(this::pushFlowStackEntry)
-        .transform(eventPub -> applyWithChildContext(from(eventPub).map(this::createEventWithParameters),
-                                                     nestedChain, ofNullable(getLocation()), errorHandler()))
-        .doOnNext(event -> ((DefaultFlowCallStack) event.getFlowCallStack()).pop())
+        .map(this::createEventWithParameters)
+        .transform(eventPub -> applyWithChildContext(eventPub,
+                                                     p -> from(p)
+                                                         .doOnNext(this::pushFlowStackEntry)
+                                                         .transform(nestedChain)
+                                                         .doOnNext(event -> ((DefaultFlowCallStack) event.getFlowCallStack())
+                                                             .pop()),
+                                                     ofNullable(getLocation()),
+                                                     errorHandler()))
         .map(eventResult -> processResult(getInternalParameter(ORIGINAL_EVENT_KEY, eventResult), eventResult));
   }
 
@@ -244,6 +249,11 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
           }
         }
         messagingException.setProcessedEvent(builder.build());
+      }
+
+      @Override
+      public String toString() {
+        return ModuleOperationMessageProcessor.class.getSimpleName() + ".errorHandler @ " + getLocation().getLocation();
       }
     };
   }
