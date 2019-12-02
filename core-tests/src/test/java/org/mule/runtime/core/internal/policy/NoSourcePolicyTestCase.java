@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.block;
+import static org.mule.runtime.core.internal.policy.SourcePolicyContext.SOURCE_POLICY_CONTEXT;
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.functional.Either;
@@ -25,6 +26,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Map;
@@ -42,16 +44,17 @@ public class NoSourcePolicyTestCase extends AbstractMuleTestCase {
 
   private NoSourcePolicy noSourcePolicy;
 
-  private final CoreEvent initialEvent = mock(InternalEvent.class, RETURNS_DEEP_STUBS);
+  private final InternalEvent initialEvent = mock(InternalEvent.class, RETURNS_DEEP_STUBS);
   private final MessageSourceResponseParametersProcessor respParametersProcessor =
       mock(MessageSourceResponseParametersProcessor.class, RETURNS_DEEP_STUBS);
 
   private CoreEvent updatedEvent;
-
   private ReactiveProcessor flowProcessor = Mockito.mock(ReactiveProcessor.class);
+  private SourcePolicyContext sourcePolicyContext;
 
   @Before
   public void setUp() throws Exception {
+    sourcePolicyContext = new SourcePolicyContext(mock(PolicyPointcutParameters.class));
     flowProcessor = coreEventPublisher -> Flux.from(coreEventPublisher).map(event -> {
       updatedEvent = event;
       return updatedEvent;
@@ -60,6 +63,7 @@ public class NoSourcePolicyTestCase extends AbstractMuleTestCase {
     noSourcePolicy = new NoSourcePolicy(flowProcessor);
 
     when(initialEvent.getVariables()).thenReturn(new CaseInsensitiveHashMap<>());
+    when(initialEvent.getInternalParameter(SOURCE_POLICY_CONTEXT)).thenReturn(sourcePolicyContext);
   }
 
   @Test

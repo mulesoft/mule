@@ -210,6 +210,7 @@ public class PolicyEventMapper {
       throws MessagingException {
     try {
       SourcePolicyContext ctx = SourcePolicyContext.from(flowResult);
+
       Map<String, Object> originalResponseParameters =
           ctx.getResponseParametersProcessor()
               .getSuccessfulExecutionResponseParametersFunction()

@@ -65,7 +65,9 @@ class CommonSourcePolicy {
     readWriteLock.withReadLock(() -> {
       if (!disposed.get()) {
         SourcePolicyContext ctx = SourcePolicyContext.from(sourceEvent);
-        ctx.configure(respParamProcessor, callback);
+        if (ctx != null) {
+          ctx.configure(respParamProcessor, callback);
+        }
 
         policySink.get().next(sourceEvent);
       } else {

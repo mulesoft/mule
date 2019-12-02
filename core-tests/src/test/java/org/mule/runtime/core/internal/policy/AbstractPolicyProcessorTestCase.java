@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static com.google.common.collect.ImmutableMap.of;
 import static java.util.UUID.randomUUID;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,14 +15,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static org.mule.runtime.core.internal.policy.OperationPolicyContext.OPERATION_POLICY_CONTEXT;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
+import static org.mule.runtime.core.internal.policy.SourcePolicyContext.SOURCE_POLICY_CONTEXT;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.subscriberContext;
 
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -33,6 +36,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder;
+import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.message.StringAttributes;
 
@@ -40,8 +44,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.reactivestreams.Publisher;
-
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCase {
@@ -49,11 +51,6 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   private static final String PAYLOAD = "payload";
 
   protected static final Message MESSAGE = Message.builder().value(PAYLOAD).attributesValue(new StringAttributes()).build();
-
-  private static final String INIT_VAR_NAME = "initVarName";
-  private static final String INIT_VAR_VALUE = "initVarValue";
-  private static final String ADDED_VAR_NAME = "addedVarName";
-  private static final String ADDED_VAR_VALUE = "addedVarValue";
 
   private final MuleContext muleContext = mockContextWithServices();
   protected Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
@@ -63,6 +60,8 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   protected ReactiveProcessor policyProcessor;
   protected ArgumentCaptor<Publisher> eventCaptor = ArgumentCaptor.forClass(Publisher.class);
   private final FlowConstruct mockFlowConstruct = mock(FlowConstruct.class, RETURNS_DEEP_STUBS);
+  private SourcePolicyContext sourcePolicyContext;
+  private OperationPolicyContext operationPolicyContext;
 
   @Before
   public void before() {
@@ -70,7 +69,11 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     when(policy.getPolicyChain().isPropagateMessageTransformations()).thenReturn(true);
 
     executionId = randomUUID().toString();
+    operationPolicyContext = mock(OperationPolicyContext.class, RETURNS_DEEP_STUBS);
+    sourcePolicyContext = new SourcePolicyContext(mock(PolicyPointcutParameters.class));
     initialEvent = createTestEvent();
+    initialEvent = quickCopy(initialEvent, of(OPERATION_POLICY_CONTEXT, operationPolicyContext,
+                                              SOURCE_POLICY_CONTEXT, sourcePolicyContext));
 
     when(flowProcessor.apply(any())).thenAnswer(invocation -> invocation.getArgument(0));
     policyProcessor = getProcessor();
