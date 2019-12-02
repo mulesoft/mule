@@ -182,13 +182,13 @@ public class CompositeOperationPolicy
         .doOnComplete(() -> sinkRecorder.complete());
 
     return subscribeFluxOnPublisherSubscription(create(sinkRecorder)
-                                                    .map(result -> {
-                                                      result.applyRight(t -> {
-                                                        throw propagate(t);
-                                                      });
-                                                      return result.getLeft();
-                                                    }), doOnNext)
-        .doOnNext(response -> from(response).setNextOperationResponse((InternalEvent) response));
+        .map(result -> {
+          result.applyRight(t -> {
+            throw propagate(t);
+          });
+          return result.getLeft();
+        }), doOnNext)
+            .doOnNext(response -> from(response).setNextOperationResponse((InternalEvent) response));
   }
 
   private Map<String, Object> resolveOperationParameters(CoreEvent event, OperationPolicyContext ctx) {

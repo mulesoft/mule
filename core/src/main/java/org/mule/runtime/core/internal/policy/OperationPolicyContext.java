@@ -27,9 +27,9 @@ public class OperationPolicyContext {
   private InternalEvent nextOperationResponse;
 
   public OperationPolicyContext(OperationParametersProcessor operationParametersProcessor,
-                        OperationExecutionFunction operationExecutionFunction,
-                        BaseEventContext operationChildContext,
-                        ExecutorCallback operationCallerCallback) {
+                                OperationExecutionFunction operationExecutionFunction,
+                                BaseEventContext operationChildContext,
+                                ExecutorCallback operationCallerCallback) {
     this.operationParametersProcessor = operationParametersProcessor;
     this.operationExecutionFunction = operationExecutionFunction;
     this.operationChildContext = operationChildContext;

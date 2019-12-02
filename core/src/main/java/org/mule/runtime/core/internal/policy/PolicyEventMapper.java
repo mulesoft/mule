@@ -248,8 +248,8 @@ public class PolicyEventMapper {
       SourcePolicyContext ctx = SourcePolicyContext.from(event);
 
       Map<String, Object> originalFailureResponseParameters = ctx.getResponseParametersProcessor()
-              .getFailedExecutionResponseParametersFunction()
-              .apply(event);
+          .getFailedExecutionResponseParametersFunction()
+          .apply(event);
       ctx.setOriginalFailureResponseParameters(originalFailureResponseParameters);
 
       Message message =

@@ -84,7 +84,8 @@ public class PolicyPointcutParametersManager {
       }
     }
 
-    PolicyPointcutParameters sourceParameters = from(event).getPointcutParameters();
+    SourcePolicyContext ctx = from(event);
+    PolicyPointcutParameters sourceParameters = ctx != null ? ctx.getPointcutParameters() : null;
 
     if (found != null) {
       try {
@@ -99,7 +100,7 @@ public class PolicyPointcutParametersManager {
 
   private void throwMoreThanOneFactoryFoundException(ComponentIdentifier sourceIdentifier, Class factoryClass) {
     throw new MuleRuntimeException(createStaticMessage(format(
-        "More than one %s for component %s was found. There should be only one.",
-        factoryClass.getName(), sourceIdentifier)));
+                                                              "More than one %s for component %s was found. There should be only one.",
+                                                              factoryClass.getName(), sourceIdentifier)));
   }
 }

@@ -64,12 +64,12 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
                                                            parametersProcessor));
               })
               .doOnNext(result -> result.apply(spfr -> {
-                                                 CoreEvent event = spfr.getMessagingException().getEvent();
-                                                 SourcePolicyContext ctx = from(event);
-                                                 commonPolicy.finishFlowProcessing(event,
-                                                                                   result,
-                                                                                   spfr.getMessagingException(), ctx);
-                                               },
+                CoreEvent event = spfr.getMessagingException().getEvent();
+                SourcePolicyContext ctx = from(event);
+                commonPolicy.finishFlowProcessing(event,
+                                                  result,
+                                                  spfr.getMessagingException(), ctx);
+              },
                                                spsr -> commonPolicy.finishFlowProcessing(spsr.getResult(), result)))
               .onErrorContinue(MessagingException.class, (t, e) -> {
                 final MessagingException me = (MessagingException) t;
