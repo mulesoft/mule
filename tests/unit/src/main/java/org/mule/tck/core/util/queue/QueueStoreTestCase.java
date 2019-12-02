@@ -6,6 +6,7 @@
  */
 package org.mule.tck.core.util.queue;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
@@ -13,6 +14,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.util.queue.QueueConfiguration.MAXIMUM_CAPACITY;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.store.ObjectStoreException;
@@ -21,14 +24,15 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.util.queue.QueueStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Map;
+
 import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Answers;
-
-import java.io.Serializable;
-import java.util.ArrayList;
 
 public abstract class QueueStoreTestCase extends AbstractMuleContextTestCase {
 
@@ -41,6 +45,11 @@ public abstract class QueueStoreTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
+  }
 
   @Test
   public void offerAndPollSingleValue() throws InterruptedException, ObjectStoreException {

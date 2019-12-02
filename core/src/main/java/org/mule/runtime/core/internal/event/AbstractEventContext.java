@@ -401,7 +401,8 @@ abstract class AbstractEventContext implements BaseEventContext {
     return (this == highlight ? "=> " : "") + basicToString()
         + lineSeparator()
         + childContexts.stream()
-            .map(ctx -> leftPad("", (1 + level) * TO_STRING_TAB_SIZE) + ((AbstractEventContext) ctx).detailedToString(1 + level, highlight))
+            .map(ctx -> leftPad("", (1 + level) * TO_STRING_TAB_SIZE)
+                + ((AbstractEventContext) ctx).detailedToString(1 + level, highlight))
             .collect(joining(lineSeparator()));
   }
 

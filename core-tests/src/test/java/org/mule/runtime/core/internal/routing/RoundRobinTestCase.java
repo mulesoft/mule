@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.message.Message.of;
@@ -22,12 +21,13 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -74,11 +74,11 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
-    ConfigurationComponentLocator configurationComponentLocator = mock(ConfigurationComponentLocator.class);
-    when(configurationComponentLocator.find(any(Location.class))).thenReturn(empty());
-    when(configurationComponentLocator.find(any(ComponentIdentifier.class))).thenReturn(emptyList());
+    when(componentLocator.find(any(Location.class))).thenReturn(empty());
+    when(componentLocator.find(any(ComponentIdentifier.class))).thenReturn(emptyList());
 
-    return singletonMap(REGISTRY_KEY, configurationComponentLocator);
+    return of(REGISTRY_KEY, componentLocator,
+              OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @Test

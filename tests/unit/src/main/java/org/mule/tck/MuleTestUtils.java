@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
@@ -53,6 +54,8 @@ import org.mockito.Mockito;
  * Utilities for creating test and Mock Mule objects
  */
 public final class MuleTestUtils {
+
+  public static final String OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY = "errorTypeRegistry";
 
   public static final String APPLE_SERVICE = "appleService";
   public static final String APPLE_FLOW = "appleFlow";

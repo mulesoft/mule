@@ -6,13 +6,17 @@
  */
 package org.mule.runtime.core.internal.el.context;
 
+import static java.util.Collections.singletonMap;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mule.mvel2.optimizers.OptimizerFactory.DYNAMIC;
 import static org.mule.mvel2.optimizers.OptimizerFactory.SAFE_REFLECTIVE;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
+
 import org.mule.mvel2.ImmutableElementException;
 import org.mule.mvel2.PropertyAccessException;
 import org.mule.mvel2.optimizers.OptimizerFactory;
@@ -21,14 +25,15 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -44,6 +49,11 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
 
   public AbstractELTestCase(String mvelOptimizer) {
     OptimizerFactory.setDefaultOptimizer(mvelOptimizer);
+  }
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @Before

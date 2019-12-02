@@ -8,6 +8,7 @@ package org.mule.functional.transformer.simple;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -24,6 +25,8 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
@@ -47,6 +50,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.nio.charset.Charset;
+import java.util.Map;
 
 import javax.activation.MimeTypeParseException;
 
@@ -81,7 +85,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
   private CoreEvent event;
   private Message message;
   private TypedValue typedValue;
-  private AbstractAddVariablePropertyProcessor addVariableProcessor;
+  private final AbstractAddVariablePropertyProcessor addVariableProcessor;
   private ExpressionManagerSession mockSession;
   private CheckedRunnable afterAssertions;
 
@@ -109,6 +113,11 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     event = createTestEvent(message);
 
     afterAssertions = () -> verify(streamingManager, never()).manage(any(CursorProvider.class), any(EventContext.class));
+  }
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @After

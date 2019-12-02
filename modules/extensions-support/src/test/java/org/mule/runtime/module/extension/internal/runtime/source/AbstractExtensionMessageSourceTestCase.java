@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -26,6 +27,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_M
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
@@ -68,6 +70,7 @@ import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
+import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
 import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamProviderFactory;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
@@ -85,12 +88,10 @@ import org.mule.runtime.module.extension.internal.loader.java.property.MediaType
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.After;
@@ -199,9 +200,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
     ErrorTypeRepository errorTypeRepository = mock(ErrorTypeRepository.class);
     when(errorTypeRepository.getErrorType(FLOW_BACK_PRESSURE)).thenReturn(of(mock(ErrorType.class)));
 
-    Map<String, Object> registryObjects = new HashMap<>();
-    registryObjects.put("errorTypeRepository", errorTypeRepository);
-    return registryObjects;
+    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, errorTypeRepository);
   }
 
   @Before

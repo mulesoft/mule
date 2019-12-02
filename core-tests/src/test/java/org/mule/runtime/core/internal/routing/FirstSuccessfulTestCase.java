@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.instanceOf;
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
@@ -15,10 +15,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -32,10 +32,13 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-import org.mule.runtime.core.privileged.routing.CouldNotRouteOutboundMessageException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.Map;
+
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
@@ -46,6 +49,11 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   public FirstSuccessfulTestCase() {
     setStartContext(true);
+  }
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @Test

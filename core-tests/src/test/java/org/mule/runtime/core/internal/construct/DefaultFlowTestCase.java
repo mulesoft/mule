@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.construct;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
@@ -33,9 +34,10 @@ import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static reactor.core.publisher.Mono.just;
 
-import io.qameta.allure.Issue;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -60,6 +62,7 @@ import org.mule.tck.core.lifecycle.LifecycleTrackerProcessor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 
@@ -73,6 +76,8 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.InOrder;
 import org.reactivestreams.Publisher;
+
+import io.qameta.allure.Issue;
 import reactor.core.publisher.Flux;
 
 @RunWith(Parameterized.class)
@@ -128,6 +133,12 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
         .processors(processors)
         .initialState(INITIAL_STATE_STOPPED)
         .build();
+  }
+
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @Override

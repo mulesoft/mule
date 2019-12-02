@@ -8,6 +8,7 @@ package org.mule.functional.transformer.simple;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -15,6 +16,8 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -32,13 +35,14 @@ import org.mule.runtime.core.privileged.processor.simple.AbstractRemoveVariableP
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.nio.charset.Charset;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.nio.charset.Charset;
-import java.util.HashSet;
-import java.util.Set;
 
 @SmallTest
 public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends AbstractMuleContextTestCase {
@@ -53,10 +57,10 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
 
   private Message message;
   private CoreEvent event;
-  private MuleContext mockMuleContext = mock(MuleContext.class);
-  private ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
+  private final MuleContext mockMuleContext = mock(MuleContext.class);
+  private final ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
   private TypedValue typedValue;
-  private AbstractRemoveVariablePropertyProcessor removeVariableProcessor;
+  private final AbstractRemoveVariablePropertyProcessor removeVariableProcessor;
   private ExpressionManagerSession mockSession;
 
   public AbstractRemoveVariablePropertyProcessorTestCase(AbstractRemoveVariablePropertyProcessor abstractAddVariableProcessor) {
@@ -75,6 +79,11 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
     when(mockExpressionManager.openSession(any(), any(), any())).thenReturn(mockSession);
     when(mockSession.evaluate(eq(EXPRESSION), eq(STRING))).thenReturn(typedValue);
     removeVariableProcessor.setMuleContext(mockMuleContext);
+  }
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   protected CoreEvent createTestEvent(final Message message) throws MuleException {

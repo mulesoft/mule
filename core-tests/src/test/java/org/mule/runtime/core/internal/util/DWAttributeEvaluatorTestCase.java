@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,6 +21,9 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -52,13 +56,18 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   private static final String DW_CAR_LIST = "#[[{color : 'RED', price: 1000}]]";
   private static final DataType CAR_DATA_TYPE = DataType.fromType(Car.class);
   private static final DataType CAR_LIST_DATA_TYPE = DataType.builder().collectionType(List.class).itemType(Car.class).build();
-  private CoreEvent mockMuleEvent = mock(CoreEvent.class);
+  private final CoreEvent mockMuleEvent = mock(CoreEvent.class);
   private DefaultExpressionManager expressionManager;
 
   @Before
   public void setUp() throws MuleException {
     expressionManager = new DefaultExpressionManager();
     initialiseIfNeeded(expressionManager, muleContext);
+  }
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @Test

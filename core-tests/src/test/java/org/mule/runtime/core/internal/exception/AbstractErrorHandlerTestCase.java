@@ -7,9 +7,12 @@
 package org.mule.runtime.core.internal.exception;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.event.EventContext;
@@ -20,6 +23,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.VerboseExceptions;
 
 import java.util.Collection;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
@@ -59,6 +63,11 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
 
     context = create(flow, TEST_CONNECTOR_LOCATION);
     muleEvent = InternalEvent.builder(context).message(of("")).build();
+  }
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @After

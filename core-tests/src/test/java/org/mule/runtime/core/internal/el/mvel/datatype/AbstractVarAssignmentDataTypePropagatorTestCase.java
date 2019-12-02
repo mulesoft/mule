@@ -8,10 +8,13 @@
 package org.mule.runtime.core.internal.el.mvel.datatype;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.mvel2.MVEL.compileExpression;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.runtime.api.metadata.MediaType.UNKNOWN;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.mvel2.MVEL;
@@ -47,6 +50,11 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
 
   protected AbstractVarAssignmentDataTypePropagatorTestCase(EnricherDataTypePropagator dataTypePropagator) {
     this.dataTypePropagator = dataTypePropagator;
+  }
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   protected void doAssignmentDataTypePropagationTest(String expression) throws Exception {

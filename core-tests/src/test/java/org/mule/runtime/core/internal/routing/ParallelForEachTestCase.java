@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -23,11 +23,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_LIST;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
-import static org.mule.test.allure.AllureConstants.RoutersFeature.ParallelForEachStory.PARALLEL_FOR_EACH;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
+import static org.mule.test.allure.AllureConstants.RoutersFeature.ParallelForEachStory.PARALLEL_FOR_EACH;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -52,13 +55,14 @@ import java.util.Map;
 
 import javax.management.DescriptorKey;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(ROUTERS)
 @Story(PARALLEL_FOR_EACH)
@@ -67,13 +71,14 @@ public class ParallelForEachTestCase extends AbstractMuleContextTestCase {
   @Rule
   public ExpectedException expectedException = none();
 
-  private ParallelForEach router = new ParallelForEach();
-  private ForkJoinStrategyFactory mockForkJoinStrategyFactory = mock(ForkJoinStrategyFactory.class);
+  private final ParallelForEach router = new ParallelForEach();
+  private final ForkJoinStrategyFactory mockForkJoinStrategyFactory = mock(ForkJoinStrategyFactory.class);
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
     when(componentLocator.find(Location.builder().globalName(APPLE_FLOW).build())).thenReturn(of(mock(Flow.class)));
-    return singletonMap(REGISTRY_KEY, componentLocator);
+    return of(REGISTRY_KEY, componentLocator,
+              OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @After
