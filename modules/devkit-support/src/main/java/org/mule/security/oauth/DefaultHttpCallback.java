@@ -516,8 +516,7 @@ public class DefaultHttpCallback implements HttpCallback
         {
             flow.setExceptionListener(exceptionHandler);
         }
-        flow.initialise();
-        flow.start();
+        muleContext.getRegistry().registerObject(dynamicFlowName, flow);
         LOGGER.debug(String.format("Created flow with http inbound endpoint listening at: %s", url));
     }
 
@@ -528,8 +527,10 @@ public class DefaultHttpCallback implements HttpCallback
     {
         if (flow != null)
         {
+            String flowName = flow.getName();
             flow.stop();
             flow.dispose();
+            muleContext.getRegistry().unregisterObject(flowName);
             LOGGER.debug("Http callback flow stopped");
         }
     }

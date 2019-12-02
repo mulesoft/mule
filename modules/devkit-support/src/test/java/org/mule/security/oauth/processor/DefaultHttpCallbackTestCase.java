@@ -108,6 +108,7 @@ public class DefaultHttpCallbackTestCase extends AbstractMuleContextTestCase
     @Test
     public void withNewHttpConnector() throws Exception
     {
+        muleContext.start();
         HttpListenerConfig config = createListenerConfig();
         callback = createCallback(config);
         sendCallbackRequest();
@@ -124,8 +125,19 @@ public class DefaultHttpCallbackTestCase extends AbstractMuleContextTestCase
     }
 
     @Test
+    public void withOldHttpTransportWithUnstartedMuleContext() throws Exception
+    {
+        callback = createCallback(newOldHttpTransport());
+
+        muleContext.start();
+
+        sendCallbackRequest();
+    }
+
+    @Test
     public void withNewHttpConnectorByDefault() throws Exception
     {
+        muleContext.start();
         createListenerConfig();
 
         callback = createCallback(null);
@@ -148,6 +160,7 @@ public class DefaultHttpCallbackTestCase extends AbstractMuleContextTestCase
     @Test
     public void withNewHttpConnectorByDefaultAndNoListenerConfigured() throws Exception
     {
+        muleContext.start();
         callback = createCallback(null);
         sendCallbackRequest();
     }
@@ -155,6 +168,7 @@ public class DefaultHttpCallbackTestCase extends AbstractMuleContextTestCase
     @Test
     public void withOldHttpTransportByDefault() throws Exception
     {
+        muleContext.start();
         MuleTestUtils.testWithSystemProperty(HttpConfiguration.USE_HTTP_TRANSPORT_FOR_URIS, Boolean.TRUE.toString(), new MuleTestUtils.TestCallback()
         {
             @Override
@@ -207,4 +221,10 @@ public class DefaultHttpCallbackTestCase extends AbstractMuleContextTestCase
     {
         return String.format("http://localhost:%d/%s", localPort.getNumber(), CALLBACK_PATH);
     }
+
+    @Override
+    protected boolean isDisposeContextPerClass() {
+        return false;
+    }
+
 }
