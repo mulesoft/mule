@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
@@ -19,6 +20,8 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
@@ -39,6 +42,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.Map;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -96,6 +101,11 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
     processor.setCacheIdGeneratorFactory(mock(MetadataCacheIdGeneratorFactory.class));
 
     initialiseIfNeeded(processor, muleContext);
+  }
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @After

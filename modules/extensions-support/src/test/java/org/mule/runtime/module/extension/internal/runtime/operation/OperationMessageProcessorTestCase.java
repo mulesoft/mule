@@ -93,8 +93,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.reflect.TypeToken;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -102,6 +100,9 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.reflect.TypeToken;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)

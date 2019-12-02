@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -31,6 +35,7 @@ import org.mule.tck.size.SmallTest;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -42,7 +47,7 @@ public class DefaultStreamingHelperTestCase extends AbstractMuleContextTestCase 
   private CursorProviderFactory cursorProviderFactory;
   private CoreEvent event;
 
-  private List<String> valueList = Arrays.asList("Apple", "Banana", "Kiwi");
+  private final List<String> valueList = Arrays.asList("Apple", "Banana", "Kiwi");
 
   @Override
   protected void doSetUp() throws Exception {
@@ -52,6 +57,11 @@ public class DefaultStreamingHelperTestCase extends AbstractMuleContextTestCase 
         new InMemoryCursorIteratorProviderFactory(InMemoryCursorIteratorConfig.getDefault(), streamingManager);
     event = testEvent();
     streamingHelper = new DefaultStreamingHelper(cursorProviderFactory, streamingManager, event);
+  }
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @Override

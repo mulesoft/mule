@@ -93,8 +93,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     flow = mock(Flow.class, RETURNS_DEEP_STUBS);
     exceptionHandler = new OnErrorPropagateHandler();
     exceptionHandler.setMuleContext(muleContext);
-    exceptionHandler
-        .setNotificationFirer(getNotificationDispatcher(muleContext));
+    exceptionHandler.setNotificationFirer(getNotificationDispatcher(muleContext));
     exceptionHandler.initialise();
     exceptionHandler.start();
     when(flow.getExceptionListener()).thenReturn(exceptionHandler);
