@@ -7,10 +7,13 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.*;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
@@ -23,6 +26,7 @@ import static reactor.core.publisher.Mono.defer;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
@@ -37,12 +41,14 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurer;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerIterator;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerList;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import com.google.common.collect.Iterators;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -53,10 +59,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * The {@code foreach} {@link Processor} allows iterating over a collection payload, or any collection obtained by an expression,
+ * The {@code foreach} {@link Processor} allow
+ *
+ *
+ * s iterating over a collection payload, or any collection obtained by an expression,
  * generating a message for each element.
  * <p>
  * The number of the message being processed is stored in {@code #[mel:variable:counter]} and the root message is store in
@@ -70,6 +80,7 @@ import reactor.core.publisher.Mono;
 public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, Scope {
 
   public static final String DEFAULT_ROOT_MESSAGE_VARIABLE = "rootMessage";
+  public static final String FOREACH_CONTEXT_VARIABLE = "foreachContext";
   static final String DEFAULT_COUNTER_VARIABLE = "counter";
   static final String MAP_NOT_SUPPORTED_MESSAGE =
       "Foreach does not support 'java.util.Map' with no collection expression. To iterate over Map entries use '#[dw::core::Objects::entrySet(payload)]'";
@@ -92,7 +103,110 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return from(publisher)
+
+    FluxSinkRecorder<CoreEvent> innerRecorder = new FluxSinkRecorder<>();
+    FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
+
+    Flux<CoreEvent> upstreamFlux = Flux.from(publisher)
+        .doOnNext(event -> {
+          if (expression.equals(DEFAULT_SPLIT_EXPRESSION)
+              && Map.class.isAssignableFrom(event.getMessage().getPayload().getDataType().getType())) {
+            throw new IllegalArgumentException(MAP_NOT_SUPPORTED_MESSAGE);
+          }
+
+          // Keep reference to existing rootMessage/count variables in order to restore later to support foreach nesting.
+          Object previousCounterVar2 = event.getVariables().containsKey(counterVariableName)
+              ? event.getVariables().get(counterVariableName).getValue()
+              : null;
+          Object previousRootMessageVar2 =
+              event.getVariables().containsKey(rootMessageVariableName)
+                  ? event.getVariables().get(rootMessageVariableName).getValue()
+                  : null;
+
+          // Create ForEachContext, with the Iterator<TypedValue> calculated
+          ForeachContext foreachContext =
+              new ForeachContext(previousCounterVar2, previousRootMessageVar2, event.getMessage(), splitRequest(event));
+
+          // Save it inside the internalParameters of the event
+          final CoreEvent requestEvent =
+              builder(event).addVariable(rootMessageVariableName, event.getMessage())
+                  .addVariable(FOREACH_CONTEXT_VARIABLE, foreachContext).build();
+
+          // Inject it into the inner flux
+          innerRecorder.next(requestEvent);
+        });
+
+    AtomicInteger count = new AtomicInteger();
+
+    Flux<CoreEvent> innerFlux = Flux.create(innerRecorder)
+        .map(event -> {
+
+          Iterator<TypedValue<?>> iterator = getForeachContextFromEvent(event).getIterator();
+
+          TypedValue currentValue;
+          if (batchSize > 1) {
+            int counter = 0;
+            ArrayList<Object> list = new ArrayList<>();
+            while (iterator.hasNext() && batchSize > 1 && counter < batchSize) {
+              list.add(iterator.next());
+              counter++;
+            }
+            currentValue = new TypedValue<>(list, fromObject(list));
+          } else {
+            currentValue = iterator.next();
+          }
+
+          // For each TypedValue part process the nested chain using the event from the previous part.
+          BaseEventContext childContext = newChildContext(event, ofNullable(getLocation()));
+
+          Builder partEventBuilder = CoreEvent.builder(event);
+          if (currentValue.getValue() instanceof EventBuilderConfigurer) {
+            // Support EventBuilderConfigurer currently used by Batch Module
+            EventBuilderConfigurer configurer = (EventBuilderConfigurer) currentValue.getValue();
+            configurer.configure(partEventBuilder);
+
+            childContext.onResponse((e, t) -> configurer.eventCompleted());
+          } else if (currentValue.getValue() instanceof Message) {
+            // If value is a Message then use it directly conserving attributes and properties.
+            partEventBuilder.message((Message) currentValue.getValue());
+          } else {
+            // Otherwise create a new message
+            partEventBuilder.message(Message.builder().payload(currentValue).build());
+          }
+
+          // Create a mapper in assembly that that buffers the events, by taking from the iterable;
+          // or takes one from it and starts processing
+          return partEventBuilder.addVariable(counterVariableName, count.incrementAndGet()).build();
+        })
+        .transform(innerPub -> applyWithChildContext(innerPub, nestedChain, of(Foreach.this.getLocation())))
+        .doOnNext(evt -> {
+          ForeachContext foreachContext = getForeachContextFromEvent(evt);
+          // Check if I have more to iterate:
+          if (foreachContext.getIterator().hasNext()) {
+            // YES - Inject again inside innerFlux. The Iterator automatically keeps track of the following elements
+            innerRecorder.next(evt);
+          } else {
+            // NO - Propagate the first inside event down to downstreamFlux
+            downstreamRecorder.next(right(evt));
+          }
+        });
+
+    Flux<CoreEvent> downstreamFlux = Flux.create(downstreamRecorder)
+        .map(either -> {
+          if (either.isLeft()) {
+            throw propagate(either.getLeft());
+          } else {
+            // Create response and restore variables
+            return createResponseEvent(either.getRight());
+          }
+        })
+        .onErrorMap(MessagingException.class, me -> {
+          me.setProcessedEvent(createResponseEvent(me.getEvent()));
+          return me;
+        });
+
+    return upstreamFlux;
+    /* return from(publisher)
         .doOnNext(event -> {
           if (expression.equals(DEFAULT_SPLIT_EXPRESSION)
               && Map.class.isAssignableFrom(event.getMessage().getPayload().getDataType().getType())) {
@@ -100,7 +214,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
           }
         })
         .flatMap(originalEvent -> {
-
+    
           // Keep reference to existing rootMessage/count variables in order to restore later to support foreach nesting.
           final Object previousCounterVar = originalEvent.getVariables().containsKey(counterVariableName)
               ? originalEvent.getVariables().get(counterVariableName).getValue()
@@ -109,10 +223,10 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
               originalEvent.getVariables().containsKey(rootMessageVariableName)
                   ? originalEvent.getVariables().get(rootMessageVariableName).getValue()
                   : null;
-
+    
           final CoreEvent requestEvent =
               builder(originalEvent).addVariable(rootMessageVariableName, originalEvent.getMessage()).build();
-
+    
           return Mono.from(splitAndProcess(requestEvent))
               .map(result -> {
                 final Builder responseBuilder = builder(result).message(originalEvent.getMessage());
@@ -126,7 +240,18 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
                 me.setProcessedEvent(exceptionEventBuilder.build());
                 return me;
               });
-        });
+        });*/
+  }
+
+  private CoreEvent createResponseEvent(CoreEvent event) {
+    ForeachContext foreachContext = getForeachContextFromEvent(event);
+    final Builder responseBuilder = builder(event).message(foreachContext.getOriginalMessage());
+    restoreVariables(foreachContext.getPreviousCounter(), foreachContext.getPreviousRootMessage(), responseBuilder);
+    return responseBuilder.build();
+  }
+
+  private ForeachContext getForeachContextFromEvent(CoreEvent event) {
+    return (ForeachContext) event.getVariables().get(FOREACH_CONTEXT_VARIABLE).getValue();
   }
 
   private void restoreVariables(Object previousCounterVar, Object previousRootMessageVar, Builder responseBuilder) {
@@ -204,16 +329,23 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   private Iterator<TypedValue<?>> splitRequest(CoreEvent request) {
     try {
       Object payloadValue = request.getMessage().getPayload().getValue();
+      Iterator<TypedValue<?>> result;
       if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerList) {
         // Support EventBuilderConfigurerList currently used by Batch Module
-        return Iterators.transform(((EventBuilderConfigurerList<Object>) payloadValue).eventBuilderConfigurerIterator(),
-                                   TypedValue::of);
+        result = Iterators.transform(((EventBuilderConfigurerList<Object>) payloadValue).eventBuilderConfigurerIterator(),
+                                     TypedValue::of);
       } else if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerIterator) {
         // Support EventBuilderConfigurerIterator currently used by Batch Module
-        return new EventBuilderConfigurerIteratorWrapper((EventBuilderConfigurerIterator) payloadValue);
+        result = new EventBuilderConfigurerIteratorWrapper((EventBuilderConfigurerIterator) payloadValue);
       } else {
-        return splittingStrategy.split(request);
+        result = splittingStrategy.split(request);
       }
+      if (logger.isDebugEnabled() && !result.hasNext()) {
+        logger.debug(
+                     "<foreach> expression \"{}\" returned no results. If this is not expected please check your expression",
+                     expression);
+      }
+      return result;
     } catch (Exception e) {
       // Wrap any exception that occurs during split in a MessagingException. This is required as the
       // automatic wrapping is only applied when the signal is an Event.
