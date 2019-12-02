@@ -48,6 +48,7 @@ public class OAuthContinuationTestCase extends AbstractMuleContextTestCase
         this.httpConnector = new HttpConnector(muleContext);
         this.httpConnector.initialise();
         this.httpConnector.start();
+        this.muleContext.start();
     }
 
     @Override
