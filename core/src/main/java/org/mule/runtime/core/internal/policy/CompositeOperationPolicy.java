@@ -7,12 +7,12 @@
 package org.mule.runtime.core.internal.policy;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
+import static com.google.common.collect.ImmutableMap.of;
 import static java.lang.Runtime.getRuntime;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock.readWriteLock;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.policy.OperationPolicyContext.OPERATION_POLICY_CONTEXT;
