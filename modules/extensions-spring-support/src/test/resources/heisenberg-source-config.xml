@@ -29,7 +29,7 @@
     </heisenberg:config>
 
     <flow name="source" initialState="stopped">
-        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" frequency="500">
             <redelivery-policy maxRedeliveryCount="10" useSecureHash="true"/>
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
@@ -46,7 +46,7 @@
     </flow>
 
     <flow name="sourceFailed" initialState="stopped">
-        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" frequency="500">
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
             </heisenberg:next-door>
@@ -64,7 +64,7 @@
 
     <flow name="sourceFailedOnRuntime" initialState="stopped">
         <!--invalid initialBatchNumber with negative value -->
-        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="-1">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="-1" frequency="500">
             <heisenberg:success-info knownAddresses="#[[]]"/>
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:listen-payments>
@@ -74,7 +74,7 @@
 
     <flow name="sourceFailedOnStart" initialState="stopped">
         <!--invalid corePoolSize with negative value -->
-        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="1" corePoolSize="-1">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="1" corePoolSize="-1" frequency="500">
             <heisenberg:success-info knownAddresses="#[[]]"/>
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:listen-payments>
@@ -83,7 +83,7 @@
     </flow>
 
     <flow name="sourceWithInvalidSuccessParameter" initialState="stopped">
-        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" frequency="500">
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
             </heisenberg:next-door>
@@ -106,7 +106,7 @@
     </flow>
 
     <flow name="sourceWithInvalidSuccessAndErrorParameters" initialState="stopped">
-        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" frequency="500">
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
             </heisenberg:next-door>
@@ -122,7 +122,7 @@
     </flow>
 
     <flow name="sourceFailsInsideOnError" initialState="stopped">
-        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" propagateError="true">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" propagateError="true" frequency="500">
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
             </heisenberg:next-door>
@@ -139,7 +139,7 @@
     </flow>
 
     <flow name="sourceFailsOnSuccessBodyCallsOnErrorAndOnTerminate" initialState="stopped">
-        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" fail="true">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" fail="true" frequency="500">
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
             </heisenberg:next-door>
@@ -165,7 +165,7 @@
     </flow>
 
     <flow name="failureInFlowCallsOnErrorDirectly" initialState="stopped">
-        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" frequency="500">
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
             </heisenberg:next-door>
@@ -181,7 +181,7 @@
     </flow>
 
     <flow name="failureInFlowErrorHandlerCallsOnErrorDirectly" initialState="stopped">
-        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" frequency="500">
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
             </heisenberg:next-door>
@@ -203,7 +203,7 @@
     </flow>
 
     <flow name="failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt" initialState="stopped">
-        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0">
+        <heisenberg:listen-payments config-ref="heisenberg" initialBatchNumber="0" frequency="500">
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
             </heisenberg:next-door>
