@@ -7102,8 +7102,26 @@
           "executionType": "BLOCKING",
           "output": {
             "type": {
-              "format": "json",
-              "type": "@ref:http://example.com/example.json"
+              "format": "java",
+              "type": "Array",
+              "annotations": {
+                "classInformation": {
+                  "classname": "org.mule.runtime.extension.api.runtime.streaming.PagingProvider",
+                  "hasDefaultConstructor": false,
+                  "isInterface": true,
+                  "isInstantiable": false,
+                  "isAbstract": true,
+                  "isFinal": false,
+                  "implementedInterfaces": [],
+                  "parent": "",
+                  "genericTypes": [],
+                  "isMap": false
+                }
+              },
+              "item": {
+                "format": "json",
+                "type": "@ref:http://example.com/example.json"
+              }
             },
             "hasDynamicType": false,
             "description": "",
@@ -19885,7 +19903,7 @@
       },
       "outputAttributes": {
         "type": {
-          "format": "json",
+          "format": "java",
           "type": "Array",
           "annotations": {
             "classInformation": {
@@ -19904,11 +19922,17 @@
               "parent": "java.util.AbstractList",
               "genericTypes": [],
               "isMap": false
-            },
-            "typeId": "http://example.com/persons.json"
+            }
           },
           "item": {
-            "type": "@ref:http://example.com/example.json"
+            "format": "json",
+            "type": "Array",
+            "annotations": {
+              "typeId": "http://example.com/persons.json"
+            },
+            "item": {
+              "type": "@ref:http://example.com/example.json"
+            }
           }
         },
         "hasDynamicType": false,
@@ -20023,7 +20047,7 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "json",
+          "format": "java",
           "type": "Array",
           "annotations": {
             "classInformation": {
@@ -20039,11 +20063,17 @@
               "parent": "",
               "genericTypes": [],
               "isMap": false
-            },
-            "typeId": "http://example.com/persons.json"
+            }
           },
           "item": {
-            "type": "@ref:http://example.com/example.json"
+            "format": "json",
+            "type": "Array",
+            "annotations": {
+              "typeId": "http://example.com/persons.json"
+            },
+            "item": {
+              "type": "@ref:http://example.com/example.json"
+            }
           }
         },
         "hasDynamicType": false,
@@ -20381,8 +20411,28 @@
       },
       "outputAttributes": {
         "type": {
-          "format": "json",
-          "type": "@ref:http://example.com/example.json"
+          "format": "java",
+          "type": "Array",
+          "annotations": {
+            "classInformation": {
+              "classname": "java.util.List",
+              "hasDefaultConstructor": false,
+              "isInterface": true,
+              "isInstantiable": false,
+              "isAbstract": true,
+              "isFinal": false,
+              "implementedInterfaces": [
+                "java.util.Collection"
+              ],
+              "parent": "",
+              "genericTypes": [],
+              "isMap": false
+            }
+          },
+          "item": {
+            "format": "json",
+            "type": "@ref:http://example.com/example.json"
+          }
         },
         "hasDynamicType": false,
         "description": "",
@@ -20572,8 +20622,28 @@
           "parameters": [
             {
               "type": {
-                "format": "json",
-                "type": "@ref:http://example.com/example.json"
+                "format": "java",
+                "type": "Array",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.util.List",
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.util.Collection"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
+                },
+                "item": {
+                  "format": "json",
+                  "type": "@ref:http://example.com/example.json"
+                }
               },
               "hasDynamicType": false,
               "required": true,
@@ -21784,8 +21854,28 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "json",
-          "type": "@ref:http://example.com/example.json"
+          "format": "java",
+          "type": "Array",
+          "annotations": {
+            "classInformation": {
+              "classname": "java.util.List",
+              "hasDefaultConstructor": false,
+              "isInterface": true,
+              "isInstantiable": false,
+              "isAbstract": true,
+              "isFinal": false,
+              "implementedInterfaces": [
+                "java.util.Collection"
+              ],
+              "parent": "",
+              "genericTypes": [],
+              "isMap": false
+            }
+          },
+          "item": {
+            "format": "json",
+            "type": "@ref:http://example.com/example.json"
+          }
         },
         "hasDynamicType": false,
         "description": "",
@@ -25138,8 +25228,28 @@
       "executionType": "CPU_LITE",
       "output": {
         "type": {
-          "format": "xml",
-          "type": "@ref:#root:shiporder"
+          "format": "java",
+          "type": "Array",
+          "annotations": {
+            "classInformation": {
+              "classname": "java.util.List",
+              "hasDefaultConstructor": false,
+              "isInterface": true,
+              "isInstantiable": false,
+              "isAbstract": true,
+              "isFinal": false,
+              "implementedInterfaces": [
+                "java.util.Collection"
+              ],
+              "parent": "",
+              "genericTypes": [],
+              "isMap": false
+            }
+          },
+          "item": {
+            "format": "xml",
+            "type": "@ref:#root:shiporder"
+          }
         },
         "hasDynamicType": false,
         "description": "",
@@ -27099,7 +27209,6 @@
       "format": "xml",
       "type": "Object",
       "annotations": {
-        "typeId": "#root:shiporder",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -27113,7 +27222,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "#root:shiporder"
       },
       "fields": [
         {
@@ -27264,7 +27374,6 @@
       "format": "csv",
       "type": "Object",
       "annotations": {
-        "typeId": "csv-object",
         "classInformation": {
           "classname": "java.lang.Integer",
           "hasDefaultConstructor": false,
@@ -27278,7 +27387,8 @@
           "parent": "java.lang.Number",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "csv-object"
       },
       "fields": []
     },
@@ -27286,7 +27396,6 @@
       "format": "java",
       "type": "Object",
       "annotations": {
-        "typeId": "custom-java",
         "classInformation": {
           "classname": "java.lang.Object",
           "hasDefaultConstructor": true,
@@ -27298,7 +27407,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "custom-java"
       },
       "fields": []
     },
@@ -27306,8 +27416,6 @@
       "format": "json",
       "type": "Object",
       "annotations": {
-        "typeId": "http://example.com/example.json",
-        "label": "Person",
         "classInformation": {
           "classname": "void",
           "hasDefaultConstructor": false,
@@ -27319,7 +27427,9 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "http://example.com/example.json",
+        "label": "Person"
       },
       "open": {
         "type": "Any"
@@ -27363,7 +27473,6 @@
       "format": "json",
       "type": "Object",
       "annotations": {
-        "typeId": "json-object",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -27377,7 +27486,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "json-object"
       },
       "fields": [
         {
