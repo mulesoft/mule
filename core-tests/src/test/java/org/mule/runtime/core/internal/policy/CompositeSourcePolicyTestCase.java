@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static com.google.common.collect.ImmutableMap.of;
 import static java.lang.Runtime.getRuntime;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -25,7 +26,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.block;
+import static org.mule.runtime.core.internal.policy.SourcePolicyContext.SOURCE_POLICY_CONTEXT;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.error;
 
@@ -40,6 +43,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.SourcePolicyTestUtils;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.util.List;
 import java.util.Map;
@@ -51,9 +55,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
-
-import com.google.common.collect.ImmutableMap;
-
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
@@ -85,7 +86,11 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
   @Before
   public void setUp() throws Exception {
     initialEvent = createTestEvent();
+    SourcePolicyContext policyContext = new SourcePolicyContext(mock(PolicyPointcutParameters.class));
+    initialEvent = quickCopy(initialEvent, of(SOURCE_POLICY_CONTEXT, policyContext));
+
     modifiedEvent = createTestEvent();
+    modifiedEvent = quickCopy(modifiedEvent, of(SOURCE_POLICY_CONTEXT, policyContext));
 
     when(nextProcessResultEvent.getMessage()).thenReturn(mock(Message.class));
     when(flowExecutionProcessor.apply(any())).thenAnswer(invocation -> {
@@ -259,7 +264,7 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
 
   @Test
   public void processAfterPolicyDispose() throws Throwable {
-    Map<String, Object> errorParameters = ImmutableMap.of("param", "value");
+    Map<String, Object> errorParameters = of("param", "value");
     when(sourcePolicyParametersTransformer.fromMessageToErrorResponseParameters(initialEvent.getMessage()))
         .thenReturn(errorParameters);
 

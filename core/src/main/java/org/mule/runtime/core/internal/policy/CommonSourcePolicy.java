@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static com.google.common.collect.ImmutableMap.of;
 import static java.lang.Runtime.getRuntime;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock.readWriteLock;
-import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
 
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.functional.Either;
@@ -22,7 +21,6 @@ import org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock;
 import org.mule.runtime.core.internal.exception.DefaultErrorTypeRepository;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.TransactionAwareFluxSinkSupplier;
@@ -39,9 +37,6 @@ import reactor.core.publisher.FluxSink;
  * Common behavior for flow dispatching, whether policies are applied or not.
  */
 class CommonSourcePolicy {
-
-  public static final String POLICY_SOURCE_PARAMETERS_PROCESSOR = "policy.source.parametersProcessor";
-  public static final String POLICY_SOURCE_PROCESS_CALLBACK = "policy.source.processCallback";
 
   private final FluxSinkSupplier<CoreEvent> policySink;
   private final AtomicBoolean disposed;
@@ -69,8 +64,12 @@ class CommonSourcePolicy {
 
     readWriteLock.withReadLock(() -> {
       if (!disposed.get()) {
-        policySink.get().next(quickCopy(sourceEvent, of(POLICY_SOURCE_PARAMETERS_PROCESSOR, respParamProcessor,
-                                                        POLICY_SOURCE_PROCESS_CALLBACK, callback)));
+        SourcePolicyContext ctx = from(sourceEvent);
+        if (ctx != null) {
+          ctx.configure(respParamProcessor, callback);
+        }
+
+        policySink.get().next(sourceEvent);
       } else {
         MessagingException me = new MessagingException(createStaticMessage("Source policy already disposed"), sourceEvent);
         me.setProcessedEvent(CoreEvent.builder(sourceEvent)
@@ -86,29 +85,23 @@ class CommonSourcePolicy {
     });
   }
 
-  public MessageSourceResponseParametersProcessor getResponseParamsProcessor(CoreEvent event) {
-    return ((InternalEvent) event).getInternalParameter(POLICY_SOURCE_PARAMETERS_PROCESSOR);
-  }
-
   public void finishFlowProcessing(CoreEvent event, Either<SourcePolicyFailureResult, SourcePolicySuccessResult> result) {
     if (!((BaseEventContext) event.getContext()).isComplete()) {
       ((BaseEventContext) event.getContext()).success(event);
     }
 
-    recoverCallback(event).complete(result);
+    from(event).getProcessCallback().complete(result);
   }
 
-  public void finishFlowProcessing(CoreEvent event, Either<SourcePolicyFailureResult, SourcePolicySuccessResult> result,
-                                   Throwable error) {
+  public void finishFlowProcessing(CoreEvent event,
+                                   Either<SourcePolicyFailureResult, SourcePolicySuccessResult> result,
+                                   Throwable error,
+                                   SourcePolicyContext ctx) {
     if (!((BaseEventContext) event.getContext()).isComplete()) {
       ((BaseEventContext) event.getContext()).error(error);
     }
 
-    recoverCallback(event).complete(result);
-  }
-
-  private CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> recoverCallback(CoreEvent event) {
-    return ((InternalEvent) event).getInternalParameter(POLICY_SOURCE_PROCESS_CALLBACK);
+    ctx.getProcessCallback().complete(result);
   }
 
   public void dispose() {

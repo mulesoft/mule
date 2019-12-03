@@ -21,12 +21,12 @@ import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.module.extension.AbstractHeisenbergConfigTestCase;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 public abstract class AbstractConfigParserTestCase extends AbstractHeisenbergConfigTestCase {
 

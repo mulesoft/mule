@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.policy;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
@@ -23,7 +24,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
 import java.util.HashMap;
@@ -35,7 +35,6 @@ import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -51,25 +50,19 @@ public class CompositeSourcePolicy
 
   private static final Logger LOGGER = getLogger(CompositeSourcePolicy.class);
 
-  public static final String POLICY_SOURCE_ORIGINAL_FAILURE_RESPONSE_PARAMETERS =
-      "policy.source.originalFailureResponseParameters";
-  public static final String POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS = "policy.source.originalResponseParameters";
-
   private final CommonSourcePolicy commonPolicy;
-
   private final SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
   private final ReactiveProcessor flowExecutionProcessor;
-
   private final PolicyEventMapper policyEventMapper;
   private final Optional<Function<MessagingException, MessagingException>> resolver;
 
   /**
    * Creates a new source policy composed by several {@link Policy} that will be chain together.
    *
-   * @param parameterizedPolicies the list of policies to use in this composite policy.
-   * @param flowExecutionProcessor the operation that executes the flow
+   * @param parameterizedPolicies             the list of policies to use in this composite policy.
+   * @param flowExecutionProcessor            the operation that executes the flow
    * @param sourcePolicyParametersTransformer a transformer from a source response parameters to a message and vice versa
-   * @param sourcePolicyProcessorFactory factory to create a {@link Processor} from each {@link Policy}
+   * @param sourcePolicyProcessorFactory      factory to create a {@link Processor} from each {@link Policy}
    */
   public CompositeSourcePolicy(List<Policy> parameterizedPolicies,
                                ReactiveProcessor flowExecutionProcessor,
@@ -81,11 +74,11 @@ public class CompositeSourcePolicy
   /**
    * Creates a new source policy composed by several {@link Policy} that will be chain together.
    *
-   * @param parameterizedPolicies the list of policies to use in this composite policy.
-   * @param flowExecutionProcessor the operation that executes the flow
+   * @param parameterizedPolicies             the list of policies to use in this composite policy.
+   * @param flowExecutionProcessor            the operation that executes the flow
    * @param sourcePolicyParametersTransformer a transformer from a source response parameters to a message and vice versa
-   * @param sourcePolicyProcessorFactory factory to create a {@link Processor} from each {@link Policy}
-   * @param resolver a mapper to update the eventual errors in source policy
+   * @param sourcePolicyProcessorFactory      factory to create a {@link Processor} from each {@link Policy}
+   * @param resolver                          a mapper to update the eventual errors in source policy
    */
   public CompositeSourcePolicy(List<Policy> parameterizedPolicies,
                                ReactiveProcessor flowExecutionProcessor,
@@ -114,11 +107,13 @@ public class CompositeSourcePolicy
       Flux<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> policyFlux =
           Flux.create(sinkRef)
               .transform(getExecutionProcessor())
-              .map(policiesResultEvent -> right(SourcePolicyFailureResult.class,
-                                                new SourcePolicySuccessResult(policiesResultEvent,
-                                                                              resolveSuccessResponseParameters(policiesResultEvent),
-                                                                              commonPolicy
-                                                                                  .getResponseParamsProcessor(policiesResultEvent))))
+              .map(policiesResultEvent -> {
+                SourcePolicyContext ctx = from(policiesResultEvent);
+                return right(SourcePolicyFailureResult.class,
+                             new SourcePolicySuccessResult(policiesResultEvent,
+                                                           resolveSuccessResponseParameters(policiesResultEvent, ctx),
+                                                           ctx.getResponseParametersProcessor()));
+              })
               .doOnNext(result -> {
                 logSourcePolicySuccessfullResult(result.getRight());
 
@@ -127,22 +122,24 @@ public class CompositeSourcePolicy
               .doOnError(e -> !(e instanceof MessagingException), e -> LOGGER.error(e.getMessage(), e))
               .onErrorContinue(MessagingException.class, (t, e) -> {
                 MessagingException me = (MessagingException) t;
+                SourcePolicyContext ctx = from(me.getEvent());
 
                 Either<SourcePolicyFailureResult, SourcePolicySuccessResult> result =
-                    left(new SourcePolicyFailureResult(me, resolveErrorResponseParameters(me)), SourcePolicySuccessResult.class);
+                    left(new SourcePolicyFailureResult(me, resolveErrorResponseParameters(me, ctx)),
+                         SourcePolicySuccessResult.class);
 
                 logSourcePolicyFailureResult(result.getLeft());
 
-                commonPolicy.finishFlowProcessing(me.getEvent(), result, me);
+                commonPolicy.finishFlowProcessing(me.getEvent(), result, me, ctx);
               });
 
       policyFlux.subscribe();
       return sinkRef.getFluxSink();
     }
 
-    private Supplier<Map<String, Object>> resolveSuccessResponseParameters(CoreEvent policiesResultEvent) {
-      final Map<String, Object> originalResponseParameters = ((InternalEvent) policiesResultEvent)
-          .getInternalParameter(POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS);
+    private Supplier<Map<String, Object>> resolveSuccessResponseParameters(CoreEvent policiesResultEvent,
+                                                                           SourcePolicyContext ctx) {
+      final Map<String, Object> originalResponseParameters = ctx.getOriginalResponseParameters();
 
       return () -> getParametersTransformer()
           .map(parametersTransformer -> concatMaps(originalResponseParameters,
@@ -152,9 +149,8 @@ public class CompositeSourcePolicy
           .orElse(originalResponseParameters);
     }
 
-    private Supplier<Map<String, Object>> resolveErrorResponseParameters(MessagingException e) {
-      final Map<String, Object> originalFailureResponseParameters =
-          ((InternalEvent) e.getEvent()).getInternalParameter(POLICY_SOURCE_ORIGINAL_FAILURE_RESPONSE_PARAMETERS);
+    private Supplier<Map<String, Object>> resolveErrorResponseParameters(MessagingException e, SourcePolicyContext ctx) {
+      final Map<String, Object> originalFailureResponseParameters = ctx.getOriginalFailureResponseParameters();
 
       return () -> getParametersTransformer()
           .map(parametersTransformer -> concatMaps(originalFailureResponseParameters,

@@ -21,7 +21,7 @@ import java.util.Map;
 public class DefaultRetryContext implements RetryContext {
 
   private Message[] returnMessages;
-  private Map<Object, Object> metaInfo = new HashMap<Object, Object>();
+  private Map<Object, Object> metaInfo = new HashMap<>();
   private String description;
   private Throwable lastFailure;
   private boolean failed = false;

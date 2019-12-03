@@ -52,7 +52,7 @@ public final class SessionVariableMapContext extends AbstractMapContext<Object> 
 
   @Override
   public String toString() {
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     for (String key : session.getPropertyNamesAsSet()) {
       Object value = session.getProperty(key);
       map.put(key, value);

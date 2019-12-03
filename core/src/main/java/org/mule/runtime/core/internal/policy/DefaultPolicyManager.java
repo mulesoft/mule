@@ -10,7 +10,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.notification.FlowConstructNotification.FLOW_CONSTRUCT_DISPOSED;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.internal.policy.PolicyPointcutParametersManager.POLICY_SOURCE_POINTCUT_PARAMETERS;
+import static org.mule.runtime.core.internal.policy.SourcePolicyContext.SOURCE_POLICY_CONTEXT;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
@@ -42,11 +42,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link PolicyManager}.
@@ -123,8 +122,8 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
                                          k -> new NoSourcePolicy(flowExecutionProcessor));
     }
 
-    final PolicyPointcutParameters sourcePointcutParameters = ((InternalEvent) sourceEvent)
-        .getInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS);
+    final SourcePolicyContext ctx = SourcePolicyContext.from(sourceEvent);
+    final PolicyPointcutParameters sourcePointcutParameters = ctx.getPointcutParameters();
 
     final Pair<String, PolicyPointcutParameters> policyKey =
         new Pair<>(source.getLocation().getRootContainerName(), sourcePointcutParameters);
@@ -150,7 +149,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
                                                                        InternalEvent.Builder eventBuilder) {
     final PolicyPointcutParameters sourcePolicyParams =
         policyPointcutParametersManager.createSourcePointcutParameters(source, attributes);
-    eventBuilder.addInternalParameter(POLICY_SOURCE_POINTCUT_PARAMETERS, sourcePolicyParams);
+    eventBuilder.addInternalParameter(SOURCE_POLICY_CONTEXT, new SourcePolicyContext(sourcePolicyParams));
     return sourcePolicyParams;
   }
 

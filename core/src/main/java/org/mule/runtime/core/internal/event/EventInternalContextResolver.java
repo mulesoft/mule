@@ -15,10 +15,10 @@ import java.util.function.Supplier;
 
 /**
  * Resolves initial and mutated event-wide internal Contexts.
- * 
+ *
  * For example, this is used for {@link org.mule.runtime.core.internal.policy.PolicyEventMapper} handling nested policies, or
  * {@link org.mule.runtime.core.internal.routing.UntilSuccessfulRouter} for handling nested retrial contexts.
- * 
+ *
  * @param <CTX> The context type
  * @since 4.2.3, 4.3.0
  */
