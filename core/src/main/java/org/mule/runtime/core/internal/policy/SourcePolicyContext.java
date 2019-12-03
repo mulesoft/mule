@@ -15,7 +15,7 @@ import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import java.util.Map;
 
 /**
- * Holds all the context information for an operation policy to function
+ * Holds all the context information for a source policy to function
  *
  * @since 4.3.0
  */
