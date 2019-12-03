@@ -6,8 +6,12 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
@@ -22,11 +26,12 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
+import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.BaseExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
-import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.function.Consumer;
 
@@ -53,10 +58,15 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   @Inject
   private MuleContext muleContext;
 
+  @Inject
+  private ServerNotificationHandler notificationManager;
+
   private PolicyNotificationHelper notificationHelper;
   private PolicyEventMapper policyEventMapper;
 
   private OnExecuteNextErrorConsumer onExecuteNextErrorConsumer;
+
+  private MessageProcessorChain nextDispatchAsChain;
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
@@ -66,10 +76,29 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   @Override
   public void initialise() throws InitialisationException {
     this.policyEventMapper = new PolicyEventMapper(getPolicyId());
-    this.notificationHelper =
-        new PolicyNotificationHelper(muleContext.getNotificationManager(), getPolicyId(), this);
+    this.notificationHelper = new PolicyNotificationHelper(notificationManager, getPolicyId(), this);
     this.onExecuteNextErrorConsumer =
         new OnExecuteNextErrorConsumer(policyEventMapper::fromPolicyNext, notificationHelper, getLocation());
+
+    // this chain exists only so that an error handler can be hooked to map the event in the propagated error.
+    this.nextDispatchAsChain = buildNewChainWithListOfProcessors(empty(), singletonList(new Processor() {
+
+      @Override
+      public CoreEvent process(CoreEvent event) throws MuleException {
+        return processToApply(event, this);
+      }
+
+      @Override
+      public Publisher<CoreEvent> apply(Publisher<CoreEvent> eventPub) {
+        return subscriberContext()
+            .flatMapMany(ctx -> from(eventPub)
+                .map(event -> ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)
+                    ? policyEventMapper.onSourcePolicyNext(event, ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))
+                    : policyEventMapper.onOperationPolicyNext(event))
+                .transform(ctx.get(POLICY_NEXT_OPERATION)));
+      }
+    }), policyNextErrorHandler());
+    initialiseIfNeeded(nextDispatchAsChain, muleContext);
   }
 
   @Override
@@ -81,24 +110,24 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
           popBeforeNextFlowFlowStackElement().accept(event);
           notificationHelper.notification(BEFORE_NEXT).accept(event);
         })
-        .compose(eventPub -> subscriberContext()
-            .flatMapMany(ctx -> eventPub
-                .map(event -> ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)
-                    ? policyEventMapper.onSourcePolicyNext(event, ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))
-                    : policyEventMapper.onOperationPolicyNext(event))
-                .transform(ctx.get(POLICY_NEXT_OPERATION))
-                .cast(CoreEvent.class)))
+        .compose(nextDispatchAsChain)
         .doOnNext(coreEvent -> {
           notificationHelper.fireNotification(coreEvent, null, AFTER_NEXT);
           pushAfterNextFlowStackElement().accept(coreEvent);
           logExecuteNextEvent("After execute-next", coreEvent.getContext(), coreEvent.getMessage(),
                               getPolicyId());
         })
-        .map(policyEventMapper::fromPolicyNext)
-        .onErrorContinue(MessagingException.class, (error, v) -> {
-          onExecuteNextErrorConsumer.accept(error);
-          ((BaseEventContext) ((MessagingException) error).getEvent().getContext()).error(error);
-        });
+        .map(policyEventMapper::fromPolicyNext);
+  }
+
+  private BaseExceptionHandler policyNextErrorHandler() {
+    return new BaseExceptionHandler() {
+
+      @Override
+      public void onError(Exception error) {
+        onExecuteNextErrorConsumer.accept(error);
+      }
+    };
   }
 
   private Consumer<CoreEvent> pushAfterNextFlowStackElement() {
