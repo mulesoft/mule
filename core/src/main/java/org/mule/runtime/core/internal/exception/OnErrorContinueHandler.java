@@ -12,11 +12,9 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
@@ -39,11 +37,10 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected void doInitialise(MuleContext muleContext) throws InitialisationException {
-    super.doInitialise(muleContext);
+  protected void doInitialise() throws InitialisationException {
+    super.doInitialise();
 
-    ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
-    sourceErrorMatcher = new SingleErrorTypeMatcher(errorTypeRepository.getSourceResponseErrorType());
+    sourceErrorMatcher = new SingleErrorTypeMatcher(getErrorTypeRepository().getSourceResponseErrorType());
 
     if (errorType != null) {
       String[] errors = errorType.split(",");
@@ -51,7 +48,7 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
         String sanitizedError = error.trim();
         ComponentIdentifier errorTypeIdentifier = buildFromStringRepresentation(sanitizedError);
 
-        Optional<ErrorType> errorType = errorTypeRepository.lookupErrorType(errorTypeIdentifier);
+        Optional<ErrorType> errorType = getErrorTypeRepository().lookupErrorType(errorTypeIdentifier);
         if (errorType.isPresent()) {
           if (sourceErrorMatcher.match(errorType.get())) {
             throw new InitialisationException(getInitialisationError(sanitizedError), this);
@@ -60,7 +57,7 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
       }
     } else if (!when.isPresent()) {
       // No error type and no expression, force ANY matcher
-      errorTypeMatcher = new SingleErrorTypeMatcher(errorTypeRepository.getAnyErrorType());
+      errorTypeMatcher = new SingleErrorTypeMatcher(getErrorTypeRepository().getAnyErrorType());
     }
 
   }

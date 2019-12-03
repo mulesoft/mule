@@ -7,10 +7,14 @@
 package org.mule.runtime.core.internal.event;
 
 import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.leftPad;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static reactor.core.publisher.Mono.empty;
+
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
@@ -33,6 +37,7 @@ import java.util.function.Consumer;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoSink;
 
@@ -48,6 +53,7 @@ abstract class AbstractEventContext implements BaseEventContext {
   private static final byte STATE_COMPLETE = 2;
   private static final byte STATE_TERMINATED = 3;
 
+  private static final int TO_STRING_TAB_SIZE = 4;
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventContext.class);
   private static final FlowExceptionHandler NULL_EXCEPTION_HANDLER = NullExceptionHandler.getInstance();
 
@@ -72,10 +78,6 @@ abstract class AbstractEventContext implements BaseEventContext {
 
   public AbstractEventContext() {
     this(NULL_EXCEPTION_HANDLER, 0, Optional.empty());
-  }
-
-  public AbstractEventContext(FlowExceptionHandler exceptionHandler) {
-    this(exceptionHandler, 0, Optional.empty());
   }
 
   /**
@@ -392,4 +394,20 @@ abstract class AbstractEventContext implements BaseEventContext {
   public Lock getChildContextsWriteLock() {
     return childContextsReadWriteLock.writeLock();
   }
+
+  protected abstract String basicToString();
+
+  protected final String detailedToString(int level, BaseEventContext highlight) {
+    return (this == highlight ? "=> " : "") + basicToString()
+        + lineSeparator()
+        + childContexts.stream()
+            .map(ctx -> leftPad("", (1 + level) * TO_STRING_TAB_SIZE)
+                + ((AbstractEventContext) ctx).detailedToString(1 + level, highlight))
+            .collect(joining(lineSeparator()));
+  }
+
+  protected byte getState() {
+    return state;
+  }
+
 }

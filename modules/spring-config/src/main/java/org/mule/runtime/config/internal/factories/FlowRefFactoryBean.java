@@ -20,7 +20,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.error;
@@ -40,12 +40,10 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.exception.RecursiveFlowRefException;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -287,6 +285,12 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       return decoratePublisher(pub);
     }
 
+    private ReactiveProcessor wrapInExceptionMapper(ReactiveProcessor target) {
+      return publisher -> Flux.from(publisher)
+          .transform(target)
+          .onErrorMap(MessagingException.class, getMessagingExceptionMapper());
+    }
+
     private Consumer<CoreEvent> assertTargetFlowIsStarted(Flow resolvedTarget) {
       return event -> {
         if (!resolvedTarget.getLifecycleState().isStarted()) {
@@ -299,11 +303,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     private Publisher<CoreEvent> applyForStaticSubFlow(ReactiveProcessor resolvedTarget, Flux<CoreEvent> pub,
                                                        Optional<ComponentLocation> location) {
-
-      pub = pub.transform(eventPub -> applyWithChildContext(eventPub, wrapInExceptionMapper(resolvedTarget), location,
-                                                            popSubFlowFlowStackElement()));
-
-      return decoratePublisher(pub);
+      return decoratePublisher(pub.transform(resolvedTarget));
     }
 
     private Publisher<CoreEvent> applyForStaticProcessor(ReactiveProcessor resolvedTarget, Flux<CoreEvent> pub,
@@ -312,19 +312,6 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
           .doOnError(exception -> ((BaseEventContext) event.getContext()).error(exception))));
 
       return decoratePublisher(pub);
-    }
-
-    private ReactiveProcessor wrapInExceptionMapper(ReactiveProcessor target) {
-      return publisher -> Flux.from(publisher)
-          .transform(target)
-          .onErrorMap(MessagingException.class, getMessagingExceptionMapper());
-    }
-
-    private FlowExceptionHandler popSubFlowFlowStackElement() {
-      return (exception, event) -> {
-        ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
-        return event;
-      };
     }
 
     /**
@@ -386,7 +373,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     }
 
     protected String originalEventKey(CoreEvent event) {
-      return "flowRef.originalEvent." + event.getContext().getId();
+      return "flowRef.originalEvent." + event.getContext().getId() + getLocation().getLocation();
     }
 
     @Override
@@ -461,30 +448,26 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
           return error(e);
         }
 
-        ReactiveProcessor decoratedTarget = p -> Mono.from(p)
-            .transform(resolvedTarget)
-            .onErrorMap(MessagingException.class,
-                        getMessagingExceptionMapper());
-
         Optional<Flow> targetAsFlow = resolvedTarget instanceof Flow ? of((Flow) resolvedTarget) : empty();
         return Mono
-            .from(processWithChildContextFlowOrSubflow(event, decoratedTarget, targetAsFlow))
+            .from(processWithChildContextFlowOrSubflow(event, resolvedTarget, targetAsFlow))
             .map(outputToTarget(event, target, targetValue, expressionManager));
       });
     }
 
     protected Publisher<CoreEvent> processWithChildContextFlowOrSubflow(CoreEvent event,
-                                                                        ReactiveProcessor decoratedTarget,
+                                                                        ReactiveProcessor resolvedTarget,
                                                                         Optional<Flow> targetAsFlow) {
       Optional<ComponentLocation> componentLocation = ofNullable(DynamicFlowRefMessageProcessor.this.getLocation());
       if (targetAsFlow.isPresent()) {
-        return processWithChildContext(event, decoratedTarget,
-                                       componentLocation,
-                                       targetAsFlow.get().getExceptionListener());
+        return processWithChildContextDontComplete(event, p -> Mono.from(p)
+            .transform(resolvedTarget)
+            .onErrorMap(MessagingException.class,
+                        getMessagingExceptionMapper()), componentLocation,
+                                                   targetAsFlow.get().getExceptionListener());
       } else {
         // If the resolved target is not a flow, it should be a subflow
-        return processWithChildContext(event, decoratedTarget, componentLocation);
-
+        return Mono.just(event).transform(resolvedTarget);
       }
     }
 

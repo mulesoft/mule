@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.source.polling;
 
+import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
 import static org.mockito.ArgumentMatchers.any;
@@ -19,9 +20,12 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.MuleTestUtils.createFlowWithSource;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -70,7 +74,8 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(REGISTRY_KEY, componentLocator);
+    return of(REGISTRY_KEY, componentLocator,
+              OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @Test

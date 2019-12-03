@@ -15,7 +15,10 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATIO
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
@@ -52,8 +55,8 @@ import org.junit.Test;
 @SmallTest
 public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
 
-  private List<Object> startStopOrder = new ArrayList<>();
-  private RecordingTQM rtqm = new RecordingTQM();
+  private final List<Object> startStopOrder = new ArrayList<>();
+  private final RecordingTQM rtqm = new RecordingTQM();
 
   @Rule
   public TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
@@ -66,6 +69,7 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
     objects.put(OBJECT_QUEUE_MANAGER, rtqm);
     objects.put(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
     objects.put(INTERCEPTOR_MANAGER_REGISTRY_KEY, mock(InterceptorManager.class));
+    objects.put(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
     muleContext = new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
                                                                     new SimpleConfigurationBuilder(objects));
     testServicesConfigurationBuilder.configure(muleContext);

@@ -8,7 +8,6 @@ package org.mule.runtime.core.privileged.exception;
 
 import static java.lang.Boolean.TRUE;
 import static java.text.MessageFormat.format;
-import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.exception.ExceptionHelper.sanitize;
@@ -19,6 +18,7 @@ import static org.mule.runtime.api.notification.SecurityNotification.SECURITY_AU
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.TypedException;
@@ -53,6 +53,7 @@ import org.slf4j.LoggerFactory;
  * <code>AbstractSystemExceptionStrategy</code> (if you are creating a System Exception Strategy) rather than directly from this
  * class.
  */
+@NoExtend
 public abstract class AbstractExceptionListener extends AbstractMessageProcessorOwner {
 
   protected static final String NOT_SET = "<not set>";
@@ -94,17 +95,25 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   @Override
   public final synchronized void initialise() throws InitialisationException {
     if (!initialised.get()) {
-      doInitialise(muleContext);
+      doInitialise();
       super.initialise();
       initialised.set(true);
     }
   }
 
-  protected void doInitialise(MuleContext context) throws InitialisationException {
-    requireNonNull(muleContext);
+  protected void doInitialise() throws InitialisationException {
     if (logger.isDebugEnabled()) {
       logger.debug("Initialising exception listener: " + toString());
     }
+    doInitialise(muleContext);
+  }
+
+  /**
+   * @deprecated Implement {@link #doInitialise()} instead.
+   */
+  @Deprecated
+  protected void doInitialise(MuleContext muleContext) throws InitialisationException {
+    // nothing to do
   }
 
   protected void fireNotification(Exception ex, CoreEvent event) {
@@ -235,5 +244,10 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   public void setStatistics(FlowConstructStatistics statistics) {
     this.statistics = statistics;
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName() + (getLocation() != null ? " @ " + getLocation().getLocation() : "");
   }
 }

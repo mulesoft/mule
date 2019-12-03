@@ -26,9 +26,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.from;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -40,7 +42,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.ErrorHandlerNotification;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
@@ -71,6 +73,8 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
@@ -79,6 +83,7 @@ import reactor.core.publisher.Mono;
 public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     implements MessagingExceptionHandlerAcceptor {
 
+  private static final Logger LOGGER = getLogger(TemplateOnErrorHandler.class);
 
   private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile(".*/.*/.*");
   private static final String ERROR_EXCEPTION = "error.exception.";
@@ -89,6 +94,12 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   @Inject
   protected ConfigurationComponentLocator locator;
+
+  @Inject
+  private ExpressionManager expressionManager;
+
+  @Inject
+  private ErrorTypeRepository errorTypeRepository;
 
   @Inject
   private ConfigurationProperties configurationProperties;
@@ -143,6 +154,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   public void routeError(Exception error, Consumer<CoreEvent> continueCallback,
                          Consumer<Throwable> propagateCallback) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Routing error in '" + this.toString() + "'...");
+    }
+
     // All calling methods will end up transforming any error class other than MessagingException into that one
     MessagingException messagingError = (MessagingException) error;
     CoreEvent failureEvent = messagingError.getEvent();
@@ -190,7 +205,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private String getParameterId(String keyPrefix, CoreEvent event) {
-    return keyPrefix + event.getContext().getId();
+    return keyPrefix + event.getContext().getId() + toString();
   }
 
   private <T> T getInternalParameter(String keyPrefix, CoreEvent event) {
@@ -224,8 +239,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   protected Publisher<CoreEvent> route(Publisher<CoreEvent> eventPublisher) {
-    return applyWithChildContext(eventPublisher, configuredMessageProcessors, ofNullable(location),
-                                 NullExceptionHandler.getInstance());
+    return from(eventPublisher).transform(configuredMessageProcessors);
   }
 
   @Override
@@ -266,8 +280,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   @Override
-  protected void doInitialise(MuleContext muleContext) throws InitialisationException {
-    super.doInitialise(muleContext);
+  protected void doInitialise() throws InitialisationException {
+    super.doInitialise();
     this.location = this.getLocation();
     Optional<ProcessingStrategy> processingStrategy = empty();
     if (flowLocation.isPresent()) {
@@ -275,13 +289,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     } else if (location != null) {
       processingStrategy = getProcessingStrategy(locator, getRootContainerLocation());
     }
-    configuredMessageProcessors = newChain(processingStrategy, getMessageProcessors());
+    configuredMessageProcessors =
+        buildNewChainWithListOfProcessors(processingStrategy, getMessageProcessors(), NullExceptionHandler.getInstance());
 
-    if (configuredMessageProcessors != null) {
-      configuredMessageProcessors.setMuleContext(muleContext);
-    }
-
-    errorTypeMatcher = createErrorType(muleContext.getErrorTypeRepository(), errorType, configurationProperties);
+    errorTypeMatcher = createErrorType(errorTypeRepository, errorType, configurationProperties);
     if (!inDefaultErrorHandler()) {
       errorHandlerLocation = this.location.getLocation();
       isLocalErrorHandlerLocation = ERROR_HANDLER_LOCATION_PATTERN.matcher(errorHandlerLocation).find();
@@ -393,7 +404,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private boolean acceptsExpression(CoreEvent event) {
-    return when.map(expr -> muleContext.getExpressionManager().evaluateBoolean(expr, event, getLocation())).orElse(true);
+    return when.map(expr -> expressionManager.evaluateBoolean(expr, event, getLocation())).orElse(true);
   }
 
   protected Function<CoreEvent, CoreEvent> afterRouting() {
@@ -425,7 +436,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
    */
   protected void logException(Throwable t, CoreEvent event) {
     if (TRUE.toString().equals(logException)
-        || this.muleContext.getExpressionManager().evaluateBoolean(logException, event, location, true, true)) {
+        || expressionManager.evaluateBoolean(logException, event, location, true, true)) {
       resolveAndLogException(t);
     }
   }
@@ -452,7 +463,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
    * {@link org.mule.runtime.core.api.construct.Flow} or {@link org.mule.runtime.core.internal.processor.TryScope} executing this
    * ErrorHandler. This is intended to be used when having references to Global ErrorHandlers, since each instance reference
    * should run with the processing strategy defined by the flow referencing it, and be able to rollback transactions.
-   * 
+   *
    * @param location
    * @return copy of this ErrorHandler with location to retrieve {@link ProcessingStrategy}
    *
@@ -512,5 +523,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       // We are in a default error handler of a Flow
       return sameRootContainerLocation(transaction);
     }
+  }
+
+  protected ErrorTypeRepository getErrorTypeRepository() {
+    return errorTypeRepository;
   }
 }

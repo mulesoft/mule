@@ -26,9 +26,11 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_MAP;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ScatterGatherStory.SCATTER_GATHER;
 import static reactor.core.publisher.Flux.from;
@@ -56,13 +58,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(ROUTERS)
 @Story(SCATTER_GATHER)
@@ -71,9 +74,9 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
   @Rule
   public ExpectedException expectedException = none();
 
-  private ScatterGatherRouter router = new ScatterGatherRouter();
-  private ForkJoinStrategyFactory mockForkJoinStrategyFactory = mock(ForkJoinStrategyFactory.class);
-  private ConfigurationProperties configurationProperties = mock(ConfigurationProperties.class);
+  private final ScatterGatherRouter router = new ScatterGatherRouter();
+  private final ForkJoinStrategyFactory mockForkJoinStrategyFactory = mock(ForkJoinStrategyFactory.class);
+  private final ConfigurationProperties configurationProperties = mock(ConfigurationProperties.class);
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
@@ -83,6 +86,7 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
     Map<String, Object> registryObjects = new HashMap<>();
     registryObjects.put(REGISTRY_KEY, componentLocator);
     registryObjects.put("_configurationProperties", configurationProperties);
+    registryObjects.put(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
     return registryObjects;
   }
 

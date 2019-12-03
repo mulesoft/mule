@@ -7,10 +7,13 @@
 
 package org.mule.runtime.core.internal.el.mvel.datatype;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.mvel2.MVEL.compileExpression;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.mvel2.ParserContext;
@@ -21,16 +24,22 @@ import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.junit.Test;
-
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
+import org.junit.Test;
 
 public class PropertyEnricherDataTypePropagatorTestCase extends AbstractMuleContextTestCase {
 
   private static final Charset CUSTOM_ENCODING = StandardCharsets.UTF_16;
 
   private final EnricherDataTypePropagator dataTypePropagator = new PropertyEnricherDataTypePropagator();
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
+  }
 
   @Test
   public void propagatesDataTypeForInlinedInvocationProperty() throws Exception {

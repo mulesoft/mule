@@ -18,6 +18,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
@@ -28,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import javax.xml.namespace.QName;
 
@@ -94,25 +94,27 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
     private final String subFlowName;
 
     SubFlowMessageProcessorChain(String name, List<Processor> processors) {
-      super(name, empty(), processors);
+      super(name, empty(), processors,
+            NullExceptionHandler.getInstance());
       this.subFlowName = name;
     }
 
-    private Consumer<CoreEvent> pushSubFlowFlowStackElement() {
-      return event -> ((DefaultFlowCallStack) event.getFlowCallStack()).push(new FlowStackElement(subFlowName, null));
+    private void pushSubFlowFlowStackElement(CoreEvent event) {
+      ((DefaultFlowCallStack) event.getFlowCallStack()).push(new FlowStackElement(subFlowName, null));
     }
 
-    private Consumer<CoreEvent> popSubFlowFlowStackElement() {
-      return event -> ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
+    private void popSubFlowFlowStackElement(CoreEvent event) {
+      ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
     }
 
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher)
-          .doOnNext(pushSubFlowFlowStackElement())
+          .doOnNext(this::pushSubFlowFlowStackElement)
           // To avoid recursive transformation when there are flowref cycles, the chain is lazily transformed
-          .compose(s -> super.apply(s))
-          .doOnNext(popSubFlowFlowStackElement());
+          .compose(super::apply)
+          .doOnNext(this::popSubFlowFlowStackElement);
     }
+
   }
 }

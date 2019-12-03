@@ -8,12 +8,15 @@
 package org.mule.runtime.core.api;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
@@ -30,13 +33,14 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.nio.charset.Charset;
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.nio.charset.Charset;
 
 @SmallTest
 public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
@@ -48,7 +52,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   public static final String PROPERTY_NAME = "test";
   public static final String PROPERTY_VALUE = "foo";
 
-  private Message muleMessage = of("test-data");
+  private final Message muleMessage = of("test-data");
   private Flow flow;
   private EventContext messageContext;
   private PrivilegedEvent muleEvent;
@@ -58,6 +62,11 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     flow = getTestFlow(muleContext);
     messageContext = create(flow, TEST_CONNECTOR_LOCATION);
     muleEvent = InternalEvent.builder(messageContext).message(muleMessage).build();
+  }
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @After

@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.api.exception;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.function.Consumer;
 
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 import reactor.core.publisher.Mono;
 
@@ -20,6 +23,8 @@ import reactor.core.publisher.Mono;
  * @since 4.2
  */
 public abstract class BaseExceptionHandler implements FlowExceptionHandler {
+
+  private static final Logger LOGGER = getLogger(BaseExceptionHandler.class);
 
   @Override
   public CoreEvent handleException(Exception exception, CoreEvent event) {
@@ -37,6 +42,10 @@ public abstract class BaseExceptionHandler implements FlowExceptionHandler {
 
   @Override
   public void routeError(Exception error, Consumer<CoreEvent> continueCallback, Consumer<Throwable> propagateCallback) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Routing error in '" + this.toString() + "'...");
+    }
+
     onError(error);
     FlowExceptionHandler.super.routeError(error, continueCallback, propagateCallback);
   }

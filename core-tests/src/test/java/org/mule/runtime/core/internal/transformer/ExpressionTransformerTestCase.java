@@ -12,6 +12,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -19,12 +21,12 @@ import org.mule.runtime.core.internal.transformer.expression.ExpressionArgument;
 import org.mule.runtime.core.internal.transformer.expression.ExpressionTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Test;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase {
 
@@ -33,6 +35,7 @@ public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase {
     Map<String, Object> objects = new HashMap<>();
     objects.putAll(super.getStartUpRegistryObjects());
     objects.put(COMPATIBILITY_PLUGIN_INSTALLED, new Object());
+    objects.put(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
     return objects;
   }
 

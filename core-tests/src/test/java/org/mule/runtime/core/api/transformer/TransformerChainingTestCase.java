@@ -7,11 +7,14 @@
 package org.mule.runtime.core.api.transformer;
 
 import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -21,10 +24,11 @@ import org.mule.runtime.core.privileged.transformer.ExtendedTransformationServic
 import org.mule.runtime.core.privileged.transformer.TransformerChain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.nio.charset.Charset;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
-
-import java.nio.charset.Charset;
 
 public class TransformerChainingTestCase extends AbstractMuleContextTestCase {
 
@@ -33,6 +37,11 @@ public class TransformerChainingTestCase extends AbstractMuleContextTestCase {
   @Before
   public void setUp() throws Exception {
     transformationService = new ExtendedTransformationService(muleContext);
+  }
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @Test
