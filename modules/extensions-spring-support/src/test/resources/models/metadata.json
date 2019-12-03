@@ -27428,8 +27428,8 @@
           "genericTypes": [],
           "isMap": false
         },
-        "typeId": "http://example.com/example.json",
-        "label": "Person"
+        "label": "Person",
+        "typeId": "http://example.com/example.json"
       },
       "open": {
         "type": "Any"
