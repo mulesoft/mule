@@ -29,6 +29,8 @@ import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 
+import com.google.common.base.Objects;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,18 +57,21 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
    */
   @Override
   public Optional<ValueProviderCacheId> getIdForResolvedValues(DslElementModel<?> containerComponent, String parameterName) {
-    return ifContainsParameter(containerComponent, parameterName).flatMap(
-                                                                          parametersMap -> parametersMap.get(parameterName)
-                                                                              .getParameterModel().getValueProviderModel()
-                                                                              .flatMap(
-                                                                                       valueProviderModel -> resolveId(containerComponent,
-                                                                                                                       valueProviderModel,
-                                                                                                                       parametersMap)));
+    return ifContainsParameter(containerComponent, parameterName)
+        .flatMap(ParameterModel::getValueProviderModel)
+        .flatMap(valueProviderModel -> resolveParametersInformation(containerComponent)
+            .flatMap(infoMap -> resolveId(containerComponent, valueProviderModel, infoMap)));
   }
 
-  private Optional<Map<String, ParameterModelInformation>> ifContainsParameter(DslElementModel<?> containerComponent,
-                                                                               String parameterName) {
-    return resolveParametersInformation(containerComponent).map(pi -> pi.containsKey(parameterName) ? pi : null);
+  private Optional<ParameterModel> ifContainsParameter(DslElementModel<?> containerComponent, String parameterName) {
+    if (containerComponent.getModel() instanceof ParameterizedModel) {
+      return ((ParameterizedModel) containerComponent.getModel())
+          .getAllParameterModels()
+          .stream()
+          .filter(p -> Objects.equal(parameterName, p.getName()))
+          .findAny();
+    }
+    return empty();
   }
 
   private Optional<Map<String, ParameterModelInformation>> resolveParametersInformation(DslElementModel<?> containerComponent) {
