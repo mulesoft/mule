@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.policy;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.Runtime.getRuntime;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -19,7 +18,6 @@ import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.policy.OperationPolicyContext.OPERATION_POLICY_CONTEXT;
 import static org.mule.runtime.core.internal.policy.OperationPolicyContext.from;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.create;
 import static reactor.core.publisher.Flux.from;
@@ -40,7 +38,6 @@ import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.TransactionAwareFluxSinkSupplier;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
 import java.util.List;
@@ -49,9 +46,11 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
+import org.reactivestreams.Publisher;
+
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
-import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -116,25 +115,10 @@ public class CompositeOperationPolicy
 
       Flux<CoreEvent> policyFlux = create(sinkRef)
           .transform(getExecutionProcessor())
-          .doOnNext(result -> {
-            OperationPolicyContext ctx = from((InternalEvent) result);
-            final BaseEventContext childContext = ctx.getOperationChildContext();
-            if (!childContext.isComplete()) {
-              childContext.success(result);
-            }
-            ctx.getOperationCallerCallback().complete(quickCopy(childContext.getParentContext().get(), result));
-          })
+          .doOnNext(result -> from(result).getOperationCallerCallback().complete(result))
           .onErrorContinue(MessagingException.class, (t, e) -> {
             final MessagingException me = (MessagingException) t;
-            OperationPolicyContext ctx = from((InternalEvent) me.getEvent());
-
-            final BaseEventContext childContext = ctx.getOperationChildContext();
-            if (!childContext.isComplete()) {
-              childContext.error(me);
-            }
-            me.setProcessedEvent(quickCopy(childContext.getParentContext().get(), me.getEvent()));
-
-            ctx.getOperationCallerCallback().error(me);
+            from(me.getEvent()).getOperationCallerCallback().error(me);
           });
 
       policyFlux.subscribe();
@@ -229,7 +213,7 @@ public class CompositeOperationPolicy
       if (!disposed.get()) {
         FluxSink<CoreEvent> policySink = policySinks.get(operationLocation.getLocation()).get();
 
-        policySink.next(operationEventForPolicy(quickCopy(newChildContext(operationEvent, of(operationLocation)), operationEvent),
+        policySink.next(operationEventForPolicy(operationEvent,
                                                 operationExecutionFunction,
                                                 parametersProcessor, callback));
       } else {
@@ -242,7 +226,6 @@ public class CompositeOperationPolicy
                                             OperationParametersProcessor parametersProcessor, ExecutorCallback callback) {
     OperationPolicyContext ctx = new OperationPolicyContext(parametersProcessor,
                                                             operationExecutionFunction,
-                                                            (BaseEventContext) operationEvent.getContext(),
                                                             callback);
     if (getParametersTransformer().isPresent()) {
       return InternalEvent.builder(operationEvent)

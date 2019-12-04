@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.policy;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
 /**
@@ -35,19 +34,16 @@ public class OperationPolicyContext {
   }
 
   private CoreEvent originalEvent;
-  private OperationParametersProcessor operationParametersProcessor;
-  private OperationExecutionFunction operationExecutionFunction;
-  private BaseEventContext operationChildContext;
-  private ExecutorCallback operationCallerCallback;
+  private final OperationParametersProcessor operationParametersProcessor;
+  private final OperationExecutionFunction operationExecutionFunction;
+  private final ExecutorCallback operationCallerCallback;
   private InternalEvent nextOperationResponse;
 
   public OperationPolicyContext(OperationParametersProcessor operationParametersProcessor,
                                 OperationExecutionFunction operationExecutionFunction,
-                                BaseEventContext operationChildContext,
                                 ExecutorCallback operationCallerCallback) {
     this.operationParametersProcessor = operationParametersProcessor;
     this.operationExecutionFunction = operationExecutionFunction;
-    this.operationChildContext = operationChildContext;
     this.operationCallerCallback = operationCallerCallback;
   }
 
@@ -65,10 +61,6 @@ public class OperationPolicyContext {
 
   public OperationExecutionFunction getOperationExecutionFunction() {
     return operationExecutionFunction;
-  }
-
-  public BaseEventContext getOperationChildContext() {
-    return operationChildContext;
   }
 
   public ExecutorCallback getOperationCallerCallback() {

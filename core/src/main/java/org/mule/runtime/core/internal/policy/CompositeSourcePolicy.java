@@ -26,6 +26,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.List;
 import java.util.Map;
@@ -196,6 +197,7 @@ public class CompositeSourcePolicy
                                                                                 getParametersTransformer()),
                                          notificationHelper, lastPolicy.getPolicyChain().getLocation())
                                              .accept(error);
+          ((BaseEventContext) ((MessagingException) error).getEvent().getContext()).error(error);
         });
   }
 
