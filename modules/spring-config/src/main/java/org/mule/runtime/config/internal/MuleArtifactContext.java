@@ -444,27 +444,27 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
 
     componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
-        .ifPresent(componentBuildingDefinition -> {
-          // add any error mappings if present
-          List<ComponentModel> errorMappingComponents = componentModel.getInnerComponents().stream()
-              .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER.equals(innerComponent.getIdentifier())).collect(toList());
-          if (!errorMappingComponents.isEmpty()) {
-            addAnnotation(ANNOTATION_ERROR_MAPPINGS, errorMappingComponents.stream().map(innerComponent -> {
-              Map<String, String> parameters = innerComponent.getRawParameters();
-              ComponentIdentifier source = parameters.containsKey(SOURCE_TYPE)
-                  ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE)) : ANY;
+        .ifPresent(componentBuildingDefinition -> registerErrorMappings(componentModel, syntheticErrorNamespaces));
+  }
 
-              ErrorType errorType = muleContext.getErrorTypeRepository()
-                  .lookupErrorType(source)
-                  .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source)));
+  private void registerErrorMappings(SpringComponentModel componentModel, Set<String> syntheticErrorNamespaces) {
+    List<ComponentModel> errorMappingComponents = componentModel.getInnerComponents().stream()
+        .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER.equals(innerComponent.getIdentifier())).collect(toList());
+    if (!errorMappingComponents.isEmpty()) {
+      addAnnotation(ANNOTATION_ERROR_MAPPINGS, errorMappingComponents.stream().map(innerComponent -> {
+        Map<String, String> parameters = innerComponent.getRawParameters();
+        ComponentIdentifier source = parameters.containsKey(SOURCE_TYPE)
+            ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE)) : ANY;
 
-              ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorType);
-              ErrorType targetValue = resolveErrorType(parameters.get(TARGET_TYPE), syntheticErrorNamespaces);
-              return new ErrorMapping(errorTypeMatcher, targetValue);
-            }).collect(toList()), componentModel);
-          }
+        ErrorType errorType = muleContext.getErrorTypeRepository()
+            .lookupErrorType(source)
+            .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source)));
 
-        });
+        ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorType);
+        ErrorType targetValue = resolveErrorType(parameters.get(TARGET_TYPE), syntheticErrorNamespaces);
+        return new ErrorMapping(errorTypeMatcher, targetValue);
+      }).collect(toList()), componentModel);
+    }
   }
 
   private void processRaiseError(ComponentModel componentModel, Set<String> syntheticErrorNamespaces) {
