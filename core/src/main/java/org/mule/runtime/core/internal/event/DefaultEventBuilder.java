@@ -184,7 +184,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     if ((flowVariables != null && !this.flowVariables.isEmpty()) || !this.originalVars.isEmpty()) {
       this.varsModified = true;
       this.modified = true;
-      //flowVariables = basedOn(new SmallMap<>());
       flowVariables = new CaseInsensitiveHashMap<>();
     }
     return this;

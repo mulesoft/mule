@@ -391,12 +391,12 @@ public final class DefaultMessageBuilder
     /**
      * Collection of attachments that were attached to the incoming message
      */
-    private transient Map<String, DataHandler> inboundAttachments = new SmallMap<>();
+    private transient Map<String, DataHandler> inboundAttachments = new LinkedHashMap<>();
 
     /**
      * Collection of attachments that will be sent out with this message
      */
-    private transient Map<String, DataHandler> outboundAttachments = new SmallMap<>();
+    private transient Map<String, DataHandler> outboundAttachments = new LinkedHashMap<>();
 
     private transient TypedValue typedValue;
     private TypedValue typedAttributes;
