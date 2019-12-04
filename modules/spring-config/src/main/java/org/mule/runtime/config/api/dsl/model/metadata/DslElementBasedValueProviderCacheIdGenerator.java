@@ -103,8 +103,8 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
     parts.add(resolveValueProviderId(valueProviderModel));
     parts.addAll(resolveActingParameterIds(valueProviderModel, parameterModelsInformation));
 
-    return of(aValueProviderCacheId(fromElementWithName(resolveDslTag(containerComponent)
-        .orElse(getSourceElementName(containerComponent))).containing(parts)));
+    String id = resolveDslTag(containerComponent).orElse(getSourceElementName(containerComponent));
+    return of(aValueProviderCacheId(fromElementWithName(id).withHashValueFrom(id).containing(parts)));
   }
 
   private Optional<ValueProviderCacheId> resolveForComponentModel(DslElementModel<?> containerComponent,
@@ -116,8 +116,8 @@ public class DslElementBasedValueProviderCacheIdGenerator implements ValueProvid
     parts.addAll(resolveActingParameterIds(valueProviderModel, parameterModelsInformation));
     parts.addAll(resolveIdForInjectedElements(containerComponent, valueProviderModel));
 
-    return of(aValueProviderCacheId(fromElementWithName(resolveDslTag(containerComponent)
-        .orElse(getSourceElementName(containerComponent))).containing(parts)));
+    String id = resolveDslTag(containerComponent).orElse(getSourceElementName(containerComponent));
+    return of(aValueProviderCacheId(fromElementWithName(id).withHashValueFrom(id).containing(parts)));
   }
 
   private List<ValueProviderCacheId> resolveIdForInjectedElements(DslElementModel<?> containerComponent,
