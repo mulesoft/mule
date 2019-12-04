@@ -28,7 +28,7 @@ public class SmallMapBenchmark extends AbstractBenchmark {
   @TearDown
   public void teardown() throws MuleException {}
 
-  //@Benchmark
+  @Benchmark
   public Object hashMapOf3() {
     Map<String, String> map = new HashMap<>();
     populate(map, 3);
@@ -39,7 +39,7 @@ public class SmallMapBenchmark extends AbstractBenchmark {
     return map;
   }
 
-  //@Benchmark
+  @Benchmark
   public Object smallMapOf3() {
     Map<String, String> map = new SmallMap<>();
     populate(map, 3);
@@ -49,7 +49,7 @@ public class SmallMapBenchmark extends AbstractBenchmark {
     return map;
   }
 
-  //@Benchmark
+  @Benchmark
   public Object hashMapOf6() {
     Map<String, String> map = new HashMap<>();
     populate(map, 6);
@@ -61,7 +61,7 @@ public class SmallMapBenchmark extends AbstractBenchmark {
     return map;
   }
 
-  //@Benchmark
+  @Benchmark
   public Object smallMapOf6() {
     Map<String, String> map = new SmallMap<>();
     populate(map, 6);
@@ -69,30 +69,6 @@ public class SmallMapBenchmark extends AbstractBenchmark {
     map.get("one");
     map.get("three");
     map.get("six");
-
-    return map;
-  }
-
-  @Benchmark
-  public Object hashMapOf7() {
-    Map<String, String> map = new HashMap<>();
-    populate(map, 7);
-
-    map.get("one");
-    map.get("three");
-    map.get("six");
-
-    return map;
-  }
-
-  @Benchmark
-  public Object smallMapOf7() {
-    Map<String, String> map = new SmallMap<>();
-    populate(map, 7);
-
-    map.get("one");
-    map.get("three");
-    map.get("seven");
 
     return map;
   }

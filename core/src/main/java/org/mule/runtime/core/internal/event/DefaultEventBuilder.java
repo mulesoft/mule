@@ -210,15 +210,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   }
 
   @Override
-  public Builder addInternalParameters(Map<String, Object> internalParameters) {
-    initInternalParameters();
-
-    this.internalParameters.putAll(internalParameters);
-    this.modified = true;
-    return this;
-  }
-
-  @Override
   public DefaultEventBuilder removeInternalParameter(String key) {
     initInternalParameters();
 
@@ -301,8 +292,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   protected void initVariables() {
     if (!varsModified && flowVariables == null) {
       flowVariables = new CaseInsensitiveHashMap<>(originalVars);
-      //flowVariables = basedOn(forSize(originalVars.size()));
-      //flowVariables.putAll(originalVars);
     }
   }
 
