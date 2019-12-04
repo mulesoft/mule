@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.policy;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.api.util.collection.SmallMap.copy;
 import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
@@ -26,7 +27,6 @@ import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -236,7 +236,7 @@ public class CompositeSourcePolicy
     if (originalResponseParameters == null) {
       return policyResponseParameters;
     } else {
-      Map<String, Object> concatMap = new HashMap<>(originalResponseParameters);
+      Map<String, Object> concatMap = copy(originalResponseParameters);
       policyResponseParameters.forEach((k, v) -> concatMap.merge(k, v, (v1, v2) -> v2));
       return concatMap;
     }

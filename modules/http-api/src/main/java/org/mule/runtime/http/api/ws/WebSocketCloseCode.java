@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.http.api.ws;
 
-import java.util.HashMap;
+import static org.mule.runtime.api.util.collection.SmallMap.forSize;
+
 import java.util.Map;
 
 /**
@@ -39,7 +40,7 @@ public enum WebSocketCloseCode {
    */
   MESSAGE_TOO_LARGE(1004);
 
-  private static final Map<Integer, WebSocketCloseCode> CODES = new HashMap<>(WebSocketCloseCode.values().length);
+  private static final Map<Integer, WebSocketCloseCode> CODES = forSize(WebSocketCloseCode.values().length);
 
   static {
     for (WebSocketCloseCode code : WebSocketCloseCode.values()) {

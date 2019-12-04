@@ -24,6 +24,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclarat
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.extension.api.annotation.notification.Fires;
 import org.mule.runtime.extension.api.annotation.notification.NotificationActionProvider;
 import org.mule.runtime.extension.api.annotation.notification.NotificationActions;
@@ -40,7 +41,6 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -71,7 +71,7 @@ public class NotificationsDeclarationEnricher implements DeclarationEnricher {
       annotation.ifPresent(actionsAnnotation -> {
         NotificationActionDefinition<?>[] actions =
             (NotificationActionDefinition<?>[]) actionsAnnotation.value().getEnumConstants();
-        Map<NotificationActionDefinition, NotificationModel> notificationModels = new HashMap<>();
+        Map<NotificationActionDefinition, NotificationModel> notificationModels = new SmallMap<>();
         stream(actions).forEach(action -> {
           NotificationModel model = new ImmutableNotificationModel(extensionNamespace, ((Enum) action).name(),
                                                                    typeLoader.load(action.getDataType().getType()));

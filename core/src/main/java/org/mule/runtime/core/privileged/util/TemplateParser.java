@@ -7,13 +7,14 @@
 package org.mule.runtime.core.privileged.util;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.util.collection.SmallMap.forSize;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
 
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -387,10 +388,10 @@ public final class TemplateParser {
 
   public Map<?, ?> parse(TemplateCallback callback, Map<?, ?> templates) {
     if (templates == null) {
-      return new HashMap<>();
+      return new SmallMap<>();
     }
 
-    Map<Object, String> map = new HashMap<>(templates.size());
+    Map<Object, String> map = forSize(templates.size());
     for (Map.Entry<?, ?> entry : templates.entrySet()) {
       map.put(entry.getKey(), parse(callback, entry.getValue().toString()));
     }

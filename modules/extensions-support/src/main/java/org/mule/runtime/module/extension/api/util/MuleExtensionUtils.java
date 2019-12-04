@@ -17,10 +17,12 @@ import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -34,7 +36,6 @@ import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -59,7 +60,7 @@ public class MuleExtensionUtils {
    *         to the expected one.
    */
   public static ExtensionModel loadExtension(Class<?> clazz) {
-    return loadExtension(clazz, new HashMap<>());
+    return loadExtension(clazz, new SmallMap<>());
   }
 
   /**

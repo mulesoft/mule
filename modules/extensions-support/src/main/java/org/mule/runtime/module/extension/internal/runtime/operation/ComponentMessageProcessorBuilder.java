@@ -7,8 +7,10 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.collection.SmallMap.copy;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -27,7 +29,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersRes
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -112,7 +113,7 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   }
 
   public ComponentMessageProcessorBuilder<M, P> setParameters(Map<String, ?> parameters) {
-    this.parameters = parameters != null ? parameters : new HashMap<>();
+    this.parameters = copy(parameters);
     return this;
   }
 

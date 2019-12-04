@@ -8,13 +8,13 @@ package org.mule.runtime.core.internal.event;
 
 
 import static java.lang.System.lineSeparator;
-import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
+import static org.mule.runtime.api.util.collection.SmallMap.unmodifiable;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsBytes;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsString;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
@@ -54,15 +54,12 @@ import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.charset.Charset;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
 
 public class DefaultEventBuilder implements InternalEvent.Builder {
-
-  private static final int INTERNAL_PARAMETERS_INITIAL_CAPACITY = 4;
 
   private BaseEventContext context;
   private Function<EventContext, Message> messageFactory;
@@ -400,7 +397,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException {
       is.defaultReadObject();
-      this.internalParameters = new HashMap<>(INTERNAL_PARAMETERS_INITIAL_CAPACITY);
+      this.internalParameters = new SmallMap<>();
     }
 
     @Override
@@ -550,7 +547,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     @Override
     public Map<String, ?> getInternalParameters() {
-      return unmodifiableMap(internalParameters);
+      return unmodifiable(internalParameters);
     }
 
     @Override

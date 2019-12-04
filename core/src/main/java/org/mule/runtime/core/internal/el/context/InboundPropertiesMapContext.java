@@ -52,7 +52,7 @@ public class InboundPropertiesMapContext extends AbstractMapContext<Serializable
 
   @Override
   public String toString() {
-    Map<String, Object> map = new HashMap<String, Object>();
+    Map<String, Object> map = new HashMap<>();
     for (String key : ((InternalMessage) event.getMessage()).getInboundPropertyNames()) {
       Object value = ((InternalMessage) event.getMessage()).getInboundProperty(key);
       map.put(key, value);

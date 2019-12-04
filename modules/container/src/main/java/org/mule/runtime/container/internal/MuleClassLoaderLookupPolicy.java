@@ -9,6 +9,7 @@ package org.mule.runtime.container.internal;
 
 import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.collection.SmallMap.copy;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentOnlyLookupStrategy.PARENT_ONLY;
 
@@ -46,7 +47,7 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
     checkArgument(rootSystemPackages != null, "System packages cannot be null");
     this.rootSystemPackages = normalizeRootSystemPackages(rootSystemPackages);
     this.configuredLookupStrategies = normalizeLookupStrategies(lookupStrategies);
-    this.lookupStrategies = new HashMap<>(configuredLookupStrategies);
+    this.lookupStrategies = copy(configuredLookupStrategies);
   }
 
   private Map<String, LookupStrategy> normalizeLookupStrategies(Map<String, LookupStrategy> lookupStrategies) {
@@ -124,7 +125,7 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
   @Override
   public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies, boolean overwrite) {
     validateLookupPolicies(lookupStrategies);
-    final Map<String, LookupStrategy> newLookupStrategies = new HashMap<>(this.configuredLookupStrategies);
+    final Map<String, LookupStrategy> newLookupStrategies = copy(this.configuredLookupStrategies);
 
     for (String packageName : lookupStrategies.keySet()) {
       if (overwrite || !newLookupStrategies.containsKey(normalizePackageName(packageName))) {

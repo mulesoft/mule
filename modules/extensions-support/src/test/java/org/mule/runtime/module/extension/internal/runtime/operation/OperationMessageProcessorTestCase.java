@@ -94,6 +94,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.google.common.reflect.TypeToken;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -101,9 +102,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.reflect.TypeToken;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -450,8 +448,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   public void newExecutionContextForNonInterceptedProcessor() throws MuleException {
     final AtomicReference<PrecalculatedExecutionContextAdapter> context = new AtomicReference<>();
 
-    Map<String, String> newContextParameters = ImmutableMap.of(MIME_TYPE_PARAMETER_NAME, MediaType.ANY.toRfcString(),
-                                                               ENCODING_PARAMETER_NAME, Charset.defaultCharset().name());
+    Map<String, String> newContextParameters = of(MIME_TYPE_PARAMETER_NAME, MediaType.ANY.toRfcString(),
+                                                  ENCODING_PARAMETER_NAME, Charset.defaultCharset().name());
     doReturn(newContextParameters).when(parameters).asMap();
     doReturn(parameters).when(resolverSet).resolve(any(ValueResolvingContext.class));
     messageProcessor.resolveParameters(CoreEvent.builder(event), (params, ctx) -> {

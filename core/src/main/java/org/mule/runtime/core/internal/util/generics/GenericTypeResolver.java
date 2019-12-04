@@ -196,7 +196,7 @@ public abstract class GenericTypeResolver {
     Map<TypeVariable, Type> typeVariableMap = (ref != null ? ref.get() : null);
 
     if (typeVariableMap == null) {
-      typeVariableMap = new HashMap<TypeVariable, Type>();
+      typeVariableMap = new HashMap<>();
 
       // interfaces
       extractTypeVariablesFromGenericInterfaces(clazz.getGenericInterfaces(), typeVariableMap);

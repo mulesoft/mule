@@ -17,6 +17,7 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.api.metadata.TypedValue.of;
+import static org.mule.runtime.api.util.collection.SmallMap.forSize;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noTransformerFoundForMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotOfCorrectType;
 import static org.mule.runtime.core.api.util.ObjectUtils.getBoolean;
@@ -37,6 +38,7 @@ import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -46,9 +48,6 @@ import org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder;
 import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -57,7 +56,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -66,6 +64,9 @@ import java.util.TreeSet;
 import java.util.function.Function;
 
 import javax.activation.DataHandler;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class DefaultMessageBuilder
     implements InternalMessage.Builder, InternalMessage.PayloadBuilder, InternalMessage.CollectionBuilder,
@@ -390,12 +391,12 @@ public final class DefaultMessageBuilder
     /**
      * Collection of attachments that were attached to the incoming message
      */
-    private transient Map<String, DataHandler> inboundAttachments = new LinkedHashMap<>();
+    private transient Map<String, DataHandler> inboundAttachments = new SmallMap<>();
 
     /**
      * Collection of attachments that will be sent out with this message
      */
-    private transient Map<String, DataHandler> outboundAttachments = new LinkedHashMap<>();
+    private transient Map<String, DataHandler> outboundAttachments = new SmallMap<>();
 
     private transient TypedValue typedValue;
     private TypedValue typedAttributes;
@@ -564,7 +565,7 @@ public final class DefaultMessageBuilder
       if (attachments == null) {
         toWrite = null;
       } else {
-        toWrite = new HashMap<>(attachments.size());
+        toWrite = forSize(attachments.size());
         for (Map.Entry<String, DataHandler> entry : attachments.entrySet()) {
           String name = entry.getKey();
           // TODO MULE-10013 remove this logic from here
@@ -613,7 +614,7 @@ public final class DefaultMessageBuilder
       if (attachments == null) {
         toReturn = emptyMap();
       } else {
-        toReturn = new HashMap<>(attachments.size());
+        toReturn = forSize(attachments.size());
         for (Map.Entry<String, SerializedDataHandler> entry : attachments.entrySet()) {
           toReturn.put(entry.getKey(), entry.getValue().getHandler());
         }
@@ -638,11 +639,11 @@ public final class DefaultMessageBuilder
      */
     public void initAfterDeserialisation(MuleContext context) throws MuleException {
       if (this.inboundAttachments == null) {
-        this.inboundAttachments = new HashMap<>();
+        this.inboundAttachments = new SmallMap<>();
       }
 
       if (this.outboundAttachments == null) {
-        this.outboundAttachments = new HashMap<>();
+        this.outboundAttachments = new SmallMap<>();
       }
     }
 

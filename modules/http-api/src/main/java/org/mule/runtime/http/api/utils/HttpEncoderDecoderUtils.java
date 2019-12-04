@@ -15,12 +15,12 @@ import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.api.util.MultiMap.StringMultiMap;
+import org.mule.runtime.api.util.collection.SmallMap;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -132,7 +132,7 @@ public final class HttpEncoderDecoderUtils {
    */
   public static Map<String, String> decodeUriParams(String pathWithUriParams, String requestPath) {
     if (pathWithUriParams.contains("{")) {
-      Map<String, String> uriParams = new HashMap<>();
+      Map<String, String> uriParams = new SmallMap<>();
 
       final String[] requestPathParts = requestPath.split("/");
       final String[] listenerPathParts = pathWithUriParams.split("/");

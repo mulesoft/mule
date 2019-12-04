@@ -22,74 +22,84 @@ import org.openjdk.jmh.annotations.TearDown;
 @OutputTimeUnit(NANOSECONDS)
 public class SmallMapBenchmark extends AbstractBenchmark {
 
-  public static final String IRON_MAN = "IronMan";
-  public static final String CAPTAIN_AMERICA = "Captain America";
-  public static final String BLACK_WIDOW = "Black Widow";
-  public static final String ANT_MAN = "Ant Man";
-  public static final String ANT_MAN1 = "Ant Man";
-  public static final String DR_STRANGE = "Dr. Strange";
+  private static final String[] KEYS = new String[] {"one", "two", "three", "four", "five", "six", "seven"};
+  private static final String[] VALUES = new String[] {"uno", "dos", "tres", "cuatro", "cinco", "seis", "siete"};
 
   @TearDown
   public void teardown() throws MuleException {}
 
-  @Benchmark
+  //@Benchmark
   public Object hashMapOf3() {
     Map<String, String> map = new HashMap<>();
-    populate3(map);
+    populate(map, 3);
 
-    map.get(IRON_MAN);
-    map.get(DR_STRANGE);
+    map.get("one");
+    map.get("three");
+
+    return map;
+  }
+
+  //@Benchmark
+  public Object smallMapOf3() {
+    Map<String, String> map = new SmallMap<>();
+    populate(map, 3);
+
+    map.get("one");
+    map.get("three");
+    return map;
+  }
+
+  //@Benchmark
+  public Object hashMapOf6() {
+    Map<String, String> map = new HashMap<>();
+    populate(map, 6);
+
+    map.get("one");
+    map.get("three");
+    map.get("six");
+
+    return map;
+  }
+
+  //@Benchmark
+  public Object smallMapOf6() {
+    Map<String, String> map = new SmallMap<>();
+    populate(map, 6);
+
+    map.get("one");
+    map.get("three");
+    map.get("six");
 
     return map;
   }
 
   @Benchmark
-  public Object smallMapOf3() {
-    Map<String, String> map = new SmallMap<>();
-    populate3(map);
-
-    map.get(IRON_MAN);
-    map.get(DR_STRANGE);
-    return map;
-  }
-
-  //@Benchmark
-  public Object fullHashMap() {
+  public Object hashMapOf7() {
     Map<String, String> map = new HashMap<>();
-    populateFive(map);
+    populate(map, 7);
+
+    map.get("one");
+    map.get("three");
+    map.get("six");
+
     return map;
   }
 
-  //@Benchmark
-  public Object fullSmallMap() {
+  @Benchmark
+  public Object smallMapOf7() {
     Map<String, String> map = new SmallMap<>();
-    populateFive(map);
+    populate(map, 7);
+
+    map.get("one");
+    map.get("three");
+    map.get("seven");
+
     return map;
   }
 
-  private void populateFive(Map<String, String> map) {
-    map.put(IRON_MAN, "Mr. Stark");
-    map.put(CAPTAIN_AMERICA, "Steve Rodgers");
-    map.put(BLACK_WIDOW, "Natasha Rommanoff");
-    map.put(ANT_MAN, "Hank Pim");
-    map.put(ANT_MAN1, "Hank Pim");
-    map.put(DR_STRANGE, "Dr. Strange");
-
-    map.get("IronMan");
-    map.get("Ant Man");
-
-    //Reference<String> r = new Reference<>();
-    //map.entrySet().forEach(entry -> r.set(entry.getKey() + entry.getValue()));
+  private void populate(Map<String, String> map, int size) {
+    for (int i = 0; i < size; i++) {
+      map.put(KEYS[i], VALUES[i]);
+    }
   }
-
-  private void populate3(Map<String, String> map) {
-    map.put(IRON_MAN, "Mr. Stark");
-    map.put(CAPTAIN_AMERICA, "Steve Rodgers");
-    map.put(BLACK_WIDOW, "Natasha Rommanoff");
-    map.put(BLACK_WIDOW, "Natasha Rommanoff");
-
-    //Reference<String> r = new Reference<>();
-    //map.entrySet().forEach(entry -> r.set(entry.getKey() + entry.getValue()));
-  }
-
 }

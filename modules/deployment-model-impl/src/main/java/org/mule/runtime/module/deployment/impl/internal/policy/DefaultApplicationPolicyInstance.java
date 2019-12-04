@@ -10,6 +10,7 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
+import static org.mule.runtime.api.util.collection.SmallMap.copy;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
@@ -42,7 +43,6 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.CompositeArtifa
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -101,7 +101,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   private void initPolicyContext() throws InitialisationException {
     ArtifactContextBuilder artifactBuilder =
         newBuilder().setArtifactType(POLICY)
-            .setArtifactProperties(new HashMap<>(parametrization.getParameters()))
+            .setArtifactProperties(copy(parametrization.getParameters()))
             .setArtifactName(parametrization.getId())
             .setConfigurationFiles(parametrization.getConfig().getAbsolutePath())
             .setExecutionClassloader(template.getArtifactClassLoader().getClassLoader())

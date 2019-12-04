@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.processor;
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.util.collection.SmallMap.forSize;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToInvoke;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.initialisationFailure;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.methodWithNumParamsNotFoundOnObject;
@@ -30,25 +31,24 @@ import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.privileged.transformer.TransformerTemplate;
 import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.core.privileged.util.TemplateParser.PatternInfo;
 
-import org.slf4j.Logger;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 /**
  * <code>InvokerMessageProcessor</code> invokes a specified method of an object. An array of argument expressions can be provided
@@ -179,7 +179,7 @@ public class InvokerMessageProcessor extends AbstractComponent implements Proces
       return newCollection;
     } else if (expressionCandidate instanceof Map<?, ?>) {
       Map<Object, Object> mapTemplate = (Map<Object, Object>) expressionCandidate;
-      Map<Object, Object> newMap = new HashMap<>();
+      Map<Object, Object> newMap = forSize(mapTemplate.size());
       for (Entry<Object, Object> entry : mapTemplate.entrySet()) {
         newMap.put(evaluateExpressionCandidate(entry.getKey(), event), evaluateExpressionCandidate(entry.getValue(), event));
       }

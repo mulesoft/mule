@@ -8,6 +8,8 @@ package org.mule.runtime.deployment.model.internal.application;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
@@ -18,7 +20,6 @@ import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassL
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +56,7 @@ public class MuleApplicationClassLoaderFactory implements DeployableArtifactClas
   private ClassLoaderLookupPolicy getApplicationClassLoaderLookupPolicy(ArtifactClassLoader parent,
                                                                         ApplicationDescriptor descriptor) {
 
-    final Map<String, LookupStrategy> pluginsLookupStrategies = new HashMap<>();
+    final Map<String, LookupStrategy> pluginsLookupStrategies = new SmallMap<>();
 
     for (ArtifactPluginDescriptor artifactPluginDescriptor : descriptor.getPlugins()) {
       artifactPluginDescriptor.getClassLoaderModel().getExportedPackages()
