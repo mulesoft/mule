@@ -385,7 +385,7 @@
 /mule-standalone-${productVersion}/lib/opt/parser-interface-impl-v1-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/opt/parser-interface-impl-v2-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/opt/quartz-2.3.2.jar
-/mule-standalone-${productVersion}/lib/opt/raml-parser-0.8.36.jar
+/mule-standalone-${productVersion}/lib/opt/raml-parser-0.8.33.jar
 /mule-standalone-${productVersion}/lib/opt/raml-parser-2-1.0.44.jar
 /mule-standalone-${productVersion}/lib/opt/reflections-0.9.9.jar
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
