@@ -6,19 +6,15 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import static java.nio.channels.Channels.newChannel;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.internal.streaming.AbstractStreamingBuffer;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousCloseException;
-import java.nio.channels.ClosedByInterruptException;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.ReadableByteChannel;
 
 import org.slf4j.Logger;
 
@@ -36,38 +32,17 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
   protected final ByteBufferManager bufferManager;
 
   private final InputStream stream;
-  private ReadableByteChannel streamChannel;
   private boolean streamFullyConsumed = false;
 
   /**
    * Creates a new instance
    *
-   * @param stream The stream being buffered. This is the original data source
+   * @param stream        The stream being buffered. This is the original data source
    * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
    */
   public AbstractInputStreamBuffer(InputStream stream, ByteBufferManager bufferManager) {
-    this(stream, openStreamChannel(stream), bufferManager);
-  }
-
-  /**
-   * Creates a new instance
-   *
-   * @param stream The stream being buffered. This is the original data source
-   * @param streamChannel a {@link ReadableByteChannel} used to read from the {@code stream}
-   * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
-   */
-  public AbstractInputStreamBuffer(InputStream stream, ReadableByteChannel streamChannel, ByteBufferManager bufferManager) {
     this.stream = stream;
-    this.streamChannel = streamChannel;
     this.bufferManager = bufferManager;
-  }
-
-  /**
-   * @param stream the stream to consume
-   * @return a new {@link ReadableByteChannel} for consuming the {@code stream}
-   */
-  protected static ReadableByteChannel openStreamChannel(InputStream stream) {
-    return stream != null ? newChannel(stream) : null;
   }
 
   /**
@@ -89,10 +64,6 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
           doClose();
           return null;
         } finally {
-          if (streamChannel != null) {
-            closeSafely(streamChannel::close);
-          }
-
           if (stream != null) {
             closeSafely(stream::close);
           }
@@ -121,20 +92,11 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
 
   protected int consumeStream(ByteBuffer buffer) throws IOException {
     int result;
-    try {
-      result = streamChannel.read(buffer);
-    } catch (ClosedByInterruptException cbie) {
-      LOGGER.error("Channel interrupted.", cbie);
-      throw cbie;
-    } catch (AsynchronousCloseException ace) {
-      LOGGER.error("Channel closed asynchronously.", ace);
-      throw ace;
-    } catch (ClosedChannelException cce) {
-      // Assume ClosedChannelException means there is no more data. AsynchronousCloseException which are not expected are handled
-      // separably above.
-      LOGGER.debug("Channel closed.", cce);
-      result = -1;
+    result = stream.read(buffer.array(), 0, buffer.remaining());
+    if (result > 0) {
+      buffer.position(buffer.position() + result);
     }
+
     return result;
   }
 
