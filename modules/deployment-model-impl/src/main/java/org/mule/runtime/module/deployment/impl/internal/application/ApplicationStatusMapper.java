@@ -7,6 +7,8 @@
 
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static org.mule.runtime.api.util.collection.SmallMap.of;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -14,7 +16,6 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -35,13 +36,12 @@ public class ApplicationStatusMapper {
   }
 
   private static Map<String, ApplicationStatus> getStatusMapping() {
-    Map<String, ApplicationStatus> statusMapping = new HashMap<>();
-
-    statusMapping.put(NotInLifecyclePhase.PHASE_NAME, ApplicationStatus.CREATED);
-    statusMapping.put(Disposable.PHASE_NAME, ApplicationStatus.DESTROYED);
-    statusMapping.put(Stoppable.PHASE_NAME, ApplicationStatus.STOPPED);
-    statusMapping.put(Startable.PHASE_NAME, ApplicationStatus.STARTED);
-    statusMapping.put(Initialisable.PHASE_NAME, ApplicationStatus.INITIALISED);
+    Map<String, ApplicationStatus> statusMapping = of(
+                                                      NotInLifecyclePhase.PHASE_NAME, ApplicationStatus.CREATED,
+                                                      Disposable.PHASE_NAME, ApplicationStatus.DESTROYED,
+                                                      Stoppable.PHASE_NAME, ApplicationStatus.STOPPED,
+                                                      Startable.PHASE_NAME, ApplicationStatus.STARTED,
+                                                      Initialisable.PHASE_NAME, ApplicationStatus.INITIALISED);
 
     return statusMapping;
   }

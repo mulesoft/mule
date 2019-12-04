@@ -12,6 +12,7 @@ import static java.util.regex.Pattern.compile;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.MEL_PREFIX;
 
@@ -22,11 +23,11 @@ import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -64,8 +65,7 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
 
   public ExpressionLanguageAdaptorHandler(ExtendedExpressionLanguageAdaptor defaultExtendedExpressionLanguage,
                                           ExtendedExpressionLanguageAdaptor mvelExpressionLanguage) {
-    expressionLanguages = new HashMap<>();
-    expressionLanguages.put(DW_PREFIX, defaultExtendedExpressionLanguage);
+    expressionLanguages = of(DW_PREFIX, defaultExtendedExpressionLanguage);
     if (mvelExpressionLanguage != null) {
       expressionLanguages.put(MEL_PREFIX, mvelExpressionLanguage);
     }
@@ -169,7 +169,7 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   @Override
   public ExpressionLanguageSessionAdaptor openSession(ComponentLocation componentLocation, CoreEvent event,
                                                       BindingContext bindingContext) {
-    Map<String, ExpressionLanguageSessionAdaptor> sessions = new HashMap<>();
+    Map<String, ExpressionLanguageSessionAdaptor> sessions = new SmallMap<>();
     for (Entry<String, ExtendedExpressionLanguageAdaptor> exprLangEntry : expressionLanguages.entrySet()) {
       if (!MEL_PREFIX.equals(exprLangEntry.getKey()) || event != null) {
         sessions.put(exprLangEntry.getKey(), exprLangEntry.getValue().openSession(componentLocation, event, bindingContext));

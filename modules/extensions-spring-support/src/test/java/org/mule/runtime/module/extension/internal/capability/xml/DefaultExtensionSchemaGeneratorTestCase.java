@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
@@ -209,11 +210,10 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
   }
 
   public static ExtensionModel loadExtension(Class<?> clazz, ExtensionModelLoader loader) {
-    Map<String, Object> params = new HashMap<>();
-    params.put(TYPE_PROPERTY_NAME, clazz.getName());
-    params.put(VERSION, getProductVersion());
-    // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
-    params.put(COMPILATION_MODE, true);
+    Map<String, Object> params = of(TYPE_PROPERTY_NAME, clazz.getName(),
+                                    VERSION, getProductVersion(),
+                                    // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
+                                    COMPILATION_MODE, true);
 
     //TODO MULE-11797: as this utils is consumed from org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel), this util should get dropped once the ticket gets implemented.
     final DslResolvingContext dslResolvingContext = getDefault(new LinkedHashSet<>(extensionModels.values()));

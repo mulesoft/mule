@@ -16,6 +16,7 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
+import static org.mule.runtime.api.util.collection.SmallMap.forSize;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
@@ -103,8 +104,9 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
 
   public static ParametersResolver fromDefaultValues(ParameterizedModel parameterizedModel, MuleContext muleContext,
                                                      ReflectionCache reflectionCache, ExpressionManager expressionManager) {
-    Map<String, Object> parameterValues = new HashMap<>();
-    for (ParameterModel model : parameterizedModel.getAllParameterModels()) {
+    List<ParameterModel> allParameterModels = parameterizedModel.getAllParameterModels();
+    Map<String, Object> parameterValues = forSize(allParameterModels.size());
+    for (ParameterModel model : allParameterModels) {
       parameterValues.put(model.getName(), model.getDefaultValue());
     }
 
@@ -219,7 +221,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
   private ResolverSet getResolverSet(Optional<ParameterizedModel> model, List<ParameterGroupModel> groups,
                                      List<ParameterModel> parameterModels, ResolverSet resolverSet)
       throws ConfigurationException {
-    Map<String, String> aliasedParameterNames = new HashMap<>();
+    Map<String, String> aliasedParameterNames = forSize(parameterModels.size());
     parameterModels.forEach(p -> {
       if (!p.isComponentId()
           // This model property exists only for non synthetic parameters, in which case the value resolver has to be created,

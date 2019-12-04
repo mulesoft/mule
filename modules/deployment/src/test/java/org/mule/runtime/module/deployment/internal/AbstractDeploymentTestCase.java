@@ -92,6 +92,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.container.api.ModuleRepository;
@@ -152,7 +153,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -1344,12 +1344,11 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static MuleArtifactLoaderDescriptor createBundleDescriptorLoader(String artifactId, String classifier,
                                                                              String bundleDescriptorLoaderId, String version) {
-    Map<String, Object> attributes = new HashMap();
-    attributes.put(VERSION, version);
-    attributes.put(GROUP_ID, "org.mule.test");
-    attributes.put(ARTIFACT_ID, artifactId);
-    attributes.put(CLASSIFIER, classifier);
-    attributes.put(TYPE, EXTENSION_BUNDLE_TYPE);
+    Map<String, Object> attributes = SmallMap.of(VERSION, version,
+                                                 GROUP_ID, "org.mule.test",
+                                                 ARTIFACT_ID, artifactId,
+                                                 CLASSIFIER, classifier,
+                                                 TYPE, EXTENSION_BUNDLE_TYPE);
 
     return new MuleArtifactLoaderDescriptor(bundleDescriptorLoaderId, attributes);
   }

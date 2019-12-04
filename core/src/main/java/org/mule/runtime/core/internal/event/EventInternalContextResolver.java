@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.internal.event;
 
-import static java.util.Collections.singletonMap;
+import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
 
@@ -49,6 +50,6 @@ public class EventInternalContextResolver<CTX> {
   }
 
   public CoreEvent eventWithContext(CoreEvent event, CTX context) {
-    return quickCopy(event, singletonMap(internalParametersKey, context));
+    return quickCopy(event, of(internalParametersKey, context));
   }
 }

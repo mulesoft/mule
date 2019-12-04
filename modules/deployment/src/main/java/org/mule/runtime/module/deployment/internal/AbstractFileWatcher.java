@@ -20,7 +20,7 @@ public abstract class AbstractFileWatcher implements Runnable {
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
   private Collection<File> files;
-  private Map<File, Long> timestamps = new HashMap<File, Long>();
+  private Map<File, Long> timestamps = new HashMap<>();
 
   public AbstractFileWatcher(File file) {
     this(Arrays.asList(file));
