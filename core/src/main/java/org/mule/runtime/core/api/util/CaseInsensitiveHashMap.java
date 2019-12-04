@@ -107,7 +107,7 @@ public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
   }
 
   public CaseInsensitiveHashMap<K, V> copy() {
-    return new CaseInsensitiveHashMap<>()
+    return new CaseInsensitiveHashMap<>(((CaseInsensitiveMapWrapper) delegate).copy());
   }
 
   @Override
@@ -189,13 +189,21 @@ public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
 
   private static class ImmutableCaseInsensitiveHashMap<K, V> extends CaseInsensitiveHashMap<K, V> {
 
+    private transient final CaseInsensitiveHashMap<K, V> originalMap;
+
     private ImmutableCaseInsensitiveHashMap(CaseInsensitiveHashMap<K, V> caseInsensitiveHashMap) {
       this.delegate = unmodifiableMap(caseInsensitiveHashMap);
+      originalMap = caseInsensitiveHashMap;
     }
 
     @Override
     public CaseInsensitiveHashMap<K, V> toImmutableCaseInsensitiveMap() {
       return this;
+    }
+
+    @Override
+    public CaseInsensitiveHashMap<K, V> copy() {
+      return originalMap.copy();
     }
   }
 }

@@ -291,7 +291,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   protected void initVariables() {
     if (!varsModified && flowVariables == null) {
-      flowVariables = new CaseInsensitiveHashMap<>(originalVars);
+      flowVariables = originalVars.copy();
     }
   }
 
