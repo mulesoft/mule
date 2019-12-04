@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.exception;
 
+import static com.google.common.collect.ImmutableMap.of;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Runtime.getRuntime;
 import static java.util.Arrays.stream;
@@ -19,7 +20,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_START;
-import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher.WILDCARD_TOKEN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -74,6 +74,7 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
@@ -153,6 +154,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   public void routeError(Exception error, Consumer<CoreEvent> continueCallback,
                          Consumer<Throwable> propagateCallback) {
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Routing error in '" + this.toString() + "'...");
+    }
+
     // All calling methods will end up transforming any error class other than MessagingException into that one
     MessagingException messagingError = (MessagingException) error;
     CoreEvent failureEvent = messagingError.getEvent();

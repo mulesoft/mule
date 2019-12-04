@@ -15,7 +15,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
-import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -26,6 +25,7 @@ import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +40,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
   protected static final Logger logger = LoggerFactory.getLogger(DomainClassLoaderFactory.class);
 
   private final ClassLoader containerClassLoader;
-  private Map<String, ArtifactClassLoader> domainArtifactClassLoaders = new SmallMap<>();
+  private Map<String, ArtifactClassLoader> domainArtifactClassLoaders = new HashMap<>();
 
   /**
    * Creates a new instance
@@ -110,7 +110,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
   private ClassLoaderLookupPolicy getApplicationClassLoaderLookupPolicy(ArtifactClassLoader parent,
                                                                         DomainDescriptor descriptor) {
 
-    final Map<String, LookupStrategy> pluginsLookupStrategies = new SmallMap<>();
+    final Map<String, LookupStrategy> pluginsLookupStrategies = new HashMap<>();
 
     for (ArtifactPluginDescriptor artifactPluginDescriptor : descriptor.getPlugins()) {
       artifactPluginDescriptor.getClassLoaderModel().getExportedPackages()
