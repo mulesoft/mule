@@ -146,6 +146,11 @@ public class PolicyChain extends AbstractComponent
         popFlowFlowStackElement().accept(t.getEvent());
         onError.ifPresent(onError -> onError.accept(t));
       }
+
+      @Override
+      public String toString() {
+        return PolicyChain.class.getSimpleName() + ".errorHandler @ " + getLocation().getLocation();
+      }
     };
   }
 

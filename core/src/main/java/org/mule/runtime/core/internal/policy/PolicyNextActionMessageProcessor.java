@@ -127,6 +127,11 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
       public void onError(Exception error) {
         onExecuteNextErrorConsumer.accept(error);
       }
+
+      @Override
+      public String toString() {
+        return PolicyNextActionMessageProcessor.class.getSimpleName() + ".errorHandler @ " + getLocation().getLocation();
+      }
     };
   }
 
