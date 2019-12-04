@@ -37,8 +37,8 @@ public class ErrorHandlerContext {
 
   private final Map<String, ErrorHandlerContextItem> items = new SmallMap<>();
 
-  public void configure(String parameterId, Exception exception, CoreEvent originalEvent,
-                        Consumer<CoreEvent> successCallback, Consumer<Throwable> errorCallback) {
+  public void addContextItem(String parameterId, Exception exception, CoreEvent originalEvent,
+                             Consumer<CoreEvent> successCallback, Consumer<Throwable> errorCallback) {
     items.put(parameterId, new ErrorHandlerContextItem(exception, originalEvent, successCallback, errorCallback));
   }
 

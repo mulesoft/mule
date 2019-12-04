@@ -87,10 +87,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private static final Logger LOGGER = getLogger(TemplateOnErrorHandler.class);
 
   private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile(".*/.*/.*");
-  // private static final String ERROR_EXCEPTION = "error.exception.";
-  // private static final String ERROR_SUCCESS_CALLBACK = "error.success.";
-  // private static final String ERROR_RETHROWN_CALLBACK = "error.error.";
-  // private static final String ERROR_EVENT = "error.event.";
 
   @Inject
   protected ConfigurationComponentLocator locator;
@@ -172,7 +168,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       failureEvent = quickCopy(failureEvent, of(ERROR_HANDLER_CONTEXT, ctx));
     }
 
-    ctx.configure(getParameterId(failureEvent), error, failureEvent, continueCallback, propagateCallback);
+    ctx.addContextItem(getParameterId(failureEvent), error, failureEvent, continueCallback, propagateCallback);
     routingSink.get().next(failureEvent);
   }
 
