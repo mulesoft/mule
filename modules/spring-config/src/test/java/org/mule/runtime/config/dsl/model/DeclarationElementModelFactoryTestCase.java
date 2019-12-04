@@ -22,9 +22,11 @@ import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
+import org.mule.runtime.app.declaration.api.ConnectionElementDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.app.declaration.api.OperationElementDeclaration;
 import org.mule.runtime.app.declaration.api.SourceElementDeclaration;
@@ -187,6 +189,25 @@ public class DeclarationElementModelFactoryTestCase extends AbstractDslModelTest
 
     DslElementModel<ConfigurationModel> element = create(declaration);
     assertThat(element.getModel(), is(configuration));
+    assertThat(element.getContainedElements().isEmpty(), is(true));
+  }
+
+  @Test
+  public void testConnectionNoParams() {
+    ConnectionProviderModel emptyConnection = mock(ConnectionProviderModel.class, withSettings().lenient());
+    when(connectionProvider.getName()).thenReturn(CONNECTION_PROVIDER_NAME);
+    when(connectionProvider.getParameterGroupModels()).thenReturn(emptyList());
+
+    ExtensionModel extensionModel = mock(ExtensionModel.class, withSettings().lenient());
+    initializeExtensionMock(extensionModel);
+    when(extensionModel.getConnectionProviders()).thenReturn(asList(emptyConnection));
+
+    ConnectionElementDeclaration declaration =
+        ElementDeclarer.forExtension(EXTENSION_NAME).newConnection(CONNECTION_PROVIDER_NAME)
+            .getDeclaration();
+
+    DslElementModel<ConnectionProviderModel> element = create(declaration);
+    assertThat(element.getModel(), is(connectionProvider));
     assertThat(element.getContainedElements().isEmpty(), is(true));
   }
 
