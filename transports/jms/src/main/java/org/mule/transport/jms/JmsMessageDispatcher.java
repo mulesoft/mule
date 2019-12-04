@@ -441,7 +441,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         // transaction to close it.
         if (session != null && !isTransacted())
         {
-            connector.closeQuietly(session);
+            connector.closeQuietly(session, true);
         }
     }
 

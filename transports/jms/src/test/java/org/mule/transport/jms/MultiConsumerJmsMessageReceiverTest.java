@@ -122,7 +122,7 @@ public class MultiConsumerJmsMessageReceiverTest extends AbstractMuleTestCase
         reset(mockMessageConsumer);
         messageReceiver.startSubReceivers();
         messageReceiver.disconnect();
-        verify(mockMessageConsumer, times(recycle?1:0)).setMessageListener(null);
+        verify(mockMessageConsumer, times(recycle?1:0)).close();
     }
 
     private MessageConsumer setupMessageReceiverMocks() throws JMSException

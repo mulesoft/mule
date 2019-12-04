@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mule.context.notification.ConnectionNotification.CONNECTION_CONNECTED;
 import static org.mule.context.notification.ConnectionNotification.CONNECTION_FAILED;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageReceiver;
@@ -27,14 +28,18 @@ import javax.jms.Session;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQSession;
+import org.apache.activemq.broker.Broker;
 import org.apache.activemq.broker.BrokerFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.TransportConnector;
 import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 public class BrokerReconnectionWithNonExistingQueuesTestCase extends FunctionalTestCase
 {
+
+    private final Logger LOGGER = getLogger(BrokerReconnectionWithNonExistingQueuesTestCase.class);
 
     private static final int CONSUMER_COUNT = 1;
 
@@ -142,6 +147,7 @@ public class BrokerReconnectionWithNonExistingQueuesTestCase extends FunctionalT
 
     private void createTestQueue() throws JMSException
     {
+        LOGGER.error("Creating test queue");
         // By creating a receiver/producer with admin privileges listening/connecting to the 'test' queue,
         // it is created by the broker
         adminSession.createProducer(testQueue);

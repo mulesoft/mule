@@ -6,6 +6,7 @@
  */
 package org.mule.transport.jms.transformers;
 
+import static org.mule.util.ClassUtils.getSimpleName;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transaction.Transaction;
@@ -30,12 +31,13 @@ import javax.jms.Session;
 
 /**
  * <code>AbstractJmsTransformer</code> is an abstract class that should be used for
- * all transformers where a JMS message will be the transformed or transformee
- * object. It provides services for compressing and uncompressing messages.
+ * all transformers where a JMS message will be the transformed or transformee object. It provides services for
+ * compressing and uncompressing messages.
  */
 
 public abstract class AbstractJmsTransformer extends AbstractMessageTransformer implements DiscoverableTransformer
 {
+
     private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
     public AbstractJmsTransformer()
@@ -45,7 +47,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
     }
 
     protected abstract void declareInputOutputClasses();
-    
+
     protected Message transformToMessage(MuleMessage message) throws Exception
     {
         Session session = null;
@@ -101,7 +103,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
                     {
                         logger.debug("Closing non-transacted jms session: " + session);
                     }
-                    connector.closeQuietly(session);
+                    connector.closeQuietly(session, true);
                 }
                 else if (!muleTx.hasResource(connector.getConnection()))
                 {
@@ -109,9 +111,9 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Closing an orphaned, but transacted jms session: " + session +
-                                ", transaction: " + muleTx);
+                                     ", transaction: " + muleTx);
                     }
-                    connector.closeQuietly(session);
+                    connector.closeQuietly(session, true);
                 }
             }
             // aggressively killing any session refs
@@ -124,7 +126,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
         if (logger.isDebugEnabled())
         {
             logger.debug("Message type received is: " +
-                    ClassUtils.getSimpleName(source.getClass()));
+                         getSimpleName(source.getClass()));
         }
 
         // Try to figure out our endpoint's JMS Specification and fall back to
@@ -185,7 +187,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
             if (logger.isDebugEnabled())
             {
                 logger.debug("Unable to set property '" + key + "' of type "
-                             + ClassUtils.getSimpleName(value.getClass())
+                             + getSimpleName(value.getClass())
                              + "': " + e.getMessage());
             }
         }
@@ -195,7 +197,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
     {
         if (endpoint != null)
         {
-            return ((JmsConnector)endpoint.getConnector()).getTransactionalResource(endpoint);
+            return ((JmsConnector) endpoint.getConnector()).getTransactionalResource(endpoint);
         }
         else
         {

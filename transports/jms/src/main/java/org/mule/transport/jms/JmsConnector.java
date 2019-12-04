@@ -6,6 +6,9 @@
  */
 package org.mule.transport.jms;
 
+import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.api.Closeable;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
@@ -50,6 +53,10 @@ import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -65,11 +72,13 @@ import javax.jms.TemporaryTopic;
 import javax.naming.CommunicationException;
 import javax.naming.NamingException;
 
+import org.slf4j.Logger;
+
 /**
  * <code>JmsConnector</code> is a JMS 1.0.2b compliant connector that can be used
  * by a Mule endpoint. The connector supports all JMS functionality including topics
  * and queues, durable subscribers, acknowledgement modes and local transactions.
- *
+ * <p>
  * From 3.6, JMS Sessions and Producers are reused by default when an {@link javax.jms.XAConnectionFactory} isn't being
  * used and when the (default) JMS 1.1 spec is being used.
  */
@@ -220,6 +229,23 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     private Timer responseTimeoutTimer;
 
+    public boolean isHandlingException()
+    {
+        return isHandlingException.get();
+    }
+
+    public void setIsHandlingException(boolean handlingException)
+    {
+        logger.debug("Setting isHandlingException flag to: " + handlingException );
+        isHandlingException.set(handlingException);
+    }
+
+    private AtomicBoolean isHandlingException = new AtomicBoolean(false);
+
+    protected BlockingQueue<Object> deferredCloseQueue = new LinkedBlockingQueue<>();
+
+    private DeferredJmsResourceCloser deferredCloseThread;
+
     ////////////////////////////////////////////////////////////////////////
     // Methods
     ////////////////////////////////////////////////////////////////////////
@@ -260,6 +286,10 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             redeliveryHandlerFactory = new AutoDiscoveryRedeliveryHandlerFactory(this);
         }
 
+        // Start deferred closing thread
+        deferredCloseThread = new DeferredJmsResourceCloser(this, deferredCloseQueue);
+        deferredCloseThread.start();
+
         try
         {
             muleContext.registerListener(new ConnectionNotificationListener<ConnectionNotification>()
@@ -294,8 +324,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     /**
      * A factory method to create various JmsSupport class versions.
      *
-     * @see JmsSupport
      * @return JmsSupport instance
+     * @see JmsSupport
      */
     protected JmsSupport createJmsSupport()
     {
@@ -389,6 +419,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     /**
      * Override this method to provide a default ConnectionFactory for a vendor-specific JMS Connector.
+     *
      * @throws Exception
      */
     protected ConnectionFactory getDefaultConnectionFactory() throws Exception
@@ -399,6 +430,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     @Override
     protected void doDispose()
     {
+        stopDeferredCloseThread();
+
         if (connection != null)
         {
             try
@@ -411,6 +444,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             }
             connection = null;
         }
+
 
         if (connectionFactory instanceof Disposable)
         {
@@ -521,7 +555,8 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     }
 
     @Override
-    public void connect() throws Exception {
+    public void connect() throws Exception
+    {
         if (muleContext.isPrimaryPollingInstance() || clientId == null)
         {
             super.connect();
@@ -540,14 +575,14 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                     {
                         // The connection should use instead the ApplicationClassloader
                         Thread.currentThread().setContextClassLoader(muleContext.getExecutionClassLoader());
-                        
+
                         JmsConnector.this.connect();
                     }
                     catch (Exception e)
                     {
                         throw new MuleRuntimeException(e);
                     }
-                    finally 
+                    finally
                     {
                         // Restore the notification original class loader so we don't interfere in any later
                         // usage of this thread
@@ -571,17 +606,21 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             shouldRetryBrokerConnection.set(true);
         }
 
-        if (!disconnecting && !shouldRetryBrokerConnection.get())
+        logger.debug("About to CAS isHandlingException with current value " + isHandlingException.get());
+        if (!disconnecting && !shouldRetryBrokerConnection.get() && isHandlingException.compareAndSet(false, true))
         {
+            logger.debug("Started exception handling, disabling receivers if there are any");
             Map<Object, MessageReceiver> receivers = getReceivers();
             boolean isMultiConsumerReceiver = false;
 
             if (!receivers.isEmpty())
             {
-                MessageReceiver reciever = receivers.values().iterator().next();
-                if (reciever instanceof MultiConsumerJmsMessageReceiver)
+                MessageReceiver receiver = receivers.values().iterator().next();
+                if (receiver instanceof MultiConsumerJmsMessageReceiver)
                 {
                     isMultiConsumerReceiver = true;
+                    // Disable all consumers
+                    ((MultiConsumerJmsMessageReceiver) receiver).disableConsumers();
                 }
             }
 
@@ -599,6 +638,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             {
                 prepareConnectorForConnectionException();
                 receiverReportedExceptionCount.set(0);
+                logger.debug("Setting 'isHandlingException' flag to true");
                 muleContext.getExceptionListener().handleException(new ConnectException(jmsException, this));
             }
         }
@@ -717,7 +757,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
 
     public Session createSession(ImmutableEndpoint endpoint) throws JMSException
     {
-        return createSession(endpoint.getTransactionConfig().isTransacted(),getTopicResolver().isTopic(endpoint));
+        return createSession(endpoint.getTransactionConfig().isTransacted(), getTopicResolver().isTopic(endpoint));
     }
 
     public Session getSession(boolean transacted, boolean topic) throws JMSException
@@ -749,7 +789,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             }
             catch (TransactionException e)
             {
-                closeQuietly(session);
+                closeQuietly(session, false);
                 throw new RuntimeException("Could not bind session to current transaction", e);
             }
         }
@@ -762,6 +802,10 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             throw new IllegalStateException(CONNECTION_STOPPING_ERROR_MESSAGE);
         }
+        if (isHandlingException.get())
+        {
+            throw new JMSException("Cannot create session while exception is being handled");
+        }
 
         return jmsSupport.createSession(connection, topic, transacted, acknowledgementMode, noLocal);
     }
@@ -769,6 +813,14 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     @Override
     protected void doStart() throws MuleException
     {
+        logger.info("About to start JmsConnector: " + this.toString());
+
+        // Clear connector exception handling flag
+        logger.debug("Setting 'isHandlingException' flag to false");
+        isHandlingException.set(false);
+
+        logNonClosedElementOnDebug();
+
         //TODO: This should never be null or an exception should be thrown
         if (connection != null)
         {
@@ -793,9 +845,10 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
      * Closes a session if there is no active transaction in the current thread, otherwise the
      * session will continue active until there is a direct call to close it.
      *
-     * @param session the session that ill be closed if there is an active transaction.
+     * @param session  the session that ill be closed if there is an active transaction.
+     * @param deferred defers closing action, to be performed asynchronously in a separate thread
      */
-    public void closeSessionIfNoTransactionActive(Session session)
+    public void closeSessionIfNoTransactionActive(Session session, boolean deferred)
     {
         final Transaction transaction = TransactionCoordination.getInstance().getTransaction();
         if (transaction == null)
@@ -804,7 +857,14 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             {
                 logger.debug("Closing non-TX session: " + session);
             }
-            closeQuietly(session);
+            if (deferred)
+            {
+                deferSessionClose(session);
+            }
+            else
+            {
+                closeQuietly(session, false);
+            }
         }
         else if (logger.isDebugEnabled())
         {
@@ -812,15 +872,43 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
     }
 
+    private void deferSessionClose(Session session)
+    {
+        try
+        {
+            deferredCloseQueue.put(session);
+        }
+        catch (NullPointerException e)
+        {
+            logger.warn("Deferred closable is 'null'", e);
+        }
+        catch (InterruptedException e)
+        {
+            logger.warn("Thread was interrupted while deferring session close.");
+        }
+    }
+
+    public void closeSessionIfNoTransactionActive(Session session)
+    {
+        closeSessionIfNoTransactionActive(session, false);
+    }
+
     @Override
     protected void doStop() throws MuleException
     {
+
         if (connection != null)
         {
             try
             {
                 stopping = true;
                 connection.stop();
+                // If deferred close queue is not empty, wait on next empty poll
+                if (!deferredCloseQueue.isEmpty())
+                {
+                    deferredCloseThread.waitOnNextEmptyPoll(20, SECONDS);
+                    logNonClosedElementOnDebug();
+                }
             }
             catch (Exception e)
             {
@@ -838,6 +926,23 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             jndiNameResolver.stop();
         }
+    }
+
+    private void logNonClosedElementOnDebug()
+    {
+        if (logger.isDebugEnabled()) {
+            logger.debug(format("There are %d elements to be closed on the deferred queue.", deferredCloseQueue.size()));
+        }
+    }
+
+    private void stopDeferredCloseThread()
+    {
+        // Mark deferredCloser to stop prior to connection stop
+        if (!deferredCloseQueue.isEmpty())
+        {
+            deferredCloseThread.waitForEmptyQueueOrTimeout(20, SECONDS);
+        }
+        deferredCloseThread.interrupt();
     }
 
     @Override
@@ -890,21 +995,50 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
     }
 
+    public void closeQuietly(MessageProducer producer)
+    {
+        closeQuietly(producer, false);
+    }
+
     /**
      * Closes the MessageProducer without throwing an exception (an error message is
      * logged instead).
      *
      * @param producer
+     * @param deferred defers closing action, to be performed asynchronously in a separate thread
      */
-    public void closeQuietly(MessageProducer producer)
+    public void closeQuietly(MessageProducer producer, boolean deferred)
+    {
+        if (deferred)
+        {
+            deferProducerClose(producer);
+        }
+        else
+        {
+            try
+            {
+                close(producer);
+            }
+            catch (Exception e)
+            {
+                logger.warn("Failed to close jms message producer: " + e.getMessage());
+            }
+        }
+    }
+
+    private void deferProducerClose(MessageProducer producer)
     {
         try
         {
-            close(producer);
+            deferredCloseQueue.put(producer);
         }
-        catch (Exception e)
+        catch (NullPointerException e)
         {
-            logger.warn("Failed to close jms message producer: " + e.getMessage());
+            logger.warn("Deferred closable is 'null'", e);
+        }
+        catch (InterruptedException e)
+        {
+            logger.warn("Thread was interrupted while deferring producer close.");
         }
     }
 
@@ -966,27 +1100,40 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
     }
 
+    public void closeQuietly(Session session)
+    {
+        this.closeQuietly(session, false);
+    }
+
+
     /**
      * Closes the MuleSession without throwing an exception (an error message is logged
      * instead).
      *
      * @param session
      */
-    public void closeQuietly(Session session)
+    public void closeQuietly(Session session, boolean deferred)
     {
-        if (session != null)
+        if (deferred)
         {
-            try
+            deferSessionClose(session);
+        }
+        else
+        {
+            if (session != null)
             {
-                close(session);
-            }
-            catch (Exception e)
-            {
-                logger.warn("Failed to close jms session consumer: " + e.getMessage());
-            }
-            finally
-            {
-                session = null;
+                try
+                {
+                    close(session);
+                }
+                catch (Exception e)
+                {
+                    logger.warn("Failed to close jms session consumer: " + e.getMessage());
+                }
+                finally
+                {
+                    session = null;
+                }
             }
         }
     }
@@ -1360,9 +1507,9 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
      * Gets the value of <code>honorQosHeaders</code> property.
      *
      * @return <code>true</code> if <code>JmsMessageDispatcher</code> should
-     *         honor incoming message's QoS headers; otherwise <code>false</code>
-     *         Default is <code>false</code>, meaning that connector settings will
-     *         override message headers.
+     * honor incoming message's QoS headers; otherwise <code>false</code>
+     * Default is <code>false</code>, meaning that connector settings will
+     * override message headers.
      */
     public boolean isHonorQosHeaders()
     {
@@ -1585,7 +1732,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
      * Schedules a timeout task used for performing timeout of async responses.
      *
      * @param timerTask task to be executed on timeout
-     * @param timeout the number of milliseconds after which the timeout task should be executed
+     * @param timeout   the number of milliseconds after which the timeout task should be executed
      */
     public void scheduleTimeoutTask(TimerTask timerTask, int timeout)
     {
@@ -1646,4 +1793,5 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     {
         return true;
     }
+
 }
