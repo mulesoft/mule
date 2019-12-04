@@ -65,12 +65,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
+import com.google.common.collect.ImmutableSet;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.w3c.dom.Element;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * The {@code BeanDefinitionFactory} is the one that knows how to convert a {@code ComponentModel} to an actual
@@ -190,7 +189,7 @@ public class BeanDefinitionFactory {
     // how core constructs are processed.
     processMuleConfiguration(componentModel, registry);
     processMuleSecurityManager(componentModel, registry);
-    processRaiseError(componentModel);
+    //processRaiseError(componentModel);
 
     componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
         .ifPresent(componentBuildingDefinition -> {
@@ -199,25 +198,25 @@ public class BeanDefinitionFactory {
             // We need to use a mutable map since spring will resolve the properties placeholder present in the value if needed
             // and it will be done by mutating the same map.
             addAnnotation(ANNOTATION_PARAMETERS, new HashMap<>(componentModel.getRawParameters()), componentModel);
-            // add any error mappings if present
-            List<ComponentModel> errorMappingComponents = componentModel.getInnerComponents().stream()
-                .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER.equals(innerComponent.getIdentifier())).collect(toList());
-            if (!errorMappingComponents.isEmpty()) {
-              addAnnotation(ANNOTATION_ERROR_MAPPINGS, errorMappingComponents.stream().map(innerComponent -> {
-                Map<String, String> parameters = innerComponent.getRawParameters();
-                ComponentIdentifier source = parameters.containsKey(SOURCE_TYPE)
-                    ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE))
-                    : ANY;
-
-                ErrorType errorType = errorTypeRepository
-                    .lookupErrorType(source)
-                    .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source)));
-
-                ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorType);
-                ErrorType targetValue = resolveErrorType(parameters.get(TARGET_TYPE));
-                return new ErrorMapping(errorTypeMatcher, targetValue);
-              }).collect(toList()), componentModel);
-            }
+            //// add any error mappings if present
+            //List<ComponentModel> errorMappingComponents = componentModel.getInnerComponents().stream()
+            //    .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER.equals(innerComponent.getIdentifier())).collect(toList());
+            //if (!errorMappingComponents.isEmpty()) {
+            //  addAnnotation(ANNOTATION_ERROR_MAPPINGS, errorMappingComponents.stream().map(innerComponent -> {
+            //    Map<String, String> parameters = innerComponent.getRawParameters();
+            //    ComponentIdentifier source = parameters.containsKey(SOURCE_TYPE)
+            //        ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE))
+            //        : ANY;
+            //
+            //    ErrorType errorType = errorTypeRepository
+            //        .lookupErrorType(source)
+            //        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source)));
+            //
+            //    ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorType);
+            //    ErrorType targetValue = resolveErrorType(parameters.get(TARGET_TYPE));
+            //    return new ErrorMapping(errorTypeMatcher, targetValue);
+            //  }).collect(toList()), componentModel);
+            //}
             componentLocator.addComponentLocation(componentModel.getComponentLocation());
             addAnnotation(ANNOTATION_COMPONENT_CONFIG, componentModel, componentModel);
           }
