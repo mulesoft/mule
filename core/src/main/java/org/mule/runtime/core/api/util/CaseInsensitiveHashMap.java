@@ -106,6 +106,10 @@ public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
     return new CaseInsensitiveHashMap<K, V>(delegate);
   }
 
+  public CaseInsensitiveHashMap<K, V> copy() {
+    return new CaseInsensitiveHashMap<>()
+  }
+
   @Override
   public int size() {
     return delegate.size();

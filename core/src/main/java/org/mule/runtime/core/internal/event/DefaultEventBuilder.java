@@ -18,6 +18,7 @@ import static org.mule.runtime.api.util.collection.SmallMap.unmodifiable;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsBytes;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsString;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
+import static org.mule.runtime.core.api.util.CaseInsensitiveHashMap.basedOn;
 import static org.mule.runtime.core.api.util.CaseInsensitiveHashMap.emptyCaseInsensitiveMap;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
@@ -184,7 +185,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     if ((flowVariables != null && !this.flowVariables.isEmpty()) || !this.originalVars.isEmpty()) {
       this.varsModified = true;
       this.modified = true;
-      flowVariables = new CaseInsensitiveHashMap<>();
+      flowVariables = basedOn(new SmallMap<>());
     }
     return this;
   }
