@@ -63,6 +63,16 @@ public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
     return EMPTY_MAP;
   }
 
+  /**
+   * Creates a new instance which is backed by the given {@code map}. Said map is required to be empty
+   *
+   * @param map the backing map
+   * @param <K> the generic type of the key
+   * @param <V> the generic type of the value
+   * @return a new instance
+   * @throws IllegalArgumentException if {@code map} is not empty
+   * @since 4.3.0
+   */
   public static <K, V> CaseInsensitiveHashMap<K, V> basedOn(Map<K, V> map) {
     return new CaseInsensitiveHashMap<>(new CaseInsensitiveMapWrapper(map));
   }
@@ -104,6 +114,17 @@ public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
   @Override
   public Object clone() {
     return new CaseInsensitiveHashMap<K, V>(delegate);
+  }
+
+  /**
+   * Creates a shallow copy of this instance. This is the recommended way of creating copy instances as this is optimized
+   * and usually much faster than using the {@link CaseInsensitiveHashMap#CaseInsensitiveHashMap(Map)} constructor.
+   *
+   * @return a shallow copy of {@code this} instance
+   * @since 4.3.0
+   */
+  public CaseInsensitiveHashMap<K, V> copy() {
+    return new CaseInsensitiveHashMap<>(((CaseInsensitiveMapWrapper) delegate).copy());
   }
 
   @Override
@@ -173,7 +194,6 @@ public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
 
   /**
    * @return an immutable version of this map.
-   *
    * @since 4.1.5
    */
   public CaseInsensitiveHashMap<K, V> toImmutableCaseInsensitiveMap() {
@@ -185,13 +205,21 @@ public class CaseInsensitiveHashMap<K, V> implements Map<K, V>, Serializable {
 
   private static class ImmutableCaseInsensitiveHashMap<K, V> extends CaseInsensitiveHashMap<K, V> {
 
+    private transient final CaseInsensitiveHashMap<K, V> originalMap;
+
     private ImmutableCaseInsensitiveHashMap(CaseInsensitiveHashMap<K, V> caseInsensitiveHashMap) {
       this.delegate = unmodifiableMap(caseInsensitiveHashMap);
+      originalMap = caseInsensitiveHashMap;
     }
 
     @Override
     public CaseInsensitiveHashMap<K, V> toImmutableCaseInsensitiveMap() {
       return this;
+    }
+
+    @Override
+    public CaseInsensitiveHashMap<K, V> copy() {
+      return originalMap.copy();
     }
   }
 }
