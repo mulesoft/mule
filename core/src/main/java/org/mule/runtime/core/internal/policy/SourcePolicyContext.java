@@ -27,11 +27,10 @@ public class SourcePolicyContext {
   public static final String SOURCE_POLICY_CONTEXT = "source.policy.context";
 
   /**
-   * Extracts an instance stored as an internal parameter in the given {@code result} under the {@link #SOURCE_POLICY_CONTEXT}
-   * key
+   * Extracts an instance stored as an internal parameter in the given {@code result} under the {@link #SOURCE_POLICY_CONTEXT} key
    *
    * @param event
-   * @return an {@link OperationPolicyContext} or {@code null} if none was set on the event
+   * @return an {@link SourcePolicyContext} or {@code null} if none was set on the event
    */
   public static SourcePolicyContext from(CoreEvent event) {
     return ((InternalEvent) event).getInternalParameter(SOURCE_POLICY_CONTEXT);
