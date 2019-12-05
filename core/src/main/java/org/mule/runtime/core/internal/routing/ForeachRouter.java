@@ -44,7 +44,7 @@ import static reactor.util.context.Context.empty;
 
 class ForeachRouter {
 
-  private final Logger LOGGER = getLogger(ForeachRouter.class);
+  private static final Logger LOGGER = getLogger(ForeachRouter.class);
 
   private static final String FOREACH_CONTEXT_VARIABLE = "foreachContext";
   static final String MAP_NOT_SUPPORTED_MESSAGE =
@@ -60,7 +60,6 @@ class ForeachRouter {
   private final FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
   private final AtomicReference<Context> downstreamCtxReference = new AtomicReference(empty());
 
-
   ForeachRouter(Foreach owner, Publisher<CoreEvent> publisher, String expression, int batchSize,
                 MessageProcessorChain nestedChain) {
     this.owner = owner;
@@ -74,46 +73,40 @@ class ForeachRouter {
             downstreamRecorder.next(left(new IllegalArgumentException(MAP_NOT_SUPPORTED_MESSAGE)));
           }
 
-          // Keep reference to existing rootMessage/count variables in order to restore later to support foreach nesting.
-          Object previousCounterVar2 = event.getVariables().containsKey(owner.getCounterVariableName())
-              ? event.getVariables().get(owner.getCounterVariableName()).getValue()
-              : null;
-          Object previousRootMessageVar2 =
-              event.getVariables().containsKey(owner.getRootMessageVariableName())
-                  ? event.getVariables().get(owner.getRootMessageVariableName()).getValue()
-                  : null;
-
           // Create ForEachContext
-          ForeachContext foreachContext =
-              new ForeachContext(previousCounterVar2, previousRootMessageVar2, event.getMessage());
+          ForeachContext foreachContext = this.createForeachContext(event);
           // Save it inside the internalParameters of the event
           Map<String, ForeachContext> currentContextFromEvent = foreachContextResolver.getCurrentContextFromEvent(event);
           currentContextFromEvent.put(event.getContext().getId(), foreachContext);
 
-          final CoreEvent requestEvent =
+          final CoreEvent innerEvent =
               builder(event).addVariable(owner.getRootMessageVariableName(), event.getMessage()).build();
 
-          CoreEvent coreEvent = foreachContextResolver.eventWithContext(requestEvent, currentContextFromEvent);
+          CoreEvent responseEvent = foreachContextResolver.eventWithContext(innerEvent, currentContextFromEvent);
           try {
             // Set the Iterator<TypedValue> calculated
-            foreachContext.setIterator(splitRequest(coreEvent, expression));
+            foreachContext.setIterator(this.splitRequest(responseEvent, expression));
 
             // Inject it into the inner flux
-            innerRecorder.next(coreEvent);
+            innerRecorder.next(responseEvent);
           } catch (Exception e) {
             // Wrap any exception that occurs during split in a MessagingException. This is required as the
             // automatic wrapping is only applied when the signal is an Event.
-            downstreamRecorder.next(left(new MessagingException(coreEvent, e, owner)));
+            downstreamRecorder.next(left(new MessagingException(responseEvent, e, owner)));
           }
+        })
+        .doOnComplete(() -> {
+          innerRecorder.complete();
+          downstreamRecorder.complete();
         });
 
     innerFlux = Flux.create(innerRecorder)
         .map(event -> {
+          ForeachContext foreachContext =
+              foreachContextResolver.getCurrentContextFromEvent(event).get(event.getContext().getId());
 
-          Iterator<TypedValue<?>> iterator =
-              foreachContextResolver.getCurrentContextFromEvent(event).get(event.getContext().getId()).getIterator();
-          if (!iterator.hasNext()
-              && foreachContextResolver.getCurrentContextFromEvent(event).get(event.getContext().getId()).getCount().get() == 0) {
+          Iterator<TypedValue<?>> iterator = foreachContext.getIterator();
+          if (!iterator.hasNext() && foreachContext.getCount().get() == 0) {
             downstreamRecorder.next(Either.right(event));
           }
 
@@ -138,8 +131,7 @@ class ForeachRouter {
             configurer.configure(partEventBuilder);
 
             Runnable onCompleteConsumer = configurer::eventCompleted;
-            foreachContextResolver.getCurrentContextFromEvent(event).get(event.getContext().getId())
-                .setOnComplete(onCompleteConsumer);
+            foreachContext.setOnComplete(onCompleteConsumer);
 
           } else if (currentValue.getValue() instanceof Message) {
             // If value is a Message then use it directly conserving attributes and properties.
@@ -148,12 +140,8 @@ class ForeachRouter {
             // Otherwise create a new message
             partEventBuilder.message(Message.builder().payload(currentValue).build());
           }
-
-          // Create a mapper in assembly that that buffers the events, by taking from the iterable;
-          // or takes one from it and starts processing
           return partEventBuilder
-              .addVariable(owner.getCounterVariableName(), foreachContextResolver.getCurrentContextFromEvent(event)
-                  .get(event.getContext().getId()).getCount().incrementAndGet())
+              .addVariable(owner.getCounterVariableName(), foreachContext.getCount().incrementAndGet())
               .build();
         })
         .transform(innerPub -> applyWithChildContext(innerPub, nestedChain, of(owner.getLocation()), chainErrorHandler()))
@@ -185,11 +173,20 @@ class ForeachRouter {
             // Create response and restore variables
             return createResponseEvent(either.getRight());
           }
-        })
-        .onErrorMap(MessagingException.class, me -> {
-          me.setProcessedEvent(createResponseEvent(me.getEvent()));
-          return me;
         });
+  }
+
+  private ForeachContext createForeachContext(CoreEvent event) {
+    // Keep reference to existing rootMessage/count variables in order to restore later to support foreach nesting.
+    Object previousCounterVar2 = event.getVariables().containsKey(owner.getCounterVariableName())
+        ? event.getVariables().get(owner.getCounterVariableName()).getValue()
+        : null;
+    Object previousRootMessageVar2 =
+        event.getVariables().containsKey(owner.getRootMessageVariableName())
+            ? event.getVariables().get(owner.getRootMessageVariableName()).getValue()
+            : null;
+
+    return new ForeachContext(previousCounterVar2, previousRootMessageVar2, event.getMessage());
   }
 
   private BaseExceptionHandler chainErrorHandler() {
