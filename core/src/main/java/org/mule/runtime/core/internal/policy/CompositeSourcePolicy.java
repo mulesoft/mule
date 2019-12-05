@@ -26,7 +26,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.List;
 import java.util.Map;
@@ -36,6 +35,7 @@ import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -178,6 +178,7 @@ public class CompositeSourcePolicy
   protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy lastPolicy) {
 
     return from(eventPub)
+        .doOnNext(e -> SourcePolicyContext.from(e).setParametersTransformer(getParametersTransformer()))
         .transform(flowExecutionProcessor)
         .map(flowExecutionResponse -> {
           try {
@@ -185,19 +186,6 @@ public class CompositeSourcePolicy
           } catch (MessagingException e) {
             throw Exceptions.propagateWrappingFatal(resolver.orElse(exc -> exc).apply(e));
           }
-        })
-        .onErrorContinue(MessagingException.class, (error, v) -> {
-
-          PolicyNotificationHelper notificationHelper =
-              new PolicyNotificationHelper(lastPolicy.getPolicyChain().getMuleContext().getNotificationManager(),
-                                           lastPolicy.getPolicyId(),
-                                           lastPolicy.getPolicyChain());
-
-          new OnExecuteNextErrorConsumer(event -> policyEventMapper.onFlowError(event, lastPolicy.getPolicyId(),
-                                                                                getParametersTransformer()),
-                                         notificationHelper, lastPolicy.getPolicyChain().getLocation())
-                                             .accept(error);
-          ((BaseEventContext) ((MessagingException) error).getEvent().getContext()).error(error);
         });
   }
 

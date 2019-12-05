@@ -6,13 +6,17 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static java.util.Optional.empty;
+
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Holds all the context information for a source policy to function
@@ -43,6 +47,7 @@ public class SourcePolicyContext {
   private CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> processCallback;
   private Map<String, Object> originalResponseParameters;
   private Map<String, Object> originalFailureResponseParameters;
+  private Optional<SourcePolicyParametersTransformer> parametersTransformer = empty();
 
   public SourcePolicyContext(PolicyPointcutParameters pointcutParameters) {
     this.pointcutParameters = pointcutParameters;
@@ -88,5 +93,13 @@ public class SourcePolicyContext {
 
   public void setOriginalFailureResponseParameters(Map<String, Object> originalFailureResponseParameters) {
     this.originalFailureResponseParameters = originalFailureResponseParameters;
+  }
+
+  public void setParametersTransformer(Optional<SourcePolicyParametersTransformer> parametersTransformer) {
+    this.parametersTransformer = parametersTransformer;
+  }
+
+  public Optional<SourcePolicyParametersTransformer> getParametersTransformer() {
+    return parametersTransformer;
   }
 }
