@@ -95,10 +95,7 @@ class ForeachRouter {
             downstreamRecorder.next(left(new MessagingException(responseEvent, e, owner)));
           }
         })
-        .doOnComplete(() -> {
-          innerRecorder.complete();
-          downstreamRecorder.complete();
-        });
+        .doOnComplete(this::completeRouter);
 
     innerFlux = Flux.create(innerRecorder)
         .map(event -> {
@@ -110,39 +107,9 @@ class ForeachRouter {
             downstreamRecorder.next(Either.right(event));
           }
 
-          TypedValue currentValue;
-          if (batchSize > 1) {
-            int counter = 0;
-            ArrayList<Object> list = new ArrayList<>();
-            while (iterator.hasNext() && counter < batchSize) {
-              list.add(iterator.next());
-              counter++;
-            }
-            currentValue = new TypedValue<>(list, fromObject(list));
-          } else {
-            currentValue = iterator.next();
-          }
+          TypedValue currentValue = setCurrentValue(batchSize, iterator);
+          return createTypedValuePartToProcess(owner, event, foreachContext, currentValue);
 
-          // For each TypedValue part process the nested chain using the event from the previous part.
-          CoreEvent.Builder partEventBuilder = CoreEvent.builder(event);
-          if (currentValue.getValue() instanceof EventBuilderConfigurer) {
-            // Support EventBuilderConfigurer currently used by Batch Module
-            EventBuilderConfigurer configurer = (EventBuilderConfigurer) currentValue.getValue();
-            configurer.configure(partEventBuilder);
-
-            Runnable onCompleteConsumer = configurer::eventCompleted;
-            foreachContext.setOnComplete(onCompleteConsumer);
-
-          } else if (currentValue.getValue() instanceof Message) {
-            // If value is a Message then use it directly conserving attributes and properties.
-            partEventBuilder.message((Message) currentValue.getValue());
-          } else {
-            // Otherwise create a new message
-            partEventBuilder.message(Message.builder().payload(currentValue).build());
-          }
-          return partEventBuilder
-              .addVariable(owner.getCounterVariableName(), foreachContext.getCount().incrementAndGet())
-              .build();
         })
         .transform(innerPub -> applyWithChildContext(innerPub, nestedChain, of(owner.getLocation()), chainErrorHandler()))
         .doOnNext(evt -> {
@@ -174,6 +141,51 @@ class ForeachRouter {
             return createResponseEvent(either.getRight());
           }
         });
+  }
+
+  private TypedValue setCurrentValue(int batchSize, Iterator<TypedValue<?>> iterator) {
+    TypedValue currentValue;
+    if (batchSize > 1) {
+      int counter = 0;
+      ArrayList<Object> list = new ArrayList<>();
+      while (iterator.hasNext() && counter < batchSize) {
+        list.add(iterator.next());
+        counter++;
+      }
+      currentValue = new TypedValue<>(list, fromObject(list));
+    } else {
+      currentValue = iterator.next();
+    }
+    return currentValue;
+  }
+
+  private CoreEvent createTypedValuePartToProcess(Foreach owner, CoreEvent event, ForeachContext foreachContext,
+                                                  TypedValue currentValue) {
+    // For each TypedValue part process the nested chain using the event from the previous part.
+    CoreEvent.Builder partEventBuilder = CoreEvent.builder(event);
+    if (currentValue.getValue() instanceof EventBuilderConfigurer) {
+      // Support EventBuilderConfigurer currently used by Batch Module
+      EventBuilderConfigurer configurer = (EventBuilderConfigurer) currentValue.getValue();
+      configurer.configure(partEventBuilder);
+
+      Runnable onCompleteConsumer = configurer::eventCompleted;
+      foreachContext.setOnComplete(onCompleteConsumer);
+
+    } else if (currentValue.getValue() instanceof Message) {
+      // If value is a Message then use it directly conserving attributes and properties.
+      partEventBuilder.message((Message) currentValue.getValue());
+    } else {
+      // Otherwise create a new message
+      partEventBuilder.message(Message.builder().payload(currentValue).build());
+    }
+    return partEventBuilder
+        .addVariable(owner.getCounterVariableName(), foreachContext.getCount().incrementAndGet())
+        .build();
+  }
+
+  private void completeRouter() {
+    innerRecorder.complete();
+    downstreamRecorder.complete();
   }
 
   private ForeachContext createForeachContext(CoreEvent event) {
