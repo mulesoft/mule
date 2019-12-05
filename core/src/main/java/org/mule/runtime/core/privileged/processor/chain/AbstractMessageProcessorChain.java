@@ -426,7 +426,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     if (serverNotificationManager != null
         && serverNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)) {
 
-      if (((Component) processor).getLocation() != null) {
+      if (processor instanceof Component && ((Component) processor).getLocation() != null) {
         serverNotificationManager
             .fireNotification(createFrom(event, ((Component) processor).getLocation(), (Component) processor,
                                          exceptionThrown, action));
