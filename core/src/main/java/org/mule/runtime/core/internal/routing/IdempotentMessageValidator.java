@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.el.BindingContextUtils.CORRELATION_ID;
-import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
@@ -20,9 +19,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -34,6 +35,7 @@ import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -66,6 +68,9 @@ public class IdempotentMessageValidator extends AbstractComponent
   protected String idExpression = format("%s%s%s", DEFAULT_EXPRESSION_PREFIX, CORRELATION_ID, DEFAULT_EXPRESSION_POSTFIX);
   protected String valueExpression = format("%s%s%s", DEFAULT_EXPRESSION_PREFIX, CORRELATION_ID, DEFAULT_EXPRESSION_POSTFIX);
 
+  private CompiledExpression compiledIdExpression;
+  private CompiledExpression compiledValueExpression;
+
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
@@ -79,6 +84,8 @@ public class IdempotentMessageValidator extends AbstractComponent
                  this.getClass().getName(), UUID.randomUUID());
     }
     setupObjectStore();
+    compiledIdExpression = compile(idExpression, muleContext.getExpressionManager());
+    compiledValueExpression = compile(valueExpression, muleContext.getExpressionManager());
   }
 
   private void setupObjectStore() throws InitialisationException {
@@ -122,11 +129,17 @@ public class IdempotentMessageValidator extends AbstractComponent
   }
 
   protected String getValueForEvent(CoreEvent event) throws MessagingException {
-    return (String) muleContext.getExpressionManager().evaluate(valueExpression, STRING, NULL_BINDING_CONTEXT, event).getValue();
+    return evaluateString(event, compiledValueExpression);
   }
 
   protected String getIdForEvent(CoreEvent event) throws MuleException {
-    return (String) muleContext.getExpressionManager().evaluate(idExpression, STRING, NULL_BINDING_CONTEXT, event).getValue();
+    return evaluateString(event, compiledIdExpression);
+  }
+
+  private String evaluateString(CoreEvent event, CompiledExpression expression) {
+    try (ExpressionManagerSession session = muleContext.getExpressionManager().openSession(event.asBindingContext())) {
+      return (String) session.evaluate(expression, STRING).getValue();
+    }
   }
 
   public String getIdExpression() {

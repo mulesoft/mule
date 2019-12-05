@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.el;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.String.format;
-import static java.util.regex.Pattern.compile;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -70,7 +69,7 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
       expressionLanguages.put(MEL_PREFIX, mvelExpressionLanguage);
     }
 
-    exprPrefixPattern = compile(EXPR_PREFIX_PATTERN_TEMPLATE.replaceAll("LANGS", join(expressionLanguages.keySet(), '|')));
+    exprPrefixPattern = Pattern.compile(EXPR_PREFIX_PATTERN_TEMPLATE.replaceAll("LANGS", join(expressionLanguages.keySet(), '|')));
 
     melDefault = MuleProperties.isMelDefault();
     if (isMelDefault() && mvelExpressionLanguage == null) {
@@ -146,6 +145,11 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   public Iterator<TypedValue<?>> split(String expression, CoreEvent event, BindingContext bindingContext)
       throws ExpressionRuntimeException {
     return selectExpressionLanguage(expression).split(expression, event, bindingContext);
+  }
+
+  @Override
+  public CompiledExpression compile(String expression, BindingContext bindingContext) {
+    return selectExpressionLanguage(expression).compile(expression, bindingContext);
   }
 
   private ExtendedExpressionLanguageAdaptor selectExpressionLanguage(String expression) {

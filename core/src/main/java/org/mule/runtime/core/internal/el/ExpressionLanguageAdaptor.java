@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.el;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ValidationResult;
@@ -141,4 +142,6 @@ public interface ExpressionLanguageAdaptor {
       throws ExpressionRuntimeException;
 
   ExpressionLanguageSessionAdaptor openSession(ComponentLocation componentLocation, CoreEvent event, BindingContext context);
+
+  CompiledExpression compile(String expression, BindingContext bindingContext);
 }

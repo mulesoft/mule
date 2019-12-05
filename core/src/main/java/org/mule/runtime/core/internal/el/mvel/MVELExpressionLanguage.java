@@ -30,11 +30,13 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionExecutionException;
+import org.mule.runtime.api.el.ModuleElementName;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
@@ -44,17 +46,19 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.el.ExpressionLanguageSessionAdaptor;
 import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.mvel.datatype.MvelDataTypeResolver;
-import org.mule.runtime.core.internal.el.mvel.datatype.MvelEnricherDataTypePropagator;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import javax.activation.DataHandler;
@@ -83,7 +87,6 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
   protected Map<String, Class<?>> imports = new HashMap<>();
   private boolean autoResolveVariables = true;
   private MvelDataTypeResolver dataTypeResolver = new MvelDataTypeResolver();
-  private final MvelEnricherDataTypePropagator dataTypePropagator = new MvelEnricherDataTypePropagator();
 
   @Inject
   public MVELExpressionLanguage(MuleContext muleContext) {
@@ -224,6 +227,27 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
 
       return new TypedValue(value, dataType);
     }
+  }
+
+  @Override
+  public CompiledExpression compile(String expression, BindingContext bindingContext) {
+    return new CompiledExpression() {
+
+      @Override
+      public String expression() {
+        return removeExpressionMarker(expression);
+      }
+
+      @Override
+      public Optional<MediaType> outputType() {
+        return Optional.empty();
+      }
+
+      @Override
+      public List<ModuleElementName> externalDependencies() {
+        return Collections.emptyList();
+      }
+    };
   }
 
   @Override

@@ -140,6 +140,11 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
     }
   }
 
+  @Override
+  public CompiledExpression compile(String expression, BindingContext bindingContext) {
+    return expressionExecutor.compile(sanitize(expression), bindingContext);
+  }
+
   /**
    * This provides an optimization to avoid going to DW for evaluationg just the payload, which is there at hand already.
    */

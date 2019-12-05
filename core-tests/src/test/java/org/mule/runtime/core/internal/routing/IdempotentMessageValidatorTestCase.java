@@ -43,12 +43,12 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
   private static IdempotentMessageValidator idempotent;
 
   @Before
-  public void reset() {
+  public void reset() throws Exception {
     // Needs to create a new validator for every test because the idExpression needs to be reset and there is not way of knowing
     // the default from the test
     idempotent = new IdempotentMessageValidator();
     idempotent.setStorePrefix("foo");
-    idempotent.setObjectStore(new InMemoryObjectStore<String>());
+    idempotent.setObjectStore(new InMemoryObjectStore<>());
     idempotent.setMuleContext(muleContext);
   }
 
@@ -64,6 +64,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     Message okMessage = InternalMessage.builder().value("OK").build();
     CoreEvent event = CoreEvent.builder(contextA).message(okMessage).build();
 
+    idempotent.initialise();
     // This one will process the event on the target endpoint
     CoreEvent processedEvent = idempotent.process(event);
     assertThat(processedEvent, sameInstance(event));
@@ -89,6 +90,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     // Set MEL expression to hash value
     idempotent.setIdExpression(melExpression);
 
+    idempotent.initialise();
     // This one will process the event on the target endpoint
     CoreEvent processedEvent = idempotent.process(event);
     assertNotNull(processedEvent);
@@ -116,6 +118,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     // Set DW expression to hash value
     idempotent.setIdExpression(dwExpression);
 
+    idempotent.initialise();
     // This one will process the event on the target endpoint
     CoreEvent processedEvent = idempotent.process(event);
     assertNotNull(processedEvent);
@@ -151,6 +154,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
                                                new WeaveDefaultExpressionLanguageFactoryService(null));
     TypedValue hashedValue = expressionLanguageAdaptor.evaluate(dwHashExpression, event, NULL_BINDING_CONTEXT);
 
+    idempotent.initialise();
     // This one will process the event on the target endpoint
     CoreEvent processedEvent = idempotent.process(event);
     assertNotNull(processedEvent);
@@ -188,6 +192,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
                                                new WeaveDefaultExpressionLanguageFactoryService(null));
     TypedValue hashedValue = expressionLanguageAdaptor.evaluate(dwHashExpression, event, NULL_BINDING_CONTEXT);
 
+    idempotent.initialise();
     // This one will process the event on the target endpoint
     CoreEvent processedEvent = idempotent.process(event);
     assertNotNull(processedEvent);
