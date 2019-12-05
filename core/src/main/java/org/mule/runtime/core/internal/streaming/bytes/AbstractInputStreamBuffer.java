@@ -91,13 +91,30 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
   protected abstract ByteBuffer doGet(long position, int length);
 
   protected int consumeStream(ByteBuffer buffer) throws IOException {
-    int result;
-    result = stream.read(buffer.array(), 0, buffer.remaining());
-    if (result > 0) {
-      buffer.position(buffer.position() + result);
+    int totalRead = 0;
+    int remaining = buffer.remaining();
+    int offset = buffer.position();
+    byte[] dest = buffer.array();
+
+    while (totalRead < remaining) {
+      try {
+        int read = stream.read(dest, offset, remaining);
+        if (read == -1) {
+          return totalRead > 0 ? totalRead : -1;
+        }
+        totalRead += read;
+        offset += read;
+      } catch (Throwable t) {
+        LOGGER.error(">>> MG <<<< : Exception", t);
+        break;
+      }
     }
 
-    return result;
+    if (totalRead > 0) {
+      buffer.position(buffer.position() + offset);
+    }
+
+    return totalRead;
   }
 
   protected boolean deallocate(ByteBuffer byteBuffer) {
