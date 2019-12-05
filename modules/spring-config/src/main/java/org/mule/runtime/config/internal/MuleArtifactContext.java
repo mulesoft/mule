@@ -323,10 +323,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   public void initialize() {
     applicationModel.macroExpandXmlSdkComponents(getExtensions());
-
     validateAllConfigElementHaveParsers();
-
-    registerErrorTypes();
   }
 
   @Override
@@ -335,6 +332,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     beanFactory.setBeanExpressionResolver(null);
 
     registerEditors(beanFactory);
+    registerErrorTypes();
 
     registerAnnotationConfigProcessors((BeanDefinitionRegistry) beanFactory, beanFactory);
 
