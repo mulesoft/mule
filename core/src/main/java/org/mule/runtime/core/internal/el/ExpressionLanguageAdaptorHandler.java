@@ -69,7 +69,8 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
       expressionLanguages.put(MEL_PREFIX, mvelExpressionLanguage);
     }
 
-    exprPrefixPattern = Pattern.compile(EXPR_PREFIX_PATTERN_TEMPLATE.replaceAll("LANGS", join(expressionLanguages.keySet(), '|')));
+    exprPrefixPattern =
+        Pattern.compile(EXPR_PREFIX_PATTERN_TEMPLATE.replaceAll("LANGS", join(expressionLanguages.keySet(), '|')));
 
     melDefault = MuleProperties.isMelDefault();
     if (isMelDefault() && mvelExpressionLanguage == null) {

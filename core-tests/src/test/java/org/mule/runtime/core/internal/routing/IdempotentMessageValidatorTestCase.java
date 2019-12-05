@@ -33,6 +33,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.weave.v2.el.ByteArrayBasedCursorStreamProvider;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,6 +51,12 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     idempotent.setStorePrefix("foo");
     idempotent.setObjectStore(new InMemoryObjectStore<>());
     idempotent.setMuleContext(muleContext);
+  }
+
+  @After
+  public void after() throws Exception {
+    idempotent.stop();
+    idempotent.dispose();
   }
 
   @Rule

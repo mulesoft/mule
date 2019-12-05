@@ -9,17 +9,18 @@ package org.mule.runtime.core.internal.util.rx;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 
+import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionLanguage;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.SynchronousSink;
 
@@ -55,6 +56,7 @@ public final class Operators {
     };
   }
 
+  @Deprecated
   public static Function<CoreEvent, CoreEvent> outputToTarget(CoreEvent originalEvent, String target,
                                                               String targetValueExpression,
                                                               ExpressionLanguage expressionManager) {
@@ -62,6 +64,22 @@ public final class Operators {
       if (target != null) {
         TypedValue targetValue = expressionManager.evaluate(targetValueExpression, getTargetBindingContext(result.getMessage()));
         return builder(originalEvent).addVariable(target, targetValue.getValue(), targetValue.getDataType()).build();
+      } else {
+        return result;
+      }
+    };
+  }
+
+
+  public static Function<CoreEvent, CoreEvent> outputToTarget(CoreEvent originalEvent, String target,
+                                                              CompiledExpression targetValueExpression,
+                                                              ExpressionLanguage expressionLanguage) {
+    return result -> {
+      if (target != null) {
+        try (ExpressionLanguageSession session = expressionLanguage.openSession(getTargetBindingContext(result.getMessage()))) {
+          TypedValue targetValue = session.evaluate(targetValueExpression);
+          return builder(originalEvent).addVariable(target, targetValue.getValue(), targetValue.getDataType()).build();
+        }
       } else {
         return result;
       }
