@@ -273,7 +273,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   }
 
   @Test
-  public void  failingNestedProcessor() throws Exception {
+  public void failingNestedProcessor() throws Exception {
     RuntimeException throwable = new BufferOverflowException();
     foreach = createForeach();
     SensingNullMessageProcessor firstProcessor = new SensingNullMessageProcessor();
