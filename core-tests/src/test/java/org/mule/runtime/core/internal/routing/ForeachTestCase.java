@@ -187,7 +187,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void mapPayload() throws Exception {
     expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage(Foreach.MAP_NOT_SUPPORTED_MESSAGE);
+    expectedException.expectMessage(ForeachRouter.MAP_NOT_SUPPORTED_MESSAGE);
     process(simpleForeach, eventBuilder(muleContext).message(of(singletonMap("foo", "bar"))).build());
   }
 
@@ -273,7 +273,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   }
 
   @Test
-  public void failingNestedProcessor() throws Exception {
+  public void  failingNestedProcessor() throws Exception {
     RuntimeException throwable = new BufferOverflowException();
     foreach = createForeach();
     SensingNullMessageProcessor firstProcessor = new SensingNullMessageProcessor();
@@ -283,14 +283,14 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     foreach.setMessageProcessors(asList(firstProcessor, failingProcessor));
     initialiseIfNeeded(foreach, muleContext);
     try {
-      expectNestedProessorException(throwable, failingProcessor);
+      expectNestedProcessorException(throwable, failingProcessor);
       process(foreach, eventBuilder(muleContext).message(of(new DummyNestedIterableClass().iterator())).build(), false);
     } finally {
       assertThat(firstProcessor.invocations, equalTo(1));
     }
   }
 
-  private void expectNestedProessorException(RuntimeException throwable, InternalTestProcessor failingProcessor) {
+  private void expectNestedProcessorException(RuntimeException throwable, InternalTestProcessor failingProcessor) {
     expectedException.expect(is(MessagingException.class));
     expectedException.expect(new FailingProcessorMatcher(failingProcessor));
     expectedException.expectCause(is(throwable));
@@ -307,7 +307,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     foreach.setMessageProcessors(asList(firstProcessor, failingProcessor));
     initialiseIfNeeded(foreach, muleContext);
     try {
-      expectNestedProessorException(throwable, failingProcessor);
+      expectNestedProcessorException(throwable, failingProcessor);
       processInChain(foreach, eventBuilder(muleContext).message(of(new DummyNestedIterableClass().iterator())).build());
     } finally {
       assertThat(firstProcessor.invocations, equalTo(1));

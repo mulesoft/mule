@@ -10,6 +10,10 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 
 import java.util.Iterator;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static java.util.Optional.empty;
 
 public class ForeachContext {
 
@@ -17,13 +21,15 @@ public class ForeachContext {
   Object previousRootMessage;
   Message originalMessage;
   Iterator<TypedValue<?>> iterator;
+  // TODO cambiale el nombreeeee
+  AtomicInteger count = new AtomicInteger();
 
+  Optional<Runnable> onComplete = empty();
 
-  public ForeachContext(Object previousCounter, Object previousRootMessage, Message message, Iterator<TypedValue<?>> iterator) {
+  public ForeachContext(Object previousCounter, Object previousRootMessage, Message message) {
     this.previousCounter = previousCounter;
     this.previousRootMessage = previousRootMessage;
     this.originalMessage = message;
-    this.iterator = iterator;
   }
 
   public Object getPreviousCounter() {
@@ -40,5 +46,25 @@ public class ForeachContext {
 
   public Iterator<TypedValue<?>> getIterator() {
     return iterator;
+  }
+
+  public void setIterator(Iterator<TypedValue<?>> iterator) {
+    this.iterator = iterator;
+  }
+
+  public AtomicInteger getCount() {
+    return count;
+  }
+
+  public void setCount(AtomicInteger count) {
+    this.count = count;
+  }
+
+  public Optional<Runnable> getOnComplete() {
+    return onComplete;
+  }
+
+  public void setOnComplete(Runnable onCompleteConsumer) {
+    this.onComplete = Optional.of(onCompleteConsumer);
   }
 }
