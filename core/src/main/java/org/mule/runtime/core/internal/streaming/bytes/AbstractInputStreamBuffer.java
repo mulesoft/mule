@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 
 /**
@@ -92,20 +93,25 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
 
   protected int consumeStream(ByteBuffer buffer) throws IOException {
     int totalRead = 0;
-    int remaining = buffer.remaining();
+    final int maxRead = buffer.remaining();
+    int remaining = maxRead;
     int offset = buffer.position();
     byte[] dest = buffer.array();
 
-    while (totalRead < remaining) {
+    while (totalRead < maxRead) {
       try {
         int read = stream.read(dest, offset, remaining);
-        if (read == -1) {
+        if (read == 0) {
+          return totalRead;
+        } else if (read < 0) {
           return totalRead > 0 ? totalRead : -1;
         }
         totalRead += read;
+        remaining -= read;
         offset += read;
       } catch (Throwable t) {
-        LOGGER.error(">>> MG <<<< : Exception", t);
+        System.out.println(">>> MG <<<< : Exception" + ExceptionUtils.getStackTrace(t));
+        System.out.println(">>> MG <<<< : CAUSE" + ExceptionUtils.getStackTrace(t.getCause()));
         break;
       }
     }
