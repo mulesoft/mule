@@ -42,8 +42,10 @@ import org.mule.runtime.api.meta.model.ComposableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.construct.HasConstructModels;
+import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
@@ -129,6 +131,14 @@ class DeclarationBasedElementModelFactory {
       protected void onConfiguration(ConfigurationModel model) {
         if (equalsName.apply(model) && declaration instanceof ConfigurationElementDeclaration) {
           elementModel.set(createConfigurationElement(model, (ConfigurationElementDeclaration) declaration));
+          stop();
+        }
+      }
+
+      @Override
+      protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
+        if (equalsName.apply(model) && declaration instanceof ConnectionElementDeclaration) {
+          elementModel.set(createConnectionProviderModel(model, (ConnectionElementDeclaration) declaration));
           stop();
         }
       }
@@ -290,6 +300,20 @@ class DeclarationBasedElementModelFactory {
     this.dsl = resolvers.get(currentExtension);
   }
 
+  private DslElementModel<ConnectionProviderModel> createConnectionProviderModel(ConnectionProviderModel providerModel,
+                                                                                 ConnectionElementDeclaration connection) {
+    DslElementSyntax providerDsl = dsl.resolve(providerModel);
+
+    InternalComponentConfiguration.Builder builder = InternalComponentConfiguration.builder()
+        .withIdentifier(asIdentifier(providerDsl));
+
+    DslElementModel.Builder<ConnectionProviderModel> element =
+        createParameterizedElementModel(providerModel, providerDsl, connection, builder);
+
+    ComponentConfiguration providerConfig = builder.build();
+    return element.withConfig(providerConfig).build();
+  }
+
   private void addConnectionProvider(ConnectionElementDeclaration connection,
                                      ConfigurationModel model,
                                      InternalComponentConfiguration.Builder configuration,
@@ -300,18 +324,10 @@ class DeclarationBasedElementModelFactory {
             .filter(c -> c.getName().equals(connection.getName()))
             .findFirst()
             .ifPresent(provider -> {
-              DslElementSyntax providerDsl = dsl.resolve(provider);
-
-              InternalComponentConfiguration.Builder builder = InternalComponentConfiguration.builder()
-                  .withIdentifier(asIdentifier(providerDsl));
-
-              DslElementModel.Builder<ConnectionProviderModel> element =
-                  createParameterizedElementModel(provider, providerDsl, connection, builder);
-
-              ComponentConfiguration providerConfig = builder.build();
-
-              configuration.withNestedComponent(providerConfig);
-              configElement.containing(element.withConfig(providerConfig).build());
+              DslElementModel<ConnectionProviderModel> connectionProviderModel =
+                  createConnectionProviderModel(provider, connection);
+              connectionProviderModel.getConfiguration().ifPresent(configuration::withNestedComponent);
+              configElement.containing(connectionProviderModel);
             });
   }
 
