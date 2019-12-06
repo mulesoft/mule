@@ -243,8 +243,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
           .forEach(componentBuildingDefinitionRegistry::register);
     }
 
-    this.beanDefinitionFactory =
-        new BeanDefinitionFactory(componentBuildingDefinitionRegistry, muleContext.getErrorTypeRepository());
+    this.beanDefinitionFactory = new BeanDefinitionFactory(componentBuildingDefinitionRegistry);
 
     this.applicationModel = createApplicationModel();
   }

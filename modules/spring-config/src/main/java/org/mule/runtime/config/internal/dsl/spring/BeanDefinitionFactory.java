@@ -33,7 +33,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
@@ -105,19 +104,14 @@ public class BeanDefinitionFactory {
 
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
   private final BeanDefinitionCreator componentModelProcessor;
-  private final ErrorTypeRepository errorTypeRepository;
   private final ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
-  private final Set<String> syntheticErrorNamespaces = new HashSet<>();
 
   /**
    * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the
    *        artifact.
-   * @param errorTypeRepository
    */
-  public BeanDefinitionFactory(ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
-                               ErrorTypeRepository errorTypeRepository) {
+  public BeanDefinitionFactory(ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
-    this.errorTypeRepository = errorTypeRepository;
     this.componentModelProcessor = buildComponentModelProcessorChainOfResponsability();
     this.ignoredMuleExtensionComponentIdentifiers = new HashSet<>();
 
