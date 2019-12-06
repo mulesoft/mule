@@ -10,6 +10,7 @@ import static java.lang.Thread.currentThread;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.AbstractServerNotification;
@@ -33,6 +34,8 @@ import org.mule.runtime.api.notification.FlowConstructNotification;
 import org.mule.runtime.api.notification.FlowConstructNotificationListener;
 import org.mule.runtime.api.notification.ManagementNotification;
 import org.mule.runtime.api.notification.ManagementNotificationListener;
+import org.mule.runtime.api.notification.MessageProcessorNotification;
+import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.notification.PipelineMessageNotification;
@@ -94,9 +97,9 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
 
   private boolean dynamic = false;
   private Configuration configuration = new Configuration();
-  private AtomicInteger activeFires = new AtomicInteger();
-  private AtomicBoolean disposed = new AtomicBoolean(false);
-  private Latch disposeLatch = new Latch();
+  private final AtomicInteger activeFires = new AtomicInteger();
+  private final AtomicBoolean disposed = new AtomicBoolean(false);
+  private final Latch disposeLatch = new Latch();
   private MuleContext muleContext;
   private Scheduler notificationsLiteScheduler;
   private Scheduler notificationsIoScheduler;
@@ -296,6 +299,7 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
     manager.addInterfaceToType(ManagementNotificationListener.class, ManagementNotification.class);
     manager.addInterfaceToType(CustomNotificationListener.class, CustomNotification.class);
     manager.addInterfaceToType(ConnectionNotificationListener.class, ConnectionNotification.class);
+    manager.addInterfaceToType(MessageProcessorNotificationListener.class, MessageProcessorNotification.class);
     manager.addInterfaceToType(ExceptionNotificationListener.class, ExceptionNotification.class);
     manager.addInterfaceToType(ErrorHandlerNotificationListener.class, ErrorHandlerNotification.class);
     manager.addInterfaceToType(TransactionNotificationListener.class, TransactionNotification.class);
@@ -303,7 +307,6 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
     manager.addInterfaceToType(AsyncMessageNotificationListener.class, AsyncMessageNotification.class);
     manager.addInterfaceToType(ClusterNodeNotificationListener.class, ClusterNodeNotification.class);
     manager.addInterfaceToType(ConnectorMessageNotificationListener.class, ConnectorMessageNotification.class);
-    manager.addInterfaceToType(ErrorHandlerNotificationListener.class, ErrorHandlerNotification.class);
     manager.addInterfaceToType(FlowConstructNotificationListener.class, FlowConstructNotification.class);
     manager.addInterfaceToType(ExtensionNotificationListener.class, ExtensionNotification.class);
 
