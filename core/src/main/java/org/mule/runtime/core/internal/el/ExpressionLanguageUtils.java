@@ -8,18 +8,19 @@ package org.mule.runtime.core.internal.el;
 
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBuindingsToBuilder;
-import static org.mule.runtime.core.internal.event.VoidEventFactory.getVoidEvent;
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionLanguage;
+import org.mule.runtime.core.internal.event.NullEventFactory;
 
 public final class ExpressionLanguageUtils {
 
   private ExpressionLanguageUtils() {}
 
   private static final BindingContext COMPILATION_BINDING_CONTEXT =
-      addEventBuindingsToBuilder(getVoidEvent(), NULL_BINDING_CONTEXT).build();
+      addEventBuindingsToBuilder(NullEventFactory.getNullEvent(), NULL_BINDING_CONTEXT).build();
 
 
   public static CompiledExpression compile(String expression, ExpressionLanguage expressionLanguage) {

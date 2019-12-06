@@ -10,7 +10,7 @@ package org.mule.runtime.module.extension.api.util;
 import static java.util.Collections.singleton;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
-import static org.mule.runtime.core.internal.event.VoidEventFactory.getVoidEvent;
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 
@@ -21,6 +21,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
+import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
@@ -77,7 +78,7 @@ public class MuleExtensionUtils {
    */
   @Deprecated
   public static CoreEvent getInitialiserEvent() {
-    return getVoidEvent();
+    return NullEventFactory.getNullEvent();
   }
 
   /**
@@ -88,7 +89,7 @@ public class MuleExtensionUtils {
    */
   @Deprecated
   public static CoreEvent getInitialiserEvent(MuleContext muleContext) {
-    return getVoidEvent(muleContext);
+    return getNullEvent(muleContext);
   }
 
   /**

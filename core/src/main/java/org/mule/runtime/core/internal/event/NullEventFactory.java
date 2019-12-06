@@ -26,19 +26,19 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-public final class VoidEventFactory {
+public final class NullEventFactory {
 
   private static final String INITIALIZER_EVENT = "InitializerEvent";
 
-  private VoidEventFactory() {}
+  private NullEventFactory() {}
 
   /**
    * Creates an empty event for extension initialization purposes
    *
    * @return a new {@link CoreEvent}
    */
-  public static CoreEvent getVoidEvent() {
-    return getVoidEvent(null);
+  public static CoreEvent getNullEvent() {
+    return getNullEvent(null);
   }
 
   /**
@@ -47,7 +47,7 @@ public final class VoidEventFactory {
    * @param muleContext context on which the event will be associated.
    * @return a new {@link CoreEvent}
    */
-  public static CoreEvent getVoidEvent(MuleContext muleContext) {
+  public static CoreEvent getNullEvent(MuleContext muleContext) {
     FlowConstruct flowConstruct = new FlowConstruct() {
 
       @Override
