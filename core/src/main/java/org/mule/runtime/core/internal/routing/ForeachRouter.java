@@ -113,7 +113,7 @@ class ForeachRouter {
           return createTypedValuePartToProcess(owner, event, foreachContext, currentValue);
 
         })
-        .transform(innerPub -> applyWithChildContext(innerPub, nestedChain, of(owner.getLocation()), chainErrorHandler()))
+        .transform(innerPub -> applyWithChildContext(innerPub, nestedChain, of(owner.getLocation())))
         .doOnNext(evt -> {
           try {
             ForeachContext foreachContext = foreachContextResolver.getCurrentContextFromEvent(evt).get(evt.getContext().getId());
@@ -134,7 +134,10 @@ class ForeachRouter {
             this.eventWithCurrentContextDeleted(evt);
             downstreamRecorder.next(left(new MessagingException(evt, e, owner)));
           }
-        }).onErrorContinue((e, o) -> downstreamRecorder.next(left(e)));
+        }).onErrorContinue((e, o) -> {
+          this.eventWithCurrentContextDeleted(((MessagingException) e).getEvent());
+          downstreamRecorder.next(left(e));
+        });
 
     downstreamFlux = Flux.<Either<Throwable, CoreEvent>>create(sink -> {
       downstreamRecorder.accept(sink);
@@ -207,16 +210,6 @@ class ForeachRouter {
             : null;
 
     return new ForeachContext(previousCounterVar2, previousRootMessageVar2, event.getMessage());
-  }
-
-  private BaseExceptionHandler chainErrorHandler() {
-    return new BaseExceptionHandler() {
-
-      @Override
-      public void onError(Exception exception) {
-        eventWithCurrentContextDeleted(((MessagingException) exception).getEvent());
-      }
-    };
   }
 
   private CoreEvent eventWithCurrentContextDeleted(CoreEvent event) {
