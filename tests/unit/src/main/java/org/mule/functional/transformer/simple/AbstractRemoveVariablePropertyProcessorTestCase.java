@@ -8,56 +8,38 @@ package org.mule.functional.transformer.simple;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.util.Arrays.asList;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.el.ExpressionManagerSession;
-import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.privileged.processor.simple.AbstractRemoveVariablePropertyProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 @SmallTest
 public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends AbstractMuleContextTestCase {
 
   public static final Charset ENCODING = US_ASCII;
   public static final String PLAIN_STRING_KEY = "someText";
-  public static final String PLAIN_STRING_VALUE = "someValue";
-  public static final String EXPRESSION = "#[string:someValue]";
+  public static final String EXPRESSION = "#['someText']";
   public static final String EXPRESSION_VALUE = "expressionValueResult";
-  public static final String NULL_EXPRESSION = "#[string:someValueNull]";
-  public static final String NULL_EXPRESSION_VALUE = null;
+  public static final String NULL_EXPRESSION = "#[null]";
 
   private Message message;
   private CoreEvent event;
-  private MuleContext mockMuleContext = mock(MuleContext.class);
-  private ExtendedExpressionManager mockExpressionManager = mock(ExtendedExpressionManager.class);
-  private TypedValue typedValue;
-  private AbstractRemoveVariablePropertyProcessor removeVariableProcessor;
-  private ExpressionManagerSession mockSession;
+  private final AbstractRemoveVariablePropertyProcessor removeVariableProcessor;
 
   public AbstractRemoveVariablePropertyProcessorTestCase(AbstractRemoveVariablePropertyProcessor abstractAddVariableProcessor) {
     removeVariableProcessor = abstractAddVariableProcessor;
@@ -68,17 +50,15 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
     message = of("");
     event = createTestEvent(message);
 
-    when(mockMuleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
-    when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
     typedValue = new TypedValue<>(EXPRESSION_VALUE, STRING);
-    mockSession = mock(ExpressionManagerSession.class);
-    when(mockExpressionManager.openSession(any(), any(), any())).thenReturn(mockSession);
-    when(mockSession.evaluate(eq(EXPRESSION), eq(STRING))).thenReturn(typedValue);
-    removeVariableProcessor.setMuleContext(mockMuleContext);
+    removeVariableProcessor.setMuleContext(muleContext);
   }
 
   protected CoreEvent createTestEvent(final Message message) throws MuleException {
-    return eventBuilder(muleContext).message(message).build();
+    return eventBuilder(muleContext)
+        .addVariable(PLAIN_STRING_KEY, EXPRESSION_VALUE)
+        .message(message)
+        .build();
   }
 
   @Test
@@ -98,14 +78,12 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testRemoveVariableNullKey() throws InitialisationException, TransformerException {
+  public void testRemoveVariableNullKey() {
     removeVariableProcessor.setIdentifier(null);
   }
 
   @Test // Don't fail.
   public void testRemoveVariableExpressionKeyNullValue() throws MuleException {
-    TypedValue typedValue = new TypedValue(null, OBJECT);
-    when(mockSession.evaluate(eq(NULL_EXPRESSION), eq(DataType.STRING))).thenReturn(typedValue);
     removeVariableProcessor.setIdentifier(NULL_EXPRESSION);
     removeVariableProcessor.initialise();
     event = removeVariableProcessor.process(event);

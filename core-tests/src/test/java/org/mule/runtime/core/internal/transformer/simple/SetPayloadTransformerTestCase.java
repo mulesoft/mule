@@ -10,52 +10,38 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.STRING;
-import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.event.EventContext;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.ExpressionManagerSession;
-import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
-import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
+public class SetPayloadTransformerTestCase extends AbstractMuleContextTestCase {
 
-  private static final String PLAIN_TEXT = "This is a plain text";
-  private static final String EXPRESSION = "#[mel:testVariable]";
+  private static final TypedValue<String> PLAIN_TEXT = new TypedValue<>("This is a plain text", STRING);
+  private static final String EXPRESSION = "#[vars.myVar]";
+  private static final String VAR_NAME = "myVar";
 
   private SetPayloadTransformer setPayloadTransformer;
-  private MuleContext mockMuleContext;
-  private CoreEvent mockMuleEvent;
-  private InternalMessage mockMuleMessage;
-  private ExtendedExpressionManager mockExpressionManager;
+  private CoreEvent event;
 
   @Before
   public void setUp() {
     setPayloadTransformer = new SetPayloadTransformer();
-    mockMuleContext = mock(MuleContext.class);
-    setPayloadTransformer.setMuleContext(mockMuleContext);
-    mockExpressionManager = mock(ExtendedExpressionManager.class);
-    mockMuleEvent = mock(CoreEvent.class);
-    mockMuleMessage = mock(InternalMessage.class);
-
-    when(mockMuleEvent.getMessage()).thenReturn(mockMuleMessage);
-    when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
-    when(mockExpressionManager.parse(anyString(), any(CoreEvent.class), any(ComponentLocation.class)))
-        .thenAnswer(invocation -> invocation.getArguments()[0]);
+    setPayloadTransformer.setMuleContext(muleContext);
+    event = CoreEvent.builder(mock(BaseEventContext.class))
+        .addVariable(VAR_NAME, PLAIN_TEXT)
+        .message(of("")).build();
   }
 
   @Test
@@ -63,36 +49,25 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
     setPayloadTransformer.setValue(null);
     setPayloadTransformer.initialise();
 
-    Object response = setPayloadTransformer.transformMessage(mockMuleEvent, UTF_8);
+    Object response = setPayloadTransformer.transformMessage(event, UTF_8);
     assertThat(response, is(nullValue()));
   }
 
   @Test
   public void testSetPayloadTransformerPlainText() throws InitialisationException, MessageTransformerException {
-    setPayloadTransformer.setValue(PLAIN_TEXT);
+    setPayloadTransformer.setValue(PLAIN_TEXT.getValue());
     setPayloadTransformer.initialise();
 
-    when(mockExpressionManager.isExpression(PLAIN_TEXT)).thenReturn(false);
-
-    Object response = setPayloadTransformer.transformMessage(mockMuleEvent, UTF_8);
-    assertThat(response, is(PLAIN_TEXT));
+    Object response = setPayloadTransformer.transformMessage(event, UTF_8);
+    assertThat(response, is(PLAIN_TEXT.getValue()));
   }
 
   @Test
   public void testSetPayloadTransformerExpression() throws InitialisationException, MessageTransformerException {
     setPayloadTransformer.setValue(EXPRESSION);
-    when(mockExpressionManager.isExpression(EXPRESSION)).thenReturn(true);
     setPayloadTransformer.initialise();
 
-    EventContext eventContext = mock(EventContext.class);
-    when(mockMuleEvent.getContext()).thenReturn(eventContext);
-
-    TypedValue typedValue = new TypedValue<>(PLAIN_TEXT, STRING);
-    ExpressionManagerSession session = mock(ExpressionManagerSession.class);
-    when(mockExpressionManager.openSession(any(), any(), any())).thenReturn(session);
-    when(session.evaluate(EXPRESSION)).thenReturn(typedValue);
-
-    Object response = setPayloadTransformer.transformMessage(mockMuleEvent, UTF_8);
+    Object response = setPayloadTransformer.transformMessage(event, UTF_8);
     assertThat(response, is(PLAIN_TEXT));
   }
 }
