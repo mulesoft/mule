@@ -34,6 +34,7 @@ import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 
@@ -49,6 +50,8 @@ import org.slf4j.Logger;
  * @since 4.0
  */
 public class PolicyNextActionMessageProcessor extends AbstractComponent implements Processor, Initialisable {
+
+  private static final String SOURCE_POLICY_PART_IDENTIFIER = "source";
 
   private static final Logger LOGGER = getLogger(PolicyNextActionMessageProcessor.class);
 
@@ -77,8 +80,20 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   public void initialise() throws InitialisationException {
     this.policyEventMapper = new PolicyEventMapper(getPolicyId());
     this.notificationHelper = new PolicyNotificationHelper(notificationManager, getPolicyId(), this);
-    this.onExecuteNextErrorConsumer =
-        new OnExecuteNextErrorConsumer(policyEventMapper::fromPolicyNext, notificationHelper, getLocation());
+
+    final Function<CoreEvent, CoreEvent> prepareEvent = policyEventMapper::fromPolicyNext;
+
+    // if current execute-next belongs to a `source` policy
+    if (getLocation().getParts().get(1).getPartIdentifier()
+        .map(tci -> tci.getIdentifier().getName().equals(SOURCE_POLICY_PART_IDENTIFIER))
+        .orElse(false)) {
+      this.onExecuteNextErrorConsumer = new OnExecuteNextErrorConsumer(prepareEvent.andThen(event -> policyEventMapper
+          .onFlowError(event, getPolicyId(), SourcePolicyContext.from(event).getParametersTransformer())),
+                                                                       notificationHelper, getLocation());
+    } else {
+      this.onExecuteNextErrorConsumer =
+          new OnExecuteNextErrorConsumer(prepareEvent, notificationHelper, getLocation());
+    }
 
     // this chain exists only so that an error handler can be hooked to map the event in the propagated error.
     this.nextDispatchAsChain = buildNewChainWithListOfProcessors(empty(), singletonList(new Processor() {
