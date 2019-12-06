@@ -90,6 +90,8 @@ class ForeachRouter {
             // Inject it into the inner flux
             innerRecorder.next(responseEvent);
           } catch (Exception e) {
+            // Delete foreach context
+            this.eventWithCurrentContextDeleted(event);
             // Wrap any exception that occurs during split in a MessagingException. This is required as the
             // automatic wrapping is only applied when the signal is an Event.
             downstreamRecorder.next(left(new MessagingException(responseEvent, e, owner)));
@@ -104,7 +106,7 @@ class ForeachRouter {
 
           Iterator<TypedValue<?>> iterator = foreachContext.getIterator();
           if (!iterator.hasNext() && foreachContext.getCount().get() == 0) {
-            downstreamRecorder.next(Either.right(event));
+            downstreamRecorder.next(right(event));
           }
 
           TypedValue currentValue = setCurrentValue(batchSize, iterator);
@@ -113,18 +115,24 @@ class ForeachRouter {
         })
         .transform(innerPub -> applyWithChildContext(innerPub, nestedChain, of(owner.getLocation()), chainErrorHandler()))
         .doOnNext(evt -> {
-          ForeachContext foreachContext = foreachContextResolver.getCurrentContextFromEvent(evt).get(evt.getContext().getId());
+          try {
+            ForeachContext foreachContext = foreachContextResolver.getCurrentContextFromEvent(evt).get(evt.getContext().getId());
 
-          if (foreachContext.getOnComplete().isPresent()) {
-            foreachContext.getOnComplete().get().run();
-          }
-          // Check if I have more to iterate:
-          if (foreachContext.getIterator().hasNext()) {
-            // YES - Inject again inside innerFlux. The Iterator automatically keeps track of the following elements
-            innerRecorder.next(evt);
-          } else {
-            // NO - Propagate the first inside event down to downstreamFlux
-            downstreamRecorder.next(right(evt));
+            if (foreachContext.getOnComplete().isPresent()) {
+              foreachContext.getOnComplete().get().run();
+            }
+            // Check if I have more to iterate:
+            if (foreachContext.getIterator().hasNext()) {
+              // YES - Inject again inside innerFlux. The Iterator automatically keeps track of the following elements
+              innerRecorder.next(evt);
+            } else {
+              // NO - Propagate the first inside event down to downstreamFlux
+              downstreamRecorder.next(right(evt));
+            }
+          } catch (Exception e) {
+            // Delete foreach context
+            this.eventWithCurrentContextDeleted(evt);
+            downstreamRecorder.next(left(new MessagingException(evt, e, owner)));
           }
         }).onErrorContinue((e, o) -> downstreamRecorder.next(left(e)));
 
