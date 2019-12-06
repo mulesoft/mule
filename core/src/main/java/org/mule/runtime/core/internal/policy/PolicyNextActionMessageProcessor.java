@@ -51,6 +51,8 @@ import org.slf4j.Logger;
  */
 public class PolicyNextActionMessageProcessor extends AbstractComponent implements Processor, Initialisable {
 
+  private static final String SOURCE_POLICY_PART_IDENTIFIER = "source";
+
   private static final Logger LOGGER = getLogger(PolicyNextActionMessageProcessor.class);
 
   public static final String POLICY_NEXT_OPERATION = "policy.nextOperation";
@@ -83,7 +85,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
 
     // if current execute-next belongs to a `source` policy
     if (getLocation().getParts().get(1).getPartIdentifier()
-        .map(tci -> tci.getIdentifier().getName().equals("source"))
+        .map(tci -> tci.getIdentifier().getName().equals(SOURCE_POLICY_PART_IDENTIFIER))
         .orElse(false)) {
       this.onExecuteNextErrorConsumer = new OnExecuteNextErrorConsumer(prepareEvent.andThen(event -> policyEventMapper
           .onFlowError(event, getPolicyId(), SourcePolicyContext.from(event).getParametersTransformer())),
