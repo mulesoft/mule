@@ -18,6 +18,8 @@ import org.mule.runtime.module.extension.internal.runtime.ValueResolvingExceptio
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -66,5 +68,10 @@ public class ObjectBasedParameterValueResolver implements ParameterValueResolver
       throw new ValueResolvingException("An error occurred trying to obtain the value for the parameter: " + parameterName);
     }
     throw new ValueResolvingException("Unable to resolve value for the parameter: " + parameterName);
+  }
+
+  @Override
+  public Map<String, ValueResolver<? extends Object>> getParameters() {
+    return new HashMap<>();
   }
 }

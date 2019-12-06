@@ -104,4 +104,9 @@ public class ResolverSetBasedParameterResolver implements ParameterValueResolver
   private ValueResolvingContext buildResolvingContext() {
     return ValueResolvingContext.builder(getInitialiserEvent()).withExpressionManager(expressionManager).build();
   }
+
+  @Override
+  public Map<String, ValueResolver<? extends Object>> getParameters() {
+    return resolverSet.getResolvers();
+  }
 }

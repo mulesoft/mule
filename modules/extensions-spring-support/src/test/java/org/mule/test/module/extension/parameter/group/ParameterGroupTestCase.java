@@ -4,11 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.module.extension;
+package org.mule.test.module.extension.parameter.group;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import org.junit.Test;
 

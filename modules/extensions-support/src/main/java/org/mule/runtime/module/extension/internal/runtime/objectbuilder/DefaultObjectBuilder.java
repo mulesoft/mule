@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import static java.lang.String.format;
+import static java.util.Collections.unmodifiableMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
@@ -149,5 +150,10 @@ public class DefaultObjectBuilder<T> implements ObjectBuilder<T>, Initialisable,
     } catch (Exception e) {
       throw new ValueResolvingException(format("An error occurred trying to resolve value for parameter [%s]", parameterName), e);
     }
+  }
+
+  @Override
+  public Map<String, ValueResolver<? extends Object>> getParameters() {
+    return unmodifiableMap(resolverByFieldName);
   }
 }

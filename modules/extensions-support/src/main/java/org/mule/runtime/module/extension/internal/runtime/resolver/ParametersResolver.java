@@ -72,6 +72,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.common.base.Joiner;
 
@@ -241,7 +242,16 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     });
 
     checkParameterGroupExclusiveness(model, groups,
-                                     parameters.keySet().stream().map(k -> aliasedParameterNames.getOrDefault(k, k))
+                                     parameters.entrySet().stream().flatMap(entry -> {
+                                       if (entry.getValue() instanceof ParameterValueResolver) {
+                                         return ((ParameterValueResolver) entry.getValue()).getParameters().keySet()
+                                             .stream().map(k -> aliasedParameterNames.getOrDefault(k, k));
+                                       } else {
+                                         String key = entry.getKey();
+                                         aliasedParameterNames.getOrDefault(key, key);
+                                         return Stream.of(key);
+                                       }
+                                     })
                                          .collect(Collectors.toSet()));
     return resolverSet;
   }
@@ -425,7 +435,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
    * <p>
    * Other values (including {@code null}) are wrapped in a {@link StaticValueResolver}.
    *
-   * @param value the value to expose
+   * @param value           the value to expose
    * @param modelProperties of the value's parameter
    * @return a {@link ValueResolver}
    */

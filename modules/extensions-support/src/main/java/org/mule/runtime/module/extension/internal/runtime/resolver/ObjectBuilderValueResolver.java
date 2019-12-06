@@ -10,14 +10,17 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A {@link ValueResolver} which wraps an {@link ObjectBuilder} and calls {@link ObjectBuilder#build(ValueResolvingContext)} on
@@ -75,6 +78,15 @@ public class ObjectBuilderValueResolver<T> extends AbstractComponent
       return ((ParameterValueResolver) builder).getParameterValue(parameterName);
     } else {
       throw new ValueResolvingException(format("Unable to resolve value for parameter '%s'", parameterName));
+    }
+  }
+
+  @Override
+  public Map<String, ValueResolver<? extends Object>> getParameters() {
+    if (builder instanceof ParameterValueResolver) {
+      return ((ParameterValueResolver) builder).getParameters();
+    } else {
+      return new HashMap<>();
     }
   }
 }

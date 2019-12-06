@@ -30,7 +30,7 @@ public class SomeOps {
 
   /**
    * An operation to test the ByteArray to InputStream value transformation.
-   * 
+  *
    * @param value the value for the operation to consume
    * @return a byte array representation of <it>value</it>
    */

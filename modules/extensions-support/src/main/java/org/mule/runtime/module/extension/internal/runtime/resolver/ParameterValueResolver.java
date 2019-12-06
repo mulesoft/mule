@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 
+import java.util.Map;
+
 /**
  * Contract for extension components that knows how to resolve parameter values
  *
@@ -20,4 +22,6 @@ public interface ParameterValueResolver {
    * @throws ValueResolvingException if the resolution fails
    */
   Object getParameterValue(String parameterName) throws ValueResolvingException;
+
+  Map<String, ValueResolver<? extends Object>> getParameters();
 }
