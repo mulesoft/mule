@@ -19,6 +19,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Extension(name = "petstore")
 @Operations({PetStoreOperations.class, PetStoreOperationsWithFailures.class, PetStoreFailingOperations.class})
@@ -35,7 +36,7 @@ public class PetStoreConnector {
   /**
    * Indicates how many times a {@link PetStoreConnector} was started.
    */
-  public static int timesStarted;
+  private static AtomicInteger timesStarted = new AtomicInteger();
 
   @Parameter
   private List<String> pets;
@@ -83,7 +84,15 @@ public class PetStoreConnector {
   }
 
   public static int getTimesStarted() {
-    return timesStarted;
+    return timesStarted.get();
+  }
+
+  public static int incTimesStarted() {
+    return timesStarted.incrementAndGet();
+  }
+
+  public static void clearTimesStarted() {
+    timesStarted.set(0);
   }
 
   public TlsContextFactory getTls() {

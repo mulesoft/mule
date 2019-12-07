@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.connector;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -14,6 +15,7 @@ import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_AS
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.petstore.extension.FailingPetStoreSource.connectionException;
 import static org.mule.test.petstore.extension.FailingPetStoreSource.executor;
+
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
@@ -21,7 +23,6 @@ import org.mule.test.petstore.extension.FailingPetStoreSource;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.After;
@@ -53,18 +54,17 @@ public class PetStoreSourceRetryPolicyFailsDeploymentTestCase extends AbstractEx
   public int expectedRetries;
 
 
-  @Parameterized.Parameters(name = "{2} - failsDeployment: {0}")
+  @Parameterized.Parameters(name = "{1} - {2} - failsDeployment: {0}")
   public static Collection<Object[]> data() {
-
-    return Arrays.asList(
-                         new Object[] {false, "petstore-connection-dont-fail-deployment.xml",
-                             "petstore-source-retry-policy-error.xml", 2},
-                         new Object[] {true, "petstore-connection-fail-deployment.xml",
-                             "petstore-source-retry-policy-error.xml", 2},
-                         new Object[] {false, "petstore-connection-dont-fail-deployment.xml",
-                             "petstore-source-retry-policy-connection-exception.xml", 3},
-                         new Object[] {false, "petstore-connection-fail-deployment.xml",
-                             "petstore-source-retry-policy-connection-exception.xml", 3});
+    return asList(
+                  new Object[] {false, "petstore-connection-dont-fail-deployment.xml",
+                      "petstore-source-retry-policy-error.xml", 2},
+                  new Object[] {true, "petstore-connection-fail-deployment.xml",
+                      "petstore-source-retry-policy-error.xml", 2},
+                  new Object[] {false, "petstore-connection-dont-fail-deployment.xml",
+                      "petstore-source-retry-policy-connection-exception.xml", 3},
+                  new Object[] {false, "petstore-connection-fail-deployment.xml",
+                      "petstore-source-retry-policy-connection-exception.xml", 3});
   }
 
   @Rule
@@ -76,35 +76,34 @@ public class PetStoreSourceRetryPolicyFailsDeploymentTestCase extends AbstractEx
     return new String[] {connectionConfig, sourceConfig};
   }
 
-  @Before
-  public void setUp() throws Exception {
-    PetStoreConnector.timesStarted = 0;
-    FailingPetStoreSource.failedDueOnException = false;
-  }
-
-  @After
-  public void tearDown() {
-    PetStoreConnector.timesStarted = 0;
-    FailingPetStoreSource.failedDueOnException = false;
-    if (executor != null) {
-      executor.shutdownNow();
-    }
-  }
-
   @Override
-  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+  @Before
+  public void doSetUpBeforeMuleContextCreation() throws Exception {
+    PetStoreConnector.clearTimesStarted();
+    FailingPetStoreSource.failedDueOnException = false;
     if (failsDeployment) {
       exception.expect(RetryPolicyExhaustedException.class);
       exception.expectCause(sameInstance(connectionException));
     } else {
       exception = none();
     }
+
+    super.doSetUpBeforeMuleContextCreation();
+  }
+
+  @After
+  public void tearDown() {
+    PetStoreConnector.clearTimesStarted();
+    FailingPetStoreSource.failedDueOnException = false;
+    if (executor != null) {
+      executor.shutdownNow();
+    }
   }
 
   @Test
   public void retryPolicySourceFailOnStart() throws Exception {
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> {
-      assertThat(PetStoreConnector.timesStarted, is(expectedRetries));
+      assertThat(PetStoreConnector.getTimesStarted(), is(expectedRetries));
       return true;
     });
   }
