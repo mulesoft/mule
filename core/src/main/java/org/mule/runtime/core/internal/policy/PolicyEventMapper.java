@@ -106,12 +106,13 @@ public class PolicyEventMapper {
     } else {
       Message message = propagate ? result.getMessage() : operationResult.getMessage();
 
-      CoreEvent next = CoreEvent.builder(result)
+      InternalEvent next = InternalEvent.builder(result)
+          .addInternalParameter(policyVarsInternalParameterName(), result.getVariables())
           .message(message)
           .variables(operationResult.getVariables())
           .build();
 
-      ctx.setNextOperationResponse((InternalEvent) next);
+      ctx.setNextOperationResponse(next);
       return next;
     }
   }
