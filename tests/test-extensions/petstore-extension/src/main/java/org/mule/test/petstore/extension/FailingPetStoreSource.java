@@ -48,7 +48,7 @@ public class FailingPetStoreSource extends Source<String, Object> {
 
   @Override
   public void onStart(SourceCallback<String, Object> sourceCallback) throws MuleException {
-    PetStoreConnector.timesStarted++;
+    final int t = PetStoreConnector.incTimesStarted();
 
     if (failOnStart || failedDueOnException) {
       throw new RuntimeException(connectionException);

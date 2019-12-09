@@ -51,4 +51,9 @@ public final class PolicyStatus {
   public Throwable getThrowable() {
     return throwable;
   }
+
+  @Override
+  public String toString() {
+    return "PolicyStatus{ ok: " + ok + "; exhausted: " + exhausted + "; throwable: " + throwable + "}";
+  }
 }
