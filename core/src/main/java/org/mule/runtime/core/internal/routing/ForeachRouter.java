@@ -48,7 +48,7 @@ class ForeachRouter {
 
   private static final Logger LOGGER = getLogger(ForeachRouter.class);
 
-  private static final String FOREACH_CONTEXT_KEY = "foreach.router.foreachContext";
+  private static final String MULE_FOREACH_CONTEXT_KEY = "mule.foreach.router.foreachContext";
   static final String MAP_NOT_SUPPORTED_MESSAGE =
       "Foreach does not support 'java.util.Map' with no collection expression. To iterate over Map entries use '#[dw::core::Objects::entrySet(payload)]'";
   private final EventInternalContextResolver<Map<String, ForeachContext>> foreachContextResolver;
@@ -67,7 +67,7 @@ class ForeachRouter {
   ForeachRouter(Foreach owner, Publisher<CoreEvent> publisher, String expression, int batchSize,
                 MessageProcessorChain nestedChain) {
     this.owner = owner;
-    this.foreachContextResolver = new EventInternalContextResolver<>(FOREACH_CONTEXT_KEY,
+    this.foreachContextResolver = new EventInternalContextResolver<>(MULE_FOREACH_CONTEXT_KEY,
                                                                      HashMap::new);
 
     upstreamFlux = Flux.from(publisher)
@@ -123,7 +123,7 @@ class ForeachRouter {
             completeRouterIfNecessary();
           }
 
-          TypedValue currentValue = setCurrentValue(batchSize, iterator);
+          TypedValue currentValue = setCurrentValue(batchSize, foreachContext);
           return createTypedValuePartToProcess(owner, event, foreachContext, currentValue);
 
         })
@@ -181,23 +181,26 @@ class ForeachRouter {
     }
   }
 
-
   private void completeRouter() {
     innerRecorder.complete();
     downstreamRecorder.complete();
   }
 
-
-  private TypedValue setCurrentValue(int batchSize, Iterator<TypedValue<?>> iterator) {
+  private TypedValue setCurrentValue(int batchSize, ForeachContext foreachContext) {
     TypedValue currentValue;
+    Iterator<TypedValue<?>> iterator = foreachContext.getIterator();
     if (batchSize > 1) {
       int counter = 0;
-      List list = new ArrayList<>();
+      List currentBatch = new ArrayList<>();
       while (iterator.hasNext() && counter < batchSize) {
-        list.add(iterator.next());
+        currentBatch.add(iterator.next());
         counter++;
       }
-      currentValue = new TypedValue<>(list, fromObject(list));
+
+      if (!foreachContext.getBatchDataType().isPresent()) {
+        foreachContext.setBatchDataType(of(fromObject(currentBatch)));
+      }
+      currentValue = new TypedValue<>(currentBatch, foreachContext.getBatchDataType().get());
     } else {
       currentValue = iterator.next();
     }

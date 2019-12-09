@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.routing;
 
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 
 import java.util.Iterator;
@@ -22,24 +23,24 @@ class ForeachContext {
   private Message originalMessage;
   private Iterator<TypedValue<?>> iterator;
   private AtomicInteger elementNumber = new AtomicInteger();
-
+  private Optional<DataType> batchDataType = empty();
   private Optional<Runnable> onComplete = empty();
 
-  public ForeachContext(Object previousCounter, Object previousRootMessage, Message message) {
+  ForeachContext(Object previousCounter, Object previousRootMessage, Message message) {
     this.previousCounter = previousCounter;
     this.previousRootMessage = previousRootMessage;
     this.originalMessage = message;
   }
 
-  public Object getPreviousCounter() {
+  Object getPreviousCounter() {
     return previousCounter;
   }
 
-  public Object getPreviousRootMessage() {
+  Object getPreviousRootMessage() {
     return previousRootMessage;
   }
 
-  public Message getOriginalMessage() {
+  Message getOriginalMessage() {
     return originalMessage;
   }
 
@@ -51,12 +52,16 @@ class ForeachContext {
     this.iterator = iterator;
   }
 
-  public AtomicInteger getElementNumber() {
+  AtomicInteger getElementNumber() {
     return elementNumber;
   }
 
-  public void setElementNumber(AtomicInteger elementNumber) {
-    this.elementNumber = elementNumber;
+  Optional<DataType> getBatchDataType() {
+    return batchDataType;
+  }
+
+  void setBatchDataType(Optional<DataType> batchDataType) {
+    this.batchDataType = batchDataType;
   }
 
   public Optional<Runnable> getOnComplete() {

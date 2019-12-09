@@ -68,7 +68,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   private static final Logger LOGGER = getLogger(ForeachTestCase.class);
-  private static final String FOREACH_CONTEXT_KEY = "foreach.router.foreachContext";
+  private static final String MULE_FOREACH_CONTEXT_KEY = "mule.foreach.router.foreachContext";
 
   protected Foreach foreach;
   private Foreach simpleForeach;
@@ -469,7 +469,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   }
 
   private void assertNoForEachContext(InternalEvent event) {
-    Map<String, Object> forEachContext = event.getInternalParameter(FOREACH_CONTEXT_KEY);
+    Map<String, Object> forEachContext = event.getInternalParameter(MULE_FOREACH_CONTEXT_KEY);
     assertThat(forEachContext.isEmpty(), Matchers.is(true));
   }
 
