@@ -7,6 +7,7 @@
 package org.mule.test.module.extension.scopes;
 
 import static java.lang.Runtime.getRuntime;
+
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -18,7 +19,6 @@ import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 
 public abstract class AbstractScopeExecutionTestCase extends AbstractExtensionFunctionalTestCase {
 

@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvalu
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.core.internal.el.CompiledExpressionDecorator.unwrap;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX_LENGTH;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
@@ -302,28 +303,48 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
 
       @Override
       public TypedValue<?> evaluate(CompiledExpression expression) throws ExpressionExecutionException {
-        return session.evaluate(expression);
+        try {
+          return session.evaluate(unwrap(expression));
+        } catch (Exception e) {
+          throw new ExpressionRuntimeException(createStaticMessage(e.getMessage()), e);
+        }
       }
 
       @Override
       public TypedValue<?> evaluate(CompiledExpression expression, DataType expectedOutputType)
           throws ExpressionExecutionException {
-        return session.evaluate(expression, expectedOutputType);
+        try {
+          return session.evaluate(unwrap(expression), expectedOutputType);
+        } catch (Exception e) {
+          throw new ExpressionRuntimeException(createStaticMessage(e.getMessage()), e);
+        }
       }
 
       @Override
       public TypedValue<?> evaluate(CompiledExpression expression, long timeout) throws ExpressionExecutionException {
-        return session.evaluate(expression, timeout);
+        try {
+          return session.evaluate(unwrap(expression), timeout);
+        } catch (Exception e) {
+          throw new ExpressionRuntimeException(createStaticMessage(e.getMessage()), e);
+        }
       }
 
       @Override
       public TypedValue<?> evaluateLogExpression(CompiledExpression expression) throws ExpressionExecutionException {
-        return session.evaluateLogExpression(expression);
+        try {
+          return session.evaluateLogExpression(unwrap(expression));
+        } catch (Exception e) {
+          throw new ExpressionRuntimeException(createStaticMessage(e.getMessage()), e);
+        }
       }
 
       @Override
       public Iterator<TypedValue<?>> split(CompiledExpression expression) {
-        return session.split(expression);
+        try {
+          return session.split(unwrap(expression));
+        } catch (Exception e) {
+          throw new ExpressionRuntimeException(createStaticMessage(e.getMessage()), e);
+        }
       }
 
       @Override

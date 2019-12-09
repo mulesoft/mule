@@ -110,7 +110,7 @@ public final class NullEventFactory {
       }
     };
     return InternalEvent.builder(create(flowConstruct, fromSingleComponent(INITIALIZER_EVENT)))
-        .message(of(""))
+        .message(of(null))
         .build();
   }
 }
