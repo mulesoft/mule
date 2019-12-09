@@ -50,11 +50,13 @@ import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -79,6 +81,7 @@ import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -131,6 +134,12 @@ public class SourceAdapter implements Lifecycle {
   private ExpressionManager expressionManager;
 
   @Inject
+  private Collection<ExceptionContextProvider> exceptionContextProviders;
+
+  @Inject
+  private ErrorTypeLocator errorTypeLocator;
+
+  @Inject
   private MuleContext muleContext;
 
   public SourceAdapter(ExtensionModel extensionModel, SourceModel sourceModel,
@@ -143,7 +152,6 @@ public class SourceAdapter implements Lifecycle {
                        ResolverSet nonCallbackParameters,
                        ResolverSet successCallbackParameters,
                        ResolverSet errorCallbackParameters,
-                       MessagingExceptionResolver exceptionResolver,
                        Optional<BackPressureAction> backPressureAction) {
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
@@ -159,7 +167,7 @@ public class SourceAdapter implements Lifecycle {
     this.nonCallbackParameters = nonCallbackParameters;
     this.successCallbackParameters = successCallbackParameters;
     this.errorCallbackParameters = errorCallbackParameters;
-    this.exceptionResolver = exceptionResolver;
+    this.exceptionResolver = new MessagingExceptionResolver(component);
     this.configurationSetter = fetchConfigurationField();
     this.connectionSetter = fetchConnectionProviderField();
     this.backPressureAction = backPressureAction.orElse(FAIL);
@@ -553,8 +561,6 @@ public class SourceAdapter implements Lifecycle {
   }
 
   private MessagingException createSourceException(CoreEvent event, Throwable cause) {
-    MessagingException messagingException = new MessagingException(event, cause);
-
-    return exceptionResolver.resolve(messagingException, muleContext);
+    return exceptionResolver.resolve(new MessagingException(event, cause), errorTypeLocator, exceptionContextProviders);
   }
 }

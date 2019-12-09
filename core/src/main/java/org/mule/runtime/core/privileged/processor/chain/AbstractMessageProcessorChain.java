@@ -223,7 +223,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     final MessagingExceptionResolver exceptionResolver =
         (processor instanceof Component) ? new MessagingExceptionResolver((Component) processor) : null;
     final Function<MessagingException, MessagingException> messagingExceptionMapper =
-        resolveMessagingException(processor, muleContext, exceptionResolver);
+        resolveMessagingException(processor, e -> exceptionResolver.resolve(e, muleContext));
 
     return (throwable, object) -> {
       throwable = unwrap(throwable);

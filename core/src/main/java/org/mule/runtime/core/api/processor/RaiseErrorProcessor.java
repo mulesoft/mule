@@ -11,12 +11,12 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.DefaultMuleException;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
@@ -37,12 +37,14 @@ public final class RaiseErrorProcessor extends AbstractComponent implements Proc
   private ErrorType errorType;
 
   @Inject
-  private MuleContext muleContext;
+  private ErrorTypeRepository errorTypeRepository;
+
+  @Inject
+  private ExtendedExpressionManager expressionManager;
 
   @Override
   public void initialise() throws InitialisationException {
-    errorType = muleContext.getErrorTypeRepository().lookupErrorType(buildFromStringRepresentation(typeId)).get();
-    ExtendedExpressionManager expressionManager = muleContext.getExpressionManager();
+    errorType = errorTypeRepository.lookupErrorType(buildFromStringRepresentation(typeId)).get();
     descriptionEvaluator.initialize(expressionManager);
   }
 

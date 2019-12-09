@@ -78,19 +78,19 @@ public class MessagingExceptionResolver {
   }
 
   /**
-   * @since 4.1.3
-   *
-   *        Resolves a new {@link MessagingException} with the real cause of the problem based on the content of an Incoming
-   *        {@link MessagingException} with a chain of causes inside it and the current event that the exception is carrying.
-   *        <p>
-   *        This method will pick the FIRST cause exception that has a mule or extension KNOWN error as the real cause, if there
-   *        is not an exception in the causes that match with an Known error type then this method will try to find the error that
-   *        the current {@link Event} is carrying.
-   *        <p>
-   *        When there are multiple exceptions that contains the same root error type, then this method will wrap the one that has
-   *        highest position in the causes list
+   * Resolves a new {@link MessagingException} with the real cause of the problem based on the content of an Incoming
+   * {@link MessagingException} with a chain of causes inside it and the current event that the exception is carrying.
+   * <p>
+   * This method will pick the FIRST cause exception that has a mule or extension KNOWN error as the real cause, if there is not
+   * an exception in the causes that match with an Known error type then this method will try to find the error that the current
+   * {@link Event} is carrying.
+   * <p>
+   * When there are multiple exceptions that contains the same root error type, then this method will wrap the one that has
+   * highest position in the causes list
    *
    * @return a {@link MessagingException} with the proper {@link Error} associated to it's {@link CoreEvent}
+   *
+   * @since 4.1.3
    */
   public MessagingException resolve(final MessagingException me, ErrorTypeLocator locator,
                                     Collection<ExceptionContextProvider> exceptionContextProviders) {

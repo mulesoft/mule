@@ -31,6 +31,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.apply
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -49,6 +50,7 @@ import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
@@ -68,8 +70,8 @@ import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceCallbackAdapter;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
-import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Collection;
@@ -101,6 +103,15 @@ public class FlowProcessMediator implements Initialisable {
   private InterceptorManager processorInterceptorManager;
 
   @Inject
+  private ErrorTypeRepository errorTypeRepository;
+
+  @Inject
+  private ErrorTypeLocator errorTypeLocator;
+
+  @Inject
+  private ServerNotificationManager notificationManager;
+
+  @Inject
   private MuleContext muleContext;
 
   private final PolicyManager policyManager;
@@ -119,8 +130,7 @@ public class FlowProcessMediator implements Initialisable {
   @Override
   public void initialise() throws InitialisationException {
     this.notificationHelper =
-        new NotificationHelper(muleContext.getNotificationManager(), ConnectorMessageNotification.class, false);
-    final ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
+        new NotificationHelper(notificationManager, ConnectorMessageNotification.class, false);
 
     sourceResponseGenerateErrorType = errorTypeRepository.getErrorType(SOURCE_RESPONSE_GENERATE).get();
     sourceResponseSendErrorType = errorTypeRepository.getErrorType(SOURCE_RESPONSE_SEND).get();
@@ -416,7 +426,7 @@ public class FlowProcessMediator implements Initialisable {
                                                                                FlowProcessTemplate template) {
     return eventOrException -> template.afterPhaseExecution(eventOrException.mapLeft(messagingException -> {
       messagingException.setProcessedEvent(createErrorEvent(messagingException.getEvent(), messageSource, messagingException,
-                                                            ((PrivilegedMuleContext) muleContext).getErrorTypeLocator()));
+                                                            errorTypeLocator));
       return messagingException;
     }));
   }
@@ -426,7 +436,7 @@ public class FlowProcessMediator implements Initialisable {
    */
   private void onMessageReceived(PhaseContext ctx) {
     fireNotification(ctx.messageProcessContext.getMessageSource(), ctx.event, ctx.flowConstruct, MESSAGE_RECEIVED);
-    ctx.template.getNotificationFunctions().forEach(notificationFunction -> muleContext.getNotificationManager()
+    ctx.template.getNotificationFunctions().forEach(notificationFunction -> notificationManager
         .fireNotification(notificationFunction.apply(ctx.event, ctx.messageProcessContext.getMessageSource())));
   }
 
