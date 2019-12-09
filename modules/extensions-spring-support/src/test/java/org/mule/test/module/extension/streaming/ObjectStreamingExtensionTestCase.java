@@ -16,6 +16,7 @@ import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.OBJECT_STREAMING;
 
 import org.junit.Ignore;
+import org.junit.runner.RunWith;
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -34,9 +35,12 @@ import org.hamcrest.BaseMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mule.tck.junit4.FlakinessDetectorTestRunner;
+import org.mule.tck.junit4.FlakyTest;
 
 @Feature(STREAMING)
 @Story(OBJECT_STREAMING)
+//@RunWith(FlakinessDetectorTestRunner.class)
 public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
 
   private static final int DATA_SIZE = 100;
@@ -93,7 +97,7 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
 
   @Test
   @Description("Operation is configured not to stream and stream gets closed automatically even if not consumed")
-  @Ignore("MULE-17546")
+  //@FlakyTest(times = 100)
   public void nonRepeatableStreamIsManaged() throws Exception {
     Object stream = getObjectStream("getStreamWithoutStreaming", false);
     assertThat(stream, is(instanceOf(ConsumerStreamingIterator.class)));
