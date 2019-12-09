@@ -25,8 +25,7 @@ import java.util.function.Function;
 
 public final class ExpressionLanguageUtils {
 
-  private ExpressionLanguageUtils() {
-  }
+  private ExpressionLanguageUtils() {}
 
   public static CompiledExpression compile(String expression, ExpressionLanguage expressionLanguage) {
     //return expressionLanguage.compile(expression, addEventBuindingsToBuilder(getNullEvent(), NULL_BINDING_CONTEXT).build());
