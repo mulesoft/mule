@@ -17,6 +17,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.transformation.TransformationService;
@@ -30,10 +31,10 @@ import org.junit.Test;
 @SmallTest
 public class TypeSafeValueResolverWrapperTestCase extends AbstractMuleContextTestCase {
 
-  private TransformationService transformationService = mock(TransformationService.class);
-  private ValueResolver<String> staticValueResolver = mock(ValueResolver.class);
-  private ValueResolver<String> dynamicValueResolver = mock(ValueResolver.class);
-  private ExpressionManager expressionManager = mock(ExpressionManager.class);
+  private final TransformationService transformationService = mock(TransformationService.class);
+  private final ValueResolver<String> staticValueResolver = mock(ValueResolver.class);
+  private final ValueResolver<String> dynamicValueResolver = mock(ValueResolver.class);
+  private final ExpressionManager expressionManager = mock(ExpressionManager.class);
   private TypeSafeValueResolverWrapper<Integer> dynamicResolver;
   private TypeSafeValueResolverWrapper<Integer> staticResolver;
 

@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.internal.util.journal.TransactionJournal.TX1_LOG_FILE_NAME;
@@ -20,8 +21,6 @@ import static org.mule.runtime.core.internal.util.journal.TransactionJournal.TX2
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.util.queue.DefaultQueueStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import com.google.common.collect.Multimap;
 
 import java.io.File;
 import java.util.Collection;
@@ -32,7 +31,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Answers;
+
+import com.google.common.collect.Multimap;
 
 public class LocalTxQueueTransactionJournalTestCase extends AbstractMuleContextTestCase {
 
@@ -47,7 +47,7 @@ public class LocalTxQueueTransactionJournalTestCase extends AbstractMuleContextT
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-  private DefaultQueueStore mockQueueInfo = mock(DefaultQueueStore.class, Answers.RETURNS_DEEP_STUBS.get());
+  private final DefaultQueueStore mockQueueInfo = mock(DefaultQueueStore.class, RETURNS_DEEP_STUBS.get());
 
 
   @Before

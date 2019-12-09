@@ -28,6 +28,7 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.getI
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -98,7 +99,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   private Flow flow;
   private UntilSuccessful untilSuccessful;
   private ConfigurableMessageProcessor targetMessageProcessor;
-  private boolean tx;
+  private final boolean tx;
 
   public UntilSuccessfulTestCase(boolean tx) {
     this.tx = tx;
@@ -113,7 +114,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   protected void doSetUp() throws Exception {
     super.doSetUp();
     flow = createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
-    untilSuccessful = buildUntilSuccessful("1000");
+    untilSuccessful = buildUntilSuccessful("100");
     if (tx) {
       getInstance().bindTransaction(mock(Transaction.class));
     }

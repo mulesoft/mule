@@ -52,6 +52,7 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
   private static final int TIMEOUT = 10;
 
   private static final long QUEUE_DELAY_MILLIS = 2000;
+  private static final long QUEUE_DELAY_TOLERANCE_MILLIS = 20;
   private DelayedQueueStore delayedQueue;
 
   @Rule
@@ -226,7 +227,7 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
     assertThat(polledValue, nullValue());
     // And it waited at least for the given timeout
     assertThat((double) (timeAfterPoll - timeBeforePoll),
-               anyOf(greaterThanOrEqualTo((double) timeout), closeTo((double) timeout, 20)));
+               anyOf(greaterThanOrEqualTo((double) timeout), closeTo(timeout, QUEUE_DELAY_TOLERANCE_MILLIS)));
   }
 
   @Test
@@ -253,8 +254,7 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
     localTxTransactionContext.poll(delayedQueue, QUEUE_DELAY_MILLIS);
     long elapsedMillis = currentTimeMillis() - timeMillisBeforePoll;
 
-    final long toleranceMillis = 5;
-    assertThat(elapsedMillis, lessThanOrEqualTo(QUEUE_DELAY_MILLIS + toleranceMillis));
+    assertThat(elapsedMillis, lessThanOrEqualTo(QUEUE_DELAY_MILLIS + QUEUE_DELAY_TOLERANCE_MILLIS));
   }
 
   @Test
@@ -267,8 +267,7 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
     localTxTransactionContext.doCommit();
     long elapsedMillis = currentTimeMillis() - timeMillisBeforeOffer;
 
-    final long toleranceMillis = 5;
-    assertThat(elapsedMillis, lessThanOrEqualTo(waitTime + toleranceMillis));
+    assertThat(elapsedMillis, lessThanOrEqualTo(waitTime + QUEUE_DELAY_TOLERANCE_MILLIS));
   }
 
   private static class DelayedQueueStore extends DefaultQueueStore {

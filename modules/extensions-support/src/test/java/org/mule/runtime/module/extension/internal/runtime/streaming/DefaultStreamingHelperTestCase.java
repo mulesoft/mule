@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -42,7 +43,7 @@ public class DefaultStreamingHelperTestCase extends AbstractMuleContextTestCase 
   private CursorProviderFactory cursorProviderFactory;
   private CoreEvent event;
 
-  private List<String> valueList = Arrays.asList("Apple", "Banana", "Kiwi");
+  private final List<String> valueList = Arrays.asList("Apple", "Banana", "Kiwi");
 
   @Override
   protected void doSetUp() throws Exception {
