@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.util;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
@@ -13,7 +14,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 
@@ -30,8 +30,6 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ExceptionMapper;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -40,19 +38,18 @@ import org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
-import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.Map;
 import java.util.Optional;
 
 import javax.xml.namespace.QName;
+
+import org.junit.Before;
+import org.junit.Test;
 
 @SmallTest
 public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
@@ -60,12 +57,11 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   private static final String ERROR_MESSAGE = "Messaging Error Message";
   private static final String EXPECTED_MESSAGE = "THIS MESSAGE SHOULD BE THROWN";
 
-  private Component processor = mock(Component.class);
+  private final Component processor = mock(Component.class);
   private CoreEvent event;
-  private MuleContext context = mock(MuleContext.class, withSettings().extraInterfaces(PrivilegedMuleContext.class));
-  private FlowCallStack flowCallStack = mock(FlowCallStack.class);
-  private Message message = mock(Message.class);
-  private ComponentIdentifier ci = mock(ComponentIdentifier.class);
+
+  private final Message message = mock(Message.class);
+  private final ComponentIdentifier ci = mock(ComponentIdentifier.class);
 
   private final TransformerException TRANSFORMER_EXCEPTION = new TransformerException(createStaticMessage("TRANSFORMER"));
   private final ConnectionException CONNECTION_EXCEPTION = new ConnectionException("CONNECTION PROBLEM");
@@ -88,8 +84,6 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     when(message.getPayload()).thenReturn(new TypedValue<>(null, DataType.STRING));
     when(message.getAttributes()).thenReturn(new TypedValue<>(null, DataType.STRING));
     event = spy(getEventBuilder().message(message).build());
-
-    when(((PrivilegedMuleContext) context).getErrorTypeLocator()).thenReturn(locator);
   }
 
   @Test
@@ -97,7 +91,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     Optional<Error> surfaceError = mockError(CONNECTION, null);
     when(event.getError()).thenReturn(surfaceError);
     MessagingException me = newMessagingException(ERROR, event, processor);
-    MessagingException resolved = resolver.resolve(me, context);
+    MessagingException resolved = resolver.resolve(me, locator, emptyList());
     assertExceptionErrorType(resolved, CONNECTION);
   }
 
@@ -106,14 +100,14 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     Optional<Error> surfaceError = mockError(CONNECTION, null);
     when(event.getError()).thenReturn(surfaceError);
     MessagingException me = newMessagingException(new Exception(), event, processor);
-    MessagingException resolved = resolver.resolve(me, context);
+    MessagingException resolved = resolver.resolve(me, locator, emptyList());
     assertExceptionErrorType(resolved, CONNECTION);
   }
 
   @Test
   public void resolveWithoutAnyErrors() {
     MessagingException me = newMessagingException(new Exception(), event, processor);
-    MessagingException resolved = resolver.resolve(me, context);
+    MessagingException resolved = resolver.resolve(me, locator, emptyList());
     assertExceptionErrorType(resolved, UNKNOWN);
     assertExceptionMessage(resolved.getMessage(), ERROR_MESSAGE);
   }
@@ -121,7 +115,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   @Test
   public void resolveCriticalError() {
     MessagingException me = newMessagingException(ERROR, event, processor);
-    MessagingException resolved = resolver.resolve(me, context);
+    MessagingException resolved = resolver.resolve(me, locator, emptyList());
     assertExceptionErrorType(resolved, CRITICAL);
     assertExceptionMessage(resolved.getMessage(), ERROR.getMessage());
   }
@@ -130,7 +124,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   public void resolveMultipleCriticalErrors() {
     Throwable t = new LinkageError("this one is NOT expected", new java.lang.Error(new java.lang.Error("expected")));
     MessagingException me = newMessagingException(t, event, processor);
-    MessagingException resolved = resolver.resolve(me, context);
+    MessagingException resolved = resolver.resolve(me, locator, emptyList());
     assertExceptionErrorType(resolved, CRITICAL);
     assertExceptionMessage(resolved.getMessage(), "expected");
   }
@@ -140,7 +134,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     Optional<Error> surfaceError = mockError(TRANSFORMER, null);
     when(event.getError()).thenReturn(surfaceError);
     MessagingException me = newMessagingException(new Exception(), event, processor);
-    MessagingException resolved = resolver.resolve(me, context);
+    MessagingException resolved = resolver.resolve(me, locator, emptyList());
     assertExceptionErrorType(resolved, TRANSFORMER);
     assertExceptionMessage(resolved.getMessage(), ERROR_MESSAGE);
   }
@@ -151,7 +145,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     when(event.getError()).thenReturn(surfaceError);
     Exception cause = new Exception(new ConnectionException(FATAL_EXCEPTION));
     MessagingException me = newMessagingException(cause, event, processor);
-    MessagingException resolved = resolver.resolve(me, context);
+    MessagingException resolved = resolver.resolve(me, locator, emptyList());
     assertExceptionErrorType(resolved, FATAL);
     assertExceptionMessage(resolved.getMessage(), FATAL_EXCEPTION.getMessage());
   }
@@ -162,7 +156,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     when(event.getError()).thenReturn(surfaceError);
     Exception cause = new MuleFatalException(createStaticMessage(EXPECTED_MESSAGE), new LinkageError("!"));
     MessagingException me = newMessagingException(cause, event, processor);
-    MessagingException resolved = resolver.resolve(me, context);
+    MessagingException resolved = resolver.resolve(me, locator, emptyList());
     assertExceptionErrorType(resolved, FATAL);
     assertExceptionMessage(resolved.getMessage(), EXPECTED_MESSAGE);
   }
@@ -174,7 +168,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     when(event.getError()).thenReturn(surfaceError);
     Exception cause = new ConnectionException("Some Connection Error", new Exception());
     MessagingException me = newMessagingException(cause, event, processor);
-    MessagingException resolved = resolver.resolve(me, context);
+    MessagingException resolved = resolver.resolve(me, locator, emptyList());
     assertExceptionErrorType(resolved, withParent);
     assertExceptionMessage(resolved.getMessage(), ERROR_MESSAGE);
   }
@@ -189,10 +183,9 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
         .defaultExceptionMapper(ExceptionMapper.builder().build())
         .defaultError(UNKNOWN)
         .build();
-    when(((PrivilegedMuleContext) context).getErrorTypeLocator()).thenReturn(locator);
     MessagingException me = newMessagingException(CONNECTION_EXCEPTION, event, processor);
     MessagingExceptionResolver anotherResolver = new MessagingExceptionResolver(new TestProcessor());
-    MessagingException resolved = anotherResolver.resolve(me, context);
+    MessagingException resolved = anotherResolver.resolve(me, locator, emptyList());
     assertExceptionErrorType(resolved, expected);
     assertExceptionMessage(resolved.getMessage(), "CONNECTION PROBLEM");
   }

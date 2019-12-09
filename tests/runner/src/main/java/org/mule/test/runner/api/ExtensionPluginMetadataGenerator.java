@@ -9,12 +9,17 @@ package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.io.File.separator;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.test.runner.api.MulePluginBasedLoaderFinder.META_INF_MULE_PLUGIN;
+
 import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
@@ -22,6 +27,7 @@ import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.SimpleRegistry;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
@@ -61,7 +67,7 @@ class ExtensionPluginMetadataGenerator {
   private final File extensionMulePluginJson;
   private final ExtensionModelLoaderFinder extensionModelLoaderFinder;
 
-  private List<ExtensionGeneratorEntry> extensionGeneratorEntries = newArrayList();
+  private final List<ExtensionGeneratorEntry> extensionGeneratorEntries = newArrayList();
 
   /**
    * Creates an instance that will generated metadata for extensions on the baseResourcesFolder
@@ -104,29 +110,36 @@ class ExtensionPluginMetadataGenerator {
    */
   private ExtensionManager createExtensionManager() {
     DefaultExtensionManager extensionManager = new DefaultExtensionManager();
-    extensionManager.setMuleContext(new DefaultMuleContext() {
+    final DefaultMuleContext muleContext = new DefaultMuleContext() {
 
-      private ErrorTypeRepository errorTypeRepository = createDefaultErrorTypeRepository();
-      private ErrorTypeLocator errorTypeLocator = createDefaultErrorTypeLocator(errorTypeRepository);
+      private final ErrorTypeRepository errorTypeRepository = createDefaultErrorTypeRepository();
+      private final ErrorTypeLocator errorTypeLocator = createDefaultErrorTypeLocator(errorTypeRepository);
+
+      private final LazyValue<SimpleRegistry> registryCreator = new LazyValue<>(() -> {
+        final SimpleRegistry registry = new SimpleRegistry(this, new MuleLifecycleInterceptor());
+
+        try {
+          registry.registerObject(ErrorTypeRepository.class.getName(), errorTypeRepository);
+          registry.registerObject(ErrorTypeLocator.class.getName(), errorTypeLocator);
+        } catch (RegistrationException e) {
+          throw new MuleRuntimeException(e);
+        }
+        return registry;
+      });
 
       @Override
       public MuleRegistry getRegistry() {
-        return new MuleRegistryHelper(new SimpleRegistry(this, new MuleLifecycleInterceptor()), this);
+        return new MuleRegistryHelper(registryCreator.get(), this);
       }
 
       @Override
-      public ErrorTypeLocator getErrorTypeLocator() {
-        return errorTypeLocator;
+      public Injector getInjector() {
+        return registryCreator.get();
       }
 
-      @Override
-      public ErrorTypeRepository getErrorTypeRepository() {
-        return errorTypeRepository;
-      }
-
-    });
+    };
     try {
-      extensionManager.initialise();
+      initialiseIfNeeded(extensionManager, muleContext);
     } catch (InitialisationException e) {
       throw new RuntimeException("Error while initialising the extension manager", e);
     }
@@ -218,8 +231,8 @@ class ExtensionPluginMetadataGenerator {
    */
   class ExtensionGeneratorEntry {
 
-    private ExtensionModel runtimeExtensionModel;
-    private File resourcesFolder;
+    private final ExtensionModel runtimeExtensionModel;
+    private final File resourcesFolder;
 
     ExtensionGeneratorEntry(ExtensionModel runtimeExtensionModel, File resourcesFolder) {
       this.runtimeExtensionModel = runtimeExtensionModel;

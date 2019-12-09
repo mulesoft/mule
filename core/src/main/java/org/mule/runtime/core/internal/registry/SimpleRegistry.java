@@ -24,6 +24,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -140,21 +141,35 @@ public class SimpleRegistry extends TransientRegistry implements Injector {
       Class<?> dependencyType = field.getType();
 
       boolean nullToOptional = false;
-      if (dependencyType.equals(Optional.class)) {
+      boolean collection = false;
+      if (dependencyType.equals(Optional.class) || Collection.class.isAssignableFrom(dependencyType)) {
+        if (dependencyType.equals(Optional.class)) {
+          nullToOptional = true;
+        } else {
+          collection = true;
+        }
+
         Type type = ((ParameterizedType) (field.getGenericType())).getActualTypeArguments()[0];
         if (type instanceof ParameterizedType) {
           dependencyType = (Class<?>) ((ParameterizedType) type).getRawType();
         } else {
           dependencyType = (Class<?>) type;
         }
-        nullToOptional = true;
+
       }
 
       Named nameAnnotation = field.getAnnotation(Named.class);
       try {
         field.setAccessible(true);
-        Object dependency =
-            resolveObjectToInject(dependencyType, nameAnnotation != null ? nameAnnotation.value() : null, nullToOptional);
+
+        Object dependency;
+        if (collection) {
+          dependency = resolveObjectsToInject(dependencyType);
+        } else {
+          dependency =
+              resolveObjectToInject(dependencyType, nameAnnotation != null ? nameAnnotation.value() : null, nullToOptional);
+        }
+
         if (dependency != null) {
           field.set(object, dependency);
         }
@@ -169,20 +184,32 @@ public class SimpleRegistry extends TransientRegistry implements Injector {
         Class<?> dependencyType = method.getParameterTypes()[0];
 
         boolean nullToOptional = false;
-        if (dependencyType.equals(Optional.class)) {
+        boolean collection = false;
+        if (dependencyType.equals(Optional.class) || Collection.class.isAssignableFrom(dependencyType)) {
+          if (dependencyType.equals(Optional.class)) {
+            nullToOptional = true;
+          } else {
+            collection = true;
+          }
+
           Type type = ((ParameterizedType) (method.getGenericParameterTypes()[0])).getActualTypeArguments()[0];
           if (type instanceof ParameterizedType) {
             dependencyType = (Class<?>) ((ParameterizedType) type).getRawType();
           } else {
             dependencyType = (Class<?>) type;
           }
-          nullToOptional = true;
         }
 
         Named nameAnnotation = method.getAnnotation(Named.class);
         try {
-          Object dependency =
-              resolveObjectToInject(dependencyType, nameAnnotation != null ? nameAnnotation.value() : null, nullToOptional);
+          Object dependency;
+          if (collection) {
+            dependency = resolveObjectsToInject(dependencyType);
+          } else {
+            dependency =
+                resolveObjectToInject(dependencyType, nameAnnotation != null ? nameAnnotation.value() : null, nullToOptional);
+          }
+
           if (dependency != null) {
             method.invoke(object, dependency);
           }
@@ -209,5 +236,11 @@ public class SimpleRegistry extends TransientRegistry implements Injector {
       dependency = muleContext;
     }
     return nullToOptional ? ofNullable(dependency) : dependency;
+  }
+
+  private <T> Collection<T> resolveObjectsToInject(Class<T> dependencyType)
+      throws RegistrationException {
+    Collection<T> dependencies = lookupObjects(dependencyType);
+    return dependencies;
   }
 }

@@ -23,7 +23,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
@@ -34,12 +33,15 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -73,6 +75,14 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       "Crypto::hashWith(payload.^raw, '%s')";
 
   private static final Logger LOGGER = getLogger(IdempotentRedeliveryPolicy.class);
+
+  private final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(this);
+
+  @Inject
+  private ErrorTypeLocator errorTypeLocator;
+
+  @Inject
+  private Collection<ExceptionContextProvider> exceptionContextProviders;
 
   private LockFactory lockFactory;
   private ObjectStoreManager objectStoreManager;
@@ -220,7 +230,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
           incrementCounter(messageId, (MessagingException) ex);
           throw ex;
         } else {
-          MessagingException me = createMessagingException(event, ex, this);
+          MessagingException me = createMessagingException(event, ex);
           incrementCounter(messageId, me);
           throw ex;
         }
@@ -237,11 +247,8 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     return BLOCKING;
   }
 
-  private MessagingException createMessagingException(CoreEvent event, Throwable cause, Component processor) {
-    MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
-    MessagingException me = new MessagingException(event, cause, processor);
-
-    return exceptionResolver.resolve(me, muleContext);
+  private MessagingException createMessagingException(CoreEvent event, Throwable cause) {
+    return exceptionResolver.resolve(new MessagingException(event, cause, this), errorTypeLocator, exceptionContextProviders);
   }
 
   private void resetCounter(String messageId) throws ObjectStoreException {

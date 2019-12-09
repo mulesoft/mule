@@ -53,6 +53,7 @@ import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
+import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.rx.Exceptions;
@@ -68,7 +69,6 @@ import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceCallbackAdapter;
-import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -107,6 +107,9 @@ public class FlowProcessMediator implements Initialisable {
 
   @Inject
   private ErrorTypeLocator errorTypeLocator;
+
+  @Inject
+  private Collection<ExceptionContextProvider> exceptionContextProviders;
 
   @Inject
   private ServerNotificationManager notificationManager;
@@ -179,8 +182,8 @@ public class FlowProcessMediator implements Initialisable {
 
         dispatch(phaseContext);
       } catch (Exception e) {
-        template.sendFailureResponseToClient(new MessagingExceptionResolver(messageProcessContext.getMessageSource())
-            .resolve(new MessagingException(event, e), muleContext),
+        template.sendFailureResponseToClient(messageProcessContext.getMessagingExceptionResolver()
+            .resolve(new MessagingException(event, e), errorTypeLocator, exceptionContextProviders),
                                              template.getFailedExecutionResponseParametersFunction().apply(event),
                                              always(() -> phaseResultNotifier.phaseFailure(e)));
 

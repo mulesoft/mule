@@ -190,11 +190,17 @@ public class MessagingExceptionResolver {
   }
 
   private ErrorType errorTypeFromException(Component failing, ErrorTypeLocator locator, Throwable e) {
+    final Optional<ErrorType> mapped;
     if (isMessagingExceptionWithError(e)) {
-      return ((MessagingException) e).getEvent().getError().map(Error::getErrorType).orElse(locator.lookupErrorType(e));
+      mapped = ((MessagingException) e).getEvent().getError().map(Error::getErrorType);
     } else {
-      Optional<ComponentIdentifier> componentIdentifier = getComponentIdentifier(failing);
-      return componentIdentifier.map(ci -> locator.lookupComponentErrorType(ci, e)).orElse(locator.lookupErrorType(e));
+      mapped = getComponentIdentifier(failing).map(ci -> locator.lookupComponentErrorType(ci, e));
+    }
+
+    if (mapped.isPresent()) {
+      return mapped.orElse(null);
+    } else {
+      return locator.lookupErrorType(e);
     }
   }
 

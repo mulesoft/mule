@@ -35,6 +35,7 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
+import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.util.Optional;
@@ -243,6 +244,8 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
   private class SchedulerProcessContext implements MessageProcessContext {
 
+    private final MessagingExceptionResolver messagingExceptionResolver = new MessagingExceptionResolver(getMessageSource());
+
     @Override
     public MessageSource getMessageSource() {
       return DefaultSchedulerMessageSource.this;
@@ -261,6 +264,11 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     @Override
     public ErrorTypeLocator getErrorTypeLocator() {
       return errorTypeLocator;
+    }
+
+    @Override
+    public MessagingExceptionResolver getMessagingExceptionResolver() {
+      return messagingExceptionResolver;
     }
 
     @Override

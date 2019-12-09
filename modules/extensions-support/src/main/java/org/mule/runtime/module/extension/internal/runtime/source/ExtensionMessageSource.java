@@ -63,6 +63,7 @@ import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -465,6 +466,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
     return new MessageProcessContext() {
 
+      private final MessagingExceptionResolver messagingExceptionResolver = new MessagingExceptionResolver(getMessageSource());
+
       @Override
       public MessageSource getMessageSource() {
         return ExtensionMessageSource.this;
@@ -483,6 +486,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       @Override
       public ErrorTypeLocator getErrorTypeLocator() {
         return ((PrivilegedMuleContext) muleContext).getErrorTypeLocator();
+      }
+
+      @Override
+      public MessagingExceptionResolver getMessagingExceptionResolver() {
+        return messagingExceptionResolver;
       }
 
       @Override

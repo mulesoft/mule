@@ -44,6 +44,7 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
@@ -441,7 +442,9 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   }
 
   private CoreEvent processInChain(Processor processor, CoreEvent event) throws Exception {
-    return process(newChain(Optional.empty(), processor), event, false);
+    final MessageProcessorChain chain = newChain(Optional.empty(), processor);
+    initialiseIfNeeded(chain, muleContext);
+    return process(chain, event, false);
   }
 
   private void assertSimpleProcessedMessages() {
@@ -490,7 +493,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   private class DummyNestedIterableClass implements Iterable<DummySimpleIterableClass> {
 
-    private List<DummySimpleIterableClass> iterables = new ArrayList<>();
+    private final List<DummySimpleIterableClass> iterables = new ArrayList<>();
 
     DummyNestedIterableClass() {
       DummySimpleIterableClass dsi1 = new DummySimpleIterableClass();
