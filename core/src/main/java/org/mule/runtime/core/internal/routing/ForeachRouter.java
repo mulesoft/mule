@@ -11,7 +11,6 @@ import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.BaseExceptionHandler;
 import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurer;
@@ -27,6 +26,7 @@ import reactor.util.context.Context;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -119,7 +119,7 @@ class ForeachRouter {
               foreachContextResolver.getCurrentContextFromEvent(event).get(event.getContext().getId());
 
           Iterator<TypedValue<?>> iterator = foreachContext.getIterator();
-          if (!iterator.hasNext() && foreachContext.getCount().get() == 0) {
+          if (!iterator.hasNext() && foreachContext.getElementNumber().get() == 0) {
             downstreamRecorder.next(right(event));
             completeRouterIfNecessary();
           }
@@ -193,7 +193,7 @@ class ForeachRouter {
     TypedValue currentValue;
     if (batchSize > 1) {
       int counter = 0;
-      ArrayList<Object> list = new ArrayList<>();
+      List list = new ArrayList<>();
       while (iterator.hasNext() && counter < batchSize) {
         list.add(iterator.next());
         counter++;
@@ -225,21 +225,21 @@ class ForeachRouter {
       partEventBuilder.message(Message.builder().payload(currentValue).build());
     }
     return partEventBuilder
-        .addVariable(owner.getCounterVariableName(), foreachContext.getCount().incrementAndGet())
+        .addVariable(owner.getCounterVariableName(), foreachContext.getElementNumber().incrementAndGet())
         .build();
   }
 
   private ForeachContext createForeachContext(CoreEvent event) {
     // Keep reference to existing rootMessage/count variables in order to restore later to support foreach nesting.
-    Object previousCounterVar2 = event.getVariables().containsKey(owner.getCounterVariableName())
+    Object previousCounterVar = event.getVariables().containsKey(owner.getCounterVariableName())
         ? event.getVariables().get(owner.getCounterVariableName()).getValue()
         : null;
-    Object previousRootMessageVar2 =
+    Object previousRootMessageVar =
         event.getVariables().containsKey(owner.getRootMessageVariableName())
             ? event.getVariables().get(owner.getRootMessageVariableName()).getValue()
             : null;
 
-    return new ForeachContext(previousCounterVar2, previousRootMessageVar2, event.getMessage());
+    return new ForeachContext(previousCounterVar, previousRootMessageVar, event.getMessage());
   }
 
   private CoreEvent eventWithCurrentContextDeleted(CoreEvent event) {

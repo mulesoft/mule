@@ -15,16 +15,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Optional.empty;
 
-public class ForeachContext {
+class ForeachContext {
 
-  Object previousCounter;
-  Object previousRootMessage;
-  Message originalMessage;
-  Iterator<TypedValue<?>> iterator;
-  // TODO cambiale el nombreeeee
-  AtomicInteger count = new AtomicInteger();
+  private Object previousCounter;
+  private Object previousRootMessage;
+  private Message originalMessage;
+  private Iterator<TypedValue<?>> iterator;
+  private AtomicInteger elementNumber = new AtomicInteger();
 
-  Optional<Runnable> onComplete = empty();
+  private Optional<Runnable> onComplete = empty();
 
   public ForeachContext(Object previousCounter, Object previousRootMessage, Message message) {
     this.previousCounter = previousCounter;
@@ -52,12 +51,12 @@ public class ForeachContext {
     this.iterator = iterator;
   }
 
-  public AtomicInteger getCount() {
-    return count;
+  public AtomicInteger getElementNumber() {
+    return elementNumber;
   }
 
-  public void setCount(AtomicInteger count) {
-    this.count = count;
+  public void setElementNumber(AtomicInteger elementNumber) {
+    this.elementNumber = elementNumber;
   }
 
   public Optional<Runnable> getOnComplete() {
