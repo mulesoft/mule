@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Optional.of;
@@ -60,6 +62,9 @@ class ForeachRouter {
   private final FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
   private final AtomicReference<Context> downstreamCtxReference = new AtomicReference(empty());
 
+  private final AtomicInteger inflightEvents = new AtomicInteger(0);
+  private final AtomicBoolean completeDeferred = new AtomicBoolean(false);
+
   ForeachRouter(Foreach owner, Publisher<CoreEvent> publisher, String expression, int batchSize,
                 MessageProcessorChain nestedChain) {
     this.owner = owner;
@@ -68,6 +73,7 @@ class ForeachRouter {
 
     upstreamFlux = Flux.from(publisher)
         .doOnNext(event -> {
+
           if (expression.equals(DEFAULT_SPLIT_EXPRESSION)
               && Map.class.isAssignableFrom(event.getMessage().getPayload().getDataType().getType())) {
             downstreamRecorder.next(left(new IllegalArgumentException(MAP_NOT_SUPPORTED_MESSAGE)));
@@ -83,6 +89,8 @@ class ForeachRouter {
               builder(event).addVariable(owner.getRootMessageVariableName(), event.getMessage()).build();
 
           CoreEvent responseEvent = foreachContextResolver.eventWithContext(innerEvent, currentContextFromEvent);
+
+          inflightEvents.getAndIncrement();
           try {
             // Set the Iterator<TypedValue> calculated
             foreachContext.setIterator(this.splitRequest(responseEvent, expression));
@@ -97,7 +105,13 @@ class ForeachRouter {
             downstreamRecorder.next(left(new MessagingException(responseEvent, e, owner)));
           }
         })
-        .doOnComplete(this::completeRouter);
+        .doOnComplete(() -> {
+          if (inflightEvents.get() == 0) {
+            completeRouter();
+          } else {
+            completeDeferred.set(true);
+          }
+        });
 
     innerFlux = Flux.create(innerRecorder)
         .map(event -> {
@@ -107,6 +121,7 @@ class ForeachRouter {
           Iterator<TypedValue<?>> iterator = foreachContext.getIterator();
           if (!iterator.hasNext() && foreachContext.getCount().get() == 0) {
             downstreamRecorder.next(right(event));
+            completeRouterIfNecessary();
           }
 
           TypedValue currentValue = setCurrentValue(batchSize, iterator);
@@ -128,15 +143,18 @@ class ForeachRouter {
             } else {
               // NO - Propagate the first inside event down to downstreamFlux
               downstreamRecorder.next(right(evt));
+              completeRouterIfNecessary();
             }
           } catch (Exception e) {
             // Delete foreach context
             this.eventWithCurrentContextDeleted(evt);
             downstreamRecorder.next(left(new MessagingException(evt, e, owner)));
+            completeRouterIfNecessary();
           }
         }).onErrorContinue((e, o) -> {
           this.eventWithCurrentContextDeleted(((MessagingException) e).getEvent());
           downstreamRecorder.next(left(e));
+          completeRouterIfNecessary();
         });
 
     downstreamFlux = Flux.<Either<Throwable, CoreEvent>>create(sink -> {
@@ -144,6 +162,7 @@ class ForeachRouter {
       // This will always run after the `downstreamCtxReference` is set
       subscribeUpstreamChains(downstreamCtxReference.get());
     })
+        .doOnNext(event -> inflightEvents.decrementAndGet())
         .map(either -> {
           if (either.isLeft()) {
             throw propagate(either.getLeft());
@@ -153,6 +172,22 @@ class ForeachRouter {
           }
         });
   }
+
+  /**
+   * If there are no events in-flight and the upstream publisher has received a completion signal, complete downstream publishers.
+   */
+  private void completeRouterIfNecessary() {
+    if (completeDeferred.get() && inflightEvents.get() == 0) {
+      completeRouter();
+    }
+  }
+
+
+  private void completeRouter() {
+    innerRecorder.complete();
+    downstreamRecorder.complete();
+  }
+
 
   private TypedValue setCurrentValue(int batchSize, Iterator<TypedValue<?>> iterator) {
     TypedValue currentValue;
@@ -192,11 +227,6 @@ class ForeachRouter {
     return partEventBuilder
         .addVariable(owner.getCounterVariableName(), foreachContext.getCount().incrementAndGet())
         .build();
-  }
-
-  private void completeRouter() {
-    innerRecorder.complete();
-    downstreamRecorder.complete();
   }
 
   private ForeachContext createForeachContext(CoreEvent event) {
