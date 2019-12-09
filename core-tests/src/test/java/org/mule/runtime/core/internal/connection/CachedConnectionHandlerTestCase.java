@@ -14,6 +14,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.probe.PollingProber.probe;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -148,8 +149,11 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase {
         latch.release();
         managedConnection.invalidate();
 
-        verify(connectionProvider).disconnect(connection);
-        verify(releaser).accept(managedConnection);
+        probe(() -> {
+          verify(connectionProvider).disconnect(connection);
+          verify(releaser).accept(managedConnection);
+          return true;
+        });
       } finally {
         t.join();
       }
