@@ -20,6 +20,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
+import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.withSession;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -35,7 +36,6 @@ import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -91,7 +91,8 @@ public class IdempotentMessageValidator extends AbstractComponent
   private void setupObjectStore() throws InitialisationException {
     // Check if OS was properly configured
     if (store != null && privateStore != null) {
-      throw new InitialisationException(createStaticMessage("Ambiguous definition of object store, both reference and private were configured"),
+      throw new InitialisationException(
+                                        createStaticMessage("Ambiguous definition of object store, both reference and private were configured"),
                                         this);
     }
     if (store == null) {
@@ -137,9 +138,9 @@ public class IdempotentMessageValidator extends AbstractComponent
   }
 
   private String evaluateString(CoreEvent event, CompiledExpression expression) {
-    try (ExpressionManagerSession session = muleContext.getExpressionManager().openSession(event.asBindingContext())) {
-      return (String) session.evaluate(expression, STRING).getValue();
-    }
+    return withSession(muleContext.getExpressionManager(),
+                       event.asBindingContext(),
+                       s -> (String) s.evaluate(expression, STRING).getValue());
   }
 
   public String getIdExpression() {

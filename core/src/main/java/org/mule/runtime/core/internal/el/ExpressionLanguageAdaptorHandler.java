@@ -210,28 +210,28 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
 
       @Override
       public TypedValue<?> evaluate(CompiledExpression expression) throws ExpressionExecutionException {
-        return sessions.get(DW_PREFIX).evaluate(expression);
+        return resolveSessionForLanguage(sessions, expression.expression()).evaluate(expression);
       }
 
       @Override
       public TypedValue<?> evaluate(CompiledExpression expression, DataType expectedOutputType)
           throws ExpressionExecutionException {
-        return sessions.get(DW_PREFIX).evaluate(expression, expectedOutputType);
+        return resolveSessionForLanguage(sessions, expression.expression()).evaluate(expression, expectedOutputType);
       }
 
       @Override
       public TypedValue<?> evaluate(CompiledExpression expression, long timeout) throws ExpressionExecutionException {
-        return sessions.get(DW_PREFIX).evaluate(expression, timeout);
+        return resolveSessionForLanguage(sessions, expression.expression()).evaluate(expression, timeout);
       }
 
       @Override
       public TypedValue<?> evaluateLogExpression(CompiledExpression expression) throws ExpressionExecutionException {
-        return sessions.get(DW_PREFIX).evaluateLogExpression(expression);
+        return resolveSessionForLanguage(sessions, expression.expression()).evaluateLogExpression(expression);
       }
 
       @Override
       public Iterator<TypedValue<?>> split(CompiledExpression expression) {
-        return sessions.get(DW_PREFIX).split(expression);
+        return resolveSessionForLanguage(sessions, expression.expression()).split(expression);
       }
 
       protected ExpressionLanguageSessionAdaptor resolveSessionForLanguage(Map<String, ExpressionLanguageSessionAdaptor> sessions,

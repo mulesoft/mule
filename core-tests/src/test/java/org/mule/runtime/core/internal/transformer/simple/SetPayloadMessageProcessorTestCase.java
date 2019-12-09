@@ -65,8 +65,8 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
 
     CoreEvent response = setPayloadMessageProcessor.process(CoreEvent.builder(testEvent())
-                                                                .addVariable("testVariable", PLAIN_TEXT, STRING)
-                                                                .build());
+        .addVariable("testVariable", PLAIN_TEXT, STRING)
+        .build());
 
     assertThat(response.getMessage().getPayload().getValue(), is(PLAIN_TEXT));
   }

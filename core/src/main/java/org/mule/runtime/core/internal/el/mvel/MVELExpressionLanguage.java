@@ -235,7 +235,7 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
 
       @Override
       public String expression() {
-        return removeExpressionMarker(expression);
+        return expression;
       }
 
       @Override

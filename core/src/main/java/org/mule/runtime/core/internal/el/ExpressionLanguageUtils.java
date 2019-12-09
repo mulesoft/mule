@@ -8,12 +8,14 @@ package org.mule.runtime.core.internal.el;
 
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBuindingsToBuilder;
-import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionLanguage;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.core.internal.event.NullEventFactory;
+
+import java.util.function.Function;
 
 public final class ExpressionLanguageUtils {
 
@@ -25,5 +27,13 @@ public final class ExpressionLanguageUtils {
 
   public static CompiledExpression compile(String expression, ExpressionLanguage expressionLanguage) {
     return expressionLanguage.compile(expression, COMPILATION_BINDING_CONTEXT);
+  }
+
+  public static <T> T withSession(ExpressionLanguage expressionLanguage,
+                                  BindingContext bindingContext,
+                                  Function<ExpressionLanguageSession, T> func) {
+    try (ExpressionLanguageSession session = expressionLanguage.openSession(bindingContext)) {
+      return func.apply(session);
+    }
   }
 }

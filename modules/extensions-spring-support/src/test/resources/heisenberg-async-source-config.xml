@@ -88,7 +88,7 @@
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
             </heisenberg:next-door>
-            <heisenberg:success-info age="#[32 ++]">
+            <heisenberg:success-info age="#[null.a!]">
                 <heisenberg:known-addresses>
                     <heisenberg:known-address value="success address"/>
                 </heisenberg:known-addresses>
@@ -111,12 +111,12 @@
             <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
                 <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
             </heisenberg:next-door>
-            <heisenberg:success-info age="#[32 ++]">
+            <heisenberg:success-info age="#[null.a!]">
                 <heisenberg:known-addresses>
                     <heisenberg:known-address value="success address"/>
                 </heisenberg:known-addresses>
             </heisenberg:success-info>
-            <heisenberg:error-info knownAddresses="#[[] ++]"/>
+            <heisenberg:error-info knownAddresses="#[null.a!]"/>
         </heisenberg:async-listen-payments>
 
         <set-payload value="#[mel:java.lang.Long.valueOf('100')]"/>
@@ -135,7 +135,7 @@
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:async-listen-payments>
 
-        <set-payload value="#[hi ++]"/>
+        <set-payload value="null.a!"/>
     </flow>
 
     <flow name="sourceFailsOnSuccessBodyCallsOnErrorAndOnTerminate" initialState="stopped">
@@ -177,7 +177,7 @@
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:async-listen-payments>
 
-        <set-payload value="#[hi ++]"/>
+        <set-payload value="null.a!"/>
     </flow>
 
     <flow name="failureInFlowErrorHandlerCallsOnErrorDirectly" initialState="stopped">
@@ -193,11 +193,11 @@
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:async-listen-payments>
 
-        <set-payload value="#[hi ++]"/>
+        <set-payload value="null.a!"/>
 
         <error-handler>
             <on-error-propagate>
-                <set-payload value="#[bye ++]"/>
+                <set-payload value="null.a!"/>
             </on-error-propagate>
         </error-handler>
     </flow>
@@ -212,10 +212,10 @@
                     <heisenberg:known-address value="success address"/>
                 </heisenberg:known-addresses>
             </heisenberg:success-info>
-            <heisenberg:error-info knownAddresses="#[[] ++]"/>
+            <heisenberg:error-info knownAddresses="#[null.a!]"/>
         </heisenberg:async-listen-payments>
 
-        <set-payload value="#[hi ++]"/>
+        <set-payload value="null.a!"/>
     </flow>
 
 </mule>

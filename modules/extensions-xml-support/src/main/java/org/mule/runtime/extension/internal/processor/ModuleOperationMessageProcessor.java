@@ -11,12 +11,15 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONFIG_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
+import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
+import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.withSession;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErrorMappings;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
@@ -27,13 +30,13 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static reactor.core.publisher.Flux.from;
 
-import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -112,6 +115,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   private final boolean returnsVoid;
   private final Optional<String> target;
   private final String targetValue;
+  private CompiledExpression targetValueExpression;
 
   public ModuleOperationMessageProcessor(Map<String, String> properties,
                                          Map<String, String> parameters,
@@ -284,8 +288,9 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   private CoreEvent createNewEventFromJustMessage(CoreEvent request, CoreEvent response) {
     final CoreEvent.Builder builder = CoreEvent.builder(request);
     if (target.isPresent()) {
-      TypedValue result =
-          expressionManager.evaluate(targetValue, getTargetBindingContext(response.getMessage()));
+      TypedValue result = withSession(expressionManager,
+                                      getTargetBindingContext(response.getMessage()),
+                                      session -> session.evaluate(targetValueExpression));
       builder.addVariable(target.get(), result.getValue(), result.getDataType());
     } else {
       builder.message(builder(response.getMessage()).build());
@@ -324,7 +329,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
     headLocation = ((Component) head).getLocation();
 
     TypedValue<?> evaluatedResult;
-    if (MetadataFormat.JAVA.equals(metadataType.getMetadataFormat())) {
+    if (JAVA.equals(metadataType.getMetadataFormat())) {
       evaluatedResult = expressionManager.evaluate(value, event, headLocation);
     } else {
       final String mediaType = metadataType.getMetadataFormat().getValidMimeTypes().iterator().next();
@@ -353,6 +358,9 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   public void initialise() throws InitialisationException {
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, getRootContainerLocation()), processors);
     super.initialise();
+    if (targetValue != null) {
+      targetValueExpression = compile(targetValue, expressionManager);
+    }
   }
 
   @Override
