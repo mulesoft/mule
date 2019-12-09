@@ -96,6 +96,10 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
 
     while (totalRead < maxLen) {
       try {
+        if (totalRead > 0 && stream.available() < 1) {
+          break;
+        }
+
         int read = stream.read(dest, offset, remaining);
 
         if (read == -1) {
