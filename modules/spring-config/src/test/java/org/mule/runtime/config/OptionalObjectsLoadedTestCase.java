@@ -20,14 +20,15 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.MockExtensionManagerConfigurationBuilder;
+import org.mule.tck.junit4.SimpleRegistryConfigurationBuilder;
+
+import java.util.Calendar;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
-
-import java.util.Calendar;
 
 public class OptionalObjectsLoadedTestCase extends AbstractMuleTestCase {
 
@@ -42,7 +43,8 @@ public class OptionalObjectsLoadedTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws Exception {
     muleContext =
-        (MuleContextWithRegistry) new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
+        (MuleContextWithRegistry) new DefaultMuleContextFactory().createMuleContext(new SimpleRegistryConfigurationBuilder(),
+                                                                                    testServicesConfigurationBuilder,
                                                                                     new MockExtensionManagerConfigurationBuilder(),
                                                                                     new SpringXmlConfigurationBuilder(new String[0],
                                                                                                                       emptyMap()));

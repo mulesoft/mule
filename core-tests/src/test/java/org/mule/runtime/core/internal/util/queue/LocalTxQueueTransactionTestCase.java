@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.util.queue;
 
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.sleep;
-import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -25,8 +24,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.core.api.MuleContext;
@@ -41,7 +38,6 @@ import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransaction
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;
-import java.util.Map;
 import java.util.concurrent.locks.Lock;
 
 import org.apache.commons.lang3.NotImplementedException;
@@ -56,7 +52,6 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
   private static final int TIMEOUT = 10;
 
   private static final long QUEUE_DELAY_MILLIS = 2000;
-  private static final long QUEUE_DELAY_TOLERANCE_MILLIS = 20;
   private DelayedQueueStore delayedQueue;
 
   @Rule
@@ -80,11 +75,6 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
     persistentTransactionContext = new PersistentQueueTransactionContext(txLog, createRecoverOnlyQueueProvider(inQueue));
     queueTransactionRecoverer = new LocalTxQueueTransactionRecoverer(txLog, createRecoverOnlyQueueProvider(inQueue));
     localTxTransactionContext = createLocalTxContext(txLog, createQueueProvider(delayedQueue));
-  }
-
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   private LocalTxQueueTransactionContext createLocalTxContext(LocalTxQueueTransactionJournal txLog, QueueProvider provider)
@@ -236,7 +226,7 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
     assertThat(polledValue, nullValue());
     // And it waited at least for the given timeout
     assertThat((double) (timeAfterPoll - timeBeforePoll),
-               anyOf(greaterThanOrEqualTo((double) timeout), closeTo(timeout, QUEUE_DELAY_TOLERANCE_MILLIS)));
+               anyOf(greaterThanOrEqualTo((double) timeout), closeTo((double) timeout, 20)));
   }
 
   @Test
@@ -263,7 +253,8 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
     localTxTransactionContext.poll(delayedQueue, QUEUE_DELAY_MILLIS);
     long elapsedMillis = currentTimeMillis() - timeMillisBeforePoll;
 
-    assertThat(elapsedMillis, lessThanOrEqualTo(QUEUE_DELAY_MILLIS + QUEUE_DELAY_TOLERANCE_MILLIS));
+    final long toleranceMillis = 5;
+    assertThat(elapsedMillis, lessThanOrEqualTo(QUEUE_DELAY_MILLIS + toleranceMillis));
   }
 
   @Test
@@ -276,7 +267,8 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
     localTxTransactionContext.doCommit();
     long elapsedMillis = currentTimeMillis() - timeMillisBeforeOffer;
 
-    assertThat(elapsedMillis, lessThanOrEqualTo(waitTime + QUEUE_DELAY_TOLERANCE_MILLIS));
+    final long toleranceMillis = 5;
+    assertThat(elapsedMillis, lessThanOrEqualTo(waitTime + toleranceMillis));
   }
 
   private static class DelayedQueueStore extends DefaultQueueStore {

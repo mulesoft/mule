@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptySet;
-import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -26,9 +25,7 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
@@ -50,12 +47,12 @@ import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
-import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
 import org.mule.runtime.core.internal.util.message.ResultsToMessageList;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
+import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -64,7 +61,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.junit.After;
@@ -121,11 +117,6 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
     when(operationContext.getMuleContext()).thenReturn(muleContext);
     when(operationContext.getComponentModel()).thenReturn(componentModel);
     when(operationContext.getVariable(contains(CONNECTION_PARAM))).thenReturn(connectionHandler);
-  }
-
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @After

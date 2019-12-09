@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.processor;
 
 import static java.lang.Thread.currentThread;
+import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.locks.LockSupport.parkNanos;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -17,6 +18,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
@@ -39,6 +41,7 @@ import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.beans.ExceptionListener;
+import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,7 +53,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   protected TestListener target = new TestListener();
   private Exception exceptionThrown;
   protected Latch latch = new Latch();
-  private final Latch asyncEntryLatch = new Latch();
+  private Latch asyncEntryLatch = new Latch();
   private Flow flow;
 
   @Rule
@@ -59,6 +62,11 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   public AsyncDelegateMessageProcessorTestCase(Mode mode) {
     super(mode);
     setStartContext(true);
+  }
+
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    return singletonMap(REGISTRY_KEY, componentLocator);
   }
 
   @Override

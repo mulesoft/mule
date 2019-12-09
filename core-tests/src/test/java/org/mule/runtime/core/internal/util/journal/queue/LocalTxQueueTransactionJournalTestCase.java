@@ -7,27 +7,24 @@
 package org.mule.runtime.core.internal.util.journal.queue;
 
 import static java.lang.Math.abs;
-import static java.util.Collections.singletonMap;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.core.internal.util.journal.TransactionJournal.TX1_LOG_FILE_NAME;
 import static org.mule.runtime.core.internal.util.journal.TransactionJournal.TX2_LOG_FILE_NAME;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.util.queue.DefaultQueueStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import com.google.common.collect.Multimap;
+
 import java.io.File;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Random;
 
 import org.junit.Before;
@@ -35,8 +32,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-
-import com.google.common.collect.Multimap;
+import org.mockito.Answers;
 
 public class LocalTxQueueTransactionJournalTestCase extends AbstractMuleContextTestCase {
 
@@ -51,17 +47,12 @@ public class LocalTxQueueTransactionJournalTestCase extends AbstractMuleContextT
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-  private final DefaultQueueStore mockQueueInfo = mock(DefaultQueueStore.class, RETURNS_DEEP_STUBS);
+  private DefaultQueueStore mockQueueInfo = mock(DefaultQueueStore.class, Answers.RETURNS_DEEP_STUBS.get());
 
 
   @Before
   public void setUpMocks() {
     when(mockQueueInfo.getName()).thenReturn(QUEUE_NAME);
-  }
-
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @Test

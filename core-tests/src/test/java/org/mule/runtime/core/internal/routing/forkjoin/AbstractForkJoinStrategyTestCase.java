@@ -10,7 +10,6 @@ package org.mule.runtime.core.internal.routing.forkjoin;
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -32,10 +31,8 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TIMEOUT;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.FORK_JOIN_STRATEGIES;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.from;
@@ -64,19 +61,18 @@ import org.mule.runtime.core.privileged.routing.RoutingResult;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -101,11 +97,6 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
     timeoutErrorType = muleContext.getErrorTypeRepository().getErrorType(TIMEOUT).get();
     setupConcurrentProcessingStrategy();
     strategy = createStrategy(processingStrategy, Integer.MAX_VALUE, true, MAX_VALUE);
-  }
-
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @After

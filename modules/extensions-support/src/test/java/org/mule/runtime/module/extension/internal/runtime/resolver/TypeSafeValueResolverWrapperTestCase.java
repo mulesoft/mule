@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,9 +17,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.transformation.TransformationService;
@@ -29,17 +25,15 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.Map;
-
 import org.junit.Test;
 
 @SmallTest
 public class TypeSafeValueResolverWrapperTestCase extends AbstractMuleContextTestCase {
 
-  private final TransformationService transformationService = mock(TransformationService.class);
-  private final ValueResolver<String> staticValueResolver = mock(ValueResolver.class);
-  private final ValueResolver<String> dynamicValueResolver = mock(ValueResolver.class);
-  private final ExpressionManager expressionManager = mock(ExpressionManager.class);
+  private TransformationService transformationService = mock(TransformationService.class);
+  private ValueResolver<String> staticValueResolver = mock(ValueResolver.class);
+  private ValueResolver<String> dynamicValueResolver = mock(ValueResolver.class);
+  private ExpressionManager expressionManager = mock(ExpressionManager.class);
   private TypeSafeValueResolverWrapper<Integer> dynamicResolver;
   private TypeSafeValueResolverWrapper<Integer> staticResolver;
 
@@ -64,11 +58,6 @@ public class TypeSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
     initialiseIfNeeded(staticResolver, muleContext);
 
     when(transformationService.transform(eq("123"), any(DataType.class), any(DataType.class))).thenReturn(123);
-  }
-
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @Test

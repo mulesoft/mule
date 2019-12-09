@@ -13,8 +13,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -26,12 +24,12 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
+import org.junit.Test;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.junit.Test;
 
 public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase {
 
@@ -42,7 +40,6 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     Map<String, Object> objects = new HashMap<>();
     objects.putAll(super.getStartUpRegistryObjects());
     objects.put(COMPATIBILITY_PLUGIN_INSTALLED, new Object());
-    objects.put(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
     return objects;
   }
 

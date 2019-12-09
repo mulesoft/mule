@@ -8,7 +8,6 @@
 package org.mule.runtime.core.internal.transformer.simple;
 
 import static java.nio.charset.StandardCharsets.UTF_16;
-import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -17,8 +16,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -35,7 +32,6 @@ import org.mule.runtime.core.internal.processor.simple.SetPayloadMessageProcesso
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -61,11 +57,6 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
     when(expressionManager.parse(anyString(), any(CoreEvent.class), any(ComponentLocation.class)))
         .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
-  }
-
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @Test

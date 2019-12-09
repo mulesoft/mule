@@ -6,7 +6,6 @@
  */
 package org.mule.tck.core.internal.serialization;
 
-import static java.util.Collections.singletonMap;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -15,8 +14,6 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.serialization.SerializationProtocol;
@@ -25,24 +22,18 @@ import org.mule.runtime.core.internal.el.datetime.DateTime;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.Map;
-
-import org.junit.Test;
 
 public abstract class AbstractSerializerProtocolContractTestCase extends AbstractMuleContextTestCase {
 
   private static final String STRING_MESSAGE = "Hello World";
 
   protected SerializationProtocol serializationProtocol;
-
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
-  }
 
   @Test(expected = IllegalArgumentException.class)
   public final void nullBytes() throws Exception {

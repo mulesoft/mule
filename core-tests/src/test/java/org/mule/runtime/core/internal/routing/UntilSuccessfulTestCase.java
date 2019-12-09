@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
@@ -25,12 +25,9 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -101,7 +98,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   private Flow flow;
   private UntilSuccessful untilSuccessful;
   private ConfigurableMessageProcessor targetMessageProcessor;
-  private final boolean tx;
+  private boolean tx;
 
   public UntilSuccessfulTestCase(boolean tx) {
     this.tx = tx;
@@ -109,8 +106,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
-    return of(REGISTRY_KEY, componentLocator,
-              OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
+    return singletonMap(REGISTRY_KEY, componentLocator);
   }
 
   @Override
