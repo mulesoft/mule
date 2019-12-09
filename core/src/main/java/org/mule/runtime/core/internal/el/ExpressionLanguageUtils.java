@@ -28,10 +28,10 @@ public final class ExpressionLanguageUtils {
   private ExpressionLanguageUtils() {}
 
   public static CompiledExpression compile(String expression, ExpressionLanguage expressionLanguage) {
-    //return expressionLanguage.compile(expression, addEventBuindingsToBuilder(getNullEvent(), NULL_BINDING_CONTEXT).build());
-    return new LazyCompiledExpression(expression,
-                                      expressionLanguage,
-                                      addEventBuindingsToBuilder(getNullEvent(), NULL_BINDING_CONTEXT).build());
+    return expressionLanguage.compile(expression, addEventBuindingsToBuilder(getNullEvent(), NULL_BINDING_CONTEXT).build());
+    //return new LazyCompiledExpression(expression,
+    //                                  expressionLanguage,
+    //                                  addEventBuindingsToBuilder(getNullEvent(), NULL_BINDING_CONTEXT).build());
   }
 
   public static <T> T withSession(ExpressionLanguage expressionLanguage,
