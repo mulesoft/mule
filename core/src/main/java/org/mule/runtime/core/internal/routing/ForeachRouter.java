@@ -48,11 +48,10 @@ class ForeachRouter {
 
   private static final Logger LOGGER = getLogger(ForeachRouter.class);
 
-  private static final String FOREACH_CONTEXT_VARIABLE = "foreachContext";
+  private static final String FOREACH_CONTEXT_KEY = "foreach.router.foreachContext";
   static final String MAP_NOT_SUPPORTED_MESSAGE =
       "Foreach does not support 'java.util.Map' with no collection expression. To iterate over Map entries use '#[dw::core::Objects::entrySet(payload)]'";
   private final EventInternalContextResolver<Map<String, ForeachContext>> foreachContextResolver;
-
   private final Foreach owner;
 
   private Flux<CoreEvent> upstreamFlux;
@@ -68,7 +67,7 @@ class ForeachRouter {
   ForeachRouter(Foreach owner, Publisher<CoreEvent> publisher, String expression, int batchSize,
                 MessageProcessorChain nestedChain) {
     this.owner = owner;
-    this.foreachContextResolver = new EventInternalContextResolver<>(FOREACH_CONTEXT_VARIABLE,
+    this.foreachContextResolver = new EventInternalContextResolver<>(FOREACH_CONTEXT_KEY,
                                                                      HashMap::new);
 
     upstreamFlux = Flux.from(publisher)
