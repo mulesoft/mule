@@ -86,7 +86,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
     return process(processor, event, true);
   }
 
-  protected CoreEvent process(Processor processor, CoreEvent event, boolean unwrapMessagingException) throws Exception {
+  public CoreEvent process(Processor processor, CoreEvent event, boolean unwrapMessagingException) throws Exception {
     setMuleContextIfNeeded(processor, muleContext);
     try {
       switch (mode) {
