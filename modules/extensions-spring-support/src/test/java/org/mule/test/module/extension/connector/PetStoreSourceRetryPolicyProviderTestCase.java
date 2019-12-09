@@ -13,6 +13,7 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.petstore.extension.FailingPetStoreSource.connectionException;
 import static org.mule.test.petstore.extension.FailingPetStoreSource.executor;
+
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
@@ -37,19 +38,21 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends AbstractExtension
   }
 
   @Override
-  protected void doSetUp() throws Exception {
-    PetStoreConnector.timesStarted = 0;
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    PetStoreConnector.clearTimesStarted();
     FailingPetStoreSource.failedDueOnException = false;
-    super.doSetUp();
+
+    super.doSetUpBeforeMuleContextCreation();
   }
 
   @Override
   protected void doTearDown() throws Exception {
-    PetStoreConnector.timesStarted = 0;
+    PetStoreConnector.clearTimesStarted();
     FailingPetStoreSource.failedDueOnException = false;
     if (executor != null) {
       executor.shutdownNow();
     }
+
     super.doTearDown();
   }
 
@@ -61,7 +64,7 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends AbstractExtension
       startFlow("source-fail-on-start");
     } catch (Exception e) {
       probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> {
-        assertThat(PetStoreConnector.timesStarted, is(2));
+        assertThat(PetStoreConnector.getTimesStarted(), is(2));
         return true;
       });
       throw e;
@@ -72,7 +75,7 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends AbstractExtension
   public void retryPolicySourceFailWithConnectionException() throws Exception {
     startFlow("source-fail-with-connection-exception");
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> {
-      assertThat(PetStoreConnector.timesStarted, is(3));
+      assertThat(PetStoreConnector.getTimesStarted(), is(3));
       return true;
     });
   }
@@ -85,7 +88,7 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends AbstractExtension
       startFlow("source-fail-on-start-fallback-to-connection");
     } catch (Exception e) {
       probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> {
-        assertThat(PetStoreConnector.timesStarted, is(2));
+        assertThat(PetStoreConnector.getTimesStarted(), is(2));
         return true;
       });
       throw e;
@@ -96,7 +99,7 @@ public class PetStoreSourceRetryPolicyProviderTestCase extends AbstractExtension
   public void retryPolicySourceFailWithConnectionExceptionFallbackToConnection() throws Exception {
     startFlow("source-fail-with-connection-exception-fallback-to-connection");
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> {
-      assertThat(PetStoreConnector.timesStarted, is(3));
+      assertThat(PetStoreConnector.getTimesStarted(), is(3));
       return true;
     });
   }
