@@ -44,10 +44,9 @@ import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
-import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
@@ -131,6 +130,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private final List<ReactiveInterceptorAdapter> additionalInterceptors = new LinkedList<>();
 
   private boolean canProcessMessage = true;
+
+  @Inject
+  private ServerNotificationHandler serverNotificationHandler;
 
   @Inject
   private InterceptorManager processorInterceptorManager;
@@ -395,16 +397,14 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private void preNotification(CoreEvent event, Processor processor) {
     if (((PrivilegedEvent) event).isNotificationsEnabled()) {
-      fireNotification(muleContext.getNotificationManager(), event, processor, null,
-                       MESSAGE_PROCESSOR_PRE_INVOKE);
+      fireNotification(event, processor, null, MESSAGE_PROCESSOR_PRE_INVOKE);
     }
   }
 
   private Consumer<CoreEvent> postNotification(Processor processor) {
     return event -> {
       if (((PrivilegedEvent) event).isNotificationsEnabled()) {
-        fireNotification(muleContext.getNotificationManager(), event, processor, null,
-                         MESSAGE_PROCESSOR_POST_INVOKE);
+        fireNotification(event, processor, null, MESSAGE_PROCESSOR_POST_INVOKE);
 
       }
     };
@@ -414,22 +414,18 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     return exception -> {
       if (exception instanceof MessagingException
           && ((PrivilegedEvent) ((MessagingException) exception).getEvent()).isNotificationsEnabled()) {
-        fireNotification(muleContext.getNotificationManager(), ((MessagingException) exception).getEvent(), processor,
-                         (MessagingException) exception,
+        fireNotification(((MessagingException) exception).getEvent(), processor, (MessagingException) exception,
                          MESSAGE_PROCESSOR_POST_INVOKE);
       }
     };
   }
 
-  private void fireNotification(ServerNotificationManager serverNotificationManager, CoreEvent event, Processor processor,
+  private void fireNotification(CoreEvent event, Processor processor,
                                 MessagingException exceptionThrown, int action) {
-    if (serverNotificationManager != null
-        && serverNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)) {
-
+    if (serverNotificationHandler != null) {
       if (processor instanceof Component && ((Component) processor).getLocation() != null) {
-        serverNotificationManager
-            .fireNotification(createFrom(event, ((Component) processor).getLocation(), (Component) processor,
-                                         exceptionThrown, action));
+        serverNotificationHandler.fireNotification(createFrom(event, ((Component) processor).getLocation(), (Component) processor,
+                                                              exceptionThrown, action));
       }
     }
   }
