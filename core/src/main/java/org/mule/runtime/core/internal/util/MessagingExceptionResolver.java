@@ -19,7 +19,6 @@ import static org.mule.runtime.core.internal.util.InternalExceptionUtils.createE
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErrorMappings;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
@@ -27,7 +26,6 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
@@ -35,7 +33,6 @@ import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.policy.FlowExecutionException;
-import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.util.Collection;
@@ -55,26 +52,6 @@ public class MessagingExceptionResolver {
 
   public MessagingExceptionResolver(Component component) {
     this.component = component;
-  }
-
-  /**
-   * Resolves a new {@link MessagingException} with the real cause of the problem based on the content of an Incoming
-   * {@link MessagingException} with a chain of causes inside it and the current event that the exception is carrying.
-   * <p>
-   * This method will pick the FIRST cause exception that has a mule or extension KNOWN error as the real cause, if there is not
-   * an exception in the causes that match with an Known error type then this method will try to find the error that the current
-   * {@link Event} is carrying.
-   * <p>
-   * When there are multiple exceptions that contains the same root error type, then this method will wrap the one that has
-   * highest position in the causes list
-   *
-   * @return a {@link MessagingException} with the proper {@link Error} associated to it's {@link CoreEvent}
-   *
-   * @deprecated Use {@link #resolve(MessagingException, ErrorTypeLocator, Collection)} instead.
-   */
-  @Deprecated
-  public MessagingException resolve(final MessagingException me, MuleContext context) {
-    return resolve(me, ((PrivilegedMuleContext) context).getErrorTypeLocator(), context.getExceptionContextProviders());
   }
 
   /**

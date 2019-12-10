@@ -202,7 +202,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       stream = stream.transform(applyInterceptors(interceptors, processor))
           // #1 Register local error hook to wrap exceptions in a MessagingException maintaining failed event.
           .subscriberContext(context -> context.put(REACTOR_ON_OPERATOR_ERROR_LOCAL,
-                                                    getLocalOperatorErrorHook(processor, muleContext)))
+                                                    getLocalOperatorErrorHook(processor, errorTypeLocator,
+                                                                              exceptionContextProviders)))
           // #2 Register continue error strategy to handle errors without stopping the stream.
           .onErrorContinue(exception -> !(exception instanceof LifecycleException),
                            getContinueStrategyErrorHandler(processor, errorBubbler));
@@ -260,7 +261,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         } else {
           notifyError(processor,
                       ((BaseEventContext) event.getContext()),
-                      resolveException(processor, event, throwable, muleContext, exceptionResolver),
+                      resolveException(processor, event, throwable, errorTypeLocator, exceptionContextProviders,
+                                       exceptionResolver),
                       errorBubbler);
         }
       }
