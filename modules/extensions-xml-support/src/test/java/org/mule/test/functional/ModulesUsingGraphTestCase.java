@@ -10,15 +10,17 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
-import org.junit.runners.Parameterized;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Arrays;
 import java.util.Collection;
+
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 /**
  * Test case to guarantee that the {@link MacroExpansionModuleModel} does its work properly. The Mule application relies on a set
@@ -48,7 +50,7 @@ import java.util.Collection;
  * </pre>
  */
 @RunnerDelegateTo(Parameterized.class)
-public class ModulesUsingGraphTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
+public class ModulesUsingGraphTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   private static final String MODULES_GRAPH_FOLDER = "modules/graph/module-";
   private static final String SUFFIX_XML_FILE = ".xml";

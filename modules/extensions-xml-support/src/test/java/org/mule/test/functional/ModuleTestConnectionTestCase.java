@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-public class ModuleTestConnectionTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
+public class ModuleTestConnectionTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Parameterized.Parameter
   public String path;

@@ -8,12 +8,13 @@ package org.mule.test.functional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import io.qameta.allure.Description;
 import org.junit.Test;
 
-public class ModuleStereotypesTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
+public class ModuleStereotypesTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Override
   protected String getModulePath() {
