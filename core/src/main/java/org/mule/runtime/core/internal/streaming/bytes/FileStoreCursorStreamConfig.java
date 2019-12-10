@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static org.mule.runtime.api.util.DataUnit.BYTE;
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.DEFAULT_BUFFER_BUCKET_SIZE;
@@ -40,7 +41,7 @@ public final class FileStoreCursorStreamConfig {
   public FileStoreCursorStreamConfig(DataSize maxInMemorySize) {
     int effectiveMaxInMemorySize = maxInMemorySize.toBytes();
     bucketSize = min(DEFAULT_BUFFER_BUCKET_SIZE, effectiveMaxInMemorySize);
-    bucketsCount = effectiveMaxInMemorySize / bucketSize;
+    bucketsCount = max(1, effectiveMaxInMemorySize / bucketSize);
     if (effectiveMaxInMemorySize % bucketSize > 0) {
       effectiveMaxInMemorySize = bucketsCount * bucketSize;
     }
