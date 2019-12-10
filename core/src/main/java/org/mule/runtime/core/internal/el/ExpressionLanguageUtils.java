@@ -25,10 +25,13 @@ import java.util.function.Function;
 
 public final class ExpressionLanguageUtils {
 
+  private static final BindingContext COMPILATION_BINDING_CONTEXT =
+      addEventBuindingsToBuilder(getNullEvent(), NULL_BINDING_CONTEXT).build();
+
   private ExpressionLanguageUtils() {}
 
   public static CompiledExpression compile(String expression, ExpressionLanguage expressionLanguage) {
-    return expressionLanguage.compile(expression, addEventBuindingsToBuilder(getNullEvent(), NULL_BINDING_CONTEXT).build());
+    return expressionLanguage.compile(expression, COMPILATION_BINDING_CONTEXT);
     //return new LazyCompiledExpression(expression,
     //                                  expressionLanguage,
     //                                  addEventBuindingsToBuilder(getNullEvent(), NULL_BINDING_CONTEXT).build());
