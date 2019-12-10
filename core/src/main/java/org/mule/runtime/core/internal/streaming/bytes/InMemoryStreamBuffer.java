@@ -39,7 +39,6 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
   private final int bufferSizeIncrement;
   private final int maxBufferSize;
   private long bufferTip = 0;
-  private boolean streamFullyConsumed = false;
 
   /**
    * Creates a new instance
