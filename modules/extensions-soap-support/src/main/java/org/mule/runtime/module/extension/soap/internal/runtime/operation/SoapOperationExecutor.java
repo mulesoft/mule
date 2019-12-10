@@ -102,13 +102,14 @@ public final class SoapOperationExecutor implements CompletableComponentExecutor
   public void initialise() {
     this.extensionsClientArgumentResolver = new ExtensionsClientArgumentResolver(extensionsClientProcessorsStrategyFactory);
     headersExpression = expressionExecutor.compile(
-        "%dw 2.0 \n"
-            + "output application/java \n"
-            + "---\n"
-            + "payload.headers mapObject (value, key) -> {\n"
-            + "    '$key' : write((key): value, \"application/xml\")\n"
-            + "}",
-        BindingContext.builder().addBinding("payload", new TypedValue<>("", XML_STRING)).build());
+                                                   "%dw 2.0 \n"
+                                                       + "output application/java \n"
+                                                       + "---\n"
+                                                       + "payload.headers mapObject (value, key) -> {\n"
+                                                       + "    '$key' : write((key): value, \"application/xml\")\n"
+                                                       + "}",
+                                                   BindingContext.builder()
+                                                       .addBinding("payload", new TypedValue<>("", XML_STRING)).build());
   }
 
   /**
