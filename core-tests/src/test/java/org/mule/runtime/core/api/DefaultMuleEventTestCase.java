@@ -30,13 +30,13 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.nio.charset.Charset;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.nio.charset.Charset;
 
 @SmallTest
 public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
@@ -48,7 +48,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   public static final String PROPERTY_NAME = "test";
   public static final String PROPERTY_VALUE = "foo";
 
-  private Message muleMessage = of("test-data");
+  private final Message muleMessage = of("test-data");
   private Flow flow;
   private EventContext messageContext;
   private PrivilegedEvent muleEvent;

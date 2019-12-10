@@ -27,15 +27,15 @@ import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguageContext;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
-import org.junit.Test;
-
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Map;
 
+import org.junit.Test;
+
 public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
-  private String a = "hi";
+  private final String a = "hi";
   private String b = "hi";
 
   public ExpressionLanguageExtensionTestCase(String mvelOptimizer) {

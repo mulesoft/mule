@@ -26,13 +26,14 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 /**
- * A very simple implementation of {@link Registry}. Useful for starting really lightweight contexts which don't depend
- * on heavier object containers such as Spring or Guice (testing being the best example).
+ * A very simple implementation of {@link Registry}. Useful for starting really lightweight contexts which don't depend on heavier
+ * object containers such as Spring or Guice (testing being the best example).
  * <p/>
  * The {@link #inject(Object)} operation will only consider fields annotated with {@link Inject} and will perform the injection
  * using simple, not-cached reflection. Also, initialisation lifecycle will be performed in pseudo-random order, no analysis will
@@ -138,38 +139,12 @@ public class SimpleRegistry extends TransientRegistry implements Injector {
 
   private <T> T injectInto(T object) {
     for (Field field : getAllFields(object.getClass(), withAnnotation(Inject.class))) {
-      Class<?> dependencyType = field.getType();
-
-      boolean nullToOptional = false;
-      boolean collection = false;
-      if (dependencyType.equals(Optional.class) || Collection.class.isAssignableFrom(dependencyType)) {
-        if (dependencyType.equals(Optional.class)) {
-          nullToOptional = true;
-        } else {
-          collection = true;
-        }
-
-        Type type = ((ParameterizedType) (field.getGenericType())).getActualTypeArguments()[0];
-        if (type instanceof ParameterizedType) {
-          dependencyType = (Class<?>) ((ParameterizedType) type).getRawType();
-        } else {
-          dependencyType = (Class<?>) type;
-        }
-
-      }
-
-      Named nameAnnotation = field.getAnnotation(Named.class);
       try {
+        Object dependency = resolveTypedDependency(field.getType(), field.getAnnotation(Named.class),
+                                                   () -> ((ParameterizedType) (field.getGenericType()))
+                                                       .getActualTypeArguments()[0]);
+
         field.setAccessible(true);
-
-        Object dependency;
-        if (collection) {
-          dependency = resolveObjectsToInject(dependencyType);
-        } else {
-          dependency =
-              resolveObjectToInject(dependencyType, nameAnnotation != null ? nameAnnotation.value() : null, nullToOptional);
-        }
-
         if (dependency != null) {
           field.set(object, dependency);
         }
@@ -181,34 +156,10 @@ public class SimpleRegistry extends TransientRegistry implements Injector {
     }
     for (Method method : getAllMethods(object.getClass(), withAnnotation(Inject.class))) {
       if (method.getParameters().length == 1) {
-        Class<?> dependencyType = method.getParameterTypes()[0];
-
-        boolean nullToOptional = false;
-        boolean collection = false;
-        if (dependencyType.equals(Optional.class) || Collection.class.isAssignableFrom(dependencyType)) {
-          if (dependencyType.equals(Optional.class)) {
-            nullToOptional = true;
-          } else {
-            collection = true;
-          }
-
-          Type type = ((ParameterizedType) (method.getGenericParameterTypes()[0])).getActualTypeArguments()[0];
-          if (type instanceof ParameterizedType) {
-            dependencyType = (Class<?>) ((ParameterizedType) type).getRawType();
-          } else {
-            dependencyType = (Class<?>) type;
-          }
-        }
-
-        Named nameAnnotation = method.getAnnotation(Named.class);
         try {
-          Object dependency;
-          if (collection) {
-            dependency = resolveObjectsToInject(dependencyType);
-          } else {
-            dependency =
-                resolveObjectToInject(dependencyType, nameAnnotation != null ? nameAnnotation.value() : null, nullToOptional);
-          }
+          Object dependency = resolveTypedDependency(method.getParameterTypes()[0], method.getAnnotation(Named.class),
+                                                     () -> ((ParameterizedType) (method.getGenericParameterTypes()[0]))
+                                                         .getActualTypeArguments()[0]);
 
           if (dependency != null) {
             method.invoke(object, dependency);
@@ -222,6 +173,37 @@ public class SimpleRegistry extends TransientRegistry implements Injector {
 
     }
     return object;
+  }
+
+  private Object resolveTypedDependency(Class<?> dependencyType, final Named namedAnnotation, Supplier<Type> typeSupplier)
+      throws RegistrationException {
+    boolean nullToOptional = false;
+    boolean collection = false;
+    if (dependencyType.equals(Optional.class)) {
+      nullToOptional = true;
+    } else if (Collection.class.isAssignableFrom(dependencyType)) {
+      collection = true;
+    }
+
+    if (nullToOptional || collection) {
+      Type type = typeSupplier.get();
+      if (type instanceof ParameterizedType) {
+        dependencyType = (Class<?>) ((ParameterizedType) type).getRawType();
+      } else {
+        dependencyType = (Class<?>) type;
+      }
+    }
+
+    return resolveDependency(dependencyType, nullToOptional, collection, namedAnnotation);
+  }
+
+  private Object resolveDependency(Class<?> dependencyType, boolean nullToOptional, boolean collection, Named nameAnnotation)
+      throws RegistrationException {
+    if (collection) {
+      return resolveObjectsToInject(dependencyType);
+    } else {
+      return resolveObjectToInject(dependencyType, nameAnnotation != null ? nameAnnotation.value() : null, nullToOptional);
+    }
   }
 
   private Object resolveObjectToInject(Class<?> dependencyType, String name, boolean nullToOptional)
