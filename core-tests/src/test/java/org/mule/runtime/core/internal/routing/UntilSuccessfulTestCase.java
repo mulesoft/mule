@@ -155,7 +155,8 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.setAnnotations(getAppleFlowComponentLocationAnnotations());
 
     targetMessageProcessor = new ConfigurableMessageProcessor();
-    untilSuccessful.setMessageProcessors(singletonList(buildUntilSuccessfulWithProcessors(MILLIS_BETWEEN_RETRIES, "1", targetMessageProcessor)));
+    untilSuccessful.setMessageProcessors(singletonList(buildUntilSuccessfulWithProcessors(MILLIS_BETWEEN_RETRIES, "1",
+                                                                                          targetMessageProcessor)));
     muleContext.getInjector().inject(untilSuccessful);
     return untilSuccessful;
   }
