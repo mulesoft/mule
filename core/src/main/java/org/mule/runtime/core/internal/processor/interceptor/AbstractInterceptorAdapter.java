@@ -20,11 +20,13 @@ import org.mule.runtime.api.interception.ProcessorParameterValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
-import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,6 +39,12 @@ class AbstractInterceptorAdapter {
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  protected ErrorTypeLocator errorTypeLocator;
+
+  @Inject
+  private Collection<ExceptionContextProvider> exceptionContextProviders;
 
   @Inject
   protected ExtendedExpressionManager expressionManager;
@@ -107,8 +115,7 @@ class AbstractInterceptorAdapter {
     MessagingException me = new MessagingException(event, cause, processor);
     original.ifPresent(error -> error.getInfo().forEach((name, info) -> me.addInfo(name, info)));
 
-    return exceptionResolver.resolve(me, ((PrivilegedMuleContext) muleContext).getErrorTypeLocator(),
-                                     muleContext.getExceptionContextProviders());
+    return exceptionResolver.resolve(me, errorTypeLocator, exceptionContextProviders);
   }
 
   protected MuleContext getMuleContext() {

@@ -30,6 +30,7 @@ import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrate
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -104,14 +105,13 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   }
 
   private void mockErrorTypeLocator() {
-    ErrorTypeLocator typeLocator = mock(ErrorTypeLocator.class);
+    ErrorTypeLocator typeLocator = ((PrivilegedMuleContext) muleContext).getErrorTypeLocator();
     ErrorType errorType = mock(ErrorType.class);
     when(errorType.getIdentifier()).thenReturn("ID");
     when(errorType.getNamespace()).thenReturn("NS");
     when(typeLocator.lookupErrorType(any(Throwable.class))).thenReturn(errorType);
     when(typeLocator.<String, Throwable>lookupComponentErrorType(any(ComponentIdentifier.class), any(Throwable.class)))
         .thenReturn(errorType);
-    when(((PrivilegedMuleContext) muleContext).getErrorTypeLocator()).thenReturn(typeLocator);
   }
 
   public void createTestPipeline(List<Processor> processors, ErrorHandler errorHandler) {
@@ -254,9 +254,9 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
   private class PipelineMessageNotificiationArgumentMatcher implements ArgumentMatcher<Notification> {
 
-    private int expectedAction;
-    private boolean exceptionExpected;
-    private CoreEvent event;
+    private final int expectedAction;
+    private final boolean exceptionExpected;
+    private final CoreEvent event;
 
     public PipelineMessageNotificiationArgumentMatcher(int expectedAction, boolean exceptionExpected, CoreEvent event) {
       this.expectedAction = expectedAction;

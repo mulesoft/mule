@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
@@ -25,9 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
@@ -60,6 +58,7 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
+  private static final String MILLIS_BETWEEN_RETRIES = "100";
   private static final String RETRY_CTX_INTERNAL_PARAMETER_KEY = "untilSuccessful.router.retryContext";
 
   public static class ConfigurableMessageProcessor implements Processor, InternalProcessor {
@@ -109,15 +108,14 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
-    return of(REGISTRY_KEY, componentLocator,
-              OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
+    return singletonMap(REGISTRY_KEY, componentLocator);
   }
 
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
     flow = createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
-    untilSuccessful = buildUntilSuccessful("1000");
+    untilSuccessful = buildUntilSuccessful(MILLIS_BETWEEN_RETRIES);
     if (tx) {
       getInstance().bindTransaction(mock(Transaction.class));
     }
@@ -157,7 +155,8 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.setAnnotations(getAppleFlowComponentLocationAnnotations());
 
     targetMessageProcessor = new ConfigurableMessageProcessor();
-    untilSuccessful.setMessageProcessors(singletonList(buildUntilSuccessfulWithProcessors("100", "1", targetMessageProcessor)));
+    untilSuccessful.setMessageProcessors(singletonList(buildUntilSuccessfulWithProcessors(MILLIS_BETWEEN_RETRIES, "1",
+                                                                                          targetMessageProcessor)));
     muleContext.getInjector().inject(untilSuccessful);
     return untilSuccessful;
   }
@@ -297,7 +296,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   public void testRetryContextIsClearedAfterSuccessfulScopeExecution() throws Exception {
     targetMessageProcessor.setNumberOfFailuresToSimulate(1);
     untilSuccessful.setMaxRetries("1");
-    untilSuccessful.setMillisBetweenRetries("100");
+    untilSuccessful.setMillisBetweenRetries(MILLIS_BETWEEN_RETRIES);
     untilSuccessful.initialise();
     untilSuccessful.start();
 
@@ -313,7 +312,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful = buildNestedUntilSuccessful();
     targetMessageProcessor.setNumberOfFailuresToSimulate(1);
     untilSuccessful.setMaxRetries("1");
-    untilSuccessful.setMillisBetweenRetries("100");
+    untilSuccessful.setMillisBetweenRetries(MILLIS_BETWEEN_RETRIES);
     untilSuccessful.initialise();
     untilSuccessful.start();
 
@@ -328,7 +327,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   public void testRetryContextIsClearedAfterExhaustedScopeExecution() throws Exception {
     targetMessageProcessor.setNumberOfFailuresToSimulate(2);
     untilSuccessful.setMaxRetries("1");
-    untilSuccessful.setMillisBetweenRetries("100");
+    untilSuccessful.setMillisBetweenRetries(MILLIS_BETWEEN_RETRIES);
     untilSuccessful.initialise();
     untilSuccessful.start();
 
@@ -340,7 +339,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful = buildNestedUntilSuccessful();
     targetMessageProcessor.setNumberOfFailuresToSimulate(4);
     untilSuccessful.setMaxRetries("1");
-    untilSuccessful.setMillisBetweenRetries("100");
+    untilSuccessful.setMillisBetweenRetries(MILLIS_BETWEEN_RETRIES);
     untilSuccessful.initialise();
     untilSuccessful.start();
 

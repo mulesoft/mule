@@ -55,8 +55,6 @@ import org.mockito.Mockito;
  */
 public final class MuleTestUtils {
 
-  public static final String OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY = "errorTypeRegistry";
-
   public static final String APPLE_SERVICE = "appleService";
   public static final String APPLE_FLOW = "appleFlow";
 

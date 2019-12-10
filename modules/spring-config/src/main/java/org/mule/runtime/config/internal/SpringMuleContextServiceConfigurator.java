@@ -137,6 +137,8 @@ import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
+import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.module.service.internal.manager.LazyServiceProxy;
 
@@ -147,13 +149,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 
 /**
@@ -183,6 +186,7 @@ class SpringMuleContextServiceConfigurator {
       .add(OBJECT_MULE_STREAM_CLOSER_SERVICE)
       .add(OBJECT_CONVERTER_RESOLVER)
       .add(OBJECT_PROCESSING_TIME_WATCHER)
+      .add(OBJECT_POLICY_MANAGER)
       .add(OBJECT_EXCEPTION_LOCATION_PROVIDER)
       .add(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER)
       .build();
@@ -278,6 +282,8 @@ class SpringMuleContextServiceConfigurator {
     registerBeanDefinition(OBJECT_CONFIGURATION_PROPERTIES, getConstantObjectBeanDefinition(configurationProperties));
     registerBeanDefinition(ErrorTypeRepository.class.getName(),
                            getConstantObjectBeanDefinition(muleContext.getErrorTypeRepository()));
+    registerBeanDefinition(ErrorTypeLocator.class.getName(),
+                           getConstantObjectBeanDefinition(((PrivilegedMuleContext) muleContext).getErrorTypeLocator()));
     registerBeanDefinition(ConfigurationComponentLocator.REGISTRY_KEY, getConstantObjectBeanDefinition(componentLocator));
     registerBeanDefinition(OBJECT_NOTIFICATION_HANDLER, getConstantObjectBeanDefinition(muleContext.getNotificationManager()));
     registerBeanDefinition(OBJECT_REGISTRY, getConstantObjectBeanDefinition(serviceLocator));

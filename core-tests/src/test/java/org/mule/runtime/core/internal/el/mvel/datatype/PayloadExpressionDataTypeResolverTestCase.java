@@ -8,14 +8,11 @@
 package org.mule.runtime.core.internal.el.mvel.datatype;
 
 import static java.nio.charset.StandardCharsets.UTF_16;
-import static java.util.Collections.singletonMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.mvel2.MVEL.compileExpression;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.runtime.core.internal.el.mvel.MessageVariableResolverFactory.MESSAGE_PAYLOAD;
 import static org.mule.runtime.core.internal.el.mvel.MessageVariableResolverFactory.PAYLOAD;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.mvel2.ParserContext;
@@ -26,21 +23,15 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.nio.charset.Charset;
-import java.util.Map;
-
 import org.junit.Test;
+
+import java.nio.charset.Charset;
 
 public class PayloadExpressionDataTypeResolverTestCase extends AbstractMuleContextTestCase {
 
   public static final Charset CUSTOM_ENCODING = UTF_16;
 
   private final PayloadExpressionDataTypeResolver dataTypeResolver = new PayloadExpressionDataTypeResolver();
-
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
-  }
 
   @Test
   public void returnsPayloadDataType() throws Exception {

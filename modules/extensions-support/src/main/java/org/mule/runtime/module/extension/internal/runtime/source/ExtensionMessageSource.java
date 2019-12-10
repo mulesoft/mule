@@ -183,7 +183,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                                                createSourceCallbackFactory(),
                                                this,
                                                sourceConnectionManager,
-                                               new MessagingExceptionResolver(this),
                                                restarting);
         muleContext.getInjector().inject(sourceAdapter);
         retryPolicyTemplate = createRetryPolicyTemplate(customRetryPolicyTemplate);
@@ -467,6 +466,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
     return new MessageProcessContext() {
 
+      private final MessagingExceptionResolver messagingExceptionResolver = new MessagingExceptionResolver(getMessageSource());
+
       @Override
       public MessageSource getMessageSource() {
         return ExtensionMessageSource.this;
@@ -485,6 +486,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       @Override
       public ErrorTypeLocator getErrorTypeLocator() {
         return ((PrivilegedMuleContext) muleContext).getErrorTypeLocator();
+      }
+
+      @Override
+      public MessagingExceptionResolver getMessagingExceptionResolver() {
+        return messagingExceptionResolver;
       }
 
       @Override

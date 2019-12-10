@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.el;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -28,7 +29,6 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
@@ -44,9 +44,7 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
-    final Map<String, Object> objects = new HashMap<>(super.getStartUpRegistryObjects());
-    objects.put("key1", new TestExtension());
-    return objects;
+    return singletonMap("key1", new TestExtension());
   }
 
   @Test

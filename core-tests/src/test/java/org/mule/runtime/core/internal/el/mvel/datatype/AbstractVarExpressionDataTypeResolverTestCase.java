@@ -7,12 +7,9 @@
 
 package org.mule.runtime.core.internal.el.mvel.datatype;
 
-import static java.util.Collections.singletonMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.mvel2.MVEL.compileExpression;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.mvel2.MVEL;
@@ -31,12 +28,11 @@ import org.mule.runtime.core.internal.el.mvel.VariableVariableResolverFactory;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.junit.Test;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.Map;
-
-import org.junit.Test;
 
 public abstract class AbstractVarExpressionDataTypeResolverTestCase extends AbstractMuleContextTestCase {
 
@@ -51,11 +47,6 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
                                                           String variableName) {
     this.expressionDataTypeResolver = expressionDataTypeResolver;
     this.variableName = variableName;
-  }
-
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @Test

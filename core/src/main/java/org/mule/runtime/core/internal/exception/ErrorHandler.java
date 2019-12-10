@@ -26,13 +26,16 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -62,6 +65,12 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   @Inject
   private ErrorTypeRepository errorTypeRepository;
+
+  @Inject
+  private ErrorTypeLocator errorTypeLocator;
+
+  @Inject
+  private Collection<ExceptionContextProvider> exceptionContextProviders;
 
   private final MessagingExceptionResolver messagingExceptionResolver = new MessagingExceptionResolver(this);
 
@@ -103,7 +112,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
       throw new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE));
     } catch (Exception e) {
       propagateCallback.accept(messagingExceptionResolver.resolve(new MessagingException(event, e, this),
-                                                                  muleContext));
+                                                                  errorTypeLocator, exceptionContextProviders));
     }
   }
 
@@ -120,8 +129,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
         }
         throw new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE));
       } catch (Exception e) {
-        return error(new MessagingExceptionResolver(this).resolve(new MessagingException(event, e, this),
-                                                                  muleContext));
+        return error(messagingExceptionResolver.resolve(new MessagingException(event, e, this),
+                                                        errorTypeLocator, exceptionContextProviders));
       }
     } else {
       // This should never occur since all exceptions at this point are ME
@@ -145,7 +154,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   private void addCriticalErrorHandler() {
-    exceptionListeners.add(0, new OnCriticalErrorHandler(new SingleErrorTypeMatcher(muleContext.getErrorTypeRepository()
+    exceptionListeners.add(0, new OnCriticalErrorHandler(new SingleErrorTypeMatcher(errorTypeRepository
         .getErrorType(OVERLOAD).get())));
   }
 

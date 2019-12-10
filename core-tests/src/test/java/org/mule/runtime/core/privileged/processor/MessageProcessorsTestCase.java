@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.privileged.processor;
 
-import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -24,7 +23,7 @@ import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasR
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
@@ -33,7 +32,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextBlocking;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
@@ -56,7 +54,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
@@ -93,7 +90,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     flow = mock(Flow.class, RETURNS_DEEP_STUBS);
     exceptionHandler = new OnErrorPropagateHandler();
     exceptionHandler.setMuleContext(muleContext);
-    exceptionHandler.setNotificationFirer(getNotificationDispatcher(muleContext));
+    exceptionHandler
+        .setNotificationFirer(getNotificationDispatcher(muleContext));
     exceptionHandler.initialise();
     exceptionHandler.start();
     when(flow.getExceptionListener()).thenReturn(exceptionHandler);
@@ -102,11 +100,6 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     output = builder(eventContext).message(of(TEST_MESSAGE)).build();
     response = builder(eventContext).message(of(TEST_MESSAGE)).build();
     responsePublisher = eventContext.getResponsePublisher();
-  }
-
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @After
@@ -737,7 +730,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   private Processor createChain(ReactiveProcessor processor) throws InitialisationException {
     MessageProcessorChain chain = newChain(Optional.empty(), new ReactiveProcessorToProcessorAdaptor(processor));
-    chain.setMuleContext(muleContext);
+    initialiseIfNeeded(chain, muleContext);
     return chain;
   }
 

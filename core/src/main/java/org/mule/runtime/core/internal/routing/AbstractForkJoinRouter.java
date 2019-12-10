@@ -16,6 +16,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
@@ -27,16 +28,15 @@ import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
-import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
 
-import org.reactivestreams.Publisher;
-
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Abstract base class for routers using a {@link ForkJoinStrategy} to process multiple {@link RoutingPair}'s and aggregate
@@ -52,13 +52,18 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
   @Inject
   private ConfigurationComponentLocator componentLocator;
 
+  @Inject
+  private ExtendedExpressionManager expressionManager;
+
+  @Inject
+  private ErrorTypeRepository errorTypeRepository;
+
   private ForkJoinStrategyFactory forkJoinStrategyFactory;
   private ForkJoinStrategy forkJoinStrategy;
   private long timeout = Long.MAX_VALUE;
   private Integer maxConcurrency;
   private Scheduler timeoutScheduler;
   private ErrorType timeoutErrorType;
-  private ExtendedExpressionManager expressionManager;
   private String target;
   private String targetValue = "#[payload]";
 
@@ -102,9 +107,8 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
-    expressionManager = muleContext.getExpressionManager();
     timeoutScheduler = schedulerService.cpuLightScheduler();
-    timeoutErrorType = muleContext.getErrorTypeRepository().getErrorType(TIMEOUT).get();
+    timeoutErrorType = errorTypeRepository.getErrorType(TIMEOUT).get();
     maxConcurrency = maxConcurrency != null ? maxConcurrency : getDefaultMaxConcurrency();
     forkJoinStrategyFactory = forkJoinStrategyFactory != null ? forkJoinStrategyFactory : getDefaultForkJoinStrategyFactory();
 

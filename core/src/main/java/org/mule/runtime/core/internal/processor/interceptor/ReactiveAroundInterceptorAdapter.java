@@ -24,14 +24,13 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.privileged.PrivilegedMuleContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s
@@ -81,8 +80,7 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
 
     DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
     final ReactiveInterceptionAction reactiveInterceptionAction =
-        new ReactiveInterceptionAction(interceptionEvent, next, component,
-                                       ((PrivilegedMuleContext) getMuleContext()).getErrorTypeLocator());
+        new ReactiveInterceptionAction(interceptionEvent, next, component, errorTypeLocator);
 
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Calling around() for '{}' in processor '{}'...", interceptor,

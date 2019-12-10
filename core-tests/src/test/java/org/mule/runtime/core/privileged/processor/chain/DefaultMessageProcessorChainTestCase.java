@@ -7,7 +7,6 @@
 
 package org.mule.runtime.core.privileged.processor.chain;
 
-import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
@@ -28,7 +27,6 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -44,11 +42,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
@@ -61,7 +57,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
@@ -71,7 +66,6 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
@@ -86,8 +80,6 @@ import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProacto
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
-import org.mule.runtime.core.privileged.PrivilegedMuleContext;
-import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
@@ -166,17 +158,12 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   public void before() throws MuleException {
     nonBlockingProcessorsExecuted.set(0);
     muleContext = spy(super.muleContext);
-    ErrorTypeLocator errorTypeLocator = mock(ErrorTypeLocator.class);
-    ErrorType errorType = mock(ErrorType.class);
-    ExceptionContextProvider exceptionContextProvider = mock(ExceptionContextProvider.class);
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
     when(muleConfiguration.isContainerMode()).thenReturn(false);
     when(muleConfiguration.getId()).thenReturn(randomNumeric(3));
     when(muleConfiguration.getShutdownTimeout()).thenReturn(1000L);
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
-    when(((PrivilegedMuleContext) muleContext).getErrorTypeLocator()).thenReturn(errorTypeLocator);
-    when(muleContext.getExceptionContextProviders()).thenReturn(singletonList(exceptionContextProvider));
-    when(errorTypeLocator.lookupErrorType((Exception) any())).thenReturn(errorType);
+
     flow = builder("flow", muleContext).processingStrategyFactory(processingStrategyFactory).build();
     flow.initialise();
     flow.start();
@@ -184,8 +171,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
-    return of(REGISTRY_KEY, componentLocator,
-              OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
+    return singletonMap(REGISTRY_KEY, componentLocator);
   }
 
   @After
@@ -682,8 +668,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     scatterGatherRouter
         .setRoutes(asList(newChain(empty(), getAppendingMP("1")), newChain(empty(), getAppendingMP("2")),
                           newChain(empty(), getAppendingMP("3"))));
-    initialiseIfNeeded(scatterGatherRouter, true, muleContext);
-    scatterGatherRouter.start();
 
     CoreEvent event = getTestEventUsingFlow("0");
     final MessageProcessorChain chain = newChain(empty(), singletonList(scatterGatherRouter));
@@ -890,9 +874,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
   @Override
   protected CoreEvent process(Processor messageProcessor, CoreEvent event) throws Exception {
-    if (messageProcessor instanceof MuleContextAware) {
-      ((MuleContextAware) messageProcessor).setMuleContext(muleContext);
-    }
+    initialiseIfNeeded(messageProcessor, muleContext);
+    startIfNeeded(messageProcessor);
+
     try {
       return super.process(messageProcessor, event);
     } finally {
