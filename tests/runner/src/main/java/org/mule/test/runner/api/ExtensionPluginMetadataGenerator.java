@@ -163,6 +163,7 @@ class ExtensionPluginMetadataGenerator {
           return Class.forName(extensionClassName);
         } catch (ClassNotFoundException e) {
           TroubleshootingUtils.copyPluginToAuxJenkinsFolderForTroubleshooting(firstURL);
+          TroubleshootingUtils.generateHeapDumpInAuxJenkinsFolder(firstURL);
           throw new IllegalArgumentException("Cannot load Extension class '" + extensionClassName + " obtained from: '" + firstURL
               + "' with MD5 '" + TroubleshootingUtils.getMD5FromFile(firstURL) + "' using classpath: "
               + new ClassPathUrlProvider().getURLs(), e);
