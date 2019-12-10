@@ -19,6 +19,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SUBFLOW_IDENTIFIER;
@@ -41,6 +42,8 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -181,6 +184,11 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
                                   componentModel.getMetadata().getStartLine(),
                                   componentModel.getMetadata().getStartColumn());
         }
+      } else if (isConnection(componentModel)) {
+        componentLocation = parentComponentLocation.appendConnectionPart(typedComponentIdentifier,
+                                                                         componentModel.getMetadata().getFileName(),
+                                                                         componentModel.getMetadata().getStartLine(),
+                                                                         componentModel.getMetadata().getStartColumn());
       } else {
         if (isBatchAggregator(componentModel)) {
           componentLocation = parentComponentLocation
@@ -209,6 +217,10 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
                                                      componentModel.getMetadata().getStartColumn());
     }
     ((ComponentModel) componentModel).setComponentLocation(componentLocation);
+  }
+
+  private boolean isConnection(ComponentAst componentModel) {
+    return componentModel.getModel(ConnectionProviderModel.class).isPresent();
   }
 
   private boolean isBatchAggregator(ComponentAst componentModel) {
@@ -332,8 +344,8 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
    * It rewrites the history for those macro expanded operations that are not direct children from a flow, which means the
    * returned {@link ComponentLocation} are mapped to the new operation rather the original flow.
    *
-   * @param componentModel source to generate the new {@link ComponentLocation}, it also relies on the provided {@code hierarchy}
-   * @param hierarchy the ancestors of {@code componentModel}
+   * @param componentModel           source to generate the new {@link ComponentLocation}, it also relies on the provided {@code hierarchy}
+   * @param hierarchy                the ancestors of {@code componentModel}
    * @param operationTypedIdentifier identifier of the current operation
    * @return a fictitious {@link ComponentLocation}
    */
@@ -378,8 +390,13 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
         || existsWithin(hierarchy, MUNIT_AFTER_SUITE_IDENTIFIER)
         || existsWithin(hierarchy, MUNIT_AFTER_TEST_IDENTIFIER)
         || existsWithin(hierarchy, HTTP_PROXY_POLICY_IDENTIFIER)
+        || existsWithinConfig(hierarchy)
         || existsWithinRootErrorHandler(componentModel, hierarchy)
         || existsWithinSubflow(hierarchy);
+  }
+
+  private boolean existsWithinConfig(List<ComponentAst> hierarchy) {
+    return hierarchy.stream().anyMatch(p -> p.getModel(ConfigurationModel.class).isPresent());
   }
 
   private boolean existsWithinRootErrorHandler(ComponentAst componentAst, List<ComponentAst> hierarchy) {
