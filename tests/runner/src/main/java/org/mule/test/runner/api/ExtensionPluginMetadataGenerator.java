@@ -31,6 +31,7 @@ import org.mule.test.runner.utils.TroubleshootingUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
@@ -144,7 +145,13 @@ class ExtensionPluginMetadataGenerator {
    */
   Class scanForExtensionAnnotatedClasses(Artifact plugin, List<URL> urls) {
     final URL firstURL = urls.stream().findFirst().get();
-    logger.debug("Scanning plugin '{}' for annotated Extension class from {}", plugin, firstURL);
+    logger.warn("Scanning plugin '{}' for annotated Extension class from {}", plugin, firstURL);
+    logger.warn("Available URLS: {}", urls);
+    try {
+      logger.warn("Contents of firstURL: {}", (Object) new File(firstURL.toURI()).listFiles());
+    } catch (URISyntaxException e) {
+      //do nothing
+    }
     ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
     scanner.addIncludeFilter(new AnnotationTypeFilter(Extension.class));
     try (URLClassLoader classLoader = new URLClassLoader(new URL[] {firstURL}, null)) {
