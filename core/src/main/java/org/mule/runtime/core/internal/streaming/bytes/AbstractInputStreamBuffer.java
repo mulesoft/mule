@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.interrupted;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.internal.streaming.AbstractStreamingBuffer;
@@ -15,7 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 
 /**
  * Base class for implementations of {@link InputStreamBuffer}.
@@ -26,10 +29,12 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  */
 public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer implements InputStreamBuffer {
 
-  protected final ByteBufferManager bufferManager;
+  private static final Logger LOGGER = getLogger(AbstractInputStreamBuffer.class);
 
   private final InputStream stream;
-  private boolean streamFullyConsumed = false;
+  protected final ByteBufferManager bufferManager;
+
+  protected boolean streamFullyConsumed = false;
 
   /**
    * Creates a new instance
@@ -88,11 +93,12 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
   protected abstract ByteBuffer doGet(long position, int length);
 
   protected int consumeStream(ByteBuffer buffer) throws IOException {
-    int totalRead = 0;
     final int maxLen = buffer.remaining();
+    final byte[] dest = buffer.array();
+
+    int totalRead = 0;
     int remaining = maxLen;
     int offset = buffer.position();
-    byte[] dest = buffer.array();
 
     while (totalRead < maxLen) {
       try {
@@ -103,7 +109,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
         int read = stream.read(dest, offset, remaining);
 
         if (read == -1) {
-          streamFullyConsumed();
+          streamFullyConsumed = true;
           if (totalRead == 0) {
             return -1;
           } else {
@@ -116,10 +122,22 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
         totalRead += read;
         remaining -= read;
         offset += read;
-      } catch (Throwable t) {
-        System.out.println(">>> MG <<<< : Exception" + ExceptionUtils.getStackTrace(t));
-        System.out.println(">>> MG <<<< : CAUSE" + ExceptionUtils.getStackTrace(t.getCause()));
-        break;
+      } catch (IOException e) {
+        if (!interrupted()) {
+          throw e;
+        }
+
+        currentThread().interrupt();
+        if (LOGGER.isWarnEnabled()) {
+          LOGGER.warn("Thread {} interrupted while reading from stream.", currentThread().getName());
+        }
+
+        if (totalRead == 0 || closed.get()) {
+          streamFullyConsumed = true;
+          return -1;
+        }
+
+        throw e;
       }
     }
 
@@ -137,14 +155,6 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     }
 
     return false;
-  }
-
-  protected boolean isStreamFullyConsumed() {
-    return streamFullyConsumed;
-  }
-
-  protected void streamFullyConsumed() {
-    streamFullyConsumed = true;
   }
 
   protected abstract ByteBuffer copy(long position, int length);
