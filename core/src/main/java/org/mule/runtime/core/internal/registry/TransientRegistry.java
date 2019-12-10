@@ -9,7 +9,9 @@ package org.mule.runtime.core.internal.registry;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_HANDLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -20,6 +22,7 @@ import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.map.RegistryMap;
+import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint;
 import org.mule.runtime.core.privileged.registry.InjectProcessor;
 import org.mule.runtime.core.privileged.registry.ObjectProcessor;
@@ -50,10 +53,14 @@ public abstract class TransientRegistry extends AbstractRegistry {
 
   private void putDefaultEntriesIntoRegistry() {
     Map<String, Object> processors = new HashMap<>();
-    processors.put(OBJECT_MULE_CONTEXT, muleContext);
-    processors.put(OBJECT_REGISTRY, new DefaultRegistry(muleContext));
-    processors.put("_muleContextProcessor", new MuleContextProcessor(muleContext));
-    processors.put("_registryProcessor", new RegistryProcessor(muleContext));
+    if (muleContext != null) {
+      processors.put(OBJECT_MULE_CONTEXT, muleContext);
+      processors.put(OBJECT_REGISTRY, new DefaultRegistry(muleContext));
+      processors.put("_muleContextProcessor", new MuleContextProcessor(muleContext));
+      processors.put("_registryProcessor", new RegistryProcessor(muleContext));
+      processors.put(OBJECT_NOTIFICATION_HANDLER, ((PrivilegedMuleContext) muleContext).getNotificationManager());
+    }
+
     processors.put("_muleLifecycleStateInjectorProcessor", new LifecycleStateInjectorProcessor(getLifecycleManager().getState()));
     processors.put("_muleLifecycleManager", getLifecycleManager());
     registryMap.putAll(processors);

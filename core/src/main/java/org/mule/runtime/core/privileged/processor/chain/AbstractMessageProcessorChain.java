@@ -29,15 +29,15 @@ import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlin
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Operators.lift;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -70,6 +70,7 @@ import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
+
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
@@ -112,6 +113,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private final List<Processor> processors;
   private final ProcessingStrategy processingStrategy;
   private final List<ReactiveInterceptorAdapter> additionalInterceptors = new LinkedList<>();
+
+  @Inject
+  private ServerNotificationHandler serverNotificationHandler;
 
   @Inject
   private InterceptorManager processorInterceptorManager;
@@ -308,8 +312,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private Consumer<CoreEvent> preNotification(Processor processor) {
     return event -> {
       if (((PrivilegedEvent) event).isNotificationsEnabled()) {
-        fireNotification(muleContext.getNotificationManager(), event, processor, null,
-                         MESSAGE_PROCESSOR_PRE_INVOKE);
+        fireNotification(event, processor, null, MESSAGE_PROCESSOR_PRE_INVOKE);
       }
     };
   }
@@ -317,8 +320,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private Consumer<CoreEvent> postNotification(Processor processor) {
     return event -> {
       if (((PrivilegedEvent) event).isNotificationsEnabled()) {
-        fireNotification(muleContext.getNotificationManager(), event, processor, null,
-                         MESSAGE_PROCESSOR_POST_INVOKE);
+        fireNotification(event, processor, null, MESSAGE_PROCESSOR_POST_INVOKE);
 
       }
     };
@@ -328,22 +330,18 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     return exception -> {
       if (exception instanceof MessagingException
           && ((PrivilegedEvent) ((MessagingException) exception).getEvent()).isNotificationsEnabled()) {
-        fireNotification(muleContext.getNotificationManager(), ((MessagingException) exception).getEvent(), processor,
-                         (MessagingException) exception,
+        fireNotification(((MessagingException) exception).getEvent(), processor, (MessagingException) exception,
                          MESSAGE_PROCESSOR_POST_INVOKE);
       }
     };
   }
 
-  private void fireNotification(ServerNotificationManager serverNotificationManager, CoreEvent event, Processor processor,
+  private void fireNotification(CoreEvent event, Processor processor,
                                 MessagingException exceptionThrown, int action) {
-    if (serverNotificationManager != null
-        && serverNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)) {
-
-      if (((Component) processor).getLocation() != null) {
-        serverNotificationManager
-            .fireNotification(createFrom(event, ((Component) processor).getLocation(), (Component) processor,
-                                         exceptionThrown, action));
+    if (serverNotificationHandler != null) {
+      if (processor instanceof Component && ((Component) processor).getLocation() != null) {
+        serverNotificationHandler.fireNotification(createFrom(event, ((Component) processor).getLocation(), (Component) processor,
+                                                              exceptionThrown, action));
       }
     }
   }

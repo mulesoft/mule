@@ -694,8 +694,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     scatterGatherRouter
         .setRoutes(asList(newChain(empty(), getAppendingMP("1")), newChain(empty(), getAppendingMP("2")),
                           newChain(empty(), getAppendingMP("3"))));
-    initialiseIfNeeded(scatterGatherRouter, true, muleContext);
-    scatterGatherRouter.start();
 
     CoreEvent event = getTestEventUsingFlow("0");
     final MessageProcessorChain chain = newChain(empty(), singletonList(scatterGatherRouter));
@@ -902,9 +900,9 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
 
   @Override
   protected CoreEvent process(Processor messageProcessor, CoreEvent event) throws Exception {
-    if (messageProcessor instanceof MuleContextAware) {
-      ((MuleContextAware) messageProcessor).setMuleContext(muleContext);
-    }
+    initialiseIfNeeded(messageProcessor, muleContext);
+    startIfNeeded(messageProcessor);
+
     try {
       return super.process(messageProcessor, event);
     } finally {
