@@ -145,10 +145,10 @@ class ExtensionPluginMetadataGenerator {
    */
   Class scanForExtensionAnnotatedClasses(Artifact plugin, List<URL> urls) {
     final URL firstURL = urls.stream().findFirst().get();
-    logger.info("Scanning plugin '{}' for annotated Extension class from {}", plugin, firstURL);
-    logger.info("Available URLS: {}", urls);
+    logger.warn("Scanning plugin '{}' for annotated Extension class from {}", plugin, firstURL);
+    logger.warn("Available URLS: {}", urls);
     try {
-      logger.info("Contents of firstURL: {}", (Object) new File(firstURL.toURI()).listFiles());
+      logger.warn("Contents of firstURL: {}", (Object) new File(firstURL.toURI()).listFiles());
     } catch (URISyntaxException e) {
       //do nothing
     }
