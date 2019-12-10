@@ -23,6 +23,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -113,6 +114,6 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
 
   @Override
   public Map<String, ValueResolver<? extends Object>> getParameters() {
-    return resolverSet.getResolvers();
+    return Collections.unmodifiableMap(resolverSet.getResolvers());
   }
 }

@@ -5,7 +5,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/some http://www.mulesoft.org/schema/mule/some/current/mule-some.xsd">
 
-    <flow name="main" initialState="stopped">
+    <flow name="salute" initialState="stopped">
         <some:one-required-parameter-resolver-operation >
             <some:awesome-parameter-group someParameter="hello dog!"/>
         </some:one-required-parameter-resolver-operation>

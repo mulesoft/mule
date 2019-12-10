@@ -23,5 +23,10 @@ public interface ParameterValueResolver {
    */
   Object getParameterValue(String parameterName) throws ValueResolvingException;
 
+  /**
+   * @return a map with all the parameter names as keys and their respective {@link ValueResolver}s as values.
+   *
+   * @since 4.2.3
+   */
   Map<String, ValueResolver<? extends Object>> getParameters();
 }

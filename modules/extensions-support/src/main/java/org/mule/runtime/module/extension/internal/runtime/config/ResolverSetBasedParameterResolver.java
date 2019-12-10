@@ -21,6 +21,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -107,6 +108,6 @@ public class ResolverSetBasedParameterResolver implements ParameterValueResolver
 
   @Override
   public Map<String, ValueResolver<? extends Object>> getParameters() {
-    return resolverSet.getResolvers();
+    return Collections.unmodifiableMap(resolverSet.getResolvers());
   }
 }

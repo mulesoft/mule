@@ -22,7 +22,7 @@ public class ParameterGroupTestCase extends AbstractExtensionFunctionalTestCase 
 
   @Test
   public void test() throws Exception {
-    CoreEvent responseEvent = flowRunner("main").withPayload("holis").run();
+    CoreEvent responseEvent = flowRunner("salute").withPayload("whatever").run();
     assertThat(responseEvent.getMessage().getPayload().getValue(), is("hello dog!"));
   }
 }

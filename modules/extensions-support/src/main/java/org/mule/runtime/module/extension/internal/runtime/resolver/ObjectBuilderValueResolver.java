@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -86,7 +86,7 @@ public class ObjectBuilderValueResolver<T> extends AbstractComponent
     if (builder instanceof ParameterValueResolver) {
       return ((ParameterValueResolver) builder).getParameters();
     } else {
-      return new HashMap<>();
+      return Collections.emptyMap();
     }
   }
 }
