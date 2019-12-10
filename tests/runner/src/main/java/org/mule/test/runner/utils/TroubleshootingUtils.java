@@ -9,6 +9,7 @@ package org.mule.test.runner.utils;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.management.ManagementFactory;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
@@ -18,7 +19,10 @@ import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.management.MBeanServer;
 import javax.xml.bind.DatatypeConverter;
+
+import com.sun.management.HotSpotDiagnosticMXBean;
 
 public class TroubleshootingUtils {
 
@@ -27,6 +31,8 @@ public class TroubleshootingUtils {
   }
 
   public static final String PLUGINS_COPIED_FOR_TROUBLESHOOTING_FOLDER = "pluginsCopiedForTroubleshooting";
+  public static final String HEAP_DUMP_FILE_NAME = "heapDump.hprof";
+  public static final String HEAP_DUMP_ONLY_LIVE_FILE_NAME = "heapDumpOnlyLive.hprof";
 
   public static Path getJenkinsWorkspacePath(Path pluginJsonUrl) {
     // The workspace name change from job to job with the form <folder>_<job name>_<branch>. Ex 'Mule-runtime_mule-ee_mule-4.x'
@@ -108,19 +114,47 @@ public class TroubleshootingUtils {
 
   public static void copyPluginToAuxJenkinsFolderForTroubleshooting(Path pluginJsonUrl) throws IOException {
     Path extensionJarPath = getJarPathFromPluginJson(pluginJsonUrl);
-    Path jenkinsTroubleshootingFolderPath =
-        Paths.get(getJenkinsWorkspacePath(pluginJsonUrl).toString(), PLUGINS_COPIED_FOR_TROUBLESHOOTING_FOLDER);
+    Path jenkinsTroubleshootingFolderPath = getJenkinsTroubleshootingFolderPath(pluginJsonUrl);
+
     Path extensionJarTargetPath =
         Paths.get(jenkinsTroubleshootingFolderPath.toString(), extensionJarPath.getFileName().toString());
-
-    if (!jenkinsTroubleshootingFolderPath.toFile().exists()) {
-      Files.createDirectories(jenkinsTroubleshootingFolderPath);
-    }
-
     Files.copy(extensionJarPath, extensionJarTargetPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
   }
 
   public static void copyPluginToAuxJenkinsFolderForTroubleshooting(URL pluginJsonUrl) throws IOException {
     copyPluginToAuxJenkinsFolderForTroubleshooting(Paths.get(getPathStringFromJarURL(pluginJsonUrl)));
+  }
+
+  public static Path getJenkinsTroubleshootingFolderPath(Path pluginJsonUrl) throws IOException {
+    Path jenkinsTroubleshootingFolderPath =
+        Paths.get(getJenkinsWorkspacePath(pluginJsonUrl).toString(), PLUGINS_COPIED_FOR_TROUBLESHOOTING_FOLDER);
+
+    if (!jenkinsTroubleshootingFolderPath.toFile().exists()) {
+      Files.createDirectories(jenkinsTroubleshootingFolderPath);
+    }
+
+    return jenkinsTroubleshootingFolderPath;
+  }
+
+  public static void generateHeapDumpInAuxJenkinsFolder(Path pluginJsonUrl) throws IOException {
+    Path jenkinsTroubleshootingFolderPath = getJenkinsTroubleshootingFolderPath(pluginJsonUrl);
+    dumpHeap(Paths.get(jenkinsTroubleshootingFolderPath.toString(), HEAP_DUMP_FILE_NAME).toString(), false);
+    dumpHeap(Paths.get(jenkinsTroubleshootingFolderPath.toString(), HEAP_DUMP_ONLY_LIVE_FILE_NAME).toString(), true);
+  }
+
+  public static void generateHeapDumpInAuxJenkinsFolder(URL pluginJsonUrl) throws IOException {
+    generateHeapDumpInAuxJenkinsFolder(Paths.get(getPathStringFromJarURL(pluginJsonUrl)));
+  }
+
+  public static void dumpHeap(String filePath, boolean live) throws IOException {
+    if (Files.exists(Paths.get(filePath))) {
+      return;
+    }
+
+    MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+    HotSpotDiagnosticMXBean mxBean = ManagementFactory
+        .newPlatformMXBeanProxy(server, "com.sun.management:type=HotSpotDiagnostic",
+                                HotSpotDiagnosticMXBean.class);
+    mxBean.dumpHeap(filePath, live);
   }
 }
