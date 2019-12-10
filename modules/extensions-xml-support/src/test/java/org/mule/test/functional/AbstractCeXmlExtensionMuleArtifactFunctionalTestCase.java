@@ -12,7 +12,7 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 /**
  * Abstract class to generate an {@link ExtensionModel} from an extension built from an XML file.
  *
- * @since 4.0
+ * @since 4.3
  */
 @ArtifactClassLoaderRunnerConfig(applicationSharedRuntimeLibs = {"org.apache.activemq:activemq-client",
     "org.apache.activemq:activemq-broker", "org.apache.activemq:activemq-kahadb-store", "org.fusesource.hawtbuf:hawtbuf"})
