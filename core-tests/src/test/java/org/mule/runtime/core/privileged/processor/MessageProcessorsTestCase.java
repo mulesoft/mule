@@ -23,6 +23,7 @@ import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasR
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
@@ -35,6 +36,7 @@ import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -56,13 +58,14 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
-import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
+
+import io.qameta.allure.Issue;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SynchronousSink;
@@ -727,7 +730,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   private Processor createChain(ReactiveProcessor processor) throws InitialisationException {
     MessageProcessorChain chain = newChain(Optional.empty(), new ReactiveProcessorToProcessorAdaptor(processor));
-    chain.setMuleContext(muleContext);
+    initialiseIfNeeded(chain, muleContext);
     return chain;
   }
 
