@@ -9,12 +9,10 @@ package org.mule.functional.transformer.simple;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.simple.AbstractRemoveVariablePropertyProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -50,7 +48,6 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
     message = of("");
     event = createTestEvent(message);
 
-    typedValue = new TypedValue<>(EXPRESSION_VALUE, STRING);
     removeVariableProcessor.setMuleContext(muleContext);
   }
 
