@@ -34,7 +34,6 @@ import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import javax.inject.Inject;
 
@@ -81,19 +80,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
     this.policyEventMapper = new PolicyEventMapper(getPolicyId());
     this.notificationHelper = new PolicyNotificationHelper(notificationManager, getPolicyId(), this);
 
-    final Function<CoreEvent, CoreEvent> prepareEvent = policyEventMapper::fromPolicyNext;
-
-    // if current execute-next belongs to a `source` policy
-    if (getLocation().getParts().get(1).getPartIdentifier()
-        .map(tci -> tci.getIdentifier().getName().equals(SOURCE_POLICY_PART_IDENTIFIER))
-        .orElse(false)) {
-      this.onExecuteNextErrorConsumer = new OnExecuteNextErrorConsumer(prepareEvent.andThen(event -> policyEventMapper
-          .onFlowError(event, getPolicyId(), SourcePolicyContext.from(event).getParametersTransformer())),
-                                                                       notificationHelper, getLocation());
-    } else {
-      this.onExecuteNextErrorConsumer =
-          new OnExecuteNextErrorConsumer(prepareEvent, notificationHelper, getLocation());
-    }
+    this.onExecuteNextErrorConsumer = errorConsumer(this.policyEventMapper, this.notificationHelper);
 
     // this chain exists only so that an error handler can be hooked to map the event in the propagated error.
     this.nextDispatchAsChain = buildNewChainWithListOfProcessors(empty(), singletonList(new Processor() {
@@ -114,6 +101,32 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
       }
     }), policyNextErrorHandler());
     initialiseIfNeeded(nextDispatchAsChain, muleContext);
+  }
+
+  private OnExecuteNextErrorConsumer errorConsumer(PolicyEventMapper policyEventMapper,
+                                                   PolicyNotificationHelper notificationHelper) {
+
+    if (isWithinSourcePolicy(getLocation())) {
+      return new OnExecuteNextErrorConsumer(me -> {
+        final CoreEvent event = me.getEvent();
+
+        if (isWithinSourcePolicy(me.getFailingComponent().getLocation())) {
+          return policyEventMapper.fromPolicyNext(event);
+        } else {
+          return policyEventMapper.onFlowError(policyEventMapper.fromPolicyNext(event), getPolicyId(),
+                                               SourcePolicyContext.from(event).getParametersTransformer());
+        }
+      }, notificationHelper, getLocation());
+    } else {
+      return new OnExecuteNextErrorConsumer(me -> policyEventMapper.fromPolicyNext(me.getEvent()), notificationHelper,
+                                            getLocation());
+    }
+  }
+
+  private Boolean isWithinSourcePolicy(final ComponentLocation loc) {
+    return loc.getParts().get(1).getPartIdentifier()
+        .map(tci -> tci.getIdentifier().getName().equals(SOURCE_POLICY_PART_IDENTIFIER))
+        .orElse(false);
   }
 
   @Override

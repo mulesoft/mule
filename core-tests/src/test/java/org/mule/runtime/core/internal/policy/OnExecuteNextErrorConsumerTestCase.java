@@ -46,7 +46,7 @@ public class OnExecuteNextErrorConsumerTestCase extends AbstractMuleTestCase {
     notificationHelper = mock(PolicyNotificationHelper.class);
     location = mock(ComponentLocation.class);
     flowCallStack = mock(DefaultFlowCallStack.class);
-    Function<CoreEvent, CoreEvent> prepareEvent = event -> updatedEvent;
+    Function<MessagingException, CoreEvent> prepareEvent = event -> updatedEvent;
 
     consumer = new OnExecuteNextErrorConsumer(prepareEvent, notificationHelper, location);
   }
