@@ -23,11 +23,11 @@ import java.util.function.Function;
  */
 public class OnExecuteNextErrorConsumer implements Consumer<Throwable> {
 
-  private final Function<CoreEvent, CoreEvent> prepareEvent;
+  private final Function<MessagingException, CoreEvent> prepareEvent;
   private final PolicyNotificationHelper notificationHelper;
   private final ComponentLocation location;
 
-  public OnExecuteNextErrorConsumer(Function<CoreEvent, CoreEvent> prepareEvent,
+  public OnExecuteNextErrorConsumer(Function<MessagingException, CoreEvent> prepareEvent,
                                     PolicyNotificationHelper notificationHelper,
                                     ComponentLocation location) {
     this.prepareEvent = prepareEvent;
@@ -39,7 +39,7 @@ public class OnExecuteNextErrorConsumer implements Consumer<Throwable> {
   public void accept(Throwable error) {
     MessagingException me = (MessagingException) error;
 
-    CoreEvent newEvent = prepareEvent.apply(me.getEvent());
+    CoreEvent newEvent = prepareEvent.apply(me);
 
     me.setProcessedEvent(newEvent);
 

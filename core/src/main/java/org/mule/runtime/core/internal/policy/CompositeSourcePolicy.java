@@ -10,6 +10,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
+import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
@@ -23,7 +24,6 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
@@ -184,7 +184,7 @@ public class CompositeSourcePolicy
           try {
             return policyEventMapper.onFlowFinish(flowExecutionResponse, getParametersTransformer());
           } catch (MessagingException e) {
-            throw Exceptions.propagateWrappingFatal(resolver.orElse(exc -> exc).apply(e));
+            throw propagateWrappingFatal(resolver.orElse(exc -> exc).apply(e));
           }
         });
   }
