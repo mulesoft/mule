@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-public class ModuleCallingOperationsWithinModuleTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
+public class ModuleCallingOperationsWithinModuleTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   private static final String HARDCODED_VALUE = "hardcoded value";
   private static final String SIMPLE_VARIABLE_VALUE = "some food for this operation";

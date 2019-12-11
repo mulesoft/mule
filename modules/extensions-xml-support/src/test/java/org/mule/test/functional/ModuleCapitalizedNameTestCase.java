@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 
 import org.junit.Test;
 
-public class ModuleCapitalizedNameTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
+public class ModuleCapitalizedNameTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Override
   protected String getModulePath() {
