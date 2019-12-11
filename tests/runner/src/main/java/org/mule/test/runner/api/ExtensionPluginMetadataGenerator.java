@@ -169,9 +169,12 @@ class ExtensionPluginMetadataGenerator {
         } catch (ClassNotFoundException e) {
           TroubleshootingUtils.copyPluginToAuxJenkinsFolderForTroubleshooting(firstURL);
           TroubleshootingUtils.generateHeapDumpInAuxJenkinsFolder(firstURL);
+          List<URL> classpath = new ClassPathUrlProvider().getURLs();
+          logger.warn("CLASSPATH URLs:");
+          classpath.forEach(url -> logger.warn(url.toString()));
           throw new IllegalArgumentException("Cannot load Extension class '" + extensionClassName + " obtained from: '" + firstURL
               + "' with MD5 '" + TroubleshootingUtils.getMD5FromFile(firstURL) + "' using classpath: "
-              + new ClassPathUrlProvider().getURLs(), e);
+              + classpath, e);
         }
       }
       logger.debug("No class found annotated with {}", Extension.class.getName());
