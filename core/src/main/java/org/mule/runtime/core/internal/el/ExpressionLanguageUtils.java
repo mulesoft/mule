@@ -20,29 +20,19 @@ import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
-import org.mule.runtime.api.el.ExpressionCompilationException;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
-import org.mule.runtime.api.el.ModuleElementName;
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.api.util.LazyValue;
-
-import java.util.List;
-import java.util.Optional;
 
 public final class ExpressionLanguageUtils {
 
   private static final BindingContext COMPILATION_BINDING_CONTEXT =
       addEventBuindingsToBuilder(getNullEvent(), NULL_BINDING_CONTEXT).build();
 
-  private ExpressionLanguageUtils() {}
+  private ExpressionLanguageUtils() {
+  }
 
   public static CompiledExpression compile(String expression, ExpressionLanguage expressionLanguage) {
-
     return expressionLanguage.compile(expression, COMPILATION_BINDING_CONTEXT);
-    //return new LazyCompiledExpression(expression,
-    //                                  expressionLanguage,
-    //                                  addEventBuindingsToBuilder(getNullEvent(), NULL_BINDING_CONTEXT).build());
   }
 
   public static String sanitize(String expression) {
@@ -67,47 +57,5 @@ public final class ExpressionLanguageUtils {
 
   public static boolean isPayloadExpression(String sanitized) {
     return sanitized.equals(PAYLOAD);
-  }
-
-  private static class LazyCompiledExpression implements CompiledExpressionDecorator {
-
-    private final String expression;
-    private final ExpressionLanguage expressionLanguage;
-    private final BindingContext bindingContext;
-    private final LazyValue<CompiledExpression> delegate;
-
-    private LazyCompiledExpression(String expression, ExpressionLanguage expressionLanguage, BindingContext bindingContext) {
-      this.expression = expression;
-      this.expressionLanguage = expressionLanguage;
-      this.bindingContext = bindingContext;
-      delegate = new LazyValue<>(() -> {
-        try {
-          return this.expressionLanguage.compile(this.expression, this.bindingContext);
-        } catch (ExpressionCompilationException e) {
-          //TODO : handle with backwards comp
-          throw e;
-        }
-      });
-    }
-
-    @Override
-    public String expression() {
-      return expression;
-    }
-
-    @Override
-    public Optional<MediaType> outputType() {
-      return delegate.get().outputType();
-    }
-
-    @Override
-    public List<ModuleElementName> externalDependencies() {
-      return delegate.get().externalDependencies();
-    }
-
-    @Override
-    public CompiledExpression getDelegate() {
-      return delegate.get();
-    }
   }
 }

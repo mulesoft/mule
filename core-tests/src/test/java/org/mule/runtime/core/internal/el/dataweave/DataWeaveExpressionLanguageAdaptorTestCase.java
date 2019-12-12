@@ -7,11 +7,12 @@
 package org.mule.runtime.core.internal.el.dataweave;
 
 import static java.lang.String.format;
+import static java.lang.System.clearProperty;
+import static java.lang.System.setProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.apache.commons.lang3.SystemUtils.FILE_SEPARATOR;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -45,12 +46,15 @@ import static org.mule.runtime.api.el.BindingContextUtils.MESSAGE;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
+import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.BOOLEAN;
 import static org.mule.runtime.api.metadata.DataType.JSON_STRING;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
@@ -58,11 +62,14 @@ import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
+import org.mule.runtime.api.el.ExpressionCompilationException;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -81,14 +88,12 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
 import org.mule.runtime.core.internal.el.ExpressionLanguageSessionAdaptor;
+import org.mule.runtime.core.internal.el.IllegalCompiledExpression;
 import org.mule.runtime.core.internal.message.BaseAttributes;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 
 import java.io.IOException;
 import java.lang.ref.PhantomReference;
@@ -101,6 +106,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.namespace.QName;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -364,7 +371,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void noSequenceSizeItemSequenceInfoBinding() throws Exception {
     CoreEvent event = spy(testEvent());
-    when(event.getItemSequenceInfo()).thenReturn(of(ItemSequenceInfo.of(43)));
+    when(event.getItemSequenceInfo()).thenReturn(Optional.of(ItemSequenceInfo.of(43)));
     TypedValue result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO + ".position", event, BindingContext.builder().build());
     assertThat(result.getValue(), is(43));
     result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO + ".sequenceSize", event, BindingContext.builder().build());
@@ -374,7 +381,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void itemSequenceInfoBinding() throws Exception {
     CoreEvent event = spy(testEvent());
-    when(event.getItemSequenceInfo()).thenReturn(of(ItemSequenceInfo.of(43, 100)));
+    when(event.getItemSequenceInfo()).thenReturn(Optional.of(ItemSequenceInfo.of(43, 100)));
     TypedValue result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO + ".position", event, BindingContext.builder().build());
     assertThat(result.getValue(), is(43));
     result = expressionLanguage.evaluate(ITEM_SEQUENCE_INFO + ".sequenceSize", event, BindingContext.builder().build());
@@ -386,7 +393,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     CoreEvent event = spy(testEvent());
     Authentication authentication =
         new DefaultMuleAuthentication(new DefaultMuleCredentials("username", "password".toCharArray()));
-    when(event.getAuthentication()).thenReturn(of(authentication));
+    when(event.getAuthentication()).thenReturn(Optional.of(authentication));
     TypedValue result = expressionLanguage.evaluate(AUTHENTICATION, event, BindingContext.builder().build());
     assertThat(result.getValue(), is(instanceOf(Authentication.class)));
     assertThat(result.getValue(), is(authentication));
@@ -403,7 +410,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void accessRegistryBean() throws MuleException {
     CoreEvent event = testEvent();
-    when(registry.lookupByName("myBean")).thenReturn(of(new MyBean("DataWeave")));
+    when(registry.lookupByName("myBean")).thenReturn(Optional.of(new MyBean("DataWeave")));
     TypedValue evaluate = expressionLanguage.evaluate("app.registry.myBean.name", event, BindingContext.builder().build());
     assertThat(evaluate.getValue(), is("DataWeave"));
   }
@@ -411,7 +418,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void accessRegistryAnnotatedBean() throws MuleException {
     CoreEvent event = testEvent();
-    when(registry.lookupByName("myBean")).thenReturn(of(new MyAnnotatedBean("DataWeave")));
+    when(registry.lookupByName("myBean")).thenReturn(Optional.of(new MyAnnotatedBean("DataWeave")));
     TypedValue evaluate = expressionLanguage.evaluate("app.registry.myBean", fromType(MyBean.class), event,
                                                       fromSingleComponent("flow"), BindingContext.builder().build(), false);
     assertThat(evaluate.getValue(), is(instanceOf(MyAnnotatedBean.class)));
@@ -423,7 +430,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
     MyBean annotatedMyBean = (MyBean) addAnnotationsToClass(MyBean.class).newInstance();
     annotatedMyBean.setName("DataWeave");
-    when(registry.lookupByName("myBean")).thenReturn(of(annotatedMyBean));
+    when(registry.lookupByName("myBean")).thenReturn(Optional.of(annotatedMyBean));
     TypedValue evaluate = expressionLanguage.evaluate("app.registry.myBean", fromType(MyBean.class), event,
                                                       fromSingleComponent("flow"), BindingContext.builder().build(), false);
     assertThat(evaluate.getValue(), is(instanceOf(MyBean.class)));
@@ -432,7 +439,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void accessServerFileSeparator() throws MuleException {
     CoreEvent event = testEvent();
-    when(registry.lookupByName("myBean")).thenReturn(of(new MyBean("DataWeave")));
+    when(registry.lookupByName("myBean")).thenReturn(Optional.of(new MyBean("DataWeave")));
     TypedValue evaluate = expressionLanguage.evaluate("server.fileSeparator", event, BindingContext.builder().build());
     assertThat(evaluate.getValue(), is(FILE_SEPARATOR));
   }
@@ -440,7 +447,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void accessMuleVersion() throws MuleException {
     CoreEvent event = testEvent();
-    when(registry.lookupByName("myBean")).thenReturn(of(new MyBean("DataWeave")));
+    when(registry.lookupByName("myBean")).thenReturn(Optional.of(new MyBean("DataWeave")));
     TypedValue evaluate = expressionLanguage.evaluate("mule.version", event, BindingContext.builder().build());
     assertThat(evaluate.getValue(), is(MuleManifest.getProductVersion()));
   }
@@ -619,6 +626,34 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     BindingContext bindingContext = eventWithJsonPayload.asBindingContext();
     ExpressionLanguageSessionAdaptor session = expressionLanguage.openSession(TEST_CONNECTOR_LOCATION, null, bindingContext);
     assertThat(session.evaluate("payload", STRING).getValue(), is("string"));
+  }
+
+  @Test
+  public void compilationExceptionDoesntPropagate() {
+    CompiledExpression compiled = expressionLanguage.compile("#[ble]", getTargetBindingContext(Message.of("")));
+    assertThat(compiled, is(instanceOf(IllegalCompiledExpression.class)));
+  }
+
+  @Test
+  public void compilationExceptionPropagates() {
+    setProperty(MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT, "true");
+    expectedEx.expect(ExpressionCompilationException.class);
+    try {
+      expressionLanguage.compile("#[ble]", getTargetBindingContext(Message.of("")));
+    } finally {
+      clearProperty(MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT);
+    }
+  }
+
+  @Test
+  public void evaluateInvalidCompiledExpression() throws MuleException {
+    ExpressionCompilationException e = new ExpressionCompilationException(createStaticMessage("oopsy"));
+    expectedEx.expect(is(sameInstance(e)));
+
+    CompiledExpression compiled = new IllegalCompiledExpression("#[ble]", e);
+    try (ExpressionLanguageSessionAdaptor session = expressionLanguage.openSession(TEST_CONNECTOR_LOCATION, testEvent(), NULL_BINDING_CONTEXT)) {
+      session.evaluate(compiled);
+    }
   }
 
   private CoreEvent getEventWithError(Optional<Error> error) {

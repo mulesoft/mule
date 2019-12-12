@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.core.internal.el.dataweave;
 
+import static java.lang.System.getProperty;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBuindingsToBuilder;
 import static org.mule.runtime.api.el.BindingContextUtils.addFlowNameBindingsToBuilder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvaluationFailed;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isPayloadExpression;
@@ -22,6 +24,7 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.BindingContext.Builder;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
+import org.mule.runtime.api.el.ExpressionCompilationException;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ExpressionLanguageConfiguration;
@@ -35,6 +38,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.el.DefaultBindingContextBuilder;
 import org.mule.runtime.core.internal.el.ExpressionLanguageSessionAdaptor;
 import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
+import org.mule.runtime.core.internal.el.IllegalCompiledExpression;
 import org.mule.runtime.core.internal.el.context.MuleInstanceContext;
 import org.mule.runtime.core.internal.el.context.ServerContext;
 
@@ -136,7 +140,18 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
 
   @Override
   public CompiledExpression compile(String expression, BindingContext bindingContext) {
-    return expressionExecutor.compile(sanitize(expression), bindingContext);
+    try {
+      return expressionExecutor.compile(sanitize(expression), bindingContext);
+    } catch (ExpressionCompilationException e) {
+      if (badExpressionsFailDeployment()) {
+        throw e;
+      }
+      return new IllegalCompiledExpression(expression, e);
+    }
+  }
+
+  private boolean badExpressionsFailDeployment() {
+    return getProperty(MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT) != null;
   }
 
   /**
@@ -274,6 +289,14 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
         return session.split(sanitize(expression));
       }
 
+      private RuntimeException handledException(CompiledExpression expression, Exception e) {
+        if (expression instanceof IllegalCompiledExpression) {
+          return ((IllegalCompiledExpression) expression).getCompilationException();
+        }
+
+        return new ExpressionRuntimeException(createStaticMessage(e.getMessage()), e);
+      }
+
       @Override
       public TypedValue<?> evaluate(CompiledExpression expression) throws ExpressionExecutionException {
         if (isPayloadExpression(expression.expression())) {
@@ -281,9 +304,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
         }
         try {
           return session.evaluate(expression);
-          //return session.evaluate(unwrap(expression));
         } catch (Exception e) {
-          throw new ExpressionRuntimeException(createStaticMessage(e.getMessage()), e);
+          throw handledException(expression, e);
         }
       }
 
@@ -297,9 +319,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
 
         try {
           return session.evaluate(expression, expectedOutputType);
-          //return session.evaluate(unwrap(expression), expectedOutputType);
         } catch (Exception e) {
-          throw new ExpressionRuntimeException(createStaticMessage(e.getMessage()), e);
+          throw handledException(expression, e);
         }
       }
 
@@ -311,9 +332,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
 
         try {
           return session.evaluate(expression, timeout);
-          //return session.evaluate(unwrap(expression), timeout);
         } catch (Exception e) {
-          throw new ExpressionRuntimeException(createStaticMessage(e.getMessage()), e);
+          throw handledException(expression, e);
         }
       }
 
@@ -321,9 +341,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       public TypedValue<?> evaluateLogExpression(CompiledExpression expression) throws ExpressionExecutionException {
         try {
           return session.evaluateLogExpression(expression);
-          //return session.evaluateLogExpression(unwrap(expression));
         } catch (Exception e) {
-          throw new ExpressionRuntimeException(createStaticMessage(e.getMessage()), e);
+          throw handledException(expression, e);
         }
       }
 
@@ -331,9 +350,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       public Iterator<TypedValue<?>> split(CompiledExpression expression) {
         try {
           return session.split(expression);
-          //return session.split(unwrap(expression));
         } catch (Exception e) {
-          throw new ExpressionRuntimeException(createStaticMessage(e.getMessage()), e);
+          throw handledException(expression, e);
         }
       }
 
