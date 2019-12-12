@@ -112,6 +112,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -463,7 +464,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
           return targetValue;
         }
         return new ErrorMapping(errorTypeMatcher, targetValue);
-      }).filter(entry -> entry != null).collect(toList()), componentModel);
+      }).filter(Objects::nonNull).collect(toList()), componentModel);
     }
   }
 
