@@ -39,6 +39,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
@@ -55,7 +56,6 @@ import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
-import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.Pair;
@@ -179,6 +179,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   protected List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
   private org.mule.runtime.core.internal.registry.Registry originalRegistry;
   private final ExtensionManager extensionManager;
+  private boolean disableXmlValidations;
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -202,13 +203,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              List<ClassLoader> pluginsClassLoaders,
                              Optional<ConfigurationProperties> parentConfigurationProperties,
                              boolean disableXmlValidations,
-                             ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider,
-                             LockFactory runtimeLockFactory)
+                             ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider)
       throws BeansException {
     this(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
          parentConfigurationProperties, artifactProperties,
          artifactType, pluginsClassLoaders, disableXmlValidations,
-         runtimeComponentBuildingDefinitionProvider, runtimeLockFactory);
+         runtimeComponentBuildingDefinitionProvider);
   }
 
   public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
@@ -216,8 +216,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              Optional<ConfigurationProperties> parentConfigurationProperties,
                              Map<String, String> artifactProperties, ArtifactType artifactType,
                              List<ClassLoader> pluginsClassLoaders, boolean disableXmlValidations,
-                             ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider,
-                             LockFactory runtimeLockFactory) {
+                             ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
     this.muleContext = (MuleContextWithRegistry) muleContext;
     this.artifactConfigResources = artifactConfigResources;
@@ -226,6 +225,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     this.artifactType = artifactType;
     this.artifactDeclaration = artifactDeclaration;
     this.parentConfigurationProperties = parentConfigurationProperties;
+    this.disableXmlValidations = disableXmlValidations;
     this.xmlConfigurationDocumentLoader = disableXmlValidations ? noValidationDocumentLoader() : schemaValidatingDocumentLoader();
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
     this.resourceLocator = new DefaultResourceLocator();
@@ -331,7 +331,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     beanFactory.setBeanExpressionResolver(null);
 
     registerEditors(beanFactory);
-    registerErrorTypes();
 
     registerAnnotationConfigProcessors((BeanDefinitionRegistry) beanFactory, beanFactory);
 
@@ -419,10 +418,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   @Override
   protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
+    registerErrorTypes();
     createApplicationComponents(beanFactory, applicationModel, true);
   }
 
-  private void registerErrorTypes() {
+  protected void registerErrorTypes() {
     Set<String> syntheticErrorNamespaces = new HashSet<>();
 
     applicationModel.executeOnEveryMuleComponentTree(cm -> {
@@ -458,19 +458,27 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
             .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source)));
 
         ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorType);
-        ErrorType targetValue = resolveErrorType(parameters.get(TARGET_TYPE), syntheticErrorNamespaces);
+        ErrorType targetValue = resolveErrorType(parameters.get(TARGET_TYPE), syntheticErrorNamespaces, !disableXmlValidations);
+        if (targetValue == null) {
+          return targetValue;
+        }
         return new ErrorMapping(errorTypeMatcher, targetValue);
-      }).collect(toList()), componentModel);
+      }).filter(entry -> entry != null).collect(toList()), componentModel);
     }
   }
 
   private void processRaiseError(ComponentModel componentModel, Set<String> syntheticErrorNamespaces) {
     if (componentModel.getIdentifier().equals(RAISE_ERROR_IDENTIFIER)) {
-      resolveErrorType(componentModel.getRawParameters().get("type"), syntheticErrorNamespaces);
+      String representation = componentModel.getRawParameters().get("type");
+      if (isEmpty(representation) && disableXmlValidations) {
+        // We can just ignore this as we should allow an empty value here
+        return;
+      }
+      resolveErrorType(representation, syntheticErrorNamespaces, !disableXmlValidations);
     }
   }
 
-  private ErrorType resolveErrorType(String representation, Set<String> syntheticErrorNamespaces) {
+  private ErrorType resolveErrorType(String representation, Set<String> syntheticErrorNamespaces, boolean checkErrorTypes) {
     int separator = representation.indexOf(":");
     String namespace;
     String identifier;
@@ -486,9 +494,13 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
     Optional<ErrorType> optionalErrorType = errorTypeRepository.lookupErrorType(errorIdentifier);
     if (CORE_ERROR_NS.equals(namespace)) {
-      return optionalErrorType
-          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("There's no MULE error named '%s'.",
-                                                                                 identifier))));
+      if (checkErrorTypes) {
+        return optionalErrorType
+            .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("There's no MULE error named '%s'.",
+                                                                                   identifier))));
+      }
+      return optionalErrorType.orElse(null);
+
     } else if (errorTypeRepository.getErrorNamespaces().contains(namespace) && !syntheticErrorNamespaces.contains(namespace)) {
       throw new MuleRuntimeException(createStaticMessage(format("Cannot use error type '%s:%s': namespace already exists.",
                                                                 namespace, identifier)));
