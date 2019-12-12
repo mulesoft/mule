@@ -92,8 +92,8 @@ public class IdempotentMessageValidator extends AbstractComponent
     // Check if OS was properly configured
     if (store != null && privateStore != null) {
       throw new InitialisationException(
-          createStaticMessage("Ambiguous definition of object store, both reference and private were configured"),
-          this);
+                                        createStaticMessage("Ambiguous definition of object store, both reference and private were configured"),
+                                        this);
     }
     if (store == null) {
       if (privateStore == null) { // If no object store was defined, create one
@@ -204,8 +204,8 @@ public class IdempotentMessageValidator extends AbstractComponent
       return !store.contains(id);
     } catch (MuleException e) {
       LOGGER.error("Exception attempting to determine idempotency of incoming message for " + getLocation().getRootContainerName()
-                       + " from the connector "
-                       + event.getContext().getOriginatingLocation().getComponentIdentifier().getIdentifier().getNamespace(), e);
+          + " from the connector "
+          + event.getContext().getOriginatingLocation().getComponentIdentifier().getIdentifier().getNamespace(), e);
       return false;
     }
   }

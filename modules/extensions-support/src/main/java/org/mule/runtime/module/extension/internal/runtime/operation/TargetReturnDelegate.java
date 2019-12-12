@@ -56,11 +56,12 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
 
   @Override
   public CoreEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
-    try (ExpressionLanguageSession session = expressionManager.openSession(getTargetBindingContext(toMessage(value, operationContext)))) {
+    try (ExpressionLanguageSession session =
+        expressionManager.openSession(getTargetBindingContext(toMessage(value, operationContext)))) {
       TypedValue result = session.evaluate(targetValue);
       return CoreEvent.builder(operationContext.getEvent())
           .securityContext(operationContext.getSecurityContext())
-          .addVariable(this.target, result.getValue(), result.getDataType())
+          .addVariable(target, result.getValue(), result.getDataType())
           .build();
     }
   }

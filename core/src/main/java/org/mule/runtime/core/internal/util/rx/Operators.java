@@ -29,8 +29,7 @@ import reactor.core.publisher.SynchronousSink;
  */
 public final class Operators {
 
-  private Operators() {
-  }
+  private Operators() {}
 
   /**
    * Custom function to be used with {@link reactor.core.publisher.Flux#handle(BiConsumer)} when a map function may return
@@ -115,8 +114,7 @@ public final class Operators {
     }
 
     @Override
-    public void onError(Throwable t) {
-    }
+    public void onError(Throwable t) {}
 
     @Override
     public void onComplete() {
