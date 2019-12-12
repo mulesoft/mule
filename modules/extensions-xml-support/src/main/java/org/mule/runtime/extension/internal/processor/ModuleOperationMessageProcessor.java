@@ -19,7 +19,6 @@ import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpa
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
-import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.withSession;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErrorMappings;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
@@ -37,6 +36,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -147,7 +147,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
    * To properly feed the {@link ExpressionManager#evaluate(String, DataType, BindingContext, CoreEvent)} we need to store the
    * {@link MetadataType} per parameter, so that the {@link DataType} can be generated.
    *
-   * @param parameters list of parameters taken from the XML
+   * @param parameters      list of parameters taken from the XML
    * @param parameterModels collection of elements taken from the matching {@link ExtensionModel}
    * @return a collection of parameters to be later consumed in {@link #getEvaluatedValue(CoreEvent, String, MetadataType)}
    */
@@ -288,10 +288,10 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   private CoreEvent createNewEventFromJustMessage(CoreEvent request, CoreEvent response) {
     final CoreEvent.Builder builder = CoreEvent.builder(request);
     if (target.isPresent()) {
-      TypedValue result = withSession(expressionManager,
-                                      getTargetBindingContext(response.getMessage()),
-                                      session -> session.evaluate(targetValueExpression));
-      builder.addVariable(target.get(), result.getValue(), result.getDataType());
+      try (ExpressionLanguageSession session = expressionManager.openSession(getTargetBindingContext(response.getMessage()))) {
+        TypedValue result = session.evaluate(targetValueExpression);
+        builder.addVariable(target.get(), result.getValue(), result.getDataType());
+      }
     } else {
       builder.message(builder(response.getMessage()).build());
     }

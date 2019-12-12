@@ -8,10 +8,10 @@ package org.mule.runtime.core.internal.util.rx;
 
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
-import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.withSession;
 
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionLanguage;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -29,7 +29,8 @@ import reactor.core.publisher.SynchronousSink;
  */
 public final class Operators {
 
-  private Operators() {}
+  private Operators() {
+  }
 
   /**
    * Custom function to be used with {@link reactor.core.publisher.Flux#handle(BiConsumer)} when a map function may return
@@ -71,23 +72,21 @@ public final class Operators {
   }
 
 
-  public static Function<CoreEvent, CoreEvent> outputToTarget(CoreEvent originalEvent, String target,
-                                                              CompiledExpression targetValueExpression,
-                                                              ExpressionLanguage expressionLanguage) {
-    return result -> {
-      if (target != null) {
-        return withSession(expressionLanguage,
-                           getTargetBindingContext(result.getMessage()),
-                           session -> {
-                             TypedValue targetValue = session.evaluate(targetValueExpression);
-                             return builder(originalEvent)
-                                 .addVariable(target, targetValue.getValue(), targetValue.getDataType())
-                                 .build();
-                           });
-      } else {
-        return result;
+  public static CoreEvent outputToTarget(CoreEvent originalEvent,
+                                         CoreEvent result,
+                                         String target,
+                                         CompiledExpression targetValueExpression,
+                                         ExpressionLanguage expressionLanguage) {
+    if (target != null) {
+      try (ExpressionLanguageSession session = expressionLanguage.openSession(getTargetBindingContext(result.getMessage()))) {
+        TypedValue targetValue = session.evaluate(targetValueExpression);
+        return builder(originalEvent)
+            .addVariable(target, targetValue.getValue(), targetValue.getDataType())
+            .build();
       }
-    };
+    } else {
+      return result;
+    }
   }
 
   /**
@@ -116,7 +115,8 @@ public final class Operators {
     }
 
     @Override
-    public void onError(Throwable t) {}
+    public void onError(Throwable t) {
+    }
 
     @Override
     public void onComplete() {

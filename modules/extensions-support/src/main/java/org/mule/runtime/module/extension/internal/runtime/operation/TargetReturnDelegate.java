@@ -8,9 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.withSession;
 
 import org.mule.runtime.api.el.CompiledExpression;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -56,13 +56,12 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
 
   @Override
   public CoreEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
-    TypedValue result = withSession(expressionManager,
-                                    getTargetBindingContext(toMessage(value, operationContext)),
-                                    session -> session.evaluate(targetValue));
-
-    return CoreEvent.builder(operationContext.getEvent())
-        .securityContext(operationContext.getSecurityContext())
-        .addVariable(this.target, result.getValue(), result.getDataType())
-        .build();
+    try (ExpressionLanguageSession session = expressionManager.openSession(getTargetBindingContext(toMessage(value, operationContext)))) {
+      TypedValue result = session.evaluate(targetValue);
+      return CoreEvent.builder(operationContext.getEvent())
+          .securityContext(operationContext.getSecurityContext())
+          .addVariable(this.target, result.getValue(), result.getDataType())
+          .build();
+    }
   }
 }

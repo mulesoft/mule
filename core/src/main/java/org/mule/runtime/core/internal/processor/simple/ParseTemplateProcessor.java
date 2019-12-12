@@ -126,8 +126,8 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
         return CoreEvent.builder(event).addVariable(target, resultMessage).build();
       } else { //typeValue was defined by the user
         if (KEEP_TYPE_TARGET_AND_TARGET_VAR) {
-          return outputToTarget(event, target, targetValueExpression, muleContext.getExpressionManager())
-              .apply(CoreEvent.builder(event).message(resultMessage).build());
+          CoreEvent resultEvent = CoreEvent.builder(event).message(resultMessage).build();
+          return outputToTarget(event, resultEvent, target, targetValueExpression, muleContext.getExpressionManager());
         } else {
           return CoreEvent.builder(event).addVariable(target,
                                                       muleContext.getExpressionManager()

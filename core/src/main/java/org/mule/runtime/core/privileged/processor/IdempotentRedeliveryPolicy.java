@@ -20,12 +20,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
-import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.withSession;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.el.CompiledExpression;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
@@ -287,9 +286,9 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   }
 
   private String getIdForEvent(CoreEvent event) {
-    return withSession(expressionManager,
-                       event.asBindingContext(),
-                       s -> (String) s.evaluate(compiledIdExpresion, STRING).getValue());
+    try (ExpressionLanguageSession session = expressionManager.openSession(event.asBindingContext())) {
+      return (String) session.evaluate(compiledIdExpresion, STRING).getValue();
+    }
   }
 
   public boolean isUseSecureHash() {

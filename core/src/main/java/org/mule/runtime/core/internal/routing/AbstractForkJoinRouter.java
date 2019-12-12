@@ -80,7 +80,7 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
     return from(publisher)
         .doOnNext(onEvent())
         .flatMap(event -> from(forkJoinStrategy.forkJoin(event, getRoutingPairs(event)))
-            .map(outputToTarget(event, target, targetValueExpression, expressionManager))
+            .map(result -> outputToTarget(event, result, target, targetValueExpression, expressionManager))
             // Ensure reference to current event is maintained in MessagingException. Reactor error handling does not
             // maintain this with flatMap and we can't use ThreadLocal event as that will have potentially been overwritten by
             // route chains.

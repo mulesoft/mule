@@ -14,14 +14,12 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionCompilationException;
 import org.mule.runtime.api.el.ExpressionLanguage;
-import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ModuleElementName;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.util.LazyValue;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 public final class ExpressionLanguageUtils {
 
@@ -37,13 +35,6 @@ public final class ExpressionLanguageUtils {
     //                                  addEventBuindingsToBuilder(getNullEvent(), NULL_BINDING_CONTEXT).build());
   }
 
-  public static <T> T withSession(ExpressionLanguage expressionLanguage,
-                                  BindingContext bindingContext,
-                                  Function<ExpressionLanguageSession, T> func) {
-    try (ExpressionLanguageSession session = expressionLanguage.openSession(bindingContext)) {
-      return func.apply(session);
-    }
-  }
 
   private static class LazyCompiledExpression implements CompiledExpressionDecorator {
 

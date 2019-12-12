@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.soap.internal.runtime.operation;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.api.metadata.DataType.XML_STRING;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
-import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.withSession;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.ATTACHMENTS_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.BODY_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.HEADERS_PARAM;
@@ -20,6 +19,7 @@ import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeO
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -157,7 +157,9 @@ public final class SoapOperationExecutor implements CompletableComponentExecutor
   private Object evaluateHeaders(InputStream headers) {
     String hs = IOUtils.toString(headers);
     BindingContext context = BindingContext.builder().addBinding("payload", new TypedValue<>(hs, XML_STRING)).build();
-    return withSession(expressionExecutor, context, session -> session.evaluate(headersExpression).getValue());
+    try (ExpressionLanguageSession session = expressionExecutor.openSession(context)) {
+      return session.evaluate(headersExpression).getValue();
+    }
   }
 
   private Map<String, SoapAttachment> toSoapAttachments(Map<String, TypedValue<?>> attachments)
