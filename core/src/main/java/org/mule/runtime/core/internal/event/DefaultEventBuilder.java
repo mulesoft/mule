@@ -152,6 +152,10 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   @Override
   public DefaultEventBuilder addVariable(String key, Object value) {
+    if (value instanceof TypedValue) {
+      return (DefaultEventBuilder) addVariable(key, (TypedValue) value);
+    }
+
     initVariables();
 
     flowVariables.put(key, new TypedValue<>(value, DataType.fromObject(value)));
