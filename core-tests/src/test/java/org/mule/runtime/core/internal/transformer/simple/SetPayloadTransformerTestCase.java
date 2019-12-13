@@ -68,6 +68,6 @@ public class SetPayloadTransformerTestCase extends AbstractMuleContextTestCase {
     setPayloadTransformer.initialise();
 
     Object response = setPayloadTransformer.transformMessage(event, UTF_8);
-    assertThat(response, is(PLAIN_TEXT));
+    assertThat(response, is(PLAIN_TEXT.getValue()));
   }
 }
