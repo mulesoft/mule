@@ -14,7 +14,6 @@ import static java.util.Optional.ofNullable;
 import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ERROR_HANDLER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
@@ -51,6 +50,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.DefaultExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +61,6 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 import org.reactivestreams.Publisher;
 
 @NoExtend

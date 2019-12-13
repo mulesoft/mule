@@ -2476,7 +2476,7 @@
     <xsd:complexType name="raiseErrorType">
         <xsd:complexContent>
             <xsd:extension base="abstractMessageProcessorType">
-                <xsd:attribute name="type" type="xsd:string" use="required">
+                <xsd:attribute name="type" type="nonBlankString" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             The error type to raise.

@@ -180,21 +180,23 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                          ArtifactDeclaration artifactDeclaration,
                                                          OptionalObjectsController optionalObjectsController) {
     if (enableLazyInit) {
-      return new LazyMuleArtifactContext(muleContext, resolveArtifactConfigResources(), artifactDeclaration,
-                                         optionalObjectsController,
-                                         getArtifactProperties(), artifactType,
-                                         resolveContextArtifactPluginClassLoaders(),
-                                         resolveComponentModelInitializer(),
-                                         resolveParentConfigurationProperties(), disableXmlValidations,
-                                         runtimeComponentBuildingDefinitionsProvider,
-                                         runtimeLockFactory);
+      muleArtifactContext = new LazyMuleArtifactContext(muleContext, resolveArtifactConfigResources(), artifactDeclaration,
+                                                        optionalObjectsController,
+                                                        getArtifactProperties(), artifactType,
+                                                        resolveContextArtifactPluginClassLoaders(),
+                                                        resolveComponentModelInitializer(),
+                                                        resolveParentConfigurationProperties(), disableXmlValidations,
+                                                        runtimeComponentBuildingDefinitionsProvider,
+                                                        runtimeLockFactory);
+    } else {
+      muleArtifactContext =
+          new MuleArtifactContext(muleContext, resolveArtifactConfigResources(), artifactDeclaration, optionalObjectsController,
+                                  getArtifactProperties(), artifactType, resolveContextArtifactPluginClassLoaders(),
+                                  resolveParentConfigurationProperties(), disableXmlValidations,
+                                  runtimeComponentBuildingDefinitionsProvider);
     }
 
-    return new MuleArtifactContext(muleContext, resolveArtifactConfigResources(), artifactDeclaration, optionalObjectsController,
-                                   getArtifactProperties(), artifactType, resolveContextArtifactPluginClassLoaders(),
-                                   resolveParentConfigurationProperties(), disableXmlValidations,
-                                   runtimeComponentBuildingDefinitionsProvider,
-                                   runtimeLockFactory);
+    return muleArtifactContext;
   }
 
   private ConfigResource[] resolveArtifactConfigResources() {
