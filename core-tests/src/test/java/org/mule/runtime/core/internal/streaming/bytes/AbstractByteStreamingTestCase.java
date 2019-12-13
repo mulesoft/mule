@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
+import static java.lang.Math.min;
 import static java.lang.String.format;
+import static java.lang.System.arraycopy;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
@@ -34,6 +37,14 @@ public abstract class AbstractByteStreamingTestCase extends AbstractMuleTestCase
 
   protected String toString(byte[] dest) throws IOException {
     return IOUtils.toString(dest, Charset.defaultCharset().name());
+  }
+
+  protected String toString(byte[] dest, int offset, int limit) throws IOException {
+    int len = min(dest.length - offset, limit);
+    byte[] buffer = new byte[len];
+    arraycopy(dest, offset, buffer, 0, len);
+
+    return toString(buffer);
   }
 
   protected String toString(InputStream inputStream) throws IOException {
