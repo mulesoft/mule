@@ -98,7 +98,7 @@ public class ObjectBasedParameterValueResolver implements ParameterValueResolver
       LOGGER.debug("An error occurred trying to obtain the parameters.");
       return Collections.emptyMap();
     }
-    return parameters;
+    return Collections.unmodifiableMap(parameters);
   }
 
   private void addFields(List<Field> fields, HashMap<String, ValueResolver<? extends Object>> parameters)

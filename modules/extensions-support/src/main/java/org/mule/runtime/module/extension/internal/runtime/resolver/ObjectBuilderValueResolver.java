@@ -84,7 +84,7 @@ public class ObjectBuilderValueResolver<T> extends AbstractComponent
   @Override
   public Map<String, ValueResolver<? extends Object>> getParameters() {
     if (builder instanceof ParameterValueResolver) {
-      return ((ParameterValueResolver) builder).getParameters();
+      return Collections.unmodifiableMap(((ParameterValueResolver) builder).getParameters());
     } else {
       return Collections.emptyMap();
     }
