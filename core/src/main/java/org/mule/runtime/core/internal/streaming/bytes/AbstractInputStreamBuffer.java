@@ -100,7 +100,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     int remaining = maxLen;
     int offset = buffer.position();
 
-    while (totalRead < maxLen) {
+    while (remaining > 0) {
       try {
         if (totalRead > 0 && stream.available() < 1) {
           break;
@@ -142,7 +142,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     }
 
     if (totalRead > 0) {
-      buffer.position(buffer.position() + offset);
+      buffer.position(offset);
     }
 
     return totalRead;
