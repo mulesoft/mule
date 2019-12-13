@@ -195,7 +195,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
           new MuleArtifactContext(muleContext, resolveArtifactConfigResources(), artifactDeclaration, optionalObjectsController,
                                   getArtifactProperties(), artifactType, resolveContextArtifactPluginClassLoaders(),
                                   resolveParentConfigurationProperties(), disableXmlValidations,
-                                  runtimeComponentBuildingDefinitionsProvider, runtimeLockFactory);
+                                  runtimeComponentBuildingDefinitionsProvider);
       muleArtifactContext.initialize();
     }
 
