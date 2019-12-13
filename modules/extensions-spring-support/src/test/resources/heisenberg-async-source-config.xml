@@ -135,7 +135,7 @@
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:async-listen-payments>
 
-        <set-payload value="null.a!"/>
+        <set-payload value="#[null.a!]"/>
     </flow>
 
     <flow name="sourceFailsOnSuccessBodyCallsOnErrorAndOnTerminate" initialState="stopped">
@@ -177,7 +177,7 @@
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:async-listen-payments>
 
-        <set-payload value="null.a!"/>
+        <set-payload value="#[null.a!]"/>
     </flow>
 
     <flow name="failureInFlowErrorHandlerCallsOnErrorDirectly" initialState="stopped">
@@ -193,11 +193,11 @@
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:async-listen-payments>
 
-        <set-payload value="null.a!"/>
+        <set-payload value="#[null.a!]"/>
 
         <error-handler>
             <on-error-propagate>
-                <set-payload value="null.a!"/>
+                <set-payload value="#[null.a!]"/>
             </on-error-propagate>
         </error-handler>
     </flow>
@@ -215,7 +215,7 @@
             <heisenberg:error-info knownAddresses="#[null.a!]"/>
         </heisenberg:async-listen-payments>
 
-        <set-payload value="null.a!"/>
+        <set-payload value="#[null.a!]"/>
     </flow>
 
 </mule>

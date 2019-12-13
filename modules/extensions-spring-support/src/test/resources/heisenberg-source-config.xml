@@ -197,7 +197,7 @@
         
         <error-handler>
             <on-error-propagate>
-                <set-payload value="null.a!"/>
+                <set-payload value="#[null.a!]"/>
             </on-error-propagate>
         </error-handler>
     </flow>

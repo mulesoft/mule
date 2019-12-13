@@ -102,7 +102,7 @@
 
     <flow name="exceptionOnCallbacksFailure">
         <heisenberg:exception-on-callbacks>
-            <set-payload value="null.a!"/>
+            <set-payload value="#[null.a!]"/>
         </heisenberg:exception-on-callbacks>
     </flow>
 
