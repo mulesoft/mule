@@ -16,7 +16,7 @@
     </description>
 
     <properties>
-        <activemq.version>5.14.5</activemq.version>
+        <activemq.version>5.15.11</activemq.version>
         <javaxJmsApiVersion>2.0.1</javaxJmsApiVersion>
 
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
