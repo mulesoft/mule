@@ -651,7 +651,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     expectedEx.expect(is(sameInstance(e)));
 
     CompiledExpression compiled = new IllegalCompiledExpression("#[ble]", e);
-    try (ExpressionLanguageSessionAdaptor session = expressionLanguage.openSession(TEST_CONNECTOR_LOCATION, testEvent(), NULL_BINDING_CONTEXT)) {
+    try (ExpressionLanguageSessionAdaptor session =
+        expressionLanguage.openSession(TEST_CONNECTOR_LOCATION, testEvent(), NULL_BINDING_CONTEXT)) {
       session.evaluate(compiled);
     }
   }

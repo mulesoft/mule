@@ -75,10 +75,11 @@ public class MuleExtensionUtils {
    * Creates an empty event for extension initialization purposes
    *
    * @return a new {@link CoreEvent}
+   * @deprecated since 4.3.0. Use {@link NullEventFactory#getNullEvent()} instead
    */
   @Deprecated
   public static CoreEvent getInitialiserEvent() {
-    return NullEventFactory.getNullEvent();
+    return getNullEvent();
   }
 
   /**
@@ -86,6 +87,7 @@ public class MuleExtensionUtils {
    *
    * @param muleContext context on which the event will be associated.
    * @return a new {@link CoreEvent}
+   * @deprecated since 4.3.0. Use {@link NullEventFactory#getNullEvent(MuleContext)} instead
    */
   @Deprecated
   public static CoreEvent getInitialiserEvent(MuleContext muleContext) {

@@ -15,7 +15,7 @@ import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvaluationFailed;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isPayloadExpression;
+import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -93,7 +93,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   @Override
   public TypedValue evaluate(String expression, CoreEvent event, BindingContext context) {
     String sanitized = sanitize(expression);
-    if (isPayloadExpression(sanitized)) {
+    if (isSanitizedPayload(sanitized)) {
       return event.getMessage().getPayload();
     } else {
       BindingContext newContext = bindingContextFor(null, event, context);
@@ -130,7 +130,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
                              ComponentLocation componentLocation,
                              BindingContext context) {
     String sanitized = sanitize(expression);
-    if (isPayloadExpression(sanitized)) {
+    if (isSanitizedPayload(sanitized)) {
       return resolvePayload(event, context);
     } else {
       BindingContext newContext = bindingContextFor(componentLocation, event, context);
@@ -143,14 +143,14 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
     try {
       return expressionExecutor.compile(sanitize(expression), bindingContext);
     } catch (ExpressionCompilationException e) {
-      if (badExpressionsFailDeployment()) {
+      if (badExpressionFailsDeployment()) {
         throw e;
       }
       return new IllegalCompiledExpression(expression, e);
     }
   }
 
-  private boolean badExpressionsFailDeployment() {
+  private boolean badExpressionFailsDeployment() {
     return getProperty(MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT) != null;
   }
 
@@ -240,7 +240,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       @Override
       public TypedValue<?> evaluate(String expression) throws ExpressionRuntimeException {
         String sanitized = sanitize(expression);
-        if (isPayloadExpression(sanitized)) {
+        if (isSanitizedPayload(sanitized)) {
           return resolvePayload(event, context);
         }
 
@@ -254,7 +254,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       @Override
       public TypedValue<?> evaluate(String expression, long timeout) throws ExpressionRuntimeException {
         String sanitized = sanitize(expression);
-        if (isPayloadExpression(sanitized)) {
+        if (isSanitizedPayload(sanitized)) {
           return resolvePayload(event, context);
         }
         try {
@@ -299,7 +299,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
 
       @Override
       public TypedValue<?> evaluate(CompiledExpression expression) throws ExpressionExecutionException {
-        if (isPayloadExpression(expression.expression())) {
+        if (isSanitizedPayload(expression.expression())) {
           return resolvePayload(event, context);
         }
         try {
@@ -312,11 +312,6 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       @Override
       public TypedValue<?> evaluate(CompiledExpression expression, DataType expectedOutputType)
           throws ExpressionExecutionException {
-
-        if (isPayloadExpression(expression.expression())) {
-          return resolvePayload(event, context);
-        }
-
         try {
           return session.evaluate(expression, expectedOutputType);
         } catch (Exception e) {
@@ -326,7 +321,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
 
       @Override
       public TypedValue<?> evaluate(CompiledExpression expression, long timeout) throws ExpressionExecutionException {
-        if (isPayloadExpression(expression.expression())) {
+        if (isSanitizedPayload(expression.expression())) {
           return resolvePayload(event, context);
         }
 

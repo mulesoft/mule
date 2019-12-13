@@ -26,6 +26,13 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+/**
+ * Utility class capable dummy events with dummy context and no values.
+ *
+ * Use cases for this is initialization scenarios which require an event.
+ *
+ * @since 4.3.0
+ */
 public final class NullEventFactory {
 
   private static final String INITIALIZER_EVENT = "InitializerEvent";
@@ -33,7 +40,7 @@ public final class NullEventFactory {
   private NullEventFactory() {}
 
   /**
-   * Creates an empty event for extension initialization purposes
+   * Creates an null event
    *
    * @return a new {@link CoreEvent}
    */
@@ -42,7 +49,7 @@ public final class NullEventFactory {
   }
 
   /**
-   * Creates an empty event for extension initialization purposes
+   * Creates an null
    *
    * @param muleContext context on which the event will be associated.
    * @return a new {@link CoreEvent}

@@ -162,5 +162,4 @@ class DefaultExpressionManagerSession implements ExpressionManagerSession {
       session.get().close();
     }
   }
-
 }

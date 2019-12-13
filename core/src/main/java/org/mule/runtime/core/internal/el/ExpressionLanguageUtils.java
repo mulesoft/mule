@@ -22,19 +22,43 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
+import org.mule.runtime.api.event.Event;
 
+/**
+ * Utilities for using {@link ExpressionLanguage} instances
+ *
+ * @since 4.3.0
+ */
 public final class ExpressionLanguageUtils {
 
   private static final BindingContext COMPILATION_BINDING_CONTEXT =
       addEventBuindingsToBuilder(getNullEvent(), NULL_BINDING_CONTEXT).build();
 
-  private ExpressionLanguageUtils() {
-  }
+  private ExpressionLanguageUtils() {}
 
+  /**
+   * Compiles the given {@code expression} using generic and precalculated {@link BindingContext}.
+   * Said {@link BindingContext} will already have all the usual bindings added by
+   * {@link org.mule.runtime.api.el.BindingContextUtils#addEventBuindingsToBuilder(Event, BindingContext)} plus all the
+   * extension modules and functions.
+   * <p>
+   * If you want to use your own {@link BindingContext} then hit {@link ExpressionLanguage#compile(String, BindingContext)}
+   * directly.
+   *
+   * @param expression         the expression to compile.
+   * @param expressionLanguage the {@link ExpressionLanguage} used for compilation
+   * @return a {@link CompiledExpression}
+   */
   public static CompiledExpression compile(String expression, ExpressionLanguage expressionLanguage) {
     return expressionLanguage.compile(expression, COMPILATION_BINDING_CONTEXT);
   }
 
+  /**
+   * Returns a sanitized version of the given {@code expression}
+   *
+   * @param expression the expression to sanitize
+   * @return the sanitized expression
+   */
   public static String sanitize(String expression) {
     String sanitizedExpression;
     if (expression.startsWith(DEFAULT_EXPRESSION_PREFIX)) {
@@ -55,7 +79,11 @@ public final class ExpressionLanguageUtils {
     return sanitizedExpression;
   }
 
-  public static boolean isPayloadExpression(String sanitized) {
-    return sanitized.equals(PAYLOAD);
+  /**
+   * @param expression the expression to test
+   * @return Whether the given {@code sanitized} is a sanitized version of the {@code payload} expression
+   */
+  public static boolean isSanitizedPayload(String expression) {
+    return PAYLOAD.equals(expression);
   }
 }

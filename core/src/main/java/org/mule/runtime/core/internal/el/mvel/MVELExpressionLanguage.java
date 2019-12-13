@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.internal.el.mvel;
 
+import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.empty;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.api.el.ValidationResult.failure;
 import static org.mule.runtime.api.el.ValidationResult.success;
@@ -52,7 +54,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -240,12 +241,12 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
 
       @Override
       public Optional<MediaType> outputType() {
-        return Optional.empty();
+        return empty();
       }
 
       @Override
       public List<ModuleElementName> externalDependencies() {
-        return Collections.emptyList();
+        return emptyList();
       }
     };
   }

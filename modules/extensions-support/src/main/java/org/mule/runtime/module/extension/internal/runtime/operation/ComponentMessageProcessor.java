@@ -18,7 +18,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
-import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isPayloadExpression;
+import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
@@ -499,7 +499,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
 
   protected ReturnDelegate getTargetReturnDelegate() {
-    if (isPayloadExpression(sanitize(targetValue))) {
+    if (isSanitizedPayload(sanitize(targetValue))) {
       return new PayloadTargetReturnDelegate(target, componentModel, cursorProviderFactory, muleContext);
     }
     return new TargetReturnDelegate(target, targetValue, componentModel, expressionManager, cursorProviderFactory, muleContext);

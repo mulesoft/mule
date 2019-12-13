@@ -23,7 +23,7 @@ public class FlowVarEnricherDataTypePropagator extends AbstractVariableEnricherD
 
   @Override
   protected void addVariable(PrivilegedEvent event, PrivilegedEvent.Builder builder, TypedValue typedValue, String propertyName) {
-    builder.addVariable(propertyName, typedValue.getValue(), typedValue.getDataType());
+    builder.addVariable(propertyName, typedValue);
   }
 
   @Override

@@ -289,8 +289,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
     final CoreEvent.Builder builder = CoreEvent.builder(request);
     if (target.isPresent()) {
       try (ExpressionLanguageSession session = expressionManager.openSession(getTargetBindingContext(response.getMessage()))) {
-        TypedValue result = session.evaluate(targetValueExpression);
-        builder.addVariable(target.get(), result.getValue(), result.getDataType());
+        builder.addVariable(target.get(), session.evaluate(targetValueExpression));
       }
     } else {
       builder.message(builder(response.getMessage()).build());
@@ -316,7 +315,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
           if (isExpression) {
             final TypedValue<?> evaluatedValue =
                 getEvaluatedValue(event, entry.getValue().getFirst(), entry.getValue().getSecond());
-            builder.addVariable(entry.getKey(), evaluatedValue.getValue(), evaluatedValue.getDataType());
+            builder.addVariable(entry.getKey(), evaluatedValue);
           } else {
             builder.addVariable(entry.getKey(), entry.getValue().getFirst());
           }

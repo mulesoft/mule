@@ -11,6 +11,7 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -39,10 +40,10 @@ public interface ExpressionLanguageAdaptor {
   /**
    * Evaluates an expression according to a given {@link BindingContext}, an {@link CoreEvent} and a {@link FlowConstruct}.
    *
-   * @param expression the expression to be executed
-   * @param event the current event being processed
+   * @param expression        the expression to be executed
+   * @param event             the current event being processed
    * @param componentLocation the location of the component where the event is being processed
-   * @param bindingContext the bindings to consider
+   * @param bindingContext    the bindings to consider
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
@@ -53,7 +54,7 @@ public interface ExpressionLanguageAdaptor {
    * Evaluates an expression according to a given {@link BindingContext}.
    *
    * @param expression the expression to be executed
-   * @param event the current event being processed
+   * @param event      the current event being processed
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
@@ -62,10 +63,10 @@ public interface ExpressionLanguageAdaptor {
   /**
    * Evaluates an expression according to a given {@link BindingContext} and outputs .
    *
-   * @param expression the expression to be executed
-   * @param event the current event being processed
+   * @param expression         the expression to be executed
+   * @param event              the current event being processed
    * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value
-   *        type.
+   *                           type.
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
@@ -75,13 +76,13 @@ public interface ExpressionLanguageAdaptor {
   /**
    * Evaluates an expression according to a given {@link BindingContext}, an {@link CoreEvent} and a {@link FlowConstruct}.
    *
-   * @param expression the expression to be executed
+   * @param expression         the expression to be executed
    * @param expectedOutputType the expected output type so that automatic conversion can be performed for the resulting value
-   *        type.
-   * @param event the current event being processed
-   * @param componentLocation the location of the component where the event is being processed
-   * @param context the bindings to consider
-   * @param failOnNull indicates if should fail if the evaluation result is {@code null}
+   *                           type.
+   * @param event              the current event being processed
+   * @param componentLocation  the location of the component where the event is being processed
+   * @param context            the bindings to consider
+   * @param failOnNull         indicates if should fail if the evaluation result is {@code null}
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
@@ -94,10 +95,10 @@ public interface ExpressionLanguageAdaptor {
    * Evaluates an expression according to a given {@link BindingContext} and the global one, doing a best effort to avoid failing
    * when the result value can not be represented in the corresponding format.
    *
-   * @param expression         the EL expression
-   * @param event the current event being processed
+   * @param expression        the EL expression
+   * @param event             the current event being processed
    * @param componentLocation the location of the component where the event is being processed
-   * @param bindingContext            the current dynamic binding context to consider
+   * @param bindingContext    the current dynamic binding context to consider
    * @return the result of the expression plus its type
    * @throws ExpressionExecutionException when an error occurs during evaluation
    */
@@ -117,10 +118,10 @@ public interface ExpressionLanguageAdaptor {
    * Splits using the specified expression and group it with the batch size. If batch size is less or equals to zero then no
    * batching is done. The expression should return a collection of elements.
    *
-   * @param expression the expression to be executed
-   * @param event the current event being processed
+   * @param expression        the expression to be executed
+   * @param event             the current event being processed
    * @param componentLocation the location of the component where the event is being processed
-   * @param bindingContext the bindings to consider
+   * @param bindingContext    the bindings to consider
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
@@ -132,8 +133,8 @@ public interface ExpressionLanguageAdaptor {
    * Splits using the specified expression and group it with the batch size. If batch size is less or equals to zero then no
    * batching is done. The expression should return a collection of elements.
    *
-   * @param expression the expression to be executed
-   * @param event the current event being processed
+   * @param expression     the expression to be executed
+   * @param event          the current event being processed
    * @param bindingContext the bindings to consider
    * @return the result of execution of the expression.
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
@@ -143,5 +144,17 @@ public interface ExpressionLanguageAdaptor {
 
   ExpressionLanguageSessionAdaptor openSession(ComponentLocation componentLocation, CoreEvent event, BindingContext context);
 
+  /**
+   * Compiles the given {@code expression}.
+   * <p>
+   * keep in mind that the {@code bindingContext} is used for compilation only. When evaluated, the compiled expression
+   * <b>WILL NOT</b> be evaluated against those bindings but the ones associated with current
+   * {@link ExpressionLanguageSession}
+   *
+   * @param expression     the expression to compile
+   * @param bindingContext a {@link BindingContext} with example bindings of the values the real expression will need
+   * @return a {@link CompiledExpression}
+   * @since 4.3.0
+   */
   CompiledExpression compile(String expression, BindingContext bindingContext);
 }
