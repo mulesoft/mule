@@ -142,7 +142,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       throws BeansException {
     super(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
           extendArtifactProperties(artifactProperties), artifactType, pluginsClassLoaders, parentConfigurationProperties,
-          disableXmlValidations, runtimeComponentBuildingDefinitionProvider, runtimeLockFactory);
+          disableXmlValidations, runtimeComponentBuildingDefinitionProvider);
+
     // Changes the component locator in order to allow accessing any component by location even when they are prototype
     this.componentLocator = new SpringConfigurationComponentLocator();
     // By default when a lazy context is created none of its components are enabled...
@@ -272,7 +273,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
               muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME);
             }
           } catch (MuleException e) {
-            throw new RuntimeException(e);
+            throw new MuleRuntimeException(e);
           }
         }
       }
@@ -286,7 +287,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                 muleContext.getRegistry().applyLifecycle(object, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
               }
             } catch (MuleException e) {
-              throw new RuntimeException(e);
+              throw new MuleRuntimeException(e);
             }
           }
         } else {
@@ -524,7 +525,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       } catch (Exception e) {
         trackingPostProcessor.stopTracking();
         trackingPostProcessor.intersection(objects.keySet());
-        unregisterBeans(trackingPostProcessor.getBeansTracked());
+        safeUnregisterBean(componentName);
 
         throw new MuleRuntimeException(e);
       }
@@ -583,8 +584,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   @Override
   public void close() {
-    trackingPostProcessor.stopTracking();
-    trackingPostProcessor.reset();
+    if (trackingPostProcessor != null) {
+      trackingPostProcessor.stopTracking();
+      trackingPostProcessor.reset();
+    }
 
     appliedStartedPhase = false;
     applicationComponentLocationsCreated.clear();
@@ -616,6 +619,14 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         throw new MuleRuntimeException(I18nMessageFactory
             .createStaticMessage("There was an error while unregistering component '%s'", beanName), e);
       }
+    }
+  }
+
+  private void safeUnregisterBean(String beanName) {
+    try {
+      unregisterObject(getMuleContext(), beanName);
+    } catch (RegistrationException e) {
+      // Nothing to do...
     }
   }
 

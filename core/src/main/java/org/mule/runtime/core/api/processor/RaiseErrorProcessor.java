@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.core.api.processor;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.TypedException;
@@ -41,7 +45,13 @@ public final class RaiseErrorProcessor extends AbstractComponent implements Proc
 
   @Override
   public void initialise() throws InitialisationException {
-    errorType = muleContext.getErrorTypeRepository().lookupErrorType(buildFromStringRepresentation(typeId)).get();
+    if (isEmpty(typeId)) {
+      throw new InitialisationException(createStaticMessage("type cannot be an empty string or null"), this);
+    }
+
+    ComponentIdentifier errorTypeComponentIdentifier = buildFromStringRepresentation(typeId);
+    errorType = muleContext.getErrorTypeRepository().lookupErrorType(errorTypeComponentIdentifier)
+        .orElseThrow(() -> new InitialisationException(createStaticMessage(format("Could not find error '%s'.", typeId)), this));
     ExtendedExpressionManager expressionManager = muleContext.getExpressionManager();
     descriptionEvaluator.initialize(expressionManager);
   }
