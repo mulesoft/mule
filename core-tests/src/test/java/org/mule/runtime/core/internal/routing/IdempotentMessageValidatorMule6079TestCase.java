@@ -28,6 +28,7 @@ import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.junit.After;
 import org.junit.Test;
 
 public class IdempotentMessageValidatorMule6079TestCase extends AbstractMuleContextTestCase {
@@ -36,6 +37,14 @@ public class IdempotentMessageValidatorMule6079TestCase extends AbstractMuleCont
   private IdempotentMessageValidator validator;
   private AtomicInteger processedEvents = new AtomicInteger(0);
   private Boolean errorHappenedInChildThreads = false;
+
+  @After
+  public void after() throws Exception {
+    if (validator != null) {
+      validator.stop();
+      validator.dispose();
+    }
+  }
 
   /*
    * This test admits two execution paths, note that the implementation of objectStore can lock on the await call of the latch, to
@@ -51,6 +60,7 @@ public class IdempotentMessageValidatorMule6079TestCase extends AbstractMuleCont
     validator.setMuleContext(muleContext);
     validator.setStorePrefix("foo");
     validator.setObjectStore(objectStore);
+    validator.initialise();
 
     Thread t1 = new Thread(new TestForRaceConditionRunnable(), "thread1");
     Thread t2 = new Thread(new TestForRaceConditionRunnable(), "thread2");

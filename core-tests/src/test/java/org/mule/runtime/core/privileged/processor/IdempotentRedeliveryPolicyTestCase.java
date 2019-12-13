@@ -7,7 +7,6 @@
 package org.mule.runtime.core.privileged.processor;
 
 import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.of;
@@ -26,20 +25,18 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy.SECURE_HASH_EXPR_FORMAT;
-import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 
-import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStore;
@@ -48,17 +45,17 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy.RedeliveryCounter;
 import org.mule.tck.SerializationTestUtils;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -73,27 +70,25 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Mono;
 
-public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
+public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestCase {
 
   public static final String STRING_MESSAGE = "message";
   public static final int MAX_REDELIVERY_COUNT = 5;
   private static ObjectSerializer serializer;
 
-  private final MuleContextWithRegistry mockMuleContext = mockMuleContext();
   private final ObjectStoreManager mockObjectStoreManager = mock(ObjectStoreManager.class, RETURNS_DEEP_STUBS.get());
   private final Processor mockFailingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
   private final Processor mockWaitingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
   private final InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS.get());
-  private CoreEvent event;
   private final Latch waitLatch = new Latch();
   private final CountDownLatch waitingMessageProcessorExecutionLatch = new CountDownLatch(2);
-  private final ExpressionManager expressionManager = mock(ExpressionManager.class);
   private final IdempotentRedeliveryPolicy irp = new IdempotentRedeliveryPolicy();
   private final AtomicInteger count = new AtomicInteger();
   private final ObjectStore mockObjectStore = mock(ObjectStore.class);
+  private CoreEvent event;
+  private ExpressionManager expressionManager;
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -102,6 +97,8 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   @SuppressWarnings("rawtypes")
   public void setUpTest() throws MuleException {
     event = spy(testEvent());
+    expressionManager = spy(muleContext.getExpressionManager());
+
     when(mockFailingMessageProcessor.apply(any(Publisher.class)))
         .thenAnswer(invocation -> {
           MessagingException me = mock(MessagingException.class, RETURNS_DEEP_STUBS.get());
@@ -120,7 +117,6 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     MuleLockFactory muleLockFactory = new MuleLockFactory();
     muleLockFactory.setLockProvider(new SingleServerLockProvider());
     muleLockFactory.initialise();
-    when(mockMuleContext.getConfiguration().getDefaultEncoding()).thenReturn(UTF_8.name());
     final InMemoryObjectStore inMemoryObjectStore = new InMemoryObjectStore();
     when(mockObjectStoreManager.getObjectStore(anyString())).thenReturn(inMemoryObjectStore);
     when(mockObjectStoreManager.createObjectStore(any(), any())).thenReturn(inMemoryObjectStore);
@@ -131,7 +127,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     irp.setExpressionManager(expressionManager);
     irp.setMaxRedeliveryCount(MAX_REDELIVERY_COUNT);
     irp.setUseSecureHash(true);
-    irp.setMuleContext(mockMuleContext);
+    irp.setMuleContext(muleContext);
     irp.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     irp.setListener(mockFailingMessageProcessor);
 
@@ -141,8 +137,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
 
   @Test
   public void messageDigestFailure() throws Exception {
-    when(expressionManager.evaluate(anyString(), any(DataType.class), any(BindingContext.class), any(CoreEvent.class)))
-        .thenThrow(ExpressionRuntimeException.class);
+    when(expressionManager.openSession(any())).thenThrow(new ExpressionRuntimeException(createStaticMessage("mock")));
     when(message.getPayload()).thenReturn(new TypedValue<>(new Object(), OBJECT));
     irp.initialise();
     CoreEvent process = irp.process(event);
@@ -151,8 +146,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testMessageRedeliveryUsingMemory() throws Exception {
-    when(expressionManager.evaluate(eq(format(SECURE_HASH_EXPR_FORMAT, "SHA-256")), eq(STRING), eq(NULL_BINDING_CONTEXT), any()))
-        .thenAnswer(inv -> new TypedValue<>("" + ((CoreEvent) inv.getArgument(3)).getMessage().getPayload().hashCode(), STRING));
+    mockSha256();
 
     when(message.getPayload()).thenReturn(new TypedValue<>(STRING_MESSAGE, STRING));
     irp.initialise();
@@ -162,9 +156,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testMessageRedeliveryUsingSerializationStore() throws Exception {
-    when(expressionManager.evaluate(eq(format(SECURE_HASH_EXPR_FORMAT, "SHA-256")), eq(STRING), eq(NULL_BINDING_CONTEXT), any()))
-        .thenAnswer(inv -> new TypedValue<>("" + ((CoreEvent) inv.getArgument(3)).getMessage().getPayload().hashCode(),
-                                            STRING));
+    mockSha256();
 
     when(message.getPayload()).thenReturn(new TypedValue<>(STRING_MESSAGE, STRING));
     reset(mockObjectStoreManager);
@@ -177,9 +169,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testThreadSafeObjectStoreUsage() throws Exception {
-    when(expressionManager.evaluate(eq(format(SECURE_HASH_EXPR_FORMAT, "SHA-256")), eq(STRING), eq(NULL_BINDING_CONTEXT), any()))
-        .thenAnswer(inv -> new TypedValue<>("" + ((CoreEvent) inv.getArgument(3)).getMessage().getPayload().hashCode(),
-                                            STRING));
+    mockSha256();
 
     when(message.getPayload()).thenReturn(new TypedValue<>(STRING_MESSAGE, STRING));
     irp.setListener(mockWaitingMessageProcessor);
@@ -213,9 +203,9 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   @Test
   public void javaObject() throws MuleException {
     final Object payloadValue = mock(Object.class);
-    when(expressionManager.evaluate(anyString(), any(DataType.class), any(BindingContext.class), any(CoreEvent.class)))
-        .thenAnswer(inv -> new TypedValue<>("" + payloadValue.hashCode(), STRING));
+    event = spy(CoreEvent.builder(testEvent()).addVariable("hash", payloadValue.hashCode()).build());
 
+    irp.setIdExpression("#[vars.hash]");
     irp.initialise();
 
     when(message.getPayload()).thenReturn(new TypedValue<>(payloadValue, OBJECT));
@@ -309,6 +299,17 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
     }
   }
 
+  private void mockSha256() {
+    ExpressionManager expressionManager = mock(ExpressionManager.class);
+    ExpressionManagerSession session = mock(ExpressionManagerSession.class);
+    CompiledExpression compiledExpression = mock(CompiledExpression.class);
+
+    when(expressionManager.openSession(any())).thenReturn(session);
+    when(expressionManager.compile(eq(format(SECURE_HASH_EXPR_FORMAT, "SHA-256")), any())).thenReturn(compiledExpression);
+    irp.setExpressionManager(expressionManager);
+    when(session.evaluate(compiledExpression, STRING))
+        .thenAnswer(inv -> new TypedValue<>("" + event.getMessage().getPayload().hashCode(), STRING));
+  }
 
   public static class InMemoryObjectStore extends TemplateObjectStore<RedeliveryCounter> {
 

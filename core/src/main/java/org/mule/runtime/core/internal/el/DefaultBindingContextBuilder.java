@@ -19,6 +19,7 @@ import org.mule.runtime.api.el.Binding;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionModule;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.collection.SmallMap;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,7 +44,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
 
   private LinkedList<BindingContext> delegates = new LinkedList<>();
 
-  private Map<String, Supplier<TypedValue>> bindings = new HashMap<>();
+  private Map<String, Supplier<TypedValue>> bindings = new SmallMap<>();
   private Collection<ExpressionModule> modules = null;
 
   public DefaultBindingContextBuilder() {}
