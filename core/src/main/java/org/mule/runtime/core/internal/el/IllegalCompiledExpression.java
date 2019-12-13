@@ -20,7 +20,7 @@ import java.util.Optional;
 /**
  * A {@link CompiledExpression} implementation which represents a DataWeave expression that failed to be compiled.
  * <p>
- * The only reason for this class to exists is backwards compatibility. Before the concept of {@link CompiledExpression} was
+ * The only reason for this class to exist is backwards compatibility. Before the concept of {@link CompiledExpression} was
  * introduced, invalid expressions would fail only when evaluated. Now that we are pre compiling all expressions, that failure
  * would occur at deployment time, meaning that apps with illegal expressions that were never executed will fail to deploy.
  * <p>

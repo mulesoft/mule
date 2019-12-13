@@ -28,7 +28,7 @@ import javax.xml.namespace.QName;
 
 /**
  * Utility class capable dummy events with dummy context and no values.
- *
+ * <p>
  * Use cases for this is initialization scenarios which require an event.
  *
  * @since 4.3.0

@@ -15,6 +15,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -24,7 +25,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -34,11 +34,9 @@ import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.el.CompiledExpression;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStore;
@@ -51,7 +49,6 @@ import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.lock.MuleLockFactory;
 import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
@@ -65,7 +62,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -73,8 +69,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Answers;
-import org.mockito.Mockito;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
@@ -84,10 +78,10 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
   public static final int MAX_REDELIVERY_COUNT = 5;
   private static ObjectSerializer serializer;
 
-  private final ObjectStoreManager mockObjectStoreManager = mock(ObjectStoreManager.class, Answers.RETURNS_DEEP_STUBS.get());
-  private final Processor mockFailingMessageProcessor = mock(Processor.class, Answers.RETURNS_DEEP_STUBS.get());
-  private final Processor mockWaitingMessageProcessor = mock(Processor.class, Answers.RETURNS_DEEP_STUBS.get());
-  private final InternalMessage message = mock(InternalMessage.class, Answers.RETURNS_DEEP_STUBS.get());
+  private final ObjectStoreManager mockObjectStoreManager = mock(ObjectStoreManager.class, RETURNS_DEEP_STUBS.get());
+  private final Processor mockFailingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
+  private final Processor mockWaitingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
+  private final InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS.get());
   private final Latch waitLatch = new Latch();
   private final CountDownLatch waitingMessageProcessorExecutionLatch = new CountDownLatch(2);
   private final IdempotentRedeliveryPolicy irp = new IdempotentRedeliveryPolicy();
@@ -107,7 +101,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
 
     when(mockFailingMessageProcessor.apply(any(Publisher.class)))
         .thenAnswer(invocation -> {
-          MessagingException me = mock(MessagingException.class, Answers.RETURNS_DEEP_STUBS.get());
+          MessagingException me = mock(MessagingException.class, RETURNS_DEEP_STUBS.get());
           CoreEvent event = mock(CoreEvent.class);
           when(event.getError()).thenReturn(of(mock(Error.class)));
           when(me.getEvent()).thenReturn(event);
@@ -139,21 +133,6 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
 
     irp.setLockFactory(muleLockFactory);
     irp.setObjectStoreManager(mockObjectStoreManager);
-  }
-
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    Map<String, Object> map = new HashMap<>();
-
-    final GlobalErrorHandler errorHandler = new GlobalErrorHandler();
-    errorHandler.setExceptionListeners(new ArrayList<>());
-    errorHandler.setAnnotations(singletonMap(ROOT_CONTAINER_NAME_KEY, "errorHandlerFromConfig"));
-    map.put("errorHandlerFromConfig", errorHandler);
-
-    ErrorTypeRepository errorTypeRepository = mock(ErrorTypeRepository.class, Mockito.RETURNS_DEEP_STUBS);
-    when(errorTypeRepository.getErrorType(any())).thenReturn(Optional.of(mock(ErrorType.class)));
-    map.put(ErrorTypeRepository.class.getName(), errorTypeRepository);
-    return map;
   }
 
   @Test
