@@ -29,7 +29,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.model.ComponentModel;
@@ -156,9 +156,8 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
         return emptyList();
       }
 
-      return ((SpringComponentModel) componentModel).getParameters().stream()
-          .filter(paramAst -> paramAst.getRawValue() != null)
-          .filter(paramAst -> paramAst.getRawValue().equals(expectedPropertyReference))
+      return ((ComponentAst) componentModel).getParameters().stream()
+          .filter(paramAst -> expectedPropertyReference.equals(paramAst.getRawValue()))
           .map(paramAst -> paramAst.getModel().getName())
           .map(attributeName -> findStereotypes(componentModel.getIdentifier(), attributeName))
           .flatMap(Collection::stream)
