@@ -14,6 +14,10 @@
         <module-simple-proxy:set-payload-param-value value="new payload" />
     </flow>
 
+    <flow name="testSetPayloadParamInvalidExpressionFlow">
+        <module-simple-proxy:set-payload-param-value-invalid-expression/>
+    </flow>
+
     <flow name="testSetPayloadParamDefaultFlow">
         <module-simple-proxy:set-payload-param-default-value />
     </flow>

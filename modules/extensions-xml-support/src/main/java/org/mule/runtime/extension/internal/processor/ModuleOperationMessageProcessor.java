@@ -176,16 +176,23 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
    */
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+    final String localStrategyCtxKey = "mule.xmlSdk." + getLocation().getLocation() + ".reactor.onNextError.localStrategy";
+
     return from(publisher)
         .map(this::createEventWithParameters)
-        .transform(eventPub -> applyWithChildContext(eventPub,
-                                                     p -> from(p)
-                                                         .doOnNext(this::pushFlowStackEntry)
-                                                         .transform(nestedChain)
-                                                         .doOnNext(event -> ((DefaultFlowCallStack) event.getFlowCallStack())
-                                                             .pop()),
-                                                     ofNullable(getLocation()),
-                                                     errorHandler()))
+        // 2. Restore the error handler, overriding the last one set by the inner chain. This one being set again is the one that
+        // must be used for handling any errors in the mapper above.
+        .subscriberContext(ctx -> ctx.put("reactor.onNextError.localStrategy", ctx.get(localStrategyCtxKey)))
+        .compose(eventPub -> applyWithChildContext(eventPub,
+                                                   p -> from(p)
+                                                       .doOnNext(this::pushFlowStackEntry)
+                                                       .compose(nestedChain)
+                                                       .doOnNext(event -> ((DefaultFlowCallStack) event.getFlowCallStack())
+                                                           .pop()),
+                                                   ofNullable(getLocation()),
+                                                   errorHandler()))
+        // 1. Store the current error handler into the subscription context, so it can be retrieved later
+        .subscriberContext(ctx -> ctx.put(localStrategyCtxKey, ctx.get("reactor.onNextError.localStrategy")))
         .map(eventResult -> processResult(getInternalParameter(ORIGINAL_EVENT_KEY, eventResult), eventResult));
   }
 
