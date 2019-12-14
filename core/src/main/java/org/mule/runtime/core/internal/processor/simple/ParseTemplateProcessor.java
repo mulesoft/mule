@@ -68,11 +68,9 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
       }
     }
 
-    if (targetValue != null && target == null) {
-      throw new InitialisationException(createStaticMessage("Can't define a targetValue with no target"), this);
+    if (targetValue != null) {
+      targetValueExpression = compile(targetValue, muleContext.getExpressionManager());
     }
-
-    targetValueExpression = compile(targetValue, muleContext.getExpressionManager());
   }
 
   private void loadContentFromLocation() throws InitialisationException {
@@ -100,6 +98,12 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
     }
   }
 
+  private void evaluateCorrectArguments() {
+    if (targetValue != null && target == null) {
+      throw new IllegalArgumentException("Can't define a targetValue with no target");
+    }
+  }
+
   private MediaType buildMediaType() {
     if (outputMimeType != null) {
       if (outputEncoding != null) {
@@ -112,6 +116,8 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
 
   @Override
   public CoreEvent process(CoreEvent event) {
+    evaluateCorrectArguments();
+
     String result = muleContext.getExpressionManager().parseLogTemplate(content, event, getLocation(), NULL_BINDING_CONTEXT);
     Message.Builder messageBuilder = Message.builder(event.getMessage()).value(result).nullAttributesValue();
     MediaType configuredMediaType = buildMediaType();

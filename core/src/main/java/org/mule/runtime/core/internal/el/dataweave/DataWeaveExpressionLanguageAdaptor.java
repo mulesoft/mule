@@ -291,7 +291,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
 
       private RuntimeException handledException(CompiledExpression expression, Exception e) {
         if (expression instanceof IllegalCompiledExpression) {
-          return ((IllegalCompiledExpression) expression).getCompilationException();
+          ExpressionCompilationException original = ((IllegalCompiledExpression) expression).getCompilationException();
+          return new ExpressionRuntimeException(createStaticMessage(original.getMessage()), original);
         }
 
         return new ExpressionRuntimeException(createStaticMessage(e.getMessage()), e);

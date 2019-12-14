@@ -38,6 +38,7 @@ import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 
@@ -161,9 +162,9 @@ public class IdempotentMessageValidator extends AbstractComponent
     BindingContext bindingContext = event.asBindingContext();
     try (ExpressionLanguageSession session = muleContext.getExpressionManager().openSession(bindingContext)) {
       String id = getIdForEvent(session);
-      if (event != null && isNewMessage(event, id)) {
+      String value = getValueForEvent(session);
 
-        String value = getValueForEvent(session);
+      if (event != null && isNewMessage(event, id)) {
         try {
           store.store(id, value);
           return true;
@@ -179,6 +180,8 @@ public class IdempotentMessageValidator extends AbstractComponent
       } else {
         return false;
       }
+    } catch (ExpressionRuntimeException e) {
+      throw e;
     } catch (Exception e) {
       LOGGER.warn("Could not retrieve Id or Value for event: " + e.getMessage());
       return false;
