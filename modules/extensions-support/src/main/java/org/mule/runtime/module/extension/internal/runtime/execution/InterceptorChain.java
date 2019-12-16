@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static java.lang.String.format;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -30,29 +31,48 @@ public class InterceptorChain<T extends ComponentModel> {
     private final List<Interceptor<T>> interceptors = new ArrayList<>(2);
     private Function<Throwable, Throwable> exceptionMapper = identity();
 
+    private Builder(){}
+
     public Builder<T> addInterceptor(Interceptor<T> interceptor) {
       interceptors.add(interceptor);
       return this;
     }
 
+    public Builder setExceptionMapper(Function<Throwable, Throwable> exceptionMapper) {
+      this.exceptionMapper = exceptionMapper;
+      return this;
+    }
+
     public InterceptorChain<T> build() {
-      InterceptorChain<T> root = null;
-      InterceptorChain<T> previous = null;
-      final int len = interceptors.size();
+      final List<InterceptorChain<T>> chains = interceptors.stream()
+          .map(i -> new InterceptorChain<>(i, exceptionMapper))
+          .collect(toList());
+      final int len = chains.size();
 
-      for (int i = len-1; i >= 0; i--) {
-        int prevIndex = i - 1;
-        Interceptor<T> prev = prevIndex >= 0 ? interceptors.get(prevIndex) : null;
-
-        //InterceptorChain chain = new InterceptorChain(interceptors.get(i), next, previous, exceptionMapper);
-        //previous = chain;
-        if (root == null) {
-          //root = chain;
-        }
+      if (len == 0) {
+        //TODO: NullInterceptor
+        return null;
       }
 
-      return root;
+      InterceptorChain<T> interceptor = chains.get(0);
+      InterceptorChain<T> previous = null;
+      InterceptorChain<T> next;
+
+      for (int i = 0; i < len; i++) {
+        interceptor.previous = previous;
+        previous = interceptor;
+        int nextIndex = i + 1;
+        next = nextIndex < len ? chains.get(nextIndex) : null;
+        interceptor.next = next;
+        interceptor = next;
+      }
+
+      return chains.get(0);
     }
+  }
+
+  public static Builder builder() {
+    return new Builder();
   }
 
   private static final String BEFORE = "before";
@@ -61,32 +81,28 @@ public class InterceptorChain<T extends ComponentModel> {
   private static final String AFTER = "after";
 
   private final Interceptor<T> interceptor;
-  private final InterceptorChain<T> nextInterceptor;
-  private final InterceptorChain<T> previousInterceptor;
-  private final Function<Throwable, Throwable> exceptionMaper;
+  private final Function<Throwable, Throwable> exceptionMapper;
+  private InterceptorChain<T> next;
+  private InterceptorChain<T> previous;
 
-  private InterceptorChain(Interceptor<T> interceptor,
-                          InterceptorChain<T> nextInterceptor,
-                          InterceptorChain<T> previousInterceptor,
-                          Function<Throwable, Throwable> exceptionMaper) {
+  public InterceptorChain(Interceptor<T> interceptor,
+                          Function<Throwable, Throwable> exceptionMapper) {
     this.interceptor = interceptor;
-    this.nextInterceptor = nextInterceptor;
-    this.previousInterceptor = previousInterceptor;
-    this.exceptionMaper = exceptionMaper;
+    this.exceptionMapper = exceptionMapper;
   }
 
   public Throwable before(ExecutionContextAdapter<T> executionContext, ExecutorCallback callback) throws Throwable {
     try {
       interceptor.before(executionContext);
-      if (nextInterceptor != null) {
-        return nextInterceptor.before(executionContext, callback);
+      if (next != null) {
+        return next.before(executionContext, callback);
       }
 
       return null;
     } catch (Throwable t) {
-      t = exceptionMaper.apply(t);
+      t = exceptionMapper.apply(t);
       logError(t, BEFORE, false);
-      t = reserveOnError(executionContext, BEFORE, t);
+      t = errorOnReverse(executionContext, t);
       callback.error(t);
 
       return t;
@@ -97,12 +113,18 @@ public class InterceptorChain<T extends ComponentModel> {
     try {
       interceptor.onSuccess(executionContext, result);
     } catch (Throwable t) {
-      t = exceptionMaper.apply(t);
+      t = exceptionMapper.apply(t);
       logError(t, ON_SUCCESS, true);
     }
 
-    if (nextInterceptor != null) {
-      nextInterceptor.onSuccess(executionContext, result);
+    try {
+      interceptor.after(executionContext, result);
+    } catch (Throwable t) {
+      logError(t, AFTER, true);
+    }
+
+    if (next != null) {
+      next.onSuccess(executionContext, result);
     }
   }
 
@@ -113,34 +135,34 @@ public class InterceptorChain<T extends ComponentModel> {
       logError(t2, ON_ERROR, true);
     }
 
-    if (nextInterceptor != null) {
-      t = nextInterceptor.onError(executionContext, t);
+    try {
+      interceptor.after(executionContext, null);
+    } catch (Throwable t2) {
+      logError(t2, AFTER, true);
+    }
+
+    if (next != null) {
+      t = next.onError(executionContext, t);
     }
 
     return t;
   }
 
-  public void after(ExecutionContextAdapter<T> executionContext, Object result) {
-    try {
-      interceptor.after(executionContext, result);
-    } catch (Throwable t) {
-      logError(t, AFTER, true);
-    }
-
-    if (nextInterceptor != null) {
-      nextInterceptor.after(executionContext, result);
-    }
-  }
-
-  private Throwable reserveOnError(ExecutionContextAdapter<T> executionContext, String phase, Throwable t) {
+  private Throwable errorOnReverse(ExecutionContextAdapter<T> executionContext, Throwable t) {
     try {
       t = interceptor.onError(executionContext, t);
     } catch (Throwable t2) {
       logError(t2, ON_ERROR, true);
     }
 
-    if (previousInterceptor != null) {
-      return previousInterceptor.reserveOnError(executionContext, phase, t);
+    try {
+      interceptor.after(executionContext, null);
+    } catch (Throwable t2) {
+      logError(t2, AFTER, true);
+    }
+
+    if (previous != null) {
+      return previous.errorOnReverse(executionContext, t);
     } else {
       return t;
     }
