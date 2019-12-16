@@ -57,7 +57,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     });
   }
 
-  private final int halfDataLength;
+  private int halfDataLength;
   private final int bufferSize;
   private final int maxBufferSize;
   protected final ScheduledExecutorService executorService;
@@ -211,6 +211,21 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   @Test
   public void consumeByChunksShorterThanBufferSize() throws Exception {
     withCursor(cursor -> assertEquals(readByChunks(cursor, bufferSize / 2), data));
+  }
+
+  @Test
+  public void readsMostOfTheStreamInFirstAccessAndRemainderInSecond() throws Exception {
+    byte[] dest = new byte[data.length()];
+    halfDataLength = new Double(Math.floor(halfDataLength * .8)).intValue();
+    withCursor(cursor -> {
+      int read = cursor.read(dest, 0, halfDataLength);
+      assertThat(read, is(halfDataLength));
+      assertEquals(toString(dest, 0, halfDataLength), data.substring(0, halfDataLength));
+
+      int secondRead = cursor.read(dest, read, data.length() - read);
+      assertThat(secondRead, is(data.length() - read));
+      assertEquals(toString(dest, halfDataLength, data.length() - read), data.substring(halfDataLength));
+    });
   }
 
   @Test

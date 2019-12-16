@@ -8,6 +8,7 @@ package org.mule.runtime.config.dsl.model;
 
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
@@ -106,6 +107,7 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
   protected static final String OPERATION_NAME = "mockOperation";
   protected static final String SOURCE_NAME = "source";
   protected static final String CONFIGURATION_NAME = "configuration";
+  protected static final String OTHER_CONFIGURATION_NAME = "otherConfiguration";
   protected static final String CONNECTION_PROVIDER_NAME = "connection";
   protected static final String VALUE_PROVIDER_NAME = "valueProvider";
 
@@ -120,6 +122,9 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
 
   @Mock(lenient = true)
   protected ConfigurationModel configuration;
+
+  @Mock(lenient = true)
+  protected ConfigurationModel otherConfiguration;
 
   @Mock(lenient = true)
   protected OperationModel operation;
@@ -263,6 +268,14 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
     when(configuration.getConnectionProviders()).thenReturn(asList(connectionProvider));
     when(configuration.getModelProperty(RequiredForMetadataModelProperty.class)).thenReturn(of(requiredForMetadataModelProperty));
 
+    when(otherConfiguration.getName()).thenReturn(OTHER_CONFIGURATION_NAME);
+    when(otherConfiguration.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
+    when(otherConfiguration.getOperationModels()).thenReturn(emptyList());
+    when(otherConfiguration.getSourceModels()).thenReturn(emptyList());
+    when(otherConfiguration.getConnectionProviders()).thenReturn(asList(connectionProvider));
+    when(otherConfiguration.getModelProperty(RequiredForMetadataModelProperty.class))
+        .thenReturn(of(requiredForMetadataModelProperty));
+
     when(source.getName()).thenReturn(SOURCE_NAME);
     when(source.getParameterGroupModels()).thenReturn(asList(parameterGroup, actingParametersGroup));
     when(source.getSuccessCallback()).thenReturn(empty());
@@ -279,7 +292,7 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
     allParameterModels.addAll(defaultGroupParameterModels);
     allParameterModels.addAll(customParameterGroupModels);
 
-    Stream.of(configuration, operation, connectionProvider, source)
+    Stream.of(configuration, otherConfiguration, operation, connectionProvider, source)
         .forEach(model -> when(model.getAllParameterModels()).thenReturn(allParameterModels));
 
     extensions = ImmutableSet.<ExtensionModel>builder()
@@ -309,8 +322,15 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
         .setSchemaVersion(EMPTY)
         .build());
 
-    when(extension.getConfigurationModels()).thenReturn(asList(configuration));
-    when(extension.getConfigurationModel(anyString())).thenReturn(of(configuration));
+    when(extension.getConfigurationModels()).thenReturn(asList(configuration, otherConfiguration));
+    when(extension.getConfigurationModel(anyString())).then(invocation -> {
+      if (configuration.getName().equals(invocation.getArgument(0))) {
+        return of(configuration);
+      } else if (otherConfiguration.getName().equals(invocation.getArgument(0))) {
+        return of(otherConfiguration);
+      }
+      return empty();
+    });
     when(extension.getOperationModels()).thenReturn(asList(operation));
     when(extension.getOperationModel(anyString())).thenReturn(of(operation));
 
@@ -324,6 +344,23 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
                                                         String parameterRequiredForMetadata, String actingParameter,
                                                         String providedParameter, String parameterInGroup) {
     return declarer.newConfiguration(CONFIGURATION_NAME)
+        .withRefName(name)
+        .withParameterGroup(newParameterGroup()
+            .withParameter(PARAMETER_REQUIRED_FOR_METADATA_NAME, parameterRequiredForMetadata)
+            .withParameter(ACTING_PARAMETER_NAME, actingParameter)
+            .withParameter(PROVIDED_PARAMETER_NAME, providedParameter)
+            .getDeclaration())
+        .withParameterGroup(newParameterGroup(CUSTOM_PARAMETER_GROUP_NAME)
+            .withParameter(PARAMETER_IN_GROUP_NAME, parameterInGroup)
+            .getDeclaration())
+        .withConnection(connectionDeclaration)
+        .getDeclaration();
+  }
+
+  private ConfigurationElementDeclaration declareOtherConfig(ConnectionElementDeclaration connectionDeclaration, String name,
+                                                             String parameterRequiredForMetadata, String actingParameter,
+                                                             String providedParameter, String parameterInGroup) {
+    return declarer.newConfiguration(OTHER_CONFIGURATION_NAME)
         .withRefName(name)
         .withParameterGroup(newParameterGroup()
             .withParameter(PARAMETER_REQUIRED_FOR_METADATA_NAME, parameterRequiredForMetadata)
@@ -509,6 +546,8 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
     assertThat(configId.isPresent(), is(true));
     checkIdsAreEqual(configId, computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME));
   }
+
+
 
   @Test
   public void idForConfigChangingNotActingParameters() throws Exception {
@@ -726,6 +765,20 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
     Optional<ValueProviderCacheId> config1Id = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
     Optional<ValueProviderCacheId> config2Id = computeIdFor(app, "newName", PROVIDED_PARAMETER_NAME);
     checkIdsAreEqual(config1Id, config2Id);
+  }
+
+  @Test
+  public void differentConfigsWithSameParametersGetDifferentHashs() throws Exception {
+    ArtifactDeclaration app = getBaseApp();
+    ConfigurationElementDeclaration config = (ConfigurationElementDeclaration) app.getGlobalElements().get(0);
+    app.addGlobalElement(declareOtherConfig(config.getConnection().get(), "newName",
+                                            PARAMETER_REQUIRED_FOR_METADATA_DEFAULT_VALUE,
+                                            ACTING_PARAMETER_DEFAULT_VALUE,
+                                            PROVIDED_PARAMETER_DEFAULT_VALUE,
+                                            PARAMETER_IN_GROUP_DEFAULT_VALUE));
+    Optional<ValueProviderCacheId> config1Id = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
+    Optional<ValueProviderCacheId> config2Id = computeIdFor(app, "newName", PROVIDED_PARAMETER_NAME);
+    checkIdsAreDifferent(config1Id, config2Id);
   }
 
   @Test

@@ -106,12 +106,13 @@ public class PolicyEventMapper {
     } else {
       Message message = propagate ? result.getMessage() : operationResult.getMessage();
 
-      CoreEvent next = CoreEvent.builder(result)
+      InternalEvent next = InternalEvent.builder(result)
+          .addInternalParameter(policyVarsInternalParameterName(), result.getVariables())
           .message(message)
           .variables(operationResult.getVariables())
           .build();
 
-      ctx.setNextOperationResponse((InternalEvent) next);
+      ctx.setNextOperationResponse(next);
       return next;
     }
   }
@@ -240,6 +241,10 @@ public class PolicyEventMapper {
                                Optional<SourcePolicyParametersTransformer> parametersTransformer) {
     try {
       SourcePolicyContext ctx = SourcePolicyContext.from(event);
+
+      if (ctx.getOriginalFailureResponseParameters() != null) {
+        return event;
+      }
 
       Map<String, Object> originalFailureResponseParameters = ctx.getResponseParametersProcessor()
           .getFailedExecutionResponseParametersFunction()

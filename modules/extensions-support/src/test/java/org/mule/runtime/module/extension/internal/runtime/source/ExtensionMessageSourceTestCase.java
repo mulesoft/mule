@@ -131,7 +131,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   public void sourceIsInstantiatedOnce() throws Exception {
     initialise();
     start();
-    verify(sourceAdapterFactory, times(1)).createAdapter(any(), any(), any(), any(), any(), anyBoolean());
+    verify(sourceAdapterFactory, times(1)).createAdapter(any(), any(), any(), any(), anyBoolean());
   }
 
   @Test
@@ -221,7 +221,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     doThrow(e).when(source).onStart(sourceCallback);
     expectedException.expect(exhaustedBecauseOf(new BaseMatcher<Throwable>() {
 
-      private Matcher<Exception> exceptionMatcher = hasCause(sameInstance(e));
+      private final Matcher<Exception> exceptionMatcher = hasCause(sameInstance(e));
 
       @Override
       public boolean matches(Object item) {
@@ -364,7 +364,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     final String person = "person";
     source = new DummySource(person);
     sourceAdapter = createSourceAdapter();
-    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), any(), anyBoolean())).thenReturn(sourceAdapter);
+    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), anyBoolean())).thenReturn(sourceAdapter);
     messageSource = getNewExtensionMessageSourceInstance();
     messageSource.initialise();
     messageSource.start();
@@ -379,7 +379,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
       this.metadataKey = metadataKey;
     }
 
-    private String metadataKey;
+    private final String metadataKey;
 
     @Override
     public void onStart(SourceCallback sourceCallback) throws MuleException {}

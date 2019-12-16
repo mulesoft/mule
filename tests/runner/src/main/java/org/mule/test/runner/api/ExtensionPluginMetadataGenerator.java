@@ -9,12 +9,17 @@ package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.io.File.separator;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.test.runner.api.MulePluginBasedLoaderFinder.META_INF_MULE_PLUGIN;
+
 import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
@@ -22,6 +27,7 @@ import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.SimpleRegistry;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
@@ -31,6 +37,7 @@ import org.mule.test.runner.utils.TroubleshootingUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
@@ -61,7 +68,7 @@ class ExtensionPluginMetadataGenerator {
   private final File extensionMulePluginJson;
   private final ExtensionModelLoaderFinder extensionModelLoaderFinder;
 
-  private List<ExtensionGeneratorEntry> extensionGeneratorEntries = newArrayList();
+  private final List<ExtensionGeneratorEntry> extensionGeneratorEntries = newArrayList();
 
   /**
    * Creates an instance that will generated metadata for extensions on the baseResourcesFolder
@@ -104,29 +111,36 @@ class ExtensionPluginMetadataGenerator {
    */
   private ExtensionManager createExtensionManager() {
     DefaultExtensionManager extensionManager = new DefaultExtensionManager();
-    extensionManager.setMuleContext(new DefaultMuleContext() {
+    final DefaultMuleContext muleContext = new DefaultMuleContext() {
 
-      private ErrorTypeRepository errorTypeRepository = createDefaultErrorTypeRepository();
-      private ErrorTypeLocator errorTypeLocator = createDefaultErrorTypeLocator(errorTypeRepository);
+      private final ErrorTypeRepository errorTypeRepository = createDefaultErrorTypeRepository();
+      private final ErrorTypeLocator errorTypeLocator = createDefaultErrorTypeLocator(errorTypeRepository);
+
+      private final LazyValue<SimpleRegistry> registryCreator = new LazyValue<>(() -> {
+        final SimpleRegistry registry = new SimpleRegistry(this, new MuleLifecycleInterceptor());
+
+        try {
+          registry.registerObject(ErrorTypeRepository.class.getName(), errorTypeRepository);
+          registry.registerObject(ErrorTypeLocator.class.getName(), errorTypeLocator);
+        } catch (RegistrationException e) {
+          throw new MuleRuntimeException(e);
+        }
+        return registry;
+      });
 
       @Override
       public MuleRegistry getRegistry() {
-        return new MuleRegistryHelper(new SimpleRegistry(this, new MuleLifecycleInterceptor()), this);
+        return new MuleRegistryHelper(registryCreator.get(), this);
       }
 
       @Override
-      public ErrorTypeLocator getErrorTypeLocator() {
-        return errorTypeLocator;
+      public Injector getInjector() {
+        return registryCreator.get();
       }
 
-      @Override
-      public ErrorTypeRepository getErrorTypeRepository() {
-        return errorTypeRepository;
-      }
-
-    });
+    };
     try {
-      extensionManager.initialise();
+      initialiseIfNeeded(extensionManager, muleContext);
     } catch (InitialisationException e) {
       throw new RuntimeException("Error while initialising the extension manager", e);
     }
@@ -144,7 +158,13 @@ class ExtensionPluginMetadataGenerator {
    */
   Class scanForExtensionAnnotatedClasses(Artifact plugin, List<URL> urls) {
     final URL firstURL = urls.stream().findFirst().get();
-    logger.debug("Scanning plugin '{}' for annotated Extension class from {}", plugin, firstURL);
+    logger.warn("Scanning plugin '{}' for annotated Extension class from {}", plugin, firstURL);
+    logger.warn("Available URLS: {}", urls);
+    try {
+      logger.warn("Contents of firstURL: {}", (Object) new File(firstURL.toURI()).listFiles());
+    } catch (URISyntaxException e) {
+      //do nothing
+    }
     ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
     scanner.addIncludeFilter(new AnnotationTypeFilter(Extension.class));
     try (URLClassLoader classLoader = new URLClassLoader(new URL[] {firstURL}, null)) {
@@ -163,9 +183,13 @@ class ExtensionPluginMetadataGenerator {
           return Class.forName(extensionClassName);
         } catch (ClassNotFoundException e) {
           TroubleshootingUtils.copyPluginToAuxJenkinsFolderForTroubleshooting(firstURL);
+          TroubleshootingUtils.generateHeapDumpInAuxJenkinsFolder(firstURL);
+          List<URL> classpath = new ClassPathUrlProvider().getURLs();
+          logger.warn("CLASSPATH URLs:");
+          classpath.forEach(url -> logger.warn(url.toString()));
           throw new IllegalArgumentException("Cannot load Extension class '" + extensionClassName + " obtained from: '" + firstURL
               + "' with MD5 '" + TroubleshootingUtils.getMD5FromFile(firstURL) + "' using classpath: "
-              + new ClassPathUrlProvider().getURLs(), e);
+              + classpath, e);
         }
       }
       logger.debug("No class found annotated with {}", Extension.class.getName());
@@ -218,8 +242,8 @@ class ExtensionPluginMetadataGenerator {
    */
   class ExtensionGeneratorEntry {
 
-    private ExtensionModel runtimeExtensionModel;
-    private File resourcesFolder;
+    private final ExtensionModel runtimeExtensionModel;
+    private final File resourcesFolder;
 
     ExtensionGeneratorEntry(ExtensionModel runtimeExtensionModel, File resourcesFolder) {
       this.runtimeExtensionModel = runtimeExtensionModel;

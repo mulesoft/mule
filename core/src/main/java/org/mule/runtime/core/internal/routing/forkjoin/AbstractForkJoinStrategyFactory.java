@@ -238,7 +238,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
           }
         }
       }));
-      routeVars.forEach((s, typedValue) -> result.addVariable(s, typedValue.getValue(), typedValue.getDataType()));
+      routeVars.forEach((s, typedValue) -> result.addVariable(s, typedValue));
     };
   }
 

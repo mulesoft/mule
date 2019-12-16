@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal;
 
 import static org.mule.runtime.config.internal.MuleArtifactContext.INNER_BEAN_PREFIX;
 
+import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -85,6 +86,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
           LockFactory.class,
           ObjectStoreManager.class,
           ExpressionLanguageExtension.class,
+          ExpressionLanguage.class,
           QueueManager.class,
           StreamingManager.class,
           ConfigurationProvider.class,

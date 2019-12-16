@@ -11,10 +11,8 @@ import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObject;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -49,7 +47,6 @@ public class EventBenchmark extends AbstractBenchmark {
   public void setup() throws Exception {
     muleContext = createMuleContextWithServices();
     muleContext.start();
-    registerObject(muleContext, OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
     flow = createFlow(muleContext);
     registerObject(muleContext, FLOW_NAME, flow, FlowConstruct.class);
     Message.Builder messageBuilder = Message.builder().value(PAYLOAD);

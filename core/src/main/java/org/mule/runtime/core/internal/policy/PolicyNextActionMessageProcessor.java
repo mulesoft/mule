@@ -50,6 +50,8 @@ import org.slf4j.Logger;
  */
 public class PolicyNextActionMessageProcessor extends AbstractComponent implements Processor, Initialisable {
 
+  private static final String SOURCE_POLICY_PART_IDENTIFIER = "source";
+
   private static final Logger LOGGER = getLogger(PolicyNextActionMessageProcessor.class);
 
   public static final String POLICY_NEXT_OPERATION = "policy.nextOperation";
@@ -77,8 +79,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   public void initialise() throws InitialisationException {
     this.policyEventMapper = new PolicyEventMapper(getPolicyId());
     this.notificationHelper = new PolicyNotificationHelper(notificationManager, getPolicyId(), this);
-    this.onExecuteNextErrorConsumer =
-        new OnExecuteNextErrorConsumer(policyEventMapper::fromPolicyNext, notificationHelper, getLocation());
+
+    this.onExecuteNextErrorConsumer = errorConsumer(this.policyEventMapper, this.notificationHelper);
 
     // this chain exists only so that an error handler can be hooked to map the event in the propagated error.
     this.nextDispatchAsChain = buildNewChainWithListOfProcessors(empty(), singletonList(new Processor() {
@@ -99,6 +101,34 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
       }
     }), policyNextErrorHandler());
     initialiseIfNeeded(nextDispatchAsChain, muleContext);
+  }
+
+  private OnExecuteNextErrorConsumer errorConsumer(PolicyEventMapper policyEventMapper,
+                                                   PolicyNotificationHelper notificationHelper) {
+
+    if (isWithinSourcePolicy(getLocation())) {
+      return new OnExecuteNextErrorConsumer(me -> {
+        final CoreEvent event = me.getEvent();
+
+        // for backpressure errors, the MessagingException does not have the failingComponent set
+        if (me.getFailingComponent() == null ||
+            isWithinSourcePolicy(me.getFailingComponent().getLocation())) {
+          return policyEventMapper.fromPolicyNext(event);
+        } else {
+          return policyEventMapper.onFlowError(policyEventMapper.fromPolicyNext(event), getPolicyId(),
+                                               SourcePolicyContext.from(event).getParametersTransformer());
+        }
+      }, notificationHelper, getLocation());
+    } else {
+      return new OnExecuteNextErrorConsumer(me -> policyEventMapper.fromPolicyNext(me.getEvent()), notificationHelper,
+                                            getLocation());
+    }
+  }
+
+  private Boolean isWithinSourcePolicy(final ComponentLocation loc) {
+    return loc.getParts().get(1).getPartIdentifier()
+        .map(tci -> tci.getIdentifier().getName().equals(SOURCE_POLICY_PART_IDENTIFIER))
+        .orElse(false);
   }
 
   @Override

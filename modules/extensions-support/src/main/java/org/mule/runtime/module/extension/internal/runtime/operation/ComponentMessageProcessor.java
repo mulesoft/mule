@@ -18,6 +18,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
+import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
@@ -56,6 +58,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
@@ -70,6 +73,7 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SynchronousSinkExecutorCallback;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
@@ -95,6 +99,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,6 +108,8 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -148,6 +155,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected final String targetValue;
   protected final RetryPolicyTemplate retryPolicyTemplate;
 
+  @Inject
+  private ErrorTypeLocator errorTypeLocator;
+
+  @Inject
+  private Collection<ExceptionContextProvider> exceptionContextProviders;
 
   private Function<Optional<ConfigurationInstance>, RetryPolicyTemplate> retryPolicyResolver;
   private String resolvedProcessorRepresentation;
@@ -190,7 +202,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         .flatMap(event -> subscriberContext().map(ctx -> addContextToEvent(event, ctx)));
 
     if (isAsync()) {
-      final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook = getLocalOperatorErrorHook(this, muleContext);
+      final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook =
+          getLocalOperatorErrorHook(this, errorTypeLocator, exceptionContextProviders);
       return flux
           // This flatMap allows the operation to run in parallel. The processing strategy relies on this
           // (ProactorStreamProcessingStrategy#proactor) to do some performance optimizations.
@@ -485,7 +498,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
 
-  protected TargetReturnDelegate getTargetReturnDelegate() {
+  protected ReturnDelegate getTargetReturnDelegate() {
+    if (isSanitizedPayload(sanitize(targetValue))) {
+      return new PayloadTargetReturnDelegate(target, componentModel, cursorProviderFactory, muleContext);
+    }
     return new TargetReturnDelegate(target, targetValue, componentModel, expressionManager, cursorProviderFactory, muleContext);
   }
 
@@ -545,7 +561,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   protected ExecutionMediator createExecutionMediator() {
-    return new DefaultExecutionMediator(extensionModel, componentModel, connectionManager, muleContext.getErrorTypeRepository());
+    return new DefaultExecutionMediator(extensionModel, componentModel, connectionManager, errorTypeRepository);
   }
 
   /**

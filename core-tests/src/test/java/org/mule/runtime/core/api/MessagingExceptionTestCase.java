@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api;
 
-import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -26,10 +25,8 @@ import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.core.internal.exception.MessagingException.PAYLOAD_INFO_KEY;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -53,7 +50,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketException;
-import java.util.Map;
 import java.util.Optional;
 
 import org.hamcrest.core.Is;
@@ -103,11 +99,6 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     when(mockContext.getConfiguration()).thenReturn(mockConfiguration);
 
     testEvent = eventBuilder(muleContext).message(of(TEST_PAYLOAD)).build();
-  }
-
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @After

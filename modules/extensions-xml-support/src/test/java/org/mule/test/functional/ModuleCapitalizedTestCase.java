@@ -6,13 +6,14 @@
  */
 package org.mule.test.functional;
 
-import org.hamcrest.core.Is;
-import org.junit.Test;
-import org.mule.runtime.core.api.event.CoreEvent;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class ModuleCapitalizedTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
+import org.mule.runtime.core.api.event.CoreEvent;
+
+import org.hamcrest.core.Is;
+import org.junit.Test;
+
+public class ModuleCapitalizedTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Override
   protected String getModulePath() {

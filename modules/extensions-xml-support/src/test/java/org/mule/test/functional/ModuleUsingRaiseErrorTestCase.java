@@ -21,15 +21,16 @@ import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHan
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
 import static org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition.CUSTOM_ERROR;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import org.junit.Test;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.test.marvel.drstrange.CustomErrorException;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.junit.Test;
+
 @Feature(ERROR_HANDLING)
 @Story(RAISE_ERROR)
-public class ModuleUsingRaiseErrorTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
+public class ModuleUsingRaiseErrorTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Override
   protected String getModulePath() {

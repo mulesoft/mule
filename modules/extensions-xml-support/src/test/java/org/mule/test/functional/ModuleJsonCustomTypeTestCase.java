@@ -10,14 +10,16 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.core.Is.is;
-import com.google.common.collect.ImmutableMap;
-import org.junit.Test;
+
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.Map;
 
-public class ModuleJsonCustomTypeTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
+import com.google.common.collect.ImmutableMap;
+import org.junit.Test;
+
+public class ModuleJsonCustomTypeTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   private static final Map<String, Object> EXPECTED_TYPE_1 = ImmutableMap.of("street_type", "Avenue",
                                                                              "street_name", "calle 7");

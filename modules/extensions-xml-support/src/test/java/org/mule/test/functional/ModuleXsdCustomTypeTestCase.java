@@ -10,14 +10,16 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
-import com.google.common.collect.ImmutableMap;
-import org.hamcrest.core.Is;
-import org.junit.Test;
+
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.Map;
 
-public class ModuleXsdCustomTypeTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
+import com.google.common.collect.ImmutableMap;
+import org.hamcrest.core.Is;
+import org.junit.Test;
+
+public class ModuleXsdCustomTypeTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   //the order matters when describing a type, and ImmutableMap guarantees it
   private static final ImmutableMap<String, Object> USER_DATA = ImmutableMap.<String, Object>builder()

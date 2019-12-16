@@ -7,10 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
+import static org.mule.runtime.api.message.Message.of;
 
-import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.el.CompiledExpression;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -18,12 +19,10 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 /**
- * An implementation of {@link AbstractReturnDelegate} which sets the output message on a variable which key is taken from the
- * {@link #target} field.
+ * An implementation of {@link AbstractReturnDelegate} which evaluates the {@link #targetValue} expressions and sets the output
+ * as a variable which key is taken from the {@link #target} field.
  * <p>
- * The target variable will always contain a {@link Message}, even if the operation returned a simple value
- * <p>
- * The original message is left untouched.
+ * The original message payload is not modified.
  *
  * @since 4.0
  */
@@ -32,7 +31,7 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
   private final ExpressionManager expressionManager;
 
   private final String target;
-  private final String targetValue;
+  private final CompiledExpression targetValue;
 
   /**
    * {@inheritDoc}
@@ -48,16 +47,17 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
     super(componentModel, cursorProviderFactory, muleContext);
     this.expressionManager = expressionManager;
     this.target = target;
-    this.targetValue = targetValue;
+    this.targetValue = expressionManager.compile(targetValue, getTargetBindingContext(of("")));
   }
 
   @Override
   public CoreEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
-    TypedValue result = expressionManager
-        .evaluate(targetValue, getTargetBindingContext(toMessage(value, operationContext)));
-    return CoreEvent.builder(operationContext.getEvent())
-        .securityContext(operationContext.getSecurityContext())
-        .addVariable(this.target, result.getValue(), result.getDataType())
-        .build();
+    try (ExpressionLanguageSession session =
+        expressionManager.openSession(getTargetBindingContext(toMessage(value, operationContext)))) {
+      return CoreEvent.builder(operationContext.getEvent())
+          .securityContext(operationContext.getSecurityContext())
+          .addVariable(target, session.evaluate(targetValue))
+          .build();
+    }
   }
 }

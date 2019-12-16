@@ -14,16 +14,17 @@ import static org.mule.functional.junit4.matchers.ThatMatcher.that;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_MAPPINGS;
 
+import org.mule.runtime.core.api.event.CoreEvent;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mule.runtime.core.api.event.CoreEvent;
 
 @Feature(ERROR_HANDLING)
 @Story(ERROR_MAPPINGS)
-public class ModuleUsingErrorMappingTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
+public class ModuleUsingErrorMappingTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   private static final String CONNECT_ERROR_MESSAGE = "Could not connect.";
   private static final String UNMATCHED_ERROR_MESSAGE = "Error.";

@@ -10,6 +10,7 @@ import static java.util.regex.Pattern.DOTALL;
 import static java.util.regex.Pattern.compile;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
+import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.DataType;
@@ -35,8 +36,9 @@ public final class AttributeEvaluator {
   private static final Pattern SANITIZE_PATTERN = compile("\r|\t");
 
   private final String attributeValue;
-  private final AttributeEvaluatorDelegate evaluator;
+  private final DataType expectedDataType;
 
+  private AttributeEvaluatorDelegate evaluator;
   private ExtendedExpressionManager expressionManager;
 
   /**
@@ -56,11 +58,12 @@ public final class AttributeEvaluator {
    */
   public AttributeEvaluator(String attributeValue, DataType expectedDataType) {
     this.attributeValue = sanitize(attributeValue);
-    this.evaluator = getEvaluator(expectedDataType);
+    this.expectedDataType = expectedDataType;
   }
 
   public AttributeEvaluator initialize(final ExtendedExpressionManager expressionManager) {
     this.expressionManager = expressionManager;
+    this.evaluator = getEvaluator(expectedDataType);
     return this;
   }
 
@@ -74,7 +77,7 @@ public final class AttributeEvaluator {
   private AttributeEvaluatorDelegate getEvaluator(DataType expectedDataType) {
     if (attributeValue != null) {
       if (SINGLE_EXPRESSION_REGEX_PATTERN.matcher(attributeValue).matches()) {
-        return new ExpressionAttributeEvaluatorDelegate(attributeValue, expectedDataType);
+        return new ExpressionAttributeEvaluatorDelegate(compile(attributeValue, expressionManager), expectedDataType);
       }
       if (isParseExpression(attributeValue)) {
         return new ParseAttributeEvaluatorDelegate(attributeValue);

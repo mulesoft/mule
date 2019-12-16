@@ -8,13 +8,14 @@ package org.mule.runtime.module.extension.soap.internal.runtime.connection;
 
 import static java.lang.String.format;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapServiceProviderDeclarer.TRANSPORT_PARAM;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
@@ -66,7 +67,8 @@ public final class SoapConnectionProviderObjectBuilder extends ConnectionProvide
     ConnectionProvider<ForwardingSoapClient> provider =
         new ForwardingSoapClientConnectionProvider(serviceProvider, transport, muleContext);
     provider = new ReconnectableConnectionProviderWrapper<>(provider, reconnectionConfig);
-    provider = new ErrorTypeHandlerConnectionProviderWrapper<>(provider, extensionModel, reconnectionConfig, muleContext);
+    provider = new ErrorTypeHandlerConnectionProviderWrapper<>(provider, extensionModel, reconnectionConfig,
+                                                               muleContext.getErrorTypeRepository());
     return new Pair(provider, result);
   }
 

@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
-import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -24,10 +23,8 @@ import static org.mule.runtime.api.component.location.ConfigurationComponentLoca
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
-import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
@@ -43,10 +40,8 @@ import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -72,7 +67,6 @@ import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
 import org.mule.runtime.core.internal.streaming.bytes.factory.NullCursorStreamProviderFactory;
-import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
@@ -92,7 +86,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
 import java.util.Collections;
-import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
@@ -195,14 +188,6 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   protected StreamingManager streamingManager = spy(new DefaultStreamingManager());
   private NotificationDispatcher notificationDispatcher;
 
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    ErrorTypeRepository errorTypeRepository = mock(ErrorTypeRepository.class);
-    when(errorTypeRepository.getErrorType(FLOW_BACK_PRESSURE)).thenReturn(of(mock(ErrorType.class)));
-
-    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, errorTypeRepository);
-  }
-
   @Before
   public void before() throws Exception {
     initMocks(this);
@@ -220,7 +205,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
 
     sourceAdapter = createSourceAdapter();
 
-    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), any(), anyBoolean())).thenReturn(sourceAdapter);
+    when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), anyBoolean())).thenReturn(sourceAdapter);
     when(sourceAdapterFactory.getSourceParameters()).thenReturn(new ResolverSet(muleContext));
 
     mockExceptionEnricher(sourceModel, null);
@@ -324,7 +309,6 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
                              mock(Component.class),
                              mock(SourceConnectionManager.class),
                              null, callbackParameters, null,
-                             mock(MessagingExceptionResolver.class),
                              of(BackPressureAction.FAIL));
   }
 

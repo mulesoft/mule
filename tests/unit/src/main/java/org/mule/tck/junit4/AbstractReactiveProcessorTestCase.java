@@ -6,21 +6,22 @@
  */
 package org.mule.tck.junit4;
 
-import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.construct.Flow;
@@ -29,19 +30,19 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 
-import java.util.Collection;
-import java.util.Map;
-
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
+
+import java.util.Collection;
+import java.util.Map;
 
 import reactor.core.publisher.Mono;
 
 /**
  * Abstract base test case extending {@link AbstractMuleContextTestCase} to be used when a {@link Processor} or {@link Flow} that
- * implements both {@link Processor#process(CoreEvent)} and {@link Processor#apply(Publisher)} needs parameterized tests so that
- * both approaches are tested with the same test method. Test cases that extend this abstract class should use (@link
+ * implements both {@link Processor#process(CoreEvent)} and {@link Processor#apply(Publisher)} needs paramatized tests so that both
+ * approaches are tested with the same test method. Test cases that extend this abstract class should use (@link
  * {@link #process(Processor, CoreEvent)} to invoke {@link Processor}'s as part of the test, rather than invoking them directly.
  */
 @RunWith(Parameterized.class)
@@ -50,6 +51,9 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
   protected Scheduler scheduler;
 
   protected Mode mode;
+
+  protected ConfigurationComponentLocator configurationComponentLocator =
+      mock(ConfigurationComponentLocator.class, RETURNS_DEEP_STUBS.get());
 
   public AbstractReactiveProcessorTestCase(Mode mode) {
     this.mode = mode;
@@ -62,11 +66,10 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
-    when(componentLocator.find(any(Location.class))).thenReturn(empty());
-    when(componentLocator.find(any(ComponentIdentifier.class))).thenReturn(emptyList());
+    when(configurationComponentLocator.find(any(Location.class))).thenReturn(empty());
+    when(configurationComponentLocator.find(any(ComponentIdentifier.class))).thenReturn(emptyList());
 
-    return of(REGISTRY_KEY, componentLocator,
-              OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
+    return singletonMap(REGISTRY_KEY, configurationComponentLocator);
   }
 
   @Override
@@ -86,7 +89,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
     return process(processor, event, true);
   }
 
-  protected CoreEvent process(Processor processor, CoreEvent event, boolean unwrapMessagingException) throws Exception {
+  public CoreEvent process(Processor processor, CoreEvent event, boolean unwrapMessagingException) throws Exception {
     setMuleContextIfNeeded(processor, muleContext);
     try {
       switch (mode) {

@@ -8,34 +8,31 @@ package org.mule.runtime.core.internal.policy;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Optional.of;
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.policy.SourcePolicyContext.SOURCE_POLICY_CONTEXT;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.core.api.policy.PolicyProvider;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
@@ -43,7 +40,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 
-public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
+public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
 
   private PolicyProvider policyProvider;
   private ArgumentCaptor<Runnable> policiesChangeCallbackCaptor;
@@ -54,23 +51,16 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
   private Component operation1Component;
   private Component operation2Component;
 
+  @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    policyProvider = mock(PolicyProvider.class, RETURNS_DEEP_STUBS);
+    return singletonMap("_policyProvider", policyProvider);
+  }
+
   @Before
   public void before() throws InitialisationException {
     policyManager = new DefaultPolicyManager();
-
-    policyProvider = mock(PolicyProvider.class, RETURNS_DEEP_STUBS);
-    final Registry registry = mock(Registry.class);
-    when(registry.lookupByType(PolicyProvider.class)).thenReturn(of(policyProvider));
-    policyManager.setRegistry(registry);
-
-    final MuleContext muleContext = mock(MuleContext.class);
-    when(muleContext.getArtifactType()).thenReturn(ArtifactType.APP);
-    ServerNotificationManager notificationManagerMock = mock(ServerNotificationManager.class);
-    doNothing().when(notificationManagerMock).addListener(any());
-    doReturn(notificationManagerMock).when(muleContext).getNotificationManager();
-    policyManager.setMuleContext(muleContext);
-
-    policyManager.initialise();
+    initialiseIfNeeded(policyManager, muleContext);
 
     policiesChangeCallbackCaptor = ArgumentCaptor.forClass(Runnable.class);
     verify(policyProvider).onPoliciesChanged(policiesChangeCallbackCaptor.capture());
