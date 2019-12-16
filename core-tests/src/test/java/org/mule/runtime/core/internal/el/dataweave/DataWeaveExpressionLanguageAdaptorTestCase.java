@@ -649,7 +649,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void evaluateInvalidCompiledExpression() throws MuleException {
     ExpressionCompilationException e = new ExpressionCompilationException(createStaticMessage("oopsy"));
-    expectedEx.expect(is(sameInstance(e)));
+    expectedEx.expect(ExpressionRuntimeException.class);
+    expectedEx.expectCause(is(sameInstance(e)));
 
     CompiledExpression compiled = new IllegalCompiledExpression("#[ble]", e);
     try (ExpressionLanguageSessionAdaptor session =
