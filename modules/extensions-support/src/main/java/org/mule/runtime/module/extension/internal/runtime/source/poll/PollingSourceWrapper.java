@@ -11,6 +11,7 @@ import static java.util.Comparator.naturalOrder;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.store.ObjectStoreSettings.unmanagedPersistent;
+import static org.mule.runtime.api.store.ObjectStoreSettings.unmanagedTransient;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.internal.util.ConcurrencyUtils.safeUnlock;
@@ -115,23 +116,21 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
     delegate.onStart(sourceCallback);
     flowName = componentLocation.getRootContainerName();
     inflightIdsObjectStore = objectStoreManager.getOrCreateObjectStore(formatKey(INFLIGHT_IDS_OS_NAME_SUFFIX),
-                                                                       ObjectStoreSettings.builder()
-                                                                           .persistent(false)
-                                                                           .maxEntries(1000)
-                                                                           .entryTtl(60000L)
-                                                                           .expirationInterval(20000L)
-                                                                           .build());
+                                                                       unmanagedTransient());
 
     recentlyProcessedIds = objectStoreManager.getOrCreateObjectStore(formatKey(RECENTLY_PROCESSED_IDS_OS_NAME_SUFFIX),
                                                                      unmanagedPersistent());
-    idsOnUpdatedWatermark =
-        objectStoreManager.getOrCreateObjectStore(formatKey(IDS_ON_UPDATED_WATERMARK_OS_NAME_SUFFIX), unmanagedPersistent());
 
-    watermarkObjectStore = objectStoreManager.getOrCreateObjectStore(formatKey(WATERMARK_OS_NAME_SUFFIX), unmanagedPersistent());
+    idsOnUpdatedWatermark = objectStoreManager.getOrCreateObjectStore(formatKey(IDS_ON_UPDATED_WATERMARK_OS_NAME_SUFFIX),
+                                                                      unmanagedPersistent());
+
+    watermarkObjectStore = objectStoreManager.getOrCreateObjectStore(formatKey(WATERMARK_OS_NAME_SUFFIX),
+                                                                     unmanagedPersistent());
+
     executor = schedulerService.customScheduler(SchedulerConfig.config()
-        .withMaxConcurrentTasks(1)
-        .withWaitAllowed(true)
-        .withName(formatKey("executor")));
+                                                    .withMaxConcurrentTasks(1)
+                                                    .withWaitAllowed(true)
+                                                    .withName(formatKey("executor")));
 
     stopRequested.set(false);
     scheduler.schedule(executor, () -> poll(sourceCallback));
