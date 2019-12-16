@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ObjectBasedParameterValueResolver implements ParameterValueResolver {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(NullSafeValueResolverWrapper.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ObjectBasedParameterValueResolver.class);
 
   private final Object object;
   private final ParameterizedModel parameterizedModel;
