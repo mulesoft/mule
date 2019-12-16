@@ -346,6 +346,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     beanFactory.registerSingleton(OBJECT_MULE_CONTEXT, muleContext);
 
+    registerErrorTypes();
+
     prepareObjectProviders();
   }
 
@@ -419,7 +421,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   @Override
   protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
-    registerErrorTypes();
     createApplicationComponents(beanFactory, applicationModel, true);
   }
 
