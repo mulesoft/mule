@@ -167,7 +167,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    */
   public DefaultEventContext(FlowConstruct flow, ComponentLocation location, String correlationId,
                              Optional<CompletableFuture<Void>> externalCompletion) {
-    this(flow, flow.getExceptionListener(), location, correlationId, externalCompletion);
+    this(flow, NullExceptionHandler.getInstance(), location, correlationId, externalCompletion);
   }
 
   /**

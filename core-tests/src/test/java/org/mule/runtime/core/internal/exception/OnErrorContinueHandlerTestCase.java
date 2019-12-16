@@ -25,6 +25,7 @@ import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_CONTINUE;
+
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
@@ -37,12 +38,13 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.rule.VerboseExceptions;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(ERROR_HANDLING)
 @Story(ON_ERROR_CONTINUE)
@@ -50,7 +52,6 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
 
   protected MuleContext muleContext = mockContextWithServices();
   private static final String DEFAULT_LOG_MESSAGE = "LOG";
-  private static final int DEFAULT_TIMEOUT = 5;
 
   @Rule
   public ExpectedException expectedException = none();

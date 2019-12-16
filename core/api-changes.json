@@ -3,6 +3,41 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.visibilityReduced",
+          "old": "method org.mule.runtime.core.privileged.event.BaseEventContext org.mule.runtime.core.privileged.component.AbstractExecutableComponent::createChildEventContext(org.mule.runtime.api.event.EventContext)",
+          "new": "method org.mule.runtime.core.privileged.event.BaseEventContext org.mule.runtime.core.privileged.component.AbstractExecutableComponent::createChildEventContext(org.mule.runtime.api.event.EventContext)",
+          "oldVisibility": "protected",
+          "newVisibility": "private",
+          "package": "org.mule.runtime.core.privileged.component",
+          "classSimpleName": "AbstractExecutableComponent",
+          "methodName": "createChildEventContext",
+          "elementKind": "method",
+          "justification": "Encapsulate child context handling"
+        },
+        {
+          "code": "java.method.visibilityReduced",
+          "old": "method org.mule.runtime.api.event.EventContext org.mule.runtime.core.privileged.component.AbstractExecutableComponent::createEventContext(java.util.Optional<java.util.concurrent.CompletableFuture<java.lang.Void>>)",
+          "new": "method org.mule.runtime.api.event.EventContext org.mule.runtime.core.privileged.component.AbstractExecutableComponent::createEventContext(java.util.Optional<java.util.concurrent.CompletableFuture<java.lang.Void>>)",
+          "oldVisibility": "protected",
+          "newVisibility": "private",
+          "package": "org.mule.runtime.core.privileged.component",
+          "classSimpleName": "AbstractExecutableComponent",
+          "methodName": "createEventContext",
+          "elementKind": "method",
+          "justification": "Encapsulate child context handling"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.mule.runtime.core.privileged.component.AbstractExecutableComponent",
+          "new": "class org.mule.runtime.core.privileged.component.AbstractExecutableComponent",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.core.privileged.component",
+          "classSimpleName": "AbstractExecutableComponent",
+          "elementKind": "class",
+          "justification": "Add missing annotation"
+        },
+        {
           "code": "java.annotation.added",
           "old": "class org.mule.runtime.core.privileged.exception.AbstractExceptionListener",
           "new": "class org.mule.runtime.core.privileged.exception.AbstractExceptionListener",
@@ -70,7 +105,7 @@
           "package": "org.mule.runtime.core.api.transaction",
           "classSimpleName": "ExternalTransactionAwareTransactionFactory",
           "elementKind": "interface",
-          "justification": "External transactionas are not supported in Mule 4. Removing leftovers from Mule 3."
+          "justification": "External transactions are not supported in Mule 4. Removing leftovers from Mule 3."
         },
         {
           "code": "java.method.removed",
@@ -79,7 +114,7 @@
           "classSimpleName": "XaTransactionFactory",
           "methodName": "joinExternalTransaction",
           "elementKind": "method",
-          "justification": "External transactionas are not supported in Mule 4. Removing leftovers from Mule 3."
+          "justification": "External transactions are not supported in Mule 4. Removing leftovers from Mule 3."
         },
         {
           "code": "java.field.removed",

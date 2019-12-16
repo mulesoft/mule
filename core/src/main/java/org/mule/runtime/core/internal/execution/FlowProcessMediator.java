@@ -543,10 +543,7 @@ public class FlowProcessMediator implements Initialisable {
 
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-      return applyWithChildContext(from(publisher),
-                                   template::routeEventAsync,
-                                   Optional.empty(),
-                                   flowConstruct.getExceptionListener());
+      return applyWithChildContext(from(publisher), template::routeEventAsync, Optional.empty());
     }
 
     @Override

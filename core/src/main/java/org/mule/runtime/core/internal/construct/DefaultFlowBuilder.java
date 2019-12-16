@@ -13,15 +13,11 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
-import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.createFlowStatistics;
-import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.empty;
 
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
-import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
@@ -35,14 +31,13 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.MessageProcessors;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -221,10 +216,11 @@ public class DefaultFlowBuilder implements Builder {
     @Override
     public ReactiveProcessor referenced() {
       return pub -> from(pub)
+          .doOnNext(assertStarted())
           // Insert the incoming event into the flow, routing it through the processing strategy
           .flatMap(routeThroughProcessingStrategy()
               // Don't propagate errors, these will be handled by parent flow through the EventContext hierarchy mechanism
-              .andThen(alreadyRoutedProcessor -> Mono.from(alreadyRoutedProcessor).onErrorResume(e -> empty())));
+              .andThen(alreadyRoutedProcessor -> Mono.from(alreadyRoutedProcessor).onErrorResume(e -> Mono.empty())));
     }
 
     /**
@@ -234,6 +230,7 @@ public class DefaultFlowBuilder implements Builder {
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher)
           .doOnNext(assertStarted())
+          // Insert the incoming event into the flow, routing it through the processing strategy
           .flatMap(routeThroughProcessingStrategy())
           // Don't handle errors, these will be handled by parent flow
           .onErrorStop();
@@ -250,23 +247,8 @@ public class DefaultFlowBuilder implements Builder {
     }
 
     @Override
-    public String getConstructType() {
-      return "Flow";
-    }
-
-    @Override
     public boolean isSynchronous() {
       return getProcessingStrategy() != null ? getProcessingStrategy().isSynchronous() : true;
-    }
-
-    @Override
-    protected EventContext createEventContext(Optional<CompletableFuture<Void>> externalCompletion) {
-      return create(this, getLocation(), null, externalCompletion);
-    }
-
-    @Override
-    protected BaseEventContext createChildEventContext(EventContext parent) {
-      return child((BaseEventContext) parent, ofNullable(getLocation()), getExceptionListener());
     }
   }
 }

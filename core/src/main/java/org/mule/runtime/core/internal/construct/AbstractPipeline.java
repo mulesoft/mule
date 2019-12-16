@@ -155,6 +155,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       builder.setProcessingStrategy(processingStrategy);
     }
     configureMessageProcessors(builder);
+    builder.setMessagingExceptionHandler(getExceptionListener());
     return builder.build();
   }
 
@@ -316,26 +317,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         .doOnNext(beforeProcessors())
         .transform(processingStrategy.onPipeline(pipeline))
         .doOnNext(afterProcessors())
-        .doOnError(throwable -> {
-          if (isCompleteSignalRejectedExecutionException(throwable)) {
-            LOGGER.debug("Scheduler busy when propagating 'complete' signal due to graceful shutdown timeout being exceeded.",
-                         throwable);
-          } else {
-            LOGGER.error("Unhandled exception in Flow ", throwable);
-          }
-        });
-  }
-
-  boolean isCompleteSignalRejectedExecutionException(Throwable throwable) {
-    if (throwable instanceof RejectedExecutionException) {
-      for (StackTraceElement element : throwable.getStackTrace()) {
-        if (element.getMethodName().contains("onComplete")
-            && element.getClassName().startsWith("reactor.core.publisher.FluxPublishOn")) {
-          return true;
-        }
-      }
-    }
-    return false;
+        .onErrorContinue(MessagingException.class,
+                         (me, e) -> ((BaseEventContext) (((MessagingException) me).getEvent().getContext())).error(me));
   }
 
   private Consumer<CoreEvent> beforeProcessors() {

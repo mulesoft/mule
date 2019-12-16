@@ -242,7 +242,7 @@ public final class MuleTestUtils {
       Object exceptionListeners = getExceptionListenersMethod.invoke(exceptionHandler);
       return (List<FlowExceptionHandler>) exceptionListeners;
     } catch (Exception e) {
-      throw new IllegalStateException("Cannot obtain exception listener for flow");
+      throw new IllegalStateException("Cannot obtain exception listener for flow", e);
     }
   }
 

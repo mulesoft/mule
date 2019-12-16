@@ -31,11 +31,9 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.config.internal.MuleArtifactContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -60,22 +58,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
@@ -274,29 +273,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     private Publisher<CoreEvent> applyForStaticFlow(Flow resolvedTarget, Flux<CoreEvent> pub,
                                                     Optional<ComponentLocation> location) {
-      pub = pub
-          .doOnNext(assertTargetFlowIsStarted(resolvedTarget))
-          .transform(eventPub -> applyWithChildContext(eventPub, wrapInExceptionMapper(resolvedTarget.referenced()),
-                                                       location,
-                                                       resolvedTarget.getExceptionListener()));
-
-      return decoratePublisher(pub);
-    }
-
-    private ReactiveProcessor wrapInExceptionMapper(ReactiveProcessor target) {
-      return publisher -> Flux.from(publisher)
-          .transform(target)
-          .onErrorMap(MessagingException.class, getMessagingExceptionMapper());
-    }
-
-    private Consumer<CoreEvent> assertTargetFlowIsStarted(Flow resolvedTarget) {
-      return event -> {
-        if (!resolvedTarget.getLifecycleState().isStarted()) {
-          throw propagate(new MessagingException(event,
-                                                 new LifecycleException(CoreMessages.isStopped(resolvedTarget.getName()),
-                                                                        event.getMessage())));
-        }
-      };
+      return decoratePublisher(pub.transform(eventPub -> applyWithChildContext(eventPub, resolvedTarget.referenced(), location)));
     }
 
     private Publisher<CoreEvent> applyForStaticSubFlow(ReactiveProcessor resolvedTarget, Flux<CoreEvent> pub,
@@ -306,10 +283,9 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     private Publisher<CoreEvent> applyForStaticProcessor(ReactiveProcessor resolvedTarget, Flux<CoreEvent> pub,
                                                          Optional<ComponentLocation> location) {
-      pub = pub.transform(eventPub -> eventPub.flatMap(event -> Mono.just(event).transform(resolvedTarget)
-          .doOnError(exception -> ((BaseEventContext) event.getContext()).error(exception))));
-
-      return decoratePublisher(pub);
+      return decoratePublisher(pub.transform(eventPub -> eventPub
+          .flatMap(event -> Mono.just(event)
+              .transform(resolvedTarget))));
     }
 
     /**
@@ -460,9 +436,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       if (targetAsFlow.isPresent()) {
         return processWithChildContextDontComplete(event, p -> Mono.from(p)
             .transform(resolvedTarget)
-            .onErrorMap(MessagingException.class,
-                        getMessagingExceptionMapper()), componentLocation,
-                                                   targetAsFlow.get().getExceptionListener());
+            .onErrorMap(MessagingException.class, getMessagingExceptionMapper()), componentLocation);
       } else {
         // If the resolved target is not a flow, it should be a subflow
         return Mono.just(event).transform(resolvedTarget);
