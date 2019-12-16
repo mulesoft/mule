@@ -13,7 +13,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
-import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.component.location.Location;
@@ -26,20 +25,22 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
+import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 
 /**
  * Selects which "on error" handler to execute based on filtering. Replaces the choice-exception-strategy from Mule 3. On error
@@ -50,9 +51,8 @@ import org.slf4j.Logger;
 public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor>
     implements MessagingExceptionHandlerAcceptor, MuleContextAware, Lifecycle {
 
-  private static final Logger LOGGER = getLogger(ErrorHandler.class);
-
   private static final String MUST_ACCEPT_ANY_EVENT_MESSAGE = "Default error handler must accept any event.";
+
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
   private ErrorType anyErrorType;
   protected String name;
@@ -62,6 +62,12 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   @Inject
   private ErrorTypeRepository errorTypeRepository;
+
+  @Inject
+  private ErrorTypeLocator errorTypeLocator;
+
+  @Inject
+  private Collection<ExceptionContextProvider> exceptionContextProviders;
 
   private final MessagingExceptionResolver messagingExceptionResolver = new MessagingExceptionResolver(this);
 
@@ -103,7 +109,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
       throw new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE));
     } catch (Exception e) {
       propagateCallback.accept(messagingExceptionResolver.resolve(new MessagingException(event, e, this),
-                                                                  muleContext));
+                                                                  errorTypeLocator, exceptionContextProviders));
     }
   }
 
@@ -120,8 +126,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
         }
         throw new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE));
       } catch (Exception e) {
-        return error(new MessagingExceptionResolver(this).resolve(new MessagingException(event, e, this),
-                                                                  muleContext));
+        return error(messagingExceptionResolver.resolve(new MessagingException(event, e, this),
+                                                        errorTypeLocator, exceptionContextProviders));
       }
     } else {
       // This should never occur since all exceptions at this point are ME
@@ -145,7 +151,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   private void addCriticalErrorHandler() {
-    exceptionListeners.add(0, new OnCriticalErrorHandler(new SingleErrorTypeMatcher(muleContext.getErrorTypeRepository()
+    exceptionListeners.add(0, new OnCriticalErrorHandler(new SingleErrorTypeMatcher(errorTypeRepository
         .getErrorType(OVERLOAD).get())));
   }
 

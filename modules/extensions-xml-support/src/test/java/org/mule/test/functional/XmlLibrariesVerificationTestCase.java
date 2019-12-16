@@ -24,7 +24,7 @@ import org.junit.Test;
  */
 @Feature("Security")
 @Story("Provide correct XML factories with isolation")
-public class XmlLibrariesVerificationTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
+public class XmlLibrariesVerificationTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Override
   protected String getModulePath() {

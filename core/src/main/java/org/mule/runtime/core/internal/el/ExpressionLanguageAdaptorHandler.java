@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.el;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.String.format;
-import static java.util.regex.Pattern.compile;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -70,7 +69,8 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
       expressionLanguages.put(MEL_PREFIX, mvelExpressionLanguage);
     }
 
-    exprPrefixPattern = compile(EXPR_PREFIX_PATTERN_TEMPLATE.replaceAll("LANGS", join(expressionLanguages.keySet(), '|')));
+    exprPrefixPattern =
+        Pattern.compile(EXPR_PREFIX_PATTERN_TEMPLATE.replaceAll("LANGS", join(expressionLanguages.keySet(), '|')));
 
     melDefault = MuleProperties.isMelDefault();
     if (isMelDefault() && mvelExpressionLanguage == null) {
@@ -148,6 +148,11 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
     return selectExpressionLanguage(expression).split(expression, event, bindingContext);
   }
 
+  @Override
+  public CompiledExpression compile(String expression, BindingContext bindingContext) {
+    return selectExpressionLanguage(expression).compile(expression, bindingContext);
+  }
+
   private ExtendedExpressionLanguageAdaptor selectExpressionLanguage(String expression) {
     return expressionLanguagesByExpressionCache.get(expression);
   }
@@ -205,28 +210,28 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
 
       @Override
       public TypedValue<?> evaluate(CompiledExpression expression) throws ExpressionExecutionException {
-        return sessions.get(DW_PREFIX).evaluate(expression);
+        return resolveSessionForLanguage(sessions, expression.expression()).evaluate(expression);
       }
 
       @Override
       public TypedValue<?> evaluate(CompiledExpression expression, DataType expectedOutputType)
           throws ExpressionExecutionException {
-        return sessions.get(DW_PREFIX).evaluate(expression, expectedOutputType);
+        return resolveSessionForLanguage(sessions, expression.expression()).evaluate(expression, expectedOutputType);
       }
 
       @Override
       public TypedValue<?> evaluate(CompiledExpression expression, long timeout) throws ExpressionExecutionException {
-        return sessions.get(DW_PREFIX).evaluate(expression, timeout);
+        return resolveSessionForLanguage(sessions, expression.expression()).evaluate(expression, timeout);
       }
 
       @Override
       public TypedValue<?> evaluateLogExpression(CompiledExpression expression) throws ExpressionExecutionException {
-        return sessions.get(DW_PREFIX).evaluateLogExpression(expression);
+        return resolveSessionForLanguage(sessions, expression.expression()).evaluateLogExpression(expression);
       }
 
       @Override
       public Iterator<TypedValue<?>> split(CompiledExpression expression) {
-        return sessions.get(DW_PREFIX).split(expression);
+        return resolveSessionForLanguage(sessions, expression.expression()).split(expression);
       }
 
       protected ExpressionLanguageSessionAdaptor resolveSessionForLanguage(Map<String, ExpressionLanguageSessionAdaptor> sessions,

@@ -60,7 +60,7 @@
                     <set-payload value="Wildcard namespace was caught" />
                 </on-error-propagate>
                 <on-error-propagate type="ANY" >
-                    <set-payload value="Wildcard namespace wasn't caught" />
+                    <set-payload value="Wildcard namespace was not caught" />
                 </on-error-propagate>
             </error-handler>
         </try>
@@ -69,7 +69,7 @@
                 <set-payload value="#[payload ++ '; Wildcard name was caught']" />
             </on-error-continue>
             <on-error-continue type="ANY" >
-                <set-payload value="#[payload ++ '; Wildcard name wasn't caught']" />
+                <set-payload value="#[payload ++ '; Wildcard name was not caught']" />
             </on-error-continue>
         </error-handler>
     </flow>

@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
@@ -20,10 +19,12 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
-import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.el.CompiledExpression;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
@@ -34,12 +35,15 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -74,6 +78,14 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
   private static final Logger LOGGER = getLogger(IdempotentRedeliveryPolicy.class);
 
+  private final MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(this);
+
+  @Inject
+  private ErrorTypeLocator errorTypeLocator;
+
+  @Inject
+  private Collection<ExceptionContextProvider> exceptionContextProviders;
+
   private LockFactory lockFactory;
   private ObjectStoreManager objectStoreManager;
   private ExpressionManager expressionManager;
@@ -81,6 +93,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   private boolean useSecureHash;
   private String messageDigestAlgorithm;
   private String idExpression;
+  private CompiledExpression compiledIdExpresion;
   private ObjectStore<RedeliveryCounter> store;
   private ObjectStore<RedeliveryCounter> privateStore;
   private String idrId;
@@ -133,6 +146,11 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
                                         createStaticMessage("Ambiguous definition of object store, both reference and private were configured"),
                                         this);
     }
+
+    if (idExpression != null) {
+      compiledIdExpresion = compile(idExpression, expressionManager);
+    }
+
     if (store == null) {
       // If no object store was defined, create one
       if (privateStore == null) {
@@ -220,7 +238,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
           incrementCounter(messageId, (MessagingException) ex);
           throw ex;
         } else {
-          MessagingException me = createMessagingException(event, ex, this);
+          MessagingException me = createMessagingException(event, ex);
           incrementCounter(messageId, me);
           throw ex;
         }
@@ -237,11 +255,8 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     return BLOCKING;
   }
 
-  private MessagingException createMessagingException(CoreEvent event, Throwable cause, Component processor) {
-    MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
-    MessagingException me = new MessagingException(event, cause, processor);
-
-    return exceptionResolver.resolve(me, muleContext);
+  private MessagingException createMessagingException(CoreEvent event, Throwable cause) {
+    return exceptionResolver.resolve(new MessagingException(event, cause, this), errorTypeLocator, exceptionContextProviders);
   }
 
   private void resetCounter(String messageId) throws ObjectStoreException {
@@ -271,7 +286,9 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   }
 
   private String getIdForEvent(CoreEvent event) {
-    return (String) expressionManager.evaluate(idExpression, STRING, NULL_BINDING_CONTEXT, event).getValue();
+    try (ExpressionLanguageSession session = expressionManager.openSession(event.asBindingContext())) {
+      return (String) session.evaluate(compiledIdExpresion, STRING).getValue();
+    }
   }
 
   public boolean isUseSecureHash() {

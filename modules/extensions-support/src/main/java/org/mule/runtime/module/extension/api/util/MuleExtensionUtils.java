@@ -7,38 +7,26 @@
 
 package org.mule.runtime.module.extension.api.util;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
-import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.runtime.core.api.util.UUID.getUUID;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
 
-import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
-import org.mule.runtime.core.api.lifecycle.LifecycleState;
-import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
-import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 
 import java.util.Map;
-
-import javax.xml.namespace.QName;
 
 /**
  * Provides utilities to work with extensions
@@ -49,7 +37,7 @@ public class MuleExtensionUtils {
 
   private MuleExtensionUtils() {}
 
-  private static final String INITIALIZER_EVENT = "InitializerEvent";
+
 
   /**
    * Loads a extension model
@@ -87,9 +75,11 @@ public class MuleExtensionUtils {
    * Creates an empty event for extension initialization purposes
    *
    * @return a new {@link CoreEvent}
+   * @deprecated since 4.3.0. Use {@link NullEventFactory#getNullEvent()} instead
    */
+  @Deprecated
   public static CoreEvent getInitialiserEvent() {
-    return getInitialiserEvent(null);
+    return getNullEvent();
   }
 
   /**
@@ -97,71 +87,11 @@ public class MuleExtensionUtils {
    *
    * @param muleContext context on which the event will be associated.
    * @return a new {@link CoreEvent}
+   * @deprecated since 4.3.0. Use {@link NullEventFactory#getNullEvent(MuleContext)} instead
    */
+  @Deprecated
   public static CoreEvent getInitialiserEvent(MuleContext muleContext) {
-    FlowConstruct flowConstruct = new FlowConstruct() {
-
-      @Override
-      public Object getAnnotation(QName name) {
-        return null;
-      }
-
-      @Override
-      public Map<QName, Object> getAnnotations() {
-        return emptyMap();
-      }
-
-      @Override
-      public void setAnnotations(Map<QName, Object> annotations) {}
-
-      @Override
-      public ComponentLocation getLocation() {
-        return null;
-      }
-
-      @Override
-      public Location getRootContainerLocation() {
-        return null;
-      }
-      // TODO MULE-9076: This is only needed because the muleContext is get from the given flow.
-
-      @Override
-      public MuleContext getMuleContext() {
-        return muleContext;
-      }
-
-      @Override
-      public String getServerId() {
-        return "InitialiserServer";
-      }
-
-      @Override
-      public String getUniqueIdString() {
-        return getUUID();
-      }
-
-      @Override
-      public String getName() {
-        return "InitialiserEventFlow";
-      }
-
-      @Override
-      public LifecycleState getLifecycleState() {
-        return null;
-      }
-
-      @Override
-      public FlowExceptionHandler getExceptionListener() {
-        return null;
-      }
-
-      @Override
-      public DefaultFlowConstructStatistics getStatistics() {
-        return null;
-      }
-    };
-    return InternalEvent.builder(create(flowConstruct, fromSingleComponent(INITIALIZER_EVENT))).message(of(null))
-        .build();
+    return getNullEvent(muleContext);
   }
 
   /**

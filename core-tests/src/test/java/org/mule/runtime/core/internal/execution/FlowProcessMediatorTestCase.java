@@ -27,24 +27,21 @@ import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
-import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_SEND;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_SEND;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
-import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.onCallback;
 import static org.mule.tck.junit4.matcher.EitherMatcher.leftMatches;
 import static org.mule.tck.junit4.matcher.EitherMatcher.rightMatches;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
 import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
-import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Mono.error;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -67,11 +64,10 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
-import org.mule.runtime.core.privileged.PrivilegedMuleContext;
+import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.matcher.EventMatcher;
 import org.mule.tck.size.SmallTest;
 
@@ -88,7 +84,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mockito.ArgumentCaptor;
 
 @SmallTest
-public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
+public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
 
   private static final ErrorType ERROR_FROM_FLOW =
       ErrorTypeBuilder.builder().parentErrorType(mock(ErrorType.class)).namespace("TEST").identifier("FLOW_FAILED").build();
@@ -122,14 +118,6 @@ public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws Exception {
-
-    final PrivilegedMuleContext muleContext = (PrivilegedMuleContext) mockMuleContext();
-    when(muleContext.getErrorTypeRepository()).thenReturn(createDefaultErrorTypeRepository());
-    ErrorTypeLocator errorTypeLocator = mock(ErrorTypeLocator.class);
-    when(errorTypeLocator.lookupErrorType(any(Throwable.class)))
-        .thenReturn(ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(ANY_IDENTIFIER).build());
-    when(muleContext.getErrorTypeLocator()).thenReturn(errorTypeLocator);
-
     event = mock(CoreEvent.class);
     mockException = mock(RuntimeException.class);
 
@@ -153,7 +141,6 @@ public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
     }).when(sourcePolicy).process(any(), any(), any());
 
     flowProcessMediator = new FlowProcessMediator(policyManager);
-    flowProcessMediator.setMuleContext(muleContext);
     initialiseIfNeeded(flowProcessMediator, muleContext);
     startIfNeeded(flowProcessMediator);
 
@@ -178,6 +165,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleTestCase {
     when(source.getRootContainerLocation()).thenReturn(Location.builder().globalName("root").build());
     when(source.getLocation()).thenReturn(mock(ComponentLocation.class));
     when(context.getMessageSource()).thenReturn(source);
+    when(context.getMessagingExceptionResolver()).thenReturn(new MessagingExceptionResolver(source));
     when(context.getTransactionConfig()).thenReturn(empty());
     when(context.getFlowConstruct()).thenReturn(flow);
 

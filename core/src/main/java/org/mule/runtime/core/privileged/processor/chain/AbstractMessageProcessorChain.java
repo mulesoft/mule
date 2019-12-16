@@ -44,13 +44,13 @@ import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
-import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.context.thread.notification.ThreadNotificationService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
+import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
@@ -69,8 +69,10 @@ import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -133,6 +135,15 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private boolean canProcessMessage = true;
 
   @Inject
+  private ServerNotificationHandler serverNotificationHandler;
+
+  @Inject
+  private ErrorTypeLocator errorTypeLocator;
+
+  @Inject
+  private Collection<ExceptionContextProvider> exceptionContextProviders;
+
+  @Inject
   private InterceptorManager processorInterceptorManager;
 
   @Inject
@@ -169,7 +180,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                       rethrown -> errorSwitchSinkAdapter.next(left((MessagingException) rethrown, CoreEvent.class)))));
       return baseStream
           // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
-          // it will be cancelled, ignoring the onErrorcontinue of the parent Flux.
+          // it will be cancelled, ignoring the onErrorContinue of the parent Flux.
           .map(event -> right(MessagingException.class, event))
           .doOnComplete(() -> errorSwitchSinkSinkRef.complete())
           .mergeWith(create(errorSwitchSinkSinkRef))
@@ -191,7 +202,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       stream = stream.transform(applyInterceptors(interceptors, processor))
           // #1 Register local error hook to wrap exceptions in a MessagingException maintaining failed event.
           .subscriberContext(context -> context.put(REACTOR_ON_OPERATOR_ERROR_LOCAL,
-                                                    getLocalOperatorErrorHook(processor, muleContext)))
+                                                    getLocalOperatorErrorHook(processor, errorTypeLocator,
+                                                                              exceptionContextProviders)))
           // #2 Register continue error strategy to handle errors without stopping the stream.
           .onErrorContinue(exception -> !(exception instanceof LifecycleException),
                            getContinueStrategyErrorHandler(processor, errorBubbler));
@@ -221,7 +233,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     final MessagingExceptionResolver exceptionResolver =
         (processor instanceof Component) ? new MessagingExceptionResolver((Component) processor) : null;
     final Function<MessagingException, MessagingException> messagingExceptionMapper =
-        resolveMessagingException(processor, muleContext, exceptionResolver);
+        resolveMessagingException(processor, e -> exceptionResolver.resolve(e, errorTypeLocator, exceptionContextProviders));
 
     return (throwable, object) -> {
       throwable = unwrap(throwable);
@@ -249,7 +261,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         } else {
           notifyError(processor,
                       ((BaseEventContext) event.getContext()),
-                      resolveException(processor, event, throwable, muleContext, exceptionResolver),
+                      resolveException(processor, event, throwable, errorTypeLocator, exceptionContextProviders,
+                                       exceptionResolver),
                       errorBubbler);
         }
       }
@@ -395,16 +408,14 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private void preNotification(CoreEvent event, Processor processor) {
     if (((PrivilegedEvent) event).isNotificationsEnabled()) {
-      fireNotification(muleContext.getNotificationManager(), event, processor, null,
-                       MESSAGE_PROCESSOR_PRE_INVOKE);
+      fireNotification(event, processor, null, MESSAGE_PROCESSOR_PRE_INVOKE);
     }
   }
 
   private Consumer<CoreEvent> postNotification(Processor processor) {
     return event -> {
       if (((PrivilegedEvent) event).isNotificationsEnabled()) {
-        fireNotification(muleContext.getNotificationManager(), event, processor, null,
-                         MESSAGE_PROCESSOR_POST_INVOKE);
+        fireNotification(event, processor, null, MESSAGE_PROCESSOR_POST_INVOKE);
 
       }
     };
@@ -414,22 +425,18 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     return exception -> {
       if (exception instanceof MessagingException
           && ((PrivilegedEvent) ((MessagingException) exception).getEvent()).isNotificationsEnabled()) {
-        fireNotification(muleContext.getNotificationManager(), ((MessagingException) exception).getEvent(), processor,
-                         (MessagingException) exception,
+        fireNotification(((MessagingException) exception).getEvent(), processor, (MessagingException) exception,
                          MESSAGE_PROCESSOR_POST_INVOKE);
       }
     };
   }
 
-  private void fireNotification(ServerNotificationManager serverNotificationManager, CoreEvent event, Processor processor,
+  private void fireNotification(CoreEvent event, Processor processor,
                                 MessagingException exceptionThrown, int action) {
-    if (serverNotificationManager != null
-        && serverNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)) {
-
-      if (((Component) processor).getLocation() != null) {
-        serverNotificationManager
-            .fireNotification(createFrom(event, ((Component) processor).getLocation(), (Component) processor,
-                                         exceptionThrown, action));
+    if (serverNotificationHandler != null) {
+      if (processor instanceof Component && ((Component) processor).getLocation() != null) {
+        serverNotificationHandler.fireNotification(createFrom(event, ((Component) processor).getLocation(), (Component) processor,
+                                                              exceptionThrown, action));
       }
     }
   }

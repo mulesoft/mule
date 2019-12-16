@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
+
 import org.mule.test.petstore.extension.PetStoreClient;
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -23,7 +24,7 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-public class ModuleGlobalElementTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
+public class ModuleGlobalElementTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Parameterized.Parameter
   public String configFile;

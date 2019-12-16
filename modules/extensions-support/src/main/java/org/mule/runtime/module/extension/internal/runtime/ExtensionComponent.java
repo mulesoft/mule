@@ -29,6 +29,7 @@ import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -143,6 +144,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   @Inject
   protected ReflectionCache reflectionCache;
+
+  @Inject
+  protected ErrorTypeRepository errorTypeRepository;
 
   private MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory;
 

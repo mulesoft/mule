@@ -9,17 +9,19 @@ package org.mule.runtime.core.internal.util.rx;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 
+import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionLanguage;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.SynchronousSink;
 
@@ -55,17 +57,55 @@ public final class Operators {
     };
   }
 
+  /**
+   * Returns a function that transforms a {@link CoreEvent} into another one in which the result of evaluating the
+   * {@code targetValueExpression} over the {@code originalEvent} is added as a variable of key {@code target}.
+   *
+   * @param originalEvent         the event on which the expression is evaluated
+   * @param target                the name of the variable in which the result is put
+   * @param targetValueExpression the expression to evaluate
+   * @param expressionManager     the {@link ExpressionManager} used for the evaluation
+   * @return a {@link Function}
+   * @deprecated since 4.3.0. Use {@link #outputToTarget(CoreEvent, CoreEvent, String, CompiledExpression, ExpressionLanguage)} instead
+   */
+  @Deprecated
   public static Function<CoreEvent, CoreEvent> outputToTarget(CoreEvent originalEvent, String target,
                                                               String targetValueExpression,
                                                               ExpressionLanguage expressionManager) {
     return result -> {
       if (target != null) {
         TypedValue targetValue = expressionManager.evaluate(targetValueExpression, getTargetBindingContext(result.getMessage()));
-        return builder(originalEvent).addVariable(target, targetValue.getValue(), targetValue.getDataType()).build();
+        return builder(originalEvent).addVariable(target, targetValue).build();
       } else {
         return result;
       }
     };
+  }
+
+  /**
+   * Returns a new {@code CoreEvent}in which the result of evaluating the
+   * {@code targetValueExpression} over the {@code originalEvent} was added as a variable of key {@code target}.
+   *
+   * @param originalEvent         the event on which the expression is evaluated
+   * @param target                the name of the variable in which the result is put
+   * @param targetValueExpression the expression to evaluate
+   * @return a new {@link CoreEvent}
+   */
+  public static CoreEvent outputToTarget(CoreEvent originalEvent,
+                                         CoreEvent result,
+                                         String target,
+                                         CompiledExpression targetValueExpression,
+                                         ExpressionLanguage expressionLanguage) {
+    if (target != null) {
+      try (ExpressionLanguageSession session = expressionLanguage.openSession(getTargetBindingContext(result.getMessage()))) {
+        TypedValue targetValue = session.evaluate(targetValueExpression);
+        return builder(originalEvent)
+            .addVariable(target, targetValue)
+            .build();
+      }
+    } else {
+      return result;
+    }
   }
 
   /**

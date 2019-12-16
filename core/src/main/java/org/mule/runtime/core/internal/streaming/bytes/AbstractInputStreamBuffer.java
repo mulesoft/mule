@@ -6,19 +6,17 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import static java.nio.channels.Channels.newChannel;
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.interrupted;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.internal.streaming.AbstractStreamingBuffer;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousCloseException;
-import java.nio.channels.ClosedByInterruptException;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.ReadableByteChannel;
 
 import org.slf4j.Logger;
 
@@ -33,41 +31,20 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
 
   private static final Logger LOGGER = getLogger(AbstractInputStreamBuffer.class);
 
+  private final InputStream stream;
   protected final ByteBufferManager bufferManager;
 
-  private final InputStream stream;
-  private ReadableByteChannel streamChannel;
-  private boolean streamFullyConsumed = false;
+  protected boolean streamFullyConsumed = false;
 
   /**
    * Creates a new instance
    *
-   * @param stream The stream being buffered. This is the original data source
+   * @param stream        The stream being buffered. This is the original data source
    * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
    */
   public AbstractInputStreamBuffer(InputStream stream, ByteBufferManager bufferManager) {
-    this(stream, openStreamChannel(stream), bufferManager);
-  }
-
-  /**
-   * Creates a new instance
-   *
-   * @param stream The stream being buffered. This is the original data source
-   * @param streamChannel a {@link ReadableByteChannel} used to read from the {@code stream}
-   * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
-   */
-  public AbstractInputStreamBuffer(InputStream stream, ReadableByteChannel streamChannel, ByteBufferManager bufferManager) {
     this.stream = stream;
-    this.streamChannel = streamChannel;
     this.bufferManager = bufferManager;
-  }
-
-  /**
-   * @param stream the stream to consume
-   * @return a new {@link ReadableByteChannel} for consuming the {@code stream}
-   */
-  protected static ReadableByteChannel openStreamChannel(InputStream stream) {
-    return stream != null ? newChannel(stream) : null;
   }
 
   /**
@@ -89,10 +66,6 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
           doClose();
           return null;
         } finally {
-          if (streamChannel != null) {
-            closeSafely(streamChannel::close);
-          }
-
           if (stream != null) {
             closeSafely(stream::close);
           }
@@ -120,22 +93,59 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
   protected abstract ByteBuffer doGet(long position, int length);
 
   protected int consumeStream(ByteBuffer buffer) throws IOException {
-    int result;
-    try {
-      result = streamChannel.read(buffer);
-    } catch (ClosedByInterruptException cbie) {
-      LOGGER.error("Channel interrupted.", cbie);
-      throw cbie;
-    } catch (AsynchronousCloseException ace) {
-      LOGGER.error("Channel closed asynchronously.", ace);
-      throw ace;
-    } catch (ClosedChannelException cce) {
-      // Assume ClosedChannelException means there is no more data. AsynchronousCloseException which are not expected are handled
-      // separably above.
-      LOGGER.debug("Channel closed.", cce);
-      result = -1;
+    final int maxLen = buffer.remaining();
+    final byte[] dest = buffer.array();
+
+    int totalRead = 0;
+    int remaining = maxLen;
+    int offset = buffer.position();
+
+    while (remaining > 0) {
+      try {
+        if (totalRead > 0 && stream.available() < 1) {
+          break;
+        }
+
+        int read = stream.read(dest, offset, remaining);
+
+        if (read == -1) {
+          streamFullyConsumed = true;
+          if (totalRead == 0) {
+            return -1;
+          } else {
+            break;
+          }
+        } else if (read == 0) {
+          break;
+        }
+
+        totalRead += read;
+        remaining -= read;
+        offset += read;
+      } catch (IOException e) {
+        if (!interrupted()) {
+          throw e;
+        }
+
+        currentThread().interrupt();
+        if (LOGGER.isWarnEnabled()) {
+          LOGGER.warn("Thread {} interrupted while reading from stream.", currentThread().getName());
+        }
+
+        if (totalRead == 0 || closed.get()) {
+          streamFullyConsumed = true;
+          return -1;
+        }
+
+        throw e;
+      }
     }
-    return result;
+
+    if (totalRead > 0) {
+      buffer.position(offset);
+    }
+
+    return totalRead;
   }
 
   protected boolean deallocate(ByteBuffer byteBuffer) {
@@ -145,14 +155,6 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     }
 
     return false;
-  }
-
-  protected boolean isStreamFullyConsumed() {
-    return streamFullyConsumed;
-  }
-
-  protected void streamFullyConsumed() {
-    streamFullyConsumed = true;
   }
 
   protected abstract ByteBuffer copy(long position, int length);

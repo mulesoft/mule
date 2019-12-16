@@ -20,7 +20,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -43,7 +42,7 @@ public class SourceAdapterFactory {
   private final Optional<BackPressureAction> backPressureAction;
   private final ReflectionCache reflectionCache;
   private final ExpressionManager expressionManager;
-  private ConfigurationProperties properties;
+  private final ConfigurationProperties properties;
   private final MuleContext muleContext;
 
   public SourceAdapterFactory(ExtensionModel extensionModel,
@@ -75,21 +74,6 @@ public class SourceAdapterFactory {
    *
    * @param configurationInstance an {@link Optional} {@link ConfigurationInstance} in case the source requires a config
    * @param sourceCallbackFactory a {@link SourceCallbackFactory}
-   * @return a new {@link SourceAdapter}
-   */
-  public SourceAdapter createAdapter(Optional<ConfigurationInstance> configurationInstance,
-                                     SourceCallbackFactory sourceCallbackFactory,
-                                     Component component,
-                                     SourceConnectionManager connectionManager,
-                                     MessagingExceptionResolver exceptionResolver) {
-    return createAdapter(configurationInstance, sourceCallbackFactory, component, connectionManager, exceptionResolver, false);
-  }
-
-  /**
-   * Creates a new {@link SourceAdapter}
-   *
-   * @param configurationInstance an {@link Optional} {@link ConfigurationInstance} in case the source requires a config
-   * @param sourceCallbackFactory a {@link SourceCallbackFactory}
    *
    * @param restarting            indicates if the creation of the adapter was triggered after by a restart
    *
@@ -99,7 +83,6 @@ public class SourceAdapterFactory {
                                      SourceCallbackFactory sourceCallbackFactory,
                                      Component component,
                                      SourceConnectionManager connectionManager,
-                                     MessagingExceptionResolver exceptionResolver,
                                      boolean restarting) {
     Source source = getSourceFactory(sourceModel).createSource();
     try {
@@ -117,7 +100,6 @@ public class SourceAdapterFactory {
                                sourceParameters,
                                successCallbackParameters,
                                errorCallbackParameters,
-                               exceptionResolver,
                                backPressureAction);
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(format("Could not create generator for source '%s'",

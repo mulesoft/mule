@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -69,7 +70,8 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
   }
 
   private ConnectionProvider<C> applyErrorHandling(ConnectionProvider<C> provider) {
-    return new ErrorTypeHandlerConnectionProviderWrapper<>(provider, extensionModel, reconnectionConfig, muleContext);
+    return new ErrorTypeHandlerConnectionProviderWrapper<>(provider, extensionModel, reconnectionConfig,
+                                                           muleContext.getErrorTypeRepository());
   }
 
   private ConnectionProvider<C> applyConnectionManagement(ConnectionProvider<C> provider) {

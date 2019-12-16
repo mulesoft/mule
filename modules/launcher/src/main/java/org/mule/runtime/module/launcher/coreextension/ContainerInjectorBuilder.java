@@ -81,6 +81,10 @@ public class ContainerInjectorBuilder<T extends ContainerInjectorBuilder> {
   public T withCoreExtensions(List<MuleCoreExtension> coreExtensions) {
     registerObject("_coreExtensions", coreExtensions);
 
+    for (MuleCoreExtension muleCoreExtension : coreExtensions) {
+      registerObject("_coreExtension_" + muleCoreExtension.getName(), muleCoreExtension);
+    }
+
     return getThis();
   }
 

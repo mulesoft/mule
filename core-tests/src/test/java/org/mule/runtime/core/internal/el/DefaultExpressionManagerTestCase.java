@@ -38,9 +38,7 @@ import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
 import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
@@ -70,12 +68,6 @@ import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
-import java.io.ByteArrayInputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -83,6 +75,12 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import java.io.ByteArrayInputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -108,7 +106,6 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
     Map<String, Object> objects = new HashMap<>();
     objects.putAll(super.getStartUpRegistryObjects());
     objects.put(COMPATIBILITY_PLUGIN_INSTALLED, new Object());
-    objects.put(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
     return objects;
   }
 

@@ -8,12 +8,14 @@ package org.mule.test.functional;
 
 
 import static org.hamcrest.Matchers.is;
-import org.hamcrest.MatcherAssert;
-import org.junit.Test;
+
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.event.CoreEvent;
 
-public class ModuleEchoTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
+import org.hamcrest.MatcherAssert;
+import org.junit.Test;
+
+public class ModuleEchoTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Override
   protected String getModulePath() {

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.soap.internal.runtime.operation;
 
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
+import static org.mule.runtime.api.metadata.DataType.XML_STRING;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.ATTACHMENTS_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.BODY_PARAM;
@@ -15,7 +16,10 @@ import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeO
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.OPERATION_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.SERVICE_PARAM;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.TRANSPORT_HEADERS_PARAM;
+
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.CompiledExpression;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -66,6 +70,7 @@ public final class SoapOperationExecutor implements CompletableComponentExecutor
   private final StreamingHelperArgumentResolver streamingHelperArgumentResolver = new StreamingHelperArgumentResolver();
   private final SoapExceptionEnricher soapExceptionEnricher = new SoapExceptionEnricher();
   private ExtensionsClientArgumentResolver extensionsClientArgumentResolver;
+  private CompiledExpression headersExpression;
 
   /**
    * {@inheritDoc}
@@ -96,6 +101,15 @@ public final class SoapOperationExecutor implements CompletableComponentExecutor
 
   public void initialise() {
     this.extensionsClientArgumentResolver = new ExtensionsClientArgumentResolver(extensionsClientProcessorsStrategyFactory);
+    headersExpression = expressionExecutor.compile(
+                                                   "%dw 2.0 \n"
+                                                       + "output application/java \n"
+                                                       + "---\n"
+                                                       + "payload.headers mapObject (value, key) -> {\n"
+                                                       + "    '$key' : write((key): value, \"application/xml\")\n"
+                                                       + "}",
+                                                   BindingContext.builder()
+                                                       .addBinding("payload", new TypedValue<>("", XML_STRING)).build());
   }
 
   /**
@@ -142,13 +156,10 @@ public final class SoapOperationExecutor implements CompletableComponentExecutor
 
   private Object evaluateHeaders(InputStream headers) {
     String hs = IOUtils.toString(headers);
-    BindingContext context = BindingContext.builder().addBinding("payload", new TypedValue<>(hs, DataType.XML_STRING)).build();
-    return expressionExecutor.evaluate("%dw 2.0 \n"
-        + "output application/java \n"
-        + "---\n"
-        + "payload.headers mapObject (value, key) -> {\n"
-        + "    '$key' : write((key): value, \"application/xml\")\n"
-        + "}", context).getValue();
+    BindingContext context = BindingContext.builder().addBinding("payload", new TypedValue<>(hs, XML_STRING)).build();
+    try (ExpressionLanguageSession session = expressionExecutor.openSession(context)) {
+      return session.evaluate(headersExpression).getValue();
+    }
   }
 
   private Map<String, SoapAttachment> toSoapAttachments(Map<String, TypedValue<?>> attachments)

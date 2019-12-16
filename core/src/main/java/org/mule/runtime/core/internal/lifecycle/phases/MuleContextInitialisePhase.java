@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.lifecycle.phases;
 
+import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -50,6 +51,7 @@ public class MuleContextInitialisePhase extends DefaultLifecyclePhase {
     setOrderedLifecycleTypes(new Class<?>[] {
         StreamingManager.class,
         ObjectStore.class,
+        ExpressionLanguage.class,
         ConfigurationProvider.class,
         Config.class,
         SecurityManager.class,

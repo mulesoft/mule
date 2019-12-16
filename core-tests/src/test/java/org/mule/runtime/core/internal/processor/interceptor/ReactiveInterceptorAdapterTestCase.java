@@ -41,8 +41,6 @@ import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorTypeThat;
 import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
@@ -161,11 +159,6 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   @Before
   public void before() throws MuleException {
     flow = builder("flow", muleContext).processors(processor).build();
-  }
-
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @After

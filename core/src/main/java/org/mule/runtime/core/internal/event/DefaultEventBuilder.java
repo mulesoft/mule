@@ -152,6 +152,10 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   @Override
   public DefaultEventBuilder addVariable(String key, Object value) {
+    if (value instanceof TypedValue) {
+      return (DefaultEventBuilder) addVariable(key, (TypedValue) value);
+    }
+
     initVariables();
 
     flowVariables.put(key, new TypedValue<>(value, DataType.fromObject(value)));
@@ -166,6 +170,16 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     initVariables();
 
     flowVariables.put(key, new TypedValue<>(value, dataType));
+    this.varsModified = true;
+    this.modified = true;
+    return this;
+  }
+
+  @Override
+  public CoreEvent.Builder addVariable(String key, TypedValue<?> value) {
+    initVariables();
+
+    flowVariables.put(key, value);
     this.varsModified = true;
     this.modified = true;
     return this;

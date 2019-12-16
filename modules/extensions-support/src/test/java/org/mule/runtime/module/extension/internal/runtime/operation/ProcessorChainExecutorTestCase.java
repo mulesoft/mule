@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -16,8 +15,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.event.Event;
@@ -32,16 +29,15 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedResult;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import reactor.core.publisher.Mono;
 
@@ -68,11 +64,6 @@ public class ProcessorChainExecutorTestCase extends AbstractMuleContextTestCase 
             .variables(coreEvent.getVariables())
             .build()));
     when(chain.getMessageProcessors()).thenReturn(singletonList(processor));
-  }
-
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @Test

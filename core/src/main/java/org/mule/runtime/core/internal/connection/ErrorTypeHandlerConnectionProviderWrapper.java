@@ -10,6 +10,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -18,7 +19,6 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
@@ -43,9 +43,9 @@ public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends Connecti
   public ErrorTypeHandlerConnectionProviderWrapper(ConnectionProvider<C> connectionProvider,
                                                    ExtensionModel extensionModel,
                                                    ReconnectionConfig reconnectionConfig,
-                                                   MuleContext muleContext) {
+                                                   ErrorTypeRepository errorTypeRepository) {
     super(connectionProvider);
-    this.errorTypeRepository = muleContext.getErrorTypeRepository();
+    this.errorTypeRepository = errorTypeRepository;
     this.prefix = extensionModel.getXmlDslModel().getPrefix().toUpperCase();
     this.reconnectionConfig = reconnectionConfig;
   }
@@ -54,7 +54,7 @@ public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends Connecti
    * Delegates to the proper {@link ConnectionProvider}, if this fails and throws a {@link ConnectionException}, this method will
    * introspect into the cause of this exception and if the cause is a {@link ModuleException} a new {@link ConnectionException}
    * will be created communicating the proper {@link ErrorType}, otherwise the original exception will be propagated.
-   * 
+   *
    * @return a ready to use {@code Connection}
    * @throws ConnectionException when a problem occurs creating the connection
    */
@@ -76,7 +76,7 @@ public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends Connecti
    * Delegates the validation of the connection {@link C} to the proper {@link ConnectionProvider}, is the validation is not valid
    * this method will introspect into the exception cause and look for a {@link ModuleException}, if one is found a new
    * {@link ConnectionValidationResult} will be created with the same information, but communicating the {@link ErrorType}.
-   * 
+   *
    * @param connection a non {@code null} {@link C}.
    * @return a {@link ConnectionValidationResult} indicating if the connection is valid or not.
    */

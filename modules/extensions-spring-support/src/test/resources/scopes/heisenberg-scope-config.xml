@@ -62,7 +62,7 @@
     <flow name="neverFailsWrapperFailingChain">
         <heisenberg:never-fails-wrapper>
             <set-variable variableName="varName" value="varValue"/>
-            <set-payload value="#[dummy.error]"/>
+            <set-payload value="#['' ++ null.a!]"/>
         </heisenberg:never-fails-wrapper>
     </flow>
 
@@ -90,7 +90,7 @@
 
     <flow name="alwaysFailsWrapperFailure">
         <heisenberg:always-fails-wrapper>
-            <set-payload value="#[dummy.error]"/>
+            <set-payload value="#[null.a!]"/>
         </heisenberg:always-fails-wrapper>
     </flow>
 
@@ -102,7 +102,7 @@
 
     <flow name="exceptionOnCallbacksFailure">
         <heisenberg:exception-on-callbacks>
-            <set-payload value="#[dummy.error]"/>
+            <set-payload value="#[null.a!]"/>
         </heisenberg:exception-on-callbacks>
     </flow>
 

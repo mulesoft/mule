@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 
 import org.junit.Test;
 
-public class ModuleContentTestCase extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
+public class ModuleContentTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Override
   protected String getModulePath() {

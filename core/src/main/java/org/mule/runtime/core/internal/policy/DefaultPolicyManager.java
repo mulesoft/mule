@@ -23,7 +23,9 @@ import org.mule.runtime.api.notification.FlowConstructNotification;
 import org.mule.runtime.api.notification.FlowConstructNotificationListener;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyProvider;
@@ -31,10 +33,12 @@ import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.policy.api.OperationPolicyPointcutParametersFactory;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executor;
@@ -42,10 +46,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 
 /**
  * Default implementation of {@link PolicyManager}.
@@ -59,6 +64,15 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
   private static final OperationPolicy NO_POLICY_OPERATION =
       (operationEvent, operationExecutionFunction, opParamProcessor, componentLocation, callback) -> operationExecutionFunction
           .execute(opParamProcessor.getOperationParameters(), operationEvent, callback);
+
+  @Inject
+  private ErrorTypeLocator errorTypeLocator;
+
+  @Inject
+  private Collection<ExceptionContextProvider> exceptionContextProviders;
+
+  @Inject
+  private ServerNotificationManager notificationManager;
 
   private MuleContext muleContext;
 
@@ -141,7 +155,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
                  : new CompositeSourcePolicy(innerKey.getSecond(), flowExecutionProcessor,
                                              lookupSourceParametersTransformer(sourceIdentifier),
                                              sourcePolicyProcessorFactory, exception -> new MessagingExceptionResolver(source)
-                                                 .resolve(exception, muleContext))));
+                                                 .resolve(exception, errorTypeLocator, exceptionContextProviders))));
   }
 
   @Override
@@ -216,7 +230,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
                                             registry.lookupAllByType(OperationPolicyPointcutParametersFactory.class));
 
     // Register flow disposal listener
-    muleContext.getNotificationManager().addListener(new FlowConstructNotificationListener<FlowConstructNotification>() {
+    notificationManager.addListener(new FlowConstructNotificationListener<FlowConstructNotification>() {
 
       @Override
       public boolean isBlocking() {

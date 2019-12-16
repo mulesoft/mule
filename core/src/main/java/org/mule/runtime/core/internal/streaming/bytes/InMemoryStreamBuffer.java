@@ -39,7 +39,6 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
   private final int bufferSizeIncrement;
   private final int maxBufferSize;
   private long bufferTip = 0;
-  private boolean streamFullyConsumed = false;
 
   /**
    * Creates a new instance
@@ -81,7 +80,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
           }
 
           final long requiredUpperBound = position + length;
-          while (!isStreamFullyConsumed() && bufferTip < requiredUpperBound) {
+          while (!streamFullyConsumed && bufferTip < requiredUpperBound) {
             try {
               final int read = consumeForwardData();
               if (read > 0) {
@@ -90,7 +89,6 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
                   return refetch;
                 }
               } else {
-                streamFullyConsumed();
                 buffer.limit(buffer.position());
               }
             } catch (IOException e) {
@@ -107,7 +105,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
   }
 
   private ByteBuffer getFromCurrentData(long position, int length) {
-    if (isStreamFullyConsumed() && position > bufferTip) {
+    if (streamFullyConsumed && position > bufferTip) {
       return null;
     }
 
@@ -157,8 +155,6 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
         }
 
         bufferTip += read;
-      } else {
-        streamFullyConsumed = true;
       }
     } finally {
       if (auxBuffer) {

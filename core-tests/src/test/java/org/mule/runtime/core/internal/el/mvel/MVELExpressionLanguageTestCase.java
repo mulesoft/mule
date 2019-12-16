@@ -30,11 +30,8 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguageTestCase.Variant.EXPRESSION_STRAIGHT_UP;
 import static org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguageTestCase.Variant.EXPRESSION_WITH_DELIMITER;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.PropertyAccessException;
@@ -43,6 +40,7 @@ import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -130,11 +128,6 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     final DefaultComponentLocation location = fromSingleComponent("myFlow");
     when(((Component) flowConstruct).getAnnotation(LOCATION_KEY)).thenReturn(location);
     when(((Component) flowConstruct).getLocation()).thenReturn(location);
-  }
-
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
   }
 
   @Test

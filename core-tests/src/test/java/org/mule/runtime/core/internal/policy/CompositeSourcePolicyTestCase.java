@@ -22,10 +22,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.block;
 import static org.mule.runtime.core.internal.policy.SourcePolicyContext.SOURCE_POLICY_CONTEXT;
@@ -55,6 +57,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
@@ -121,6 +124,22 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
     };
   }
 
+  protected ReactiveProcessor errorProcessor(Throwable failure) {
+    return eventPub -> {
+      Flux<CoreEvent> baseFlux = Flux.from(eventPub);
+      if (processChangeThread) {
+        baseFlux = baseFlux.publishOn(Schedulers.single());
+      }
+      return baseFlux
+          .doOnNext(ev -> flowActualResultEvent = ev)
+          .doOnNext(event -> {
+            final MessagingException me = new MessagingException(event, failure);
+            ((BaseEventContext) event.getContext()).error(me);
+            throw propagateWrappingFatal(me);
+          });
+    };
+  }
+
   @Test
   public void singlePolicy() throws Throwable {
     compositeSourcePolicy = new CompositeSourcePolicy(asList(firstPolicy), flowExecutionProcessor,
@@ -168,6 +187,28 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
   public void emptyPolicyList() {
     compositeSourcePolicy = new CompositeSourcePolicy(emptyList(), flowExecutionProcessor,
                                                       of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory);
+  }
+
+  @Test
+  public void policyExecutionFlowFailurePropagates() throws Throwable {
+    RuntimeException flowException = new RuntimeException("flow failure");
+    final Component policyComponent = mock(Component.class);
+    when(policyComponent.getLocation()).thenReturn(fromSingleComponent("http-policy:proxy"));
+
+    doAnswer(invocation -> {
+      return Flux.from(errorProcessor(flowException).apply(invocation.getArgument(0)));
+    }).when(flowExecutionProcessor).apply(any());
+
+    compositeSourcePolicy =
+        new CompositeSourcePolicy(asList(firstPolicy, secondPolicy), flowExecutionProcessor,
+                                  of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory);
+
+    Either<SourcePolicyFailureResult, SourcePolicySuccessResult> sourcePolicyResult =
+        block(callback -> compositeSourcePolicy.process(initialEvent, sourceParametersProcessor, callback));
+    assertThat(sourcePolicyResult.isLeft(), is(true));
+    assertThat(sourcePolicyResult.getLeft().getMessagingException().getCause(), is(flowException));
+    verify(sourcePolicyParametersTransformer, never()).fromFailureResponseParametersToMessage(any());
+    verify(sourcePolicyParametersTransformer, never()).fromSuccessResponseParametersToMessage(any());
   }
 
   @Test

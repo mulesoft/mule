@@ -8,12 +8,9 @@
 package org.mule.runtime.core.internal.el.mvel.datatype;
 
 import static java.util.Collections.EMPTY_LIST;
-import static java.util.Collections.singletonMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.mvel2.MVEL.compileExpression;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
-import static org.mule.tck.MuleTestUtils.OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.mvel2.ParserContext;
@@ -21,8 +18,6 @@ import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.util.Map;
 
 import org.junit.Test;
 
@@ -32,11 +27,6 @@ public class MvelExpressionDataTypeResolverTestCase extends AbstractMuleContextT
   public static final String MEL_EXPRESSION = "someExpression";
 
   private MvelDataTypeResolver dataTypeResolver;
-
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(OBJECT_ERROR_TYPE_REPO_REGISTRY_KEY, createDefaultErrorTypeRepository());
-  }
 
   @Test
   public void returnsDefaultDataTypeForNonNullValue() throws Exception {
