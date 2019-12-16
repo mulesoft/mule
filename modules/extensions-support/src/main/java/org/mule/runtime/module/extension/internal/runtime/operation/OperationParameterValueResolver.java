@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
+import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getShowInDslParameters;
 
@@ -23,7 +24,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -114,6 +114,6 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
 
   @Override
   public Map<String, ValueResolver<? extends Object>> getParameters() {
-    return Collections.unmodifiableMap(resolverSet.getResolvers());
+    return unmodifiableMap(resolverSet.getResolvers());
   }
 }

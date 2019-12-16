@@ -28,5 +28,5 @@ public interface ParameterValueResolver {
    *
    * @since 4.2.3
    */
-  Map<String, ValueResolver<? extends Object>> getParameters();
+  Map<String, ValueResolver<? extends Object>> getParameters() throws ValueResolvingException;
 }

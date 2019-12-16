@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
@@ -19,7 +20,6 @@ import org.mule.runtime.module.extension.internal.runtime.ValueResolvingExceptio
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +79,7 @@ public class ObjectBasedParameterValueResolver implements ParameterValueResolver
   }
 
   @Override
-  public Map<String, ValueResolver<? extends Object>> getParameters() {
+  public Map<String, ValueResolver<? extends Object>> getParameters() throws ValueResolvingException{
     HashMap<String, ValueResolver<? extends Object>> parameters = new HashMap<>();
     try {
       addFields(getFields(object.getClass()), parameters);
@@ -95,10 +95,9 @@ public class ObjectBasedParameterValueResolver implements ParameterValueResolver
         }
       }
     } catch (Exception e) {
-      LOGGER.debug("An error occurred trying to obtain the parameters.");
-      return Collections.emptyMap();
+      throw new ValueResolvingException("An error occurred trying to obtain the parameters.");
     }
-    return Collections.unmodifiableMap(parameters);
+    return unmodifiableMap(parameters);
   }
 
   private void addFields(List<Field> fields, HashMap<String, ValueResolver<? extends Object>> parameters)
