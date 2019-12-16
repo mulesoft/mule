@@ -663,10 +663,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   @Override
   protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
-    // We should register error types at this point but we cannot call method from super class as it will
-    // create bean definitions for all the application model components.
-    registerErrorTypes();
-
     applicationModel.recursiveStream()
         .filter(cm -> !beanDefinitionFactory.isComponentIgnored(cm.getIdentifier()))
         .forEach(cm -> componentLocator.addComponentLocation(cm.getLocation()));
