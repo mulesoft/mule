@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -20,7 +21,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
-import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -87,7 +87,7 @@ public class ObjectBuilderValueResolver<T> extends AbstractComponent
     if (builder instanceof ParameterValueResolver) {
       return unmodifiableMap(((ParameterValueResolver) builder).getParameters());
     } else {
-      return Collections.emptyMap();
+      return emptyMap();
     }
   }
 }
