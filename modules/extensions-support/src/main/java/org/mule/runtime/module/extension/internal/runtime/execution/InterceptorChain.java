@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static java.lang.String.format;
+import static java.util.function.Function.identity;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -14,6 +15,8 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -21,6 +24,36 @@ import org.slf4j.Logger;
 public class InterceptorChain<T extends ComponentModel> {
 
   private static final Logger LOGGER = getLogger(InterceptorChain.class);
+
+  public static class Builder<T extends ComponentModel> {
+
+    private final List<Interceptor<T>> interceptors = new ArrayList<>(2);
+    private Function<Throwable, Throwable> exceptionMapper = identity();
+
+    public Builder<T> addInterceptor(Interceptor<T> interceptor) {
+      interceptors.add(interceptor);
+      return this;
+    }
+
+    public InterceptorChain<T> build() {
+      InterceptorChain<T> root = null;
+      InterceptorChain<T> previous = null;
+      final int len = interceptors.size();
+
+      for (int i = len-1; i >= 0; i--) {
+        int prevIndex = i - 1;
+        Interceptor<T> prev = prevIndex >= 0 ? interceptors.get(prevIndex) : null;
+
+        //InterceptorChain chain = new InterceptorChain(interceptors.get(i), next, previous, exceptionMapper);
+        //previous = chain;
+        if (root == null) {
+          //root = chain;
+        }
+      }
+
+      return root;
+    }
+  }
 
   private static final String BEFORE = "before";
   private static final String ON_SUCCESS = "onSuccess";
