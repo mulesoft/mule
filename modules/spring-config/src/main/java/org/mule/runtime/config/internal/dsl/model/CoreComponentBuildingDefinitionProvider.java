@@ -165,7 +165,6 @@ import org.mule.runtime.core.internal.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.internal.transformer.simple.HexStringToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
-import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy;
@@ -802,11 +801,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withIdentifier("content").withTypeDefinition(fromType(String.class)).build());
     transformerComponentBuildingDefinitions.add(getCoreTransformerBaseBuilder(AutoTransformer.class)
         .withIdentifier("auto-transformer")
-        .build());
-    transformerComponentBuildingDefinitions.add(getCoreMuleMessageTransformerBaseBuilder()
-        .withIdentifier("append-string-transformer")
-        .withTypeDefinition(fromType(StringAppendTransformer.class))
-        .withSetterParameterDefinition("message", fromSimpleParameter("message").build())
         .build());
     transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(getCustomTransformerConfigurationFactory(),
                                                                           Transformer.class,

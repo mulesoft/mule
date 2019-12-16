@@ -230,28 +230,6 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="append-string-transformer" type="appendStringTransformerType" substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that appends a string to a string payload.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="appendStringTransformerType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractTransformerType">
-                <xsd:attribute name="message" type="xsd:string" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The string to append.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <xsd:element name="encrypt-transformer" type="encryptionTransformerType" substitutionGroup="abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
