@@ -21,6 +21,7 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNO
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErrorMappings;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
@@ -182,7 +183,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
         .map(this::createEventWithParameters)
         // 2. Restore the error handler, overriding the last one set by the inner chain. This one being set again is the one that
         // must be used for handling any errors in the mapper above.
-        .subscriberContext(ctx -> ctx.put("reactor.onNextError.localStrategy", ctx.get(localStrategyCtxKey)))
+        .subscriberContext(ctx -> ctx.put(KEY_ON_NEXT_ERROR_STRATEGY, ctx.get(localStrategyCtxKey)))
         .compose(eventPub -> applyWithChildContext(eventPub,
                                                    p -> from(p)
                                                        .doOnNext(this::pushFlowStackEntry)
@@ -192,7 +193,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
                                                    ofNullable(getLocation()),
                                                    errorHandler()))
         // 1. Store the current error handler into the subscription context, so it can be retrieved later
-        .subscriberContext(ctx -> ctx.put(localStrategyCtxKey, ctx.get("reactor.onNextError.localStrategy")))
+        .subscriberContext(ctx -> ctx.put(localStrategyCtxKey, ctx.get(KEY_ON_NEXT_ERROR_STRATEGY)))
         .map(eventResult -> processResult(getInternalParameter(ORIGINAL_EVENT_KEY, eventResult), eventResult));
   }
 
