@@ -33,7 +33,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -250,7 +249,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
                                            return ((ParameterValueResolver) entry.getValue()).getParameters().keySet()
                                                .stream().map(k -> aliasedParameterNames.getOrDefault(k, k));
                                          } catch (ValueResolvingException e) {
-                                           throw new RuntimeException(e);
+                                           throw new MuleRuntimeException(e);
                                          }
                                        } else {
                                          String key = entry.getKey();
