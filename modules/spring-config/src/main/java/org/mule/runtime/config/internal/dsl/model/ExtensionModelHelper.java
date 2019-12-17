@@ -24,9 +24,12 @@ import static org.mule.runtime.api.util.NameUtils.toCamelCase;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.ORIGINAL_IDENTIFIER;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
+import org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.construct.HasConstructModels;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
@@ -38,12 +41,16 @@ import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
@@ -52,6 +59,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -73,13 +81,23 @@ public class ExtensionModelHelper {
       CacheBuilder.newBuilder().build();
   private Cache<ComponentIdentifier, Optional<NestableElementModel>> extensionNestableElementModelByComponentIdentifier =
       CacheBuilder.newBuilder().build();
+  private final com.github.benmanes.caffeine.cache.Cache<ComponentIdentifier, Optional<? extends ConnectionProviderModel>> extensionConnectionProviderModelByComponentIdentifier =
+      Caffeine.newBuilder().build();
+  private final LoadingCache<ExtensionModel, DslSyntaxResolver> dslSyntaxResolversByExtension;
+
+  public ExtensionModelHelper(Set<ExtensionModel> extensionModels) {
+    this(extensionModels, DslResolvingContext.getDefault(extensionModels));
+  }
+
 
   /**
    * @param extensionModels the set of {@link ExtensionModel}s to work with. Usually this is the set of models configured within a
    *                        mule artifact.
    */
-  public ExtensionModelHelper(Set<ExtensionModel> extensionModels) {
+  public ExtensionModelHelper(Set<ExtensionModel> extensionModels, DslResolvingContext dslResolvingCtx) {
     this.extensionsModels = extensionModels;
+    this.dslSyntaxResolversByExtension =
+        Caffeine.newBuilder().build(key -> DslSyntaxResolver.getDefault(key, dslResolvingCtx));
   }
 
   /**
@@ -141,11 +159,11 @@ public class ExtensionModelHelper {
   }
 
   /**
-   * Finds a {@link org.mule.runtime.api.meta.model.ComponentModel} within the provided set of {@link ExtensionModel}s by a
+   * Finds a {@link ComponentModel} within the provided set of {@link ExtensionModel}s by a
    * {@link ComponentIdentifier}.
    *
    * @param componentIdentifier the identifier to use for the search.
-   * @return the found {@link org.mule.runtime.api.meta.model.ComponentModel} or {@link Optional#empty()} if it couldn't be found.
+   * @return the found {@link ComponentModel} or {@link Optional#empty()} if it couldn't be found.
    */
   public Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> findComponentModel(ComponentIdentifier componentIdentifier) {
     try {
@@ -178,6 +196,50 @@ public class ExtensionModelHelper {
     } catch (ExecutionException e) {
       throw new MuleRuntimeException(e);
     }
+  }
+
+  /**
+   * Finds a {@link ConnectionProviderModel} within the provided set of {@link ExtensionModel}s by
+   * a {@link ComponentIdentifier}.
+   *
+   * @param componentId the identifier to use for the search.
+   * @return the found {@link ConnectionProviderModel} or {@link Optional#empty()} if it couldn't
+   *         be found.
+   */
+  public Optional<? extends ConnectionProviderModel> findConnectionProviderModel(ComponentIdentifier componentId) {
+
+    return extensionConnectionProviderModelByComponentIdentifier.get(componentId,
+                                                                     componentIdentifier -> lookupExtensionModelFor(componentIdentifier)
+                                                                         .flatMap(currentExtension -> {
+                                                                           AtomicReference<ConnectionProviderModel> modelRef =
+                                                                               new AtomicReference<>();
+
+                                                                           new ExtensionWalker() {
+
+                                                                             final DslSyntaxResolver dslSyntaxResolver =
+                                                                                 dslSyntaxResolversByExtension
+                                                                                     .get(currentExtension);
+
+                                                                             @Override
+                                                                             protected void onConnectionProvider(HasConnectionProviderModels owner,
+                                                                                                                 ConnectionProviderModel model) {
+                                                                               if (dslSyntaxResolver.resolve(model)
+                                                                                   .getElementName()
+                                                                                   .equals(componentIdentifier.getName())) {
+                                                                                 modelRef.set(model);
+                                                                               }
+                                                                             };
+
+                                                                           }.walk(currentExtension);
+
+                                                                           return ofNullable(modelRef.get());
+                                                                         }));
+  }
+
+  private Optional<ExtensionModel> lookupExtensionModelFor(ComponentIdentifier componentIdentifier) {
+    return extensionsModels.stream()
+        .filter(e -> e.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace()))
+        .findFirst();
   }
 
   private Optional<NestableElementModel> findNestableElementModel(ComponentIdentifier componentIdentifier) {

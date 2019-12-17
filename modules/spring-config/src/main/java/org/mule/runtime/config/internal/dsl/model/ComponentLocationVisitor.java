@@ -15,6 +15,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SUBFLOW_IDENTIFIER;
@@ -37,9 +38,8 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
@@ -49,6 +49,7 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -74,6 +75,13 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
   private static final ComponentIdentifier CHOICE_WHEN_COMPONENT_IDENTIFIER = buildFromStringRepresentation("mule:when");
   private static final ComponentIdentifier CHOICE_OTHERWISE_COMPONENT_IDENTIFIER =
       buildFromStringRepresentation("mule:otherwise");
+  private static final String CONNECTION_LOCATION_PART = "connection";
+
+  private ExtensionModelHelper extensionModelHelper;
+
+  public ComponentLocationVisitor(ExtensionModelHelper extensionModelHelper) {
+    this.extensionModelHelper = extensionModelHelper;
+  }
 
   /**
    * For every {@link ComponentModel} in the configuration, sets the {@link DefaultComponentLocation} associated within an
@@ -131,7 +139,7 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
       } else if (parentComponentIsRouter(componentModel)) {
         if (isRoute(componentModel)) {
           componentLocation = parentComponentLocation.appendRoutePart()
-              .appendLocationPart(findRoutePath(componentModel), of(TypedComponentIdentifier.builder().type(SCOPE)
+              .appendLocationPart(findRoutePath(componentModel), of(builder().type(SCOPE)
                   .identifier(ROUTE_COMPONENT_IDENTIFIER).build()), componentModel.getConfigFileName(),
                                   componentModel.getLineNumber(), componentModel.getStartColumn());
         } else if (isProcessor(componentModel)) {
@@ -163,16 +171,11 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
                                                                                                 componentModel.getLineNumber(),
                                                                                                 componentModel.getStartColumn());
         }
-      } else if (isConnection(componentModel)) {
-        componentLocation = parentComponentLocation.appendConnectionPart(typedComponentIdentifier,
-                                                                         componentModel.getMetadata().getFileName(),
-                                                                         componentModel.getMetadata().getStartLine(),
-                                                                         componentModel.getMetadata().getStartColumn());
       } else {
         if (isBatchAggregator(componentModel)) {
           componentLocation = parentComponentLocation
               .appendLocationPart(BATCH_AGGREGATOR_COMPONENT_IDENTIFIER.getName(),
-                                  of(TypedComponentIdentifier.builder().type(UNKNOWN)
+                                  of(builder().type(UNKNOWN)
                                       .identifier(BATCH_AGGREGATOR_COMPONENT_IDENTIFIER).build()),
                                   componentModel.getConfigFileName(),
                                   componentModel.getLineNumber(),
@@ -186,16 +189,24 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
       }
     } else {
       DefaultComponentLocation parentComponentLocation = componentModel.getParent().getComponentLocation();
-      componentLocation =
-          parentComponentLocation.appendLocationPart(findNonProcessorPath(componentModel), typedComponentIdentifier,
-                                                     componentModel.getConfigFileName(), componentModel.getLineNumber(),
-                                                     componentModel.getStartColumn());
+      if (isConnection(componentModel)) {
+        componentLocation = parentComponentLocation.appendLocationPart(CONNECTION_LOCATION_PART,
+                                                                       typedComponentIdentifier,
+                                                                       componentModel.getConfigFileName(),
+                                                                       componentModel.getLineNumber(),
+                                                                       componentModel.getStartColumn());
+      } else {
+        componentLocation =
+            parentComponentLocation.appendLocationPart(findNonProcessorPath(componentModel), typedComponentIdentifier,
+                                                       componentModel.getConfigFileName(), componentModel.getLineNumber(),
+                                                       componentModel.getStartColumn());
+      }
     }
     componentModel.setComponentLocation(componentLocation);
   }
 
-  private boolean isConnection(ComponentAst componentModel) {
-    return componentModel.getModel(ConnectionProviderModel.class).isPresent();
+  private boolean isConnection(ComponentModel componentModel) {
+    return this.extensionModelHelper.findConnectionProviderModel(componentModel.getIdentifier()).isPresent();
   }
 
   private boolean isBatchAggregator(ComponentModel componentModel) {
@@ -381,13 +392,8 @@ public class ComponentLocationVisitor implements Consumer<ComponentModel> {
         || existsWithin(componentModel, MUNIT_AFTER_SUITE_IDENTIFIER)
         || existsWithin(componentModel, MUNIT_AFTER_TEST_IDENTIFIER)
         || existsWithin(componentModel, HTTP_PROXY_POLICY_IDENTIFIER)
-        || existsWithinConfig(hierarchy)
         || existsWithinRootErrorHandler(componentModel)
         || existsWithinSubflow(componentModel);
-  }
-
-  private boolean existsWithinConfig(List<ComponentAst> hierarchy) {
-    return hierarchy.stream().anyMatch(p -> p.getModel(ConfigurationModel.class).isPresent());
   }
 
   private boolean existsWithinRootErrorHandler(ComponentModel componentModel) {

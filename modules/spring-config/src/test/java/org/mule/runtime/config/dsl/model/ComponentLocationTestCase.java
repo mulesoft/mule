@@ -13,6 +13,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -55,11 +56,11 @@ public class ComponentLocationTestCase extends AbstractDslModelTestCase {
     assertThat(root.getComponentLocation(), is(nullValue()));
 
     ComponentModel config = root.getInnerComponents().get(0);
-    assertThat(config.getModel(ConfigurationModel.class), is(not(empty())));
+    assertThat(config.getIdentifier().getName(), containsString("config"));
     assertThat(config.getComponentLocation().getLocation(), equalTo(CONFIG_NAME));
 
     ComponentModel connection = config.getInnerComponents().get(0);
-    assertThat(connection.getModel(ConnectionProviderModel.class), is(not(empty())));
+    assertThat(connection.getIdentifier().getName(), containsString("connection"));
     assertThat(connection.getComponentLocation().getLocation(), equalTo(CONFIG_NAME + "/connection"));
   }
 
@@ -67,7 +68,7 @@ public class ComponentLocationTestCase extends AbstractDslModelTestCase {
 
   protected ApplicationModel loadApplicationModel(ArtifactDeclaration declaration) throws Exception {
     return new ApplicationModel(new ArtifactConfig.Builder().build(),
-                                declaration, extensions, emptyMap(), empty(), empty(),
+                                declaration, extensions, emptyMap(), empty(), empty(), true,
                                 uri -> getClass().getResourceAsStream(uri));
   }
 
