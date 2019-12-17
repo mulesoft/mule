@@ -33,6 +33,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -57,6 +58,7 @@ import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescripto
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.exception.RequiredParameterNotSetException;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ExclusiveParameterGroupObjectBuilder;
@@ -244,8 +246,12 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     checkParameterGroupExclusiveness(model, groups,
                                      parameters.entrySet().stream().flatMap(entry -> {
                                        if (entry.getValue() instanceof ParameterValueResolver) {
-                                         return ((ParameterValueResolver) entry.getValue()).getParameters().keySet()
-                                             .stream().map(k -> aliasedParameterNames.getOrDefault(k, k));
+                                         try {
+                                           return ((ParameterValueResolver) entry.getValue()).getParameters().keySet()
+                                               .stream().map(k -> aliasedParameterNames.getOrDefault(k, k));
+                                         } catch (ValueResolvingException e) {
+                                           throw new RuntimeException(e);
+                                         }
                                        } else {
                                          String key = entry.getKey();
                                          aliasedParameterNames.getOrDefault(key, key);
