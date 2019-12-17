@@ -79,7 +79,7 @@ public class ObjectBasedParameterValueResolver implements ParameterValueResolver
   }
 
   @Override
-  public Map<String, ValueResolver<? extends Object>> getParameters() throws ValueResolvingException{
+  public Map<String, ValueResolver<? extends Object>> getParameters() throws ValueResolvingException {
     HashMap<String, ValueResolver<? extends Object>> parameters = new HashMap<>();
     try {
       addFields(getFields(object.getClass()), parameters);
