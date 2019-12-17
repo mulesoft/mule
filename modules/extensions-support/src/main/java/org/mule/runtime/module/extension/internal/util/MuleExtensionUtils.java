@@ -8,12 +8,9 @@ package org.mule.runtime.module.extension.internal.util;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
@@ -38,7 +35,6 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
-import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -57,12 +53,10 @@ import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionE
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
-import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
-import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
@@ -75,11 +69,9 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactoryWrapper;
 import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ComponentExecutorCompletableAdapterFactory;
 import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ReactiveOperationExecutorFactoryWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -187,64 +179,6 @@ public class MuleExtensionUtils {
     }.walk(extensionModel);
 
     return connectionProvider.get() != null;
-  }
-
-  /**
-   * Creates a new {@link List} of {@link Interceptor interceptors} using the factories returned by
-   * {@link InterceptorsModelProperty} (if present).
-   *
-   * @param model the model on which {@link InterceptorsModelProperty} is to be invoked
-   * @return an immutable {@link List} with instances of {@link Interceptor}
-   */
-  public static List<Interceptor> createInterceptors(EnrichableModel model) {
-    return model.getModelProperty(InterceptorsModelProperty.class)
-        .map(p -> createInterceptors(p.getInterceptorFactories()))
-        .orElse(ImmutableList.of());
-  }
-
-  /**
-   * Adds the given {@code interceptorFactory} to the {@code declaration} as the last interceptor in the list
-   *
-   * @param declaration        a {@link BaseDeclaration}
-   * @param interceptorFactory a {@link InterceptorFactory}
-   */
-  public static void addInterceptorFactory(BaseDeclaration declaration, InterceptorFactory interceptorFactory) {
-    getOrCreateInterceptorModelProperty(declaration).addInterceptorFactory(interceptorFactory);
-  }
-
-  /**
-   * Adds the given {@code interceptorFactory} to the {@code declaration} at the given {@code position}
-   *
-   * @param declaration        a {@link BaseDeclaration}
-   * @param interceptorFactory a {@link InterceptorFactory}
-   * @param position           a valid list index
-   */
-  public static void addInterceptorFactory(BaseDeclaration declaration, InterceptorFactory interceptorFactory, int position) {
-    getOrCreateInterceptorModelProperty(declaration).addInterceptorFactory(interceptorFactory, position);
-  }
-
-  private static InterceptorsModelProperty getOrCreateInterceptorModelProperty(BaseDeclaration declaration) {
-    InterceptorsModelProperty property =
-        (InterceptorsModelProperty) declaration.getModelProperty(InterceptorsModelProperty.class).orElse(null);
-    if (property == null) {
-      property = new InterceptorsModelProperty(emptyList());
-      declaration.addModelProperty(property);
-    }
-    return property;
-  }
-
-  /**
-   * Creates a new {@link List} of {@link Interceptor interceptors} using the {@code interceptorFactories}
-   *
-   * @param interceptorFactories a {@link List} with instances of {@link InterceptorFactory}
-   * @return an immutable {@link List} with instances of {@link Interceptor}
-   */
-  public static List<Interceptor> createInterceptors(List<InterceptorFactory> interceptorFactories) {
-    if (isEmpty(interceptorFactories)) {
-      return ImmutableList.of();
-    }
-
-    return interceptorFactories.stream().map(InterceptorFactory::createInterceptor).collect(toImmutableList());
   }
 
   /**
@@ -385,7 +319,7 @@ public class MuleExtensionUtils {
                                                                                     ComponentExecutorFactory.class
                                                                                         .getSimpleName())));
 
-    return new ReactiveOperationExecutorFactoryWrapper(executorFactory, createInterceptors(operationModel));
+    return new ReactiveOperationExecutorFactoryWrapper(executorFactory);
   }
 
   public static <T extends ComponentModel> CompletableComponentExecutorFactory<T> getOperationExecutorFactory(T operationModel) {
@@ -393,16 +327,13 @@ public class MuleExtensionUtils {
       return new ComponentExecutorCompletableAdapterFactory<>(getLegacyOperationExecutorFactory(operationModel));
     }
 
-    CompletableComponentExecutorFactory executorFactory =
-        fromModelProperty(operationModel,
-                          CompletableComponentExecutorModelProperty.class,
-                          CompletableComponentExecutorModelProperty::getExecutorFactory,
-                          () -> new IllegalOperationModelDefinitionException(format("Operation '%s' does not provide a %s",
-                                                                                    operationModel.getName(),
-                                                                                    CompletableComponentExecutorModelProperty.class
-                                                                                        .getSimpleName())));
-
-    return new CompletableOperationExecutorFactoryWrapper<>(executorFactory, createInterceptors(operationModel));
+    return fromModelProperty(operationModel,
+                             CompletableComponentExecutorModelProperty.class,
+                             CompletableComponentExecutorModelProperty::getExecutorFactory,
+                             () -> new IllegalOperationModelDefinitionException(format("Operation '%s' does not provide a %s",
+                                                                                       operationModel.getName(),
+                                                                                       CompletableComponentExecutorModelProperty.class
+                                                                                           .getSimpleName())));
   }
 
   public static boolean isNonBlocking(ComponentModel model) {

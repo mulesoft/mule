@@ -23,11 +23,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATI
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 
-import java.util.Optional;
-
-import org.junit.After;
-import org.junit.Test;
-import org.mockito.Mock;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.PoolingProfile;
@@ -49,18 +44,21 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
-import org.mule.runtime.module.extension.internal.AbstractInterceptableContractTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.TestTimeSupplier;
 
+import java.util.Optional;
+
 import io.qameta.allure.Description;
+import org.junit.After;
+import org.junit.Test;
+import org.mockito.Mock;
 
 @SmallTest
-public class AsyncTestConnectivityTestCase
-    extends AbstractInterceptableContractTestCase<LifecycleAwareConfigurationInstance> {
-
+public class AsyncTestConnectivityTestCase extends AbstractMuleContextTestCase {
 
   protected static final int RECONNECTION_MAX_ATTEMPTS = 5;
   private static final int RECONNECTION_FREQ = 100;
@@ -80,11 +78,9 @@ public class AsyncTestConnectivityTestCase
   private ConfigurationProperties configurationProperties;
 
   protected Lifecycle value = mock(Lifecycle.class, withSettings().extraInterfaces(Component.class));
-
   protected AsyncConnectionManagerAdapter connectionManager;
-
   protected RetryPolicyTemplate retryPolicyTemplate;
-
+  protected LifecycleAwareConfigurationInstance configurationInstance;
   private TestTimeSupplier timeSupplier = new TestTimeSupplier(currentTimeMillis());
   private Optional<ConnectionProvider> connectionProvider =
       of(mock(ConnectionProvider.class, withSettings().extraInterfaces(Lifecycle.class, MuleContextAware.class)));
@@ -97,7 +93,6 @@ public class AsyncTestConnectivityTestCase
 
   @Override
   protected void doSetUp() throws Exception {
-
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_TIME_SUPPLIER, timeSupplier);
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_CONFIGURATION_PROPERTIES,
                                                                          configurationProperties);
@@ -108,6 +103,7 @@ public class AsyncTestConnectivityTestCase
     retryPolicyTemplate.setNotifier(mock(RetryNotifier.class));
     connectionManager = spy(new AsyncConnectionManagerAdapter(retryPolicyTemplate));
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManager);
+    configurationInstance = createConfigurationInstance();
 
     super.doSetUp();
   }
@@ -118,16 +114,14 @@ public class AsyncTestConnectivityTestCase
 
   @After
   public void after() {
-    interceptable.dispose();
+    configurationInstance.dispose();
   }
 
-  @Override
-  protected LifecycleAwareConfigurationInstance createInterceptable() {
+  protected LifecycleAwareConfigurationInstance createConfigurationInstance() {
     return new LifecycleAwareConfigurationInstance(NAME,
                                                    configurationModel,
                                                    value,
                                                    configurationState,
-                                                   getInterceptors(),
                                                    connectionProvider);
   }
 
@@ -135,10 +129,10 @@ public class AsyncTestConnectivityTestCase
   @Test
   @Description("Checks that the test connectivity test is not interrupted")
   public void testConnectivityIsNotInterruptedWhenAsyncRetryTemplate() throws Exception {
-    interceptable.initialise();
-    interceptable.start();
+    configurationInstance.initialise();
+    configurationInstance.start();
     new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
-      verify(connectionManager).testConnectivity(interceptable);
+      verify(connectionManager).testConnectivity(configurationInstance);
       assertThat(connectionManager.wasInterruptedBeforeTestingConnectivity(), is(false));
       return true;
     }));

@@ -47,14 +47,14 @@ public class LifecycleAwareConfigurationInstanceAsyncRetryTestCase extends Lifec
   public void testConnectivityFailsUponStart() throws Exception {
     if (connectionProvider.isPresent()) {
       Exception connectionException = new ConnectionException("Oops!");
-      when(connectionManager.testConnectivity(interceptable))
+      when(connectionManager.testConnectivity(configurationInstance))
           .thenReturn(failure(connectionException.getMessage(), connectionException));
 
-      interceptable.initialise();
-      interceptable.start();
+      configurationInstance.initialise();
+      configurationInstance.start();
 
       new PollingProber().check(new JUnitLambdaProbe(() -> {
-        verify(connectionManager, times(RECONNECTION_MAX_ATTEMPTS + 1)).testConnectivity(interceptable);
+        verify(connectionManager, times(RECONNECTION_MAX_ATTEMPTS + 1)).testConnectivity(configurationInstance);
         return true;
       }));
     }
@@ -63,21 +63,21 @@ public class LifecycleAwareConfigurationInstanceAsyncRetryTestCase extends Lifec
   @Override
   @Test
   public void valueStarted() throws Exception {
-    interceptable.initialise();
+    configurationInstance.initialise();
     super.valueStarted();
   }
 
   @Override
   @Test
   public void valueStopped() throws Exception {
-    interceptable.initialise();
+    configurationInstance.initialise();
     super.valueStopped();
   }
 
   @Override
   @Test
   public void connectionUnbound() throws Exception {
-    interceptable.initialise();
+    configurationInstance.initialise();
     super.connectionUnbound();
   }
 
@@ -87,24 +87,10 @@ public class LifecycleAwareConfigurationInstanceAsyncRetryTestCase extends Lifec
     if (connectionProvider.isPresent()) {
       valueStarted();
       new PollingProber().check(new JUnitLambdaProbe(() -> {
-        verify(connectionManager).testConnectivity(interceptable);
+        verify(connectionManager).testConnectivity(configurationInstance);
         return true;
       }));
     }
-  }
-
-  @Override
-  @Test
-  public void interceptorsStarted() throws Exception {
-    interceptable.initialise();
-    super.interceptorsStarted();
-  }
-
-  @Override
-  @Test
-  public void interceptorsStopped() throws Exception {
-    interceptable.initialise();
-    super.interceptorsStopped();
   }
 
   @Test
@@ -132,17 +118,15 @@ public class LifecycleAwareConfigurationInstanceAsyncRetryTestCase extends Lifec
         return success();
       });
 
-      interceptable.initialise();
-      interceptable.start();
+      configurationInstance.initialise();
+      configurationInstance.start();
       assertThat(testConnectivityInvokedLatch.await(10, SECONDS), is(true));
 
-      interceptable.stop();
+      configurationInstance.stop();
       stopped.set(true);
       interceptableShutdownLatch.countDown();
 
-      new PollingProber(15000, 1000).check(new JUnitLambdaProbe(() -> {
-        return testConnectivityFinished.get();
-      }));
+      new PollingProber(15000, 1000).check(new JUnitLambdaProbe(testConnectivityFinished::get));
 
       if (thrownByTestConnectivity.get() != null) {
         throw thrownByTestConnectivity.get();

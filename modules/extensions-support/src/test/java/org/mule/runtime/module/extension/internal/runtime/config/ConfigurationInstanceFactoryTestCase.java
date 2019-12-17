@@ -13,12 +13,11 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockInterceptors;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -33,21 +32,18 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.execution.ConfigurationObjectBuilderTestCase;
 import org.mule.runtime.module.extension.internal.runtime.execution.ConfigurationObjectBuilderTestCase.TestConfig;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Kiwi;
 
 import com.google.common.collect.ImmutableList;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -79,12 +75,6 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
   @Mock(lenient = true)
   private ComponentModel componentModel;
 
-  @Mock(lenient = true)
-  private Interceptor interceptor1;
-
-  @Mock(lenient = true)
-  private Interceptor interceptor2;
-
   @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   private CoreEvent event;
 
@@ -103,7 +93,6 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws Exception {
     mockConfigurationInstance(configurationModel, new TestConfig());
-    mockInterceptors(configurationModel, asList(() -> interceptor1, () -> interceptor2));
     when(configurationModel.getOperationModels()).thenReturn(ImmutableList.of());
     when(configurationModel.getSourceModels()).thenReturn(ImmutableList.of());
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
@@ -117,8 +106,7 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
     when(muleContext.getConfiguration().getDefaultEncoding()).thenReturn(ENCODING);
 
     resolverSet = ConfigurationObjectBuilderTestCase.createResolverSet();
-    factory = new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet, new ReflectionCache(),
-                                                 expressionManager, muleContext);
+    factory = new ConfigurationInstanceFactory<>(extensionModel, configurationModel, resolverSet, expressionManager, muleContext);
   }
 
   @Test
@@ -145,7 +133,6 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
     assertThat(configurationInstance.getValue(), is(instanceOf(TestConfig.class)));
 
     assertThat(configurationInstance, is(instanceOf(Interceptable.class)));
-    assertThat(((Interceptable) configurationInstance).getInterceptors(), containsInAnyOrder(interceptor1, interceptor2));
   }
 
   public static class InvalidConfigTestConnectionProvider implements ConnectionProvider<Banana> {

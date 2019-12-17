@@ -71,7 +71,6 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
           withContextClassLoader(pluginClassloader, () -> new ConfigurationInstanceFactory(extensionModel,
                                                                                            implicitConfigurationModel,
                                                                                            resolverSet,
-                                                                                           reflectionCache,
                                                                                            expressionManager,
                                                                                            muleContext)
                                                                                                .createConfiguration(providerName,

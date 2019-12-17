@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
@@ -54,7 +53,6 @@ import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
@@ -68,6 +66,7 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
+import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ValueTransformer;
 import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionMediator;
@@ -101,7 +100,6 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   public static final int RETRY_COUNT = 10;
   private static final String DUMMY_NAME = "dummyName";
   private static final String ERROR = "Error";
-  private final Object result = new Object();
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
@@ -139,16 +137,10 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   private CompletableComponentExecutor operationExceptionExecutor;
 
   @Mock
-  private Interceptor configurationInterceptor1;
+  private Interceptor interceptor1;
 
   @Mock
-  private Interceptor configurationInterceptor2;
-
-  @Mock
-  private Interceptor operationInterceptor1;
-
-  @Mock
-  private Interceptor operationInterceptor2;
+  private Interceptor interceptor2;
 
   @Mock
   private ExceptionHandler exceptionEnricher;
@@ -166,12 +158,14 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   private ConnectionManagerAdapter connectionManagerAdapter;
 
   private String name;
+  private final Object result = new Object();
   private final RetryPolicyTemplate retryPolicy;
   private final ConnectionException connectionException = new ConnectionException("Connection failure");
   private final Exception exception = new Exception();
   private InOrder inOrder;
   private List<Interceptor> orderedInterceptors;
   private ExecutionMediator mediator;
+  private InterceptorChain interceptorChain;
 
   @Before
   public void before() throws Exception {
@@ -193,7 +187,18 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     when(operationContext.getCurrentScheduler()).thenReturn(IMMEDIATE_SCHEDULER);
 
     when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("test-extension").build());
-    mediator = new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext),
+
+    interceptorChain = InterceptorChain.builder()
+        .addInterceptor(interceptor1)
+        .addInterceptor(interceptor2)
+        .build();
+
+    when(interceptor1.onError(any(), any())).thenAnswer(inv -> inv.getArgument(1));
+    when(interceptor2.onError(any(), any())).thenAnswer(inv -> inv.getArgument(1));
+
+    mediator = new DefaultExecutionMediator(extensionModel,
+                                            operationModel,
+                                            interceptorChain,
                                             muleContext.getErrorTypeRepository());
 
     final ReconnectableConnectionProviderWrapper<Object> connectionProviderWrapper =
@@ -212,9 +217,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
       }
     });
 
-    setInterceptors((Interceptable) configurationInstance, configurationInterceptor1, configurationInterceptor2);
-    setInterceptors((Interceptable) operationExecutor, operationInterceptor1, operationInterceptor2);
-    defineOrder(configurationInterceptor1, configurationInterceptor2, operationInterceptor1, operationInterceptor2);
+    defineOrder(interceptor1, interceptor2);
   }
 
   @Test
@@ -224,7 +227,6 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     assertBefore();
     assertOnSuccess(times(1));
     assertOnError(never());
-    assertAfter(result);
     assertResult(result);
   }
 
@@ -241,18 +243,14 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
       }
       assertOnSuccess(never());
       assertOnError(times(1));
-      assertAfter(null);
     });
   }
 
   @Test
   public void decoratedException() throws Throwable {
     stubException();
-    final Exception decoratedException = mock(Exception.class);
-    when(configurationInterceptor2.onError(same(operationContext), same(connectionException)))
-        .thenReturn(decoratedException);
     assertException(e -> {
-      assertThat(e, is(sameInstance(decoratedException)));
+      assertThat(e, is(sameInstance(connectionException)));
       assertAfter(null);
     });
   }
@@ -300,7 +298,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
-                                            new DefaultConnectionManager(muleContext),
+                                            interceptorChain,
                                             muleContext.getErrorTypeRepository());
     execute();
   }
@@ -313,7 +311,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
-                                            new DefaultConnectionManager(muleContext),
+                                            interceptorChain,
                                             muleContext.getErrorTypeRepository());
     execute();
   }
@@ -330,7 +328,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
-                                            new DefaultConnectionManager(muleContext),
+                                            interceptorChain,
                                             muleContext.getErrorTypeRepository(), failingTransformer);
     execute();
   }
@@ -347,7 +345,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
-                                            new DefaultConnectionManager(muleContext),
+                                            interceptorChain,
                                             errorTypeRepository, failingTransformer);
     execute();
   }
@@ -363,7 +361,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
-                                            new DefaultConnectionManager(muleContext),
+                                            interceptorChain,
                                             muleContext.getErrorTypeRepository(), failingTransformer);
 
     execute();
@@ -382,7 +380,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
-                                            new DefaultConnectionManager(muleContext),
+                                            interceptorChain,
                                             errorTypeRepository, failingTransformer);
     execute();
   }
@@ -403,11 +401,6 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   @Test
   public void retry() throws Throwable {
     stubException();
-    Interceptor interceptor = mock(Interceptor.class);
-    setInterceptors((Interceptable) configurationInstance, interceptor);
-    setInterceptors((Interceptable) operationExecutor);
-
-    defineOrder(interceptor);
 
     int expectedRetries = retryPolicy instanceof SimpleRetryPolicyTemplate
         ? RETRY_COUNT + 1
@@ -416,12 +409,16 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     assertException(exception -> {
       assertThat(exception, instanceOf(ConnectionException.class));
       try {
-        verify(interceptor, times(expectedRetries)).before(operationContext);
+        verify(interceptor1, times(expectedRetries)).before(operationContext);
+        verify(interceptor2, times(expectedRetries)).before(operationContext);
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
-      verify(interceptor, times(expectedRetries)).onError(same(operationContext), anyVararg());
-      verify(interceptor, times(expectedRetries)).after(operationContext, null);
+      verify(interceptor1, times(expectedRetries)).onError(same(operationContext), anyVararg());
+      verify(interceptor1, times(expectedRetries)).after(operationContext, null);
+
+      verify(interceptor2, times(expectedRetries)).onError(same(operationContext), anyVararg());
+      verify(interceptor2, times(expectedRetries)).after(operationContext, null);
     });
   }
 
@@ -435,7 +432,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   }
 
   private void stubExceptionOnBeforeInterceptor() throws Exception {
-    doThrow(exception).when(operationInterceptor2).before(operationContext);
+    doThrow(exception).when(interceptor2).before(operationContext);
   }
 
   private void assertStatistics() {
@@ -455,11 +452,17 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   }
 
   private void assertOnSuccess(VerificationMode verificationMode) {
-    verifyInOrder(interceptor -> interceptor.onSuccess(operationContext, result), verificationMode);
+    verifyInOrder(interceptor -> {
+      interceptor.onSuccess(operationContext, result);
+      interceptor.after(operationContext, result);
+    }, verificationMode);
   }
 
   private void assertOnError(VerificationMode verificationMode) {
-    verifyInOrder(interceptor -> interceptor.onError(same(operationContext), same(connectionException)),
+    verifyInOrder(interceptor -> {
+      interceptor.onError(same(operationContext), same(connectionException));
+      interceptor.after(operationContext, null);
+    },
                   verificationMode);
   }
 
@@ -473,10 +476,6 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
   private void stubException() throws Exception {
     stubFailingComponentExecutor(operationExecutor, connectionException);
-  }
-
-  private void setInterceptors(Interceptable interceptable, Interceptor... interceptors) {
-    when(interceptable.getInterceptors()).thenReturn(asList(interceptors));
   }
 
   private void defineOrder(Interceptor... interceptors) {

@@ -94,7 +94,7 @@ import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
-import org.mule.runtime.module.extension.internal.runtime.execution.InterceptorChain;
+import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
@@ -262,11 +262,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       } else {
         operationExecutionFunction = (parameters, operationEvent, callback) -> {
           ExecutionContextAdapter<T> operationContext = createExecutionContext(
-              configuration,
-              parameters,
-              operationEvent,
-              currentScheduler != null ? currentScheduler
-                  : IMMEDIATE_SCHEDULER);
+                                                                               configuration,
+                                                                               parameters,
+                                                                               operationEvent,
+                                                                               currentScheduler != null ? currentScheduler
+                                                                                   : IMMEDIATE_SCHEDULER);
 
           executeOperation(operationContext, mapped(callback, operationContext, operationEvent));
         };
@@ -598,10 +598,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private void addCursorResetInterceptor(InterceptorChain.Builder chainBuilder) {
     List<String> streamParams = new ArrayList<>(5);
     componentModel.getAllParameterModels().forEach(
-        p -> getType(p.getType(), getClassLoader(extensionModel))
-            .filter(clazz -> InputStream.class.isAssignableFrom(clazz) || Iterator.class.isAssignableFrom(clazz))
-            .ifPresent(clazz -> streamParams.add(p.getName()))
-    );
+                                                   p -> getType(p.getType(), getClassLoader(extensionModel))
+                                                       .filter(clazz -> InputStream.class.isAssignableFrom(clazz)
+                                                           || Iterator.class.isAssignableFrom(clazz))
+                                                       .ifPresent(clazz -> streamParams.add(p.getName())));
 
     if (!streamParams.isEmpty()) {
       chainBuilder.addInterceptor(new CursorResetInterceptor(streamParams));
@@ -664,7 +664,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     List<Interceptor> interceptors = mediator.collectInterceptors(executionContext.getConfiguration(),
                                                                   executionContext instanceof PrecalculatedExecutionContextAdapter
                                                                       ? ((PrecalculatedExecutionContextAdapter) executionContext)
-                                                                      .getOperationExecutor()
+                                                                          .getOperationExecutor()
                                                                       : componentExecutor);
 
     disposeResolvedParameters(executionContext, interceptors);

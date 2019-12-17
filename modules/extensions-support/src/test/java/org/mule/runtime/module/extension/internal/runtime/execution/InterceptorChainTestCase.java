@@ -13,14 +13,18 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -196,7 +200,7 @@ public class InterceptorChainTestCase extends AbstractMuleTestCase {
     Exception e = new Exception();
     doThrow(new RuntimeException()).when(interceptor2).onError(ctx, new RuntimeException());
     mockAfterFails(new RuntimeException(), interceptor1, interceptor2, interceptor3);
-    
+
     chain.onError(ctx, e);
 
     inOrder.verify(interceptor1).onError(ctx, e);
@@ -205,6 +209,19 @@ public class InterceptorChainTestCase extends AbstractMuleTestCase {
     inOrder.verify(interceptor2).after(ctx, null);
     inOrder.verify(interceptor3).onError(ctx, e);
     inOrder.verify(interceptor3).after(ctx, null);
+  }
+
+  @Test
+  public void noInterceptors() {
+    chain = InterceptorChain.builder().build();
+    Object result = mock(Object.class);
+    Exception e = spy(new Exception());
+
+    assertThat(chain.before(ctx, callback), is(nullValue()));
+    chain.onSuccess(ctx, result);
+    assertThat(chain.onError(ctx, e), is(sameInstance(e)));
+
+    verifyZeroInteractions(ctx, callback);
   }
 
   private void mockErrorIdentity(Interceptor<OperationModel>... interceptors) {

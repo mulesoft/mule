@@ -12,18 +12,21 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.api.runtime.operation.Interceptor;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+
+import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -37,21 +40,22 @@ import org.slf4j.Logger;
  * @deprecated since 4.3
  */
 @Deprecated
-public final class ReactiveInterceptableOperationExecutorWrapper<M extends ComponentModel> extends AbstractInterceptable
-    implements ComponentExecutor<M>, OperationArgumentResolverFactory<M> {
+public final class ReactiveInterceptableOperationExecutorWrapper<M extends ComponentModel>
+    implements ComponentExecutor<M>, OperationArgumentResolverFactory<M>, Lifecycle {
 
   private static final Logger LOGGER = getLogger(ReactiveInterceptableOperationExecutorWrapper.class);
+
+  @Inject
+  protected MuleContext muleContext;
 
   private final ComponentExecutor delegate;
 
   /**
    * Creates a new instance
    *
-   * @param delegate the {@link ComponentExecutor} to be decorated
-   * @param interceptors the {@link Interceptor interceptors} that should apply to the {@code delegate}
+   * @param delegate     the {@link ComponentExecutor} to be decorated
    */
-  public ReactiveInterceptableOperationExecutorWrapper(ComponentExecutor<M> delegate, List<Interceptor> interceptors) {
-    super(interceptors);
+  public ReactiveInterceptableOperationExecutorWrapper(ComponentExecutor<M> delegate) {
     this.delegate = delegate;
   }
 
@@ -64,7 +68,7 @@ public final class ReactiveInterceptableOperationExecutorWrapper<M extends Compo
   }
 
   /**
-   * Performs dependency injection into the {@link #delegate} and the items in the {@link #interceptors} list.
+   * Performs dependency injection into the {@link #delegate}.
    * <p>
    * Then it propagates this lifecycle phase into them.
    *
@@ -73,39 +77,35 @@ public final class ReactiveInterceptableOperationExecutorWrapper<M extends Compo
   @Override
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(delegate, true, muleContext);
-    super.initialise();
   }
 
   /**
-   * Propagates this lifecycle phase into the items in the {@link #interceptors} list and the {@link #delegate}
+   * Propagates this lifecycle phase into the {@link #delegate}
    *
    * @throws MuleException in case of error
    */
   @Override
   public void start() throws MuleException {
-    super.start();
     startIfNeeded(delegate);
   }
 
   /**
-   * Propagates this lifecycle phase into the items in the {@link #interceptors} list and the {@link #delegate}
+   * Propagates this lifecycle phase into the {@link #delegate}
    *
    * @throws MuleException in case of error
    */
   @Override
   public void stop() throws MuleException {
-    super.stop();
     stopIfNeeded(delegate);
   }
 
   /**
-   * Propagates this lifecycle phase into the items in the {@link #interceptors} list and the {@link #delegate}
+   * Propagates this lifecycle phase into the {@link #delegate}
    *
    * @throws MuleException in case of error
    */
   @Override
   public void dispose() {
-    super.dispose();
     disposeIfNeeded(delegate, LOGGER);
   }
 

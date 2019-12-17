@@ -97,7 +97,6 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.exception.NullExceptionHandler;
@@ -292,7 +291,6 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(outputMock.hasDynamicType()).thenReturn(true);
     when(operationModel.getOutput()).thenReturn(outputMock);
     when(operationModel.getOutputAttributes()).thenReturn(outputMock);
-    when(operationModel.getModelProperty(InterceptorsModelProperty.class)).thenReturn(empty());
 
     when(operationExecutorFactory.createExecutor(same(operationModel), anyMap())).thenReturn(operationExecutor);
 

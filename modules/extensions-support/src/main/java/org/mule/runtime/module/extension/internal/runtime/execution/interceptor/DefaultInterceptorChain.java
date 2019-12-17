@@ -4,75 +4,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.execution;
+package org.mule.runtime.module.extension.internal.runtime.execution.interceptor;
 
 import static java.lang.String.format;
-import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import org.slf4j.Logger;
 
-public class InterceptorChain {
+class DefaultInterceptorChain implements InterceptorChain {
 
-  private static final Logger LOGGER = getLogger(InterceptorChain.class);
-
-  public static class Builder {
-
-    private final List<Interceptor> interceptors = new ArrayList<>(2);
-    private Function<Throwable, Throwable> exceptionMapper = identity();
-
-    private Builder(){}
-
-    public Builder addInterceptor(Interceptor interceptor) {
-      interceptors.add(interceptor);
-      return this;
-    }
-
-    public Builder setExceptionMapper(Function<Throwable, Throwable> exceptionMapper) {
-      this.exceptionMapper = exceptionMapper;
-      return this;
-    }
-
-    public InterceptorChain build() {
-      final List<InterceptorChain> chains = interceptors.stream()
-          .map(i -> new InterceptorChain(i, exceptionMapper))
-          .collect(toList());
-      final int len = chains.size();
-
-      if (len == 0) {
-        //TODO: NullInterceptor
-        return null;
-      }
-
-      InterceptorChain interceptor = chains.get(0);
-      InterceptorChain previous = null;
-      InterceptorChain next;
-
-      for (int i = 0; i < len; i++) {
-        interceptor.previous = previous;
-        previous = interceptor;
-        int nextIndex = i + 1;
-        next = nextIndex < len ? chains.get(nextIndex) : null;
-        interceptor.next = next;
-        interceptor = next;
-      }
-
-      return chains.get(0);
-    }
-  }
-
-  public static Builder builder() {
-    return new Builder();
-  }
+  private static final Logger LOGGER = getLogger(DefaultInterceptorChain.class);
 
   private static final String BEFORE = "before";
   private static final String ON_SUCCESS = "onSuccess";
@@ -80,17 +28,39 @@ public class InterceptorChain {
   private static final String AFTER = "after";
 
   private final Interceptor interceptor;
-  private final Function<Throwable, Throwable> exceptionMapper;
-  private InterceptorChain next;
-  private InterceptorChain previous;
+  private DefaultInterceptorChain next;
+  private DefaultInterceptorChain previous;
 
-  public InterceptorChain(Interceptor interceptor,
-                          Function<Throwable, Throwable> exceptionMapper) {
-    this.interceptor = interceptor;
-    this.exceptionMapper = exceptionMapper;
+
+  static DefaultInterceptorChain of(List<Interceptor> interceptors) {
+    final List<DefaultInterceptorChain> chains = interceptors.stream()
+        .map(DefaultInterceptorChain::new)
+        .collect(toList());
+
+    DefaultInterceptorChain interceptor = chains.get(0);
+    DefaultInterceptorChain previous = null;
+    DefaultInterceptorChain next;
+
+    final int len = chains.size();
+
+    for (int i = 0; i < len; i++) {
+      interceptor.previous = previous;
+      previous = interceptor;
+      int nextIndex = i + 1;
+      next = nextIndex < len ? chains.get(nextIndex) : null;
+      interceptor.next = next;
+      interceptor = next;
+    }
+
+    return chains.get(0);
   }
 
-  public Throwable before(ExecutionContextAdapter executionContext, ExecutorCallback callback) {
+  private DefaultInterceptorChain(Interceptor interceptor) {
+    this.interceptor = interceptor;
+  }
+
+  @Override
+  public Throwable before(ExecutionContextAdapter executionContext, CompletableComponentExecutor.ExecutorCallback callback) {
     try {
       interceptor.before(executionContext);
       if (next != null) {
@@ -99,7 +69,6 @@ public class InterceptorChain {
 
       return null;
     } catch (Throwable t) {
-      t = exceptionMapper.apply(t);
       logError(t, BEFORE, false);
       t = errorOnReverse(executionContext, t);
       callback.error(t);
@@ -108,11 +77,11 @@ public class InterceptorChain {
     }
   }
 
+  @Override
   public void onSuccess(ExecutionContextAdapter executionContext, Object result) {
     try {
       interceptor.onSuccess(executionContext, result);
     } catch (Throwable t) {
-      t = exceptionMapper.apply(t);
       logError(t, ON_SUCCESS, true);
     }
 
@@ -127,6 +96,7 @@ public class InterceptorChain {
     }
   }
 
+  @Override
   public Throwable onError(ExecutionContextAdapter executionContext, Throwable t) {
     try {
       t = interceptor.onError(executionContext, t);
@@ -173,7 +143,7 @@ public class InterceptorChain {
       builder.append(format("Interceptor %s threw exception executing '%s' phase.", interceptor, phase));
       if (executionContinues) {
         builder.append(
-            " Exception will be ignored. Next interceptors (if any) will be executed and the operation's exception will be returned");
+                       " Exception will be ignored. Next interceptors (if any) will be executed and the operation's exception will be returned");
       }
 
       LOGGER.debug(builder.toString());

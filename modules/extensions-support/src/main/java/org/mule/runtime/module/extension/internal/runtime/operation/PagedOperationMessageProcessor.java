@@ -67,7 +67,7 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
   protected ExecutionMediator createExecutionMediator() {
     return new DefaultExecutionMediator(extensionModel,
                                         componentModel,
-                                        connectionManager,
+                                        createInterceptorChain(),
                                         errorTypeRepository,
                                         transformPagingDelegate());
   }

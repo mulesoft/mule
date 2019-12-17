@@ -79,7 +79,6 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
         ConfigurationInstanceFactory configurationFactory = new ConfigurationInstanceFactory(extensionModel,
                                                                                              configurationModel,
                                                                                              resolverSet,
-                                                                                             reflectionCache,
                                                                                              expressionManager,
                                                                                              muleContext);
         configuration = configurationFactory.createConfiguration(name, initialiserEvent, connectionProviderResolver);
