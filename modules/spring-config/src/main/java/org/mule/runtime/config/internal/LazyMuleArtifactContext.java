@@ -46,6 +46,7 @@ import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.internal.dsl.model.ConfigurationDependencyResolver;
 import org.mule.runtime.config.internal.dsl.model.MinimalApplicationModelGenerator;
+import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -426,6 +427,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                                                                   .getLocation().equals(location.toString()))
                                                                               || muleConfigurationComponentPredicate
                                                                                   .test(componentModel))));
+
+      if (locationOptional.isPresent() &&
+          !(locationOptional.flatMap(loc -> dependencyResolver.findRequiredComponentModel(loc)).isPresent())) {
+        throw new NoSuchComponentModelException(createStaticMessage("No object found at location "
+            + locationOptional.get().toString()));
+      }
 
       Set<String> applicationComponentLocations = new HashSet<>();
       componentModelsToBuildMinimalModel.stream().forEach(componentModel -> {
