@@ -9,6 +9,9 @@ package org.mule.runtime.config.internal.dsl.model;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.dsl.model.DependencyNode.Type.INNER;
@@ -18,6 +21,8 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.config.internal.model.ApplicationModel;
@@ -167,6 +172,27 @@ public class ConfigurationDependencyResolver {
   private ComponentModel findRequiredComponentModel(String name) {
     return applicationModel.findNamedElement(name)
         .orElseThrow(() -> new NoSuchComponentModelException(createStaticMessage("No named component with name " + name)));
+  }
+
+  public Optional<ComponentModel> findRequiredComponentModel(Location location) {
+    final Reference<ComponentModel> foundComponentModelReference = new Reference<>();
+    Optional<ComponentModel> globalComponent = applicationModel.findTopLevelNamedComponent(location.getGlobalName());
+    globalComponent.ifPresent(componentModel -> findComponentWithLocation(componentModel, location)
+        .ifPresent(foundComponentModel -> foundComponentModelReference.set(foundComponentModel)));
+    return ofNullable(foundComponentModelReference.get());
+  }
+
+  private Optional<ComponentModel> findComponentWithLocation(ComponentModel componentModel, Location location) {
+    if (componentModel.getComponentLocation().getLocation().equals(location.toString())) {
+      return of(componentModel);
+    }
+    for (ComponentModel childComponent : componentModel.getInnerComponents()) {
+      Optional<ComponentModel> foundComponent = findComponentWithLocation(childComponent, location);
+      if (foundComponent.isPresent()) {
+        return foundComponent;
+      }
+    }
+    return empty();
   }
 
   /**
