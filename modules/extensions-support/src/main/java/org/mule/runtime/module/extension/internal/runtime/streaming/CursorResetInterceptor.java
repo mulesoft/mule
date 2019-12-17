@@ -16,6 +16,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -36,15 +37,22 @@ public class CursorResetInterceptor implements Interceptor<OperationModel> {
   private static final Logger LOGGER = LoggerFactory.getLogger(CursorResetInterceptor.class);
   private static final String CURSOR_POSITIONS = "CURSOR_POSITIONS";
 
+  private final List<String> cursorParamNames;
+
+  public CursorResetInterceptor(List<String> cursorParamNames) {
+    this.cursorParamNames = cursorParamNames;
+  }
+
   @Override
   public void before(ExecutionContext<OperationModel> ctx) throws Exception {
     Map<Cursor, Long> cursorPositions = new HashMap<>();
-    ctx.getParameters().forEach((key, value) -> {
+    for (String cursorParamName : cursorParamNames) {
+      Object value = ctx.getParameter(cursorParamName);
       if (value instanceof Cursor) {
         final Cursor cursor = (Cursor) value;
         cursorPositions.put(cursor, cursor.getPosition());
       }
-    });
+    }
 
     if (!cursorPositions.isEmpty()) {
       ((ExecutionContextAdapter<OperationModel>) ctx).setVariable(CURSOR_POSITIONS, cursorPositions);

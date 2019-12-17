@@ -50,7 +50,7 @@ public class InterceptorChainTestCase extends AbstractMuleTestCase {
   @Mock
   private ExecutorCallback callback;
 
-  private InterceptorChain<OperationModel> chain;
+  private InterceptorChain chain;
   private InOrder inOrder;
 
   @Before

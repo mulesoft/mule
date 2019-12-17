@@ -10,6 +10,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.api.util.StreamingUtils.supportsStreaming;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -23,8 +24,6 @@ import org.mule.runtime.module.extension.internal.ExtensionProperties;
 
 import java.util.function.Consumer;
 
-import javax.inject.Inject;
-
 /**
  * Implements simple connection management by using the {@link #before(ExecutionContext)} phase to set a connection as parameter
  * value of key {@link ExtensionProperties#CONNECTION_PARAM} into an {@link ExecutionContext}.
@@ -35,8 +34,11 @@ public final class ConnectionInterceptor implements Interceptor<ComponentModel> 
 
   private static final String CLOSE_CONNECTION_COMMAND = "closeCommand";
 
-  @Inject
-  private ExtensionConnectionSupplier connectionSupplier;
+  private final ExtensionConnectionSupplier connectionSupplier;
+
+  public ConnectionInterceptor(ExtensionConnectionSupplier connectionSupplier) {
+    this.connectionSupplier = connectionSupplier;
+  }
 
   /**
    * Adds a {@code Connection} as a parameter in the {@code operationContext}, following the considerations in this type's

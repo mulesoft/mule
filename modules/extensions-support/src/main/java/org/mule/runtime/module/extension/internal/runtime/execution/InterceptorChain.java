@@ -11,7 +11,6 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -22,18 +21,18 @@ import java.util.function.Function;
 
 import org.slf4j.Logger;
 
-public class InterceptorChain<T extends ComponentModel> {
+public class InterceptorChain {
 
   private static final Logger LOGGER = getLogger(InterceptorChain.class);
 
-  public static class Builder<T extends ComponentModel> {
+  public static class Builder {
 
-    private final List<Interceptor<T>> interceptors = new ArrayList<>(2);
+    private final List<Interceptor> interceptors = new ArrayList<>(2);
     private Function<Throwable, Throwable> exceptionMapper = identity();
 
     private Builder(){}
 
-    public Builder<T> addInterceptor(Interceptor<T> interceptor) {
+    public Builder addInterceptor(Interceptor interceptor) {
       interceptors.add(interceptor);
       return this;
     }
@@ -43,9 +42,9 @@ public class InterceptorChain<T extends ComponentModel> {
       return this;
     }
 
-    public InterceptorChain<T> build() {
-      final List<InterceptorChain<T>> chains = interceptors.stream()
-          .map(i -> new InterceptorChain<>(i, exceptionMapper))
+    public InterceptorChain build() {
+      final List<InterceptorChain> chains = interceptors.stream()
+          .map(i -> new InterceptorChain(i, exceptionMapper))
           .collect(toList());
       final int len = chains.size();
 
@@ -54,9 +53,9 @@ public class InterceptorChain<T extends ComponentModel> {
         return null;
       }
 
-      InterceptorChain<T> interceptor = chains.get(0);
-      InterceptorChain<T> previous = null;
-      InterceptorChain<T> next;
+      InterceptorChain interceptor = chains.get(0);
+      InterceptorChain previous = null;
+      InterceptorChain next;
 
       for (int i = 0; i < len; i++) {
         interceptor.previous = previous;
@@ -80,18 +79,18 @@ public class InterceptorChain<T extends ComponentModel> {
   private static final String ON_ERROR = "onError";
   private static final String AFTER = "after";
 
-  private final Interceptor<T> interceptor;
+  private final Interceptor interceptor;
   private final Function<Throwable, Throwable> exceptionMapper;
-  private InterceptorChain<T> next;
-  private InterceptorChain<T> previous;
+  private InterceptorChain next;
+  private InterceptorChain previous;
 
-  public InterceptorChain(Interceptor<T> interceptor,
+  public InterceptorChain(Interceptor interceptor,
                           Function<Throwable, Throwable> exceptionMapper) {
     this.interceptor = interceptor;
     this.exceptionMapper = exceptionMapper;
   }
 
-  public Throwable before(ExecutionContextAdapter<T> executionContext, ExecutorCallback callback) throws Throwable {
+  public Throwable before(ExecutionContextAdapter executionContext, ExecutorCallback callback) {
     try {
       interceptor.before(executionContext);
       if (next != null) {
@@ -109,7 +108,7 @@ public class InterceptorChain<T extends ComponentModel> {
     }
   }
 
-  public void onSuccess(ExecutionContextAdapter<T> executionContext, Object result) {
+  public void onSuccess(ExecutionContextAdapter executionContext, Object result) {
     try {
       interceptor.onSuccess(executionContext, result);
     } catch (Throwable t) {
@@ -128,7 +127,7 @@ public class InterceptorChain<T extends ComponentModel> {
     }
   }
 
-  public Throwable onError(ExecutionContextAdapter<T> executionContext, Throwable t) {
+  public Throwable onError(ExecutionContextAdapter executionContext, Throwable t) {
     try {
       t = interceptor.onError(executionContext, t);
     } catch (Throwable t2) {
@@ -148,7 +147,7 @@ public class InterceptorChain<T extends ComponentModel> {
     return t;
   }
 
-  private Throwable errorOnReverse(ExecutionContextAdapter<T> executionContext, Throwable t) {
+  private Throwable errorOnReverse(ExecutionContextAdapter executionContext, Throwable t) {
     try {
       t = interceptor.onError(executionContext, t);
     } catch (Throwable t2) {

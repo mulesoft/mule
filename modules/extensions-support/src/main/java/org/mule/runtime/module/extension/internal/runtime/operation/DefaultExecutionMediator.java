@@ -28,7 +28,6 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;
-import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
@@ -40,6 +39,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
+import org.mule.runtime.module.extension.internal.runtime.execution.InterceptorChain;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
 import java.util.ArrayList;
@@ -76,10 +76,12 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExecutionMediator.class);
 
   private final ExceptionHandlerManager exceptionEnricherManager;
-  private final ConnectionManagerAdapter connectionManager;
+  private final InterceptorChain interceptorChain;
   private final ExecutionTemplate<?> defaultExecutionTemplate = callback -> callback.process();
   private final ModuleExceptionHandler moduleExceptionHandler;
   private final List<ValueTransformer> valueTransformers;
+  private final ClassLoader extensionClassLoader;
+
 
   @FunctionalInterface
   public interface ValueTransformer extends CheckedBiFunction<ExecutionContextAdapter, Object, Object> {
@@ -88,13 +90,14 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
   public DefaultExecutionMediator(ExtensionModel extensionModel,
                                   M operationModel,
-                                  ConnectionManagerAdapter connectionManager,
+                                  InterceptorChain interceptorChain,
                                   ErrorTypeRepository typeRepository,
                                   ValueTransformer... valueTransformers) {
-    this.connectionManager = connectionManager;
+    this.interceptorChain = interceptorChain;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel, typeRepository);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     this.valueTransformers = valueTransformers != null ? asList(valueTransformers) : emptyList();
+    extensionClassLoader = getClassLoader(extensionModel);
   }
 
   /**
@@ -117,7 +120,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
     try {
       getExecutionTemplate((ExecutionContextAdapter<ComponentModel>) context).execute(() -> {
-        executeWithInterceptors(executor, context, collectInterceptors(context, executor), stats, callback);
+        executeWithInterceptors(executor, context, stats, callback);
         return null;
       });
     } catch (Exception e) {
@@ -150,7 +153,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
   private void executeWithRetry(ExecutionContextAdapter<M> context,
                                 RetryPolicyTemplate retryPolicy,
-                                List<Interceptor> executedInterceptors,
                                 Consumer<ExecutorCallback> executeCommand,
                                 ExecutorCallback callback) {
 
@@ -160,10 +162,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       return future;
     },
                             e -> shouldRetry(e, context),
-                            e -> {
-                              interceptError(context, e, executedInterceptors);
-                              after(context, null, executedInterceptors);
-                            },
+                            e -> interceptorChain.onError(context, e),
                             e -> {
                             },
                             identity(),
@@ -193,22 +192,13 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
   private void executeWithInterceptors(CompletableComponentExecutor<M> executor,
                                        ExecutionContextAdapter<M> context,
-                                       final List<Interceptor> interceptors,
                                        MutableConfigurationStats stats,
                                        ExecutorCallback executorCallback) {
 
-    List<Interceptor> executedInterceptors = new ArrayList<>(interceptors.size());
-
     Consumer<ExecutorCallback> executeCommand = callback -> {
-      // If the operation is retried, then the interceptors need to be executed again,
-      executedInterceptors.clear();
-      InterceptorsExecutionResult beforeExecutionResult = before(context, interceptors);
-      if (beforeExecutionResult.isOk()) {
-        executedInterceptors.addAll(interceptors);
-        withContextClassLoader(getClassLoader(context.getExtensionModel()), () -> executor.execute(context, callback));
-      } else {
-        executedInterceptors.addAll(beforeExecutionResult.getExecutedInterceptors());
-        callback.error(beforeExecutionResult.getThrowable());
+      Throwable t = interceptorChain.before(context, callback);
+      if (t == null) {
+        withContextClassLoader(extensionClassLoader, () -> executor.execute(context, callback));
       }
     };
 
@@ -220,18 +210,13 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
         // Race conditions appear otherwise, specially in connection pooling scenarios.
         try {
           value = transform(context, value);
-          onSuccess(context, value, executedInterceptors);
-          after(context, value, executedInterceptors);
+          interceptorChain.onSuccess(context, value);
           executorCallback.complete(value);
         } catch (Throwable t) {
           try {
-            t = handleError(t, context, executedInterceptors);
+            t = handleError(t, context);
           } finally {
-            try {
-              after(context, value, executedInterceptors);
-            } finally {
-              executorCallback.error(t);
-            }
+            executorCallback.error(t);
           }
         } finally {
           if (stats != null) {
@@ -242,9 +227,8 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
       @Override
       public void error(Throwable t) {
-        t = handleError(t, context, executedInterceptors);
         try {
-          after(context, null, executedInterceptors);
+          t = handleError(t, context);
         } finally {
           try {
             executorCallback.error(t);
@@ -259,20 +243,16 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
     RetryPolicyTemplate retryPolicy = context.getRetryPolicyTemplate().orElse(null);
     if (retryPolicy != null && retryPolicy.isEnabled()) {
-      executeWithRetry(context, retryPolicy, executedInterceptors, executeCommand, callbackDelegate);
+      executeWithRetry(context, retryPolicy, executeCommand, callbackDelegate);
     } else {
       executeCommand.accept(callbackDelegate);
     }
   }
 
-  private Throwable handleError(Throwable e, ExecutionContextAdapter context, List<Interceptor> interceptors) {
-    return mapError(e, context, interceptors);
-  }
-
-  private Throwable mapError(Throwable e, ExecutionContextAdapter context, List<Interceptor> interceptors) {
+  private Throwable handleError(Throwable e, ExecutionContextAdapter context) {
     e = exceptionEnricherManager.process(e);
     e = moduleExceptionHandler.processException(e);
-    e = interceptError(context, e, interceptors);
+    e = interceptorChain.onError(context, e);
 
     return e;
   }
