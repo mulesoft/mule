@@ -13,7 +13,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
-import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.component.location.Location;
@@ -42,7 +41,6 @@ import java.util.function.Consumer;
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
 
 /**
  * Selects which "on error" handler to execute based on filtering. Replaces the choice-exception-strategy from Mule 3. On error
@@ -53,9 +51,8 @@ import org.slf4j.Logger;
 public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHandlerAcceptor>
     implements MessagingExceptionHandlerAcceptor, MuleContextAware, Lifecycle {
 
-  private static final Logger LOGGER = getLogger(ErrorHandler.class);
-
   private static final String MUST_ACCEPT_ANY_EVENT_MESSAGE = "Default error handler must accept any event.";
+
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
   private ErrorType anyErrorType;
   protected String name;

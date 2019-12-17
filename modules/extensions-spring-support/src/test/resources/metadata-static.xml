@@ -49,6 +49,6 @@
         <metadata:custom-static-metadata
                 person="#[%dw 2.0 output application/json --- {age: 12, dni: 1478231}]"
                 order="#[%dw 2.0 output application/xml --- {person: {age: 12}}]"/>
-        <set-payload value="#[hi ++]"/>
+        <set-payload value="#[null.a!]"/>
     </flow>
 </mule>

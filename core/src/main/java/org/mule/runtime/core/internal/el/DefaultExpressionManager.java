@@ -23,8 +23,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.DefaultValidationResult;
+import org.mule.runtime.api.el.ExpressionCompilationException;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -206,6 +208,11 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     } else {
       return target;
     }
+  }
+
+  @Override
+  public CompiledExpression compile(String expression, BindingContext context) throws ExpressionCompilationException {
+    return expressionLanguage.compile(expression, context);
   }
 
   @Override

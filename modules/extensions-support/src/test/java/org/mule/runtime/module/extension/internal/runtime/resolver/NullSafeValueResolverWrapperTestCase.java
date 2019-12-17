@@ -10,7 +10,6 @@ import static java.util.Optional.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -18,7 +17,9 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -76,7 +77,7 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
   @Test
   public void testPojoType() throws Exception {
     ExpressionManagerSession session = mock(ExpressionManagerSession.class);
-    when(session.evaluate(eq("#[5]"), any(DataType.class)))
+    when(session.evaluate(any(CompiledExpression.class), any(DataType.class)))
         .thenAnswer(inv -> new TypedValue<>(5, inv.getArgument(1)));
     when(expressionManager.openSession(any())).thenReturn(session);
 
@@ -143,6 +144,7 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
     }
   }
 
+
   public static class DynamicPojoWithMap {
 
     public DynamicPojoWithMap() {}
@@ -174,6 +176,7 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
       return Objects.hash(map);
     }
   }
+
 
   public static class NonDynamicPojo {
 

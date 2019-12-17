@@ -11,17 +11,15 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.metadata.DataType.CURSOR_STREAM_PROVIDER;
-import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
@@ -29,18 +27,12 @@ import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.el.ExpressionManagerSession;
-import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -65,24 +57,15 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
   public static final String PLAIN_STRING_KEY = "someText";
   public static final String PLAIN_STRING_VALUE = "someValue";
   public static final String EXPRESSION = "#['someValue']";
-  public static final String EXPRESSION_VALUE = "expressionValueResult";
-  public static final String NULL_EXPRESSION = "#['someValueNull']";
+  public static final String NULL_EXPRESSION = "#[null]";
   public static final Charset CUSTOM_ENCODING = UTF_8;
-
-  @Mock
-  private MuleContext mockMuleContext;
 
   @Mock(lenient = true)
   private StreamingManager streamingManager;
 
-  @Mock
-  private ExtendedExpressionManager mockExpressionManager;
-
   private CoreEvent event;
   private Message message;
-  private TypedValue typedValue;
-  private AbstractAddVariablePropertyProcessor addVariableProcessor;
-  private ExpressionManagerSession mockSession;
+  private final AbstractAddVariablePropertyProcessor addVariableProcessor;
   private CheckedRunnable afterAssertions;
 
   public AbstractAddVariablePropertyProcessorTestCase(AbstractAddVariablePropertyProcessor abstractAddVariableProcessor) {
@@ -91,18 +74,9 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
 
   @Before
   public void setUpTest() throws Exception {
-    when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
-    when(mockMuleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
-    typedValue = new TypedValue(EXPRESSION_VALUE, STRING);
-
-    mockSession = mock(ExpressionManagerSession.class);
-    when(mockExpressionManager.openSession(any(), any(), any())).thenReturn(mockSession);
-    when(mockSession.evaluate(eq(EXPRESSION), eq(STRING))).thenReturn(typedValue);
-    when(mockSession.evaluate(eq(EXPRESSION))).thenReturn(typedValue);
-
     when(streamingManager.manage(any(CursorProvider.class), any(EventContext.class))).thenAnswer(inv -> inv.getArgument(0));
 
-    addVariableProcessor.setMuleContext(mockMuleContext);
+    addVariableProcessor.setMuleContext(muleContext);
     addVariableProcessor.setStreamingManager(streamingManager);
 
     message = of("");
@@ -130,7 +104,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     event = addVariableProcessor.process(event);
 
     verifyAdded(event, PLAIN_STRING_KEY, PLAIN_STRING_VALUE);
-    assertThat(getVariableDataType(event, PLAIN_STRING_KEY), like(String.class, ANY, getDefaultEncoding(mockMuleContext)));
+    assertThat(getVariableDataType(event, PLAIN_STRING_KEY), like(String.class, ANY, getDefaultEncoding(muleContext)));
   }
 
   @Test
@@ -140,8 +114,9 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     addVariableProcessor.initialise();
     event = addVariableProcessor.process(event);
 
-    verifyAdded(event, PLAIN_STRING_KEY, EXPRESSION_VALUE);
-    assertThat(getVariableDataType(event, PLAIN_STRING_KEY), like(String.class, ANY, getDefaultEncoding(mockMuleContext)));
+    verifyAdded(event, PLAIN_STRING_KEY, PLAIN_STRING_VALUE);
+    assertThat(getVariableDataType(event, PLAIN_STRING_KEY),
+               like(String.class, APPLICATION_JAVA, getDefaultEncoding(muleContext)));
   }
 
   @Test
@@ -151,8 +126,8 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     addVariableProcessor.initialise();
     event = addVariableProcessor.process(event);
 
-    verifyAdded(event, EXPRESSION_VALUE, PLAIN_STRING_VALUE);
-    assertThat(getVariableDataType(event, EXPRESSION_VALUE), like(String.class, ANY, getDefaultEncoding(mockMuleContext)));
+    verifyAdded(event, PLAIN_STRING_VALUE, PLAIN_STRING_VALUE);
+    assertThat(getVariableDataType(event, PLAIN_STRING_VALUE), like(String.class, ANY, getDefaultEncoding(muleContext)));
   }
 
   @Test
@@ -177,30 +152,28 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
 
     verifyAdded(event, PLAIN_STRING_KEY, PLAIN_STRING_VALUE);
     assertThat(getVariableDataType(event, PLAIN_STRING_KEY),
-               like(String.class, APPLICATION_XML, getDefaultEncoding(mockMuleContext)));
+               like(String.class, APPLICATION_XML, getDefaultEncoding(muleContext)));
   }
 
   protected abstract DataType getVariableDataType(CoreEvent event, String key);
 
   @Test(expected = IllegalArgumentException.class)
-  public void testAddVariableWithNullKey() throws InitialisationException, TransformerException {
+  public void testAddVariableWithNullKey() {
     addVariableProcessor.setIdentifier(null);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testAddVariableWithEmptyKey() throws InitialisationException, TransformerException {
+  public void testAddVariableWithEmptyKey() {
     addVariableProcessor.setIdentifier("");
   }
 
   @Test(expected = NullPointerException.class)
-  public void testAddVariableWithNullValue() throws InitialisationException, TransformerException {
+  public void testAddVariableWithNullValue() {
     addVariableProcessor.setValue(null);
   }
 
   @Test
   public void testAddVariableWithNullExpressionKeyResult() throws MuleException {
-    TypedValue typedValue = new TypedValue(null, OBJECT);
-    when(mockSession.evaluate(eq(NULL_EXPRESSION), eq(DataType.STRING))).thenReturn(typedValue);
     addVariableProcessor.setIdentifier(NULL_EXPRESSION);
     addVariableProcessor.setValue(PLAIN_STRING_VALUE);
     addVariableProcessor.initialise();
@@ -211,20 +184,15 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
   @Test
   public void testAddVariableWithNullExpressionValueResult() throws MuleException {
     addVariableProcessor.setIdentifier(PLAIN_STRING_KEY);
-    TypedValue typedValue = new TypedValue(null, DataType.OBJECT);
-    when(mockSession.evaluate(NULL_EXPRESSION)).thenReturn(typedValue);
     addVariableProcessor.setValue(NULL_EXPRESSION);
     addVariableProcessor.initialise();
-    event = addVariableProcessor.process(event);
     verifyRemoved(event, PLAIN_STRING_KEY);
   }
 
   @Test
   public void testAddVariableWithNullPayloadExpressionValueResult() throws MuleException {
     addVariableProcessor.setIdentifier(PLAIN_STRING_KEY);
-    addVariableProcessor.setValue(EXPRESSION);
-    TypedValue typedValue = new TypedValue(null, DataType.OBJECT);
-    when(mockSession.evaluate(EXPRESSION)).thenReturn(typedValue);
+    addVariableProcessor.setValue(NULL_EXPRESSION);
     addVariableProcessor.initialise();
 
     event = addVariableProcessor.process(event);
@@ -235,15 +203,11 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
   @Test
   public void testCursorProvidersAreManaged() throws MuleException {
     CursorProvider cursorProvider = mock(CursorProvider.class);
-    typedValue = new TypedValue(cursorProvider, CURSOR_STREAM_PROVIDER);
-
-    when(mockSession.evaluate(eq(EXPRESSION), eq(STRING))).thenReturn(typedValue);
-    when(mockSession.evaluate(eq(EXPRESSION))).thenReturn(typedValue);
 
     addVariableProcessor.setIdentifier(PLAIN_STRING_KEY);
-    addVariableProcessor.setValue(EXPRESSION);
+    addVariableProcessor.setValue("#[payload]");
     addVariableProcessor.initialise();
-    event = addVariableProcessor.process(event);
+    event = addVariableProcessor.process(CoreEvent.builder(event).message(of(cursorProvider)).build());
 
     assertThat(event.getVariables().get(PLAIN_STRING_KEY).getValue(), is(cursorProvider));
     verify(streamingManager).manage(same(cursorProvider), any(EventContext.class));

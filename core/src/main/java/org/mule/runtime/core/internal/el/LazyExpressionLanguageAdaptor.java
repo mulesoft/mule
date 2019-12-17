@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.el;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -105,6 +106,11 @@ public class LazyExpressionLanguageAdaptor implements ExtendedExpressionLanguage
                              BindingContext context, boolean failOnNull)
       throws ExpressionRuntimeException {
     return delegate().evaluate(expression, expectedOutputType, event, componentLocation, context, failOnNull);
+  }
+
+  @Override
+  public CompiledExpression compile(String expression, BindingContext bindingContext) {
+    return delegate().compile(expression, bindingContext);
   }
 
   @Override

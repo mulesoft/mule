@@ -10,7 +10,6 @@ import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
@@ -20,9 +19,12 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
+import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.el.CompiledExpression;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
@@ -91,6 +93,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   private boolean useSecureHash;
   private String messageDigestAlgorithm;
   private String idExpression;
+  private CompiledExpression compiledIdExpresion;
   private ObjectStore<RedeliveryCounter> store;
   private ObjectStore<RedeliveryCounter> privateStore;
   private String idrId;
@@ -143,6 +146,11 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
                                         createStaticMessage("Ambiguous definition of object store, both reference and private were configured"),
                                         this);
     }
+
+    if (idExpression != null) {
+      compiledIdExpresion = compile(idExpression, expressionManager);
+    }
+
     if (store == null) {
       // If no object store was defined, create one
       if (privateStore == null) {
@@ -278,7 +286,9 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   }
 
   private String getIdForEvent(CoreEvent event) {
-    return (String) expressionManager.evaluate(idExpression, STRING, NULL_BINDING_CONTEXT, event).getValue();
+    try (ExpressionLanguageSession session = expressionManager.openSession(event.asBindingContext())) {
+      return (String) session.evaluate(compiledIdExpresion, STRING).getValue();
+    }
   }
 
   public boolean isUseSecureHash() {

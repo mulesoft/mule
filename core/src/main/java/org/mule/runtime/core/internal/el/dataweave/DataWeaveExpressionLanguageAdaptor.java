@@ -6,19 +6,16 @@
  */
 package org.mule.runtime.core.internal.el.dataweave;
 
-import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBuindingsToBuilder;
 import static org.mule.runtime.api.el.BindingContextUtils.addFlowNameBindingsToBuilder;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.fromType;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvaluationFailed;
-import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
-import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX;
-import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX_LENGTH;
-import static org.mule.runtime.core.internal.el.DefaultExpressionManager.PREFIX_EXPR_SEPARATOR;
+import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
+import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -26,6 +23,7 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.BindingContext.Builder;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
+import org.mule.runtime.api.el.ExpressionCompilationException;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ExpressionLanguageConfiguration;
@@ -39,6 +37,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.el.DefaultBindingContextBuilder;
 import org.mule.runtime.core.internal.el.ExpressionLanguageSessionAdaptor;
 import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
+import org.mule.runtime.core.internal.el.IllegalCompiledExpression;
 import org.mule.runtime.core.internal.el.context.MuleInstanceContext;
 import org.mule.runtime.core.internal.el.context.ServerContext;
 
@@ -93,7 +92,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   @Override
   public TypedValue evaluate(String expression, CoreEvent event, BindingContext context) {
     String sanitized = sanitize(expression);
-    if (isPayloadExpression(sanitized)) {
+    if (isSanitizedPayload(sanitized)) {
       return event.getMessage().getPayload();
     } else {
       BindingContext newContext = bindingContextFor(null, event, context);
@@ -101,9 +100,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
     }
   }
 
-  private boolean isPayloadExpression(String sanitized) {
-    return sanitized.equals(PAYLOAD);
-  }
+
 
   @Override
   public TypedValue evaluate(String expression, DataType expectedOutputType, CoreEvent event, BindingContext context)
@@ -132,12 +129,28 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
                              ComponentLocation componentLocation,
                              BindingContext context) {
     String sanitized = sanitize(expression);
-    if (isPayloadExpression(sanitized)) {
+    if (isSanitizedPayload(sanitized)) {
       return resolvePayload(event, context);
     } else {
       BindingContext newContext = bindingContextFor(componentLocation, event, context);
       return evaluate(sanitized, exp -> expressionExecutor.evaluate(exp, newContext));
     }
+  }
+
+  @Override
+  public CompiledExpression compile(String expression, BindingContext bindingContext) {
+    try {
+      return expressionExecutor.compile(sanitize(expression), bindingContext);
+    } catch (ExpressionCompilationException e) {
+      if (badExpressionFailsDeployment()) {
+        throw e;
+      }
+      return new IllegalCompiledExpression(expression, e);
+    }
+  }
+
+  private boolean badExpressionFailsDeployment() {
+    return getProperty(MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT) != null;
   }
 
   /**
@@ -218,26 +231,6 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
     return contextBuilder.build();
   }
 
-  private String sanitize(String expression) {
-    String sanitizedExpression;
-    if (expression.startsWith(DEFAULT_EXPRESSION_PREFIX)) {
-      if (!expression.endsWith(DEFAULT_EXPRESSION_POSTFIX)) {
-        throw new ExpressionExecutionException(createStaticMessage(format("Unbalanced brackets in expression '%s'", expression)));
-      }
-      sanitizedExpression =
-          expression.substring(DEFAULT_EXPRESSION_PREFIX.length(), expression.length() - DEFAULT_EXPRESSION_POSTFIX.length());
-    } else {
-      sanitizedExpression = expression;
-    }
-
-    if (sanitizedExpression.startsWith(DW_PREFIX + PREFIX_EXPR_SEPARATOR)
-        // Handle DW functions that start with dw:: without removing dw:
-        && !sanitizedExpression.substring(DW_PREFIX_LENGTH, DW_PREFIX_LENGTH + 1).equals(PREFIX_EXPR_SEPARATOR)) {
-      sanitizedExpression = sanitizedExpression.substring(DW_PREFIX_LENGTH);
-    }
-    return sanitizedExpression;
-  }
-
   @Override
   public ExpressionLanguageSessionAdaptor openSession(ComponentLocation location, CoreEvent event, BindingContext context) {
     ExpressionLanguageSession session = expressionExecutor.openSession(bindingContextFor(location, event, context));
@@ -246,7 +239,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       @Override
       public TypedValue<?> evaluate(String expression) throws ExpressionRuntimeException {
         String sanitized = sanitize(expression);
-        if (isPayloadExpression(sanitized)) {
+        if (isSanitizedPayload(sanitized)) {
           return resolvePayload(event, context);
         }
 
@@ -260,7 +253,7 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       @Override
       public TypedValue<?> evaluate(String expression, long timeout) throws ExpressionRuntimeException {
         String sanitized = sanitize(expression);
-        if (isPayloadExpression(sanitized)) {
+        if (isSanitizedPayload(sanitized)) {
           return resolvePayload(event, context);
         }
         try {
@@ -295,30 +288,66 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
         return session.split(sanitize(expression));
       }
 
+      private RuntimeException handledException(CompiledExpression expression, Exception e) {
+        if (expression instanceof IllegalCompiledExpression) {
+          ExpressionCompilationException original = ((IllegalCompiledExpression) expression).getCompilationException();
+          return new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression.expression()), original);
+        }
+
+        return new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression.expression()), e);
+      }
+
       @Override
       public TypedValue<?> evaluate(CompiledExpression expression) throws ExpressionExecutionException {
-        return session.evaluate(expression);
+        if (isSanitizedPayload(expression.expression())) {
+          return resolvePayload(event, context);
+        }
+        try {
+          return session.evaluate(expression);
+        } catch (Exception e) {
+          throw handledException(expression, e);
+        }
       }
 
       @Override
       public TypedValue<?> evaluate(CompiledExpression expression, DataType expectedOutputType)
           throws ExpressionExecutionException {
-        return session.evaluate(expression, expectedOutputType);
+        try {
+          return session.evaluate(expression, expectedOutputType);
+        } catch (Exception e) {
+          throw handledException(expression, e);
+        }
       }
 
       @Override
       public TypedValue<?> evaluate(CompiledExpression expression, long timeout) throws ExpressionExecutionException {
-        return session.evaluate(expression, timeout);
+        if (isSanitizedPayload(expression.expression())) {
+          return resolvePayload(event, context);
+        }
+
+        try {
+          return session.evaluate(expression, timeout);
+        } catch (Exception e) {
+          throw handledException(expression, e);
+        }
       }
 
       @Override
       public TypedValue<?> evaluateLogExpression(CompiledExpression expression) throws ExpressionExecutionException {
-        return session.evaluateLogExpression(expression);
+        try {
+          return session.evaluateLogExpression(expression);
+        } catch (Exception e) {
+          throw handledException(expression, e);
+        }
       }
 
       @Override
       public Iterator<TypedValue<?>> split(CompiledExpression expression) {
-        return session.split(expression);
+        try {
+          return session.split(expression);
+        } catch (Exception e) {
+          throw handledException(expression, e);
+        }
       }
 
       @Override
