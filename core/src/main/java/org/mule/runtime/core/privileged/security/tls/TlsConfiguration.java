@@ -7,17 +7,17 @@
 package org.mule.runtime.core.privileged.security.tls;
 
 import static java.lang.String.format;
+import static java.security.KeyStore.getInstance;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotLoadFromClasspath;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToLoad;
-import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.util.FileUtils;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.security.tls.RestrictedSSLServerSocketFactory;
 import org.mule.runtime.core.internal.security.tls.RestrictedSSLSocketFactory;
 import org.mule.runtime.core.internal.security.tls.TlsProperties;
@@ -256,9 +256,9 @@ public final class TlsConfiguration extends AbstractComponent
   }
 
   private KeyStore loadKeyStore() throws GeneralSecurityException, IOException {
-    KeyStore tempKeyStore = KeyStore.getInstance(keystoreType);
+    KeyStore tempKeyStore = getInstance(keystoreType);
 
-    try (InputStream is = IOUtils.getResourceAsStream(keyStoreName, getClass())) {
+    try (InputStream is = getResourceAsStream(keyStoreName, getClass())) {
       if (null == is) {
         throw new FileNotFoundException(cannotLoadFromClasspath("Keystore: " + keyStoreName).getMessage());
       }
@@ -347,25 +347,16 @@ public final class TlsConfiguration extends AbstractComponent
   private KeyStore createTrustStore() throws CreateException {
     trustStorePassword = null == trustStorePassword ? "" : trustStorePassword;
 
-    KeyStore trustStore;
-    InputStream is = null;
-
-    try {
-      trustStore = KeyStore.getInstance(trustStoreType);
-      is = IOUtils.getResourceAsStream(trustStoreName, getClass());
+    try (InputStream is = getResourceAsStream(trustStoreName, getClass())) {
+      KeyStore trustStore = getInstance(trustStoreType);
       if (null == is) {
         throw new FileNotFoundException("Failed to load truststore from classpath or local file: " + trustStoreName);
       }
       trustStore.load(is, trustStorePassword.toCharArray());
+      return trustStore;
     } catch (Exception e) {
       throw new CreateException(failedToLoad("TrustStore: " + trustStoreName), e, this);
-    } finally {
-      if (is != null) {
-        closeQuietly(is);
-      }
     }
-
-    return trustStore;
   }
 
   public static Set<TrustAnchor> getDefaultCaCerts() throws GeneralSecurityException {
