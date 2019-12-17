@@ -10,7 +10,6 @@ import static java.lang.System.getProperty;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBuindingsToBuilder;
 import static org.mule.runtime.api.el.BindingContextUtils.addFlowNameBindingsToBuilder;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvaluationFailed;
@@ -292,10 +291,10 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       private RuntimeException handledException(CompiledExpression expression, Exception e) {
         if (expression instanceof IllegalCompiledExpression) {
           ExpressionCompilationException original = ((IllegalCompiledExpression) expression).getCompilationException();
-          return new ExpressionRuntimeException(createStaticMessage(original.getMessage()), original);
+          return new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression.expression()), original);
         }
 
-        return new ExpressionRuntimeException(createStaticMessage(e.getMessage()), e);
+        return new ExpressionRuntimeException(expressionEvaluationFailed(e.getMessage(), expression.expression()), e);
       }
 
       @Override
