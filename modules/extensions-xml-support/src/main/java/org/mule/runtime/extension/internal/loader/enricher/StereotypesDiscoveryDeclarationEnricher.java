@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.extension.internal.loader.enricher;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
 
@@ -27,6 +29,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.model.ComponentModel;
@@ -41,9 +44,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 /**
@@ -151,12 +152,16 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
     private List<StereotypeModel> findStereotypes(ComponentModel componentModel, ParameterDeclaration propertyDeclaration) {
       final String expectedPropertyReference = ExpressionManager.DEFAULT_EXPRESSION_PREFIX + BindingContextUtils.VARS + "."
           + propertyDeclaration.getName() + ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
-      return componentModel.getRawParameters().entrySet().stream()
-          .filter(stringStringEntry -> stringStringEntry.getValue().equals(expectedPropertyReference))
-          .map(Map.Entry::getKey)
+      if (!componentModel.getModel(ParameterizedModel.class).isPresent()) {
+        return emptyList();
+      }
+
+      return ((ComponentAst) componentModel).getParameters().stream()
+          .filter(paramAst -> expectedPropertyReference.equals(paramAst.getRawValue()))
+          .map(paramAst -> paramAst.getModel().getName())
           .map(attributeName -> findStereotypes(componentModel.getIdentifier(), attributeName))
           .flatMap(Collection::stream)
-          .collect(Collectors.toList());
+          .collect(toList());
     }
 
     private List<StereotypeModel> findStereotypes(ComponentIdentifier componentModelIdentifier, String attributeName) {
@@ -202,7 +207,7 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
             .filter(parameterModel -> dslSyntaxResolver.resolve(parameterModel).getAttributeName().equals(attributeName))
             .map(ParameterModel::getAllowedStereotypes)
             .flatMap(Collection::stream)
-            .collect(Collectors.toList());
+            .collect(toList());
       }
       return allowedStereotypes;
     }
