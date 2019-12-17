@@ -117,12 +117,12 @@ public class AsyncTestConnectivityTestCase extends AbstractMuleContextTestCase {
     configurationInstance.dispose();
   }
 
-  protected LifecycleAwareConfigurationInstance createConfigurationInstance() {
-    return new LifecycleAwareConfigurationInstance(NAME,
-                                                   configurationModel,
-                                                   value,
-                                                   configurationState,
-                                                   connectionProvider);
+  protected LifecycleAwareConfigurationInstance createConfigurationInstance() throws MuleException {
+    return muleContext.getInjector().inject(new LifecycleAwareConfigurationInstance(NAME,
+                                                                                    configurationModel,
+                                                                                    value,
+                                                                                    configurationState,
+                                                                                    connectionProvider));
   }
 
 

@@ -30,7 +30,6 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.execution.ConfigurationObjectBuilderTestCase;
@@ -131,8 +130,6 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
     assertThat(configurationInstance.getName(), is(CONFIG_NAME));
     assertThat(configurationInstance.getModel(), is(sameInstance(configurationModel)));
     assertThat(configurationInstance.getValue(), is(instanceOf(TestConfig.class)));
-
-    assertThat(configurationInstance, is(instanceOf(Interceptable.class)));
   }
 
   public static class InvalidConfigTestConnectionProvider implements ConnectionProvider<Banana> {

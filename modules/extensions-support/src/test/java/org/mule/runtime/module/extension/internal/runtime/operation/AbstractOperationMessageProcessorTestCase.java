@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -100,6 +101,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.FieldOper
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.exception.NullExceptionHandler;
+import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
@@ -143,7 +145,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   @Mock(lenient = true)
   protected CompletableComponentExecutorFactory operationExecutorFactory;
 
-  @Mock(extraInterfaces = {Lifecycle.class, MuleContextAware.class}, lenient = true)
+  @Mock(extraInterfaces = {Lifecycle.class, MuleContextAware.class, OperationArgumentResolverFactory.class}, lenient = true)
   protected CompletableComponentExecutor operationExecutor;
 
   @Mock(lenient = true)
@@ -246,6 +248,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
                                                                                            .load(String.class), "someParam")));
     setRequires(operationModel, true, true);
     when(operationExecutorFactory.createExecutor(same(operationModel), anyMap())).thenReturn(operationExecutor);
+    when(((OperationArgumentResolverFactory) operationExecutor).createArgumentResolver(any())).thenReturn(ctx -> emptyMap());
 
     when(operationModel.getName()).thenReturn(OPERATION_NAME);
     when(operationModel.getDisplayModel()).thenReturn(empty());
