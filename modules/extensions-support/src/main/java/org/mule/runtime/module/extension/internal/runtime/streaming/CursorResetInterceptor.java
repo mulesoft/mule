@@ -7,17 +7,18 @@
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.streaming.Cursor;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,12 +46,12 @@ public class CursorResetInterceptor implements Interceptor<OperationModel> {
 
   @Override
   public void before(ExecutionContext<OperationModel> ctx) throws Exception {
-    Map<Cursor, Long> cursorPositions = new HashMap<>();
+    List<Pair<Cursor, Long>> cursorPositions = new ArrayList<>(cursorParamNames.size());
     for (String cursorParamName : cursorParamNames) {
       Object value = ctx.getParameter(cursorParamName);
       if (value instanceof Cursor) {
         final Cursor cursor = (Cursor) value;
-        cursorPositions.put(cursor, cursor.getPosition());
+        cursorPositions.add(new Pair<>(cursor, cursor.getPosition()));
       }
     }
 
@@ -62,15 +63,15 @@ public class CursorResetInterceptor implements Interceptor<OperationModel> {
   @Override
   public Throwable onError(ExecutionContext<OperationModel> executionContext, Throwable exception) {
     extractConnectionException(exception).ifPresent(cne -> {
-      Map<Cursor, Long> cursorPositions =
+      List<Pair<Cursor, Long>> cursorPositions =
           ((ExecutionContextAdapter<OperationModel>) executionContext).removeVariable(CURSOR_POSITIONS);
       if (cursorPositions != null) {
-        cursorPositions.forEach((cursor, position) -> {
+        cursorPositions.forEach(pair -> {
           try {
-            cursor.seek(position);
+            pair.getFirst().seek(pair.getSecond());
           } catch (IOException e) {
             if (LOGGER.isWarnEnabled()) {
-              LOGGER.warn("Could not reset cursor back to position " + position + ". Inconsistencies might occur if "
+              LOGGER.warn("Could not reset cursor back to position " + pair.getSecond() + ". Inconsistencies might occur if "
                   + "reconnection attempted", e);
             }
           }

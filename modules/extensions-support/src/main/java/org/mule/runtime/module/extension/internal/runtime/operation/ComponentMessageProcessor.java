@@ -262,11 +262,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       } else {
         operationExecutionFunction = (parameters, operationEvent, callback) -> {
           ExecutionContextAdapter<T> operationContext = createExecutionContext(
-                                                                               configuration,
-                                                                               parameters,
-                                                                               operationEvent,
-                                                                               currentScheduler != null ? currentScheduler
-                                                                                   : IMMEDIATE_SCHEDULER);
+              configuration,
+              parameters,
+              operationEvent,
+              currentScheduler != null ? currentScheduler
+                  : IMMEDIATE_SCHEDULER);
 
           executeOperation(operationContext, mapped(callback, operationContext, operationEvent));
         };
@@ -597,13 +597,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private void addCursorResetInterceptor(InterceptorChain.Builder chainBuilder) {
     List<String> streamParams = new ArrayList<>(5);
-    componentModel.getAllParameterModels().forEach(p -> {
-      getType(p.getType(), getClassLoader(extensionModel)).ifPresent(clazz -> {
-        if (InputStream.class.isAssignableFrom(clazz) || Iterator.class.isAssignableFrom(clazz)) {
-          streamParams.add(p.getName());
-        }
-      });
-    });
+    componentModel.getAllParameterModels().forEach(
+        p -> getType(p.getType(), getClassLoader(extensionModel))
+            .filter(clazz -> InputStream.class.isAssignableFrom(clazz) || Iterator.class.isAssignableFrom(clazz))
+            .ifPresent(clazz -> streamParams.add(p.getName()))
+    );
 
     if (!streamParams.isEmpty()) {
       chainBuilder.addInterceptor(new CursorResetInterceptor(streamParams));
@@ -666,7 +664,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     List<Interceptor> interceptors = mediator.collectInterceptors(executionContext.getConfiguration(),
                                                                   executionContext instanceof PrecalculatedExecutionContextAdapter
                                                                       ? ((PrecalculatedExecutionContextAdapter) executionContext)
-                                                                          .getOperationExecutor()
+                                                                      .getOperationExecutor()
                                                                       : componentExecutor);
 
     disposeResolvedParameters(executionContext, interceptors);
