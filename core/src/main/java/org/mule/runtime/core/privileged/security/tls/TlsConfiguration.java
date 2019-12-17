@@ -11,7 +11,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotLoadFromClasspath;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToLoad;
-import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -258,14 +257,13 @@ public final class TlsConfiguration extends AbstractComponent
   private KeyStore loadKeyStore() throws GeneralSecurityException, IOException {
     KeyStore tempKeyStore = KeyStore.getInstance(keystoreType);
 
-    try (InputStream is = IOUtils.getResourceAsStream(keyStoreName, getClass())) {
-      if (null == is) {
-        throw new FileNotFoundException(cannotLoadFromClasspath("Keystore: " + keyStoreName).getMessage());
-      }
-
-      tempKeyStore.load(is, keyStorePassword.toCharArray());
-      return tempKeyStore;
+    InputStream is = IOUtils.getResourceAsStream(keyStoreName, getClass());
+    if (null == is) {
+      throw new FileNotFoundException(cannotLoadFromClasspath("Keystore: " + keyStoreName).getMessage());
     }
+
+    tempKeyStore.load(is, keyStorePassword.toCharArray());
+    return tempKeyStore;
   }
 
   /**
@@ -348,21 +346,18 @@ public final class TlsConfiguration extends AbstractComponent
     trustStorePassword = null == trustStorePassword ? "" : trustStorePassword;
 
     KeyStore trustStore;
-    InputStream is = null;
 
     try {
       trustStore = KeyStore.getInstance(trustStoreType);
-      is = IOUtils.getResourceAsStream(trustStoreName, getClass());
+      InputStream is = IOUtils.getResourceAsStream(trustStoreName, getClass());
       if (null == is) {
-        throw new FileNotFoundException("Failed to load truststore from classpath or local file: " + trustStoreName);
+        throw new FileNotFoundException(
+                                        "Failed to load truststore from classpath or local file: " + trustStoreName);
       }
       trustStore.load(is, trustStorePassword.toCharArray());
     } catch (Exception e) {
-      throw new CreateException(failedToLoad("TrustStore: " + trustStoreName), e, this);
-    } finally {
-      if (is != null) {
-        closeQuietly(is);
-      }
+      throw new CreateException(
+                                failedToLoad("TrustStore: " + trustStoreName), e, this);
     }
 
     return trustStore;
