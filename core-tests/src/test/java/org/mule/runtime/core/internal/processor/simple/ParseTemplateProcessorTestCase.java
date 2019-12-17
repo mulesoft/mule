@@ -18,6 +18,10 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.create;
 import static org.mule.runtime.api.metadata.TypedValue.of;
+import static org.mule.runtime.core.api.util.FileUtils.newFile;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
+import static org.mule.runtime.core.internal.util.TestFileUtils.isFileOpen;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -26,8 +30,10 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.internal.util.TestFileUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -37,6 +43,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.HashMap;
 
@@ -106,7 +114,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     parseTemplateProcessor.setLocation(LOCATION);
     parseTemplateProcessor.initialise();
     when(mockMuleMessage.getInboundProperty("errorMessage")).thenReturn("ERROR!!!");
-    String expectedExpression = IOUtils.getResourceAsString(LOCATION, this.getClass());
+    String expectedExpression = getResourceAsString(LOCATION, this.getClass());
 
     when(mockMuleMessage.getPayload()).thenReturn(of("Parsed"));
     when(mockMuleMessage.getAttributes()).thenReturn(of(new HashMap<>()));
@@ -126,7 +134,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
   public void parseTemplateFromLocationWithKnownMediaType() throws Exception {
     parseTemplateProcessor.setLocation(LOCATION);
     parseTemplateProcessor.initialise();
-    String expectedExpression = IOUtils.getResourceAsString(LOCATION, this.getClass());
+    String expectedExpression = getResourceAsString(LOCATION, this.getClass());
     when(mockExpressionManager.parseLogTemplate(eq(expectedExpression), eq(event), any(), any())).thenReturn("Parsed");
     CoreEvent response = parseTemplateProcessor.process(event);
     assertThat(response.getMessage().getPayload().getDataType().getMediaType(), is(equalTo(LOCATION_MEDIA_TYPE)));
@@ -136,7 +144,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
   public void parseTemplateFromLocationWithUnknownMediaType() throws Exception {
     parseTemplateProcessor.setLocation(UNKNOWN_MEDIATYPE_LOCATION);
     parseTemplateProcessor.initialise();
-    String expectedExpression = IOUtils.getResourceAsString(UNKNOWN_MEDIATYPE_LOCATION, this.getClass());
+    String expectedExpression = getResourceAsString(UNKNOWN_MEDIATYPE_LOCATION, this.getClass());
     when(mockExpressionManager.parseLogTemplate(eq(expectedExpression), eq(event), any(), any())).thenReturn("Parsed");
     CoreEvent response = parseTemplateProcessor.process(event);
     assertThat(response.getMessage().getPayload().getDataType().getMediaType(), is(equalTo(ANY)));
@@ -150,7 +158,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     parseTemplateProcessor.setOutputMimeType(customMediaType.toRfcString());
     parseTemplateProcessor.setOutputEncoding(customEncoding);
     parseTemplateProcessor.initialise();
-    String expectedExpression = IOUtils.getResourceAsString(UNKNOWN_MEDIATYPE_LOCATION, this.getClass());
+    String expectedExpression = getResourceAsString(UNKNOWN_MEDIATYPE_LOCATION, this.getClass());
     when(mockExpressionManager.parseLogTemplate(eq(expectedExpression), eq(event), any(), any())).thenReturn("Parsed");
     CoreEvent response = parseTemplateProcessor.process(event);
     assertThat(response.getMessage().getPayload().getDataType().getMediaType().getPrimaryType(),
@@ -183,7 +191,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     parseTemplateProcessor.setOutputMimeType(customMediaType.toRfcString());
     parseTemplateProcessor.setOutputEncoding(customEncoding);
     parseTemplateProcessor.initialise();
-    String expectedExpression = IOUtils.getResourceAsString(UNKNOWN_MEDIATYPE_LOCATION, this.getClass());
+    String expectedExpression = getResourceAsString(UNKNOWN_MEDIATYPE_LOCATION, this.getClass());
     when(mockExpressionManager.parseLogTemplate(eq(expectedExpression), eq(event), any(), any())).thenReturn("Parsed");
     CoreEvent response = parseTemplateProcessor.process(event);
     assertThat(response.getMessage().getPayload().getDataType().getMediaType().getPrimaryType(),
@@ -192,6 +200,23 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
                is(equalTo(customMediaType.getSubType())));
     assertThat(response.getMessage().getPayload().getDataType().getMediaType().getCharset().get().toString(),
                is(equalTo(customEncoding)));
+  }
+
+  @Test
+  public void parseTemplateDoesNotLeakTheLocationFile() throws Exception {
+    String customEncoding = "UTF-16";
+    MediaType customMediaType = create("application", "lrmextension");
+    parseTemplateProcessor.setLocation(UNKNOWN_MEDIATYPE_LOCATION);
+    parseTemplateProcessor.setOutputMimeType(customMediaType.toRfcString());
+    parseTemplateProcessor.setOutputEncoding(customEncoding);
+    parseTemplateProcessor.initialise();
+
+    String expectedExpression = getResourceAsString(UNKNOWN_MEDIATYPE_LOCATION, this.getClass());
+    when(mockExpressionManager.parseLogTemplate(eq(expectedExpression), eq(event), any(), any())).thenReturn("Parsed");
+    parseTemplateProcessor.process(event);
+
+    URL url = getResourceAsUrl(UNKNOWN_MEDIATYPE_LOCATION, getClass());
+    assertThat(isFileOpen(newFile(url.toURI())), is(false));
   }
 
   @Test

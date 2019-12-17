@@ -14,6 +14,7 @@ import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.api.metadata.MediaType.create;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
 import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
@@ -74,19 +75,24 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor {
   }
 
   private void loadContentFromLocation() throws InitialisationException {
-    InputStream contentStream;
+    InputStream contentStream = null;
     try {
       contentStream = getResourceAsStream(location, getClass());
+
+      if (contentStream == null) {
+        throw new InitialisationException(createStaticMessage("Template location: " + location + " not found"), this);
+      }
+      if (outputEncoding != null) {
+        content = IOUtils.toString(contentStream, outputEncoding);
+      } else {
+        content = IOUtils.toString(contentStream);
+      }
     } catch (IOException e) {
       throw new InitialisationException(createStaticMessage("Error loading template from location"), this);
-    }
-    if (contentStream == null) {
-      throw new InitialisationException(createStaticMessage("Template location: " + location + " not found"), this);
-    }
-    if (outputEncoding != null) {
-      content = IOUtils.toString(contentStream, outputEncoding);
-    } else {
-      content = IOUtils.toString(contentStream);
+    } finally {
+      if (contentStream != null) {
+        closeQuietly(contentStream);
+      }
     }
   }
 
