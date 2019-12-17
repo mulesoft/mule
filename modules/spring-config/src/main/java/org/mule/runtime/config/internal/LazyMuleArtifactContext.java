@@ -310,7 +310,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           try {
             muleContext.getRegistry().applyLifecycle(configurationProviders, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
           } catch (MuleException e) {
-            throw new RuntimeException(e);
+            throw new MuleRuntimeException(e);
           }
         });
   }
