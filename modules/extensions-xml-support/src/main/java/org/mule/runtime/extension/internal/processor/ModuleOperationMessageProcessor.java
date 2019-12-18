@@ -148,7 +148,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
    * To properly feed the {@link ExpressionManager#evaluate(String, DataType, BindingContext, CoreEvent)} we need to store the
    * {@link MetadataType} per parameter, so that the {@link DataType} can be generated.
    *
-   * @param parameters      list of parameters taken from the XML
+   * @param parameters list of parameters taken from the XML
    * @param parameterModels collection of elements taken from the matching {@link ExtensionModel}
    * @return a collection of parameters to be later consumed in {@link #getEvaluatedValue(CoreEvent, String, MetadataType)}
    */
@@ -183,7 +183,9 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
         .map(this::createEventWithParameters)
         // 2. Restore the error handler, overriding the last one set by the inner chain. This one being set again is the one that
         // must be used for handling any errors in the mapper above.
-        .subscriberContext(ctx -> ctx.put(KEY_ON_NEXT_ERROR_STRATEGY, ctx.get(localStrategyCtxKey)))
+        .subscriberContext(ctx -> ctx.getOrEmpty(localStrategyCtxKey)
+            .map(localErrorStr -> ctx.put(KEY_ON_NEXT_ERROR_STRATEGY, localErrorStr))
+            .orElse(ctx))
         .compose(eventPub -> applyWithChildContext(eventPub,
                                                    p -> from(p)
                                                        .doOnNext(this::pushFlowStackEntry)
@@ -193,7 +195,9 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
                                                    ofNullable(getLocation()),
                                                    errorHandler()))
         // 1. Store the current error handler into the subscription context, so it can be retrieved later
-        .subscriberContext(ctx -> ctx.put(localStrategyCtxKey, ctx.get(KEY_ON_NEXT_ERROR_STRATEGY)))
+        .subscriberContext(ctx -> ctx.getOrEmpty(KEY_ON_NEXT_ERROR_STRATEGY)
+            .map(onNextErrorStr -> ctx.put(localStrategyCtxKey, onNextErrorStr))
+            .orElse(ctx))
         .map(eventResult -> processResult(getInternalParameter(ORIGINAL_EVENT_KEY, eventResult), eventResult));
   }
 
