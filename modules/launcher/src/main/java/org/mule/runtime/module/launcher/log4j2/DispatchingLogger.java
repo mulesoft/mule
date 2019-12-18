@@ -60,7 +60,6 @@ abstract class DispatchingLogger extends Logger {
       .weakKeys()
       .weakValues()
       .build(key -> new Reference<>());
-
   private Method updateConfigurationMethod = null;
 
   DispatchingLogger(Logger originalLogger, int ownerClassLoaderHash, LoggerContext loggerContext, ContextSelector contextSelector,
@@ -71,7 +70,6 @@ abstract class DispatchingLogger extends Logger {
     this.ownerClassLoaderHash = ownerClassLoaderHash;
   }
 
-
   private Logger getLogger() {
     return getLogger(resolveLoggerContextClassLoader(currentThread().getContextClassLoader()));
   }
@@ -80,7 +78,6 @@ abstract class DispatchingLogger extends Logger {
     if (useThisLoggerContextClassLoader(resolvedCtxClassLoader)) {
       return originalLogger;
     }
-
     // we need to cache reference objects and do this double lookup to avoid cyclic resolutions of the same classloader
     // key which would result in an exception or a deadlock, depending on the cache implementation
     Reference<Logger> loggerReference = loggerCache.get(resolvedCtxClassLoader);
@@ -89,12 +86,16 @@ abstract class DispatchingLogger extends Logger {
       synchronized (loggerReference) {
         logger = loggerReference.get();
         if (logger == null) {
-          logger = resolveLogger(resolvedCtxClassLoader);
+          try {
+            logger = resolveLogger(resolvedCtxClassLoader);
+          } catch (RecursiveLoggerContextInstantiationException rle) {
+            // The required Logger is already under construcion by a previuos resolveLogger call. Falling back to SystemClassLoader.
+            return resolveLogger(ClassLoader.getSystemClassLoader());
+          }
           loggerReference.set(logger);
         }
       }
     }
-
     return logger;
   }
 

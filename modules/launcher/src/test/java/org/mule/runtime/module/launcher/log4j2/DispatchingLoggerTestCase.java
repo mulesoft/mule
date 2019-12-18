@@ -7,14 +7,12 @@
 package org.mule.runtime.module.launcher.log4j2;
 
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -32,6 +30,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
   private static final String LOGGER_NAME = DispatchingLoggerTestCase.class.getName();
+
   private static final String MESSAGE = "Hello Log!";
 
   private ClassLoader currentClassLoader;
@@ -48,8 +47,17 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private ContextSelector contextSelector;
 
+  @Mock
+  private ArtifactAwareContextSelector artifactAwareContextSelector;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private MessageFactory messageFactory;
+
+  @Mock
+  RegionClassLoader regionClassLoader;
+
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  LoggerContext regionClassLoaderLoggerContext;
 
   private Logger logger;
 
@@ -57,7 +65,6 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
   public void before() {
     currentClassLoader = Thread.currentThread().getContextClassLoader();
     when(loggerContext.getConfiguration().getLoggerConfig(anyString()).getLevel()).thenReturn(Level.INFO);
-
     logger =
         new DispatchingLogger(originalLogger, currentClassLoader.hashCode(), loggerContext, contextSelector, messageFactory) {
 
@@ -90,4 +97,36 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
       verify(contextSelector).getContext(LOGGER_NAME, regionClassLoader, true);
     });
   }
+
+  @Test
+  public void when_RecursiveLoggerContextInstantiationException_expect_fallback_dispatch_using_system_classloader() {
+    // Expected Loggers
+    Logger currentClassLoaderLogger = mock(Logger.class);
+    Logger regionClassLoaderLogger = mock(Logger.class);
+    when(loggerContext.getLogger(any(), any())).thenReturn(currentClassLoaderLogger);
+    when(regionClassLoaderLoggerContext.getLogger(any(), any())).thenReturn(regionClassLoaderLogger);
+    when(artifactAwareContextSelector.getContextWithResolvedContextClassLoader(currentClassLoader))
+        .thenAnswer(invocation -> loggerContext);
+    // Triggers of the expected Loggers
+    when(artifactAwareContextSelector.getContextWithResolvedContextClassLoader(regionClassLoader))
+        .thenThrow(RecursiveLoggerContextInstantiationException.class)
+        .thenAnswer(invocation -> regionClassLoaderLoggerContext);
+    // Class under test
+    DispatchingLogger dispatchingLogger = new DispatchingLogger(originalLogger, currentClassLoader.hashCode(),
+                                                                loggerContext, artifactAwareContextSelector, messageFactory) {
+
+      @Override
+      public String getName() {
+        return LOGGER_NAME;
+      }
+    };
+    // Test and assertions
+    withContextClassLoader(regionClassLoader, () -> {
+      dispatchingLogger.info("Fallback Test Message");
+      dispatchingLogger.info("Test Message");
+    });
+    verify(currentClassLoaderLogger, times(1)).info("Fallback Test Message");
+    verify(regionClassLoaderLogger, times(1)).info("Test Message");
+  }
+
 }

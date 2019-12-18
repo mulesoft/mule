@@ -55,6 +55,7 @@ final class LoggerContextCache implements Disposable {
 
   private static final long DEFAULT_DISPOSE_DELAY_IN_MILLIS = 15000;
 
+  private static final ThreadLocal<Boolean> isLoggerContextUnderConstruction = ThreadLocal.withInitial(() -> Boolean.FALSE);
   private final ArtifactAwareContextSelector artifactAwareContextSelector;
   // Extra cache layer to avid some nasty implications for using Guava cache at this point. See the comments in
   // #doGetLoggerContext(final ClassLoader classLoader) for details.
@@ -96,23 +97,35 @@ final class LoggerContextCache implements Disposable {
     disposeDelayInMillis = Long.getLong(MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS, DEFAULT_DISPOSE_DELAY_IN_MILLIS);
   }
 
+  /**
+   * Returns the {@link MuleLoggerContext} for a given {@link ClassLoader}, maintaining an internal cache.
+   * @param classLoader {@link MuleLoggerContext} owner {@link ClassLoader}
+   * @return Cached {@link MuleLoggerContext} instance.
+   * @throws RecursiveLoggerContextInstantiationException If the {@link MuleLoggerContext} that should be returned is
+   * already under construction (indicates recursive {{@link #getLoggerContext(ClassLoader)}} call).
+   */
   LoggerContext getLoggerContext(final ClassLoader classLoader) {
     LoggerContext ctx;
-    try {
-      final int key = computeKey(classLoader);
-      // If possible, avoid using Guava cache since the callable puts unwanted pressure on the garbage collector.
-      ctx = builtContexts.get(key);
-
-      if (ctx == null) {
-        synchronized (this) {
-          ctx = builtContexts.get(key);
-          if (ctx == null) {
+    final int key = computeKey(classLoader);
+    // If possible, avoid using Guava cache since the callable puts unwanted pressure on the garbage collector.
+    ctx = builtContexts.get(key);
+    if (ctx == null) {
+      synchronized (this) {
+        ctx = builtContexts.get(key);
+        if (ctx == null) {
+          // LoggerContext construction is flagged in order to prevent recursion
+          setLoggerContextUnderConstruction(classLoader);
+          try {
             ctx = doGetLoggerContext(classLoader, key);
+            unsetLoggerContextUnderConstruction();
+          } catch (ExecutionException e) {
+            throw new MuleRuntimeException(createStaticMessage("Could not init logger context "), e);
+          } finally {
+            // LoggerContext construction has failed, so the under construction flag must be unset
+            unsetLoggerContextUnderConstruction();
           }
         }
       }
-    } catch (ExecutionException e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not init logger context "), e);
     }
 
     if (ctx.getState() == LifeCycle.State.INITIALIZED) {
@@ -213,5 +226,33 @@ final class LoggerContextCache implements Disposable {
     builtContexts.clear();
     disposedContexts.invalidateAll();
     disposedContexts.cleanUp();
+  }
+
+  /**
+   * Marks a {@link MuleLoggerContext} under construction
+   * @param classLoader {@link ClassLoader} that owns the {@link MuleLoggerContext}
+   * @throws RecursiveLoggerContextInstantiationException if a {@link MuleLoggerContext} is already under construction
+   */
+  private void setLoggerContextUnderConstruction(ClassLoader classLoader) {
+    if (isLoggerContextUnderConstruction()) {
+      throw new RecursiveLoggerContextInstantiationException(String
+          .format("A LoggerContext is already under construction for ClassLoader: %s", classLoader));
+    } else {
+      isLoggerContextUnderConstruction.set(Boolean.TRUE);
+    }
+  }
+
+  /**
+   * @return True if a {@link MuleLoggerContext} is already under construction
+   */
+  private boolean isLoggerContextUnderConstruction() {
+    return isLoggerContextUnderConstruction.get();
+  }
+
+  /**
+   * Unmarks a {@link MuleLoggerContext} under construction
+   */
+  private void unsetLoggerContextUnderConstruction() {
+    isLoggerContextUnderConstruction.set(Boolean.FALSE);
   }
 }
