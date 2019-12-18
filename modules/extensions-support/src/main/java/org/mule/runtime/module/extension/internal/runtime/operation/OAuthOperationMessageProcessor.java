@@ -77,7 +77,7 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
   @Override
   protected Mono<CoreEvent> doProcess(CoreEvent event, ExecutionContextAdapter<OperationModel> operationContext) {
     return super.doProcess(event, operationContext)
-        .onErrorResume(AccessTokenExpiredException.class, e -> {
+        .onErrorResume(Exception.class, e -> {
           OAuthConnectionProviderWrapper connectionProvider = getOAuthConnectionProvider(operationContext);
           if (connectionProvider == null) {
             return error(e);
@@ -143,9 +143,7 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
   }
 
   private AccessTokenExpiredException getTokenExpirationException(Exception e) {
-    return e instanceof AccessTokenExpiredException
-        ? (AccessTokenExpiredException) e
-        : (AccessTokenExpiredException) extractCauseOfType(e, AccessTokenExpiredException.class).orElse(null);
+    return extractOfType(e, AccessTokenExpiredException.class).orElse(null);
   }
 
   private OAuthConnectionProviderWrapper getOAuthConnectionProvider(ExecutionContextAdapter operationContext) {
