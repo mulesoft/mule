@@ -128,9 +128,9 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
                                                                      unmanagedPersistent());
 
     executor = schedulerService.customScheduler(SchedulerConfig.config()
-                                                    .withMaxConcurrentTasks(1)
-                                                    .withWaitAllowed(true)
-                                                    .withName(formatKey("executor")));
+        .withMaxConcurrentTasks(1)
+        .withWaitAllowed(true)
+        .withName(formatKey("executor")));
 
     stopRequested.set(false);
     scheduler.schedule(executor, () -> poll(sourceCallback));
