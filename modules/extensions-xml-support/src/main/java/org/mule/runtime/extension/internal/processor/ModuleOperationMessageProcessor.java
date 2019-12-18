@@ -186,7 +186,6 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
         .subscriberContext(ctx -> ctx.getOrEmpty(localStrategyCtxKey)
             .map(localErrorStr -> ctx.put(KEY_ON_NEXT_ERROR_STRATEGY, localErrorStr))
             .orElse(ctx))
-        // .subscriberContext(ctx -> ctx.put(KEY_ON_NEXT_ERROR_STRATEGY, ctx.get(localStrategyCtxKey)))
         .compose(eventPub -> applyWithChildContext(eventPub,
                                                    p -> from(p)
                                                        .doOnNext(this::pushFlowStackEntry)
