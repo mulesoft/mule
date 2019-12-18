@@ -241,8 +241,6 @@ public class ApplicationModel implements ArtifactAst {
           .add(builder().namespace(MULE_ROOT_ELEMENT)
               .name("string-to-byte-array-transformer")
               .build())
-          .add(builder().namespace(MULE_ROOT_ELEMENT).name("append-string-transformer")
-              .build())
           .add(builder().namespace(MULE_ROOT_ELEMENT).name("security-manager").build())
           .add(builder().namespace(TEST_NAMESPACE).name("queue").build())
           .add(builder().namespace(TEST_NAMESPACE).name("invocation-counter").build())

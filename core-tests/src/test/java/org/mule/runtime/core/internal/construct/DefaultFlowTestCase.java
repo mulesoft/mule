@@ -35,7 +35,6 @@ import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrate
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static reactor.core.publisher.Mono.just;
 
-import io.qameta.allure.Issue;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -53,7 +52,6 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
-import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.core.lifecycle.LifecycleTrackerProcessor;
 
@@ -73,6 +71,8 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.InOrder;
 import org.reactivestreams.Publisher;
+
+import io.qameta.allure.Issue;
 import reactor.core.publisher.Flux;
 
 @RunWith(Parameterized.class)
@@ -112,9 +112,6 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     sensingMessageProcessor = getSensingNullMessageProcessor();
 
     List<Processor> processors = new ArrayList<>();
-    processors.add(new StringAppendTransformer("a"));
-    processors.add(new StringAppendTransformer("b"));
-    processors.add(new StringAppendTransformer("c"));
     processors.add(event -> CoreEvent.builder(event).addVariable("thread", currentThread()).build());
     processors.add(sensingMessageProcessor);
 
