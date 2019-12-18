@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
+import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getShowInDslParameters;
 
@@ -20,6 +21,7 @@ import org.mule.runtime.module.extension.internal.runtime.config.ResolverSetBase
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Map;
@@ -108,5 +110,10 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
                                       format("An error occurred trying to obtain the field '%s' from the group '%s' of the Operation '%s'",
                                              parameterName, showInDslGroupName, operationModel.getName()));
     }
+  }
+
+  @Override
+  public Map<String, ValueResolver<? extends Object>> getParameters() {
+    return unmodifiableMap(resolverSet.getResolvers());
   }
 }

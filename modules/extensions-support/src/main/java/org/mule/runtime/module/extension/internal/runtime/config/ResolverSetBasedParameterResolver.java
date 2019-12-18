@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.lang.String.format;
+import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -103,5 +104,10 @@ public class ResolverSetBasedParameterResolver implements ParameterValueResolver
 
   private ValueResolvingContext buildResolvingContext() {
     return ValueResolvingContext.builder(getInitialiserEvent()).withExpressionManager(expressionManager).build();
+  }
+
+  @Override
+  public Map<String, ValueResolver<? extends Object>> getParameters() {
+    return unmodifiableMap(resolverSet.getResolvers());
   }
 }

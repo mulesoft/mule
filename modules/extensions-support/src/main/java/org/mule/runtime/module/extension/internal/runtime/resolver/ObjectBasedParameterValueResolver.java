@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -18,7 +20,13 @@ import org.mule.runtime.module.extension.internal.runtime.ValueResolvingExceptio
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ParameterValueResolver} implementation for Object based components, like {@link Source sources}, configurations
@@ -27,6 +35,8 @@ import java.util.Optional;
  * @since 4.0
  */
 public class ObjectBasedParameterValueResolver implements ParameterValueResolver {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ObjectBasedParameterValueResolver.class);
 
   private final Object object;
   private final ParameterizedModel parameterizedModel;
@@ -66,5 +76,35 @@ public class ObjectBasedParameterValueResolver implements ParameterValueResolver
       throw new ValueResolvingException("An error occurred trying to obtain the value for the parameter: " + parameterName);
     }
     throw new ValueResolvingException("Unable to resolve value for the parameter: " + parameterName);
+  }
+
+  @Override
+  public Map<String, ValueResolver<? extends Object>> getParameters() throws ValueResolvingException {
+    HashMap<String, ValueResolver<? extends Object>> parameters = new HashMap<>();
+    try {
+      addFields(getFields(object.getClass()), parameters);
+
+      for (ParameterGroupModel parameterGroupModel : parameterizedModel.getParameterGroupModels()) {
+        Optional<ParameterGroupModelProperty> modelProperty =
+            parameterGroupModel.getModelProperty(ParameterGroupModelProperty.class);
+        if (modelProperty.isPresent()) {
+          ParameterGroupModelProperty property = modelProperty.get();
+          Field container = (Field) property.getDescriptor().getContainer();
+          Object parameterGroup = getFieldValue(object, container.getName(), reflectionCache);
+          addFields(getFields(parameterGroup.getClass()), parameters);
+        }
+      }
+    } catch (Exception e) {
+      throw new ValueResolvingException("An error occurred trying to obtain the parameters.");
+    }
+    return unmodifiableMap(parameters);
+  }
+
+  private void addFields(List<Field> fields, HashMap<String, ValueResolver<? extends Object>> parameters)
+      throws NoSuchFieldException, IllegalAccessException {
+    for (Field field : fields) {
+      String parameterName = field.getName();
+      parameters.put(parameterName, new StaticValueResolver<>(getFieldValue(object, parameterName, reflectionCache)));
+    }
   }
 }

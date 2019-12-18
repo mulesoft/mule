@@ -57,6 +57,7 @@ import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescripto
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.exception.RequiredParameterNotSetException;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ExclusiveParameterGroupObjectBuilder;
@@ -72,6 +73,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.common.base.Joiner;
 
@@ -241,7 +243,20 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     });
 
     checkParameterGroupExclusiveness(model, groups,
-                                     parameters.keySet().stream().map(k -> aliasedParameterNames.getOrDefault(k, k))
+                                     parameters.entrySet().stream().flatMap(entry -> {
+                                       if (entry.getValue() instanceof ParameterValueResolver) {
+                                         try {
+                                           return ((ParameterValueResolver) entry.getValue()).getParameters().keySet()
+                                               .stream().map(k -> aliasedParameterNames.getOrDefault(k, k));
+                                         } catch (ValueResolvingException e) {
+                                           throw new MuleRuntimeException(e);
+                                         }
+                                       } else {
+                                         String key = entry.getKey();
+                                         aliasedParameterNames.getOrDefault(key, key);
+                                         return Stream.of(key);
+                                       }
+                                     })
                                          .collect(Collectors.toSet()));
     return resolverSet;
   }
@@ -425,7 +440,7 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
    * <p>
    * Other values (including {@code null}) are wrapped in a {@link StaticValueResolver}.
    *
-   * @param value the value to expose
+   * @param value           the value to expose
    * @param modelProperties of the value's parameter
    * @return a {@link ValueResolver}
    */
