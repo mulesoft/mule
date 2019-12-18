@@ -38,7 +38,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.processor.strategy.TransactionAwareStreamEmitterProcessingStrategyFactory;
+import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorderToReactorSinkAdapter;
 import org.mule.runtime.core.internal.rx.MonoSinkRecorder;
@@ -626,7 +626,7 @@ public class MessageProcessors {
   }
 
   public static ProcessingStrategyFactory createDefaultProcessingStrategyFactory() {
-    return new TransactionAwareStreamEmitterProcessingStrategyFactory();
+    return new TransactionAwareProactorStreamEmitterProcessingStrategyFactory();
   }
 
   /**
