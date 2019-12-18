@@ -16,6 +16,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.api.util.FileUtils.newFile;
+import static org.mule.runtime.core.internal.util.TestFileUtils.isFileOpen;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_KEYSTORE;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SSL_TYPE;
@@ -70,6 +72,34 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase {
     } catch (Exception e) {
       assertNotNull("expected", e);
     }
+  }
+
+  @Test
+  public void testTlsConfigurationDoesNotLeakKeyStoreFile() throws Exception {
+    TlsConfiguration configuration = new TlsConfiguration(DEFAULT_KEYSTORE);
+    configuration.setKeyPassword("mulepassword");
+    configuration.setKeyStorePassword("mulepassword");
+    configuration.setKeyStore("clientKeystore");
+    configuration.initialise(false, JSSE_NAMESPACE);
+
+    URL keystoreUrl = getClass().getClassLoader().getResource("clientKeystore");
+    File keyStoreFile = newFile(keystoreUrl.toURI());
+    assertThat(isFileOpen(keyStoreFile), is(false));
+  }
+
+  @Test
+  public void testTlsConfigurationDoesNotLeakTrustStoreFile() throws Exception {
+    TlsConfiguration configuration = new TlsConfiguration(DEFAULT_KEYSTORE);
+    configuration.setKeyPassword("mulepassword");
+    configuration.setKeyStorePassword("mulepassword");
+    configuration.setKeyStore("clientKeystore");
+    configuration.setTrustStorePassword("mulepassword");
+    configuration.setTrustStore("trustStore");
+    configuration.initialise(false, JSSE_NAMESPACE);
+
+    URL keystoreUrl = getClass().getClassLoader().getResource("trustStore");
+    File trustStoreFile = newFile(keystoreUrl.toURI());
+    assertThat(isFileOpen(trustStoreFile), is(false));
   }
 
   @Test
