@@ -764,6 +764,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="inheritIterableRepeatability" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether streamed iterable objects should follow the repeatability strategy of the iterable or use the default one.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="shutdownTimeout" type="substitutableInt" default="5000">
                     <xsd:annotation>
                         <xsd:documentation>

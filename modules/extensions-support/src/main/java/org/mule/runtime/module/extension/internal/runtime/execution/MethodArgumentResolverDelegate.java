@@ -119,8 +119,6 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   private static final ArgumentResolver<AuthenticationHandler> SECURITY_CONTEXT_HANDLER =
       new SecurityContextHandlerArgumentResolver();
   private static final ArgumentResolver<FlowListener> FLOW_LISTENER_ARGUMENT_RESOLVER = new FlowListenerArgumentResolver();
-  private static final ArgumentResolver<StreamingHelper> STREAMING_HELPER_ARGUMENT_RESOLVER =
-      new StreamingHelperArgumentResolver();
   private static final ArgumentResolver<SourceResult> SOURCE_RESULT_ARGUMENT_RESOLVER =
       new SourceResultArgumentResolver(ERROR_ARGUMENT_RESOLVER, SOURCE_CALLBACK_CONTEXT_ARGUMENT_RESOLVER);
   private static final ArgumentResolver<BackPressureContext> BACK_PRESSURE_CONTEXT_ARGUMENT_RESOLVER =
@@ -217,7 +215,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       } else if (FlowListener.class.equals(parameterType)) {
         argumentResolver = FLOW_LISTENER_ARGUMENT_RESOLVER;
       } else if (StreamingHelper.class.equals(parameterType)) {
-        argumentResolver = STREAMING_HELPER_ARGUMENT_RESOLVER;
+        argumentResolver = new StreamingHelperArgumentResolver();
       } else if (SourceResult.class.equals(parameterType)) {
         argumentResolver = SOURCE_RESULT_ARGUMENT_RESOLVER;
       } else if (BackPressureContext.class.equals(parameterType)) {

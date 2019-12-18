@@ -238,6 +238,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String TX_TYPE = "transactionType";
   private static final String LOG_EXCEPTION = "logException";
   private static final String RAISE_ERROR = "raise-error";
+  private static final String INHERIT_ITERABLE_REPEATABILITY = "inheritIterableRepeatability";
 
   private static final Class<?> MESSAGE_PROCESSOR_CLASS = Processor.class;
 
@@ -492,6 +493,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("dynamicConfigExpiration",
                                        fromChildConfiguration(DynamicConfigExpiration.class).build())
         .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(Object.class).build())
+        .withSetterParameterDefinition(INHERIT_ITERABLE_REPEATABILITY,
+                                       fromSimpleParameter(INHERIT_ITERABLE_REPEATABILITY).build())
         .withRegistrationName(OBJECT_MULE_CONFIGURATION)
         .build());
 

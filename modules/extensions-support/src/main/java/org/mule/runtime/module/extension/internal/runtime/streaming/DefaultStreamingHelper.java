@@ -11,9 +11,12 @@ import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
 
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils;
@@ -32,8 +35,8 @@ import java.util.function.Function;
  */
 public class DefaultStreamingHelper implements StreamingHelper {
 
-  private final CursorProviderFactory cursorProviderFactory;
-  private final StreamingManager streamingManager;
+  private final CursorStreamProviderFactory cursorStreamProviderFactory;
+  private final CursorIteratorProviderFactory cursorIteratorProviderFactory;
   private final CoreEvent event;
 
   /**
@@ -46,8 +49,26 @@ public class DefaultStreamingHelper implements StreamingHelper {
   public DefaultStreamingHelper(CursorProviderFactory cursorProviderFactory,
                                 StreamingManager streamingManager,
                                 CoreEvent event) {
-    this.cursorProviderFactory = cursorProviderFactory;
-    this.streamingManager = streamingManager;
+    this(streamingManager.getPairFor(cursorProviderFactory), event);
+  }
+
+  private DefaultStreamingHelper(Pair<CursorStreamProviderFactory, CursorIteratorProviderFactory> cursorProviderFactories,
+                                 CoreEvent event) {
+    this(cursorProviderFactories.getFirst(), cursorProviderFactories.getSecond(), event);
+  }
+
+  /**
+   * Creates a new instance
+   *
+   * @param cursorStreamProviderFactory   the {@link CursorStreamProviderFactory} to be used for byte streaming
+   * @param cursorIteratorProviderFactory the {@link CursorIteratorProviderFactory} to be used for object streaming
+   * @param event                         the {@link CoreEvent} being currently executed
+   */
+  public DefaultStreamingHelper(CursorStreamProviderFactory cursorStreamProviderFactory,
+                                CursorIteratorProviderFactory cursorIteratorProviderFactory,
+                                CoreEvent event) {
+    this.cursorStreamProviderFactory = cursorStreamProviderFactory;
+    this.cursorIteratorProviderFactory = cursorIteratorProviderFactory;
     this.event = event;
   }
 
@@ -96,19 +117,11 @@ public class DefaultStreamingHelper implements StreamingHelper {
   }
 
   private Object resolveCursorStreamProvider(InputStream value) {
-    CursorProviderFactory factory = cursorProviderFactory.accepts(value)
-        ? cursorProviderFactory
-        : streamingManager.forBytes().getDefaultCursorProviderFactory();
-
-    return factory.of(getRoot(event.getContext()), value);
+    return cursorStreamProviderFactory.of(getRoot(event.getContext()), value);
   }
 
   private Object resolveCursorIteratorProvider(Iterator value) {
-    CursorProviderFactory factory = cursorProviderFactory.accepts(value)
-        ? cursorProviderFactory
-        : streamingManager.forObjects().getDefaultCursorProviderFactory();
-
-    return factory.of(getRoot(event.getContext()), value);
+    return cursorIteratorProviderFactory.of(getRoot(event.getContext()), value);
   }
 
   private TypedValue resolveCursorTypedValueProvider(TypedValue value) {

@@ -26,11 +26,16 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManagerFactory;
 import org.mule.runtime.core.api.streaming.bytes.ByteStreamingManager;
+import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.api.streaming.object.ObjectStreamingManager;
 import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.internal.streaming.AtomicStreamingStatistics;
@@ -42,6 +47,7 @@ import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.internal.streaming.bytes.DefaultByteStreamingManager;
 import org.mule.runtime.core.internal.streaming.bytes.factory.PoolingByteBufferManagerFactory;
 import org.mule.runtime.core.internal.streaming.object.DefaultObjectStreamingManager;
+import org.mule.runtime.core.internal.streaming.object.factory.NullCursorIteratorProviderFactory;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
@@ -196,6 +202,29 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   @Override
   public void manage(InputStream stream, CoreEvent creatorEvent) {
     manage(stream, getRoot(creatorEvent.getContext()));
+  }
+
+  @Override
+  public Pair<CursorStreamProviderFactory, CursorIteratorProviderFactory> getPairFor(CursorProviderFactory provider) {
+    CursorStreamProviderFactory cursorStreamProviderFactory;
+    CursorIteratorProviderFactory cursorIteratorProviderFactory;
+
+    if (provider instanceof CursorIteratorProviderFactory) {
+      cursorIteratorProviderFactory = (CursorIteratorProviderFactory) provider;
+      if (provider instanceof NullCursorIteratorProviderFactory
+          && muleContext.getConfiguration().isInheritIterableRepeatability()) {
+        cursorStreamProviderFactory = forBytes().getNullCursorProviderFactory();
+      } else {
+        cursorStreamProviderFactory = forBytes().getDefaultCursorProviderFactory();
+      }
+    } else if (provider instanceof CursorStreamProviderFactory) {
+      cursorStreamProviderFactory = (CursorStreamProviderFactory) provider;
+      cursorIteratorProviderFactory = forObjects().getDefaultCursorProviderFactory();
+    } else {
+      cursorStreamProviderFactory = forBytes().getDefaultCursorProviderFactory();
+      cursorIteratorProviderFactory = forObjects().getDefaultCursorProviderFactory();
+    }
+    return new Pair<>(cursorStreamProviderFactory, cursorIteratorProviderFactory);
   }
 
   /**

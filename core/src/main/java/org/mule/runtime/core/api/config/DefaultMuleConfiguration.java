@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.config;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -188,6 +189,13 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
    * @since 3.9.0
    */
   private int maxQueueTransactionFilesSizeInMegabytes = 500;
+
+  /**
+   * Whether streamed iterable objects should follow the repeatability strategy of the iterable or use the default one.
+   *
+   * @since 4.3.0
+   */
+  private boolean inheritIterableRepeatability = false;
 
   /**
    * Mule Registry to initialize this configuration
@@ -662,6 +670,14 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     updateWorkingDirectory();
   }
 
+  public void setInheritIterableRepeatability(String inheritIterableRepeatability) {
+    this.inheritIterableRepeatability = parseBoolean(inheritIterableRepeatability);
+  }
+
+  public void setInheritIterableRepeatability(boolean inheritIterableRepeatability) {
+    this.inheritIterableRepeatability = inheritIterableRepeatability;
+  }
+
   public void addExtensions(List<ConfigurationExtension> extensions) {
     this.extensions.addAll(extensions);
   }
@@ -676,6 +692,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
       return Collections.emptyList();
     }
     return Collections.unmodifiableList(extensions);
+  }
+
+  @Override
+  public boolean isInheritIterableRepeatability() {
+    return inheritIterableRepeatability;
   }
 
   @Override
@@ -698,6 +719,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     result = prime * result + ((systemModelType == null) ? 0 : systemModelType.hashCode());
     result = prime * result + ((workingDirectory == null) ? 0 : workingDirectory.hashCode());
     result = prime * result + (containerMode ? 1231 : 1237);
+    result = prime * result + (inheritIterableRepeatability ? 1231 : 1237);
     return result;
   }
 
@@ -780,6 +802,9 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
       return false;
     }
     if (maxQueueTransactionFilesSizeInMegabytes != other.maxQueueTransactionFilesSizeInMegabytes) {
+      return false;
+    }
+    if (inheritIterableRepeatability != other.inheritIterableRepeatability) {
       return false;
     }
 
