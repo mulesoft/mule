@@ -50,7 +50,7 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
     this.connectionSupplier = connectionSupplier;
   }
 
-  private DefaultExecutionMediator.ValueTransformer transformPagingDelegate() {
+  private DefaultExecutionMediator.ResultTransformer transformPagingDelegate() {
     return (operationContext, value) -> {
       if (value == null) {
         throw new IllegalStateException("Obtained paging delegate cannot be null");

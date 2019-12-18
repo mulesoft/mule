@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.execution.interceptor;
 
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
-import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 class NullInterceptorChain implements InterceptorChain {
 
@@ -16,17 +16,20 @@ class NullInterceptorChain implements InterceptorChain {
   private NullInterceptorChain() {}
 
   @Override
-  public Throwable before(ExecutionContextAdapter executionContext, CompletableComponentExecutor.ExecutorCallback callback) {
+  public Throwable before(ExecutionContext executionContext, CompletableComponentExecutor.ExecutorCallback callback) {
     return null;
   }
 
   @Override
-  public void onSuccess(ExecutionContextAdapter executionContext, Object result) {
+  public void onSuccess(ExecutionContext executionContext, Object result) {
 
   }
 
   @Override
-  public Throwable onError(ExecutionContextAdapter executionContext, Throwable t) {
+  public Throwable onError(ExecutionContext executionContext, Throwable t) {
     return t;
   }
+
+  @Override
+  public void abort(ExecutionContext executionContext) {}
 }

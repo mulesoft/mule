@@ -11,8 +11,8 @@ import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 import java.util.List;
 
@@ -60,7 +60,7 @@ class DefaultInterceptorChain implements InterceptorChain {
   }
 
   @Override
-  public Throwable before(ExecutionContextAdapter executionContext, CompletableComponentExecutor.ExecutorCallback callback) {
+  public Throwable before(ExecutionContext executionContext, CompletableComponentExecutor.ExecutorCallback callback) {
     try {
       interceptor.before(executionContext);
       if (next != null) {
@@ -71,14 +71,17 @@ class DefaultInterceptorChain implements InterceptorChain {
     } catch (Throwable t) {
       logError(t, BEFORE, false);
       t = errorOnReverse(executionContext, t);
-      callback.error(t);
+
+      if (callback != null) {
+        callback.error(t);
+      }
 
       return t;
     }
   }
 
   @Override
-  public void onSuccess(ExecutionContextAdapter executionContext, Object result) {
+  public void onSuccess(ExecutionContext executionContext, Object result) {
     try {
       interceptor.onSuccess(executionContext, result);
     } catch (Throwable t) {
@@ -97,7 +100,7 @@ class DefaultInterceptorChain implements InterceptorChain {
   }
 
   @Override
-  public Throwable onError(ExecutionContextAdapter executionContext, Throwable t) {
+  public Throwable onError(ExecutionContext executionContext, Throwable t) {
     try {
       t = interceptor.onError(executionContext, t);
     } catch (Throwable t2) {
@@ -117,7 +120,20 @@ class DefaultInterceptorChain implements InterceptorChain {
     return t;
   }
 
-  private Throwable errorOnReverse(ExecutionContextAdapter executionContext, Throwable t) {
+  @Override
+  public void abort(ExecutionContext executionContext) {
+    try {
+      interceptor.after(executionContext, null);
+    } catch (Throwable t) {
+      logError(t, AFTER, true);
+    }
+
+    if (next != null) {
+      next.abort(executionContext);
+    }
+  }
+
+  private Throwable errorOnReverse(ExecutionContext executionContext, Throwable t) {
     try {
       t = interceptor.onError(executionContext, t);
     } catch (Throwable t2) {
@@ -146,7 +162,7 @@ class DefaultInterceptorChain implements InterceptorChain {
                        " Exception will be ignored. Next interceptors (if any) will be executed and the operation's exception will be returned");
       }
 
-      LOGGER.debug(builder.toString());
+      LOGGER.debug(builder.toString(), t);
     }
   }
 }

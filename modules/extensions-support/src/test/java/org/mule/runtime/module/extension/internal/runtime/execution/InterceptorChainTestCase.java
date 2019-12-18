@@ -22,8 +22,8 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -49,7 +49,7 @@ public class InterceptorChainTestCase extends AbstractMuleTestCase {
   private Interceptor<OperationModel> interceptor3;
 
   @Mock
-  private ExecutionContextAdapter<OperationModel> ctx;
+  private ExecutionContext<OperationModel> ctx;
 
   @Mock
   private ExecutorCallback callback;

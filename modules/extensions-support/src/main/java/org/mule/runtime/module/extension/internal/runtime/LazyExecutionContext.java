@@ -87,6 +87,18 @@ public class LazyExecutionContext<M extends ComponentModel> implements EventedEx
    * {@inheritDoc}
    */
   @Override
+  public <T> T getParameterOrDefault(String parameterName, T defaultValue) {
+    if (hasParameter(parameterName)) {
+      return (T) valueResolvers.get(parameterName).get();
+    }
+
+    return defaultValue;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Map<String, Object> getParameters() {
     return unmodifiableMap(valueResolvers.entrySet().stream()
         .collect(toMap(entry -> entry.getKey(), entry -> entry.getValue().get())));

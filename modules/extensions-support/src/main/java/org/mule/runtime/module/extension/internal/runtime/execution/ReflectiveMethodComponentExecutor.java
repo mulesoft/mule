@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
-import static java.util.Arrays.stream;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.collection.SmallMap.forSize;
@@ -27,7 +26,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ReactiveReflectiveMethodOperationExecutor;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -56,7 +54,7 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
     }
   }
 
-  private static final Logger LOGGER = getLogger(ReactiveReflectiveMethodOperationExecutor.class);
+  private static final Logger LOGGER = getLogger(ReflectiveMethodComponentExecutor.class);
   private static final ArgumentResolverDelegate NO_ARGS_DELEGATE = new NoArgumentsResolverDelegate();
 
   private final List<ParameterGroupModel> groups;
@@ -78,14 +76,24 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
   }
 
   public Object execute(ExecutionContext<M> executionContext) {
-    return withContextClassLoader(extensionClassLoader,
-                                  () -> invokeMethod(method, componentInstance,
-                                                     stream(getParameterValues(executionContext, method.getParameterTypes()))
-                                                         .map(Supplier::get).toArray(Object[]::new)));
+    final Thread currentThread = Thread.currentThread();
+    final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(extensionClassLoader);
+
+    try {
+      return invokeMethod(method, componentInstance, getParameterValues(executionContext));
+    } finally {
+      currentThread.setContextClassLoader(currentClassLoader);
+    }
   }
 
-  private Supplier<Object>[] getParameterValues(ExecutionContext<M> executionContext, Class<?>[] parameterTypes) {
-    return argumentResolverDelegate.resolve(executionContext, parameterTypes);
+  private Object[] getParameterValues(ExecutionContext<M> executionContext) {
+    Supplier<Object>[] params = argumentResolverDelegate.resolve(executionContext, method.getParameterTypes());
+    Object[] paramValues = new Object[parameterCount];
+    for (int i = 0; i < parameterCount; i++) {
+      paramValues[i] = params[i].get();
+    }
+    return paramValues;
   }
 
   @Override
@@ -133,8 +141,7 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
   public Function<ExecutionContext<M>, Map<String, Object>> createArgumentResolver(M operationModel) {
     return ec -> withContextClassLoader(extensionClassLoader,
                                         () -> {
-                                          final Object[] resolved =
-                                              getParameterValues(ec, method.getParameterTypes());
+                                          final Object[] resolved = getParameterValues(ec);
 
                                           final Map<String, Object> resolvedParams = forSize(parameterCount);
                                           for (int i = 0; i < parameterCount; ++i) {

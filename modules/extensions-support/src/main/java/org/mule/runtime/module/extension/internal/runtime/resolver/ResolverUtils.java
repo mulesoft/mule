@@ -100,7 +100,7 @@ public class ResolverUtils {
    * the given {@code T} type.
    *
    * @param resolver the {@link ValueResolver} to execute
-   * @param context the {@link ValueResolvingContext} to pass on the {@code resolver}
+   * @param context  the {@link ValueResolvingContext} to pass on the {@code resolver}
    * @return the resolved value
    * @throws MuleException
    */
@@ -124,19 +124,24 @@ public class ResolverUtils {
       return ((CursorProvider) value).openCursor();
 
     } else if (value instanceof TypedValue) {
-      TypedValue typedValue = (TypedValue) value;
-      Object objectValue = typedValue.getValue();
-
-      if (objectValue instanceof CursorProvider) {
-        Cursor cursor = ((CursorProvider) objectValue).openCursor();
-        return new TypedValue<>(cursor, DataType.builder()
-            .type(cursor.getClass())
-            .mediaType(typedValue.getDataType().getMediaType())
-            .build(), typedValue.getByteLength());
-      }
+      return resolveCursor((TypedValue) value);
     }
 
     return value;
+  }
+
+  public static Object resolveCursor(TypedValue<?> typedValue) {
+    Object objectValue = typedValue.getValue();
+
+    if (objectValue instanceof CursorProvider) {
+      Cursor cursor = ((CursorProvider) objectValue).openCursor();
+      return new TypedValue<>(cursor, DataType.builder()
+          .type(cursor.getClass())
+          .mediaType(typedValue.getDataType().getMediaType())
+          .build(), typedValue.getByteLength());
+    }
+
+    return typedValue;
   }
 
   private static ValueResolver<?> getExpressionBasedValueResolver(String expression, BooleanSupplier isTypedValue,

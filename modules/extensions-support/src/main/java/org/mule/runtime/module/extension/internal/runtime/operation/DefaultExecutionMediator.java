@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
@@ -29,7 +26,6 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;
 import org.mule.runtime.extension.api.runtime.Interceptable;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
@@ -42,16 +38,8 @@ import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExcept
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.function.Function;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link ExecutionMediator}.
@@ -73,30 +61,35 @@ import org.slf4j.LoggerFactory;
  */
 public final class DefaultExecutionMediator<M extends ComponentModel> implements ExecutionMediator<M> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExecutionMediator.class);
-
   private final ExceptionHandlerManager exceptionEnricherManager;
   private final InterceptorChain interceptorChain;
   private final ExecutionTemplate<?> defaultExecutionTemplate = callback -> callback.process();
   private final ModuleExceptionHandler moduleExceptionHandler;
-  private final List<ValueTransformer> valueTransformers;
+  private final ResultTransformer resultTransformer;
   private final ClassLoader extensionClassLoader;
 
 
   @FunctionalInterface
-  public interface ValueTransformer extends CheckedBiFunction<ExecutionContextAdapter, Object, Object> {
+  public interface ResultTransformer extends CheckedBiFunction<ExecutionContextAdapter, Object, Object> {
 
   }
 
   public DefaultExecutionMediator(ExtensionModel extensionModel,
                                   M operationModel,
                                   InterceptorChain interceptorChain,
+                                  ErrorTypeRepository typeRepository) {
+    this(extensionModel, operationModel, interceptorChain, typeRepository, null);
+  }
+
+  public DefaultExecutionMediator(ExtensionModel extensionModel,
+                                  M operationModel,
+                                  InterceptorChain interceptorChain,
                                   ErrorTypeRepository typeRepository,
-                                  ValueTransformer... valueTransformers) {
+                                  ResultTransformer resultTransformer) {
     this.interceptorChain = interceptorChain;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel, typeRepository);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
-    this.valueTransformers = valueTransformers != null ? asList(valueTransformers) : emptyList();
+    this.resultTransformer = resultTransformer;
     extensionClassLoader = getClassLoader(extensionModel);
   }
 
@@ -198,7 +191,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     Consumer<ExecutorCallback> executeCommand = callback -> {
       Throwable t = interceptorChain.before(context, callback);
       if (t == null) {
-        withContextClassLoader(extensionClassLoader, () -> executor.execute(context, callback));
+        executor.execute(context, callback);
       }
     };
 
@@ -209,7 +202,9 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
         // after() method cannot be invoked in the finally. Needs to be explicitly called before completing the callback.
         // Race conditions appear otherwise, specially in connection pooling scenarios.
         try {
-          value = transform(context, value);
+          if (resultTransformer != null) {
+            value = resultTransformer.apply(context, value);
+          }
           interceptorChain.onSuccess(context, value);
           executorCallback.complete(value);
         } catch (Throwable t) {
@@ -257,77 +252,12 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     return e;
   }
 
-  private Object transform(ExecutionContextAdapter context, Object value) {
-    for (ValueTransformer transformer : valueTransformers) {
-      value = transformer.apply(context, value);
-    }
-
-    return value;
+  Throwable applyBeforeInterceptors(ExecutionContextAdapter executionContext) {
+    return interceptorChain.before(executionContext, null);
   }
 
-  InterceptorsExecutionResult before(ExecutionContext executionContext, List<Interceptor> interceptors) {
-
-    List<Interceptor> interceptorList = new ArrayList<>(interceptors.size());
-
-    try {
-      for (Interceptor interceptor : interceptors) {
-        interceptorList.add(interceptor);
-        interceptor.before(executionContext);
-      }
-    } catch (Exception e) {
-      return new InterceptorsExecutionResult(exceptionEnricherManager.handleThrowable(e), interceptorList);
-    }
-    return new InterceptorsExecutionResult(null, interceptorList);
-  }
-
-  private void onSuccess(ExecutionContext executionContext, Object result, List<Interceptor> interceptors) {
-    intercept(interceptors, interceptor -> interceptor.onSuccess(executionContext, result),
-              interceptor -> format(
-                                    "Interceptor %s threw exception executing 'onSuccess' phase. Exception will be ignored. Next interceptors (if any) will be executed and the operation's result will be returned",
-                                    interceptor));
-  }
-
-  private Throwable interceptError(ExecutionContext executionContext, Throwable e, List<Interceptor> interceptors) {
-    Reference<Throwable> exceptionHolder = new Reference<>(e);
-
-    intercept(interceptors, interceptor -> {
-      Throwable decoratedException = interceptor.onError(executionContext, exceptionHolder.get());
-      if (decoratedException != null) {
-        exceptionHolder.set(decoratedException);
-      }
-    }, interceptor -> format(
-                             "Interceptor %s threw exception executing 'interceptError' phase. Exception will be ignored. Next interceptors (if any) will be executed and the operation's exception will be returned",
-                             interceptor));
-
-    return exceptionHolder.get();
-  }
-
-  void after(ExecutionContext executionContext, Object result, List<Interceptor> interceptors) {
-    intercept(interceptors, interceptor -> interceptor.after(executionContext, result),
-              interceptor -> format(
-                                    "Interceptor %s threw exception executing 'after' phase. Exception will be ignored. Next interceptors (if any) will be executed and the operation's result be returned",
-                                    interceptor));
-  }
-
-  private void intercept(List<Interceptor> interceptors, Consumer<Interceptor> closure,
-                         Function<Interceptor, String> exceptionMessageFunction) {
-    if (!LOGGER.isDebugEnabled()) {
-      interceptors.forEach(interceptor -> {
-        try {
-          closure.accept(interceptor);
-        } catch (Exception e) {
-          // Nothing to do
-        }
-      });
-    } else {
-      interceptors.forEach(interceptor -> {
-        try {
-          closure.accept(interceptor);
-        } catch (Exception e) {
-          LOGGER.debug(exceptionMessageFunction.apply(interceptor), e);
-        }
-      });
-    }
+  void applyAfterInterceptors(ExecutionContext executionContext) {
+    interceptorChain.abort(executionContext);
   }
 
   private <T> ExecutionTemplate<T> getExecutionTemplate(ExecutionContextAdapter<ComponentModel> context) {
@@ -340,27 +270,5 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     return context.getConfiguration()
         .map(c -> (MutableConfigurationStats) c.getStatistics())
         .orElse(null);
-  }
-
-  private List<Interceptor> collectInterceptors(ExecutionContextAdapter<M> context, CompletableComponentExecutor<M> executor) {
-    return collectInterceptors(context.getConfiguration(),
-                               context instanceof PrecalculatedExecutionContextAdapter
-                                   ? ((PrecalculatedExecutionContextAdapter) context).getOperationExecutor()
-                                   : executor);
-  }
-
-  List<Interceptor> collectInterceptors(Optional<ConfigurationInstance> configurationInstance,
-                                        CompletableComponentExecutor executor) {
-    List<Interceptor> accumulator = new LinkedList<>();
-    configurationInstance.ifPresent(config -> collectInterceptors(accumulator, config));
-    collectInterceptors(accumulator, executor);
-
-    return accumulator;
-  }
-
-  private void collectInterceptors(List<Interceptor> accumulator, Object subject) {
-    if (subject instanceof Interceptable) {
-      accumulator.addAll(((Interceptable) subject).getInterceptors());
-    }
   }
 }

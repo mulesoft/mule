@@ -67,7 +67,7 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
 
   @Override
   public ConnectionProviderResolver doGetObject() {
-    Callable<ResolverSet> callable = () -> getParametersResolver().getParametersAsHashedResolverSet(providerModel, muleContext);
+    Callable<ResolverSet> callable = () -> getParametersResolver().getParametersAsResolverSet(providerModel, muleContext);
     ResolverSet resolverSet = withContextClassLoader(getClassLoader(extensionModel), callable);
 
     ConnectionProviderObjectBuilder builder;

@@ -144,6 +144,18 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
    * {@inheritDoc}
    */
   @Override
+  public <T> T getParameterOrDefault(String parameterName, T defaultValue) {
+    if (hasParameter(parameterName)) {
+      return (T) parameters.get(parameterName);
+    }
+
+    return defaultValue;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Map<String, Object> getParameters() {
     return unmodifiableMap(parameters);
   }

@@ -7,8 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.execution.interceptor;
 
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +35,11 @@ public interface InterceptorChain {
     return new Builder();
   }
 
-  Throwable before(ExecutionContextAdapter executionContext, CompletableComponentExecutor.ExecutorCallback callback);
+  Throwable before(ExecutionContext executionContext, CompletableComponentExecutor.ExecutorCallback callback);
 
-  void onSuccess(ExecutionContextAdapter executionContext, Object result);
+  void onSuccess(ExecutionContext executionContext, Object result);
 
-  Throwable onError(ExecutionContextAdapter executionContext, Throwable t);
+  Throwable onError(ExecutionContext executionContext, Throwable t);
+
+  void abort(ExecutionContext executionContext);
 }

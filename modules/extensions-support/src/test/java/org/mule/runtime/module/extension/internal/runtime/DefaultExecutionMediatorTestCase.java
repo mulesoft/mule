@@ -68,7 +68,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator;
-import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ValueTransformer;
+import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
 import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionMediator;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
@@ -323,7 +323,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     expectedException.expect(instanceOf(HeisenbergException.class));
     expectedException.expectMessage(ERROR);
     mockExceptionEnricher(operationModel, () -> exceptionEnricher);
-    final ValueTransformer failingTransformer = mock(ValueTransformer.class);
+    final ResultTransformer failingTransformer = mock(ResultTransformer.class);
     when(failingTransformer.apply(any(), any())).thenThrow(exceptionToThrow);
 
     mediator = new DefaultExecutionMediator(extensionModel,
@@ -338,7 +338,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     final ModuleException moduleExceptionToThrow = new ModuleException(ERROR, HEALTH, exception);
     expectedException.expectCause(sameInstance(moduleExceptionToThrow));
     mockExceptionEnricher(operationModel, () -> exceptionEnricher);
-    final ValueTransformer failingTransformer = mock(ValueTransformer.class);
+    final ResultTransformer failingTransformer = mock(ResultTransformer.class);
     when(failingTransformer.apply(any(), any())).thenThrow(moduleExceptionToThrow);
 
     ErrorTypeRepository errorTypeRepository = mockErrorModel();
@@ -356,7 +356,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     expectedException.expectCause(sameInstance(exception));
     expectedException.expectMessage(ERROR);
     mockExceptionEnricher(operationModel, () -> new NullExceptionEnricher());
-    final ValueTransformer failingTransformer = mock(ValueTransformer.class);
+    final ResultTransformer failingTransformer = mock(ResultTransformer.class);
     when(failingTransformer.apply(any(), any())).thenThrow(exceptionToThrow);
 
     mediator = new DefaultExecutionMediator(extensionModel,
@@ -373,7 +373,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     expectedException.expect(instanceOf(TypedException.class));
     expectedException.expectCause(sameInstance(exception));
     mockExceptionEnricher(operationModel, () -> new NullExceptionEnricher());
-    final ValueTransformer failingTransformer = mock(ValueTransformer.class);
+    final ResultTransformer failingTransformer = mock(ResultTransformer.class);
     when(failingTransformer.apply(any(), any())).thenThrow(moduleExceptionToThrow);
 
     ErrorTypeRepository errorTypeRepository = mockErrorModel();

@@ -83,7 +83,6 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
@@ -94,8 +93,8 @@ import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
-import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
+import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
@@ -642,38 +641,22 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                                                                                        componentExecutor);
 
       final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
-      List<Interceptor> interceptors = mediator.collectInterceptors(executionContext.getConfiguration(),
-                                                                    executionContext.getOperationExecutor());
-      InterceptorsExecutionResult beforeExecutionResult = mediator.before(executionContext, interceptors);
-      if (beforeExecutionResult.isOk()) {
+      Throwable throwable = mediator.applyBeforeInterceptors(executionContext);
+      if (throwable == null) {
         final Map<String, Supplier<Object>> resolvedArguments = ((OperationArgumentResolverFactory<T>) componentExecutor)
             .createArgumentResolver(componentModel)
             .apply(executionContext);
         afterConfigurer.accept(resolvedArguments, executionContext);
         executionContext.changeEvent(eventBuilder.build());
       } else {
-        disposeResolvedParameters(executionContext, interceptors);
-        throw new DefaultMuleException("Interception execution for operation not ok", beforeExecutionResult.getThrowable());
+        throw new DefaultMuleException("Interception execution for operation not ok", throwable);
       }
     }
   }
 
   @Override
   public void disposeResolvedParameters(ExecutionContext<T> executionContext) {
-    final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
-    List<Interceptor> interceptors = mediator.collectInterceptors(executionContext.getConfiguration(),
-                                                                  executionContext instanceof PrecalculatedExecutionContextAdapter
-                                                                      ? ((PrecalculatedExecutionContextAdapter) executionContext)
-                                                                          .getOperationExecutor()
-                                                                      : componentExecutor);
-
-    disposeResolvedParameters(executionContext, interceptors);
-  }
-
-  private void disposeResolvedParameters(ExecutionContext<T> executionContext, List<Interceptor> interceptors) {
-    final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
-
-    mediator.after(executionContext, null, interceptors);
+    ((DefaultExecutionMediator) executionMediator).applyAfterInterceptors(executionContext);
   }
 
   private ExecutionContextAdapter<T> createExecutionContext(CoreEvent event) throws MuleException {
