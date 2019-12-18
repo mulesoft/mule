@@ -204,6 +204,9 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
     manage(stream, getRoot(creatorEvent.getContext()));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Pair<CursorStreamProviderFactory, CursorIteratorProviderFactory> getPairFor(CursorProviderFactory provider) {
     CursorStreamProviderFactory cursorStreamProviderFactory;
