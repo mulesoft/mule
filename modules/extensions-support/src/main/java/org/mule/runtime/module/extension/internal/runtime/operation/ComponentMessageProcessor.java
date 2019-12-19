@@ -648,6 +648,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
             .apply(executionContext);
         afterConfigurer.accept(resolvedArguments, executionContext);
         executionContext.changeEvent(eventBuilder.build());
+        mediator.applyAfterInterceptors(executionContext);
       } else {
         throw new DefaultMuleException("Interception execution for operation not ok", throwable);
       }
