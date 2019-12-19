@@ -21,7 +21,6 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
@@ -105,7 +104,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     private static final long SCHEDULER_BUSY_RETRY_INTERVAL_NS = MILLISECONDS.toNanos(SCHEDULER_BUSY_RETRY_INTERVAL_MS);
 
     private final int bufferSize;
-    private final Supplier<Scheduler> flowDispatchSchedulerSupplier;
+    private final LazyValue<Scheduler> flowDispatchSchedulerLazy;
     private final AtomicLong lastRetryTimestamp = new AtomicLong(MIN_VALUE);
     private final AtomicInteger queuedEvents = new AtomicInteger();
     private final BiConsumer<CoreEvent, Throwable> queuedDecrementCallback = (e, t) -> queuedEvents.decrementAndGet();
@@ -118,9 +117,6 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     private boolean sinkCreated = false;
     private final AtomicInteger disposedEmittersCount = new AtomicInteger(0);
 
-    private LazyValue<Scheduler> flowDispatchSchedulerLazy;
-
-
     public StreamEmitterProcessingStrategy(int bufferSize,
                                            int subscribers,
                                            Supplier<Scheduler> flowDispatchSchedulerSupplier,
@@ -130,14 +126,8 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
                                            boolean maxConcurrencyEagerCheck) {
       super(subscribers, cpuLightSchedulerSupplier, parallelism, maxConcurrency, maxConcurrencyEagerCheck);
       this.bufferSize = bufferSize;
-      this.flowDispatchSchedulerSupplier = flowDispatchSchedulerSupplier;
+      this.flowDispatchSchedulerLazy = new LazyValue<>(flowDispatchSchedulerSupplier);
       this.sinksCount = getSinksCount();
-    }
-
-    @Override
-    public void start() throws MuleException {
-      super.start();
-      flowDispatchSchedulerLazy = new LazyValue<>(flowDispatchSchedulerSupplier);
     }
 
     @Override
