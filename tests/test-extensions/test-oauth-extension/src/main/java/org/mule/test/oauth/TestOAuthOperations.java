@@ -11,12 +11,10 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
-import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 public class TestOAuthOperations {
 
@@ -35,25 +33,25 @@ public class TestOAuthOperations {
     }
   }
 
-  public PagingProvider<TestOAuthConnection, String> pagedOperation(@Connection TestOAuthConnection connection) {
-    final OAuthState state = connection.getState().getState();
-    if (state != null && !state.getAccessToken().endsWith("refreshed")) {
-      if (state instanceof AuthorizationCodeState) {
-        throw new AccessTokenExpiredException(((AuthorizationCodeState) state).getResourceOwnerId());
-      } else {
-        throw new AccessTokenExpiredException();
-      }
-    }
+  public PagingProvider<TestOAuthConnection, String> pagedOperation() {
     return new PagingProvider<TestOAuthConnection, String>() {
 
       @Override
       public List<String> getPage(TestOAuthConnection connection) {
-        return new ArrayList<>();
+        final OAuthState state = connection.getState().getState();
+        if (state != null && !state.getAccessToken().endsWith("refreshed")) {
+          if (state instanceof AuthorizationCodeState) {
+            throw new AccessTokenExpiredException(((AuthorizationCodeState) state).getResourceOwnerId());
+          } else {
+            throw new AccessTokenExpiredException();
+          }
+        }
+        return null;
       }
 
       @Override
-      public java.util.Optional<Integer> getTotalResults(TestOAuthConnection connection) {
-        return java.util.Optional.empty();
+      public Optional<Integer> getTotalResults(TestOAuthConnection connection) {
+        return Optional.empty();
       }
 
       @Override
