@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 
@@ -65,7 +65,7 @@ class LinkedInterceptorChain implements InterceptorChain {
   }
 
   @Override
-  public Throwable before(ExecutionContext executionContext, CompletableComponentExecutor.ExecutorCallback callback) {
+  public Throwable before(ExecutionContext executionContext, ExecutorCallback callback) {
     try {
       interceptor.before(executionContext);
       if (next != null) {
