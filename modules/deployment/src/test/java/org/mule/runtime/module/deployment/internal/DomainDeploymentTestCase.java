@@ -787,6 +787,19 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   @Test
+  public void failsToDeployDomainWithPluginThatUsesExtensionsClient() throws Exception {
+    DomainFileBuilder domainFileBuilder = new DomainFileBuilder("dummy-domain-bundle")
+        .definedBy("goodbye-domain-config.xml")
+        .dependingOn(goodbyeExtensionV1Plugin);
+
+    addPackedDomainFromBuilder(domainFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
+  }
+
+  @Test
   public void appliesApplicationPolicyUsingDomainPlugin() throws Exception {
     installEchoService();
     installFooService();

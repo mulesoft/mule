@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule-domain xmlns="http://www.mulesoft.org/schema/mule/domain"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:goodbye="http://www.mulesoft.org/schema/mule/goodbye"
+             xsi:schemaLocation="http://www.mulesoft.org/schema/mule/domain http://www.mulesoft.org/schema/mule/domain/current/mule-domain.xsd
+                            http://www.mulesoft.org/schema/mule/goodbye http://www.mulesoft.org/schema/mule/goodbye/current/mule-goodbye.xsd">
+
+    <goodbye:config name="Elvis"/>
+</mule-domain>
