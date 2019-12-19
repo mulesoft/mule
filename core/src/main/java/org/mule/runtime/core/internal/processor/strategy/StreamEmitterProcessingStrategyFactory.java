@@ -25,6 +25,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.BackPressureReason;
@@ -117,7 +118,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     private boolean sinkCreated = false;
     private final AtomicInteger disposedEmittersCount = new AtomicInteger(0);
 
-    private Scheduler flowDispatchScheduler;
+    private LazyValue<Scheduler> flowDispatchSchedulerLazy;
 
 
     public StreamEmitterProcessingStrategy(int bufferSize,
@@ -136,7 +137,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     @Override
     public void start() throws MuleException {
       super.start();
-      flowDispatchScheduler = flowDispatchSchedulerSupplier.get();
+      flowDispatchSchedulerLazy = new LazyValue<>(flowDispatchSchedulerSupplier);
     }
 
     @Override
@@ -156,9 +157,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
         try {
           super.stopSchedulersIfNeeded();
         } finally {
-          if (flowDispatchScheduler != null) {
-            flowDispatchScheduler.stop();
-          }
+          flowDispatchSchedulerLazy.ifComputed(Scheduler::stop);
         }
       }
 
@@ -279,7 +278,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     }
 
     protected Scheduler getFlowDispatcherScheduler() {
-      return flowDispatchScheduler;
+      return flowDispatchSchedulerLazy.get();
     }
 
     @Override
