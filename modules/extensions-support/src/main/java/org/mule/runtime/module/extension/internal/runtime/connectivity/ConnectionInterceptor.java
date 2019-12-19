@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.api.util.StreamingUtils.supportsStreaming;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
@@ -56,12 +55,12 @@ public final class ConnectionInterceptor implements Interceptor<ComponentModel> 
     }
 
     ExecutionContextAdapter<OperationModel> context = (ExecutionContextAdapter) executionContext;
-    checkArgument(context.getVariable(CONNECTION_PARAM) == null, "A connection was already set for this operation context");
+    if (context.getVariable(CONNECTION_PARAM) == null) {
+      context.setVariable(CONNECTION_PARAM, getConnection(context));
 
-    context.setVariable(CONNECTION_PARAM, getConnection(context));
-
-    if (!supportsStreaming(componentModel)) {
-      setCloseCommand(executionContext, () -> release(executionContext));
+      if (!supportsStreaming(componentModel)) {
+        setCloseCommand(executionContext, () -> release(executionContext));
+      }
     }
   }
 

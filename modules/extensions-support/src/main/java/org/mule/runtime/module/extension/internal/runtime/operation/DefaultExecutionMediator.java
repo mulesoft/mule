@@ -251,10 +251,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     return interceptorChain.before(executionContext, null);
   }
 
-  void applyOnSuccessInterceptors(ExecutionContextAdapter executionContext) {
-    interceptorChain.onSuccess(executionContext, null);
-  }
-
   void applyAfterInterceptors(ExecutionContext executionContext) {
     interceptorChain.abort(executionContext);
   }
