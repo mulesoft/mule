@@ -47,7 +47,7 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
   private static class NoArgumentsResolverDelegate implements ArgumentResolverDelegate {
 
     private static final Object[] EMPTY = new Object[][] {};
-    private static final Supplier<Object>[] EMPTY_DEFERRED = new Supplier[]{};
+    private static final Supplier<Object>[] EMPTY_DEFERRED = new Supplier[] {};
 
     @Override
     public Object[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
