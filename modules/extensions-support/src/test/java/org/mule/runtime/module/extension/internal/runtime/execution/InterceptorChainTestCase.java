@@ -212,6 +212,15 @@ public class InterceptorChainTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void abort() {
+    chain.abort(ctx);
+
+    inOrder.verify(interceptor1).after(ctx, null);
+    inOrder.verify(interceptor2).after(ctx, null);
+    inOrder.verify(interceptor3).after(ctx, null);
+  }
+
+  @Test
   public void noInterceptors() {
     chain = InterceptorChain.builder().build();
     Object result = mock(Object.class);
@@ -220,6 +229,7 @@ public class InterceptorChainTestCase extends AbstractMuleTestCase {
     assertThat(chain.before(ctx, callback), is(nullValue()));
     chain.onSuccess(ctx, result);
     assertThat(chain.onError(ctx, e), is(sameInstance(e)));
+    chain.abort(ctx);
 
     verifyZeroInteractions(ctx, callback);
   }

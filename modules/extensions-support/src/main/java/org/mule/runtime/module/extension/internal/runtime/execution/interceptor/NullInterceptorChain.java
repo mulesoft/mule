@@ -9,6 +9,11 @@ package org.mule.runtime.module.extension.internal.runtime.execution.interceptor
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
+/**
+ * {@link InterceptorChain} implementation based on the Null Object pattern.
+ *
+ * @since 4.3.0
+ */
 class NullInterceptorChain implements InterceptorChain {
 
   static final InterceptorChain INSTANCE = new NullInterceptorChain();

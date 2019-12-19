@@ -18,9 +18,14 @@ import java.util.List;
 
 import org.slf4j.Logger;
 
-class DefaultInterceptorChain implements InterceptorChain {
+/**
+ * Implementation of {@link InterceptorChain} based on bidirectional linking of interception nodes.
+ *
+ * @since 4.3.0
+ */
+class LinkedInterceptorChain implements InterceptorChain {
 
-  private static final Logger LOGGER = getLogger(DefaultInterceptorChain.class);
+  private static final Logger LOGGER = getLogger(LinkedInterceptorChain.class);
 
   private static final String BEFORE = "before";
   private static final String ON_SUCCESS = "onSuccess";
@@ -28,18 +33,18 @@ class DefaultInterceptorChain implements InterceptorChain {
   private static final String AFTER = "after";
 
   private final Interceptor interceptor;
-  private DefaultInterceptorChain next;
-  private DefaultInterceptorChain previous;
+  private LinkedInterceptorChain next;
+  private LinkedInterceptorChain previous;
 
 
-  static DefaultInterceptorChain of(List<Interceptor> interceptors) {
-    final List<DefaultInterceptorChain> chains = interceptors.stream()
-        .map(DefaultInterceptorChain::new)
+  static LinkedInterceptorChain of(List<Interceptor> interceptors) {
+    final List<LinkedInterceptorChain> chains = interceptors.stream()
+        .map(LinkedInterceptorChain::new)
         .collect(toList());
 
-    DefaultInterceptorChain interceptor = chains.get(0);
-    DefaultInterceptorChain previous = null;
-    DefaultInterceptorChain next;
+    LinkedInterceptorChain interceptor = chains.get(0);
+    LinkedInterceptorChain previous = null;
+    LinkedInterceptorChain next;
 
     final int len = chains.size();
 
@@ -55,7 +60,7 @@ class DefaultInterceptorChain implements InterceptorChain {
     return chains.get(0);
   }
 
-  private DefaultInterceptorChain(Interceptor interceptor) {
+  private LinkedInterceptorChain(Interceptor interceptor) {
     this.interceptor = interceptor;
   }
 
