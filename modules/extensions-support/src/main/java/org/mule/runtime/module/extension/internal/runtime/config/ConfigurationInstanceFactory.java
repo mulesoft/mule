@@ -46,7 +46,7 @@ public final class ConfigurationInstanceFactory<T> {
   private final ExpressionManager expressionManager;
   private final MuleContext muleContext;
 
-  /**ec
+  /**
    * Creates a new instance which provides instances derived from the given {@code configurationModel} and {@code resolverSet}
    *
    * @param extensionModel     the {@link ExtensionModel} that owns the {@code configurationModel}
