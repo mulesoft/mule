@@ -26,9 +26,7 @@ class NullInterceptorChain implements InterceptorChain {
   }
 
   @Override
-  public void onSuccess(ExecutionContext executionContext, Object result) {
-
-  }
+  public void onSuccess(ExecutionContext executionContext, Object result) {}
 
   @Override
   public Throwable onError(ExecutionContext executionContext, Throwable t) {

@@ -30,8 +30,7 @@ public interface InterceptorChain {
 
     private final List<Interceptor> interceptors = new ArrayList<>(2);
 
-    private Builder() {
-    }
+    private Builder() {}
 
     /**
      * Adds the given {@code interceptor} to the product chain. Interceptors will be executed in the order corresponding
