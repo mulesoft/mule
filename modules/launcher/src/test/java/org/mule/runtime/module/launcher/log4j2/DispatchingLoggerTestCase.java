@@ -8,7 +8,10 @@ package org.mule.runtime.module.launcher.log4j2;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
