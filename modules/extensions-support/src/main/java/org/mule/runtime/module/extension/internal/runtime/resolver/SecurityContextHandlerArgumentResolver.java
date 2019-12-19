@@ -6,13 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.security.DefaultAuthenticationHandler;
-
-import java.util.function.Supplier;
 
 /**
  * An {@link ArgumentResolver} which returns the {@link AuthenticationHandler} of the current event
@@ -22,12 +19,10 @@ import java.util.function.Supplier;
 public final class SecurityContextHandlerArgumentResolver implements ArgumentResolver<AuthenticationHandler> {
 
   @Override
-  public Supplier<AuthenticationHandler> resolve(ExecutionContext executionContext) {
-    return new LazyValue<>(() -> {
-      ExecutionContextAdapter context = ((ExecutionContextAdapter) executionContext);
-      return new DefaultAuthenticationHandler(context.getSecurityContext(),
-                                              context.getMuleContext().getSecurityManager(),
-                                              context::setSecurityContext);
-    });
+  public AuthenticationHandler resolve(ExecutionContext executionContext) {
+    ExecutionContextAdapter context = ((ExecutionContextAdapter) executionContext);
+    return new DefaultAuthenticationHandler(context.getSecurityContext(),
+                                            context.getMuleContext().getSecurityManager(),
+                                            context::setSecurityContext);
   }
 }

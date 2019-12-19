@@ -25,5 +25,7 @@ interface ArgumentResolverDelegate {
    * @param parameterTypes
    * @return an object array
    */
-  Supplier<Object>[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes);
+  Object[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes);
+
+  Supplier<Object>[] resolveDeferred(ExecutionContext executionContext, Class<?>[] parameterTypes);
 }

@@ -12,8 +12,6 @@ import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.parameter.ImmutableCorrelationInfo;
 
-import java.util.function.Supplier;
-
 /**
  * {@link ArgumentResolver} that yields instances of {@link CorrelationInfo}
  *
@@ -22,11 +20,9 @@ import java.util.function.Supplier;
 public class CorrelationInfoArgumentResolver implements ArgumentResolver<CorrelationInfo> {
 
   @Override
-  public Supplier<CorrelationInfo> resolve(ExecutionContext executionContext) {
-    return () -> {
-      CoreEvent event = ((ExecutionContextAdapter) executionContext).getEvent();
-      return new ImmutableCorrelationInfo(event.getContext().getId(), true, event.getCorrelationId(),
-                                          event.getItemSequenceInfo().orElse(null));
-    };
+  public CorrelationInfo resolve(ExecutionContext executionContext) {
+    CoreEvent event = ((ExecutionContextAdapter) executionContext).getEvent();
+    return new ImmutableCorrelationInfo(event.getContext().getId(), true, event.getCorrelationId(),
+                                        event.getItemSequenceInfo().orElse(null));
   }
 }

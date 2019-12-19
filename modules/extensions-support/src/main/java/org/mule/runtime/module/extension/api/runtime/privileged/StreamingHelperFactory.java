@@ -18,6 +18,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StreamingHelp
 public class StreamingHelperFactory {
 
   public StreamingHelper resolve(ExecutionContext executionContext) {
-    return new StreamingHelperArgumentResolver().resolve(executionContext).get();
+    return new StreamingHelperArgumentResolver().resolve(executionContext);
   }
 }

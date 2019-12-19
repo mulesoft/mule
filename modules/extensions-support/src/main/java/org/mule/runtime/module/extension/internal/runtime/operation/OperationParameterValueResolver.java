@@ -60,8 +60,7 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
   public Object getParameterValue(String parameterName) throws ValueResolvingException {
     try {
       return getParameterGroup(parameterName)
-          .map(group -> new ParameterGroupArgumentResolver<>(group, reflectionCache, expressionManager).resolve(executionContext)
-              .get())
+          .map(group -> new ParameterGroupArgumentResolver<>(group, reflectionCache, expressionManager).resolve(executionContext))
           .orElseGet(() -> {
             String showInDslGroupName = showInDslParameters.get(parameterName);
 

@@ -13,8 +13,6 @@ import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 
-import java.util.function.Supplier;
-
 /**
  * An argument resolver that yields instances of {@Link SourceCompletionCallback}.
  * <p>
@@ -26,9 +24,7 @@ import java.util.function.Supplier;
 public class SourceCompletionCallbackArgumentResolver implements ArgumentResolver<SourceCompletionCallback> {
 
   @Override
-  public Supplier<SourceCompletionCallback> resolve(ExecutionContext executionContext) {
-    return () -> (SourceCompletionCallback) ((ExecutionContextAdapter) executionContext)
-        .getVariable(SOURCE_COMPLETION_CALLBACK_PARAM);
-
+  public SourceCompletionCallback resolve(ExecutionContext executionContext) {
+    return (SourceCompletionCallback) ((ExecutionContextAdapter) executionContext).getVariable(SOURCE_COMPLETION_CALLBACK_PARAM);
   }
 }

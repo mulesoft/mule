@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS;
@@ -417,7 +418,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         new LazyValue<>(() -> {
           CoreEvent initialiserEvent = null;
           try {
-            initialiserEvent = getInitialiserEvent();
+            initialiserEvent = getNullEvent();
             return ValueResolvingContext.builder(initialiserEvent, expressionManager)
                 .withConfig(getStaticConfiguration())
                 .build();

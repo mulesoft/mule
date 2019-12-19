@@ -25,6 +25,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -242,10 +243,21 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   }
 
   @Override
-  public Supplier<Object>[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
-    Supplier<Object>[] parameterValues = new Supplier[argumentResolvers.length];
+  public Object[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
+    Object[] parameterValues = new Object[argumentResolvers.length];
     for (int i = 0; i < argumentResolvers.length; i++) {
       parameterValues[i] = argumentResolvers[i].resolve(executionContext);
+    }
+
+    return parameterValues;
+  }
+
+  @Override
+  public Supplier<Object>[] resolveDeferred(ExecutionContext executionContext, Class<?>[] parameterTypes) {
+    Supplier<Object>[] parameterValues = new Supplier[argumentResolvers.length];
+    for (int i = 0; i < argumentResolvers.length; i++) {
+      final int itemIndex = i;
+      parameterValues[i] = new LazyValue<>(() -> argumentResolvers[itemIndex].resolve(executionContext));
     }
 
     return parameterValues;
@@ -374,8 +386,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     }
 
     @Override
-    public Supplier<Object> resolve(ExecutionContext executionContext) {
-      return () -> decorate(decoratee.resolve(executionContext).get());
+    public Object resolve(ExecutionContext executionContext) {
+      return decorate(decoratee.resolve(executionContext));
     }
 
     protected abstract Object decorate(Object value);

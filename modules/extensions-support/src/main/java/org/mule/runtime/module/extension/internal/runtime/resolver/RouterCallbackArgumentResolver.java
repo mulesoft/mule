@@ -14,8 +14,6 @@ import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
-import java.util.function.Supplier;
-
 /**
  * {@link ArgumentResolver} which returns the {@link org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextProperties#COMPLETION_CALLBACK_CONTEXT_PARAM}
  * context variable.
@@ -27,23 +25,21 @@ import java.util.function.Supplier;
 public final class RouterCallbackArgumentResolver implements ArgumentResolver<RouterCompletionCallback> {
 
   @Override
-  public Supplier<RouterCompletionCallback> resolve(ExecutionContext executionContext) {
-    return () -> {
-      CompletionCallback completionCallback = (CompletionCallback) ((ExecutionContextAdapter) executionContext)
-          .getVariable(COMPLETION_CALLBACK_CONTEXT_PARAM);
+  public RouterCompletionCallback resolve(ExecutionContext executionContext) {
+    CompletionCallback completionCallback = (CompletionCallback) ((ExecutionContextAdapter) executionContext)
+        .getVariable(COMPLETION_CALLBACK_CONTEXT_PARAM);
 
-      return new RouterCompletionCallback() {
+    return new RouterCompletionCallback() {
 
-        @Override
-        public void success(Result result) {
-          completionCallback.success(result);
-        }
+      @Override
+      public void success(Result result) {
+        completionCallback.success(result);
+      }
 
-        @Override
-        public void error(Throwable e) {
-          completionCallback.error(e);
-        }
-      };
+      @Override
+      public void error(Throwable e) {
+        completionCallback.error(e);
+      }
     };
   }
 }

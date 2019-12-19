@@ -46,11 +46,17 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
 
   private static class NoArgumentsResolverDelegate implements ArgumentResolverDelegate {
 
-    private static final Supplier[] EMPTY = new Supplier[] {};
+    private static final Object[] EMPTY = new Object[][] {};
+    private static final Supplier<Object>[] EMPTY_DEFERRED = new Supplier[]{};
 
     @Override
-    public Supplier<Object>[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
+    public Object[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
       return EMPTY;
+    }
+
+    @Override
+    public Supplier<Object>[] resolveDeferred(ExecutionContext executionContext, Class<?>[] parameterTypes) {
+      return EMPTY_DEFERRED;
     }
   }
 
@@ -60,6 +66,7 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
   private final List<ParameterGroupModel> groups;
   private final Method method;
   private final int parameterCount;
+  private final Class<?>[] methodParameterTypes;
   private final Object componentInstance;
   private final ClassLoader extensionClassLoader;
 
@@ -70,8 +77,9 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
   public ReflectiveMethodComponentExecutor(List<ParameterGroupModel> groups, Method method, Object componentInstance) {
     this.groups = groups;
     this.method = method;
-    parameterCount = method.getParameterCount();
     this.componentInstance = componentInstance;
+    methodParameterTypes = method.getParameterTypes();
+    parameterCount = method.getParameterCount();
     extensionClassLoader = method.getDeclaringClass().getClassLoader();
   }
 
@@ -81,19 +89,10 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
     currentThread.setContextClassLoader(extensionClassLoader);
 
     try {
-      return invokeMethod(method, componentInstance, getParameterValues(executionContext));
+      return invokeMethod(method, componentInstance, argumentResolverDelegate.resolve(executionContext, methodParameterTypes));
     } finally {
       currentThread.setContextClassLoader(currentClassLoader);
     }
-  }
-
-  private Object[] getParameterValues(ExecutionContext<M> executionContext) {
-    Supplier<Object>[] params = argumentResolverDelegate.resolve(executionContext, method.getParameterTypes());
-    Object[] paramValues = new Object[parameterCount];
-    for (int i = 0; i < parameterCount; i++) {
-      paramValues[i] = params[i].get();
-    }
-    return paramValues;
   }
 
   @Override
@@ -139,15 +138,14 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
 
   @Override
   public Function<ExecutionContext<M>, Map<String, Object>> createArgumentResolver(M operationModel) {
-    return ec -> withContextClassLoader(extensionClassLoader,
-                                        () -> {
-                                          final Object[] resolved = getParameterValues(ec);
+    return ec -> withContextClassLoader(extensionClassLoader, () -> {
+      final Object[] resolved = argumentResolverDelegate.resolveDeferred(ec, methodParameterTypes);
 
-                                          final Map<String, Object> resolvedParams = forSize(parameterCount);
-                                          for (int i = 0; i < parameterCount; ++i) {
-                                            resolvedParams.put(method.getParameters()[i].getName(), resolved[i]);
-                                          }
-                                          return resolvedParams;
-                                        });
+      final Map<String, Object> resolvedParams = forSize(parameterCount);
+      for (int i = 0; i < parameterCount; ++i) {
+        resolvedParams.put(method.getParameters()[i].getName(), resolved[i]);
+      }
+      return resolvedParams;
+    });
   }
 }

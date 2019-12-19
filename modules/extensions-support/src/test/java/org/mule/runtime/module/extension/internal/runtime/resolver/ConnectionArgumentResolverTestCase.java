@@ -39,12 +39,12 @@ public class ConnectionArgumentResolverTestCase extends AbstractMuleTestCase {
     when(connectionHandler.getConnection()).thenReturn(connection);
     when(operationContext.getVariable(CONNECTION_PARAM)).thenReturn(connectionHandler);
 
-    assertThat(resolver.resolve(operationContext).get(), is(sameInstance(connection)));
+    assertThat(resolver.resolve(operationContext), is(sameInstance(connection)));
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void noConnection() {
     when(operationContext.getVariable(CONNECTION_PARAM)).thenReturn(null);
-    resolver.resolve(operationContext).get();
+    resolver.resolve(operationContext);
   }
 }

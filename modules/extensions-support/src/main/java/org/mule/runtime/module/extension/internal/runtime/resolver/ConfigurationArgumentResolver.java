@@ -9,8 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
-import java.util.function.Supplier;
-
 /**
  * An implementation of {@link ArgumentResolver} which returns the value obtained through
  * {@link ExecutionContext#getConfiguration()}
@@ -20,7 +18,7 @@ import java.util.function.Supplier;
 public final class ConfigurationArgumentResolver implements ArgumentResolver<Object> {
 
   @Override
-  public Supplier<Object> resolve(ExecutionContext executionContext) {
-    return () -> executionContext.getConfiguration().map(cfg -> ((ConfigurationInstance) cfg).getValue()).orElse(null);
+  public Object resolve(ExecutionContext executionContext) {
+    return executionContext.getConfiguration().map(cfg -> ((ConfigurationInstance) cfg).getValue()).orElse(null);
   }
 }
