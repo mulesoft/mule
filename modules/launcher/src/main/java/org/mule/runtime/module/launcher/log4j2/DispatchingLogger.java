@@ -12,6 +12,7 @@ import static org.mule.runtime.module.launcher.log4j2.ArtifactAwareContextSelect
 import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withName;
 import static org.reflections.ReflectionUtils.withParameters;
+import static java.lang.ClassLoader.getSystemClassLoader;
 
 import org.mule.runtime.api.util.Reference;
 
@@ -60,6 +61,7 @@ abstract class DispatchingLogger extends Logger {
       .weakKeys()
       .weakValues()
       .build(key -> new Reference<>());
+
   private Method updateConfigurationMethod = null;
 
   DispatchingLogger(Logger originalLogger, int ownerClassLoaderHash, LoggerContext loggerContext, ContextSelector contextSelector,
@@ -89,8 +91,8 @@ abstract class DispatchingLogger extends Logger {
           try {
             logger = resolveLogger(resolvedCtxClassLoader);
           } catch (RecursiveLoggerContextInstantiationException rle) {
-            // The required Logger is already under construcion by a previuos resolveLogger call. Falling back to SystemClassLoader.
-            return resolveLogger(ClassLoader.getSystemClassLoader());
+            // The required Logger is already under construction by a previous resolveLogger call. Falling back to SystemClassLoader.
+            return resolveLogger(getSystemClassLoader());
           }
           loggerReference.set(logger);
         }

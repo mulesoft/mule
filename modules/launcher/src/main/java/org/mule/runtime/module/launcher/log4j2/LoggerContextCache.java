@@ -114,15 +114,15 @@ final class LoggerContextCache implements Disposable {
         ctx = builtContexts.get(key);
         if (ctx == null) {
           // LoggerContext construction is flagged in order to prevent recursion
-          setLoggerContextUnderConstruction(classLoader);
+          startLoggerContextConstruction(classLoader);
           try {
             ctx = doGetLoggerContext(classLoader, key);
-            unsetLoggerContextUnderConstruction();
+            endLoggerContextConstruction();
           } catch (ExecutionException e) {
             throw new MuleRuntimeException(createStaticMessage("Could not init logger context "), e);
           } finally {
             // LoggerContext construction has failed, so the under construction flag must be unset
-            unsetLoggerContextUnderConstruction();
+            endLoggerContextConstruction();
           }
         }
       }
@@ -229,30 +229,39 @@ final class LoggerContextCache implements Disposable {
   }
 
   /**
-   * Marks a {@link MuleLoggerContext} under construction
+   * Registers that a {@link MuleLoggerContext} is under construction, rejecting recursive calls
    * @param classLoader {@link ClassLoader} that owns the {@link MuleLoggerContext}
-   * @throws RecursiveLoggerContextInstantiationException if a {@link MuleLoggerContext} is already under construction
+   * @throws RecursiveLoggerContextInstantiationException if a {@link MuleLoggerContext} is already under construction for the given {@link ClassLoader}
    */
-  private void setLoggerContextUnderConstruction(ClassLoader classLoader) {
+  private void startLoggerContextConstruction(ClassLoader classLoader) {
     if (isLoggerContextUnderConstruction()) {
       throw new RecursiveLoggerContextInstantiationException(String
           .format("A LoggerContext is already under construction for ClassLoader: %s", classLoader));
     } else {
-      isLoggerContextUnderConstruction.set(Boolean.TRUE);
+      setLoggerContextUnderConstruction(Boolean.TRUE);
     }
   }
 
   /**
-   * @return True if a {@link MuleLoggerContext} is already under construction
+   * Registers that a {@link MuleLoggerContext} is no longer under construction
+   */
+  private void endLoggerContextConstruction() {
+    setLoggerContextUnderConstruction(Boolean.FALSE);
+  }
+
+  /**
+   * @return True if a {@link MuleLoggerContext} is under construction
    */
   private boolean isLoggerContextUnderConstruction() {
     return isLoggerContextUnderConstruction.get();
   }
 
   /**
-   * Unmarks a {@link MuleLoggerContext} under construction
+   * {{@link #isLoggerContextUnderConstruction}} setter method
+   * @param loggerContextUnderConstruction value to set
    */
-  private void unsetLoggerContextUnderConstruction() {
-    isLoggerContextUnderConstruction.set(Boolean.FALSE);
+  private void setLoggerContextUnderConstruction(Boolean loggerContextUnderConstruction) {
+    isLoggerContextUnderConstruction.set(loggerContextUnderConstruction);
   }
+
 }

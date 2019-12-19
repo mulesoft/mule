@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 
 /**
  * Indicates that the instantiation of a {@link MuleLoggerContext} is not possible due to the same context being already
@@ -18,6 +19,6 @@ import org.mule.runtime.api.i18n.I18nMessageFactory;
 public class RecursiveLoggerContextInstantiationException extends MuleRuntimeException {
 
   public RecursiveLoggerContextInstantiationException(String message) {
-    super(I18nMessageFactory.createStaticMessage(message));
+    super(createStaticMessage(message));
   }
 }

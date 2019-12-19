@@ -6,24 +6,26 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
-import org.apache.logging.log4j.core.LoggerContext;
-import org.hamcrest.collection.IsCollectionWithSize;
-import org.hamcrest.core.IsCollectionContaining;
-import org.hamcrest.core.IsEqual;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.tck.size.SmallTest;
-
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -48,7 +50,7 @@ public class LoggerContextCacheTestCase {
   }
 
   @Test
-  public void when_recursive_MuleLoggerContext_instantiation_expect_RecursiveLoggerContextInstantiationException_and_recovery() {
+  public void whenRecursiveMuleLoggerContextInstantiationExpectRecursiveLoggerContextInstantiationExceptionAndRecovery() {
     LoggerContext expectedLoggerContext = mock(MuleLoggerContext.class);
     when(contextSelector.buildContext(currentClassLoader))
         .thenAnswer(invocation -> loggerContextCache.getLoggerContext(currentClassLoader))
@@ -59,14 +61,14 @@ public class LoggerContextCacheTestCase {
       fail("Recursive instantiation should throw RecursiveInstantiationException");
     } catch (MuleRuntimeException e) {
       assertThat("Exception should be caused by RecursiveContextInstantiation", e.getClass(),
-                 IsEqual.equalTo(RecursiveLoggerContextInstantiationException.class));
+                 equalTo(RecursiveLoggerContextInstantiationException.class));
       actualLoggerContext = loggerContextCache.getLoggerContext(currentClassLoader);
     }
-    assertThat("Invalid LoggerContext", actualLoggerContext, IsEqual.equalTo(expectedLoggerContext));
+    assertThat("Invalid LoggerContext", actualLoggerContext, equalTo(expectedLoggerContext));
   }
 
   @Test
-  public void when_MuleRuntimeException_during_MuleLoggerContext_instantiation_expect_recovery() {
+  public void whenMuleRuntimeExceptionDuringMuleLoggerContextInstantiationExpectRecovery() {
     LoggerContext expectedLoggerContext = mock(MuleLoggerContext.class);
     when(contextSelector.buildContext(currentClassLoader))
         .thenThrow(MuleRuntimeException.class)
@@ -77,25 +79,23 @@ public class LoggerContextCacheTestCase {
     } catch (MuleRuntimeException mre) {
       actualLoggerContext = loggerContextCache.getLoggerContext(currentClassLoader);
     }
-    assertThat("Invalid loggerContext", actualLoggerContext, IsEqual.equalTo(expectedLoggerContext));
+    assertThat("Invalid loggerContext", actualLoggerContext, equalTo(expectedLoggerContext));
   }
 
   @Test
-  public void when_MuleLoggerContext_instantiation_expect_cache_store() {
+  public void whenMuleLoggerContextInstantiationExpectCacheStore() {
     LoggerContext firstExpectedLoggerContext = mock(MuleLoggerContext.class);
     LoggerContext secondExpectedLoggerContext = mock(MuleLoggerContext.class);
     when(contextSelector.buildContext(currentClassLoader)).thenReturn(firstExpectedLoggerContext);
     when(contextSelector.buildContext(regionClassLoader)).thenReturn(secondExpectedLoggerContext);
     loggerContextCache.getLoggerContext(currentClassLoader);
-    ClassUtils.withContextClassLoader(regionClassLoader, () -> {
+    withContextClassLoader(regionClassLoader, () -> {
       loggerContextCache.getLoggerContext(regionClassLoader);
     });
     assertThat("Additional or missing LoggerContext instances found in cache", loggerContextCache.getAllLoggerContexts(),
-               IsCollectionWithSize.hasSize(2));
-    assertThat("Cache should contain firstExpectedLogger", loggerContextCache.getAllLoggerContexts(),
-               IsCollectionContaining.hasItem(firstExpectedLoggerContext));
-    assertThat("Cache should contain secondExpectedLogger", loggerContextCache.getAllLoggerContexts(),
-               IsCollectionContaining.hasItem(secondExpectedLoggerContext));
+               hasSize(2));
+    assertThat(loggerContextCache.getAllLoggerContexts(), hasItem(firstExpectedLoggerContext));
+    assertThat(loggerContextCache.getAllLoggerContexts(), hasItem(secondExpectedLoggerContext));
   }
 
 }

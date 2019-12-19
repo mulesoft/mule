@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -13,6 +14,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -99,7 +101,7 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void when_RecursiveLoggerContextInstantiationException_expect_fallback_dispatch_using_system_classloader() {
+  public void whenRecursiveLoggerContextInstantiationExceptionExpectFallbackDispatchUsingSystemClassLoader() {
     // Expected Loggers
     Logger currentClassLoaderLogger = mock(Logger.class);
     Logger regionClassLoaderLogger = mock(Logger.class);
