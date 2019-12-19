@@ -157,9 +157,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
         try {
           super.stopSchedulersIfNeeded();
         } finally {
-          if (flowDispatchSchedulerLazy.isComputed()) {
-            flowDispatchSchedulerLazy.get().stop();
-          }
+          flowDispatchSchedulerLazy.ifComputed(Scheduler::stop);
         }
       }
 
