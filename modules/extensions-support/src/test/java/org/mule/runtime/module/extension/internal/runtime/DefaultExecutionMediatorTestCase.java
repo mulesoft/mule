@@ -58,7 +58,6 @@ import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
-import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
@@ -121,13 +120,13 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ExecutionContextAdapter operationContext;
 
-  @Mock(extraInterfaces = Interceptable.class, lenient = true)
+  @Mock(lenient = true)
   private ConfigurationInstance configurationInstance;
 
   @Mock
   private MutableConfigurationStats configurationStats;
 
-  @Mock(extraInterfaces = Interceptable.class, lenient = true)
+  @Mock(lenient = true)
   private CompletableComponentExecutor operationExecutor;
 
   @Mock(lenient = true)

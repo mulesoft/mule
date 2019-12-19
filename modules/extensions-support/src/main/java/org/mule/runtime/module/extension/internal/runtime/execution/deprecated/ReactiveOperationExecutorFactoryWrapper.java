@@ -20,8 +20,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
- * Decorates a {@link ComponentExecutorFactory} so that the instances that it generates are also decorated through a
- * {@link ReactiveInterceptableOperationExecutorWrapper}, so that the items in the {@link #interceptors} list can apply.
+ * Decorates a {@link ComponentExecutorFactory} so that non blocking operations can correctly hook into the execution pipeline.
  *
  * @since 4.0
  * @deprecated since 4.2
@@ -53,7 +52,6 @@ public final class ReactiveOperationExecutorFactoryWrapper<T extends ComponentMo
       executor = new ReactiveOperationExecutionWrapper(executor);
     }
 
-    executor = new ReactiveInterceptableOperationExecutorWrapper(executor);
     return executor;
   }
 

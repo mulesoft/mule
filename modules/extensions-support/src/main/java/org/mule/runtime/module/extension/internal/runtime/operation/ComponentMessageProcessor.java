@@ -638,8 +638,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       throws MuleException {
     if (componentExecutor instanceof OperationArgumentResolverFactory) {
       ExecutionContextAdapter<T> delegateExecutionContext = createExecutionContext(eventBuilder.build());
-      PrecalculatedExecutionContextAdapter executionContext = new PrecalculatedExecutionContextAdapter(delegateExecutionContext,
-                                                                                                       componentExecutor);
+      PrecalculatedExecutionContextAdapter executionContext = new PrecalculatedExecutionContextAdapter(delegateExecutionContext);
 
       final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
       Throwable throwable = mediator.applyBeforeInterceptors(executionContext);

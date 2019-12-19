@@ -47,11 +47,9 @@ import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
-import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
-import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
@@ -63,9 +61,6 @@ import org.slf4j.Logger;
 /**
  * Implementation of {@link ConfigurationInstance} which propagates dependency injection and lifecycle phases into the contained
  * configuration {@link #value} and {@link #connectionProvider} (if present).
- * <p>
- * It also implements the {@link Interceptable} interface which means that it contains a list of {@link Interceptor interceptors},
- * on which IoC and lifecycle is propagated as well.
  * <p>
  * In the case of the {@link #connectionProvider} being present, then it also binds the {@link #value} to the
  * {@link ConnectionProvider} by the means of {@link ConnectionManager#bind(Object, ConnectionProvider)} when the

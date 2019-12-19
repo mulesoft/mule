@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 /**
@@ -16,7 +15,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
  *
  * @since 4.1.3
  */
-public interface ExecutionContextConfigurationDecorator extends Interceptable, ConfigurationInstance {
+public interface ExecutionContextConfigurationDecorator extends ConfigurationInstance {
 
   ConfigurationInstance getDecorated();
 }
