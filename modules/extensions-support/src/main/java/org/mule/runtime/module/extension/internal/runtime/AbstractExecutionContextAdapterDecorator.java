@@ -83,8 +83,13 @@ public abstract class AbstractExecutionContextAdapterDecorator<M extends Compone
   }
 
   @Override
-  public <T> T getParameter(String arg0) {
-    return decorated.getParameter(arg0);
+  public <T> T getParameter(String parameterName) {
+    return decorated.getParameter(parameterName);
+  }
+
+  @Override
+  public <T> T getParameterOrDefault(String parameterName, T defaultValue) {
+    return decorated.getParameterOrDefault(parameterName, defaultValue);
   }
 
   @Override

@@ -14,8 +14,6 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 
-import java.util.function.Supplier;
-
 /**
  * An {@link ArgumentResolver} which returns a {@link SourceCallbackContext} registered as an {@link ExecutionContext} variable
  * under the key {@link ExtensionProperties#SOURCE_CALLBACK_CONTEXT_PARAM}.
@@ -27,8 +25,7 @@ import java.util.function.Supplier;
 public class SourceCallbackContextArgumentResolver implements ArgumentResolver<SourceCallbackContext> {
 
   @Override
-  public Supplier<SourceCallbackContext> resolve(ExecutionContext executionContext) {
-    return () -> ((ExecutionContextAdapter<ComponentModel>) executionContext)
-        .getVariable(SOURCE_CALLBACK_CONTEXT_PARAM);
+  public SourceCallbackContext resolve(ExecutionContext executionContext) {
+    return ((ExecutionContextAdapter<ComponentModel>) executionContext).getVariable(SOURCE_CALLBACK_CONTEXT_PARAM);
   }
 }

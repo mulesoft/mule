@@ -21,12 +21,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.config.ConfigurationInstanceNotification.CONFIGURATION_STOPPED;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.locks.Lock;
-
-import javax.inject.Inject;
-
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -34,6 +28,7 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
@@ -42,6 +37,7 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.time.TimeSupplier;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
@@ -51,20 +47,20 @@ import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
-import org.mule.runtime.extension.api.runtime.Interceptable;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
-import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.module.extension.internal.loader.AbstractInterceptable;
+
+import java.util.Optional;
+import java.util.concurrent.locks.Lock;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 
 /**
  * Implementation of {@link ConfigurationInstance} which propagates dependency injection and lifecycle phases into the contained
  * configuration {@link #value} and {@link #connectionProvider} (if present).
- * <p>
- * It also implements the {@link Interceptable} interface which means that it contains a list of {@link Interceptor interceptors},
- * on which IoC and lifecycle is propagated as well.
  * <p>
  * In the case of the {@link #connectionProvider} being present, then it also binds the {@link #value} to the
  * {@link ConnectionProvider} by the means of {@link ConnectionManager#bind(Object, ConnectionProvider)} when the
@@ -73,9 +69,7 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public final class LifecycleAwareConfigurationInstance extends AbstractInterceptable implements ConfigurationInstance {
-
-
+public final class LifecycleAwareConfigurationInstance implements ConfigurationInstance, Lifecycle {
 
   private static final Integer DEFAULT_ASYNC_TEST_CONNECTIVITY_TIMEOUT = 30000;
 
@@ -111,6 +105,9 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   @Inject
   private ConfigurationProperties configurationProperties;
 
+  @Inject
+  private MuleContext muleContext;
+
   private volatile Lock testConnectivityLock;
 
   private volatile boolean initialized = false;
@@ -124,16 +121,13 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
    * @param name this configuration's name
    * @param model the {@link ConfigurationModel} for this instance
    * @param value the actual configuration instance
-   * @param interceptors the {@link List} of {@link Interceptor interceptors} that applies
    * @param connectionProvider an {@link Optional} containing the {@link ConnectionProvider} to use
    */
   public LifecycleAwareConfigurationInstance(String name,
                                              ConfigurationModel model,
                                              Object value,
                                              ConfigurationState configurationState,
-                                             List<Interceptor> interceptors,
                                              Optional<ConnectionProvider> connectionProvider) {
-    super(interceptors);
     this.name = name;
     this.model = model;
     this.value = value;
@@ -141,16 +135,6 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
     this.connectionProvider = connectionProvider;
   }
 
-  /**
-   * Initialises this instance by
-   * <ul>
-   * <li>Initialising the {@link #configurationStats}</li>
-   * <li>Performs dependency injection on the {@link #value} and each item in {@link #getInterceptors()}</li>
-   * <li>Propagates this lifecycle phase into the the {@link #value} and each item in {@link #getInterceptors()}</li>
-   * </ul>
-   *
-   * @throws InitialisationException if an exception is found
-   */
   @Override
   public synchronized void initialise() throws InitialisationException {
     if (!initialized) {
@@ -159,7 +143,6 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
       try {
         initStats();
         doInitialise();
-        super.initialise();
       } catch (Exception e) {
         if (e instanceof InitialisationException) {
           throw (InitialisationException) e;
@@ -170,11 +153,6 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
     }
   }
 
-  /**
-   * Propagates this lifecycle phase into the the {@link #value} and each item in {@link #getInterceptors()}
-   *
-   * @throws MuleException if an exception is found
-   */
   @Override
   public synchronized void start() throws MuleException {
     if (!started) {
@@ -189,7 +167,6 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
         }
       }
       startIfNeeded(value);
-      super.start();
     }
   }
 
@@ -275,7 +252,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   }
 
   /**
-   * Propagates this lifecycle phase into the the {@link #value} and each item in {@link #getInterceptors()}. Also triggers a
+   * Propagates this lifecycle phase into the the {@link #value}. Also triggers a
    * {@link ConfigurationInstanceNotification} that is being stopped.
    *
    * @throws MuleException if an exception is found
@@ -295,7 +272,6 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
             testConnectivityLock.unlock();
           }
         }
-        super.stop();
       } finally {
         notificationFirer.dispatch(new ConfigurationInstanceNotification(this, CONFIGURATION_STOPPED));
       }
@@ -303,7 +279,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   }
 
   /**
-   * Propagates this lifecycle phase into the the {@link #value} and each item in {@link #getInterceptors()}
+   * Propagates this lifecycle phase into the the {@link #value}.
    */
   @Override
   public synchronized void dispose() {
@@ -313,7 +289,6 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
       disposeIfNeeded(connectionProvider, LOGGER);
       configurationStats = null;
       testConnectivityLock = null;
-      super.dispose();
     }
   }
 

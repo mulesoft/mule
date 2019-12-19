@@ -71,7 +71,6 @@ import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
-import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
@@ -82,7 +81,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Configura
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -94,7 +92,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.google.common.collect.ImmutableList;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
@@ -337,15 +334,6 @@ public final class ExtensionsTestUtils {
         : empty();
 
     when(enrichableModel.getModelProperty(ExceptionHandlerModelProperty.class)).thenReturn(property);
-  }
-
-  public static void mockInterceptors(EnrichableModel enrichableModel, List<InterceptorFactory> interceptorFactories) {
-    if (interceptorFactories == null) {
-      interceptorFactories = ImmutableList.of();
-    }
-
-    when(enrichableModel.getModelProperty(InterceptorsModelProperty.class))
-        .thenReturn(of(new InterceptorsModelProperty(interceptorFactories)));
   }
 
   public static void mockConfigurationInstance(ConfigurationModel configurationModel, Object config) {

@@ -11,8 +11,6 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
-import java.util.function.Supplier;
-
 /**
  * A {@link ArgumentResolver} that returns the {@link RetryPolicyTemplate} effective for the operation
  *
@@ -21,8 +19,8 @@ import java.util.function.Supplier;
 public class RetryPolicyTemplateArgumentResolver implements ArgumentResolver<RetryPolicyTemplate> {
 
   @Override
-  public Supplier<RetryPolicyTemplate> resolve(ExecutionContext executionContext) {
+  public RetryPolicyTemplate resolve(ExecutionContext executionContext) {
     ExecutionContextAdapter<OperationModel> ctx = (ExecutionContextAdapter<OperationModel>) executionContext;
-    return () -> ctx.getRetryPolicyTemplate().get();
+    return ctx.getRetryPolicyTemplate().get();
   }
 }

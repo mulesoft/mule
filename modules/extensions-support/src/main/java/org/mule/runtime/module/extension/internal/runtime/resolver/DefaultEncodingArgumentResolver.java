@@ -9,8 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
-import java.util.function.Supplier;
-
 /**
  * An implementation of {@link ArgumentResolver} which returns the value obtained through
  * {@link ExecutionContext#getConfiguration()}
@@ -20,7 +18,7 @@ import java.util.function.Supplier;
 public final class DefaultEncodingArgumentResolver implements ArgumentResolver<String> {
 
   @Override
-  public Supplier<String> resolve(ExecutionContext executionContext) {
-    return () -> ((ExecutionContextAdapter) executionContext).getMuleContext().getConfiguration().getDefaultEncoding();
+  public String resolve(ExecutionContext executionContext) {
+    return ((ExecutionContextAdapter) executionContext).getMuleContext().getConfiguration().getDefaultEncoding();
   }
 }

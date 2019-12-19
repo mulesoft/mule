@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -100,8 +99,8 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
                                                 configurationModel,
                                                 configurationInstance,
                                                 configurationState,
-                                                emptyList(),
                                                 empty());
+
     Map<String, Object> parametersMap = new HashMap<>();
     parametersMap.put(PARAM_NAME, VALUE);
     when(resolverSetResult.asMap()).thenReturn(parametersMap);

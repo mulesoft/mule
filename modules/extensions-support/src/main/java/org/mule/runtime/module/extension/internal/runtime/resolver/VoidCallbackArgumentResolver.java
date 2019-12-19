@@ -15,8 +15,6 @@ import org.mule.runtime.extension.api.runtime.process.VoidCompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedResult;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
-import java.util.function.Supplier;
-
 /**
  * {@link ArgumentResolver} which returns the {@link org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextProperties#COMPLETION_CALLBACK_CONTEXT_PARAM} context variable.
  * <p>
@@ -27,25 +25,22 @@ import java.util.function.Supplier;
 public final class VoidCallbackArgumentResolver implements ArgumentResolver<VoidCompletionCallback> {
 
   @Override
-  public Supplier<VoidCompletionCallback> resolve(ExecutionContext executionContext) {
-    return () -> {
-      ExecutionContextAdapter adapter = (ExecutionContextAdapter) executionContext;
-      CompletionCallback completionCallback = (CompletionCallback) adapter.getVariable(COMPLETION_CALLBACK_CONTEXT_PARAM);
-      final CoreEvent event = adapter.getEvent();
+  public VoidCompletionCallback resolve(ExecutionContext executionContext) {
+    ExecutionContextAdapter adapter = (ExecutionContextAdapter) executionContext;
+    CompletionCallback completionCallback = (CompletionCallback) adapter.getVariable(COMPLETION_CALLBACK_CONTEXT_PARAM);
+    final CoreEvent event = adapter.getEvent();
 
-      return new VoidCompletionCallback() {
+    return new VoidCompletionCallback() {
 
-        @Override
-        public void success() {
-          completionCallback.success(EventedResult.from(event));
-        }
+      @Override
+      public void success() {
+        completionCallback.success(EventedResult.from(event));
+      }
 
-        @Override
-        public void error(Throwable e) {
-          completionCallback.error(e);
-        }
-      };
+      @Override
+      public void error(Throwable e) {
+        completionCallback.error(e);
+      }
     };
-
   }
 }

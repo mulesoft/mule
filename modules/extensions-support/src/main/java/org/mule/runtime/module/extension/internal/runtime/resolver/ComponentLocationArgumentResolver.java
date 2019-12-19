@@ -10,8 +10,6 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
-import java.util.function.Supplier;
-
 /**
  * {@link ArgumentResolver} which returns the {@link ComponentLocation} of the received {@link ExecutionContextAdapter}
  *
@@ -20,7 +18,7 @@ import java.util.function.Supplier;
 public class ComponentLocationArgumentResolver implements ArgumentResolver<ComponentLocation> {
 
   @Override
-  public Supplier<ComponentLocation> resolve(ExecutionContext executionContext) {
-    return () -> ((ExecutionContextAdapter) executionContext).getComponent().getLocation();
+  public ComponentLocation resolve(ExecutionContext executionContext) {
+    return ((ExecutionContextAdapter) executionContext).getComponent().getLocation();
   }
 }

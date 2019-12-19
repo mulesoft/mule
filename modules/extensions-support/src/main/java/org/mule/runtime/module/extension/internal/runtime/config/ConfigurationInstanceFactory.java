@@ -10,7 +10,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.supportsConnectivity;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -20,16 +19,13 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
-import org.mule.runtime.module.extension.internal.loader.java.property.InterceptorsModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
-import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Collections;
 import java.util.Map;
@@ -38,10 +34,6 @@ import java.util.stream.Collectors;
 
 /**
  * Reusable and thread-safe factory that creates instances of {@link ConfigurationInstance}
- * <p>
- * The created instances will be of concrete type {@link LifecycleAwareConfigurationInstance}, which means that all the
- * {@link InterceptorFactory interceptor factories} obtained through the {@link InterceptorsModelProperty}
- * (if present) will be exercised per each created instance
  *
  * @param <T> the generic type of the returned {@link ConfigurationInstance} instances
  * @since 4.0
@@ -50,7 +42,6 @@ public final class ConfigurationInstanceFactory<T> {
 
   private final ConfigurationModel configurationModel;
   private final ConfigurationObjectBuilder<T> configurationObjectBuilder;
-  private final ImplicitConnectionProviderFactory implicitConnectionProviderFactory;
   private final boolean requiresConnection;
   private final ExpressionManager expressionManager;
   private final MuleContext muleContext;
@@ -61,14 +52,12 @@ public final class ConfigurationInstanceFactory<T> {
    * @param extensionModel     the {@link ExtensionModel} that owns the {@code configurationModel}
    * @param configurationModel the {@link ConfigurationModel} that describes the configurations to be created
    * @param resolverSet        the {@link ResolverSet} which provides the values for the configuration's parameters
-   * @param reflectionCache    the {@link ReflectionCache} used to improve reflection lookups performance
    * @param expressionManager  the {@link ExpressionManager} used to create a session used to evaluate the attributes.
    * @param context            the current {@link MuleContext}
    */
   public ConfigurationInstanceFactory(ExtensionModel extensionModel,
                                       ConfigurationModel configurationModel,
                                       ResolverSet resolverSet,
-                                      ReflectionCache reflectionCache,
                                       ExpressionManager expressionManager,
                                       MuleContext context) {
     this.configurationModel = configurationModel;
@@ -76,11 +65,6 @@ public final class ConfigurationInstanceFactory<T> {
     this.muleContext = context;
     configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet, expressionManager, context);
     requiresConnection = supportsConnectivity(extensionModel, configurationModel);
-    implicitConnectionProviderFactory = new DefaultImplicitConnectionProviderFactory(extensionModel,
-                                                                                     configurationModel,
-                                                                                     reflectionCache,
-                                                                                     expressionManager,
-                                                                                     context);
   }
 
   /**
@@ -113,7 +97,6 @@ public final class ConfigurationInstanceFactory<T> {
                                                    configurationModel,
                                                    configValue.getFirst(),
                                                    createState(configValue.getSecond(), connectionProvider),
-                                                   createInterceptors(configurationModel),
                                                    connectionProvider.map(Pair::getFirst));
   }
 
@@ -150,7 +133,6 @@ public final class ConfigurationInstanceFactory<T> {
                                                    configurationModel,
                                                    configValue.getFirst(),
                                                    createState(configValue.getSecond(), connectionProvider),
-                                                   createInterceptors(configurationModel),
                                                    connectionProvider.map(Pair::getFirst));
   }
 
@@ -192,7 +174,6 @@ public final class ConfigurationInstanceFactory<T> {
                                                    configurationModel,
                                                    configValue.getFirst(),
                                                    createState(configValue.getSecond(), connectionProvider),
-                                                   createInterceptors(configurationModel),
                                                    connectionProvider.map(Pair::getFirst));
   }
 

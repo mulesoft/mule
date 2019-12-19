@@ -34,16 +34,20 @@ import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZ
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
+import static org.mule.tck.MuleTestUtils.spyInjector;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
@@ -53,7 +57,7 @@ import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
-import org.mule.runtime.module.extension.internal.AbstractInterceptableContractTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.TestTimeSupplier;
 
@@ -73,8 +77,7 @@ import org.mockito.verification.VerificationMode;
 
 @SmallTest
 @RunWith(Parameterized.class)
-public class LifecycleAwareConfigurationInstanceTestCase
-    extends AbstractInterceptableContractTestCase<LifecycleAwareConfigurationInstance> {
+public class LifecycleAwareConfigurationInstanceTestCase extends AbstractMuleContextTestCase {
 
   protected static final int RECONNECTION_MAX_ATTEMPTS = 5;
   private static final int RECONNECTION_FREQ = 100;
@@ -101,14 +104,14 @@ public class LifecycleAwareConfigurationInstanceTestCase
   @Mock
   private ConfigurationProperties configurationProperties;
 
-  protected Lifecycle value = mock(Lifecycle.class, withSettings().extraInterfaces(Component.class));
-
   @Mock
   protected ConnectionManagerAdapter connectionManager;
 
+  protected Lifecycle value = mock(Lifecycle.class, withSettings().extraInterfaces(Component.class));
   protected RetryPolicyTemplate retryPolicyTemplate;
-
   protected Optional<ConnectionProvider> connectionProvider;
+  protected LifecycleAwareConfigurationInstance configurationInstance;
+  protected Injector injector;
 
   public LifecycleAwareConfigurationInstanceTestCase(String name, ConnectionProvider connectionProvider) {
     this.connectionProvider = ofNullable(connectionProvider);
@@ -134,6 +137,8 @@ public class LifecycleAwareConfigurationInstanceTestCase
     retryPolicyTemplate = createRetryTemplate();
     retryPolicyTemplate.setNotifier(mock(RetryNotifier.class));
 
+    configurationInstance = createConfigurationInstance();
+    injector = spyInjector(muleContext);
     super.doSetUp();
   }
 
@@ -143,21 +148,19 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @After
   public void after() {
-    interceptable.dispose();
+    configurationInstance.dispose();
   }
 
-  @Override
-  protected LifecycleAwareConfigurationInstance createInterceptable() {
+  protected LifecycleAwareConfigurationInstance createConfigurationInstance() throws MuleException {
     if (connectionProvider.isPresent()) {
       reset(connectionProvider.get());
     }
     setup(connectionManager);
-    return new LifecycleAwareConfigurationInstance(NAME,
-                                                   configurationModel,
-                                                   value,
-                                                   configurationState,
-                                                   getInterceptors(),
-                                                   connectionProvider);
+    return muleContext.getInjector().inject(new LifecycleAwareConfigurationInstance(NAME,
+                                                                                    configurationModel,
+                                                                                    value,
+                                                                                    configurationState,
+                                                                                    connectionProvider));
   }
 
   private void setup(ConnectionManagerAdapter connectionManager) {
@@ -176,7 +179,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void valueInjected() throws Exception {
-    interceptable.initialise();
+    configurationInstance.initialise();
     verify(injector).inject(value);
     if (connectionProvider.isPresent()) {
       verify(injector).inject(connectionProvider.get());
@@ -187,7 +190,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void connectionBound() throws Exception {
-    interceptable.initialise();
+    configurationInstance.initialise();
     assertBound();
   }
 
@@ -206,18 +209,18 @@ public class LifecycleAwareConfigurationInstanceTestCase
   @Test
   public void connectionReBoundfterStopStart() throws Exception {
     connectionBound();
-    interceptable.start();
-    interceptable.stop();
+    configurationInstance.start();
+    configurationInstance.stop();
     verify(connectionManager, getBindingVerificationMode()).unbind(value);
 
     reset(connectionManager);
-    interceptable.start();
+    configurationInstance.start();
     assertBound();
   }
 
   @Test
   public void valueInitialised() throws Exception {
-    interceptable.initialise();
+    configurationInstance.initialise();
     verify((Initialisable) value).initialise();
     if (connectionProvider.isPresent()) {
       verify((Initialisable) connectionProvider.get()).initialise();
@@ -226,7 +229,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void valueStarted() throws Exception {
-    interceptable.start();
+    configurationInstance.start();
     verify((Startable) value).start();
     if (connectionProvider.isPresent()) {
       verify((Startable) connectionProvider.get()).start();
@@ -235,10 +238,10 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void testConnectivityUponStart() throws Exception {
-    interceptable.initialise();
+    configurationInstance.initialise();
     if (connectionProvider.isPresent()) {
       valueStarted();
-      verify(connectionManager).testConnectivity(interceptable);
+      verify(connectionManager).testConnectivity(configurationInstance);
     }
   }
 
@@ -246,15 +249,15 @@ public class LifecycleAwareConfigurationInstanceTestCase
   public void testConnectivityFailsUponStart() throws Exception {
     if (connectionProvider.isPresent()) {
       Exception connectionException = new ConnectionException("Oops!");
-      when(connectionManager.testConnectivity(interceptable))
+      when(connectionManager.testConnectivity(configurationInstance))
           .thenReturn(failure(connectionException.getMessage(), connectionException));
 
-      interceptable.initialise();
+      configurationInstance.initialise();
       try {
-        interceptable.start();
+        configurationInstance.start();
         fail("Was expecting connectivity testing to fail");
       } catch (Exception e) {
-        verify(connectionManager, times(RECONNECTION_MAX_ATTEMPTS + 1)).testConnectivity(interceptable);
+        verify(connectionManager, times(RECONNECTION_MAX_ATTEMPTS + 1)).testConnectivity(configurationInstance);
         assertThat(e.getCause(), is(instanceOf(RetryPolicyExhaustedException.class)));
       }
     }
@@ -262,9 +265,9 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void valueStopped() throws Exception {
-    interceptable.initialise();
-    interceptable.start();
-    interceptable.stop();
+    configurationInstance.initialise();
+    configurationInstance.start();
+    configurationInstance.stop();
     verify((Stoppable) value).stop();
     if (connectionProvider.isPresent()) {
       verify((Stoppable) connectionProvider.get()).stop();
@@ -273,9 +276,9 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void connectionUnbound() throws Exception {
-    interceptable.initialise();
-    interceptable.start();
-    interceptable.stop();
+    configurationInstance.initialise();
+    configurationInstance.start();
+    configurationInstance.stop();
     if (connectionProvider.isPresent()) {
       verify(connectionManager).unbind(value);
     } else {
@@ -285,8 +288,8 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void valueDisposed() throws Exception {
-    interceptable.initialise();
-    interceptable.dispose();
+    configurationInstance.initialise();
+    configurationInstance.dispose();
     verify((Disposable) value).dispose();
     if (connectionProvider.isPresent()) {
       verify((Disposable) connectionProvider.get()).dispose();
@@ -295,32 +298,32 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void getName() {
-    assertThat(interceptable.getName(), is(NAME));
+    assertThat(configurationInstance.getName(), is(NAME));
   }
 
   @Test
   public void getModel() {
-    assertThat(interceptable.getModel(), is(sameInstance(configurationModel)));
+    assertThat(configurationInstance.getModel(), is(sameInstance(configurationModel)));
   }
 
   @Test
   public void getValue() {
-    assertThat(interceptable.getValue(), is(sameInstance(value)));
+    assertThat(configurationInstance.getValue(), is(sameInstance(value)));
   }
 
   @Test(expected = IllegalStateException.class)
   public void getStatsBeforeInit() {
-    interceptable.getStatistics();
+    configurationInstance.getStatistics();
   }
 
   @Test
   public void getStatistics() throws Exception {
-    interceptable.initialise();
-    assertThat(interceptable.getStatistics(), is(notNullValue()));
+    configurationInstance.initialise();
+    assertThat(configurationInstance.getStatistics(), is(notNullValue()));
   }
 
   @Test
   public void getState() {
-    assertThat(interceptable.getState(), is(sameInstance(configurationState)));
+    assertThat(configurationInstance.getState(), is(sameInstance(configurationState)));
   }
 }

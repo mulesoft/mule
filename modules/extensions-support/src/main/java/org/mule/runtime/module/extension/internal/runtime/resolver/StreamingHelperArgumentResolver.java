@@ -12,8 +12,6 @@ import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.streaming.DefaultStreamingHelper;
 
-import java.util.function.Supplier;
-
 /**
  * An argument resolver which provides instances of {@link StreamingHelper}
  *
@@ -25,10 +23,8 @@ public class StreamingHelperArgumentResolver implements ArgumentResolver<Streami
    * {@inheritDoc}
    */
   @Override
-  public Supplier<StreamingHelper> resolve(ExecutionContext executionContext) {
-    return () -> {
-      ExecutionContextAdapter<OperationModel> context = (ExecutionContextAdapter<OperationModel>) executionContext;
-      return new DefaultStreamingHelper(context.getCursorProviderFactory(), context.getStreamingManager(), context.getEvent());
-    };
+  public StreamingHelper resolve(ExecutionContext executionContext) {
+    ExecutionContextAdapter<OperationModel> context = (ExecutionContextAdapter<OperationModel>) executionContext;
+    return new DefaultStreamingHelper(context.getCursorProviderFactory(), context.getStreamingManager(), context.getEvent());
   }
 }

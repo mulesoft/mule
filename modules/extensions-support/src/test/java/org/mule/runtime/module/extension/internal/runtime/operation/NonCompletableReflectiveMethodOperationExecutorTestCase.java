@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
@@ -24,6 +23,7 @@ import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIAT
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -127,7 +127,6 @@ public class NonCompletableReflectiveMethodOperationExecutorTestCase extends Abs
                                                 configurationModel,
                                                 config,
                                                 configurationState,
-                                                emptyList(),
                                                 empty());
 
     when(muleEvent.getMessage().getPayload()).thenReturn(new TypedValue<>(null, DATA_TYPE));

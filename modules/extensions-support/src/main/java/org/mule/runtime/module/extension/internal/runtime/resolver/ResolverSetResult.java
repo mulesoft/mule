@@ -10,11 +10,12 @@ import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-
-import com.google.common.base.Objects;
+import org.mule.runtime.api.util.LazyValue;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import com.google.common.base.Objects;
 
 /**
  * This class represents the outcome of the evaluation of a {@link ResolverSet}. This class maps a set of {@link ParameterModel}
@@ -72,6 +73,7 @@ public class ResolverSetResult {
   }
 
   private final Map<String, Object> evaluationResult;
+  private final LazyValue<Integer> hashCode = new LazyValue<>(this::calculateHashCode);
 
   ResolverSetResult(Map<String, Object> evaluationResult) {
     this.evaluationResult = evaluationResult;
@@ -112,15 +114,15 @@ public class ResolverSetResult {
 
   @Override
   public int hashCode() {
-    int hashcode = 1;
-    for (Object val : evaluationResult.values()) {
-      hashcode = calculateValueHash(hashcode, val);
-    }
-    return hashcode;
+    return hashCode.get();
   }
 
-  static int calculateValueHash(int hashcode, Object val) {
-    return 31 * hashcode + (val == null ? 0 : val.hashCode());
+  private int calculateHashCode() {
+    int hashcode = 1;
+    for (Object val : evaluationResult.values()) {
+      hashcode = 31 * hashcode + (val == null ? 0 : val.hashCode());
+    }
+    return hashcode;
   }
 
   public Map<String, Object> asMap() {

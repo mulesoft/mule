@@ -23,7 +23,9 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -78,9 +80,12 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.VoidCallbackA
 import org.mule.runtime.module.extension.internal.runtime.streaming.UnclosableCursorStream;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -143,7 +148,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   private final List<ParameterGroupModel> parameterGroupModels;
   private final Method method;
   private final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
-  private ArgumentResolver<?>[] argumentResolvers;
+  private ArgumentResolver<Object>[] argumentResolvers;
   private Map<java.lang.reflect.Parameter, ParameterGroupArgumentResolver<?>> parameterGroupResolvers;
 
   /**
@@ -173,7 +178,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
     for (int i = 0; i < parameterTypes.length; i++) {
       final Class<?> parameterType = parameterTypes[i];
-      Map<Class<? extends Annotation>, Annotation> annotations = toMap(parameterAnnotations[i]);
+      final Parameter parameter = parameters[i];
+      final Map<Class<? extends Annotation>, Annotation> annotations = toMap(parameterAnnotations[i]);
 
       ArgumentResolver<?> argumentResolver;
 
@@ -189,7 +195,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = SOURCE_CALLBACK_CONTEXT_ARGUMENT_RESOLVER;
       } else if (isParameterContainer(annotations.keySet(), typeLoader.load(parameterType)) &&
           !((ParameterGroup) annotations.get(ParameterGroup.class)).showInDsl()) {
-        argumentResolver = parameterGroupResolvers.get(parameters[i]);
+        argumentResolver = parameterGroupResolvers.get(parameter);
       } else if (ParameterResolver.class.equals(parameterType)) {
         argumentResolver = new ParameterResolverArgumentResolver<>(paramNames.get(i));
       } else if (TypedValue.class.equals(parameterType)) {
@@ -232,62 +238,79 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));
       }
 
-      argumentResolvers[i] = argumentResolver;
+      argumentResolvers[i] = addResolverDecorators((ArgumentResolver<Object>) argumentResolver, parameter);
     }
   }
 
   @Override
-  public Supplier<Object>[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
-
-    Supplier<Object>[] parameterValues = new Supplier[argumentResolvers.length];
-    int i = 0;
-    for (ArgumentResolver<?> argumentResolver : argumentResolvers) {
-      parameterValues[i] = wrapParameterResolution(parameterTypes[i], argumentResolver.resolve(executionContext));
-      i++;
+  public Object[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
+    Object[] parameterValues = new Object[argumentResolvers.length];
+    for (int i = 0; i < argumentResolvers.length; i++) {
+      parameterValues[i] = argumentResolvers[i].resolve(executionContext);
     }
 
     return parameterValues;
   }
 
-  private Supplier<Object> wrapParameterResolution(Class<?> parameterType, Supplier<?> valueSupplier) {
-    return () -> {
-      Object parameterValue = valueSupplier.get();
-      if (parameterValue == null) {
-        return resolvePrimitiveTypeDefaultValue(parameterType);
-      } else if (parameterValue instanceof CursorStream) {
-        return new UnclosableCursorStream((CursorStream) parameterValue);
-      } else {
-        return resolveCursor(parameterValue);
-      }
-    };
+  @Override
+  public Supplier<Object>[] resolveDeferred(ExecutionContext executionContext, Class<?>[] parameterTypes) {
+    Supplier<Object>[] parameterValues = new Supplier[argumentResolvers.length];
+    for (int i = 0; i < argumentResolvers.length; i++) {
+      final int itemIndex = i;
+      parameterValues[i] = new LazyValue<>(() -> argumentResolvers[itemIndex].resolve(executionContext));
+    }
+
+    return parameterValues;
   }
 
-  private Object resolvePrimitiveTypeDefaultValue(Class<?> type) {
+  private ArgumentResolver<Object> addResolverDecorators(ArgumentResolver<Object> resolver, Parameter parameter) {
+    Class<?> argumentType = parameter.getType();
+    if (argumentType.isPrimitive()) {
+      resolver = addPrimitiveTypeDefaultValueDecorator(resolver, argumentType);
+    } else if (InputStream.class.equals(argumentType)) {
+      resolver = new InputStreamArgumentResolverDecorator(resolver);
+    } else if (TypedValue.class.equals(argumentType)) {
+      if (parameter.getParameterizedType() instanceof ParameterizedType) {
+        Type generic = ((ParameterizedType) parameter.getParameterizedType()).getActualTypeArguments()[0];
+        if (generic instanceof Class) {
+          Class<?> genericClass = (Class<?>) generic;
+          if (CursorProvider.class.isAssignableFrom(genericClass) || Object.class.equals(genericClass)) {
+            resolver = new TypedValueCursorArgumentResolverDecorator(resolver);
+          }
+        }
+      }
+    }
+
+    return resolver;
+  }
+
+  private ArgumentResolver<Object> addPrimitiveTypeDefaultValueDecorator(ArgumentResolver<Object> resolver, Class<?> type) {
     if (type.equals(int.class)) {
-      return 0;
+      return new DefaultValueArgumentResolverDecorator(resolver, 0);
     }
     if (type.equals(boolean.class)) {
-      return false;
+      return new DefaultValueArgumentResolverDecorator(resolver, false);
     }
     if (type.equals(float.class)) {
-      return 0.0f;
+      return new DefaultValueArgumentResolverDecorator(resolver, 0.0f);
     }
     if (type.equals(long.class)) {
-      return 0l;
+      return new DefaultValueArgumentResolverDecorator(resolver, 0l);
     }
     if (type.equals(byte.class)) {
-      return (byte) 0;
+      return new DefaultValueArgumentResolverDecorator(resolver, (byte) 0);
     }
     if (type.equals(short.class)) {
-      return (short) 0;
+      return new DefaultValueArgumentResolverDecorator(resolver, (short) 0);
     }
     if (type.equals(double.class)) {
-      return 0.0d;
+      return new DefaultValueArgumentResolverDecorator(resolver, (double) 0.0d);
     }
     if (type.equals(char.class)) {
-      return '\u0000';
+      return new DefaultValueArgumentResolverDecorator(resolver, '\u0000');
     }
-    return null;
+
+    return resolver;
   }
 
   /**
@@ -309,5 +332,64 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   @Override
   public void initialise() throws InitialisationException {
     initArgumentResolvers();
+  }
+
+  private class InputStreamArgumentResolverDecorator extends ArgumentResolverDecorator {
+
+    public InputStreamArgumentResolverDecorator(ArgumentResolver<Object> decoratee) {
+      super(decoratee);
+    }
+
+    @Override
+    protected Object decorate(Object value) {
+      if (value instanceof CursorStream) {
+        return new UnclosableCursorStream((CursorStream) value);
+      }
+
+      return value;
+    }
+  }
+
+  private class DefaultValueArgumentResolverDecorator extends ArgumentResolverDecorator {
+
+    private final Object defaultValue;
+
+    public DefaultValueArgumentResolverDecorator(ArgumentResolver<Object> decoratee, Object defaultValue) {
+      super(decoratee);
+      this.defaultValue = defaultValue;
+    }
+
+    @Override
+    protected Object decorate(Object value) {
+      return value != null ? value : defaultValue;
+    }
+  }
+
+  private class TypedValueCursorArgumentResolverDecorator extends ArgumentResolverDecorator {
+
+    public TypedValueCursorArgumentResolverDecorator(ArgumentResolver<Object> decoratee) {
+      super(decoratee);
+    }
+
+    @Override
+    protected Object decorate(Object value) {
+      return resolveCursor((TypedValue) value);
+    }
+  }
+
+  private abstract class ArgumentResolverDecorator implements ArgumentResolver<Object> {
+
+    private final ArgumentResolver<Object> decoratee;
+
+    public ArgumentResolverDecorator(ArgumentResolver<Object> decoratee) {
+      this.decoratee = decoratee;
+    }
+
+    @Override
+    public Object resolve(ExecutionContext executionContext) {
+      return decorate(decoratee.resolve(executionContext));
+    }
+
+    protected abstract Object decorate(Object value);
   }
 }

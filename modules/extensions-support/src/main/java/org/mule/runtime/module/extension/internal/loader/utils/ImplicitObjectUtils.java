@@ -18,7 +18,6 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.resolver.HashedResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NullSafeValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -48,7 +47,7 @@ public final class ImplicitObjectUtils {
    */
   public static ResolverSet buildImplicitResolverSet(ParameterizedModel model, ReflectionCache reflectionCache,
                                                      ExpressionManager expressionManager, MuleContext muleContext) {
-    ResolverSet resolverSet = new HashedResolverSet(muleContext);
+    ResolverSet resolverSet = new ResolverSet(muleContext);
     ParametersResolver parametersResolver =
         ParametersResolver.fromDefaultValues(model, muleContext, reflectionCache, expressionManager);
 

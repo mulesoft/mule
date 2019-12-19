@@ -10,8 +10,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
-import java.util.function.Supplier;
-
 /**
  * An implementation of {@link ArgumentResolver} which resolves the {@link TypedValue} of a parameter
  *
@@ -30,12 +28,10 @@ public final class TypedValueArgumentResolver<T> implements ArgumentResolver<Typ
    * {@inheritDoc}
    */
   @Override
-  public Supplier<TypedValue<T>> resolve(ExecutionContext executionContext) {
-    return () -> {
-      T value = argumentResolver.resolve(executionContext).get();
-      return value instanceof TypedValue
-          ? (TypedValue<T>) value
-          : new TypedValue<>(value, DataType.fromObject(value));
-    };
+  public TypedValue<T> resolve(ExecutionContext executionContext) {
+    T value = argumentResolver.resolve(executionContext);
+    return value instanceof TypedValue
+        ? (TypedValue<T>) value
+        : new TypedValue<>(value, DataType.fromObject(value));
   }
 }

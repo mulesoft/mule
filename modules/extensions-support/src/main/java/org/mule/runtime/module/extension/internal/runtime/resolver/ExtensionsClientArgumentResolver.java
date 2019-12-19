@@ -17,8 +17,6 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.runtime.client.DefaultExtensionsClient;
 import org.mule.runtime.module.extension.internal.runtime.client.strategy.ExtensionsClientProcessorsStrategyFactory;
 
-import java.util.function.Supplier;
-
 /**
  * An argument resolver that yields instances of {@link ExtensionsClient}.
  *
@@ -33,17 +31,15 @@ public class ExtensionsClientArgumentResolver implements ArgumentResolver<Extens
   }
 
   @Override
-  public Supplier<ExtensionsClient> resolve(ExecutionContext executionContext) {
-    return () -> {
-      ExecutionContextAdapter cxt = (ExecutionContextAdapter) executionContext;
-      DefaultExtensionsClient extensionClient =
-          new DefaultExtensionsClient(cxt.getEvent(), extensionsClientProcessorsStrategyFactory);
-      try {
-        extensionClient.initialise();
-      } catch (InitialisationException e) {
-        throw new MuleRuntimeException(createStaticMessage("Failed to initialise Extension Client"), e);
-      }
-      return extensionClient;
-    };
+  public ExtensionsClient resolve(ExecutionContext executionContext) {
+    ExecutionContextAdapter cxt = (ExecutionContextAdapter) executionContext;
+    DefaultExtensionsClient extensionClient =
+        new DefaultExtensionsClient(cxt.getEvent(), extensionsClientProcessorsStrategyFactory);
+    try {
+      extensionClient.initialise();
+    } catch (InitialisationException e) {
+      throw new MuleRuntimeException(createStaticMessage("Failed to initialise Extension Client"), e);
+    }
+    return extensionClient;
   }
 }

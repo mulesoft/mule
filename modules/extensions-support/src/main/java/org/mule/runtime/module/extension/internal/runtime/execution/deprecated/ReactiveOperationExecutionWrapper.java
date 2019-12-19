@@ -14,17 +14,18 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextProperties.COMPLETION_CALLBACK_CONTEXT_PARAM;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactoryWrapper;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
 
 import java.util.Map;
@@ -43,7 +44,7 @@ import reactor.core.publisher.Mono;
  * It also implements {@link Lifecycle} and {@link MuleContextAware}, propagating those to the decoratee if necessary
  *
  * @since 4.0
- * @deprecated since 4.3. Use {@link CompletableOperationExecutorFactoryWrapper} instead
+ * @deprecated since 4.3. Use {@link CompletableComponentExecutorFactory} instead
  */
 public final class ReactiveOperationExecutionWrapper<M extends ComponentModel>
     implements ComponentExecutor<M>, OperationArgumentResolverFactory<M>, Lifecycle, MuleContextAware {

@@ -19,7 +19,6 @@ import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKN
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.valuesWithClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
@@ -43,7 +42,6 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.config.ExpirableConfigurationProvider;
 import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
-import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -57,6 +55,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.slf4j.Logger;
 
 /**
@@ -108,8 +107,8 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
                                       ExpressionManager expressionManager,
                                       MuleContext muleContext) {
     super(name, extension, config, muleContext);
-    this.configurationInstanceFactory = new ConfigurationInstanceFactory<>(extension, config, resolverSet, reflectionCache,
-                                                                           expressionManager, muleContext);
+    this.configurationInstanceFactory =
+        new ConfigurationInstanceFactory<>(extension, config, resolverSet, expressionManager, muleContext);
     this.reflectionCache = reflectionCache;
     this.expressionManager = expressionManager;
     this.resolverSet = resolverSet;
@@ -318,10 +317,12 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
 
     @Override
     public boolean equals(Object o) {
-      if (this == o)
+      if (this == o) {
         return true;
-      if (!(o instanceof ResolverResultAndEvent))
+      }
+      if (!(o instanceof ResolverResultAndEvent)) {
         return false;
+      }
       ResolverResultAndEvent that = (ResolverResultAndEvent) o;
       return resolverSetResult.equals(that.resolverSetResult);
     }

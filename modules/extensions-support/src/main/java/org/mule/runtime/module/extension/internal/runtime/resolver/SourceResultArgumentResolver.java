@@ -16,13 +16,11 @@ import static org.mule.runtime.extension.api.runtime.source.SourceResult.success
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceResult;
 
 import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * {@link ArgumentResolver} implementation which create instances of {@link SourceResult}
@@ -46,20 +44,18 @@ public class SourceResultArgumentResolver implements ArgumentResolver<SourceResu
   }
 
   @Override
-  public Supplier<SourceResult> resolve(ExecutionContext executionContext) {
-    return new LazyValue<>(() -> {
-      Error error = errorArgumentResolver.resolve(executionContext).get();
-      SourceCallbackContext callbackContext = callbackContextArgumentResolver.resolve(executionContext).get();
+  public SourceResult resolve(ExecutionContext executionContext) {
+    Error error = errorArgumentResolver.resolve(executionContext);
+    SourceCallbackContext callbackContext = callbackContextArgumentResolver.resolve(executionContext);
 
-      if (error == null) {
-        return success(callbackContext);
-      } else {
-        String errorIdentifier = error.getErrorType().getIdentifier();
-        return isErrorGeneratingErrorResponse(errorIdentifier)
-            ? invocationError(error, callbackContext)
-            : responseError(error, callbackContext);
-      }
-    });
+    if (error == null) {
+      return success(callbackContext);
+    } else {
+      String errorIdentifier = error.getErrorType().getIdentifier();
+      return isErrorGeneratingErrorResponse(errorIdentifier)
+          ? invocationError(error, callbackContext)
+          : responseError(error, callbackContext);
+    }
   }
 
   private boolean isErrorGeneratingErrorResponse(String identifier) {

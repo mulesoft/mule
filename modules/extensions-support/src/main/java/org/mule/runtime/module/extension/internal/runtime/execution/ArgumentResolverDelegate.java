@@ -22,8 +22,20 @@ interface ArgumentResolverDelegate {
    * Returns an object array with the argument values of the given {@code executionContext}
    *
    * @param executionContext the {@link ExecutionContext context} of an {@link ComponentModel} being currently executed
-   * @param parameterTypes
+   * @param parameterTypes each argument's type
    * @return an object array
    */
-  Supplier<Object>[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes);
+  Object[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes);
+
+  /**
+   * Returns an array of {@link Supplier} of the argument values of the given {@code executionContext}.
+   * <p>
+   * Actual resolution of each argument is deferred until the {@link Supplier#get()} method is invoked on each supplier
+   *
+   * @param executionContext the {@link ExecutionContext context} of an {@link ComponentModel} being currently executed
+   * @param parameterTypes each argument's type
+   * @return a {@link Supplier} array
+   * @since 4.3.0
+   */
+  Supplier<Object>[] resolveDeferred(ExecutionContext executionContext, Class<?>[] parameterTypes);
 }

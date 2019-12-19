@@ -153,23 +153,6 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
     return resolverSet;
   }
 
-  /**
-   * Constructs a {@link ResolverSet} from the parameters, using {@link #toValueResolver(Object, Set)} to process the values.
-   *
-   * @return a {@link ResolverSet}
-   */
-  public ResolverSet getParametersAsHashedResolverSet(ParameterizedModel model, MuleContext muleContext)
-      throws ConfigurationException {
-
-    List<ParameterGroupModel> inlineGroups = getInlineGroups(model.getParameterGroupModels());
-    ResolverSet resolverSet =
-        getParametersAsHashedResolverSet(model, getFlatParameters(inlineGroups, model.getAllParameterModels()), muleContext);
-    for (ParameterGroupModel group : inlineGroups) {
-      getInlineGroupResolver(group, resolverSet, muleContext);
-    }
-    return resolverSet;
-  }
-
   private void getInlineGroupResolver(ParameterGroupModel group, ResolverSet resolverSet, MuleContext muleContext) {
     Optional<ParameterGroupDescriptor> descriptor = group.getModelProperty(ParameterGroupModelProperty.class)
         .map(ParameterGroupModelProperty::getDescriptor);
@@ -204,13 +187,6 @@ public final class ParametersResolver implements ObjectTypeParametersResolver {
       throws ConfigurationException {
     ResolverSet resolverSet = new ResolverSet(context);
     return getResolverSet(Optional.of(model), model.getParameterGroupModels(), parameters, resolverSet);
-  }
-
-  public ResolverSet getParametersAsHashedResolverSet(ParameterizedModel model, List<ParameterModel> parameterModels,
-                                                      MuleContext muleContext)
-      throws ConfigurationException {
-    ResolverSet resolverSet = new HashedResolverSet(muleContext);
-    return getResolverSet(Optional.of(model), model.getParameterGroupModels(), parameterModels, resolverSet);
   }
 
   public ResolverSet getParametersAsResolverSet(List<ParameterGroupModel> groups, List<ParameterModel> parameterModels,

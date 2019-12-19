@@ -11,8 +11,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 
-import java.util.function.Supplier;
-
 /**
  * {@link ArgumentResolver} for parameters which are of {@link Literal} type
  *
@@ -33,17 +31,15 @@ public class LiteralArgumentResolver<T> implements ArgumentResolver<Literal<T>> 
    * {@inheritDoc}
    */
   @Override
-  public Supplier<Literal<T>> resolve(ExecutionContext executionContext) {
-    return () -> {
-      Object value = argumentResolver.resolve(executionContext).get();
-      if (value instanceof Literal) {
-        return (Literal<T>) value;
-      } else if (value == null) {
-        return null;
-      }
+  public Literal<T> resolve(ExecutionContext executionContext) {
+    Object value = argumentResolver.resolve(executionContext);
+    if (value instanceof Literal) {
+      return (Literal<T>) value;
+    } else if (value == null) {
+      return null;
+    }
 
-      checkArgument(value instanceof String, "Resolved value was expected to be a String");
-      return new ImmutableLiteral<>((String) value, expectedType);
-    };
+    checkArgument(value instanceof String, "Resolved value was expected to be a String");
+    return new ImmutableLiteral<>((String) value, expectedType);
   }
 }

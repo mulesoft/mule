@@ -11,8 +11,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
-import java.util.function.Supplier;
-
 /**
  * {@link ArgumentResolver} which returns the {@link Error} in the {@link CoreEvent} associated to the given
  * {@link ExecutionContext}.
@@ -24,7 +22,7 @@ import java.util.function.Supplier;
 public final class ErrorArgumentResolver implements ArgumentResolver<Error> {
 
   @Override
-  public Supplier<Error> resolve(ExecutionContext executionContext) {
-    return () -> ((ExecutionContextAdapter) executionContext).getEvent().getError().orElse(null);
+  public Error resolve(ExecutionContext executionContext) {
+    return ((ExecutionContextAdapter) executionContext).getEvent().getError().orElse(null);
   }
 }

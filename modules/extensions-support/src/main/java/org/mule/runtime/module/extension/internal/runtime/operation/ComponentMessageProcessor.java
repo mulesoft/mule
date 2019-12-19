@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS;
@@ -31,12 +32,14 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ImmutableProcessorChainExecutor.INNER_CHAIN_CTX_MAPPING;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
@@ -52,6 +55,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -80,7 +84,6 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
@@ -89,18 +92,25 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
+import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.internal.runtime.streaming.CursorResetInterceptor;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -160,6 +170,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Inject
   private Collection<ExceptionContextProvider> exceptionContextProviders;
+
+  @Inject
+  private ExtensionConnectionSupplier extensionConnectionSupplier;
 
   private Function<Optional<ConfigurationInstance>, RetryPolicyTemplate> retryPolicyResolver;
   private String resolvedProcessorRepresentation;
@@ -405,7 +418,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         new LazyValue<>(() -> {
           CoreEvent initialiserEvent = null;
           try {
-            initialiserEvent = getInitialiserEvent();
+            initialiserEvent = getNullEvent();
             return ValueResolvingContext.builder(initialiserEvent, expressionManager)
                 .withConfig(getStaticConfiguration())
                 .build();
@@ -561,7 +574,38 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   protected ExecutionMediator createExecutionMediator() {
-    return new DefaultExecutionMediator(extensionModel, componentModel, connectionManager, errorTypeRepository);
+    return new DefaultExecutionMediator(extensionModel, componentModel, createInterceptorChain(), errorTypeRepository);
+  }
+
+  protected InterceptorChain createInterceptorChain() {
+    InterceptorChain.Builder chainBuilder = InterceptorChain.builder();
+
+    if (componentModel instanceof ConnectableComponentModel) {
+      if (((ConnectableComponentModel) componentModel).requiresConnection()) {
+        addConnectionInterceptors(chainBuilder);
+      }
+    }
+
+    return chainBuilder.build();
+  }
+
+  private void addConnectionInterceptors(InterceptorChain.Builder chainBuilder) {
+    chainBuilder.addInterceptor(new ConnectionInterceptor(extensionConnectionSupplier));
+
+    addCursorResetInterceptor(chainBuilder);
+  }
+
+  private void addCursorResetInterceptor(InterceptorChain.Builder chainBuilder) {
+    List<String> streamParams = new ArrayList<>(5);
+    componentModel.getAllParameterModels().forEach(
+                                                   p -> getType(p.getType(), getClassLoader(extensionModel))
+                                                       .filter(clazz -> InputStream.class.isAssignableFrom(clazz)
+                                                           || Iterator.class.isAssignableFrom(clazz))
+                                                       .ifPresent(clazz -> streamParams.add(p.getName())));
+
+    if (!streamParams.isEmpty()) {
+      chainBuilder.addInterceptor(new CursorResetInterceptor(streamParams));
+    }
   }
 
   /**
@@ -594,42 +638,25 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       throws MuleException {
     if (componentExecutor instanceof OperationArgumentResolverFactory) {
       ExecutionContextAdapter<T> delegateExecutionContext = createExecutionContext(eventBuilder.build());
-      PrecalculatedExecutionContextAdapter executionContext = new PrecalculatedExecutionContextAdapter(delegateExecutionContext,
-                                                                                                       componentExecutor);
+      PrecalculatedExecutionContextAdapter executionContext = new PrecalculatedExecutionContextAdapter(delegateExecutionContext);
 
       final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
-      List<Interceptor> interceptors = mediator.collectInterceptors(executionContext.getConfiguration(),
-                                                                    executionContext.getOperationExecutor());
-      InterceptorsExecutionResult beforeExecutionResult = mediator.before(executionContext, interceptors);
-      if (beforeExecutionResult.isOk()) {
+      Throwable throwable = mediator.applyBeforeInterceptors(executionContext);
+      if (throwable == null) {
         final Map<String, Supplier<Object>> resolvedArguments = ((OperationArgumentResolverFactory<T>) componentExecutor)
             .createArgumentResolver(componentModel)
             .apply(executionContext);
         afterConfigurer.accept(resolvedArguments, executionContext);
         executionContext.changeEvent(eventBuilder.build());
       } else {
-        disposeResolvedParameters(executionContext, interceptors);
-        throw new DefaultMuleException("Interception execution for operation not ok", beforeExecutionResult.getThrowable());
+        throw new DefaultMuleException("Interception execution for operation not ok", throwable);
       }
     }
   }
 
   @Override
   public void disposeResolvedParameters(ExecutionContext<T> executionContext) {
-    final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
-    List<Interceptor> interceptors = mediator.collectInterceptors(executionContext.getConfiguration(),
-                                                                  executionContext instanceof PrecalculatedExecutionContextAdapter
-                                                                      ? ((PrecalculatedExecutionContextAdapter) executionContext)
-                                                                          .getOperationExecutor()
-                                                                      : componentExecutor);
-
-    disposeResolvedParameters(executionContext, interceptors);
-  }
-
-  private void disposeResolvedParameters(ExecutionContext<T> executionContext, List<Interceptor> interceptors) {
-    final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
-
-    mediator.after(executionContext, null, interceptors);
+    ((DefaultExecutionMediator) executionMediator).applyAfterInterceptors(executionContext);
   }
 
   private ExecutionContextAdapter<T> createExecutionContext(CoreEvent event) throws MuleException {

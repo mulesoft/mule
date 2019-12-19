@@ -80,7 +80,7 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
     }
 
     return withContextClassLoader(getExtensionClassLoader(), () -> {
-      ResolverSet resolverSet = getParametersResolver().getParametersAsHashedResolverSet(configurationModel, muleContext);
+      ResolverSet resolverSet = getParametersResolver().getParametersAsResolverSet(configurationModel, muleContext);
       final ConnectionProviderValueResolver connectionProviderResolver = getConnectionProviderResolver();
       connectionProviderResolver.getResolverSet()
           .ifPresent((CheckedConsumer) resolver -> initialiseIfNeeded(resolver, true, muleContext));

@@ -79,17 +79,16 @@ public final class SoapOperationExecutor implements CompletableComponentExecutor
   public void execute(ExecutionContext<OperationModel> context, ExecutorCallback callback) {
     try {
       String serviceId = context.getParameter(SERVICE_PARAM);
-      ForwardingSoapClient connection = (ForwardingSoapClient) connectionResolver.resolve(context).get();
+      ForwardingSoapClient connection = (ForwardingSoapClient) connectionResolver.resolve(context);
       Map<String, String> customHeaders = connection.getCustomHeaders(serviceId, getOperation(context));
       SoapRequest request = getRequest(context, customHeaders);
       SoapClient soapClient = connection.getSoapClient(serviceId);
       SoapResponse response = connection.getExtensionsClientDispatcher(() -> extensionsClientArgumentResolver
-          .resolve(context)
-          .get())
+          .resolve(context))
           .map(d -> soapClient.consume(request, d))
           .orElseGet(() -> soapClient.consume(request));
 
-      callback.complete((response.getAsResult(streamingHelperArgumentResolver.resolve(context).get())));
+      callback.complete((response.getAsResult(streamingHelperArgumentResolver.resolve(context))));
     } catch (MessageTransformerException | TransformerException e) {
       callback.error(e);
     } catch (Exception e) {

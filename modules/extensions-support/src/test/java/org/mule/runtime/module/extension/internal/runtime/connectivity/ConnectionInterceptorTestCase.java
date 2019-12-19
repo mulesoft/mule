@@ -12,10 +12,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -78,17 +78,7 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase {
 
     when(operationContext.getTransactionConfig()).thenReturn(empty());
 
-    interceptor = new ConnectionInterceptor();
-    setupConnectionSupplier();
-  }
-
-  private void setupConnectionSupplier() throws Exception {
-    String connectionSupplierKey = "extensions.connection.supplier";
-
-    ((MuleContextWithRegistry) muleContext).getRegistry().unregisterObject(connectionSupplierKey);
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(connectionSupplierKey, connectionSupplier);
-    muleContext.getInjector().inject(interceptor);
-
+    interceptor = new ConnectionInterceptor(connectionSupplier);
     when(connectionSupplier.getConnection(operationContext)).thenReturn(connectionHandler);
   }
 

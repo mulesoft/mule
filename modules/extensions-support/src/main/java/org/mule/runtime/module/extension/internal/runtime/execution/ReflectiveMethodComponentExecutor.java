@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
-import static java.util.Arrays.stream;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.collection.SmallMap.forSize;
@@ -27,7 +26,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ReactiveReflectiveMethodOperationExecutor;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -48,20 +46,27 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
 
   private static class NoArgumentsResolverDelegate implements ArgumentResolverDelegate {
 
-    private static final Supplier[] EMPTY = new Supplier[] {};
+    private static final Object[] EMPTY = new Object[][] {};
+    private static final Supplier<Object>[] EMPTY_DEFERRED = new Supplier[] {};
 
     @Override
-    public Supplier<Object>[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
+    public Object[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
       return EMPTY;
+    }
+
+    @Override
+    public Supplier<Object>[] resolveDeferred(ExecutionContext executionContext, Class<?>[] parameterTypes) {
+      return EMPTY_DEFERRED;
     }
   }
 
-  private static final Logger LOGGER = getLogger(ReactiveReflectiveMethodOperationExecutor.class);
+  private static final Logger LOGGER = getLogger(ReflectiveMethodComponentExecutor.class);
   private static final ArgumentResolverDelegate NO_ARGS_DELEGATE = new NoArgumentsResolverDelegate();
 
   private final List<ParameterGroupModel> groups;
   private final Method method;
   private final int parameterCount;
+  private final Class<?>[] methodParameterTypes;
   private final Object componentInstance;
   private final ClassLoader extensionClassLoader;
 
@@ -72,20 +77,22 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
   public ReflectiveMethodComponentExecutor(List<ParameterGroupModel> groups, Method method, Object componentInstance) {
     this.groups = groups;
     this.method = method;
-    parameterCount = method.getParameterCount();
     this.componentInstance = componentInstance;
+    methodParameterTypes = method.getParameterTypes();
+    parameterCount = method.getParameterCount();
     extensionClassLoader = method.getDeclaringClass().getClassLoader();
   }
 
   public Object execute(ExecutionContext<M> executionContext) {
-    return withContextClassLoader(extensionClassLoader,
-                                  () -> invokeMethod(method, componentInstance,
-                                                     stream(getParameterValues(executionContext, method.getParameterTypes()))
-                                                         .map(Supplier::get).toArray(Object[]::new)));
-  }
+    final Thread currentThread = Thread.currentThread();
+    final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(extensionClassLoader);
 
-  private Supplier<Object>[] getParameterValues(ExecutionContext<M> executionContext, Class<?>[] parameterTypes) {
-    return argumentResolverDelegate.resolve(executionContext, parameterTypes);
+    try {
+      return invokeMethod(method, componentInstance, argumentResolverDelegate.resolve(executionContext, methodParameterTypes));
+    } finally {
+      currentThread.setContextClassLoader(currentClassLoader);
+    }
   }
 
   @Override
@@ -131,16 +138,14 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
 
   @Override
   public Function<ExecutionContext<M>, Map<String, Object>> createArgumentResolver(M operationModel) {
-    return ec -> withContextClassLoader(extensionClassLoader,
-                                        () -> {
-                                          final Object[] resolved =
-                                              getParameterValues(ec, method.getParameterTypes());
+    return ec -> withContextClassLoader(extensionClassLoader, () -> {
+      final Object[] resolved = argumentResolverDelegate.resolveDeferred(ec, methodParameterTypes);
 
-                                          final Map<String, Object> resolvedParams = forSize(parameterCount);
-                                          for (int i = 0; i < parameterCount; ++i) {
-                                            resolvedParams.put(method.getParameters()[i].getName(), resolved[i]);
-                                          }
-                                          return resolvedParams;
-                                        });
+      final Map<String, Object> resolvedParams = forSize(parameterCount);
+      for (int i = 0; i < parameterCount; ++i) {
+        resolvedParams.put(method.getParameters()[i].getName(), resolved[i]);
+      }
+      return resolvedParams;
+    });
   }
 }
