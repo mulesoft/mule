@@ -45,6 +45,11 @@ public class PartitionedInMemoryObjectStoreTestCase extends AbstractMuleTestCase
       }
     };
   }
+  
+  @Test
+  public void expireByTtlWithNegativeMaxEntriesAndEmptyStore() throws ObjectStoreException {
+    store.expire(1, -1, TEST_PARTITION);
+  }
 
   @Test
   public void expireByTtlMultipleKeysInsertedInTheSameNanoSecond() throws ObjectStoreException {

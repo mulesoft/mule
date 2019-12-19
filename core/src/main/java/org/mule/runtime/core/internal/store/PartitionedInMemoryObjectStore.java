@@ -176,7 +176,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
   }
 
   private void trimToMaxSize(ConcurrentLinkedQueue<ExpiryEntry> store, int maxEntries, ConcurrentMap<String, T> partition) {
-    if (maxEntries == UNBOUNDED) {
+    if (maxEntries < UNBOUNDED) {
       return;
     }
 
