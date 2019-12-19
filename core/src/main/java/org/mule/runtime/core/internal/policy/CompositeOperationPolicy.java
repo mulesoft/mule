@@ -134,7 +134,7 @@ public class CompositeOperationPolicy
    */
   @Override
   protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy lastPolicy) {
-    FluxSinkRecorder<Either<CoreEvent, Throwable>> sinkRecorder = new FluxSinkRecorder<>();
+    FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder = new FluxSinkRecorder<>();
     final Flux<CoreEvent> doOnNext = from(eventPub)
         .doOnNext(event -> {
           OperationPolicyContext ctx = from(event);
@@ -144,14 +144,14 @@ public class CompositeOperationPolicy
 
             @Override
             public void complete(Object value) {
-              sinkRecorder.next(left((CoreEvent) value, Throwable.class));
+              sinkRecorder.next(right(Throwable.class, (CoreEvent) value));
             }
 
             @Override
             public void error(Throwable e) {
               // if `sink.error` is called here, it will cancel the flux altogether. That's why an `Either` is used here, so the
               // error can be propagated afterwards in a way consistent with our expected error handling.
-              sinkRecorder.next(right(CoreEvent.class, mapError(e, event)));
+              sinkRecorder.next(left(mapError(e, event), CoreEvent.class));
             }
 
             private Throwable mapError(Throwable t, CoreEvent event) {
@@ -167,10 +167,10 @@ public class CompositeOperationPolicy
 
     return subscribeFluxOnPublisherSubscription(create(sinkRecorder)
         .map(result -> {
-          result.applyRight(t -> {
+          result.applyLeft(t -> {
             throw propagate(t);
           });
-          return result.getLeft();
+          return result.getRight();
         }), doOnNext)
             .doOnNext(response -> from(response).setNextOperationResponse((InternalEvent) response));
   }
