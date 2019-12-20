@@ -1395,7 +1395,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
         .setId(MULE_LOADER_ID).build());
     mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
-        .addProperty("type", "org.foo.goodbye.GoodbyeExtension")
+        .addProperty("type", "org.foo.goodbye.GoodByeExtension")
         .addProperty("version", "2.0.0");
     return new ArtifactPluginFileBuilder("goodbyeExtensionPlugin-1.0.0")
         .dependingOn(new JarFileBuilder("goodbyeExtensionV1", goodbyeExtensionV1JarFile))
