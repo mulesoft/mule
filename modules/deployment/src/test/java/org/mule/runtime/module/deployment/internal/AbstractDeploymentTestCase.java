@@ -319,8 +319,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         .compile("mule-module-hello-1.0.0.jar", "1.0.0");
 
     goodbyeExtensionV1JarFile = new ExtensionCompiler()
-        .compiling(getResourceFile("/org/foo/goodbye/GoodbyeConfiguration.java"),
-                   getResourceFile("/org/foo/goodbye/GoodbyeExtension.java"))
+        .compiling(getResourceFile("/org/foo/goodbye/GoodByeConfiguration.java"),
+                   getResourceFile("/org/foo/goodbye/GoodByeExtension.java"))
         .compile("mule-module-goodbye-1.0.0.jar", "1.0.0");
 
     helloExtensionV2JarFile = new ExtensionCompiler().compiling(getResourceFile("/org/foo/hello/HelloExtension.java"),
