@@ -246,7 +246,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private ReactiveProcessor dispatchToFlow() {
     return publisher -> from(publisher)
         .doOnNext(assertStarted())
-        .flatMap(routeThroughProcessingStrategy())
+        .flatMap(routeThroughProcessingStrategy2())
         // This replaces the onErrorContinue key if it exists, to prevent it from being propagated within the flow
         .compose(clearSubscribersErrorStrategy());
   }
@@ -265,6 +265,38 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         return context.put(KEY_ON_NEXT_ERROR_STRATEGY, onErrorContinue);
       }
       return context;
+    });
+  }
+
+  protected Function<CoreEvent, Publisher<? extends CoreEvent>> routeThroughProcessingStrategy2() {
+    return event -> Mono.create(_sink -> {
+      try {
+        // This accept/emit choice is made because there's a backpressure check done in the #emit sink message, which can be done
+        // preemptively as the maxConcurrency one, before policies execution. As previous implementation, use WAIT strategy as
+        // default. This check may not be needed anymore for ProactorStreamProcessingStrategy. See MULE-16988.
+        if (getSource() == null || getSource().getBackPressureStrategy() == WAIT) {
+          sink.accept(event);
+        } else {
+          final BackPressureReason emitFailReason = sink.emit(event);
+          if (emitFailReason != null) {
+            notifyBackpressureException(event, backPressureExceptions.get(emitFailReason));
+          }
+        }
+      } catch (RejectedExecutionException e) {
+        // Handle the case in which the event execution is rejected from the scheduler.
+        FlowBackPressureException wrappedException = createFlowBackPressureException(this.getName(), REQUIRED_SCHEDULER_BUSY, e);
+        notifyBackpressureException(event, wrappedException);
+      }
+
+      // // Retrieve response publisher before error is communicated
+      // // Subscribe the rest of reactor chain to response publisher, through which errors and responses will be emitted
+      ((BaseEventContext) event.getContext()).onResponse((e, t) -> {
+        if (t != null) {
+          _sink.error(t);
+        } else {
+          _sink.success(e);
+        }
+      });
     });
   }
 
