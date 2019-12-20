@@ -41,8 +41,6 @@ public class ExpressionTypedValueValueResolver<T> extends ExpressionValueResolve
 
   @Override
   public TypedValue<T> resolve(ValueResolvingContext context) throws MuleException {
-    initEvaluator();
-
     TypedValue<T> typedValue = resolveTypedValue(context);
     if (!isInstance(expectedClass, typedValue.getValue())) {
       DataType expectedDataType =
