@@ -246,7 +246,7 @@ final class LoggerContextCache implements Disposable {
    * Registers that a {@link MuleLoggerContext} is no longer under construction
    */
   private void endLoggerContextConstruction() {
-    setLoggerContextUnderConstruction(Boolean.FALSE);
+    isLoggerContextUnderConstruction.remove();
   }
 
   /**
