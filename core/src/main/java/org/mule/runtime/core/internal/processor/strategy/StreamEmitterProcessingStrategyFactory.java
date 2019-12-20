@@ -116,7 +116,9 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
             : MIN_VALUE;
 
     private final int sinksCount;
-    private final AtomicInteger activeEmittersCount = new AtomicInteger(0);
+    // This counter keeps track of how many sinks are created for fluxes that use this processing strategy.
+    // Using it, an eager stop of the schedulers is implmented in `stopSchedulersIfNeeded`
+    private final AtomicInteger activeSinksCount = new AtomicInteger(0);
 
     public StreamEmitterProcessingStrategy(int bufferSize,
                                            int subscribers,
@@ -138,7 +140,10 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     protected boolean stopSchedulersIfNeeded() {
-      boolean shouldStop = activeEmittersCount.updateAndGet(operand -> operand == 0 ? 0 : operand - 1) == 0;
+      // While there are active fluxes, the schedulers cannot be stopped because they are still being used.
+      // Moreover, the `complete` of the flux done during shutdown will require those schedulers active to correctly propagate it
+      // downstream
+      boolean shouldStop = activeSinksCount.updateAndGet(operand -> operand == 0 ? 0 : operand - 1) == 0;
 
       if (shouldStop) {
         try {
@@ -180,7 +185,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
         sinks.add(sink);
       }
 
-      activeEmittersCount.addAndGet(sinksCount);
+      activeSinksCount.addAndGet(sinksCount);
       return new RoundRobinReactorSink<>(sinks);
     }
 
@@ -198,7 +203,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
                                   stopSchedulersIfNeeded();
                                 });
 
-      activeEmittersCount.incrementAndGet();
+      activeSinksCount.incrementAndGet();
     }
 
     @Override
