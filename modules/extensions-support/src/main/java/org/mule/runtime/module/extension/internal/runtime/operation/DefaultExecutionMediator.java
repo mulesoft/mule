@@ -186,7 +186,14 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     Consumer<ExecutorCallback> executeCommand = callback -> {
       Throwable t = interceptorChain.before(context, callback);
       if (t == null) {
-        executor.execute(context, callback);
+        final Thread currentThread = Thread.currentThread();
+        final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+        currentThread.setContextClassLoader(extensionClassLoader);
+        try {
+          executor.execute(context, callback);
+        } finally {
+          currentThread.setContextClassLoader(currentClassLoader);
+        }
       }
     };
 
