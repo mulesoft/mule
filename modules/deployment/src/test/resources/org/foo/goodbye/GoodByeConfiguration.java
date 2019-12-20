@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.client.ExtensionsClient;
 import javax.inject.Inject;
 
 @Configuration(name = "config")
-public class GoodbyeConfiguration {
+public class GoodByeConfiguration {
 
   @Inject
   private ExtensionsClient extensionsClient;

@@ -16,14 +16,14 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
  * Extension for testing purposes
  */
 @Extension(name = "Goodbye")
-@Configurations({GoodbyeConfiguration.class})
+@Configurations({GoodByeConfiguration.class})
 @Xml(prefix = "goodbye")
-public class GoodbyeExtension {
+public class GoodByeExtension {
 
   @Parameter
   private String message;
 
-  public GoodbyeExtension() {
+  public GoodByeExtension() {
   }
 
 }
