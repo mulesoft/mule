@@ -38,11 +38,11 @@ import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.beans.ExceptionListener;
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract implementation of {@link FlowConstruct} that:
@@ -141,8 +141,8 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
       }
 
       lifecycleManager.fireDisposePhase((phaseName, object) -> {
-        doDispose();
         disposeIfDisposable(exceptionListener);
+        doDispose();
       });
     } catch (MuleException e) {
       LOGGER.error("Failed to stop service: " + name, e);

@@ -17,6 +17,10 @@ import org.mule.runtime.core.api.processor.Sink;
 
 import java.util.concurrent.RejectedExecutionException;
 
+import org.reactivestreams.Publisher;
+
+import reactor.core.publisher.Flux;
+
 /**
  * Determines how a list of message processors should processed.
  */
@@ -34,10 +38,21 @@ public interface ProcessingStrategy {
   Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline);
 
   /**
+   * For sinks created internally by the components in a flow, have them accounted for in the processing strategy for a graceful
+   * shutdown.
+   *
+   * @param flux the flux whose sink will be registered
+   * @param sinkRepresentation a representation of the chain for it to appear in log entries.
+   */
+  default void registerInternalSink(Publisher<CoreEvent> flux, String sinkRepresentation) {
+    Flux.from(flux).subscribe();
+  }
+
+  /**
    * Enrich {@link Processor} function by adding pre/post operators to implement processing strategy behaviour.
    *
    * @param pipeline processor representing the the pipeline.
-   * @return enriched pipeline function/
+   * @return enriched pipeline function
    */
   default ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
     return pipeline;

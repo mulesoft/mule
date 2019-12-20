@@ -48,9 +48,11 @@ import java.util.function.IntUnaryOperator;
 import java.util.function.LongUnaryOperator;
 import java.util.function.Supplier;
 
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 import reactor.core.publisher.EmitterProcessor;
+import reactor.core.publisher.Flux;
 
 /**
  * {@link AbstractStreamProcessingStrategyFactory} implementation for Reactor streams using a {@link EmitterProcessor}
@@ -114,8 +116,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
             : MIN_VALUE;
 
     private final int sinksCount;
-    private boolean sinkCreated = false;
-    private final AtomicInteger disposedEmittersCount = new AtomicInteger(0);
+    private final AtomicInteger activeEmittersCount = new AtomicInteger(0);
 
     public StreamEmitterProcessingStrategy(int bufferSize,
                                            int subscribers,
@@ -132,16 +133,12 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     public void dispose() {
-      if (!sinkCreated) {
-        stopSchedulersIfNeeded();
-      }
+      stopSchedulersIfNeeded();
     }
 
     @Override
     protected boolean stopSchedulersIfNeeded() {
-      boolean shouldStop = sinkCreated
-          ? disposedEmittersCount.addAndGet(1) == sinksCount
-          : true;
+      boolean shouldStop = activeEmittersCount.updateAndGet(operand -> operand == 0 ? 0 : operand - 1) == 0;
 
       if (shouldStop) {
         try {
@@ -165,7 +162,6 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
         EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(getBufferQueueSize());
         AtomicReference<Throwable> failedSubscriptionCause = new AtomicReference<>();
         processor.transform(function)
-            .doAfterTerminate(this::stopSchedulersIfNeeded)
             .subscribe(null, getThrowableConsumer(flowConstruct, completionLatch, failedSubscriptionCause),
                        () -> completionLatch.release());
 
@@ -175,14 +171,34 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
         ReactorSink<CoreEvent> sink =
             new DefaultReactorSink<>(processor.sink(BUFFER),
-                                     () -> awaitSubscribersCompletion(flowConstruct, shutdownTimeout, completionLatch,
-                                                                      currentTimeMillis()),
+                                     () -> {
+                                       awaitSubscribersCompletion(flowConstruct, shutdownTimeout, completionLatch,
+                                                                  currentTimeMillis());
+                                       stopSchedulersIfNeeded();
+                                     },
                                      onEventConsumer, getBufferQueueSize());
         sinks.add(sink);
       }
 
-      sinkCreated = true;
+      activeEmittersCount.addAndGet(sinksCount);
       return new RoundRobinReactorSink<>(sinks);
+    }
+
+    @Override
+    public void registerInternalSink(Publisher<CoreEvent> flux, String sinkRepresentation) {
+      Latch completionLatch = new Latch();
+
+      Flux.from(flux).subscribe(null, e -> {
+        LOGGER.error("Exception reached PS subscriber for " + sinkRepresentation, e);
+        completionLatch.release();
+        stopSchedulersIfNeeded();
+      },
+                                () -> {
+                                  completionLatch.release();
+                                  stopSchedulersIfNeeded();
+                                });
+
+      activeEmittersCount.incrementAndGet();
     }
 
     @Override
