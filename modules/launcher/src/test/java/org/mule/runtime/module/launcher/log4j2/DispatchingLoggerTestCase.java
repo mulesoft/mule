@@ -6,18 +6,24 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.LoggerStory.LOGGER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import io.qameta.allure.Features;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
+import io.qameta.allure.Feature;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -32,6 +38,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
+@Features({@Feature(CORE_COMPONENTS)})
+@Stories({@Story(LOGGER)})
 public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
   private static final String LOGGER_NAME = DispatchingLoggerTestCase.class.getName();
