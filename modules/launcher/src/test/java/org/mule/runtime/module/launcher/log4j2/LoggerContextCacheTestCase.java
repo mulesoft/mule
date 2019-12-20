@@ -21,8 +21,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 
 import io.qameta.allure.Feature;
-import io.qameta.allure.Features;
-import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
@@ -35,8 +33,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-@Features({@Feature(CORE_COMPONENTS)})
-@Stories({@Story(LOGGER)})
+@Feature(CORE_COMPONENTS)
+@Story(LOGGER)
 public class LoggerContextCacheTestCase {
 
   private ClassLoader currentClassLoader;

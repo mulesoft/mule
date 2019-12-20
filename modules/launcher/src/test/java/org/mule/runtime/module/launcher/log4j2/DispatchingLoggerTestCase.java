@@ -20,8 +20,6 @@ import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import io.qameta.allure.Features;
-import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
 import io.qameta.allure.Feature;
 import org.apache.logging.log4j.Level;
@@ -38,8 +36,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-@Features({@Feature(CORE_COMPONENTS)})
-@Stories({@Story(LOGGER)})
+@Feature(CORE_COMPONENTS)
+@Story(LOGGER)
 public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
   private static final String LOGGER_NAME = DispatchingLoggerTestCase.class.getName();
