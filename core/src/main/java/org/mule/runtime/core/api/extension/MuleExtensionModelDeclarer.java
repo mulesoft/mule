@@ -866,6 +866,13 @@ class MuleExtensionModelDeclarer {
         .describedAs("The default error handler for every flow. This must be a reference to a global error handler.");
 
     configuration.onDefaultParameterGroup()
+        .withOptionalParameter("inheritIterableRepeatability")
+        .ofType(typeLoader.load(boolean.class))
+        .defaultingTo(false)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("Whether streamed iterable objects should follow the repeatability strategy of the iterable or use the default one.");
+
+    configuration.onDefaultParameterGroup()
         .withOptionalParameter("shutdownTimeout")
         .ofType(typeLoader.load(Integer.class))
         .withExpressionSupport(NOT_SUPPORTED)

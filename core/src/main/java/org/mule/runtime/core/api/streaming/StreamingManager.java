@@ -10,8 +10,11 @@ import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.bytes.ByteStreamingManager;
+import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.api.streaming.object.ObjectStreamingManager;
 
 import java.io.Closeable;
@@ -103,4 +106,18 @@ public interface StreamingManager {
    */
   @Deprecated
   void manage(InputStream inputStream, CoreEvent creatorEvent);
+
+  /**
+   * Given a {@link CursorProviderFactory} that is either a {@link CursorStreamProviderFactory} or a {@link CursorIteratorProviderFactory},
+   * returns the pair of provider factories that must be used for streaming bytes and objects. This way, when you are given
+   * a provider factory for streaming objects, but those objects are or have a stream of bytes, you will also have the appropriate
+   * provider factory for those streams to be managed.
+   *
+   * @param provider the provider for which you want the correspondent byte and object providers.
+   * @return a pair of {@link CursorProviderFactory}s to be used, one for streaming bytes, and the other for streaming objects
+   *
+   * @since 4.3
+   */
+  Pair<CursorStreamProviderFactory, CursorIteratorProviderFactory> getPairFor(CursorProviderFactory provider);
+
 }

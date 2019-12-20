@@ -28,10 +28,13 @@ import org.mule.runtime.extension.api.annotation.param.reference.FlowReference;
 import org.mule.runtime.extension.api.annotation.param.stereotype.ComponentId;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
+import org.mule.test.marvel.model.Relic;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -128,6 +131,44 @@ public class DrStrangeOperations {
         if (timesClosed > 1) {
           throw new RuntimeException("Expected to be closed only once but was called twice");
         }
+      }
+    };
+  }
+
+  public PagingProvider<MysticConnection, Relic> getRelics(StreamingHelper streamingHelper) {
+    return new PagingProvider<MysticConnection, Relic>() {
+
+      private int currentPage = 1;
+      private final int PAGES = 4;
+
+      @Override
+      public List<Relic> getPage(MysticConnection connection) {
+        if (currentPage == PAGES) {
+          return emptyList();
+        }
+        currentPage++;
+        return new ArrayList<Relic>() {
+
+          {
+            add(getResolvedRelic("cloak"));
+            add(getResolvedRelic("boots"));
+            add(getResolvedRelic("staff"));
+          }
+        };
+      }
+
+      private Relic getResolvedRelic(String description) {
+        return new Relic(streamingHelper.resolveCursorProvider(new ByteArrayInputStream(description.getBytes())));
+      }
+
+      @Override
+      public java.util.Optional<Integer> getTotalResults(MysticConnection connection) {
+        return java.util.Optional.empty();
+      }
+
+      @Override
+      public void close(MysticConnection connection) throws MuleException {
+        // Do nothing.
       }
     };
   }

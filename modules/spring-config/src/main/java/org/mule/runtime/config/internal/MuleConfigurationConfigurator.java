@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal;
 
+import static java.lang.Boolean.parseBoolean;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 
@@ -111,6 +112,10 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
     config.setDynamicConfigExpiration(dynamicConfigExpiration);
   }
 
+  public void setInheritIterableRepeatability(String inheritIterableRepeatability) {
+    config.setInheritIterableRepeatability(inheritIterableRepeatability);
+  }
+
   public void setExtensions(List<ConfigurationExtension> extensions) {
     config.addExtensions(extensions);
   }
@@ -130,6 +135,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
       defaultConfig.addExtensions(config.getExtensions());
       defaultConfig.setMaxQueueTransactionFilesSize(config.getMaxQueueTransactionFilesSizeInMegabytes());
       defaultConfig.setDynamicConfigExpiration(config.getDynamicConfigExpiration());
+      defaultConfig.setInheritIterableRepeatability(config.isInheritIterableRepeatability());
       applyDefaultIfNoObjectSerializerSet(defaultConfig);
 
       return configuration;

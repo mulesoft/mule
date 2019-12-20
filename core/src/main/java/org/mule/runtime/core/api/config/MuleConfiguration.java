@@ -141,4 +141,10 @@ public interface MuleConfiguration {
    */
   boolean isThreadLoggingEnabled();
 
+  /**
+   * @return whether streaming iterable items should follow the iterable repeatability
+   * @since 4.3
+   */
+  boolean isInheritIterableRepeatability();
+
 }
