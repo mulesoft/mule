@@ -60,6 +60,7 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
     }
   }
 
+
   private static final Logger LOGGER = getLogger(ReflectiveMethodComponentExecutor.class);
   private static final ArgumentResolverDelegate NO_ARGS_DELEGATE = new NoArgumentsResolverDelegate();
 
@@ -84,15 +85,7 @@ public class ReflectiveMethodComponentExecutor<M extends ComponentModel>
   }
 
   public Object execute(ExecutionContext<M> executionContext) {
-    final Thread currentThread = Thread.currentThread();
-    final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-    currentThread.setContextClassLoader(extensionClassLoader);
-
-    try {
-      return invokeMethod(method, componentInstance, argumentResolverDelegate.resolve(executionContext, methodParameterTypes));
-    } finally {
-      currentThread.setContextClassLoader(currentClassLoader);
-    }
+    return invokeMethod(method, componentInstance, argumentResolverDelegate.resolve(executionContext, methodParameterTypes));
   }
 
   @Override
