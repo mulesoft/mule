@@ -93,11 +93,10 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
   protected abstract ByteBuffer doGet(long position, int length);
 
   protected int consumeStream(ByteBuffer buffer) throws IOException {
-    final int maxLen = buffer.remaining();
     final byte[] dest = buffer.array();
 
     int totalRead = 0;
-    int remaining = maxLen;
+    int remaining = buffer.remaining();
     int offset = buffer.position();
 
     while (remaining > 0) {
