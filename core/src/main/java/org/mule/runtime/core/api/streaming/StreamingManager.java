@@ -108,6 +108,11 @@ public interface StreamingManager {
   void manage(InputStream inputStream, CoreEvent creatorEvent);
 
   /**
+   * Given a {@link CursorProviderFactory} that is either a {@link CursorStreamProviderFactory} or a {@link CursorIteratorProviderFactory},
+   * returns the pair of provider factories that must be used for streaming bytes and objects. This way, when you are given
+   * a provider factory for streaming objects, but those objects are or have a stream of bytes, you will also have the appropriate
+   * provider factory for those streams to be managed.
+   *
    * @param provider the provider for which you want the correspondent byte and object providers.
    * @return a pair of {@link CursorProviderFactory}s to be used, one for streaming bytes, and the other for streaming objects
    *

@@ -224,8 +224,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
       cursorStreamProviderFactory = (CursorStreamProviderFactory) provider;
       cursorIteratorProviderFactory = forObjects().getDefaultCursorProviderFactory();
     } else {
-      cursorStreamProviderFactory = forBytes().getDefaultCursorProviderFactory();
-      cursorIteratorProviderFactory = forObjects().getDefaultCursorProviderFactory();
+      throw new IllegalArgumentException("The given cursor provider factory must be either a CursorStreamProviderFactory or a CursorIteratorProviderFactory");
     }
     return new Pair<>(cursorStreamProviderFactory, cursorIteratorProviderFactory);
   }
