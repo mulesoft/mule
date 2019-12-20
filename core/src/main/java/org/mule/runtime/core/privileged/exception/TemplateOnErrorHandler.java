@@ -75,6 +75,7 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
@@ -112,9 +113,16 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private boolean isLocalErrorHandlerLocation;
   private ComponentLocation location;
 
+  private Supplier<FluxSink<CoreEvent>> fluxFactory;
   private Supplier<FluxSink<CoreEvent>> routingSink;
 
   private final class OnErrorHandlerFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
+
+    private final Optional<ProcessingStrategy> processingStrategy;
+
+    public OnErrorHandlerFluxObjectFactory(Optional<ProcessingStrategy> processingStrategy) {
+      this.processingStrategy = processingStrategy;
+    }
 
     @Override
     public FluxSink<CoreEvent> get() {
@@ -134,7 +142,11 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
           })
           .doOnNext(TemplateOnErrorHandler.this::resolveHandling);
 
-      onErrorFlux.subscribe();
+      if (processingStrategy.isPresent()) {
+        processingStrategy.get().registerInternalSink(onErrorFlux, "error handler '" + getLocation().getLocation() + "'");
+      } else {
+        onErrorFlux.subscribe();
+      }
       return sinkRef.getFluxSink();
     }
 
@@ -289,6 +301,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     configuredMessageProcessors =
         buildNewChainWithListOfProcessors(processingStrategy, getMessageProcessors(), NullExceptionHandler.getInstance());
 
+    fluxFactory = new OnErrorHandlerFluxObjectFactory(processingStrategy);
+
     errorTypeMatcher = createErrorType(errorTypeRepository, errorType, configurationProperties);
     if (!inDefaultErrorHandler()) {
       errorHandlerLocation = this.location.getLocation();
@@ -303,16 +317,15 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   public void start() throws MuleException {
     super.start();
-    OnErrorHandlerFluxObjectFactory factory = new OnErrorHandlerFluxObjectFactory();
     routingSink =
-        new TransactionAwareFluxSinkSupplier<>(factory,
-                                               new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(), factory));
+        new TransactionAwareFluxSinkSupplier<>(fluxFactory,
+                                               new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(), fluxFactory));
   }
 
   @Override
   public void dispose() {
-    super.dispose();
     disposeIfNeeded(routingSink, logger);
+    super.dispose();
   }
 
   public static ErrorTypeMatcher createErrorType(ErrorTypeRepository errorTypeRepository, String errorTypeNames,

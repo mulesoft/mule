@@ -23,6 +23,8 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
 import java.util.concurrent.RejectedExecutionException;
 
+import org.reactivestreams.Publisher;
+
 /**
  * Base class for {@link ProcessingStrategy} decorators.
  * <p>
@@ -42,6 +44,11 @@ public abstract class ProcessingStrategyDecorator implements ProcessingStrategy,
   @Override
   public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
     return delegate.createSink(flowConstruct, pipeline);
+  }
+
+  @Override
+  public void registerInternalSink(Publisher<CoreEvent> flux, String sinkRepresentation) {
+    delegate.registerInternalSink(flux, sinkRepresentation);
   }
 
   @Override

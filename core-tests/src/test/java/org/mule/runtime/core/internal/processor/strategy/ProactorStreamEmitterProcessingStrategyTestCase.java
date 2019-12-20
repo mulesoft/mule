@@ -25,6 +25,7 @@ import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -54,7 +55,9 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
@@ -62,6 +65,7 @@ import org.mule.runtime.core.internal.construct.FlowBackPressureMaxConcurrencyEx
 import org.mule.runtime.core.internal.construct.FlowBackPressureRequiredSchedulerBusyException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory.ProactorStreamEmitterProcessingStrategy;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -73,16 +77,18 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InOrder;
 import org.slf4j.Logger;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+import reactor.core.publisher.Flux;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(PROACTOR)
@@ -755,6 +761,61 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     stopIfNeeded(ps);
     disposeIfNeeded(ps, LOGGER);
 
+    final InOrder inOrder = inOrder(cpuLight, cpuIntensive, blocking);
+    inOrder.verify(cpuLight).stop();
+    inOrder.verify(blocking).stop();
+    inOrder.verify(cpuIntensive).stop();
+  }
+
+  @Test
+  public void schedulersStoppedOnFluxesComplete() throws MuleException {
+    flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
+    flow.initialise();
+    flow.start();
+
+    cpuLight = spy(cpuLight);
+    blocking = spy(blocking);
+    cpuIntensive = spy(cpuIntensive);
+
+    final ProcessingStrategy ps = createProcessingStrategy(muleContext, "schedulersStoppedInOrder");
+
+    startIfNeeded(ps);
+
+    final Sink sink = ps.createSink(flow, flow);
+
+    disposeIfNeeded(sink, LOGGER);
+
+    final InOrder inOrder = inOrder(cpuLight, cpuIntensive, blocking);
+    inOrder.verify(cpuLight).stop();
+    inOrder.verify(blocking).stop();
+    inOrder.verify(cpuIntensive).stop();
+  }
+
+  @Test
+  public void schedulersStoppedOnInternalFluxesComplete() throws MuleException {
+    flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
+    flow.initialise();
+    flow.start();
+
+    cpuLight = spy(cpuLight);
+    blocking = spy(blocking);
+    cpuIntensive = spy(cpuIntensive);
+
+    final ProcessingStrategy ps = createProcessingStrategy(muleContext, "schedulersStoppedInOrder");
+
+    startIfNeeded(ps);
+
+    final Sink sink = ps.createSink(flow, flow);
+
+    final FluxSinkRecorder<CoreEvent> internalSink = new FluxSinkRecorder<>();
+    ps.registerInternalSink(Flux.create(internalSink), "internalSink");
+
+    disposeIfNeeded(sink, LOGGER);
+    verify(cpuLight, never()).stop();
+    verify(blocking, never()).stop();
+    verify(cpuIntensive, never()).stop();
+
+    internalSink.complete();
     final InOrder inOrder = inOrder(cpuLight, cpuIntensive, blocking);
     inOrder.verify(cpuLight).stop();
     inOrder.verify(blocking).stop();

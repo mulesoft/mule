@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.mule.runtime.api.notification.FlowConstructNotification.FLOW_CONSTRUCT_DISPOSED;
+import static org.mule.runtime.api.notification.FlowConstructNotification.FLOW_CONSTRUCT_STOPPED;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.internal.policy.SourcePolicyContext.SOURCE_POLICY_CONTEXT;
@@ -239,7 +239,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
 
       @Override
       public void onNotification(FlowConstructNotification notification) {
-        if (Integer.parseInt(notification.getAction().getIdentifier()) == FLOW_CONSTRUCT_DISPOSED) {
+        if (Integer.parseInt(notification.getAction().getIdentifier()) == FLOW_CONSTRUCT_STOPPED) {
           LOGGER.debug("Invalidating flow from caches named {}", notification.getResourceIdentifier());
           // Invalidate flow from caches
           invalidateDisposedFlowFromCaches(notification.getResourceIdentifier());
