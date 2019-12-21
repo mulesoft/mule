@@ -255,6 +255,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static File helloExtensionV1JarFile;
 
+  protected static File goodbyeExtensionV1JarFile;
+
   private static File helloExtensionV2JarFile;
 
   protected static File loadsAppResourceCallbackClassFile;
@@ -316,6 +318,11 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                    "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties")
         .compile("mule-module-hello-1.0.0.jar", "1.0.0");
 
+    goodbyeExtensionV1JarFile = new ExtensionCompiler()
+        .compiling(getResourceFile("/org/foo/goodbye/GoodByeConfiguration.java"),
+                   getResourceFile("/org/foo/goodbye/GoodByeExtension.java"))
+        .compile("mule-module-goodbye-1.0.0.jar", "1.0.0");
+
     helloExtensionV2JarFile = new ExtensionCompiler().compiling(getResourceFile("/org/foo/hello/HelloExtension.java"),
                                                                 getResourceFile("/org/foo/hello/HelloOperation.java"))
         .compile("mule-module-hello-2.0.0.jar", "2.0.0");
@@ -347,6 +354,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       .dependingOn(new JarFileBuilder("echoTestJar", echoTestJarFile));
   protected final ArtifactPluginFileBuilder helloExtensionV1Plugin = createHelloExtensionV1PluginFileBuilder();
   protected final ArtifactPluginFileBuilder helloExtensionV2Plugin = createHelloExtensionV2PluginFileBuilder();
+  protected final ArtifactPluginFileBuilder goodbyeExtensionV1Plugin = createGoodbyeExtensionV1PluginFileBuilder();
 
   protected final ArtifactPluginFileBuilder exceptionThrowingPlugin = createExceptionThrowingPluginFileBuilder();
 
@@ -1376,6 +1384,21 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         .addProperty("version", "2.0.0");
     return new ArtifactPluginFileBuilder("helloExtensionPlugin-2.0.0")
         .dependingOn(new JarFileBuilder("helloExtensionV2", helloExtensionV2JarFile))
+        .describedBy((mulePluginModelBuilder.build()));
+  }
+
+  private ArtifactPluginFileBuilder createGoodbyeExtensionV1PluginFileBuilder() {
+    MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName("goodbyeExtensionPlugin").setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("goodbyeExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "2.0.0"));
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder()
+        .setId(MULE_LOADER_ID).build());
+    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
+        .addProperty("type", "org.foo.goodbye.GoodByeExtension")
+        .addProperty("version", "2.0.0");
+    return new ArtifactPluginFileBuilder("goodbyeExtensionPlugin-1.0.0")
+        .dependingOn(new JarFileBuilder("goodbyeExtensionV1", goodbyeExtensionV1JarFile))
         .describedBy((mulePluginModelBuilder.build()));
   }
 
