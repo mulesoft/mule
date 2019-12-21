@@ -8,8 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_MEL_AS_DEFAULT;
 import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -48,6 +49,7 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements Express
   private Class<T> type;
   private boolean melDefault;
   private boolean melAvailable;
+  private TypeSafeExpressionValueResolver<T> delegateResolver;
 
   public ExpressionBasedParameterResolverValueResolver(String expression, Class<T> type, DataType expectedDataType) {
     this.expression = expression;
@@ -59,6 +61,15 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements Express
   public void initialise() throws InitialisationException {
     melDefault = valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false"));
     melAvailable = registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED).isPresent();
+
+    delegateResolver = new TypeSafeExpressionValueResolver<>(expression, type, expectedDataType);
+    delegateResolver.setExtendedExpressionManager(extendedExpressionManager);
+    delegateResolver.setTransformationService(transformationService);
+    delegateResolver.setMuleContext(muleContext);
+    delegateResolver.setMelDefault(melDefault);
+    delegateResolver.setMelAvailable(melAvailable);
+
+    delegateResolver.initialise();
   }
 
   /**
@@ -66,16 +77,7 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements Express
    */
   @Override
   public ParameterResolver<T> resolve(ValueResolvingContext context) throws MuleException {
-    ExpressionBasedParameterResolver<T> resolver =
-        new ExpressionBasedParameterResolver<>(expression, type, context, expectedDataType);
-    resolver.setTransformationService(transformationService);
-    resolver.setExtendedExpressionManager(extendedExpressionManager);
-    resolver.setMuleContext(muleContext);
-    resolver.setMelAvailable(melAvailable);
-    resolver.setMelDefault(melDefault);
-
-    resolver.initialise();
-    return resolver;
+    return new ExpressionBasedParameterResolver<>(expression, delegateResolver, context);
   }
 
   /**
