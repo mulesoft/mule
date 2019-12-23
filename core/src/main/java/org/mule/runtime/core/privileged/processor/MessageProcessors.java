@@ -486,14 +486,13 @@ public class MessageProcessors {
                 return eventPub.flatMap(event -> internalProcessWithChildContext(event, processor, completeParentIfEmpty));
               } else {
                 FluxSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
+                final FluxSinkRecorderToReactorSinkAdapter<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRefAdapter =
+                    new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef);
                 Set<BaseEventContext> seenContexts = newSetFromMap(new WeakHashMap<BaseEventContext, Boolean>());
 
                 return Flux.from(eventChildCtxPub)
-                    .doOnNext(eventChildCtx -> {
-                      childContextResponseHandler(eventChildCtx,
-                                                  new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef),
-                                                  completeParentIfEmpty);
-                    })
+                    .doOnNext(eventChildCtx -> childContextResponseHandler(eventChildCtx, errorSwitchSinkSinkRefAdapter,
+                                                                           completeParentIfEmpty))
                     .transform(processor)
                     .doOnNext(completeSuccessIfNeeded())
                     .map(event -> right(MessagingException.class, event))

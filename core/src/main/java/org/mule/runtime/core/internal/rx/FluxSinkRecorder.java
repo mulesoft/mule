@@ -20,64 +20,115 @@ import reactor.core.publisher.FluxSink;
  */
 public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
 
-  private volatile FluxSink<T> fluxSink;
-
-  // If a fluxSink as not yet been accepted, events are buffered until one is accepted
-  private final List<Runnable> bufferedEvents = new ArrayList<>();
+  private volatile FluxSinkRecorderDelegate<T> delegate = new NotYetAcceptedDelegate<>();
 
   @Override
   public void accept(FluxSink<T> fluxSink) {
-    synchronized (this) {
-      this.fluxSink = fluxSink;
-    }
-    bufferedEvents.forEach(e -> e.run());
+    FluxSinkRecorderDelegate<T> previousDelegate = this.delegate;
+    delegate = new DirectDelegate<>(fluxSink);
+    previousDelegate.accept(fluxSink);
   }
 
   public FluxSink<T> getFluxSink() {
-    return fluxSink;
+    return delegate.getFluxSink();
   }
 
   public void next(T response) {
-    boolean present = true;
-    synchronized (this) {
-      if (fluxSink == null) {
-        present = false;
-        bufferedEvents.add(() -> fluxSink.next(response));
-      }
-    }
-
-    if (present) {
-      fluxSink.next(response);
-    }
+    delegate.next(response);
   }
 
   public void error(Throwable error) {
-    boolean present = true;
-    synchronized (this) {
-      if (fluxSink == null) {
-        present = false;
-        bufferedEvents.add(() -> fluxSink.error(error));
-      }
-    }
-
-    if (present) {
-      fluxSink.error(error);
-    }
+    delegate.error(error);
   }
 
   public void complete() {
-    boolean present = true;
-    synchronized (this) {
-      if (fluxSink == null) {
-        present = false;
-        bufferedEvents.add(() -> {
-          fluxSink.complete();
-        });
+    delegate.complete();
+  }
+
+  private interface FluxSinkRecorderDelegate<T> extends Consumer<FluxSink<T>> {
+
+    public FluxSink<T> getFluxSink();
+
+    public void next(T response);
+
+    public void error(Throwable error);
+
+    public void complete();
+
+  }
+
+  private static class NotYetAcceptedDelegate<T> implements FluxSinkRecorderDelegate<T> {
+
+    // If a fluxSink as not yet been accepted, events are buffered until one is accepted
+    private final List<Consumer<FluxSink<T>>> bufferedEvents = new ArrayList<>();
+
+    @Override
+    public void accept(FluxSink<T> t) {
+      synchronized (bufferedEvents) {
+        bufferedEvents.forEach(e -> e.accept(t));
+        bufferedEvents.clear();
       }
     }
 
-    if (present) {
+    @Override
+    public FluxSink<T> getFluxSink() {
+      return null;
+    }
+
+    @Override
+    public void next(T response) {
+      synchronized (bufferedEvents) {
+        bufferedEvents.add(fluxSink -> fluxSink.next(response));
+      }
+    }
+
+    @Override
+    public void error(Throwable error) {
+      synchronized (bufferedEvents) {
+        bufferedEvents.add(fluxSink -> fluxSink.error(error));
+      }
+    }
+
+    @Override
+    public void complete() {
+      synchronized (bufferedEvents) {
+        bufferedEvents.add(fluxSink -> fluxSink.complete());
+      }
+    }
+  }
+
+  private static class DirectDelegate<T> implements FluxSinkRecorderDelegate<T> {
+
+    private final FluxSink<T> fluxSink;
+
+    public DirectDelegate(FluxSink<T> fluxSink) {
+      this.fluxSink = fluxSink;
+    }
+
+    @Override
+    public void accept(FluxSink<T> t) {
+      // Nothing to do
+    }
+
+    @Override
+    public FluxSink<T> getFluxSink() {
+      return fluxSink;
+    }
+
+    @Override
+    public void next(T response) {
+      fluxSink.next(response);
+    }
+
+    @Override
+    public void error(Throwable error) {
+      fluxSink.error(error);
+    }
+
+    @Override
+    public void complete() {
       fluxSink.complete();
     }
+
   }
 }
