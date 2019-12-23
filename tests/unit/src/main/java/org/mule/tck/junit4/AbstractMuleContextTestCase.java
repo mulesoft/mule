@@ -203,6 +203,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       if (LIFECYCLE_EXCEPTION_COMPONENT_FIELD != null) {
         LIFECYCLE_EXCEPTION_COMPONENT_FIELD.set(e, null);
       }
+      throw e;
     } finally {
       if (workingDirectoryOldValue != null) {
         System.setProperty(WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY, workingDirectoryOldValue);
