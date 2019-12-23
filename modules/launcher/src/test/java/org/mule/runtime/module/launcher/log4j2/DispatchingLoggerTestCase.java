@@ -8,8 +8,10 @@ package org.mule.runtime.module.launcher.log4j2;
 
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,6 +38,7 @@ import org.mockito.junit.MockitoRule;
 public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
   private static final String LOGGER_NAME = DispatchingLoggerTestCase.class.getName();
+
   private static final String MESSAGE = "Hello Log!";
 
   @Rule
@@ -50,23 +53,32 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
   private Logger originalLogger;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private LoggerContext loggerContext;
+  private LoggerContext containerLoggerContext;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private ContextSelector contextSelector;
 
+  @Mock
+  private ArtifactAwareContextSelector artifactAwareContextSelector;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private MessageFactory messageFactory;
+
+  @Mock
+  RegionClassLoader regionClassLoader;
+
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  LoggerContext regionClassLoaderLoggerContext;
 
   private Logger logger;
 
   @Before
   public void before() {
     currentClassLoader = Thread.currentThread().getContextClassLoader();
-    when(loggerContext.getConfiguration().getLoggerConfig(anyString()).getLevel()).thenReturn(Level.INFO);
-
+    when(containerLoggerContext.getConfiguration().getLoggerConfig(anyString()).getLevel()).thenReturn(Level.INFO);
     logger =
-        new DispatchingLogger(originalLogger, currentClassLoader.hashCode(), loggerContext, contextSelector, messageFactory) {
+        new DispatchingLogger(originalLogger, currentClassLoader.hashCode(), containerLoggerContext, contextSelector,
+                              messageFactory) {
 
           @Override
           public String getName() {
@@ -97,4 +109,37 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
       verify(contextSelector).getContext(LOGGER_NAME, regionClassLoader, true);
     });
   }
+
+  @Test
+  public void whenRecursiveLoggerContextInstantiationExceptionExpectFallbackUsingContainerClassLoader() {
+    // Expected Loggers
+    Logger containerLogger = mock(Logger.class);
+    Logger regionClassLoaderLogger = mock(Logger.class);
+    when(containerLoggerContext.getLogger(anyString(), any())).thenReturn(containerLogger);
+    when(regionClassLoaderLoggerContext.getLogger(anyString(), any())).thenReturn(regionClassLoaderLogger);
+    when(artifactAwareContextSelector.getContextWithResolvedContextClassLoader(currentClassLoader))
+        .thenAnswer(invocation -> containerLoggerContext);
+    // Triggers of the expected Loggers
+    when(artifactAwareContextSelector.getContextWithResolvedContextClassLoader(regionClassLoader))
+        .thenThrow(RecursiveLoggerContextInstantiationException.class)
+        .thenAnswer(invocation -> regionClassLoaderLoggerContext);
+    // Class under test
+    DispatchingLogger dispatchingLogger = new DispatchingLogger(originalLogger, currentClassLoader.hashCode(),
+                                                                containerLoggerContext, artifactAwareContextSelector,
+                                                                messageFactory) {
+
+      @Override
+      public String getName() {
+        return LOGGER_NAME;
+      }
+    };
+    // Test and assertions
+    withContextClassLoader(regionClassLoader, () -> {
+      dispatchingLogger.info("Fallback Test Message");
+      dispatchingLogger.info("Test Message");
+    });
+    verify(containerLogger, times(1)).info("Fallback Test Message");
+    verify(regionClassLoaderLogger, times(1)).info("Test Message");
+  }
+
 }
