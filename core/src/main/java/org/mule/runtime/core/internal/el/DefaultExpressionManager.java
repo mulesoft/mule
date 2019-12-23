@@ -16,11 +16,13 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.config.MuleProperties.isMelDefault;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
@@ -65,6 +67,9 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public static final int DW_PREFIX_LENGTH = (DW_PREFIX + PREFIX_EXPR_SEPARATOR).length();
   private static final Logger LOGGER = getLogger(DefaultExpressionManager.class);
 
+  @Inject
+  private ConfigurationProperties properties;
+
   private final OneTimeWarning parseWarning = new OneTimeWarning(LOGGER,
                                                                  "Expression parsing is deprecated, regular expressions should be used instead.");
 
@@ -87,7 +92,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
     final ExtendedExpressionLanguageAdaptor dwExpressionLanguage =
         registry.lookupByType(DefaultExpressionLanguageFactoryService.class)
-            .map(s -> new LazyExpressionLanguageAdaptor(() -> new DataWeaveExpressionLanguageAdaptor(muleContext, registry, s)))
+            .map(this::createExpressionLanguageAdaptor)
             .orElse(null);
 
     if (isMelDefault() || registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED).isPresent()) {
@@ -120,6 +125,19 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     if (melDefault) {
       LOGGER.warn("Using MEL as the default expression language.");
     }
+  }
+
+  private ExtendedExpressionLanguageAdaptor createExpressionLanguageAdaptor(DefaultExpressionLanguageFactoryService service) {
+    if (isLazyInitMode(properties)) {
+      return new LazyExpressionLanguageAdaptor(() -> createWeaveExpressionLanguageAdaptor(service));
+    }
+
+    return createWeaveExpressionLanguageAdaptor(service);
+  }
+
+  private DataWeaveExpressionLanguageAdaptor createWeaveExpressionLanguageAdaptor(
+                                                                                  DefaultExpressionLanguageFactoryService service) {
+    return new DataWeaveExpressionLanguageAdaptor(muleContext, registry, service);
   }
 
   @Override

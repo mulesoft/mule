@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
+
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.exception.MuleException;
 
@@ -64,15 +65,10 @@ public class RequiredParameterValueResolverWrapper<T> extends LifecycleAwareValu
   @Override
   public T resolve(ValueResolvingContext context) throws MuleException {
     T value = super.resolve(context);
-    if (value == null && !isLazyInit()) {
+    if (value == null && !isLazyInitMode(properties)) {
       throw new IllegalArgumentException(errorMessage);
     }
 
     return value;
   }
-
-  private Boolean isLazyInit() {
-    return properties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
-  }
-
 }

@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectComponentLocation;
@@ -129,7 +129,7 @@ public final class SourceConfigurer {
       if (configuredSource instanceof PollingSource) {
         ValueResolver<?> valueResolver = resolverSet.getResolvers().get(SCHEDULING_STRATEGY_PARAMETER_NAME);
         if (valueResolver == null) {
-          if (!lazyInit()) {
+          if (!isLazyInitMode(properties)) {
             throw new IllegalStateException("The scheduling strategy has not been configured");
           }
         } else {
@@ -154,9 +154,5 @@ public final class SourceConfigurer {
         context.close();
       }
     }
-  }
-
-  private Boolean lazyInit() {
-    return properties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
   }
 }
