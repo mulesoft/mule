@@ -937,4 +937,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
      */
     SOURCE
   }
+
+  @Override
+  protected boolean isGracefulShutdown() {
+    return true;
+  }
+
 }

@@ -299,7 +299,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                                                  ((BaseEventContext) event.getContext()).onResponse((e, t) -> {
                                                    if (t != null) {
                                                      sinkRecorder.next(left(t, CoreEvent.class));
-                                                   } else {
+                                                   } else if (e != null) {
                                                      sinkRecorder.next(right(Throwable.class, e));
                                                    }
                                                  });
@@ -332,7 +332,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
                                                }),
                                            () -> sinkRecorder.complete(), t -> sinkRecorder.error(t),
-                                           muleContext.getConfiguration().getShutdownTimeout(), completionCallbackScheduler);
+                                           muleContext.getConfiguration().getShutdownTimeout(),
+                                           completionCallbackScheduler);
   }
 
   protected Function<CoreEvent, Publisher<? extends CoreEvent>> routeThroughProcessingStrategyOld() {
