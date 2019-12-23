@@ -45,8 +45,8 @@ abstract class AbstractSinkRouter {
    */
   List<Flux<CoreEvent>> collectPublishers() {
     List<Flux<CoreEvent>> routes = new ArrayList<>();
-    for (Iterator routesIterator = this.routes.iterator(); routesIterator.hasNext();) {
-      ExecutableRoute nextRoute = (ExecutableRoute) routesIterator.next();
+    for (Iterator<ExecutableRoute> routesIterator = this.routes.iterator(); routesIterator.hasNext();) {
+      ExecutableRoute nextRoute = routesIterator.next();
       if (routesIterator.hasNext()) {
         routes.add(nextRoute.getPublisher());
       } else {

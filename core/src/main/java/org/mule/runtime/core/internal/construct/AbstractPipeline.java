@@ -383,10 +383,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     return stream -> from(stream)
         .doOnNext(beforeProcessors())
         .transform(processingStrategy.onPipeline(pipeline))
-        .log()
-        .doOnComplete(() -> {
-          System.err.println("");
-        })
         .doOnNext(afterProcessors())
         .onErrorContinue(MessagingException.class,
                          (me, e) -> ((BaseEventContext) (((MessagingException) me).getEvent().getContext())).error(me));
