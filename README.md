@@ -13,7 +13,7 @@ Transform
 =========
 Mule transformers are the key to exchanging data between nodes, as they allow Mule to convert message payload data to a format that another application can understand. Mule also enables content enrichment of messages which allows you to retrieve additional data during processing and attach it to the message.
 
-Process
+Process 
 =======
 Mule uses components to conduct backend processes for specific business logic (like checking the customer and inventory databases). Then, the components route messages to the correct application (such as an order fulfillment system). Importantly, components don't have to have any Mule-specific code; they can simply be POJOs, Spring beans, Java beans, Groovy scripts, or web services containing the business logic for processing data. Components can even be developed in other languages such as Python, JavaScript, Ruby, and PHP. Mule’s catalog of building blocks includes the most commonly used Enterprise Integration Patterns.
 
