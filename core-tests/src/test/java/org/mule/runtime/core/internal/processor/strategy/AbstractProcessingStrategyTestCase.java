@@ -560,7 +560,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow.initialise();
     flow.start();
     processFlow(eventSupplier.call());
-    assertThat(schedulers, schedulerNameMatcher);
+    assertThat(schedulers.toString(), schedulers, schedulerNameMatcher);
   }
 
   protected CoreEvent processFlow(CoreEvent event) throws Exception {
@@ -852,8 +852,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       Flux<CoreEvent> schedulerTrackingPublisher = from(publisher)
-          .doOnEach(signal -> signal.getContext().getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY)
-              .ifPresent(sch -> schedulers.add(((Scheduler) sch).getName())));
+          .doOnEach(signal -> {
+            signal.getContext().getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY)
+                .ifPresent(sch -> schedulers.add(((Scheduler) sch).getName()));
+          });
 
       if (getProcessingType() == CPU_LITE_ASYNC) {
         return from(schedulerTrackingPublisher).transform(processorPublisher -> Processor.super.apply(schedulerTrackingPublisher))
