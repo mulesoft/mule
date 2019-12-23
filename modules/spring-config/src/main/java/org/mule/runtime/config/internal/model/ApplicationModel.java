@@ -347,7 +347,7 @@ public class ApplicationModel {
     // and crafted declared extension models)
     resolveComponentTypes();
     resolveTypedComponentIdentifier(extensionModelHelper);
-    executeOnEveryMuleComponentTree(componentModel -> new ComponentLocationVisitor().accept(componentModel));
+    executeOnEveryMuleComponentTree(componentModel -> new ComponentLocationVisitor(extensionModelHelper).accept(componentModel));
   }
 
   private void indexComponentModels() {
