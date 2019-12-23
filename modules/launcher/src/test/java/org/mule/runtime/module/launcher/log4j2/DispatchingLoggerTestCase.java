@@ -53,7 +53,7 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
   private Logger originalLogger;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private LoggerContext loggerContext;
+  private LoggerContext containerLoggerContext;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private ContextSelector contextSelector;
@@ -75,9 +75,10 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
   @Before
   public void before() {
     currentClassLoader = Thread.currentThread().getContextClassLoader();
-    when(loggerContext.getConfiguration().getLoggerConfig(anyString()).getLevel()).thenReturn(Level.INFO);
+    when(containerLoggerContext.getConfiguration().getLoggerConfig(anyString()).getLevel()).thenReturn(Level.INFO);
     logger =
-        new DispatchingLogger(originalLogger, currentClassLoader.hashCode(), loggerContext, contextSelector, messageFactory) {
+        new DispatchingLogger(originalLogger, currentClassLoader.hashCode(), containerLoggerContext, contextSelector,
+                              messageFactory) {
 
           @Override
           public String getName() {
@@ -110,21 +111,22 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void whenRecursiveLoggerContextInstantiationExceptionExpectFallbackDispatchUsingSystemClassLoader() {
+  public void whenRecursiveLoggerContextInstantiationExceptionExpectFallbackUsingContainerClassLoader() {
     // Expected Loggers
-    Logger currentClassLoaderLogger = mock(Logger.class);
+    Logger containerLogger = mock(Logger.class);
     Logger regionClassLoaderLogger = mock(Logger.class);
-    when(loggerContext.getLogger(any(), any())).thenReturn(currentClassLoaderLogger);
+    when(containerLoggerContext.getLogger(any(), any())).thenReturn(containerLogger);
     when(regionClassLoaderLoggerContext.getLogger(any(), any())).thenReturn(regionClassLoaderLogger);
     when(artifactAwareContextSelector.getContextWithResolvedContextClassLoader(currentClassLoader))
-        .thenAnswer(invocation -> loggerContext);
+        .thenAnswer(invocation -> containerLoggerContext);
     // Triggers of the expected Loggers
     when(artifactAwareContextSelector.getContextWithResolvedContextClassLoader(regionClassLoader))
         .thenThrow(RecursiveLoggerContextInstantiationException.class)
         .thenAnswer(invocation -> regionClassLoaderLoggerContext);
     // Class under test
     DispatchingLogger dispatchingLogger = new DispatchingLogger(originalLogger, currentClassLoader.hashCode(),
-                                                                loggerContext, artifactAwareContextSelector, messageFactory) {
+                                                                containerLoggerContext, artifactAwareContextSelector,
+                                                                messageFactory) {
 
       @Override
       public String getName() {
@@ -136,7 +138,7 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
       dispatchingLogger.info("Fallback Test Message");
       dispatchingLogger.info("Test Message");
     });
-    verify(currentClassLoaderLogger, times(1)).info("Fallback Test Message");
+    verify(containerLogger, times(1)).info("Fallback Test Message");
     verify(regionClassLoaderLogger, times(1)).info("Test Message");
   }
 

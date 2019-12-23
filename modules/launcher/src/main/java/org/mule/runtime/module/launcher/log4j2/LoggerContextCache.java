@@ -9,6 +9,7 @@ package org.mule.runtime.module.launcher.log4j2;
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.lang.ThreadLocal.withInitial;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
 
@@ -55,7 +56,7 @@ final class LoggerContextCache implements Disposable {
 
   private static final long DEFAULT_DISPOSE_DELAY_IN_MILLIS = 15000;
 
-  private static final ThreadLocal<Boolean> isLoggerContextUnderConstruction = ThreadLocal.withInitial(() -> Boolean.FALSE);
+  private static final ThreadLocal<Boolean> isLoggerContextUnderConstruction = withInitial(() -> Boolean.FALSE);
   private final ArtifactAwareContextSelector artifactAwareContextSelector;
   // Extra cache layer to avid some nasty implications for using Guava cache at this point. See the comments in
   // #doGetLoggerContext(final ClassLoader classLoader) for details.
@@ -117,11 +118,10 @@ final class LoggerContextCache implements Disposable {
           startLoggerContextConstruction(classLoader);
           try {
             ctx = doGetLoggerContext(classLoader, key);
-            endLoggerContextConstruction();
           } catch (ExecutionException e) {
             throw new MuleRuntimeException(createStaticMessage("Could not init logger context "), e);
           } finally {
-            // LoggerContext construction has failed, so the under construction flag must be unset
+            // LoggerContext construction has failed. The under construction flag must be unset
             endLoggerContextConstruction();
           }
         }
