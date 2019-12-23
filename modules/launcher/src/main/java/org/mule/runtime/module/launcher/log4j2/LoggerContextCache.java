@@ -9,6 +9,7 @@ package org.mule.runtime.module.launcher.log4j2;
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.lang.ThreadLocal.withInitial;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
 
@@ -55,6 +56,7 @@ final class LoggerContextCache implements Disposable {
 
   private static final long DEFAULT_DISPOSE_DELAY_IN_MILLIS = 15000;
 
+  private static final ThreadLocal<Boolean> isLoggerContextUnderConstruction = withInitial(() -> Boolean.FALSE);
   private final ArtifactAwareContextSelector artifactAwareContextSelector;
   // Extra cache layer to avid some nasty implications for using Guava cache at this point. See the comments in
   // #doGetLoggerContext(final ClassLoader classLoader) for details.
@@ -96,23 +98,34 @@ final class LoggerContextCache implements Disposable {
     disposeDelayInMillis = Long.getLong(MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS, DEFAULT_DISPOSE_DELAY_IN_MILLIS);
   }
 
+  /**
+   * Returns the {@link MuleLoggerContext} for a given {@link ClassLoader}, maintaining an internal cache.
+   * @param classLoader {@link MuleLoggerContext} owner {@link ClassLoader}
+   * @return Cached {@link MuleLoggerContext} instance.
+   * @throws RecursiveLoggerContextInstantiationException If the {@link MuleLoggerContext} that should be returned is
+   * already under construction (indicates recursive {{@link #getLoggerContext(ClassLoader)}} call).
+   */
   LoggerContext getLoggerContext(final ClassLoader classLoader) {
     LoggerContext ctx;
-    try {
-      final int key = computeKey(classLoader);
-      // If possible, avoid using Guava cache since the callable puts unwanted pressure on the garbage collector.
-      ctx = builtContexts.get(key);
-
-      if (ctx == null) {
-        synchronized (this) {
-          ctx = builtContexts.get(key);
-          if (ctx == null) {
+    final int key = computeKey(classLoader);
+    // If possible, avoid using Guava cache since the callable puts unwanted pressure on the garbage collector.
+    ctx = builtContexts.get(key);
+    if (ctx == null) {
+      synchronized (this) {
+        ctx = builtContexts.get(key);
+        if (ctx == null) {
+          // LoggerContext construction is flagged in order to prevent recursion
+          startLoggerContextConstruction(classLoader);
+          try {
             ctx = doGetLoggerContext(classLoader, key);
+          } catch (ExecutionException e) {
+            throw new MuleRuntimeException(createStaticMessage("Could not init logger context "), e);
+          } finally {
+            // LoggerContext construction has failed. The under construction flag must be unset
+            endLoggerContextConstruction();
           }
         }
       }
-    } catch (ExecutionException e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not init logger context "), e);
     }
 
     if (ctx.getState() == LifeCycle.State.INITIALIZED) {
@@ -214,4 +227,41 @@ final class LoggerContextCache implements Disposable {
     disposedContexts.invalidateAll();
     disposedContexts.cleanUp();
   }
+
+  /**
+   * Registers that a {@link MuleLoggerContext} is under construction, rejecting recursive calls
+   * @param classLoader {@link ClassLoader} that owns the {@link MuleLoggerContext}
+   * @throws RecursiveLoggerContextInstantiationException if a {@link MuleLoggerContext} is already under construction for the given {@link ClassLoader}
+   */
+  private void startLoggerContextConstruction(ClassLoader classLoader) {
+    if (isLoggerContextUnderConstruction()) {
+      throw new RecursiveLoggerContextInstantiationException(String
+          .format("A LoggerContext is already under construction for ClassLoader: %s", classLoader));
+    } else {
+      setLoggerContextUnderConstruction(Boolean.TRUE);
+    }
+  }
+
+  /**
+   * Registers that a {@link MuleLoggerContext} is no longer under construction
+   */
+  private void endLoggerContextConstruction() {
+    isLoggerContextUnderConstruction.remove();
+  }
+
+  /**
+   * @return True if a {@link MuleLoggerContext} is under construction
+   */
+  private boolean isLoggerContextUnderConstruction() {
+    return isLoggerContextUnderConstruction.get();
+  }
+
+  /**
+   * {{@link #isLoggerContextUnderConstruction}} setter method
+   * @param loggerContextUnderConstruction value to set
+   */
+  private void setLoggerContextUnderConstruction(Boolean loggerContextUnderConstruction) {
+    isLoggerContextUnderConstruction.set(loggerContextUnderConstruction);
+  }
+
 }
