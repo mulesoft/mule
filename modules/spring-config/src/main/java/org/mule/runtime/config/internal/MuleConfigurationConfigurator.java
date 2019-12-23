@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.config.internal;
 
-import static java.lang.Boolean.parseBoolean;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -126,7 +125,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory impl
     if (configuration instanceof DefaultMuleConfiguration) {
       DefaultMuleConfiguration defaultConfig = (DefaultMuleConfiguration) configuration;
       // First of all set the lazyInit mode or not to allow modifications to the configuration
-      defaultConfig.setLazyInit(configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false));
+      defaultConfig.setLazyInit(isLazyInitMode(configurationProperties));
 
       defaultConfig.setDefaultResponseTimeout(config.getDefaultResponseTimeout());
       defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());

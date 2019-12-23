@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
-import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.isLazyInitMode;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.isChildKey;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.unwrapChildKey;
 
@@ -92,11 +92,7 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponen
   }
 
   private ParametersResolver parametersResolverFromValues(MuleContext muleContext) {
-    return ParametersResolver.fromValues(parameters, muleContext, isLazyModeEnabled(), reflectionCache, expressionManager);
-  }
-
-  protected boolean isLazyModeEnabled() {
-    return properties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY).orElse(false);
+    return ParametersResolver.fromValues(parameters, muleContext, isLazyInitMode(properties), reflectionCache, expressionManager);
   }
 
   public Map<String, Object> getParameters() {
