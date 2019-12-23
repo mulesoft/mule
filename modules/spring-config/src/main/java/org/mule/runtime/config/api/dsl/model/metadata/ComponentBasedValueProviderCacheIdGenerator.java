@@ -6,13 +6,9 @@
  */
 package org.mule.runtime.config.api.dsl.model.metadata;
 
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
@@ -38,33 +34,6 @@ public class ComponentBasedValueProviderCacheIdGenerator implements ValueProvide
                                                                String parameterName) {
     checkArgument(componentConfiguration != null, "Cannot generate a Cache Key for a 'null' component");
     return elementModelFactory.create(componentConfiguration)
-        .flatMap(m -> {
-          if (isConnection(m)) {
-            return getConnectionModel(m).flatMap(connection -> delegate.getIdForResolvedValues(connection, parameterName));
-          }
-          return delegate.getIdForResolvedValues(m, parameterName);
-        });
+        .flatMap(m -> delegate.getIdForResolvedValues(m, parameterName));
   }
-
-  private boolean isConnection(DslElementModel<?> componentDslModel) {
-    return componentDslModel.getModel() instanceof ConnectionProviderModel;
-  }
-
-  private Optional<DslElementModel> getConnectionModel(DslElementModel<?> componentDslModel) {
-    if (componentDslModel.getModel() instanceof ComponentModel) {
-      return elementModelFactory.create(((ComponentModel) componentDslModel.getModel()).getParent().getConfiguration())
-          .flatMap(
-                   configModel -> configModel
-                       .getContainedElements()
-                       .stream()
-                       .filter(contained -> contained.getModel() instanceof ConnectionProviderModel)
-                       .findAny()
-
-      );
-    }
-    return empty();
-  }
-
-
-
 }
