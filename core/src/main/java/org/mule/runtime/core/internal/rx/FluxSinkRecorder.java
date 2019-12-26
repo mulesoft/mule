@@ -59,40 +59,68 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
 
   private static class NotYetAcceptedDelegate<T> implements FluxSinkRecorderDelegate<T> {
 
+    private volatile FluxSink<T> fluxSink;
+
     // If a fluxSink as not yet been accepted, events are buffered until one is accepted
-    private final List<Consumer<FluxSink<T>>> bufferedEvents = new ArrayList<>();
+    private final List<Runnable> bufferedEvents = new ArrayList<>();
 
     @Override
-    public void accept(FluxSink<T> t) {
-      synchronized (bufferedEvents) {
-        bufferedEvents.forEach(e -> e.accept(t));
-        bufferedEvents.clear();
+    public void accept(FluxSink<T> fluxSink) {
+      synchronized (this) {
+        this.fluxSink = fluxSink;
       }
+      bufferedEvents.forEach(e -> e.run());
     }
 
     @Override
     public FluxSink<T> getFluxSink() {
-      return null;
+      return fluxSink;
     }
 
     @Override
     public void next(T response) {
-      synchronized (bufferedEvents) {
-        bufferedEvents.add(fluxSink -> fluxSink.next(response));
+      boolean present = true;
+      synchronized (this) {
+        if (fluxSink == null) {
+          present = false;
+          bufferedEvents.add(() -> fluxSink.next(response));
+        }
+      }
+
+      if (present) {
+        fluxSink.next(response);
       }
     }
 
     @Override
     public void error(Throwable error) {
-      synchronized (bufferedEvents) {
-        bufferedEvents.add(fluxSink -> fluxSink.error(error));
+      boolean present = true;
+      synchronized (this) {
+        if (fluxSink == null) {
+          present = false;
+          bufferedEvents.add(() -> fluxSink.error(error));
+        }
+      }
+
+      if (present) {
+        fluxSink.error(error);
       }
     }
 
     @Override
     public void complete() {
-      synchronized (bufferedEvents) {
-        bufferedEvents.add(fluxSink -> fluxSink.complete());
+      boolean present = true;
+      synchronized (this) {
+        if (fluxSink == null) {
+          present = false;
+          bufferedEvents.add(() -> {
+            fluxSink.complete();
+          });
+        }
+      }
+
+      if (present) {
+        fluxSink.complete();
       }
     }
   }

@@ -23,7 +23,6 @@ import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SC
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
-import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createFlowBackPressureException;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.ON_NEXT_FAILURE_STRATEGY;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
@@ -81,7 +80,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -259,8 +257,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private ReactiveProcessor dispatchToFlow() {
     return publisher -> from(publisher)
         .doOnNext(assertStarted())
-        // .transform(routeThroughProcessingStrategy())
-        .flatMap(routeThroughProcessingStrategyOld())
+        .transform(routeThroughProcessingStrategy())
         .compose(clearSubscribersErrorStrategy());
   }
 
@@ -282,7 +279,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   protected Function<Publisher<CoreEvent>, Publisher<CoreEvent>> routeThroughProcessingStrategy() {
-    final FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder = new FluxSinkRecorder<>();
+    FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder = new FluxSinkRecorder<>();
 
     return eventPub -> propagateCompletion(eventPub,
                                            create(sinkRecorder)
@@ -304,64 +301,54 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                                                      sinkRecorder.next(right(Throwable.class, e));
                                                    }
                                                  });
+                                               })
 
-                                                 try {
-                                                   // This accept/emit choice is made because there's a
-                                                   // backpressure check done in the #emit sink message, which can
-                                                   // be done preemptively as the maxConcurrency one, before policies
-                                                   // execution. As previous implementation, use WAIT strategy as
-                                                   // default. This check may not be needed anymore for
-                                                   // ProactorStreamProcessingStrategy. See MULE-16988.
-                                                   if (getSource() == null
-                                                       || getSource().getBackPressureStrategy() == WAIT) {
-                                                     sink.accept(event);
-                                                   } else {
+                                               // This accept/emit choice is made because there's a
+                                               // backpressure check done in the #emit sink message, which can
+                                               // be done preemptively as the maxConcurrency one, before policies
+                                               // execution. As previous implementation, use WAIT strategy as
+                                               // default. This check may not be needed anymore for
+                                               // ProactorStreamProcessingStrategy. See MULE-16988.
+                                               .doOnNext(getSource() == null || getSource().getBackPressureStrategy() == WAIT
+                                                   ? sink::accept
+                                                   : event -> {
                                                      final BackPressureReason emitFailReason = sink.emit(event);
                                                      if (emitFailReason != null) {
-                                                       notifyBackpressureException(event, backPressureExceptions
-                                                           .get(emitFailReason));
+                                                       notifyBackpressureException(event,
+                                                                                   backPressureExceptions.get(emitFailReason));
                                                      }
-                                                   }
-                                                 } catch (RejectedExecutionException ree) {
-                                                   // Handle the case in which the event execution is rejected from
-                                                   // the scheduler.
-                                                   notifyBackpressureException(event,
-                                                                               createFlowBackPressureException(this.getName(),
-                                                                                                               REQUIRED_SCHEDULER_BUSY,
-                                                                                                               ree));
-                                                 }
-
-                                               }),
+                                                   }),
                                            () -> sinkRecorder.complete(), t -> sinkRecorder.error(t),
                                            muleContext.getConfiguration().getShutdownTimeout(),
                                            completionCallbackScheduler);
   }
 
   protected Function<CoreEvent, Publisher<? extends CoreEvent>> routeThroughProcessingStrategyOld() {
-    return event -> {
-      // Retrieve response publisher before error is communicated
-      Publisher<CoreEvent> responsePublisher = ((BaseEventContext) event.getContext()).getResponsePublisher();
-      try {
-        // This accept/emit choice is made because there's a backpressure check done in the #emit sink message, which can be done
-        // preemptively as the maxConcurrency one, before policies execution. As previous implementation, use WAIT strategy as
-        // default. This check may not be needed anymore for ProactorStreamProcessingStrategy. See MULE-16988.
-        if (getSource() == null || getSource().getBackPressureStrategy() == WAIT) {
-          sink.accept(event);
-        } else {
-          final BackPressureReason emitFailReason = sink.emit(event);
-          if (emitFailReason != null) {
-            notifyBackpressureException(event, backPressureExceptions.get(emitFailReason));
-          }
-        }
-      } catch (RejectedExecutionException e) {
-        // Handle the case in which the event execution is rejected from the scheduler.
-        FlowBackPressureException wrappedException = createFlowBackPressureException(this.getName(), REQUIRED_SCHEDULER_BUSY, e);
-        notifyBackpressureException(event, wrappedException);
-      }
+    // This accept/emit choice is made because there's a backpressure check done in the #emit sink message, which can be done
+    // preemptively as the maxConcurrency one, before policies execution. As previous implementation, use WAIT strategy as
+    // default. This check may not be needed anymore for ProactorStreamProcessingStrategy. See MULE-16988.
+    if (getSource() == null || getSource().getBackPressureStrategy() == WAIT) {
+      return event -> {
+        Publisher<CoreEvent> responsePublisher = ((BaseEventContext) event.getContext()).getResponsePublisher();
 
-      // Subscribe the rest of reactor chain to response publisher, through which errors and responses will be emitted
-      return Mono.from(responsePublisher);
-    };
+        sink.accept(event);
+
+        // Subscribe the rest of reactor chain to response publisher, through which errors and responses will be emitted
+        return Mono.from(responsePublisher);
+      };
+    } else {
+      return event -> {
+        Publisher<CoreEvent> responsePublisher = ((BaseEventContext) event.getContext()).getResponsePublisher();
+
+        final BackPressureReason emitFailReason = sink.emit(event);
+        if (emitFailReason != null) {
+          notifyBackpressureException(event, backPressureExceptions.get(emitFailReason));
+        }
+
+        // Subscribe the rest of reactor chain to response publisher, through which errors and responses will be emitted
+        return Mono.from(responsePublisher);
+      };
+    }
   }
 
   /**
