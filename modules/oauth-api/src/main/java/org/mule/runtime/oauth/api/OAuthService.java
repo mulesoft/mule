@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.oauth.api;
 
+import org.mule.api.annotation.Experimental;
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
 import org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder;
+import org.mule.runtime.oauth.api.builder.OAuthPlatformManagedDancerBuilder;
 
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
-import org.mule.api.annotation.NoImplement;
 
 /**
  * Allows for creation of OAuth dancer implementations for the supported grant types:
@@ -58,4 +60,9 @@ public interface OAuthService extends Service {
                                                                                   Map<String, T> tokensStore,
                                                                                   MuleExpressionLanguage expressionEvaluator);
 
+  @Experimental
+  default OAuthPlatformManagedDancerBuilder platformManagedOAuthDancerBuilder(LockFactory lockFactory,
+                                                                              MuleExpressionLanguage expressionEvaluator) {
+    throw new UnsupportedOperationException("Platform Managed OAuth is only supported in the Enterprise Edition");
+  }
 }
