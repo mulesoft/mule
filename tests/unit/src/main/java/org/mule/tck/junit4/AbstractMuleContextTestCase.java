@@ -30,6 +30,7 @@ import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -61,6 +62,7 @@ import org.mule.tck.config.TestServicesConfigurationBuilder;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +86,23 @@ import org.slf4j.Logger;
 public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   private static final Logger LOGGER = getLogger(AbstractMuleContextTestCase.class);
+
+  private static Field LIFECYCLE_EXCEPTION_COMPONENT_FIELD;
+
+  /**
+   * This is stored in order to clean the field in case a {@link LifecycleException} is thrown by the {@link MuleContext}s creation.
+   * Since the component keeps a reference to the {@link MuleContext}, and JUnit stores all thrown exceptions, if there are multiple failures
+   * with this cause in a row, it will cause an OOM Exception.
+   */
+  static {
+    try {
+      LIFECYCLE_EXCEPTION_COMPONENT_FIELD = LifecycleException.class.getDeclaredField("component");
+      LIFECYCLE_EXCEPTION_COMPONENT_FIELD.setAccessible(true);
+    } catch (NoSuchFieldException | SecurityException e) {
+      LOGGER.warn("Could not find LifecycleException's 'component' field: " + e.getMessage());
+    }
+  }
+
   public static final String WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY = "workingDirectory";
 
   public TestServicesConfigurationBuilder testServicesConfigurationBuilder;
@@ -177,6 +196,12 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       }
 
       doSetUp();
+    } catch (LifecycleException e) {
+      //Set to null in order to clean references to the muleContext and avoid OOM errors.
+      if (LIFECYCLE_EXCEPTION_COMPONENT_FIELD != null) {
+        LIFECYCLE_EXCEPTION_COMPONENT_FIELD.set(e, null);
+      }
+      throw e;
     } finally {
       if (workingDirectoryOldValue != null) {
         System.setProperty(WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY, workingDirectoryOldValue);
