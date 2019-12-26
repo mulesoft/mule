@@ -39,7 +39,6 @@ import java.util.Optional;
 import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * Creates instances of {@link Flow} with a default implementation
@@ -218,9 +217,13 @@ public class DefaultFlowBuilder implements Builder {
       return pub -> from(pub)
           .doOnNext(assertStarted())
           // Insert the incoming event into the flow, routing it through the processing strategy
-          .flatMap(routeThroughProcessingStrategyOld()
-              // Don't propagate errors, these will be handled by parent flow through the EventContext hierarchy mechanism
-              .andThen(alreadyRoutedProcessor -> Mono.from(alreadyRoutedProcessor).onErrorResume(e -> Mono.empty())));
+          .transform(routeThroughProcessingStrategy())
+          // .flatMap(routeThroughProcessingStrategyOld()
+          // // Don't propagate errors, these will be handled by parent flow through the EventContext hierarchy mechanism
+          // .andThen(alreadyRoutedProcessor -> Mono.from(alreadyRoutedProcessor).onErrorResume(e -> Mono.empty())))
+          .onErrorContinue((t, e) -> {
+            // Don't propagate errors, these will be handled by parent flow through the EventContext hierarchy mechanism
+          });
     }
 
     /**
@@ -229,12 +232,7 @@ public class DefaultFlowBuilder implements Builder {
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher)
-          .doOnNext(assertStarted())
-          // Insert the incoming event into the flow, routing it through the processing strategy
-          .flatMap(routeThroughProcessingStrategyOld())
-          // .transform(routeThroughProcessingStrategy())
-          // Don't handle errors, these will be handled by parent flow
-          .onErrorStop();
+          .transform(referenced());
     }
 
     /**
