@@ -460,6 +460,10 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
 
   @Test
   public void metadataKeyWithValidDefaultValues() {
+    mockMetadataResolverFactory(sourceModel,
+                                new DefaultMetadataResolverFactory(NULL_RESOLVER_SUPPLIER, emptyMap(), MOCK_RESOLVER_SUPPLIER,
+                                                                   NULL_RESOLVER_SUPPLIER));
+
     ParameterModel param1 = getMockKeyPartParam("Value", 1);
     ParameterModel param2 = getMockKeyPartParam("SomeValue", 2);
     setInvalidKeyId();
@@ -469,10 +473,25 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
 
   @Test
   public void metadataKeyWithoutDefaultValues() {
+    mockMetadataResolverFactory(sourceModel,
+                                new DefaultMetadataResolverFactory(NULL_RESOLVER_SUPPLIER, emptyMap(), MOCK_RESOLVER_SUPPLIER,
+                                                                   NULL_RESOLVER_SUPPLIER));
+
     ParameterModel param1 = getMockKeyPartParam(null, 1);
     ParameterModel param2 = getMockKeyPartParam(null, 2);
     setInvalidKeyId();
     when(sourceModel.getAllParameterModels()).thenReturn(asList(param1, param2));
+    validate(extensionModel, validator);
+  }
+
+  @Test
+  public void metadataKeyIdWithoutTypeResolver() {
+    exception.expect(IllegalModelDefinitionException.class);
+    exception
+        .expectMessage("Source 'source' defines a MetadataKeyId parameter but neither an Output nor Type resolver that makes use of it was defined");
+    ParameterModel param = getMockKeyPartParam("Value", 1);
+    setValidKeyId(param.getName());
+    when(sourceModel.getAllParameterModels()).thenReturn(singletonList(param));
     validate(extensionModel, validator);
   }
 
@@ -486,6 +505,10 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
 
   @Test
   public void stringMetadataKeyWithDefaultValue() {
+    mockMetadataResolverFactory(sourceModel,
+                                new DefaultMetadataResolverFactory(NULL_RESOLVER_SUPPLIER, emptyMap(), MOCK_RESOLVER_SUPPLIER,
+                                                                   NULL_RESOLVER_SUPPLIER));
+
     ParameterModel param = getMockKeyPartParam("default", 1);
     setValidKeyId(param.getName());
     when(sourceModel.getAllParameterModels()).thenReturn(singletonList(param));
