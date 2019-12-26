@@ -23,6 +23,7 @@ import static org.mule.runtime.core.internal.message.InternalMessage.builder;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErrorMappings;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
@@ -62,7 +63,6 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.ArrayList;
@@ -367,16 +367,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
 
   @Override
   public void initialise() throws InitialisationException {
-    DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
-    getProcessingStrategy(locator, getRootContainerLocation())
-        .ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
-    //    defaultMessageProcessorChainBuilder.setMessagingExceptionHandler(errorHandler());
-    this.nestedChain = defaultMessageProcessorChainBuilder.chain(processors).build();
-
-    // ,
-    // errorHandler()
-    // this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, getRootContainerLocation()),
-    // processors);
+    this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, getRootContainerLocation()), processors);
     super.initialise();
     if (targetValue != null) {
       targetValueExpression = compile(targetValue, expressionManager);

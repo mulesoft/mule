@@ -232,7 +232,6 @@ public class DefaultFlowBuilder implements Builder {
           .doOnNext(assertStarted())
           // Insert the incoming event into the flow, routing it through the processing strategy
           .flatMap(routeThroughProcessingStrategyMapper())
-          // .transform(routeThroughProcessingStrategy())
           // Don't handle errors, these will be handled by parent flow
           .onErrorStop();
     }
