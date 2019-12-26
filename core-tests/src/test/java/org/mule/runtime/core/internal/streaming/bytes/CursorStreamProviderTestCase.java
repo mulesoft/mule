@@ -80,11 +80,15 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   @Before
   public void before() {
     bufferManager = new PoolingByteBufferManager();
-    final ByteArrayInputStream dataStream = new ByteArrayInputStream(data.getBytes());
+    final InputStream dataStream = createDataStream();
     streamProvider = createStreamProvider(bufferSize, maxBufferSize, dataStream);
   }
 
-  protected CursorStreamProvider createStreamProvider(int bufferSize, int maxBufferSize, ByteArrayInputStream dataStream) {
+  protected InputStream createDataStream() {
+    return new ByteArrayInputStream(data.getBytes());
+  }
+
+  protected CursorStreamProvider createStreamProvider(int bufferSize, int maxBufferSize, InputStream dataStream) {
     InMemoryCursorStreamConfig config =
         new InMemoryCursorStreamConfig(new DataSize(bufferSize, BYTE),
                                        new DataSize(bufferSize / 2, BYTE),
@@ -289,7 +293,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   @Test
   public void dataLengthMatchesMaxBufferSizeExactly() throws Exception {
     data = randomAlphabetic(maxBufferSize);
-    final ByteArrayInputStream dataStream = new ByteArrayInputStream(data.getBytes());
+    final InputStream dataStream = createDataStream();
 
     InMemoryCursorStreamConfig config =
         new InMemoryCursorStreamConfig(new DataSize(maxBufferSize, BYTE),

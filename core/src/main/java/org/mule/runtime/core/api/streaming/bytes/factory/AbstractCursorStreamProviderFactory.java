@@ -32,7 +32,7 @@ import java.io.InputStream;
 @NoExtend
 public abstract class AbstractCursorStreamProviderFactory extends AbstractComponent implements CursorStreamProviderFactory {
 
-  private final ByteBufferManager bufferManager;
+  protected final ByteBufferManager bufferManager;
   protected final StreamingManager streamingManager;
 
   /**

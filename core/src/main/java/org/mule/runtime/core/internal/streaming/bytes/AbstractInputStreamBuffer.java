@@ -31,7 +31,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
 
   private static final Logger LOGGER = getLogger(AbstractInputStreamBuffer.class);
 
-  private final InputStream stream;
+  protected final InputStream stream;
   protected final ByteBufferManager bufferManager;
 
   protected boolean streamFullyConsumed = false;
