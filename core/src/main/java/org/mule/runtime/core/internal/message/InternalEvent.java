@@ -33,15 +33,31 @@ public interface InternalEvent extends PrivilegedEvent {
 
   /**
    * Internal parameters used by the runtime to pass information around.
-   *
+   * @deprecated since 4.3.0. Replace with {@link EventInternalContext} attributes
    */
+  @Deprecated
   Map<String, ?> getInternalParameters();
 
   /**
    * Internal parameters used by the runtime to pass information around.
-   *
+   * @deprecated since 4.3.0. Replace with {@link EventInternalContext} attributes
    */
+  @Deprecated
   <T> T getInternalParameter(String key);
+
+  /**
+   * @return a {@link EventInternalContext} with state from the SDK
+   * @since 4.3.0
+   */
+  <T extends EventInternalContext> EventInternalContext<T> getSdkInternalContext();
+
+
+  /**
+   * Sets context related to the SDK
+   * @param context an {@link EventInternalContext}
+   * @since 4.3.0
+   */
+  <T extends EventInternalContext> void setSdkInternalContext(EventInternalContext<T> context);
 
   /**
    * Create new {@link Builder} based on an existing {@link CoreEvent} instance. The existing {@link EventContext} is conserved.

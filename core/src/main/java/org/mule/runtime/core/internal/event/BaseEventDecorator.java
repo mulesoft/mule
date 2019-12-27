@@ -23,6 +23,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
+import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -158,6 +159,16 @@ abstract class BaseEventDecorator implements InternalEvent, DeserializationPostI
   @Override
   public <T> T getInternalParameter(String key) {
     return event.getInternalParameter(key);
+  }
+
+  @Override
+  public <T extends EventInternalContext> EventInternalContext<T> getSdkInternalContext() {
+    return event.getSdkInternalContext();
+  }
+
+  @Override
+  public <T extends EventInternalContext> void setSdkInternalContext(EventInternalContext<T> context) {
+    event.setSdkInternalContext(context);
   }
 
   /**

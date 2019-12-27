@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.CaseInsensitiveHashMap.basedOn;
 import static org.mule.runtime.core.api.util.CaseInsensitiveHashMap.emptyCaseInsensitiveMap;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.core.internal.message.EventInternalContext.copyOf;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.toGroupCorrelation;
 
@@ -43,6 +44,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
+import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalEvent.Builder;
 import org.mule.runtime.core.internal.message.InternalMessage;
@@ -73,6 +75,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private String legacyCorrelationId;
   private MuleSession session;
   private SecurityContext securityContext;
+  private EventInternalContext sdkInternalContext;
   private InternalEvent originalEvent;
   private boolean modified;
   private boolean internalParametersInitialized = false;
@@ -99,6 +102,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     this.originalVars = (CaseInsensitiveHashMap<String, TypedValue<?>>) event.getVariables();
     this.internalParameters = (Map<String, Object>) event.getInternalParameters();
+    sdkInternalContext = copyOf(event.getSdkInternalContext());
   }
 
   public DefaultEventBuilder(BaseEventContext messageContext, InternalEvent event) {
@@ -295,9 +299,15 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     if (originalEvent != null && !modified) {
       return originalEvent;
     } else {
-      return new InternalEventImplementation(context, requireNonNull(messageFactory.apply(context)),
+      return new InternalEventImplementation(context,
+                                             requireNonNull(messageFactory.apply(context)),
                                              varsModified ? flowVariables : originalVars,
-                                             internalParameters, session, securityContext, itemSequenceInfo, error,
+                                             internalParameters,
+                                             session,
+                                             securityContext,
+                                             itemSequenceInfo,
+                                             sdkInternalContext,
+                                             error,
                                              legacyCorrelationId,
                                              notificationsEnabled);
     }
@@ -361,6 +371,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final ItemSequenceInfo itemSequenceInfo;
 
     private transient Map<String, ?> internalParameters;
+    private transient EventInternalContext sdkInternalContext;
     private transient LazyValue<BindingContext> bindingContextBuilder =
         new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
 
@@ -378,12 +389,17 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     }
 
     // Use this constructor from the builder
-    private InternalEventImplementation(BaseEventContext context, Message message,
+    private InternalEventImplementation(BaseEventContext context,
+                                        Message message,
                                         CaseInsensitiveHashMap<String, TypedValue<?>> variables,
-                                        Map<String, ?> internalParameters, MuleSession session, SecurityContext securityContext,
+                                        Map<String, ?> internalParameters,
+                                        MuleSession session,
+                                        SecurityContext securityContext,
                                         Optional<ItemSequenceInfo> itemSequenceInfo,
+                                        EventInternalContext sdkInternalContext,
                                         Error error,
-                                        String legacyCorrelationId, boolean notificationsEnabled) {
+                                        String legacyCorrelationId,
+                                        boolean notificationsEnabled) {
       this.context = context;
       this.session = session;
       this.securityContext = securityContext;
@@ -392,6 +408,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.internalParameters = internalParameters;
 
       this.itemSequenceInfo = itemSequenceInfo.orElse(null);
+      this.sdkInternalContext = sdkInternalContext;
       this.error = error;
       this.legacyCorrelationId = legacyCorrelationId;
 
@@ -566,6 +583,16 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     @Override
     public Optional<ItemSequenceInfo> getItemSequenceInfo() {
       return ofNullable(itemSequenceInfo);
+    }
+
+    @Override
+    public EventInternalContext getSdkInternalContext() {
+      return sdkInternalContext;
+    }
+
+    @Override
+    public void setSdkInternalContext(EventInternalContext sdkInternalContext) {
+      this.sdkInternalContext = sdkInternalContext;
     }
 
     @Override
