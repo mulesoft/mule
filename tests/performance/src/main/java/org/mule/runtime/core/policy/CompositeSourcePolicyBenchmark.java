@@ -17,7 +17,6 @@ import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
@@ -75,7 +74,7 @@ public class CompositeSourcePolicyBenchmark extends AbstractBenchmark {
     CoreEvent event;
     Message.Builder messageBuilder = Message.builder().value(PAYLOAD);
     CoreEvent.Builder eventBuilder =
-        CoreEvent.builder(create("", "", CONNECTOR_LOCATION, NullExceptionHandler.getInstance())).message(messageBuilder.build());
+        CoreEvent.builder(create("", "", CONNECTOR_LOCATION, null, empty())).message(messageBuilder.build());
     event = eventBuilder.build();
 
     return block(callback -> handler.process(event, sourceRpp, callback));

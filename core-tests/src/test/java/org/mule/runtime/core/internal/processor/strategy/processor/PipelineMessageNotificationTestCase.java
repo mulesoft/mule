@@ -245,11 +245,6 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
       });
     }
 
-    @Override
-    public String getConstructType() {
-      return "test";
-    }
-
   }
 
   private class PipelineMessageNotificiationArgumentMatcher implements ArgumentMatcher<Notification> {

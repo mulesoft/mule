@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.construct;
 
 import static org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory.DIRECT_PROCESSING_STRATEGY_INSTANCE;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.core.api.MuleContext;
@@ -27,7 +28,10 @@ public interface FlowConstruct extends NamedObject, LifecycleStateEnabled, Compo
   /**
    * @return The exception listener that will be used to handle exceptions that may be thrown at different points during the
    *         message flow defined by this construct.
+   *
+   * @deprecated since 4.3.0. Error handling in the flow is encapsulated.
    */
+  @Deprecated
   FlowExceptionHandler getExceptionListener();
 
   /**

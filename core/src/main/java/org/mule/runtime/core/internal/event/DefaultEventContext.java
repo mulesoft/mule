@@ -167,7 +167,19 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    */
   public DefaultEventContext(FlowConstruct flow, ComponentLocation location, String correlationId,
                              Optional<CompletableFuture<Void>> externalCompletion) {
-    this(flow, flow.getExceptionListener(), location, correlationId, externalCompletion);
+    super(NullExceptionHandler.getInstance(), 0, externalCompletion);
+    this.id = flow.getUniqueIdString();
+    this.serverId = flow.getServerId();
+    this.location = location;
+    this.processingTime = ProcessingTime.newInstance(flow);
+    this.correlationId = correlationId;
+
+    // Only generate flowStack dump information for when the eventContext is created for a flow.
+    if (flow != null && flow.getMuleContext() != null) {
+      eventContextMaintain(flow.getMuleContext().getEventContextService());
+    }
+    this.flowCallStack = new DefaultFlowCallStack();
+    createStreamingState();
   }
 
   /**
@@ -209,8 +221,28 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    *                           context, if available.
    * @param externalCompletion future that completes when source completes enabling termination of {@link BaseEventContext} to
    *                           depend on completion of source.
-   * @param exceptionHandler   the exception handler that will deal with an error context
    */
+  public DefaultEventContext(String id, String serverId, ComponentLocation location, String correlationId,
+                             Optional<CompletableFuture<Void>> externalCompletion) {
+    this(id, serverId, location, correlationId, externalCompletion, NullExceptionHandler.getInstance());
+  }
+
+  /**
+   * Builds a new execution context with the given parameters.
+   *
+   * @param id the unique id for this event context.
+   * @param serverId the id of the running mule server
+   * @param location the location of the component that received the first message for this context.
+   * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of this
+   *        context, if available.
+   * @param externalCompletion future that completes when source completes enabling termination of {@link BaseEventContext} to
+   *        depend on completion of source.
+   * @param exceptionHandler the exception handler that will deal with an error context
+   *
+   * @deprecated since 4.3.0, use {@link #DefaultEventContext(String, String, ComponentLocation, String, Optional)} instead and
+   *             rely on the provided {@code processor} to do the error handling.
+   */
+  @Deprecated
   public DefaultEventContext(String id, String serverId, ComponentLocation location, String correlationId,
                              Optional<CompletableFuture<Void>> externalCompletion, FlowExceptionHandler exceptionHandler) {
     super(exceptionHandler, 0, externalCompletion);

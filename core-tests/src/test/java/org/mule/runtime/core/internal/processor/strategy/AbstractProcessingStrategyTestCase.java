@@ -268,7 +268,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow.start();
     processFlow(testEvent());
 
-    assertThat(schedulers, cpuLightSchedulerMatcher());
+    assertThat(schedulers.toString(), schedulers, cpuLightSchedulerMatcher());
   }
 
   protected Matcher<Iterable<? extends String>> cpuLightSchedulerMatcher() {
@@ -339,7 +339,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
     processFlow(testEvent());
 
-    assertThat(schedulers, ioSchedulerMatcher());
+    assertThat(schedulers.toString(), schedulers, ioSchedulerMatcher());
   }
 
   protected Matcher<Iterable<? extends String>> ioSchedulerMatcher() {
@@ -363,7 +363,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
     processFlow(testEvent());
 
-    assertThat(schedulers, cpuIntensiveSchedulerMatcher());
+    assertThat(schedulers.toString(), schedulers, cpuIntensiveSchedulerMatcher());
   }
 
   protected Matcher<Iterable<? extends String>> cpuIntensiveSchedulerMatcher() {
@@ -560,7 +560,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     flow.initialise();
     flow.start();
     processFlow(eventSupplier.call());
-    assertThat(schedulers, schedulerNameMatcher);
+    assertThat(schedulers.toString(), schedulers, schedulerNameMatcher);
   }
 
   protected CoreEvent processFlow(CoreEvent event) throws Exception {
@@ -935,4 +935,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
      */
     SOURCE
   }
+
+  @Override
+  protected boolean isGracefulShutdown() {
+    return true;
+  }
+
 }

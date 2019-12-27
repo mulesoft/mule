@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -13,10 +14,20 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.util.func.CheckedConsumer;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
+import org.mule.runtime.core.api.util.func.Once;
+import org.mule.runtime.core.api.util.func.Once.ConsumeOnce;
+import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -53,11 +64,88 @@ public class RxUtils {
    * @return the triggeringSubscriber {@link Flux}, decorated with the callback that will perform this deferred subscription.
    * @since 4.3
    */
-  public static Flux<CoreEvent> subscribeFluxOnPublisherSubscription(Flux<CoreEvent> triggeringSubscriber,
-                                                                     Flux<CoreEvent> deferredSubscriber) {
+  public static <T> Flux<T> subscribeFluxOnPublisherSubscription(Flux<T> triggeringSubscriber,
+                                                                 Flux<T> deferredSubscriber) {
     return triggeringSubscriber
         .compose(eventPub -> subscriberContext()
             .flatMapMany(ctx -> eventPub.doOnSubscribe(s -> deferredSubscriber.subscriberContext(ctx).subscribe())));
+  }
+
+  /**
+   * As {@link #subscribeFluxOnPublisherSubscription(Flux, Flux)}, but also propagates completion and cancellation events in the
+   * upstream to the downstream.
+   * <p>
+   * Internal state is kept so that any pending items still being processed are waited for before propagating any completion or
+   * cancellation event. This implementation will not reject new items after receiving the completion or cancellation event. It is
+   * up to the caller to avoid sending new items to be processed when completion or cancellation is expected.
+   *
+   * @param upstream the source of the items, completion of cancellation events to be processed and propagated downstream.
+   * @param downstream the downstream that will receive the items, completion of cancellation events, as well as trigger the
+   *        subscription to upstream.
+   * @param transformer the data transformation to be done on the items of upstream. If any items are in any operators of this
+   *        transformation when a completion or cancellation event is received, that event will wait for any in-flight events to
+   *        finish.
+   * @param completionCallback how a completion event will be triggered on the downstream.
+   * @param errorCallback how a cancellation event will be triggered on the downstream.
+   * @param completionTimeoutMillis how long to wait for pending items to finish processing before actually propagating the
+   *        completion or cancellation downstream.
+   * @param delayedExecutor the executor that will delay the completion or cancellation propagation when there are pending items
+   * @return an enriched downstream where items and events will be triggered according to the rules defined for this method.
+   */
+  public static <T> Publisher<T> propagateCompletion(Publisher<T> upstream, Publisher<T> downstream,
+                                                     Function<Publisher<T>, Publisher<T>> transformer,
+                                                     CheckedRunnable completionCallback, CheckedConsumer<Throwable> errorCallback,
+                                                     long completionTimeoutMillis, ScheduledExecutorService delayedExecutor) {
+    AtomicInteger inflightCounter = new AtomicInteger(0);
+    AtomicBoolean upstreamComplete = new AtomicBoolean(false);
+    AtomicReference<Throwable> upstreamError = new AtomicReference<>();
+    AtomicReference<ScheduledFuture<?>> scheduledCompletion = new AtomicReference<>();
+
+    final RunOnce completer = Once.of(completionCallback);
+    final ConsumeOnce<Throwable> errorForwarder = Once.of(errorCallback);
+
+    Flux<T> enrichedUpstream = Flux.from(upstream)
+        .doOnNext(s -> inflightCounter.incrementAndGet())
+        .transform(transformer)
+        .doOnComplete(() -> {
+          upstreamComplete.set(true);
+
+          if (inflightCounter.get() == 0) {
+            completer.runOnce();
+          } else {
+            scheduledCompletion.set(delayedExecutor.schedule(() -> {
+              completer.runOnce();
+            }, completionTimeoutMillis, MILLISECONDS));
+          }
+        })
+        .doOnError(t -> {
+          upstreamError.set(t);
+
+          if (inflightCounter.get() == 0) {
+            errorForwarder.consumeOnce(t);
+          } else {
+            scheduledCompletion.set(delayedExecutor.schedule(() -> {
+              errorForwarder.consumeOnce(t);
+            }, completionTimeoutMillis, MILLISECONDS));
+          }
+        });
+
+    return subscribeFluxOnPublisherSubscription(Flux.from(downstream)
+        .doOnNext(s -> {
+          if (inflightCounter.decrementAndGet() == 0) {
+            if (upstreamComplete.get()) {
+              completer.runOnce();
+              scheduledCompletion.get().cancel(true);
+            }
+
+            final Throwable t = upstreamError.get();
+            if (t != null) {
+              errorForwarder.consumeOnce(t);
+              scheduledCompletion.get().cancel(true);
+            }
+          }
+        }),
+                                                enrichedUpstream);
   }
 
   /**

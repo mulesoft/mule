@@ -33,8 +33,8 @@ public class BlockingProcessingStrategyTestCase extends DirectProcessingStrategy
 
   @Override
   @Description("Regardless of processor type, when the BlockingProcessingStrategy is configured, the pipeline is executed "
-      + "synchronously in a caller thread and the pipeline will block caller thread until any async processors complete " +
-      "before continuing in the caller thread.")
+      + "synchronously in a caller thread and the pipeline will block caller thread until any async processors complete "
+      + "before continuing in the caller thread.")
   public void asyncCpuLight() throws Exception {
     super.asyncCpuLight();
   }
@@ -46,8 +46,8 @@ public class BlockingProcessingStrategyTestCase extends DirectProcessingStrategy
 
   @Override
   @Description("Regardless of processor type, when the BlockingProcessingStrategy is configured, the pipeline is executed "
-      + "synchronously in a caller thread and the pipeline will block caller thread until any async processors complete " +
-      "before continuing in the caller thread.")
+      + "synchronously in a caller thread and the pipeline will block caller thread until any async processors complete "
+      + "before continuing in the caller thread.")
   public void asyncCpuLightConcurrent() throws Exception {
     internalConcurrent(flowBuilder.get(), false, CPU_LITE, 1, asyncProcessor);
     assertSynchronous(2);

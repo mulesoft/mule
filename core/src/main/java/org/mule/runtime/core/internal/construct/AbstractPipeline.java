@@ -10,6 +10,8 @@ import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
+import static org.mule.runtime.api.functional.Either.left;
+import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_END;
@@ -21,22 +23,26 @@ import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SC
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
-import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createFlowBackPressureException;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.ON_NEXT_FAILURE_STRATEGY;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getDefaultProcessingStrategyFactory;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Flux.create;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.PipelineMessageNotification;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
@@ -62,6 +68,7 @@ import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -73,7 +80,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -93,6 +99,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   private final NotificationDispatcher notificationFirer;
 
+  private final SchedulerService schedulerService;
+
   private final MessageSource source;
   private final List<Processor> processors;
   private MessageProcessorChain pipeline;
@@ -102,6 +110,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   private volatile boolean canProcessMessage = false;
   private Sink sink;
+  private Scheduler completionCallbackScheduler;
   private Map<BackPressureReason, FlowBackPressureException> backPressureExceptions;
   private final int maxConcurrency;
   private final ComponentInitialStateManager componentInitialStateManager;
@@ -120,6 +129,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }
+
+    this.schedulerService = muleContext.getSchedulerService();
 
     this.source = source;
     this.componentInitialStateManager = componentInitialStateManager;
@@ -155,6 +166,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       builder.setProcessingStrategy(processingStrategy);
     }
     configureMessageProcessors(builder);
+    builder.setMessagingExceptionHandler(getExceptionListener());
     return builder.build();
   }
 
@@ -245,8 +257,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private ReactiveProcessor dispatchToFlow() {
     return publisher -> from(publisher)
         .doOnNext(assertStarted())
-        .flatMap(routeThroughProcessingStrategy())
-        // This replaces the onErrorContinue key if it exists, to prevent it from being propagated within the flow
+        .transform(routeThroughProcessingStrategyTransformer())
         .compose(clearSubscribersErrorStrategy());
   }
 
@@ -267,31 +278,74 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     });
   }
 
-  protected Function<CoreEvent, Publisher<? extends CoreEvent>> routeThroughProcessingStrategy() {
+  protected Function<Publisher<CoreEvent>, Publisher<CoreEvent>> routeThroughProcessingStrategyTransformer() {
+    FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder = new FluxSinkRecorder<>();
+
+    return eventPub -> propagateCompletion(eventPub,
+                                           create(sinkRecorder)
+                                               .map(result -> {
+                                                 result.applyLeft(t -> {
+                                                   throw propagate(t);
+                                                 });
+                                                 return result.getRight();
+                                               }),
+                                           innerEventPub -> from(innerEventPub)
+                                               .doOnNext(event -> {
+                                                 // Retrieve response publisher before error is communicated
+                                                 // Subscribe the rest of reactor chain to response publisher,
+                                                 // through which errors and responses will be emitted
+                                                 ((BaseEventContext) event.getContext()).onResponse((e, t) -> {
+                                                   if (t != null) {
+                                                     sinkRecorder.next(left(t, CoreEvent.class));
+                                                   } else if (e != null) {
+                                                     sinkRecorder.next(right(Throwable.class, e));
+                                                   }
+                                                 });
+                                               })
+
+                                               // This accept/emit choice is made because there's a
+                                               // backpressure check done in the #emit sink message, which can
+                                               // be done preemptively as the maxConcurrency one, before policies
+                                               // execution. As previous implementation, use WAIT strategy as
+                                               // default. This check may not be needed anymore for
+                                               // ProactorStreamProcessingStrategy. See MULE-16988.
+                                               .doOnNext(getSource() == null || getSource().getBackPressureStrategy() == WAIT
+                                                   ? event -> sink.accept(event)
+                                                   : event -> sinkEmit(event)),
+                                           () -> sinkRecorder.complete(), t -> sinkRecorder.error(t),
+                                           muleContext.getConfiguration().getShutdownTimeout(),
+                                           completionCallbackScheduler);
+  }
+
+  /**
+   * @deprecated since 4.3.0. Kept for backwards compatibility of some cases until those are migrated.
+   */
+  @Deprecated
+  protected Function<CoreEvent, Publisher<? extends CoreEvent>> routeThroughProcessingStrategyMapper() {
+    // This accept/emit choice is made because there's a backpressure check done in the #emit sink message, which can be done
+    // preemptively as the maxConcurrency one, before policies execution. As previous implementation, use WAIT strategy as
+    // default. This check may not be needed anymore for ProactorStreamProcessingStrategy. See MULE-16988.
+    return getSource() == null || getSource().getBackPressureStrategy() == WAIT
+        ? routeToSink(event -> sink.accept(event))
+        : routeToSink(event -> sinkEmit(event));
+  }
+
+  private Function<CoreEvent, Publisher<? extends CoreEvent>> routeToSink(Consumer<CoreEvent> sinkRouter) {
     return event -> {
-      // Retrieve response publisher before error is communicated
       Publisher<CoreEvent> responsePublisher = ((BaseEventContext) event.getContext()).getResponsePublisher();
-      try {
-        // This accept/emit choice is made because there's a backpressure check done in the #emit sink message, which can be done
-        // preemptively as the maxConcurrency one, before policies execution. As previous implementation, use WAIT strategy as
-        // default. This check may not be needed anymore for ProactorStreamProcessingStrategy. See MULE-16988.
-        if (getSource() == null || getSource().getBackPressureStrategy() == WAIT) {
-          sink.accept(event);
-        } else {
-          final BackPressureReason emitFailReason = sink.emit(event);
-          if (emitFailReason != null) {
-            notifyBackpressureException(event, backPressureExceptions.get(emitFailReason));
-          }
-        }
-      } catch (RejectedExecutionException e) {
-        // Handle the case in which the event execution is rejected from the scheduler.
-        FlowBackPressureException wrappedException = createFlowBackPressureException(this.getName(), REQUIRED_SCHEDULER_BUSY, e);
-        notifyBackpressureException(event, wrappedException);
-      }
+
+      sinkRouter.accept(event);
 
       // Subscribe the rest of reactor chain to response publisher, through which errors and responses will be emitted
       return Mono.from(responsePublisher);
     };
+  }
+
+  private void sinkEmit(CoreEvent event) {
+    final BackPressureReason emitFailReason = sink.emit(event);
+    if (emitFailReason != null) {
+      notifyBackpressureException(event, backPressureExceptions.get(emitFailReason));
+    }
   }
 
   /**
@@ -316,26 +370,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         .doOnNext(beforeProcessors())
         .transform(processingStrategy.onPipeline(pipeline))
         .doOnNext(afterProcessors())
-        .doOnError(throwable -> {
-          if (isCompleteSignalRejectedExecutionException(throwable)) {
-            LOGGER.debug("Scheduler busy when propagating 'complete' signal due to graceful shutdown timeout being exceeded.",
-                         throwable);
-          } else {
-            LOGGER.error("Unhandled exception in Flow ", throwable);
-          }
-        });
-  }
-
-  boolean isCompleteSignalRejectedExecutionException(Throwable throwable) {
-    if (throwable instanceof RejectedExecutionException) {
-      for (StackTraceElement element : throwable.getStackTrace()) {
-        if (element.getMethodName().contains("onComplete")
-            && element.getClassName().startsWith("reactor.core.publisher.FluxPublishOn")) {
-          return true;
-        }
-      }
-    }
-    return false;
+        .onErrorContinue(MessagingException.class,
+                         (me, e) -> ((BaseEventContext) (((MessagingException) me).getEvent().getContext())).error(me));
   }
 
   private Consumer<CoreEvent> beforeProcessors() {
@@ -419,6 +455,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       stopOnFailure(e);
       return;
     }
+
+    completionCallbackScheduler = schedulerService.ioScheduler(muleContext.getSchedulerBaseConfig().withMaxConcurrentTasks(1)
+        .withName(getName() + ".flux.completionCallback"));
+
     canProcessMessage = true;
     if (getMuleContext().isStarted()) {
       try {
@@ -472,6 +512,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected void doStop() throws MuleException {
     stopSafely(() -> stopIfStoppable(source));
     canProcessMessage = false;
+
+    if (completionCallbackScheduler != null) {
+      completionCallbackScheduler.stop();
+    }
 
     stopSafely(() -> disposeIfDisposable(sink));
     sink = null;

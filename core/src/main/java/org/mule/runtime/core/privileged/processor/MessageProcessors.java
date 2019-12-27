@@ -321,7 +321,11 @@ public class MessageProcessors {
    * @param componentLocation
    * @param exceptionHandler used to handle {@link Exception}'s.
    * @return the future result of processing processor.
+   *
+   * @deprecated Since 4.3.0, use {@link #processWithChildContext(CoreEvent, ReactiveProcessor, Optional)} instead and rely on the
+   *             provided {@code processor} to do the error handling.
    */
+  @Deprecated
   public static Publisher<CoreEvent> processWithChildContext(CoreEvent event, ReactiveProcessor processor,
                                                              Optional<ComponentLocation> componentLocation,
                                                              FlowExceptionHandler exceptionHandler) {
@@ -346,7 +350,11 @@ public class MessageProcessors {
    * @param componentLocation
    * @param exceptionHandler used to handle {@link Exception}'s.
    * @return the future result of processing processor.
+   *
+   * @deprecated Since 4.3.0, use {@link #processWithChildContextDontComplete(CoreEvent, ReactiveProcessor, Optional)} instead and
+   *             rely on the provided {@code processor} to do the error handling.
    */
+  @Deprecated
   public static Publisher<CoreEvent> processWithChildContextDontComplete(CoreEvent event, ReactiveProcessor processor,
                                                                          Optional<ComponentLocation> componentLocation,
                                                                          FlowExceptionHandler exceptionHandler) {
@@ -385,7 +393,11 @@ public class MessageProcessors {
    * @param exceptionHandler used to handle {@link Exception}'s.
    * @return the result of processing processor.
    * @throws MuleException
+   *
+   * @deprecated Since 4.3.0, use {@link #processWithChildContextBlocking(CoreEvent, Processor, Optional)} instead and rely on the
+   *             provided {@code processor} to do the error handling.
    */
+  @Deprecated
   public static CoreEvent processWithChildContextBlocking(CoreEvent event, Processor processor,
                                                           Optional<ComponentLocation> componentLocation,
                                                           FlowExceptionHandler exceptionHandler)
@@ -474,14 +486,13 @@ public class MessageProcessors {
                 return eventPub.flatMap(event -> internalProcessWithChildContext(event, processor, completeParentIfEmpty));
               } else {
                 FluxSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
+                final FluxSinkRecorderToReactorSinkAdapter<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRefAdapter =
+                    new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef);
                 Set<BaseEventContext> seenContexts = newSetFromMap(new WeakHashMap<BaseEventContext, Boolean>());
 
                 return Flux.from(eventChildCtxPub)
-                    .doOnNext(eventChildCtx -> {
-                      childContextResponseHandler(eventChildCtx,
-                                                  new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef),
-                                                  completeParentIfEmpty);
-                    })
+                    .doOnNext(eventChildCtx -> childContextResponseHandler(eventChildCtx, errorSwitchSinkSinkRefAdapter,
+                                                                           completeParentIfEmpty))
                     .transform(processor)
                     .doOnNext(completeSuccessIfNeeded())
                     .map(event -> right(MessagingException.class, event))
@@ -562,7 +573,11 @@ public class MessageProcessors {
    * @param componentLocation
    * @param exceptionHandler used to handle {@link Exception}'s.
    * @return the future result of processing processor.
+   *
+   * @deprecated Since 4.3.0, use {@link #applyWithChildContext(Publisher, ReactiveProcessor, Optional)} instead and rely on the
+   *             provided {@code processor} to do the error handling.
    */
+  @Deprecated
   public static Publisher<CoreEvent> applyWithChildContext(Publisher<CoreEvent> eventPub, ReactiveProcessor processor,
                                                            Optional<ComponentLocation> componentLocation,
                                                            FlowExceptionHandler exceptionHandler) {
@@ -637,7 +652,7 @@ public class MessageProcessors {
    * @param processor the processor to transform publisher with
    * @return the transformed publisher
    * @since 4.1
-   * @deprecated Use {@link RxUtils} instead
+   * @deprecated Since 4.3.0, use {@link RxUtils} instead
    */
   @Deprecated
   public static Publisher<CoreEvent> transform(Publisher<CoreEvent> publisher, ReactiveProcessor processor) {
@@ -652,7 +667,7 @@ public class MessageProcessors {
    * @param mapper the mapper to map publisher items with
    * @return the transformed publisher
    * @since 4.2
-   * @deprecated Use {@link RxUtils} instead
+   * @deprecated Since 4.3.0, use {@link RxUtils} instead
    */
   @Deprecated
   public static Publisher<CoreEvent> map(Publisher<CoreEvent> publisher, Function<CoreEvent, CoreEvent> mapper) {
@@ -668,7 +683,7 @@ public class MessageProcessors {
    * @param component the component that implements this functionality.
    * @return the transformed publisher
    * @since 4.1
-   * @deprecated Use {@link RxUtils} instead
+   * @deprecated Since 4.3.0, use {@link RxUtils} instead
    */
   @Deprecated
   public static Publisher<CoreEvent> flatMap(Publisher<CoreEvent> publisher,
@@ -683,7 +698,7 @@ public class MessageProcessors {
    * @param executor the thread pool where the event will be published.
    * @return the created publisher
    * @since 4.2
-   * @deprecated Use {@link RxUtils} instead
+   * @deprecated Since 4.3.0, use {@link RxUtils} instead
    */
   @Deprecated
   public static Publisher<CoreEvent> justPublishOn(CoreEvent event, ExecutorService executor) {

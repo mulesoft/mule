@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.core.api.MuleContext;
@@ -49,16 +50,16 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
 
   public static final String FLOW_NAME = "flowName";
 
-  private MuleContext muleContext = mockContextWithServices();
-  private Builder flowBuilder = new DefaultFlowBuilder(FLOW_NAME, muleContext, new ComponentInitialStateManager() {
+  private final MuleContext muleContext = mockContextWithServices();
+  private final Builder flowBuilder = new DefaultFlowBuilder(FLOW_NAME, muleContext, new ComponentInitialStateManager() {
 
     @Override
     public boolean mustStartMessageSource(Component component) {
       return true;
     }
   });
-  private ProcessingStrategyFactory defaultProcessingStrategyFactory = mock(ProcessingStrategyFactory.class);
-  private ProcessingStrategy processingStrategy = mock(ProcessingStrategy.class);
+  private final ProcessingStrategyFactory defaultProcessingStrategyFactory = mock(ProcessingStrategyFactory.class);
+  private final ProcessingStrategy processingStrategy = mock(ProcessingStrategy.class);
 
   @Rule
   public ExpectedException expectedException = none();
@@ -78,7 +79,8 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
     assertThat(flow.getMuleContext(), is(muleContext));
     assertThat(flow.getProcessors(), is(empty()));
     assertThat(flow.getSource(), is(nullValue()));
-    assertThat(flow.getExceptionListener(), not(sameInstance(muleContext.getDefaultErrorHandler(Optional.empty()))));
+    assertThat(((AbstractFlowConstruct) flow).getExceptionListener(),
+               not(sameInstance(muleContext.getDefaultErrorHandler(Optional.empty()))));
     assertThat(flow.getProcessingStrategy(), sameInstance(processingStrategy));
   }
 
@@ -103,7 +105,7 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
     assertThat(flow.getMuleContext(), is(muleContext));
     assertThat(flow.getProcessors(), contains(processor1, processor2));
     assertThat(flow.getSource(), is(messageSource));
-    assertThat(flow.getExceptionListener(), is(exceptionListener));
+    assertThat(((AbstractFlowConstruct) flow).getExceptionListener(), is(exceptionListener));
     assertThat(flow.getProcessingStrategy(), sameInstance(processingStrategy));
   }
 

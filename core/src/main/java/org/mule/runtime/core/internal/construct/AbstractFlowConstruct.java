@@ -166,7 +166,6 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
     return name;
   }
 
-  @Override
   public FlowExceptionHandler getExceptionListener() {
     return exceptionListener;
   }
@@ -265,9 +264,4 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
   protected void disposeIfDisposable(Object candidate) {
     disposeIfNeeded(candidate, LOGGER);
   }
-
-  /**
-   * @return the type of construct being created, e.g. "Flow"
-   */
-  public abstract String getConstructType();
 }

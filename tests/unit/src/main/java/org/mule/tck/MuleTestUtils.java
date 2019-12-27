@@ -236,13 +236,33 @@ public final class MuleTestUtils {
    * @return the list of configured exception listeners
    * @throws IllegalStateException if the provided exception handler does not have the expect method or it cannot be invoked.
    */
+  public static List<FlowExceptionHandler> getExceptionListeners(FlowConstruct flow) {
+    try {
+      Method getExceptionListenerMethod = flow.getClass().getMethod("getExceptionListener");
+      FlowExceptionHandler exceptionListener = (FlowExceptionHandler) getExceptionListenerMethod.invoke(flow);
+      return getExceptionListeners(exceptionListener);
+    } catch (Exception e) {
+      throw new IllegalStateException("Cannot obtain exception listener for flow", e);
+    }
+  }
+
+  /**
+   * Returns the exception listener configured on a messaging exception handler
+   * <p/>
+   * Invokes {@code getExceptionListeners} method on the provided exception handler to avoid exposing that method on the public
+   * API.
+   *
+   * @param exceptionHandler exception handler to inspect
+   * @return the list of configured exception listeners
+   * @throws IllegalStateException if the provided exception handler does not have the expect method or it cannot be invoked.
+   */
   public static List<FlowExceptionHandler> getExceptionListeners(FlowExceptionHandler exceptionHandler) {
     try {
       Method getExceptionListenersMethod = exceptionHandler.getClass().getMethod("getExceptionListeners");
       Object exceptionListeners = getExceptionListenersMethod.invoke(exceptionHandler);
       return (List<FlowExceptionHandler>) exceptionListeners;
     } catch (Exception e) {
-      throw new IllegalStateException("Cannot obtain exception listener for flow");
+      throw new IllegalStateException("Cannot obtain exception listener for flow", e);
     }
   }
 

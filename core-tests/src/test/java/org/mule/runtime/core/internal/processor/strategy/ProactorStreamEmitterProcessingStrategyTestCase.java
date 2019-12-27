@@ -270,19 +270,19 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   @Description("When the ReactorProcessingStrategy is configured and a transaction is active processing fails with an error")
   public void asyncCpuLight() throws Exception {
     super.asyncCpuLight();
-    assertThat(threads, hasSize(between(1, 2)));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), between(1l, 2l));
-    assertThat(threads, not(hasItem(startsWith(IO))));
-    assertThat(threads, not(hasItem(startsWith(CPU_INTENSIVE))));
-    assertThat(threads, not(hasItem(startsWith(CUSTOM))));
+    assertThat(threads.toString(), threads, hasSize(between(1, 2)));
+    assertThat(threads.toString(), threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), between(1l, 2l));
+    assertThat(threads.toString(), threads, not(hasItem(startsWith(IO))));
+    assertThat(threads.toString(), threads, not(hasItem(startsWith(CPU_INTENSIVE))));
+    assertThat(threads.toString(), threads, not(hasItem(startsWith(CUSTOM))));
   }
 
   @Override
   @Description("Concurrent stream with concurrency of 8 only uses two CPU_LIGHT threads.")
   public void concurrentStream() throws Exception {
     super.concurrentStream();
-    assertThat(threads, hasSize(2));
-    assertThat(threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(2l));
+    assertThat(threads.toString(), threads, hasSize(2));
+    assertThat(threads.toString(), threads.stream().filter(name -> name.startsWith(CPU_LIGHT)).count(), equalTo(2l));
   }
 
   @Test
@@ -309,10 +309,10 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     processFlow(testEvent());
 
-    verify(blockingSchedulerSpy, times(1)).submit(any(Callable.class));
     // Reactor dispatches different tasks to the scheduler for processing the task, so we cannot assume a 1-1 ratio between events
     // and calls to the scheduler, or that they happen all in a predictable order (threading, ya know...).
     probe(() -> {
+      verify(blockingSchedulerSpy, times(1)).submit(any(Callable.class));
       assertThat(rejectingSchedulerSpy.getRejections(), is(greaterThanOrEqualTo(REJECTION_COUNT)));
       return true;
     });
@@ -348,10 +348,10 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     processFlow(testEvent());
 
-    verify(cpuIntensiveSchedulerSpy, times(1)).submit(any(Callable.class));
     // Reactor dispatches different tasks to the scheduler for processing the task, so we cannot assume a 1-1 ratio between events
     // and calls to the scheduler, or that they happen all in a predictable order (threading, ya know...).
     probe(() -> {
+      verify(cpuIntensiveSchedulerSpy, times(1)).submit(any(Callable.class));
       assertThat(rejectingSchedulerSpy.getRejections(), is(greaterThanOrEqualTo(REJECTION_COUNT)));
       return true;
     });

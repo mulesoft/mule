@@ -13,7 +13,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getDefaultProcessingStrategyFactory;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Mono.error;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.AbstractComponent;
@@ -21,28 +20,21 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.FlowExceptionHandler;
-import org.mule.runtime.core.api.lifecycle.LifecycleState;
-import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.core.api.policy.PolicyInstance;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
-import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
 
 import java.util.Optional;
 
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 @NoExtend
 public class DefaultPolicyInstance extends AbstractComponent
-    implements PolicyInstance, FlowConstruct, MuleContextAware, Lifecycle {
+    implements PolicyInstance, MuleContextAware, Lifecycle {
 
   private static final Logger LOGGER = getLogger(DefaultPolicyInstance.class);
 
@@ -53,15 +45,12 @@ public class DefaultPolicyInstance extends AbstractComponent
   private PolicyChain operationPolicyChain;
   private PolicyChain sourcePolicyChain;
 
-  private FlowConstructStatistics flowConstructStatistics;
   private MuleContext muleContext;
   private final DefaultLifecycleManager<DefaultPolicyInstance> lifecycleStateManager =
       new DefaultLifecycleManager<>("proxy-policy-" + UUID.getUUID(), this);
 
   @Override
   public void initialise() throws InitialisationException {
-    flowConstructStatistics = new DefaultFlowConstructStatistics("policy", getName());
-
     processingStrategy = defaultProcessingStrategy().create(muleContext, getName());
 
     if (operationPolicyChain != null) {
@@ -91,54 +80,12 @@ public class DefaultPolicyInstance extends AbstractComponent
 
   }
 
-  @Override
-  public FlowExceptionHandler getExceptionListener() {
-    return new FlowExceptionHandler() {
-
-      @Override
-      public CoreEvent handleException(Exception exception, CoreEvent event) {
-        return null;
-      }
-
-      @Override
-      public Publisher<CoreEvent> apply(Exception exception) {
-        return error(exception);
-      }
-    };
-  }
-
-  @Override
-  public FlowConstructStatistics getStatistics() {
-    return this.flowConstructStatistics;
-  }
-
-  @Override
-  public MuleContext getMuleContext() {
-    return muleContext;
-  }
-
-  @Override
-  public String getUniqueIdString() {
-    return muleContext.getUniqueIdString();
-  }
-
-  @Override
-  public String getServerId() {
-    return muleContext.getId();
-  }
-
-  @Override
   public String getName() {
     return this.name;
   }
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  @Override
-  public LifecycleState getLifecycleState() {
-    return lifecycleStateManager.getState();
   }
 
   @Override
@@ -180,11 +127,6 @@ public class DefaultPolicyInstance extends AbstractComponent
   @Override
   public Optional<PolicyChain> getOperationPolicyChain() {
     return ofNullable(operationPolicyChain);
-  }
-
-  @Override
-  public ProcessingStrategy getProcessingStrategy() {
-    return processingStrategy;
   }
 
 }

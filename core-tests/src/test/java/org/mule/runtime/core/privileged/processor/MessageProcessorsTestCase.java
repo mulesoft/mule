@@ -18,7 +18,6 @@ import static org.junit.Assert.fail;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
@@ -32,7 +31,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextBlocking;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
-import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -46,7 +44,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -77,7 +74,6 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   public ExpectedException thrown = ExpectedException.none();
 
   private final RuntimeException exception = new IllegalArgumentException();
-  private OnErrorPropagateHandler exceptionHandler;
   private BaseEventContext eventContext;
   private CoreEvent input;
   private CoreEvent output;
@@ -88,13 +84,6 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   @Before
   public void setup() throws MuleException {
     flow = mock(Flow.class, RETURNS_DEEP_STUBS);
-    exceptionHandler = new OnErrorPropagateHandler();
-    exceptionHandler.setMuleContext(muleContext);
-    exceptionHandler
-        .setNotificationFirer(getNotificationDispatcher(muleContext));
-    exceptionHandler.initialise();
-    exceptionHandler.start();
-    when(flow.getExceptionListener()).thenReturn(exceptionHandler);
     eventContext = (BaseEventContext) create(flow, TEST_CONNECTOR_LOCATION);
     input = builder(eventContext).message(of(TEST_MESSAGE)).build();
     output = builder(eventContext).message(of(TEST_MESSAGE)).build();
@@ -108,7 +97,6 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
       flow.stop();
       flow.dispose();
     }
-    exceptionHandler.dispose();
   }
 
   private final InternalReactiveProcessor map = publisher -> from(publisher).map(in -> output);

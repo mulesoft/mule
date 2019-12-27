@@ -67,7 +67,10 @@ public class StreamPerThreadSink implements Sink, Disposable {
       Flux.create(recorder)
           .doOnNext(request -> eventConsumer.accept(request))
           .transform(processor)
-          .subscribe(null, e -> sinks.invalidate(currentThread()), () -> sinks.invalidate(currentThread()));
+          .subscribe(null, e -> {
+            LOGGER.error("Exception reached PS subscriber for flow '" + flowConstruct.getName() + "'", e);
+            sinks.invalidate(currentThread());
+          }, () -> sinks.invalidate(currentThread()));
 
       return recorder.getFluxSink();
     })
