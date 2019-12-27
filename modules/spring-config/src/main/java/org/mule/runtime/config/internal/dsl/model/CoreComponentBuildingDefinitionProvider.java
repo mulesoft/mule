@@ -7,11 +7,7 @@
 
 package org.mule.runtime.config.internal.dsl.model;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.util.Arrays.asList;
-import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.createNewInstance;
@@ -56,7 +52,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEME
 import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 
 import org.mule.runtime.api.config.PoolingProfile;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.AbstractServerNotification;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.tx.TransactionType;
@@ -157,9 +152,6 @@ import org.mule.runtime.core.internal.transformer.compression.GZipUncompressTran
 import org.mule.runtime.core.internal.transformer.encryption.AbstractEncryptionTransformer;
 import org.mule.runtime.core.internal.transformer.encryption.DecryptionTransformer;
 import org.mule.runtime.core.internal.transformer.encryption.EncryptionTransformer;
-import org.mule.runtime.core.internal.transformer.expression.AbstractExpressionTransformer;
-import org.mule.runtime.core.internal.transformer.expression.ExpressionArgument;
-import org.mule.runtime.core.internal.transformer.expression.ExpressionTransformer;
 import org.mule.runtime.core.internal.transformer.simple.AutoTransformer;
 import org.mule.runtime.core.internal.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.internal.transformer.simple.HexStringToByteArray;
@@ -189,7 +181,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -817,79 +808,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                                                   .withNamespace(CORE_PREFIX)
                                                                                   .build());
 
-    transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(getExpressionTransformerConfigurationFactory(),
-                                                                          ExpressionTransformer.class,
-                                                                          newBuilder()
-                                                                              .withKey("returnSourceIfNull")
-                                                                              .withAttributeDefinition(fromSimpleParameter("returnSourceIfNull")
-                                                                                  .build())
-                                                                              .build(),
-                                                                          newBuilder()
-                                                                              .withKey("expression")
-                                                                              .withAttributeDefinition(fromSimpleParameter("expression")
-                                                                                  .build())
-                                                                              .build(),
-                                                                          newBuilder()
-                                                                              .withKey("arguments")
-                                                                              .withAttributeDefinition(fromChildCollectionConfiguration(ExpressionArgument.class)
-                                                                                  .build())
-                                                                              .build())
-                                                                                  .withIdentifier("expression-transformer")
-                                                                                  .withNamespace(CORE_PREFIX)
-                                                                                  .withTypeDefinition(fromType(ExpressionTransformer.class))
-                                                                                  .build());
-    transformerComponentBuildingDefinitions.add(baseDefinition
-        .withObjectFactoryType(ConfigurableObjectFactory.class)
-        .withIdentifier("return-argument")
-        .withTypeDefinition(fromType(ExpressionArgument.class))
-        .withSetterParameterDefinition("factory", fromFixedValue(getExpressionArgumentConfigurationFactory()).build())
-        .withSetterParameterDefinition("parameters", fromMultipleDefinitions(
-                                                                             newBuilder()
-                                                                                 .withKey("optional")
-                                                                                 .withAttributeDefinition(fromSimpleParameter("optional")
-                                                                                     .build())
-                                                                                 .build(),
-                                                                             newBuilder()
-                                                                                 .withKey("expression")
-                                                                                 .withAttributeDefinition(fromSimpleParameter("expression")
-                                                                                     .build())
-                                                                                 .build(),
-                                                                             newBuilder()
-                                                                                 .withKey("muleContext")
-                                                                                 .withAttributeDefinition(fromReferenceObject(MuleContext.class)
-                                                                                     .build())
-                                                                                 .build())
-                                                                                     .build())
-        .build());
-    transformerComponentBuildingDefinitions.add(baseDefinition
-        .withObjectFactoryType(ConfigurableObjectFactory.class)
-        .withIdentifier("bean-property")
-        .withTypeDefinition(fromType(ExpressionArgument.class))
-        .withSetterParameterDefinition("factory", fromFixedValue(getExpressionArgumentConfigurationFactory()).build())
-        .withSetterParameterDefinition("parameters", fromMultipleDefinitions(
-                                                                             newBuilder()
-                                                                                 .withKey("optional")
-                                                                                 .withAttributeDefinition(fromSimpleParameter("optional")
-                                                                                     .build())
-                                                                                 .build(),
-                                                                             newBuilder()
-                                                                                 .withKey("expression")
-                                                                                 .withAttributeDefinition(fromSimpleParameter("expression")
-                                                                                     .build())
-                                                                                 .build(),
-                                                                             newBuilder()
-                                                                                 .withKey("muleContext")
-                                                                                 .withAttributeDefinition(fromReferenceObject(MuleContext.class)
-                                                                                     .build())
-                                                                                 .build(),
-                                                                             newBuilder()
-                                                                                 .withKey("propertyName")
-                                                                                 .withAttributeDefinition(fromSimpleParameter("property-name")
-                                                                                     .build())
-                                                                                 .build())
-                                                                                     .build())
-        .build());
-
     return transformerComponentBuildingDefinitions;
   }
 
@@ -917,44 +835,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
       String className = (String) parameters.get("class");
       checkState(className != null, "custom-transformer class attribute cannot be null");
       return createNewInstance(className);
-    };
-  }
-
-  private ConfigurableInstanceFactory getExpressionArgumentConfigurationFactory() {
-    return parameters -> {
-      String name = (String) parameters.get("propertyName");
-      ExpressionArgument expressionArgument =
-          new ExpressionArgument(name, (String) parameters.get("expression"),
-                                 parseBoolean((String) ofNullable(parameters.get("optional")).orElse("false")));
-      expressionArgument.setMuleContext((MuleContext) parameters.get("muleContext"));
-      return expressionArgument;
-    };
-  }
-
-  private ConfigurableInstanceFactory getExpressionTransformerConfigurationFactory() {
-    return getAbstractTransformerConfigurationFactory(parameters -> {
-      ExpressionTransformer expressionTransformer = new ExpressionTransformer();
-      Boolean returnSourceIfNull = (Boolean) parameters.get("returnSourceIfNull");
-      if (returnSourceIfNull != null) {
-        expressionTransformer.setReturnSourceIfNull(returnSourceIfNull);
-      }
-      return expressionTransformer;
-    });
-  }
-
-  private ConfigurableInstanceFactory getAbstractTransformerConfigurationFactory(Function<Map<String, Object>, AbstractExpressionTransformer> abstractExpressionTransformerFactory) {
-    return parameters -> {
-      List<ExpressionArgument> arguments = (List<ExpressionArgument>) parameters.get("arguments");
-      String expression = (String) parameters.get("expression");
-      AbstractExpressionTransformer abstractExpressionTransformer = abstractExpressionTransformerFactory.apply(parameters);
-      if (expression != null && arguments != null) {
-        throw new MuleRuntimeException(createStaticMessage("Expression transformer do not support expression attribute or return-data child element at the same time."));
-      }
-      if (expression != null) {
-        arguments = asList(new ExpressionArgument("single", expression, false));
-      }
-      abstractExpressionTransformer.setArguments(arguments);
-      return abstractExpressionTransformer;
     };
   }
 
