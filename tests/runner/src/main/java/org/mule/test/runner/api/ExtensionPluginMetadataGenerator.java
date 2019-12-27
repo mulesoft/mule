@@ -173,7 +173,8 @@ class ExtensionPluginMetadataGenerator {
           logger.warn("CLASSPATH URLs:");
           classpath.forEach(url -> logger.warn(url.toString()));
           throw new IllegalArgumentException("Cannot load Extension class '" + extensionClassName + " obtained from: '" + firstURL
-              + "' with MD5 '" + TroubleshootingUtils.getMD5FromFile(firstURL) + "' using classpath: "
+              + "' with MD5 '" + TroubleshootingUtils.getMD5FromFile(firstURL) + "' with last modification on '"
+              + TroubleshootingUtils.getLastModifiedDateFromUrl(firstURL) + "' using classpath: "
               + classpath, e);
         }
       }
