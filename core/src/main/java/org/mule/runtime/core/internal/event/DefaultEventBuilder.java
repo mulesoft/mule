@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.CaseInsensitiveHashMap.basedOn;
 import static org.mule.runtime.core.api.util.CaseInsensitiveHashMap.emptyCaseInsensitiveMap;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.core.internal.message.EventInternalContext.copyOf;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.toGroupCorrelation;
 
@@ -101,7 +102,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     this.originalVars = (CaseInsensitiveHashMap<String, TypedValue<?>>) event.getVariables();
     this.internalParameters = (Map<String, Object>) event.getInternalParameters();
-    sdkInternalContext = event.getSdkInternalContext();
+    sdkInternalContext = copyOf(event.getSdkInternalContext());
   }
 
   public DefaultEventBuilder(BaseEventContext messageContext, InternalEvent event) {
@@ -407,7 +408,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.internalParameters = internalParameters;
 
       this.itemSequenceInfo = itemSequenceInfo.orElse(null);
-      this.sdkInternalContext = sdkInternalContext != null ? sdkInternalContext.copy() : null;
+      this.sdkInternalContext = sdkInternalContext;
       this.error = error;
       this.legacyCorrelationId = legacyCorrelationId;
 
