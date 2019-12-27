@@ -101,7 +101,6 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   protected static final String SOURCE_METADATA = "sourceMetadata";
   protected static final String SOURCE_METADATA_WITH_MULTILEVEL = "sourceMetadataWithMultilevel";
   protected static final String SOURCE_METADATA_WITH_CALLBACK_PARAMETERS = "sourceMetadataWithCallbackParameters";
-  protected static final String SHOULD_INHERIT_EXTENSION_RESOLVERS = "shouldInheritExtensionResolvers";
   protected static final String SHOULD_INHERIT_OPERATION_PARENT_RESOLVERS = "shouldInheritOperationParentResolvers";
   protected static final String SIMPLE_MULTILEVEL_KEY_RESOLVER = "simpleMultiLevelKeyResolver";
   protected static final String INCOMPLETE_MULTILEVEL_KEY_RESOLVER = "incompleteMultiLevelKeyResolver";
