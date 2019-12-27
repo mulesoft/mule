@@ -277,6 +277,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
           }
         }
       }
+    } else if (Object.class.equals(argumentType)) {
+      resolver = new ObjectArgumentResolverDecorator(resolver);
     }
 
     return resolver;
@@ -372,6 +374,18 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     @Override
     protected Object decorate(Object value) {
       return resolveCursor((TypedValue) value);
+    }
+  }
+
+  private class ObjectArgumentResolverDecorator extends ArgumentResolverDecorator {
+
+    public ObjectArgumentResolverDecorator(ArgumentResolver<Object> decoratee) {
+      super(decoratee);
+    }
+
+    @Override
+    protected Object decorate(Object value) {
+      return resolveCursor(value);
     }
   }
 

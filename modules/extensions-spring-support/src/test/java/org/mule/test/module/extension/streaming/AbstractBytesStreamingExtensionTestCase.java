@@ -16,6 +16,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATE
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.BYTES_STREAMING;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
+
 import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -24,12 +25,16 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
+import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
@@ -81,6 +86,9 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
   @Inject
   @Named("toNonRepeatableStream")
   private Flow toNonRepeatableStream;
+
+  @Inject
+  private StreamingManager streamingManager;
 
   @Rule
   public SystemProperty configName;
@@ -221,6 +229,23 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
   @Description("A source is configured not to stream")
   public void sourceWithoutStreaming() throws Exception {
     startSourceAndListenSpell(bytesCasterWithoutStreaming, bargainPredicate());
+  }
+
+  @Test
+  @Description("New cursor is open for Object parameter which receives a CursorProvider")
+  public void resolveCursorsFromObjectParams() throws Exception {
+    CursorStreamProviderFactory factory = streamingManager
+        .forBytes()
+        .getInMemoryCursorProviderFactory(InMemoryCursorStreamConfig.getDefault());
+
+    CursorStreamProvider provider = (CursorStreamProvider) flowRunner("objectToStream")
+        .keepStreamsOpen()
+        .withPayload(factory.of(testEvent().getContext(), new ByteArrayInputStream(data.getBytes())))
+        .run().getMessage().getPayload().getValue();
+
+    byte[] bytes = muleContext.getObjectSerializer().getInternalProtocol().serialize(provider);
+    bytes = muleContext.getObjectSerializer().getInternalProtocol().deserialize(bytes);
+    assertThat(new String(bytes, Charset.defaultCharset()), equalTo(data));
   }
 
   @Test

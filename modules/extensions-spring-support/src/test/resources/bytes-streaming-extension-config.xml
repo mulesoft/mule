@@ -52,6 +52,10 @@
         <marvel:to-stream config-ref="${configName}"/>
     </flow>
 
+    <flow name="objectToStream">
+        <marvel:object-to-stream config-ref="${configName}" />
+    </flow>
+
     <flow name="toNonRepeatableStream">
         <marvel:to-stream config-ref="${configName}">
             <non-repeatable-stream />
