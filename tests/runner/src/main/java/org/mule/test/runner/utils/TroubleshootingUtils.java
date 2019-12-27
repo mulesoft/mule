@@ -7,10 +7,12 @@
 
 package org.mule.test.runner.utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.management.ManagementFactory;
 import java.net.JarURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,6 +20,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 
 import javax.management.MBeanServer;
 import javax.xml.bind.DatatypeConverter;
@@ -156,5 +159,18 @@ public class TroubleshootingUtils {
         .newPlatformMXBeanProxy(server, "com.sun.management:type=HotSpotDiagnostic",
                                 HotSpotDiagnosticMXBean.class);
     mxBean.dumpHeap(filePath, live);
+  }
+
+  public static String getLastModifiedDateFromUrl(URL filePathURL) {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    long lastModifiedDate = 0L;
+
+    try {
+      lastModifiedDate = new File(filePathURL.toURI()).lastModified();
+    } catch (URISyntaxException e) {
+      //do nothing
+    }
+
+    return sdf.format(lastModifiedDate);
   }
 }
