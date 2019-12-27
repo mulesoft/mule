@@ -135,13 +135,19 @@ public class RxUtils {
           if (inflightCounter.decrementAndGet() == 0) {
             if (upstreamComplete.get()) {
               completer.runOnce();
-              scheduledCompletion.get().cancel(true);
+              final ScheduledFuture<?> scheduledFuture = scheduledCompletion.get();
+              if (scheduledFuture != null) {
+                scheduledFuture.cancel(true);
+              }
             }
 
             final Throwable t = upstreamError.get();
             if (t != null) {
               errorForwarder.consumeOnce(t);
-              scheduledCompletion.get().cancel(true);
+              final ScheduledFuture<?> scheduledFuture = scheduledCompletion.get();
+              if (scheduledFuture != null) {
+                scheduledFuture.cancel(true);
+              }
             }
           }
         }),
