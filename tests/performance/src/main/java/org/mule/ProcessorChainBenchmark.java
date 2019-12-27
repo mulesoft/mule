@@ -6,6 +6,7 @@
  */
 package org.mule;
 
+import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
@@ -14,18 +15,17 @@ import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.Warmup;
+
 import reactor.core.publisher.FluxProcessor;
 import reactor.core.publisher.FluxSink;
 
@@ -48,7 +48,7 @@ public class ProcessorChainBenchmark extends AbstractBenchmark {
     }
     chain = builder.build();
     chain.setMuleContext(createMuleContextWithServices());
-    event = builder(create("", "", CONNECTOR_LOCATION, NullExceptionHandler.getInstance()))
+    event = builder(create("", "", CONNECTOR_LOCATION, null, empty()))
         .message(of(PAYLOAD)).build();
   }
 

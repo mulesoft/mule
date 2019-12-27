@@ -7,6 +7,7 @@
 package org.mule.el;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.mule.runtime.api.el.BindingContextUtils.ATTRIBUTES;
 import static org.mule.runtime.api.el.BindingContextUtils.CORRELATION_ID;
@@ -24,7 +25,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.NullExceptionHandler;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
@@ -33,7 +33,7 @@ import org.openjdk.jmh.annotations.TearDown;
 @OutputTimeUnit(NANOSECONDS)
 public class BindingContextBenchmark extends AbstractBenchmark {
 
-  private static final CoreEvent event = CoreEvent.builder(create("", "", CONNECTOR_LOCATION, NullExceptionHandler.getInstance()))
+  private static final CoreEvent event = CoreEvent.builder(create("", "", CONNECTOR_LOCATION, null, empty()))
       .message(of(PAYLOAD)).addVariable("foo", "bar").build();
 
   private static final BindingContext globalCtx = BindingContext.builder()

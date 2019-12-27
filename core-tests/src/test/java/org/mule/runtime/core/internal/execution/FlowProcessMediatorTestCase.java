@@ -55,6 +55,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.construct.AbstractFlowConstruct;
 import org.mule.runtime.core.internal.construct.FlowBackPressureMaxConcurrencyExceededException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
@@ -144,7 +145,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     initialiseIfNeeded(flowProcessMediator, muleContext);
     startIfNeeded(flowProcessMediator);
 
-    flow = mock(FlowConstruct.class, withSettings().extraInterfaces(Component.class));
+    flow = mock(AbstractFlowConstruct.class, withSettings().extraInterfaces(Component.class));
     FlowExceptionHandler exceptionHandler = mock(FlowExceptionHandler.class);
 
     // Call routeError failure callback for success response sending error test cases
@@ -155,7 +156,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
       return null;
     }).when(exceptionHandler).routeError(any(Exception.class), any(Consumer.class), any(Consumer.class));
 
-    when(flow.getExceptionListener()).thenReturn(exceptionHandler);
+    when(((AbstractFlowConstruct) flow).getExceptionListener()).thenReturn(exceptionHandler);
     when(exceptionHandler.apply(any()))
         .thenAnswer(invocationOnMock -> error((MessagingException) invocationOnMock.getArgument(0)));
     when(flow.getMuleContext()).thenReturn(muleContext);
@@ -335,7 +336,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
 
     flowProcessMediator.process(template, context, notifier);
 
-    verify(flow.getExceptionListener(), never()).handleException(any(), any());
+    verify(((AbstractFlowConstruct) flow).getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any());
     verify(template, never()).sendFailureResponseToClient(any(), any(), any());
     verify(template).afterPhaseExecution(argThat(leftMatches(withEventThat(isErrorTypeSourceErrorResponseGenerate()))));
@@ -351,7 +352,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
 
     flowProcessMediator.process(template, context, notifier);
 
-    verify(flow.getExceptionListener(), never()).handleException(any(), any());
+    verify(((AbstractFlowConstruct) flow).getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
     verify(template).afterPhaseExecution(argThat(leftMatches(withEventThat(isErrorTypeSourceErrorResponseSend()))));
@@ -368,7 +369,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
 
     flowProcessMediator.process(template, context, notifier);
 
-    verify(flow.getExceptionListener(), never()).handleException(any(), any());
+    verify(((AbstractFlowConstruct) flow).getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
     verify(notifier, never()).phaseSuccessfully();
@@ -391,7 +392,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
   }
 
   private void verifySuccess() {
-    verify(flow.getExceptionListener(), never()).handleException(any(), any());
+    verify(((AbstractFlowConstruct) flow).getExceptionListener(), never()).handleException(any(), any());
     verify(template).sendResponseToClient(any(), any(), any());
     verify(template, never()).sendFailureResponseToClient(any(), any(), any());
     verify(template).afterPhaseExecution(argThat(rightMatches(Matchers.any(CoreEvent.class))));
@@ -401,7 +402,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
   }
 
   private void verifyFlowError(EventMatcher errorTypeMatcher) {
-    verify(flow.getExceptionListener(), never()).handleException(any(), any());
+    verify(((AbstractFlowConstruct) flow).getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
     verify(template).afterPhaseExecution(argThat(leftMatches(withEventThat(errorTypeMatcher))));
@@ -410,8 +411,9 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
   }
 
   private void verifyFlowErrorHandler(final EventMatcher errorHandlerEventMatcher) {
-    verify(flow.getExceptionListener()).routeError(argThat(withEventThat(errorHandlerEventMatcher)), any(Consumer.class),
-                                                   any(Consumer.class));
+    verify(((AbstractFlowConstruct) flow).getExceptionListener()).routeError(argThat(withEventThat(errorHandlerEventMatcher)),
+                                                                             any(Consumer.class),
+                                                                             any(Consumer.class));
   }
 
   private EventMatcher isErrorTypeSourceResponseGenerate() {

@@ -28,7 +28,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.CoreEvent.Builder;
-import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -134,8 +133,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
   }
 
   private EventContext createEventContext(Optional<CompletableFuture<Void>> externalCompletion) {
-    return create(muleContext.getUniqueIdString(), muleContext.getId(), getLocation(), null, externalCompletion,
-                  NullExceptionHandler.getInstance());
+    return create(muleContext.getUniqueIdString(), muleContext.getId(), getLocation(), null, externalCompletion);
   }
 
   private BaseEventContext createChildEventContext(EventContext parent) {

@@ -52,12 +52,12 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.internal.construct.AbstractFlowConstruct;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
@@ -161,7 +161,7 @@ public class FlowProcessMediator implements Initialisable {
     try {
 
       final MessageSource messageSource = messageProcessContext.getMessageSource();
-      final FlowConstruct flowConstruct = messageProcessContext.getFlowConstruct();
+      final AbstractFlowConstruct flowConstruct = (AbstractFlowConstruct) messageProcessContext.getFlowConstruct();
       final CompletableFuture<Void> responseCompletion = new CompletableFuture<>();
       final FlowProcessor flowExecutionProcessor = new FlowProcessor(template, flowConstruct);
       final CoreEvent event = createEvent(template, messageSource, responseCompletion, flowConstruct);
@@ -476,9 +476,7 @@ public class FlowProcessMediator implements Initialisable {
 
   private Builder createEventBuilder(ComponentLocation sourceLocation, CompletableFuture<Void> responseCompletion,
                                      FlowConstruct flowConstruct, String correlationId) {
-    return InternalEvent
-        .builder(create(flowConstruct, NullExceptionHandler.getInstance(), sourceLocation, correlationId,
-                        Optional.of(responseCompletion)));
+    return InternalEvent.builder(create(flowConstruct, sourceLocation, correlationId, Optional.of(responseCompletion)));
   }
 
   /**
@@ -582,7 +580,7 @@ public class FlowProcessMediator implements Initialisable {
     private final MessageSource messageSource;
     private final MessageProcessContext messageProcessContext;
     private final PhaseResultNotifier phaseResultNotifier;
-    private final FlowConstruct flowConstruct;
+    private final AbstractFlowConstruct flowConstruct;
     private final Consumer<Either<MessagingException, CoreEvent>> terminateConsumer;
     private final CompletableFuture<Void> responseCompletion;
     private final SourcePolicy sourcePolicy;
@@ -594,7 +592,7 @@ public class FlowProcessMediator implements Initialisable {
                          MessageSource messageSource,
                          MessageProcessContext messageProcessContext,
                          PhaseResultNotifier phaseResultNotifier,
-                         FlowConstruct flowConstruct,
+                         AbstractFlowConstruct flowConstruct,
                          Consumer<Either<MessagingException, CoreEvent>> terminateConsumer,
                          CompletableFuture<Void> responseCompletion,
                          CoreEvent event,

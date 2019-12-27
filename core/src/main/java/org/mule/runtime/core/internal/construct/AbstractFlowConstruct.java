@@ -166,7 +166,6 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
     return name;
   }
 
-  @Override
   public FlowExceptionHandler getExceptionListener() {
     return exceptionListener;
   }

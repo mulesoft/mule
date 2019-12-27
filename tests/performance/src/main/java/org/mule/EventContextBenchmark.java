@@ -10,7 +10,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.runtime.core.api.exception.NullExceptionHandler.getInstance;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObject;
@@ -28,18 +27,18 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.annotations.Warmup;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Warmup(iterations = 20)
 @Measurement(iterations = 100)
@@ -48,8 +47,8 @@ public class EventContextBenchmark extends AbstractBenchmark {
 
   private MuleContext muleContext;
   private Flow flow;
-  private String id = UUID.getUUID();
-  private String severId = UUID.getUUID();
+  private final String id = UUID.getUUID();
+  private final String severId = UUID.getUUID();
   private CoreEvent event;
 
 
@@ -73,7 +72,7 @@ public class EventContextBenchmark extends AbstractBenchmark {
 
   @Benchmark
   public EventContext createEventContext() {
-    return create(id, severId, CONNECTOR_LOCATION, getInstance());
+    return create(id, severId, CONNECTOR_LOCATION, null, empty());
   }
 
   @Benchmark

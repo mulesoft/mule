@@ -7,6 +7,7 @@
 package org.mule.runtime.core.policy;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.block;
@@ -15,7 +16,6 @@ import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
 import org.mule.runtime.core.internal.policy.NoSourcePolicy;
@@ -68,7 +68,7 @@ public class NoSourcePolicyBenchmark extends AbstractBenchmark {
     CoreEvent event;
     Message.Builder messageBuilder = Message.builder().value(PAYLOAD);
     CoreEvent.Builder eventBuilder =
-        CoreEvent.builder(create("", "", CONNECTOR_LOCATION, NullExceptionHandler.getInstance())).message(messageBuilder.build());
+        CoreEvent.builder(create("", "", CONNECTOR_LOCATION, null, empty())).message(messageBuilder.build());
     event = eventBuilder.build();
 
     return block(callback -> handler.process(event, sourceRpp, callback));

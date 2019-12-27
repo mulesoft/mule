@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -23,7 +23,6 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -57,9 +56,6 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
   @Mock
   private ComponentLocation location;
 
-  @Mock
-  private FlowExceptionHandler exceptionHandler;
-
   private DefaultEventContext ctx;
   private CursorManager cursorManager;
   private ExecutorService executorService;
@@ -67,7 +63,7 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
   @Before
   public void before() {
     cursorManager = new CursorManager(statistics, ghostBuster);
-    ctx = new DefaultEventContext("id", "server", location, "", empty(), exceptionHandler);
+    ctx = new DefaultEventContext("id", "server", location, "", empty());
     when(ghostBuster.track(any())).thenAnswer(inv -> new WeakReference<>(inv.getArgument(0)));
   }
 

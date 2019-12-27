@@ -36,7 +36,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -154,20 +153,17 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
         },
         {
             (CheckedSupplier<EventContext>) () -> create("id", DefaultEventContextTestCase.class.getName(),
-                                                         TEST_CONNECTOR_LOCATION, NullExceptionHandler.getInstance()),
+                                                         TEST_CONNECTOR_LOCATION, null, empty()),
             (CheckedFunction<CompletableFuture<Void>, EventContext>) externalCompletion -> create("id",
                                                                                                   DefaultEventContextTestCase.class
                                                                                                       .getName(),
                                                                                                   TEST_CONNECTOR_LOCATION,
                                                                                                   null,
-                                                                                                  of(externalCompletion),
-                                                                                                  NullExceptionHandler
-                                                                                                      .getInstance()),
+                                                                                                  of(externalCompletion)),
             (CheckedFunction<ComponentLocation, EventContext>) location -> create("id",
                                                                                   DefaultEventContextTestCase.class
                                                                                       .getName(),
-                                                                                  location,
-                                                                                  NullExceptionHandler.getInstance())
+                                                                                  location, null, empty())
         }
     });
   }
