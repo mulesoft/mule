@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.internal.factories;
 
+import static java.util.Collections.emptyList;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
@@ -23,7 +25,7 @@ public class ChoiceRouterObjectFactory extends AbstractComponentFactory<ChoiceRo
   private MuleContext muleContext;
 
   private Processor defaultProcessor;
-  private Collection<ProcessorExpressionRoute> conditionalMessageProcessors;
+  private Collection<ProcessorExpressionRoute> conditionalMessageProcessors = emptyList();
 
   public ChoiceRouterObjectFactory() {
     super();
