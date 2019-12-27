@@ -260,48 +260,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="expression-transformer" type="expressionTransformerType" substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that evaluates one or more expressions on the current message. Each expression equates to a parameter in the return message. The return message for two or more expressions will be an Object[].
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="expressionTransformerType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractTransformerType">
-                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-                    <xsd:element name="return-argument">
-                        <xsd:annotation>
-                            <xsd:documentation>If all expressions return null or NullPayload on this transformer, this flag will cause the source payload to be returned without modification.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                        <xsd:complexType>
-                            <xsd:attributeGroup ref="expressionAttributes"/>
-                            <!--
-                             -->
-                            <xsd:attribute name="optional" type="substitutableBoolean" use="optional">
-                                <xsd:annotation>
-                                    <xsd:documentation>If the expression evaluates to null, specifies whether to continue to the next expression without error.
-                                    </xsd:documentation>
-                                </xsd:annotation>
-                            </xsd:attribute>
-                        </xsd:complexType>
-                    </xsd:element>
-                </xsd:sequence>
-                <xsd:attributeGroup ref="optionalExpressionAttributes"/>
-                <xsd:attribute name="returnSourceIfNull" type="xsd:boolean" use="optional">
-                    <xsd:annotation>
-                        <xsd:documentation>If all expressions return null on this transformer, this flag will cause the source payload to be returned without modification.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-
     <xsd:element name="expression-component" substitutionGroup="abstract-mixed-content-message-processor">
         <xsd:complexType>
             <xsd:complexContent mixed="true">
