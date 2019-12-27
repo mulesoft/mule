@@ -75,6 +75,11 @@ public class DrStrangeOperations {
     return connection.manage(new ByteArrayInputStream(data.getBytes()));
   }
 
+  @MediaType(TEXT_PLAIN)
+  public InputStream objectToStream(@Connection MysticConnection connection, @Optional(defaultValue = PAYLOAD) Object data) {
+    return connection.manage((InputStream) data);
+  }
+
   public void crashCar(@Config DrStrange dr) {
     throw new RuntimeException();
   }
