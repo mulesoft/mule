@@ -26,8 +26,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -168,7 +166,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
     if (provider instanceof ManagedCursorProvider) {
       return provider;
     }
-    return cursorManager.manage(provider, (DefaultEventContext) creatorEventContext);
+    return cursorManager.manage(provider, (DefaultEventContext) ((BaseEventContext) creatorEventContext).getRootContext());
   }
 
   /**
