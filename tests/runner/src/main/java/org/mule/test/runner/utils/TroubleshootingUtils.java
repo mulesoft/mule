@@ -18,9 +18,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import javax.management.MBeanServer;
 import javax.xml.bind.DatatypeConverter;
@@ -172,5 +178,24 @@ public class TroubleshootingUtils {
     }
 
     return sdf.format(lastModifiedDate);
+  }
+
+  public static List<String> listEntriesInJar(File jarPath) throws IOException {
+    List<String> entriesInJarList = new ArrayList<>();
+
+    entriesInJarList.add("name: '" + jarPath.getName() + "' - last modified time: '"
+        + getLastModifiedDateFromUrl(jarPath.toURI().toURL()) + "'");
+
+    try (JarFile jarFile = new JarFile(jarPath)) {
+      Enumeration<JarEntry> jarEntries = jarFile.entries();
+      while (jarEntries.hasMoreElements()) {
+        JarEntry entry = jarEntries.nextElement();
+        String entryName = entry.getName();
+        FileTime entryLastModifiedTime = entry.getLastModifiedTime();
+
+        entriesInJarList.add("name: '" + entryName + "' - last modified time: '" + entryLastModifiedTime + "'");
+      }
+    }
+    return entriesInJarList;
   }
 }
