@@ -161,8 +161,8 @@ class ExtensionPluginMetadataGenerator {
     logger.warn("Scanning plugin '{}' for annotated Extension class from {}", plugin, firstURL);
     logger.warn("Available URLS: {}", urls);
     try {
-      logger.warn("Contents of firstURL: {}", (Object) new File(firstURL.toURI()).listFiles());
-    } catch (URISyntaxException e) {
+      logger.warn("Contents of firstURL: {}", TroubleshootingUtils.listEntriesInJar(new File(firstURL.toURI())));
+    } catch (IOException | URISyntaxException e) {
       //do nothing
     }
     ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
