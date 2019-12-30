@@ -423,4 +423,22 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:attributeGroup name="expressionAttributes">
+        <xsd:attribute name="expression" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>The expression to evaluate.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="optionalExpressionAttributes">
+        <xsd:attribute name="expression" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>The expression to evaluate.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
 </xsd:schema>
