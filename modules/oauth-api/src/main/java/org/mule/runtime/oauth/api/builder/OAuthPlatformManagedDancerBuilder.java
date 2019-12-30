@@ -15,6 +15,8 @@ import org.mule.runtime.oauth.api.listener.PlatformManagedListener;
 @Experimental
 public interface OAuthPlatformManagedDancerBuilder extends OAuthDancerBuilder<PlatformManagedOAuthDancer> {
 
+  OAuthPlatformManagedDancerBuilder setConnectionId(String connectionId);
+
   OAuthPlatformManagedDancerBuilder addListener(PlatformManagedListener listener);
 
 }
