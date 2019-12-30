@@ -68,9 +68,10 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
                                         RetryPolicyTemplate retryPolicyTemplate,
                                         ExtensionManager extensionManager,
                                         PolicyManager policyManager,
-                                        ReflectionCache reflectionCache) {
+                                        ReflectionCache reflectionCache,
+                                        DefaultExecutionMediator.ValueTransformer valueTransformer) {
     super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-          retryPolicyTemplate, extensionManager, policyManager, reflectionCache);
+          retryPolicyTemplate, extensionManager, policyManager, reflectionCache, valueTransformer);
   }
 
   @Override
@@ -160,5 +161,10 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
     return t instanceof AccessTokenExpiredException
         ? (AccessTokenExpiredException) t
         : extractOfType(t, AccessTokenExpiredException.class).orElse(null);
+  }
+
+  @Override
+  protected ExecutionMediator createExecutionMediator() {
+    return new DefaultExecutionMediator(extensionModel, componentModel, connectionManager, muleContext.getErrorTypeRepository());
   }
 }

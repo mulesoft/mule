@@ -41,6 +41,7 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.subscriberContext;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -93,8 +94,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
@@ -104,6 +103,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.google.common.collect.ImmutableMap;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
@@ -152,7 +152,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected ComponentExecutor componentExecutor;
   protected ReturnDelegate returnDelegate;
   protected PolicyManager policyManager;
-  private Supplier<ExecutionMediator> executionMediatorFactory;
 
   private String resolvedProcessorRepresentation;
   private boolean initialised = false;
@@ -504,10 +503,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   protected ExecutionMediator createExecutionMediator() {
-    if (executionMediatorFactory != null) {
-      return executionMediatorFactory.get();
-    }
-
     return new DefaultExecutionMediator(extensionModel, componentModel, connectionManager, muleContext.getErrorTypeRepository());
   }
 
@@ -598,9 +593,5 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       return location.equals(component.getLocation());
     }
     return false;
-  }
-
-  public void setExecutionMediatorFactory(Supplier<ExecutionMediator> executionMediatorFactory) {
-    this.executionMediatorFactory = executionMediatorFactory;
   }
 }

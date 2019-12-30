@@ -542,10 +542,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   protected abstract ParameterValueResolver getParameterValueResolver();
 
-  public ConnectionManagerAdapter getConnectionManager() {
-    return connectionManager;
-  }
-
   /**
    * @return the extension model where the component has been defined.
    */

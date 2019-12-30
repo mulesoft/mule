@@ -11,6 +11,8 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
+import org.mule.runtime.extension.api.error.MuleErrors;
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
 import java.util.List;
@@ -41,9 +43,10 @@ public class TestOAuthOperations {
         final OAuthState state = connection.getState().getState();
         if (state != null && !state.getAccessToken().endsWith("refreshed")) {
           if (state instanceof AuthorizationCodeState) {
-            throw new AccessTokenExpiredException(((AuthorizationCodeState) state).getResourceOwnerId());
+            throw new ModuleException(MuleErrors.CONNECTIVITY,
+                                      new AccessTokenExpiredException(((AuthorizationCodeState) state).getResourceOwnerId()));
           } else {
-            throw new AccessTokenExpiredException();
+            throw new ModuleException(MuleErrors.CONNECTIVITY, new AccessTokenExpiredException());
           }
         }
         return null;

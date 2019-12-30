@@ -50,23 +50,19 @@ public final class OperationMessageProcessorBuilder
   protected OperationMessageProcessor createMessageProcessor(ExtensionManager extensionManager, ResolverSet arguments) {
     ConfigurationProvider configurationProvider = getConfigurationProvider();
     OperationMessageProcessor processor;
-
+    DefaultExecutionMediator.ValueTransformer valueTransformer = null;
+    if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
+      valueTransformer = transformPagingDelegate(extensionConnectionSupplier);
+    }
     if (supportsOAuth(extensionModel)) {
       processor = new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
                                                      arguments, cursorProviderFactory, retryPolicyTemplate, extensionManager,
-                                                     policyManager, reflectionCache);
+                                                     policyManager, reflectionCache, valueTransformer);
     } else {
       processor = new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
                                                 arguments, cursorProviderFactory, retryPolicyTemplate, extensionManager,
                                                 policyManager,
-                                                reflectionCache);
-    }
-    if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
-      processor.setExecutionMediatorFactory(() -> new DefaultExecutionMediator(extensionModel,
-                                                                               operationModel,
-                                                                               processor.getConnectionManager(),
-                                                                               muleContext.getErrorTypeRepository(),
-                                                                               transformPagingDelegate(extensionConnectionSupplier)));
+                                                reflectionCache, valueTransformer);
     }
     return processor;
   }
