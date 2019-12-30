@@ -54,7 +54,6 @@ public class OptimizedCaseInsensitiveMapWrapper<T> extends CaseInsensitiveMapWra
     return new EntrySet<>(baseMap.entrySet());
   }
 
-
   private static class KeySet extends AbstractConverterSet<CaseInsensitiveMapKey, String> {
 
     public KeySet(Set<CaseInsensitiveMapKey> keys) {

@@ -8,6 +8,7 @@
 package org.mule.runtime.http.api.domain;
 
 import static java.util.Collections.unmodifiableMap;
+import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
@@ -60,7 +61,7 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
   protected final boolean optimized;
 
   public CaseInsensitiveMultiMap() {
-    this(true);
+    this(!PRESERVE_HEADER_CASE);
     LOGGER.error("Constructor without parameters, line 58");
   }
 
@@ -73,7 +74,7 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
   }
 
   public CaseInsensitiveMultiMap(MultiMap<String, String> paramsMap) {
-    this(paramsMap, true);
+    this(paramsMap, !PRESERVE_HEADER_CASE);
     LOGGER.error("Constructor with Multimap paramsMap, line 71");
   }
 
@@ -86,9 +87,25 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
     LOGGER.error("Constructor with Multimap paramsMap & boolean optimized, line 80");
   }
 
+  protected CaseInsensitiveMultiMap(CaseInsensitiveMultiMap multiMap, Boolean optimized) {
+    this.optimized = optimized;
+    if (!optimized && !multiMap.optimized) {
+      this.paramsMap = multiMap.paramsMap;
+    } else {
+      this.paramsMap = optimized
+          ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>())
+          : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
+      putAll(multiMap);
+    }
+  }
+
+  public CaseInsensitiveMultiMap(CaseInsensitiveMultiMap multiMap) {
+    this(multiMap, !PRESERVE_HEADER_CASE);
+  }
+
   @Override
   public CaseInsensitiveMultiMap toImmutableMultiMap() {
-    LOGGER.error("toInmutableMultiMap, line 85");
+    LOGGER.error("toImmutableMultiMap, line 85");
     if (this.isEmpty() && emptyCaseInsensitiveMultiMap() != null) {
       return emptyCaseInsensitiveMultiMap();
     }
