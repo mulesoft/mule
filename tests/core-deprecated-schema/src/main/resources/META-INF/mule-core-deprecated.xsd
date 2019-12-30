@@ -113,60 +113,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="xml-entity-encoder-transformer" type="abstractTransformerType"
-                 substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that encodes a string using XML entities.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="xml-entity-decoder-transformer" type="abstractTransformerType"
-                 substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that decodes a string containing XML entities.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="gzip-compress-transformer" type="abstractTransformerType"
-                 substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that compresses a byte array using gzip.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="gzip-uncompress-transformer" type="abstractTransformerType"
-                 substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that uncompresses a byte array using gzip.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="byte-array-to-hex-string-transformer" type="abstractTransformerType"
-                 substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that converts a byte array to a string of hexadecimal digits.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="hex-string-to-byte-array-transformer" type="abstractTransformerType"
-                 substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that converts a string of hexadecimal digits to a byte array.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
     <xsd:element name="byte-array-to-object-transformer" type="abstractTransformerType"
                  substitutionGroup="abstract-transformer">
         <xsd:annotation>
@@ -229,36 +175,6 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-
-    <xsd:element name="encrypt-transformer" type="encryptionTransformerType" substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that encrypts a message.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="decrypt-transformer" type="encryptionTransformerType" substitutionGroup="abstract-transformer">
-        <xsd:annotation>
-            <xsd:documentation>
-                A transformer that decrypts a message.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:complexType name="encryptionTransformerType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractTransformerType">
-                <xsd:attribute name="strategy-ref" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The name of the encryption strategy to use. This should be configured using the password-encryption-strategy element, inside a security-manager element at the top level.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <xsd:element name="expression-component" substitutionGroup="abstract-mixed-content-message-processor">
         <xsd:complexType>
@@ -355,4 +271,156 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+    
+    <!-- Already Removed -->
+    <!-- These items remain here for compatibility with stale schema definitions -->
+    <!--     but they do NOT have an associated parser definition! --> 
+
+    <xsd:element name="xml-entity-encoder-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that encodes a string using XML entities.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="xml-entity-decoder-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that decodes a string containing XML entities.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="gzip-compress-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that compresses a byte array using gzip.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="gzip-uncompress-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that uncompresses a byte array using gzip.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="byte-array-to-hex-string-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that converts a byte array to a string of hexadecimal digits.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="hex-string-to-byte-array-transformer" type="abstractTransformerType"
+                 substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that converts a string of hexadecimal digits to a byte array.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="append-string-transformer" type="appendStringTransformerType" substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that appends a string to a string payload.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="appendStringTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractTransformerType">
+                <xsd:attribute name="message" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The string to append.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="encrypt-transformer" type="encryptionTransformerType" substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that encrypts a message.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="decrypt-transformer" type="encryptionTransformerType" substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that decrypts a message.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="encryptionTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractTransformerType">
+                <xsd:attribute name="strategy-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the encryption strategy to use. This should be configured using the password-encryption-strategy element, inside a security-manager element at the top level.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="expression-transformer" type="expressionTransformerType" substitutionGroup="abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that evaluates one or more expressions on the current message. Each expression equates to a parameter in the return message. The return message for two or more expressions will be an Object[].
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="expressionTransformerType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractTransformerType">
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xsd:element name="return-argument">
+                        <xsd:annotation>
+                            <xsd:documentation>If all expressions return null or NullPayload on this transformer, this flag will cause the source payload to be returned without modification.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                        <xsd:complexType>
+                            <xsd:attributeGroup ref="expressionAttributes"/>
+                            <!--
+                             -->
+                            <xsd:attribute name="optional" type="substitutableBoolean" use="optional">
+                                <xsd:annotation>
+                                    <xsd:documentation>If the expression evaluates to null, specifies whether to continue to the next expression without error.
+                                    </xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:attribute>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attributeGroup ref="optionalExpressionAttributes"/>
+                <xsd:attribute name="returnSourceIfNull" type="xsd:boolean" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>If all expressions return null on this transformer, this flag will cause the source payload to be returned without modification.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
 </xsd:schema>

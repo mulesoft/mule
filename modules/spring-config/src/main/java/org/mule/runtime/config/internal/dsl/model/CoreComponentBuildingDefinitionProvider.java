@@ -145,16 +145,8 @@ import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.internal.security.UsernamePasswordAuthenticationFilter;
 import org.mule.runtime.core.internal.security.filter.MuleEncryptionEndpointSecurityFilter;
 import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
-import org.mule.runtime.core.internal.transformer.codec.XmlEntityDecoder;
-import org.mule.runtime.core.internal.transformer.codec.XmlEntityEncoder;
-import org.mule.runtime.core.internal.transformer.compression.GZipCompressTransformer;
-import org.mule.runtime.core.internal.transformer.compression.GZipUncompressTransformer;
 import org.mule.runtime.core.internal.transformer.encryption.AbstractEncryptionTransformer;
-import org.mule.runtime.core.internal.transformer.encryption.DecryptionTransformer;
-import org.mule.runtime.core.internal.transformer.encryption.EncryptionTransformer;
 import org.mule.runtime.core.internal.transformer.simple.AutoTransformer;
-import org.mule.runtime.core.internal.transformer.simple.ByteArrayToHexString;
-import org.mule.runtime.core.internal.transformer.simple.HexStringToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
@@ -728,38 +720,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   @SuppressWarnings("unchecked")
   private List<ComponentBuildingDefinition> getTransformersBuildingDefinitions() {
     List<ComponentBuildingDefinition> transformerComponentBuildingDefinitions = new ArrayList<>();
-    transformerComponentBuildingDefinitions.add(getCoreTransformerBaseBuilder(XmlEntityEncoder.class)
-        .withIdentifier("xml-entity-encoder-transformer")
-        .build());
-    transformerComponentBuildingDefinitions.add(getCoreTransformerBaseBuilder(XmlEntityDecoder.class)
-        .withIdentifier("xml-entity-decoder-transformer")
-        .build());
-    transformerComponentBuildingDefinitions.add(getCoreTransformerBaseBuilder(GZipCompressTransformer.class)
-        .withIdentifier("gzip-compress-transformer")
-        .build());
-    transformerComponentBuildingDefinitions.add(getCoreTransformerBaseBuilder(GZipUncompressTransformer.class)
-        .withIdentifier("gzip-uncompress-transformer")
-        .build());
-    KeyAttributeDefinitionPair strategyParameterDefinition = newBuilder()
-        .withKey("strategy")
-        .withAttributeDefinition(fromSimpleReferenceParameter("strategy-ref").build())
-        .build();
-    transformerComponentBuildingDefinitions
-        .add(getTransformerBaseBuilder(getEncryptionTransformerConfigurationFactory(EncryptionTransformer.class),
-                                       EncryptionTransformer.class, strategyParameterDefinition)
-                                           .withIdentifier("encrypt-transformer").withNamespace(CORE_PREFIX)
-                                           .build());
-    transformerComponentBuildingDefinitions
-        .add(getTransformerBaseBuilder(getEncryptionTransformerConfigurationFactory(DecryptionTransformer.class),
-                                       DecryptionTransformer.class, strategyParameterDefinition)
-                                           .withIdentifier("decrypt-transformer").withNamespace(CORE_PREFIX)
-                                           .build());
-    transformerComponentBuildingDefinitions.add(getCoreTransformerBaseBuilder(ByteArrayToHexString.class)
-        .withIdentifier("byte-array-to-hex-string-transformer")
-        .build());
-    transformerComponentBuildingDefinitions.add(getCoreTransformerBaseBuilder(HexStringToByteArray.class)
-        .withIdentifier("hex-string-to-byte-array-transformer")
-        .build());
+
     transformerComponentBuildingDefinitions.add(getCoreTransformerBaseBuilder(ByteArrayToObject.class)
         .withIdentifier("byte-array-to-object-transformer")
         .build());
