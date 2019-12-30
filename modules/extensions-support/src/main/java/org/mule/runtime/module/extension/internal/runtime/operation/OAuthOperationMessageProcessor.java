@@ -163,8 +163,4 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
         : extractOfType(t, AccessTokenExpiredException.class).orElse(null);
   }
 
-  @Override
-  protected ExecutionMediator createExecutionMediator() {
-    return new DefaultExecutionMediator(extensionModel, componentModel, connectionManager, muleContext.getErrorTypeRepository());
-  }
 }
