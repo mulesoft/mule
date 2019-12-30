@@ -7,12 +7,18 @@
 
 package org.mule.test.implicit.config.extension.extension.internal;
 
+import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Config;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.test.implicit.config.extension.extension.api.Counter;
 import org.mule.test.implicit.config.extension.extension.api.ImplicitConfigExtension;
 
 public class ImplicitOperations {
+
+  @Parameter
+  @ConfigOverride
+  private String optionalNoDefault;
 
   public ImplicitConfigExtension getConfig(@Config ImplicitConfigExtension config) {
     return config;
