@@ -1042,23 +1042,6 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ShouldInheritExtensionResolversType" substitutionGroup="mule:abstract-operator" name="should-inherit-extension-resolvers"></xs:element>
-  <xs:complexType name="ShouldInheritExtensionResolversType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content"></xs:element>
-        </xs:sequence>
-        <xs:attribute type="mule:expressionString" use="required" name="type"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ShouldInheritOperationParentResolversType" substitutionGroup="mule:abstract-operator" name="should-inherit-operation-parent-resolvers"></xs:element>
   <xs:complexType name="ShouldInheritOperationParentResolversType">
     <xs:complexContent>

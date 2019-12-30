@@ -396,23 +396,6 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   }
 
   @Test
-  @Ignore("MULE-14190: Revamp MetadataScope annotation")
-  public void shouldInheritExtensionResolvers() throws Exception {
-    location = Location.builder().globalName(SHOULD_INHERIT_EXTENSION_RESOLVERS).addProcessorsPart().addIndexPart(0).build();
-
-    final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataService.getMetadataKeys(location);
-    assertSuccessResult(metadataKeysResult);
-    final Set<MetadataKey> metadataKeys = getKeysFromContainer(metadataKeysResult.get());
-    assertThat(metadataKeys.size(), is(1));
-    assertThat(metadataKeys, hasItems(metadataKeyWithId("APPLE")));
-
-    final ComponentMetadataDescriptor<OperationModel> metadataDescriptor =
-        getSuccessComponentDynamicMetadataWithKey(newKey("APPLE").build());
-    final OperationModel typedModel = metadataDescriptor.getModel();
-    assertExpectedOutput(typedModel, typeLoader.load(Apple.class), void.class);
-  }
-
-  @Test
   public void shouldInheritOperationResolvers() throws Exception {
     location =
         Location.builder().globalName(SHOULD_INHERIT_OPERATION_PARENT_RESOLVERS).addProcessorsPart().addIndexPart(0).build();

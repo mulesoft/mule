@@ -28,7 +28,7 @@ import org.mule.test.metadata.extension.query.NativeQueryOutputResolver;
 import org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils;
 
 @Extension(name = "Metadata")
-@Operations({MetadataOperations.class, MetadataFailureOperations.class, MetadataInheritedExtensionResolversOperations.class,
+@Operations({MetadataOperations.class, MetadataFailureOperations.class,
     MetadataInheritedOperationResolversOperations.class, CustomStaticMetadataOperations.class})
 @ConnectionProviders(MetadataConnectionProvider.class)
 @Sources({MetadataSource.class, MetadataSourceWithMultilevel.class, CustomStaticMetadataSource.class,
