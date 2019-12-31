@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
@@ -15,21 +16,26 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_BEGIN_OR_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.just;
+import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
-import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
@@ -63,31 +69,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
   @Override
   public CoreEvent process(final CoreEvent event) throws MuleException {
-    if (nestedChain == null) {
-      return event;
-    }
-    final boolean txPrevoiuslyActive = isTransactionActive();
-    Transaction previousTx = TransactionCoordination.getInstance().getTransaction();
-    ExecutionTemplate<CoreEvent> executionTemplate =
-        createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
-    ExecutionCallback<CoreEvent> processingCallback = () -> {
-      Transaction currentTx = TransactionCoordination.getInstance().getTransaction();
-      // Whether there wasn't a tx and now there is, or if there is a newer one (if we have a nested tx, using xa)
-      // we must set the component location of this try scope
-      if ((!txPrevoiuslyActive && isTransactionActive()) || (txPrevoiuslyActive && previousTx != currentTx)) {
-        TransactionAdapter transaction = (TransactionAdapter) currentTx;
-        transaction.setComponentLocation(getLocation());
-      }
-      return nestedChain.process(event);
-    };
-
-    try {
-      return executionTemplate.execute(processingCallback);
-    } catch (MuleException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new DefaultMuleException(errorInvokingMessageProcessorWithinTransaction(nestedChain, transactionConfig), e);
-    }
+    return processToApply(event, this);
   }
 
   @Override
@@ -95,10 +77,53 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     if (nestedChain == null) {
       return publisher;
     } else if (isTransactionActive() || transactionConfig.getAction() != ACTION_INDIFFERENT) {
-      return Scope.super.apply(publisher);
+      ExecutionTemplate<CoreEvent> executionTemplate = createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
+      final I18nMessage txErrorMessage = errorInvokingMessageProcessorWithinTransaction(nestedChain, transactionConfig);
+
+      return subscriberContext()
+          .flatMapMany(ctx -> from(publisher)
+              .handle((event, sink) -> {
+                final boolean txPrevoiuslyActive = isTransactionActive();
+                Transaction previousTx = getCurrentTx();
+                try {
+                  sink.next(executionTemplate.execute(() -> {
+                    Transaction currentTx = getCurrentTx();
+                    // Whether there wasn't a tx and now there is, or if there is a newer one (if we have a nested tx, using xa)
+                    // we must set the component location of this try scope
+                    if ((!txPrevoiuslyActive && isTransactionActive()) || (txPrevoiuslyActive && previousTx != currentTx)) {
+                      TransactionAdapter transaction = (TransactionAdapter) currentTx;
+                      transaction.setComponentLocation(getLocation());
+                    }
+                    try {
+                      return just(event)
+                          .transform(nestedChain)
+                          .onErrorStop()
+                          .subscriberContext(ctx)
+                          .block();
+                    } catch (Throwable e) {
+                      if (e.getCause() instanceof InterruptedException) {
+                        currentThread().interrupt();
+                      }
+                      throw rxExceptionToMuleException(e);
+                    }
+                  }));
+                } catch (Exception e) {
+                  final Throwable unwrapped = unwrap(e);
+
+                  if (unwrapped instanceof MuleException) {
+                    sink.error(unwrapped);
+                  } else {
+                    sink.error(new DefaultMuleException(txErrorMessage, unwrapped));
+                  }
+                }
+              }));
     } else {
       return from(publisher).transform(nestedChain);
     }
+  }
+
+  private Transaction getCurrentTx() {
+    return TransactionCoordination.getInstance().getTransaction();
   }
 
   /**

@@ -193,7 +193,11 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
                  ? NO_POLICY_OPERATION
                  : new CompositeOperationPolicy(operation, innerKey,
                                                 lookupOperationParametersTransformer(outerKey.getFirst()),
-                                                operationPolicyProcessorFactory)));
+                                                operationPolicyProcessorFactory,
+                                                muleContext.getConfiguration().getShutdownTimeout(),
+                                                muleContext.getSchedulerService()
+                                                    .ioScheduler(muleContext.getSchedulerBaseConfig().withMaxConcurrentTasks(1)
+                                                        .withName(operation.getLocation().getLocation() + ".policy.flux.")))));
   }
 
   private Optional<OperationPolicyParametersTransformer> lookupOperationParametersTransformer(ComponentIdentifier componentIdentifier) {

@@ -17,7 +17,7 @@ import static org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock.
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.policy.OperationPolicyContext.OPERATION_POLICY_CONTEXT;
 import static org.mule.runtime.core.internal.policy.OperationPolicyContext.from;
-import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.create;
 import static reactor.core.publisher.Flux.from;
@@ -26,6 +26,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
@@ -70,6 +71,8 @@ public class CompositeOperationPolicy
 
   private final LoadingCache<String, FluxSinkSupplier<CoreEvent>> policySinks;
 
+  private final long shutdownTimeout;
+  private final Scheduler completionCallbackScheduler;
   private final AtomicBoolean disposed;
   private final FunctionalReadWriteLock readWriteLock;
 
@@ -82,14 +85,18 @@ public class CompositeOperationPolicy
    * won't be able to change the response parameters of the source and the original response parameters generated from the source
    * will be used.
    *
-   * @param operation                            the operation on which the policies will be applied
-   * @param parameterizedPolicies                list of {@link Policy} to chain together.
+   * @param operation the operation on which the policies will be applied
+   * @param parameterizedPolicies list of {@link Policy} to chain together.
    * @param operationPolicyParametersTransformer transformer from the operation parameters to a message and vice versa.
-   * @param operationPolicyProcessorFactory      factory for creating each {@link OperationPolicy} from a {@link Policy}
+   * @param operationPolicyProcessorFactory factory for creating each {@link OperationPolicy} from a {@link Policy}.
+   * @param completionCallbackScheduler the executor where the completion of the policy flux will happen.
+   * @param shutdownTimeout how long to wait for pending items to finish processing before actually completing the flux for the
+   *        policy.
    */
   public CompositeOperationPolicy(Component operation, List<Policy> parameterizedPolicies,
                                   Optional<OperationPolicyParametersTransformer> operationPolicyParametersTransformer,
-                                  OperationPolicyProcessorFactory operationPolicyProcessorFactory) {
+                                  OperationPolicyProcessorFactory operationPolicyProcessorFactory,
+                                  long shutdownTimeout, Scheduler completionCallbackScheduler) {
     super(parameterizedPolicies, operationPolicyParametersTransformer);
     this.operation = operation;
     this.operationPolicyProcessorFactory = operationPolicyProcessorFactory;
@@ -105,6 +112,9 @@ public class CompositeOperationPolicy
                                                         new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(),
                                                                                          factory));
         });
+
+    this.shutdownTimeout = shutdownTimeout;
+    this.completionCallbackScheduler = completionCallbackScheduler;
   }
 
   private final class OperationWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
@@ -135,44 +145,45 @@ public class CompositeOperationPolicy
   @Override
   protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy lastPolicy) {
     FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder = new FluxSinkRecorder<>();
-    final Flux<CoreEvent> doOnNext = from(eventPub)
-        .doOnNext(event -> {
-          OperationPolicyContext ctx = from(event);
-          OperationExecutionFunction operationExecutionFunction = ctx.getOperationExecutionFunction();
 
-          operationExecutionFunction.execute(resolveOperationParameters(event, ctx), event, new ExecutorCallback() {
-
-            @Override
-            public void complete(Object value) {
-              sinkRecorder.next(right(Throwable.class, (CoreEvent) value));
-            }
-
-            @Override
-            public void error(Throwable e) {
-              // if `sink.error` is called here, it will cancel the flux altogether. That's why an `Either` is used here, so the
-              // error can be propagated afterwards in a way consistent with our expected error handling.
-              sinkRecorder.next(left(mapError(e, event), CoreEvent.class));
-            }
-
-            private Throwable mapError(Throwable t, CoreEvent event) {
-              t = Exceptions.unwrap(t);
-              if (!(t instanceof MessagingException)) {
-                t = new MessagingException(event, t, operation);
-              }
-              return t;
-            }
-          });
-        })
-        .doOnComplete(() -> sinkRecorder.complete());
-
-    return subscribeFluxOnPublisherSubscription(create(sinkRecorder)
+    return from(propagateCompletion(from(eventPub), create(sinkRecorder)
         .map(result -> {
           result.applyLeft(t -> {
             throw propagate(t);
           });
           return result.getRight();
-        }), doOnNext)
-            .doOnNext(response -> from(response).setNextOperationResponse((InternalEvent) response));
+        }), pub -> from(pub)
+            .doOnNext(event -> {
+              OperationPolicyContext ctx = from(event);
+              OperationExecutionFunction operationExecutionFunction = ctx.getOperationExecutionFunction();
+
+              operationExecutionFunction.execute(resolveOperationParameters(event, ctx), event, new ExecutorCallback() {
+
+                @Override
+                public void complete(Object value) {
+                  sinkRecorder.next(right(Throwable.class, (CoreEvent) value));
+                }
+
+                @Override
+                public void error(Throwable e) {
+                  // if `sink.error` is called here, it will cancel the flux altogether. That's why an `Either` is used here, so
+                  // the error can be propagated afterwards in a way consistent with our expected error handling.
+                  sinkRecorder.next(left(mapError(e, event), CoreEvent.class));
+                }
+
+                private Throwable mapError(Throwable t, CoreEvent event) {
+                  t = Exceptions.unwrap(t);
+                  if (!(t instanceof MessagingException)) {
+                    t = new MessagingException(event, t, operation);
+                  }
+                  return t;
+                }
+              });
+            }), () -> sinkRecorder.complete(), t -> sinkRecorder.error(t),
+                                    shutdownTimeout,
+                                    completionCallbackScheduler))
+                                        .doOnNext(response -> from(response)
+                                            .setNextOperationResponse((InternalEvent) response));
   }
 
   private Map<String, Object> resolveOperationParameters(CoreEvent event, OperationPolicyContext ctx) {
@@ -192,9 +203,9 @@ public class CompositeOperationPolicy
    * Always uses the stored result of {@code processNextOperation} so all the chains after the operation execution are executed
    * with the actual operation result and not a modified version from another policy.
    *
-   * @param policy        the policy to execute.
+   * @param policy the policy to execute.
    * @param nextProcessor the processor to execute when the policy next-processor gets executed
-   * @param eventPub      the event to use to execute the policy chain.
+   * @param eventPub the event to use to execute the policy chain.
    */
   @Override
   protected Publisher<CoreEvent> applyPolicy(Policy policy, ReactiveProcessor nextProcessor, Publisher<CoreEvent> eventPub) {
@@ -241,6 +252,7 @@ public class CompositeOperationPolicy
   public void dispose() {
     readWriteLock.withWriteLock(() -> {
       policySinks.invalidateAll();
+      completionCallbackScheduler.stop();
       disposed.set(true);
     });
   }
