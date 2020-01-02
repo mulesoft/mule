@@ -25,6 +25,7 @@ import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStream
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
@@ -63,8 +64,6 @@ import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcess
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveAroundInterceptorAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
-import org.mule.runtime.core.internal.rx.FluxSinkRecorderToReactorSinkAdapter;
-import org.mule.runtime.core.internal.rx.SinkRecorderToReactorSinkAdapter;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -171,22 +170,23 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     if (messagingExceptionHandler != null) {
       final FluxSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
-      SinkRecorderToReactorSinkAdapter<Either<MessagingException, CoreEvent>> errorSwitchSinkAdapter =
-          new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef);
 
-      final Flux<CoreEvent> baseStream = from(doApply(publisher, (context, throwable) -> messagingExceptionHandler
-          .routeError(throwable,
-                      handled -> errorSwitchSinkAdapter.next(right(handled)),
-                      rethrown -> errorSwitchSinkAdapter.next(left((MessagingException) rethrown, CoreEvent.class)))));
-      return baseStream
-          // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
-          // it will be cancelled, ignoring the onErrorcontinue of the parent Flux.
-          .map(event -> right(MessagingException.class, event))
-          .doOnComplete(() -> errorSwitchSinkSinkRef.complete())
-          .mergeWith(create(errorSwitchSinkSinkRef))
+      final Flux<Either<MessagingException, CoreEvent>> upstream =
+          from(doApply(publisher, (context, throwable) -> messagingExceptionHandler
+              .routeError(throwable,
+                          handled -> errorSwitchSinkSinkRef.next(right(handled)),
+                          rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class)))))
+                              // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
+                              // it will be cancelled, ignoring the onErrorcontinue of the parent Flux.
+                              .map(event -> right(MessagingException.class, event))
+                              .doOnNext(r -> errorSwitchSinkSinkRef.next(r))
+                              .doOnError(t -> errorSwitchSinkSinkRef.error(t))
+                              .doOnComplete(() -> errorSwitchSinkSinkRef.complete());
+
+      return subscribeFluxOnPublisherSubscription(create(errorSwitchSinkSinkRef)
           .map(result -> result.reduce(me -> {
             throw propagateWrappingFatal(me);
-          }, response -> response));
+          }, response -> response)), upstream);
     } else {
       return doApply(publisher, (context, throwable) -> context.error(throwable));
     }
