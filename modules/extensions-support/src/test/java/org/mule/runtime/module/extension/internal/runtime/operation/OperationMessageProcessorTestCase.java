@@ -129,7 +129,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     OperationMessageProcessor operationMessageProcessor =
         new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
                                       cursorStreamProviderFactory, new NoRetryPolicyTemplate(), extensionManager,
-                                      mockPolicyManager, reflectionCache);
+                                      mockPolicyManager, reflectionCache, null);
     operationMessageProcessor.setAnnotations(getFlowComponentLocationAnnotations(FLOW_NAME));
     return operationMessageProcessor;
   }

@@ -33,6 +33,8 @@ import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediato
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
+import java.util.function.Supplier;
+
 /**
  * An implementation of a {@link ComponentMessageProcessor} for {@link OperationModel operation models}
  *
@@ -45,6 +47,7 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
 
   private final EntityMetadataMediator entityMetadataMediator;
+  private final Supplier<ExecutionMediator> executionMediatorSupplier;
 
   public OperationMessageProcessor(ExtensionModel extensionModel,
                                    OperationModel operationModel,
@@ -56,10 +59,18 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
-                                   ReflectionCache reflectionCache) {
+                                   ReflectionCache reflectionCache,
+                                   DefaultExecutionMediator.ValueTransformer valueTransformer) {
     super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
           cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager, reflectionCache);
     this.entityMetadataMediator = new EntityMetadataMediator(operationModel);
+    if (valueTransformer != null) {
+      this.executionMediatorSupplier = () -> new DefaultExecutionMediator(extensionModel, componentModel, connectionManager,
+                                                                          muleContext.getErrorTypeRepository(), valueTransformer);
+    } else {
+      this.executionMediatorSupplier = () -> new DefaultExecutionMediator(extensionModel, componentModel, connectionManager,
+                                                                          muleContext.getErrorTypeRepository());
+    }
   }
 
   @Override
@@ -112,6 +123,11 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
     } else {
       return processingType;
     }
+  }
+
+  @Override
+  protected ExecutionMediator createExecutionMediator() {
+    return executionMediatorSupplier.get();
   }
 
 }
