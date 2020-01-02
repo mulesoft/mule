@@ -116,6 +116,7 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   protected static final String ENUM_METADATA_KEY = "enumMetadataKey";
   protected static final String BOOLEAN_METADATA_KEY = "booleanMetadataKey";
   protected static final String METADATA_KEY_DEFAULT_VALUE = "metadataKeyDefaultValue";
+  protected static final String METADATA_KEY_OPTIONAL = "metadataKeyOptional";
   protected static final String MULTILEVEL_METADATA_KEY_DEFAULT_VALUE = "multilevelMetadataKeyDefaultValue";
   protected static final String OUTPUT_AND_MULTIPLE_INPUT_WITH_KEY_ID = "outputAndMultipleInputWithKeyId";
 
