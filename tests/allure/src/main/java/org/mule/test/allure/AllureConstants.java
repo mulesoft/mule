@@ -194,7 +194,6 @@ public interface AllureConstants {
 
   }
 
-
   interface FtpFeature {
 
     String FTP_EXTENSION = "FTP Extension";
@@ -514,6 +513,19 @@ public interface AllureConstants {
       String COMPONENT_CONFIGURATION_YAML_STORY = "Component configuration properties with YAML story";
 
       String COMPONENT_CONFIGURATION_ERROR_SCEANRIOS = "Component configuration properties error scenarios";
+
+    }
+
+  }
+
+  interface Logging {
+
+    String LOGGING = "Logging";
+
+    interface LoggingStory {
+
+      String ERROR_REPORTING = "Error Reporting";
+      String FLOW_STACK = "Flow Stack";
 
     }
 

@@ -12,6 +12,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
+import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.FLOW_STACK;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
@@ -26,7 +28,13 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+
 @SmallTest
+@Feature(LOGGING)
+@Story(FLOW_STACK)
 public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestCase {
 
   private ServerNotificationManager notificationManager;
@@ -62,6 +70,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
   }
 
   @Test
+  @Issue("MULE-17911")
   public void loggerCtxRefreshDoesntRemoveListeners() {
     ((LoggerContext) org.apache.logging.log4j.LogManager.getContext(false)).updateLoggers();
     verify(notificationManager, never()).removeListener(any());
