@@ -41,6 +41,7 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.fromCallable;
 import static reactor.core.publisher.Mono.subscriberContext;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -93,8 +94,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
@@ -104,6 +103,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.google.common.collect.ImmutableMap;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import reactor.core.publisher.Mono;

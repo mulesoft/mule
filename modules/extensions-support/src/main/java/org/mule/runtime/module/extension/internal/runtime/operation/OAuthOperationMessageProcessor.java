@@ -11,7 +11,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
-import static org.mule.runtime.core.api.util.ExceptionUtils.extractCauseOfType;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
@@ -69,15 +68,16 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
                                         RetryPolicyTemplate retryPolicyTemplate,
                                         ExtensionManager extensionManager,
                                         PolicyManager policyManager,
-                                        ReflectionCache reflectionCache) {
+                                        ReflectionCache reflectionCache,
+                                        DefaultExecutionMediator.ValueTransformer valueTransformer) {
     super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-          retryPolicyTemplate, extensionManager, policyManager, reflectionCache);
+          retryPolicyTemplate, extensionManager, policyManager, reflectionCache, valueTransformer);
   }
 
   @Override
   protected Mono<CoreEvent> doProcess(CoreEvent event, ExecutionContextAdapter<OperationModel> operationContext) {
     return super.doProcess(event, operationContext)
-        .onErrorResume(AccessTokenExpiredException.class, e -> {
+        .onErrorResume(Exception.class, e -> {
           OAuthConnectionProviderWrapper connectionProvider = getOAuthConnectionProvider(operationContext);
           if (connectionProvider == null) {
             return error(e);
@@ -143,9 +143,7 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
   }
 
   private AccessTokenExpiredException getTokenExpirationException(Exception e) {
-    return e instanceof AccessTokenExpiredException
-        ? (AccessTokenExpiredException) e
-        : (AccessTokenExpiredException) extractCauseOfType(e, AccessTokenExpiredException.class).orElse(null);
+    return extractOfType(e, AccessTokenExpiredException.class).orElse(null);
   }
 
   private OAuthConnectionProviderWrapper getOAuthConnectionProvider(ExecutionContextAdapter operationContext) {
@@ -164,4 +162,5 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
         ? (AccessTokenExpiredException) t
         : extractOfType(t, AccessTokenExpiredException.class).orElse(null);
   }
+
 }
