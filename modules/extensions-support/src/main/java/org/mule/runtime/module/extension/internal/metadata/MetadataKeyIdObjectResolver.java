@@ -263,7 +263,7 @@ final class MetadataKeyIdObjectResolver {
   }
 
   public boolean isKeyRequired() {
-    return keyParts.stream().noneMatch(k -> k.isRequired() || k.getDefaultValue() != null);
+    return keyParts.stream().anyMatch(k -> k.isRequired() || k.getDefaultValue() != null);
   }
 
   private abstract class KeyMetadataTypeVisitor extends MetadataTypeVisitor {
