@@ -25,6 +25,7 @@ import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvid
 
 import java.beans.PropertyChangeListener;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
@@ -56,22 +57,21 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
 
   @Override
   public void initialise() throws InitialisationException {
-    LoggerContext context = LogManager.getContext(false);
-    if (context != null && context instanceof LogConfigChangeSubject) {
-      ((LogConfigChangeSubject) context).registerLogConfigChangeListener(logConfigChangeListener);
-    }
-
+    withLoggerContext(context -> ((LogConfigChangeSubject) context).registerLogConfigChangeListener(logConfigChangeListener));
     handleNotificationListeners();
   }
 
   @Override
   public void dispose() {
+    withLoggerContext(context -> ((LogConfigChangeSubject) context).unregisterLogConfigChangeListener(logConfigChangeListener));
+    removeNotificationListeners();
+  }
+
+  protected void withLoggerContext(Consumer<LoggerContext> action) {
     LoggerContext context = LogManager.getContext(false);
     if (context != null && context instanceof LogConfigChangeSubject) {
-      ((LogConfigChangeSubject) context).unregisterLogConfigChangeListener(logConfigChangeListener);
+      action.accept(context);
     }
-
-    removeNotificationListeners();
   }
 
   protected synchronized void handleNotificationListeners() {
@@ -80,8 +80,6 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
         notificationManager.addListener(messageProcessorTextDebugger);
         notificationManager.addListener(pipelineProcessorDebugger);
         listenersAdded = true;
-      } else {
-        removeNotificationListeners();
       }
     }
   }
