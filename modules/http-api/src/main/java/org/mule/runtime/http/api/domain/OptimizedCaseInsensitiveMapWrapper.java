@@ -13,6 +13,7 @@ import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,7 +27,6 @@ import java.util.Set;
  * @since 1.0
  */
 public class OptimizedCaseInsensitiveMapWrapper<T> extends CaseInsensitiveMapWrapper<T> {
-
 
   /**
    * Creates a new instance using an existing map as backing map. Said map should be empty.

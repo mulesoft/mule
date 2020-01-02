@@ -31,11 +31,6 @@ public final class HttpResponseBuilder extends HttpMessageBuilder<HttpResponseBu
     responseStatus(httpResponse);
   }
 
-  @Override
-  protected void initHeaders() {
-    headers = new CaseInsensitiveMultiMap();
-  }
-
   private void responseStatus(HttpResponse httpResponse) {
     statusCode(httpResponse.getStatusCode());
     reasonPhrase(httpResponse.getReasonPhrase());
@@ -80,7 +75,7 @@ public final class HttpResponseBuilder extends HttpMessageBuilder<HttpResponseBu
    */
   @Override
   public HttpResponse build() {
-    return new DefaultHttpResponse(responseStatus, headers, entity);
+    return new DefaultHttpResponse(responseStatus, headers.get(), entity);
   }
 
 }

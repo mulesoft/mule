@@ -9,6 +9,7 @@ package org.mule.runtime.http.api.domain.message;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
@@ -27,21 +28,18 @@ import java.util.Optional;
  */
 public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends HttpMessage> {
 
-  protected CaseInsensitiveMultiMap headers;
+  protected LazyValue<CaseInsensitiveMultiMap> headers = new LazyValue<>(this::initHeaders);
   protected HttpEntity entity = new EmptyHttpEntity();
 
-  public HttpMessageBuilder() {
-    initHeaders();
-  }
+  public HttpMessageBuilder() {}
 
   protected HttpMessageBuilder(HttpMessage httpMessage) {
     entity(httpMessage.getEntity());
-    initHeaders();
     headers(httpMessage.getHeaders());
   }
 
-  protected void initHeaders() {
-    headers = new CaseInsensitiveMultiMap();
+  protected CaseInsensitiveMultiMap initHeaders() {
+    return new CaseInsensitiveMultiMap();
   }
 
   /**
@@ -59,7 +57,7 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @return this builder
    */
   public B headers(MultiMap<String, String> headersMap) {
-    this.headers.putAll(headersMap);
+    this.headers.get().putAll(headersMap);
     return (B) this;
   }
 
@@ -72,7 +70,7 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @return this builder
    */
   public B addHeader(String name, String value) {
-    headers.put(name, value);
+    headers.get().put(name, value);
     return (B) this;
   }
 
@@ -84,7 +82,7 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @return this builder
    */
   public B addHeaders(String name, Collection<String> values) {
-    headers.put(name, values);
+    headers.get().put(name, values);
     return (B) this;
   }
 
@@ -95,7 +93,7 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @return this builder
    */
   public B removeHeader(String name) {
-    headers.remove(name);
+    headers.get().remove(name);
     return (B) this;
   }
 
@@ -107,7 +105,7 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @return the value of the header or {@code null} if there isn't one
    */
   public Optional<String> getHeaderValue(String name) {
-    return ofNullable(headers.get(name));
+    return ofNullable(headers.get().get(name));
   }
 
   /**
@@ -117,14 +115,14 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @return an immutable {@link Collection} of {@link String} values for the header
    */
   public Collection<String> getHeaderValues(String name) {
-    return headers.getAll(name);
+    return headers.get().getAll(name);
   }
 
   /**
    * @return an immutable version of the current headers in the builder.
    */
   public MultiMap<String, String> getHeaders() {
-    return headers.toImmutableMultiMap();
+    return headers.get().toImmutableMultiMap();
   }
 
   /**

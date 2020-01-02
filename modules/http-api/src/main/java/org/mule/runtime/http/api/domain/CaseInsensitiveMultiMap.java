@@ -87,18 +87,6 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
     LOGGER.error("Constructor with Multimap paramsMap & boolean optimized, line 80");
   }
 
-  protected CaseInsensitiveMultiMap(CaseInsensitiveMultiMap multiMap, Boolean optimized) {
-    this.optimized = optimized;
-    if (!optimized && !multiMap.optimized) {
-      this.paramsMap = multiMap.paramsMap;
-    } else {
-      this.paramsMap = optimized
-          ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>())
-          : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
-      putAll(multiMap);
-    }
-  }
-
   public CaseInsensitiveMultiMap(CaseInsensitiveMultiMap multiMap) {
     this(multiMap, !PRESERVE_HEADER_CASE);
   }
