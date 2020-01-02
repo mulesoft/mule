@@ -63,7 +63,7 @@ public interface OAuthService extends Service {
   @Experimental
   default <T> OAuthPlatformManagedDancerBuilder platformManagedOAuthDancerBuilder(LockFactory lockFactory,
                                                                                   Map<String, T> tokensStore,
-                                                                              MuleExpressionLanguage expressionEvaluator) {
+                                                                                  MuleExpressionLanguage expressionEvaluator) {
     throw new UnsupportedOperationException("Platform Managed OAuth is only supported in the Enterprise Edition");
   }
 }
