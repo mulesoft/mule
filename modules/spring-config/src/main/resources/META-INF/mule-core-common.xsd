@@ -3609,4 +3609,26 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!-- Already Removed -->
+    <!-- These items remain here for compatibility with stale schema definitions -->
+    <!--     but they do NOT have an associated parser definition! --> 
+
+    <xsd:attributeGroup name="expressionAttributes">
+        <xsd:attribute name="expression" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>The expression to evaluate.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="optionalExpressionAttributes">
+        <xsd:attribute name="expression" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>The expression to evaluate.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
 </xsd:schema>
