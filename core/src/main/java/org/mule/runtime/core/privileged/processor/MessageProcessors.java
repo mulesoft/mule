@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 import static reactor.core.publisher.Flux.create;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -490,18 +491,18 @@ public class MessageProcessors {
                     new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef);
                 Set<BaseEventContext> seenContexts = newSetFromMap(new WeakHashMap<BaseEventContext, Boolean>());
 
-                return Flux.from(eventChildCtxPub)
+                final Flux<Either<MessagingException, CoreEvent>> upstream = Flux.from(eventChildCtxPub)
                     .doOnNext(eventChildCtx -> childContextResponseHandler(eventChildCtx, errorSwitchSinkSinkRefAdapter,
                                                                            completeParentIfEmpty))
                     .transform(processor)
                     .doOnNext(completeSuccessIfNeeded())
                     .map(event -> right(MessagingException.class, event))
-
                     // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
                     // it will be cancelled, ignoring the onErrorcontinue of the parent Flux.
-                    .doOnComplete(() -> errorSwitchSinkSinkRef.complete())
-                    .mergeWith(create(errorSwitchSinkSinkRef))
+                    .doOnError(t -> errorSwitchSinkSinkRef.error(t))
+                    .doOnComplete(() -> errorSwitchSinkSinkRef.complete());
 
+                return subscribeFluxOnPublisherSubscription(create(errorSwitchSinkSinkRef), upstream)
                     .map(childContextResponseMapper())
                     .distinct(event -> (BaseEventContext) event.getContext(), () -> seenContexts)
                     .map(MessageProcessors::toParentContext);

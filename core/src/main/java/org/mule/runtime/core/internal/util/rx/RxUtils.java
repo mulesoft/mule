@@ -64,8 +64,8 @@ public class RxUtils {
    * @return the triggeringSubscriber {@link Flux}, decorated with the callback that will perform this deferred subscription.
    * @since 4.3
    */
-  public static <T> Flux<T> subscribeFluxOnPublisherSubscription(Flux<T> triggeringSubscriber,
-                                                                 Flux<T> deferredSubscriber) {
+  public static <T, U> Flux<T> subscribeFluxOnPublisherSubscription(Flux<T> triggeringSubscriber,
+                                                                    Flux<U> deferredSubscriber) {
     return triggeringSubscriber
         .compose(eventPub -> subscriberContext()
             .flatMapMany(ctx -> eventPub.doOnSubscribe(s -> deferredSubscriber.subscriberContext(ctx).subscribe())));
