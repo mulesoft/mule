@@ -16,7 +16,10 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
@@ -24,10 +27,13 @@ import static org.mule.runtime.api.notification.MessageProcessorNotification.MES
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.internal.context.notification.MessageProcessingFlowTraceManager.FLOW_STACK_INFO_KEY;
+import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
+import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.FLOW_STACK;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.api.notification.PipelineMessageNotification;
 import org.mule.runtime.core.api.MuleContext;
@@ -37,28 +43,43 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.xml.namespace.QName;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
 @SmallTest
+@RunWith(Parameterized.class)
+@Feature(LOGGING)
+@Story(FLOW_STACK)
 public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestCase {
 
   public static final String CONFIG_FILE_NAME = "muleApp.xml";
@@ -82,20 +103,62 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
     DefaultMuleConfiguration.flowTrace = originalFlowTrace;
   }
 
+  @Parameters
+  public static final Runnable[] params() {
+    return new Runnable[] {
+        () -> {
+        },
+        () -> ((LoggerContext) org.apache.logging.log4j.LogManager.getContext(false)).updateLoggers()
+
+    };
+  }
+
+  private final Runnable beforeTest;
+
+  private ServerNotificationManager notificationManager;
+
   private MessageProcessingFlowTraceManager manager;
   private EventContext messageContext;
 
   private FlowConstruct rootFlowConstruct;
   private FlowConstruct nestedFlowConstruct;
 
+  public MessageProcessingFlowTraceManagerTestCase(Runnable beforeTest) {
+    this.beforeTest = beforeTest;
+  }
+
   @Before
-  public void before() {
-    manager = new MessageProcessingFlowTraceManager();
+  public void before() throws InitialisationException {
+    final LogConfigChangeSubject mockLogContext = mock(LogConfigChangeSubject.class, withSettings()
+        .extraInterfaces(org.apache.logging.log4j.spi.LoggerContext.class));
+
+    org.apache.logging.log4j.spi.LoggerContext loggerContext = LogManager.getContext(false);
+
+    doAnswer(inv -> {
+      ((LoggerContext) loggerContext).addPropertyChangeListener(inv.getArgument(0));
+      return null;
+    }).when(mockLogContext).registerLogConfigChangeListener(any());
+    doAnswer(inv -> {
+      ((LoggerContext) loggerContext).removePropertyChangeListener(inv.getArgument(0));
+      return null;
+    }).when(mockLogContext).unregisterLogConfigChangeListener(any());
+
+    manager = new MessageProcessingFlowTraceManager() {
+
+      @Override
+      protected void withLoggerContext(Consumer<org.apache.logging.log4j.spi.LoggerContext> action) {
+        action.accept((org.apache.logging.log4j.spi.LoggerContext) mockLogContext);
+      }
+    };
     MuleContext context = mock(MuleContext.class);
+
     MuleConfiguration config = mock(MuleConfiguration.class);
     when(config.getId()).thenReturn(APP_ID);
     when(context.getConfiguration()).thenReturn(config);
+    notificationManager = mock(ServerNotificationManager.class);
+    when(context.getNotificationManager()).thenReturn(notificationManager);
     manager.setMuleContext(context);
+    manager.initialise();
 
     rootFlowConstruct = mock(FlowConstruct.class);
     ComponentLocation mockComponentLocation = mock(ComponentLocation.class);
@@ -110,6 +173,13 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
     when(nestedFlowConstruct.getMuleContext()).thenReturn(context);
 
     messageContext = create(rootFlowConstruct, TEST_CONNECTOR_LOCATION);
+
+    beforeTest.run();
+  }
+
+  @After
+  public void after() {
+    verify(notificationManager, never()).removeListener(any());
   }
 
   @Test
@@ -389,7 +459,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
   private Matcher<ProcessorsTrace> hasExecutedProcessors(final String... expectedProcessors) {
     return new TypeSafeMatcher<ProcessorsTrace>() {
 
-      private List<Matcher> failed = new ArrayList<>();
+      private final List<Matcher> failed = new ArrayList<>();
 
       @Override
       protected boolean matchesSafely(ProcessorsTrace processorsTrace) {
