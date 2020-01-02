@@ -30,11 +30,12 @@ import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.spi.LoggerContext;
-
 import java.beans.PropertyChangeListener;
 import java.util.Map;
+import java.util.function.Consumer;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.spi.LoggerContext;
 
 /**
  * Manager for handling message processing troubleshooting data.
@@ -50,7 +51,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
   private MuleContext muleContext;
 
   private volatile boolean listenersAdded = false;
-  private PropertyChangeListener logConfigChangeListener = evt -> handleNotificationListeners();
+  private final PropertyChangeListener logConfigChangeListener = evt -> handleNotificationListeners();
 
   public MessageProcessingFlowTraceManager() {
     messageProcessorTextDebugger = new MessageProcessorTextDebugger(this);
@@ -64,32 +65,33 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
 
   @Override
   public void initialise() throws InitialisationException {
-    LoggerContext context = LogManager.getContext(false);
-    if (context != null && context instanceof LogConfigChangeSubject) {
-      ((LogConfigChangeSubject) context).registerLogConfigChangeListener(logConfigChangeListener);
-    }
-
+    withLoggerContext(context -> ((LogConfigChangeSubject) context).registerLogConfigChangeListener(logConfigChangeListener));
     handleNotificationListeners();
   }
 
   @Override
   public void dispose() {
+    withLoggerContext(context -> ((LogConfigChangeSubject) context).unregisterLogConfigChangeListener(logConfigChangeListener));
+    removeNotificationListeners();
+  }
+
+  protected void withLoggerContext(Consumer<LoggerContext> action) {
     LoggerContext context = LogManager.getContext(false);
     if (context != null && context instanceof LogConfigChangeSubject) {
-      ((LogConfigChangeSubject) context).unregisterLogConfigChangeListener(logConfigChangeListener);
+      action.accept(context);
     }
-
-    removeNotificationListeners();
   }
 
   protected synchronized void handleNotificationListeners() {
     if (!muleContext.getNotificationManager().isDisposed()) {
-      if (!listenersAdded && DefaultMuleConfiguration.isFlowTrace()) {
+      final boolean flowTrace = DefaultMuleConfiguration.isFlowTrace();
+
+      if (listenersAdded && !flowTrace) {
+        removeNotificationListeners();
+      } else if (!listenersAdded && flowTrace) {
         muleContext.getNotificationManager().addListener(messageProcessorTextDebugger);
         muleContext.getNotificationManager().addListener(pipelineProcessorDebugger);
         listenersAdded = true;
-      } else {
-        removeNotificationListeners();
       }
     }
   }

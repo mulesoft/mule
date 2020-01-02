@@ -519,6 +519,19 @@ public interface AllureConstants {
 
   }
 
+  interface Logging {
+
+    String LOGGING = "Logging";
+
+    interface LoggingStory {
+
+      String ERROR_REPORTING = "Error Reporting";
+      String FLOW_STACK = "Flow Stack";
+
+    }
+
+  }
+
   interface InterceptonApi {
 
     String INTERCEPTION_API = "Interception API";
