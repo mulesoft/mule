@@ -58,6 +58,7 @@ public class MessageProcessingFlowTraceManagerTestCase extends AbstractMuleTestC
     }).when(mockLogContext).unregisterLogConfigChangeListener(any());
 
     manager = new MessageProcessingFlowTraceManager() {
+
       @Override
       protected void withLoggerContext(Consumer<org.apache.logging.log4j.spi.LoggerContext> action) {
         action.accept((org.apache.logging.log4j.spi.LoggerContext) mockLogContext);
