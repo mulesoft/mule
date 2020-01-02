@@ -8,7 +8,6 @@ package org.mule.runtime.core.privileged.processor;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
-import static java.util.Collections.newSetFromMap;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
@@ -52,8 +51,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -450,7 +447,7 @@ public class MessageProcessors {
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
         .switchIfEmpty(Mono.<Either<MessagingException, CoreEvent>>create(errorSwitchSinkSinkRef)
-            .map(childContextResponseMapper())
+            .map(propagateErrorResponseMapper())
             .toProcessor())
         .map(MessageProcessors::toParentContext)
         .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true));
@@ -489,7 +486,6 @@ public class MessageProcessors {
                 FluxSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
                 final FluxSinkRecorderToReactorSinkAdapter<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRefAdapter =
                     new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef);
-                Set<BaseEventContext> seenContexts = newSetFromMap(new WeakHashMap<BaseEventContext, Boolean>());
 
                 final Flux<Either<MessagingException, CoreEvent>> upstream = Flux.from(eventChildCtxPub)
                     .doOnNext(eventChildCtx -> childContextResponseHandler(eventChildCtx, errorSwitchSinkSinkRefAdapter,
@@ -503,9 +499,7 @@ public class MessageProcessors {
                     .doOnComplete(() -> errorSwitchSinkSinkRef.complete());
 
                 return subscribeFluxOnPublisherSubscription(create(errorSwitchSinkSinkRef), upstream)
-                    .map(childContextResponseMapper())
-                    .distinct(event -> (BaseEventContext) event.getContext(), () -> seenContexts)
-                    .map(MessageProcessors::toParentContext);
+                    .map(propagateErrorResponseMapper().andThen(MessageProcessors::toParentContext));
               }
             }));
   }
@@ -532,7 +526,7 @@ public class MessageProcessors {
     });
   }
 
-  private static Function<? super Either<MessagingException, CoreEvent>, ? extends CoreEvent> childContextResponseMapper() {
+  private static Function<? super Either<MessagingException, CoreEvent>, ? extends CoreEvent> propagateErrorResponseMapper() {
     return result -> result.reduce(me -> {
       throw propagateWrappingFatal(me);
     }, response -> response);
