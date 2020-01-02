@@ -88,7 +88,10 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
 
     final ProcessorInterceptor interceptor = interceptorFactory.get();
     Map<String, String> dslParameters = (Map<String, String>) ((Component) component).getAnnotation(ANNOTATION_PARAMETERS);
-    ReactiveProcessor interceptedProcessor = doApply(component, next, componentLocation, interceptor, dslParameters.entrySet().stream().filter(param -> !macroExpansionInternalParams.contains(param.getKey())).collect(toMap(p -> p.getKey(), p -> p.getValue())));
+    ReactiveProcessor interceptedProcessor = doApply(component, next, componentLocation, interceptor,
+                                                     dslParameters.entrySet().stream()
+                                                         .filter(param -> !macroExpansionInternalParams.contains(param.getKey()))
+                                                         .collect(toMap(p -> p.getKey(), p -> p.getValue())));
 
     LOGGER.debug("Interceptor '{}' for processor '{}' configured.", interceptor, componentLocation.getLocation());
     return interceptedProcessor;
