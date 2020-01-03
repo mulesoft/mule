@@ -27,6 +27,7 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -165,7 +166,9 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
           EventContext parentContext = currentEvent.get().getContext();
           BaseEventContext childContext = newChildContext(currentEvent.get(), ofNullable(getLocation()));
 
-          Builder partEventBuilder = builder(childContext, currentEvent.get());
+          Builder partEventBuilder = builder(childContext, currentEvent.get())
+              .itemSequenceInfo(Optional.of(ItemSequenceInfo.of(count.get())));
+
           if (typedValue.getValue() instanceof EventBuilderConfigurer) {
             // Support EventBuilderConfigurer currently used by Batch Module
             EventBuilderConfigurer configurer = (EventBuilderConfigurer) typedValue.getValue();
