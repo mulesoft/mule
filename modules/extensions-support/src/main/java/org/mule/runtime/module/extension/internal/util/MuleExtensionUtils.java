@@ -66,6 +66,7 @@ import org.mule.runtime.module.extension.api.loader.java.DefaultJavaExtensionMod
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
@@ -472,6 +473,17 @@ public class MuleExtensionUtils {
     } else {
       return false;
     }
+  }
+
+  /**
+   * Indicates if the extension model is being built on compile time.
+   *
+   * @param extensionModel the extension model to check
+   * @return a boolean indicating if the the extension model is being build on runtime or not
+   * @since 4.3.0
+   */
+  public static boolean isCompileTime(ExtensionModel extensionModel) {
+    return extensionModel.getModelProperty(CompileTimeModelProperty.class).isPresent();
   }
 
 }

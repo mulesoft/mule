@@ -13,6 +13,7 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -496,6 +497,15 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   }
 
   @Test
+  public void metadataKeyIdWithoutTypeResolverOnRuntimeShouldNotFail() {
+    setCompileTime(false);
+    ParameterModel param = getMockKeyPartParam("Value", 1);
+    setValidKeyId(param.getName());
+    when(sourceModel.getAllParameterModels()).thenReturn(singletonList(param));
+    validate(extensionModel, validator);
+  }
+
+  @Test
   public void noMetadataKey() {
     ParameterModel param = mock(ParameterModel.class);
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(empty());
@@ -582,5 +592,10 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     MetadataKeyIdModelProperty keyIdModelProperty =
         new MetadataKeyIdModelProperty(loader.load(InvalidMetadataKeyIdPojo.class), "groupKeyParam");
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(of(keyIdModelProperty));
+  }
+
+  private void setCompileTime(boolean compileTime) {
+    when(extensionModel.getModelProperty(CompileTimeModelProperty.class))
+        .thenReturn(ofNullable(compileTime ? new CompileTimeModelProperty() : null));
   }
 }
