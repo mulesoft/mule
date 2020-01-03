@@ -527,6 +527,13 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   }
 
   @Test
+  public void operationWithOptionalMetadataKeyIdNotConfigured() throws Exception {
+    location = Location.builder().globalName(METADATA_KEY_OPTIONAL).addProcessorsPart().addIndexPart(0).build();
+    final MetadataResult<ComponentMetadataDescriptor<OperationModel>> result = metadataService.getOperationMetadata(location);
+    assertSuccessResult(result);
+  }
+
+  @Test
   public void operationWhichReturnsListOfMessages() throws Exception {
     location = Location.builder().globalName("listOfMessages").addProcessorsPart().addIndexPart(0).build();
     final MetadataResult<ComponentMetadataDescriptor<OperationModel>> result = metadataService.getOperationMetadata(location);

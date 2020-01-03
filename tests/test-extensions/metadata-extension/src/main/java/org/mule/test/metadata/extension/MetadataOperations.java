@@ -87,6 +87,14 @@ public class MetadataOperations {
     return type;
   }
 
+  @OutputResolver(output = TestOutputAnyTypeResolver.class)
+  @MediaType(value = ANY, strict = false)
+  public Object metadataKeyOptional(@Connection MetadataConnection connection,
+                                    @Optional @MetadataKeyId(TestOutputResolverWithKeyResolver.class) String type,
+                                    @Optional @Content Object content) {
+    return type;
+  }
+
   @OutputResolver(output = TestInputAndOutputResolverWithKeyResolver.class)
   @MediaType(value = ANY, strict = false)
   public Object contentAndOutputMetadataWithKeyId(@Connection MetadataConnection connection,
