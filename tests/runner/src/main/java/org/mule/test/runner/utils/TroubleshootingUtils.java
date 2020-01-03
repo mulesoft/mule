@@ -7,8 +7,10 @@
 
 package org.mule.test.runner.utils;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.lang.management.ManagementFactory;
 import java.net.JarURLConnection;
@@ -22,6 +24,8 @@ import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -32,16 +36,25 @@ import javax.management.MBeanServer;
 import javax.xml.bind.DatatypeConverter;
 
 import com.sun.management.HotSpotDiagnosticMXBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TroubleshootingUtils {
 
-  private TroubleshootingUtils() {
-    throw new IllegalStateException("Utility class");
-  }
+  private static final String OS_NAME = System.getProperty("os.name").toLowerCase();
+  private static final String OS_NAME_FAMILY = getOsNameFamily();
+  private static final Map<String, String> GET_OS_PROCESSES_COMMANDS = initializeGetOSProcessesCommands();
 
   public static final String PLUGINS_COPIED_FOR_TROUBLESHOOTING_FOLDER = "pluginsCopiedForTroubleshooting";
   public static final String HEAP_DUMP_FILE_NAME = "heapDump.hprof";
   public static final String HEAP_DUMP_ONLY_LIVE_FILE_NAME = "heapDumpOnlyLive.hprof";
+  public static final String OS_PROCESSES_LOG_NAME = "osProcessesFile.log";
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(TroubleshootingUtils.class);
+
+  private TroubleshootingUtils() {
+    throw new IllegalStateException("Utility class");
+  }
 
   public static Path getJenkinsWorkspacePath(Path pluginJsonUrl) {
     // The workspace name change from job to job with the form <folder>_<job name>_<branch>. Ex 'Mule-runtime_mule-ee_mule-4.x'
@@ -91,7 +104,7 @@ public class TroubleshootingUtils {
       auxPath = auxPath.getParent();
     }
 
-    if (auxPath == null) {
+    if (pluginJsonUrl != null && auxPath == null) {
       throw new RuntimeException(String.format("Could not find the substring '%s' in path '%s'", substring,
                                                pluginJsonUrl.toAbsolutePath()));
     }
@@ -121,17 +134,35 @@ public class TroubleshootingUtils {
     return getMD5FromFile(getJarPathFromPluginJson(filePath));
   }
 
-  public static void copyPluginToAuxJenkinsFolderForTroubleshooting(Path pluginJsonUrl) throws IOException {
-    Path extensionJarPath = getJarPathFromPluginJson(pluginJsonUrl);
-    Path jenkinsTroubleshootingFolderPath = getJenkinsTroubleshootingFolderPath(pluginJsonUrl);
+  public static void copyFileToAuxJenkinsFolder(Path fileToCopy) throws IOException {
+    Path jenkinsTroubleshootingFolderPath = getJenkinsTroubleshootingFolderPath(fileToCopy);
 
     Path extensionJarTargetPath =
-        Paths.get(jenkinsTroubleshootingFolderPath.toString(), extensionJarPath.getFileName().toString());
-    Files.copy(extensionJarPath, extensionJarTargetPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+        Paths.get(jenkinsTroubleshootingFolderPath.toString(), fileToCopy.getFileName().toString());
+    Files.copy(fileToCopy, extensionJarTargetPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+  }
+
+  public static void copyPluginToAuxJenkinsFolderForTroubleshooting(Path pluginJsonUrl) throws IOException {
+    copyFileToAuxJenkinsFolder(getJarPathFromPluginJson(pluginJsonUrl));
   }
 
   public static void copyPluginToAuxJenkinsFolderForTroubleshooting(URL pluginJsonUrl) throws IOException {
     copyPluginToAuxJenkinsFolderForTroubleshooting(Paths.get(getPathStringFromJarURL(pluginJsonUrl)));
+  }
+
+  public static void copyOsRunningProcessesToAuxJenkinsFolder(URL pluginJsonUrl) throws IOException {
+    Path jenkinsTroubleshootingFolderPath =
+        getJenkinsTroubleshootingFolderPath(Paths.get(getPathStringFromJarURL(pluginJsonUrl)));
+    Path osProcessesTargetPath =
+        Paths.get(jenkinsTroubleshootingFolderPath.toString(), OS_PROCESSES_LOG_NAME);
+
+    if (osProcessesTargetPath.toFile().exists()) {
+      return;
+    }
+
+    List<String> runningProcesses = getRunningProcesses();
+
+    Files.write(osProcessesTargetPath, runningProcesses);
   }
 
   public static Path getJenkinsTroubleshootingFolderPath(Path pluginJsonUrl) throws IOException {
@@ -156,7 +187,7 @@ public class TroubleshootingUtils {
   }
 
   public static void dumpHeap(String filePath, boolean live) throws IOException {
-    if (Files.exists(Paths.get(filePath))) {
+    if (Paths.get(filePath).toFile().exists()) {
       return;
     }
 
@@ -198,4 +229,70 @@ public class TroubleshootingUtils {
     }
     return entriesInJarList;
   }
+
+  public static List<String> getRunningProcesses() {
+
+    List<String> processesList = new ArrayList<>();
+
+    if (!GET_OS_PROCESSES_COMMANDS.containsKey(OS_NAME_FAMILY)) {
+      return processesList;
+    }
+
+    String getOsProcessesCommand = GET_OS_PROCESSES_COMMANDS.get(OS_NAME_FAMILY);
+    processesList.add(String.format("OS: '%s' - Command: '%s'", OS_NAME, getOsProcessesCommand));
+
+    try {
+      Process runningProcessesResult = Runtime.getRuntime().exec(GET_OS_PROCESSES_COMMANDS.get(OS_NAME_FAMILY));
+      try (BufferedReader runningProcessesResultReader =
+          new BufferedReader(new InputStreamReader(runningProcessesResult.getInputStream()))) {
+        String runningProcessLine;
+
+        while ((runningProcessLine = runningProcessesResultReader.readLine()) != null) {
+          processesList.add(runningProcessLine);
+        }
+      }
+    } catch (IOException e) {
+      LOGGER.trace(e.getMessage());
+    }
+
+    return processesList;
+  }
+
+  public static String getOsNameFamily() {
+    String osFamily;
+
+    if (isUnix()) {
+      osFamily = "unix";
+    } else if (isMac()) {
+      osFamily = "mac";
+    } else if (isWindows()) {
+      osFamily = "windows";
+    } else {
+      osFamily = "other";
+    }
+
+    return osFamily;
+  }
+
+  private static boolean isUnix() {
+    return OS_NAME.contains("nix") || OS_NAME.contains("nux") || OS_NAME.contains("aix");
+  }
+
+  private static boolean isMac() {
+    return OS_NAME.contains("mac");
+  }
+
+  private static boolean isWindows() {
+    return OS_NAME.startsWith("win");
+  }
+
+  private static Map<String, String> initializeGetOSProcessesCommands() {
+    Map<String, String> getProcessesCommand = new HashMap<>();
+
+    getProcessesCommand.put("unix", "ps -aux");
+    getProcessesCommand.put("mac", "ps -e");
+
+    return getProcessesCommand;
+  }
+
 }
