@@ -22,6 +22,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTyp
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isRouter;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.isScope;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMetadataResolverFactory;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isCompileTime;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -150,9 +151,10 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
     Optional<MetadataKeyIdModelProperty> keyId = model.getModelProperty(MetadataKeyIdModelProperty.class);
     if (keyId.isPresent()) {
 
-      if (resolverFactory.getOutputResolver() instanceof NullMetadataResolver
-          && !thereIsAnInputTypeResolverDefined(getAllInputResolvers(model, resolverFactory))
-          && isCompileTime(extensionModel)) {
+      // This validations has been fixed for runtime since 4.3.p, so we need to keep backwards compatibility somehow for now.
+      if (isCompileTime(extensionModel)
+          && resolverFactory.getOutputResolver() instanceof NullMetadataResolver
+          && !thereIsAnInputTypeResolverDefined(getAllInputResolvers(model, resolverFactory))) {
         problemsReporter.addError(new Problem(model, format("%s '%s' defines a MetadataKeyId parameter but neither"
             + " an Output nor Type resolver that makes use of it was defined",
                                                             modelTypeName, model.getName())));
@@ -349,10 +351,6 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
     return model.getModelProperty(ExtensionOperationDescriptorModelProperty.class).map(mp -> mp.getOperationElement())
         .map(m -> !isScope(m) && !isRouter(m))
         .orElse(true);
-  }
-
-  private boolean isCompileTime(ExtensionModel extensionModel) {
-    return extensionModel.getModelProperty(CompileTimeModelProperty.class).isPresent();
   }
 
 }
