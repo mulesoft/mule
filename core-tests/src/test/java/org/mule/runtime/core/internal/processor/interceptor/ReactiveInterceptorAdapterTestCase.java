@@ -295,11 +295,10 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
                                                          Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
-        action.proceed();
-        return supplyAsync(() -> {
-          event.message(Message.of(TEST_PAYLOAD));
-          return event;
-        });
+        return action.proceed().thenCompose(result -> supplyAsync(() -> {
+          result.message(Message.of(TEST_PAYLOAD));
+          return result;
+        }));
       }
     });
     startFlowWithInterceptors(interceptor);
@@ -360,11 +359,10 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
                                                          Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
-        action.skip();
-        return supplyAsync(() -> {
-          event.message(Message.of(TEST_PAYLOAD));
-          return event;
-        });
+        return action.skip().thenCompose(result -> supplyAsync(() -> {
+          result.message(Message.of(TEST_PAYLOAD));
+          return result;
+        }));
       }
     });
     startFlowWithInterceptors(interceptor);
@@ -591,8 +589,11 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
                                                          Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
-        action.proceed();
-        throw expectedException;
+        return action.proceed().thenCompose(result -> {
+          final CompletableFuture<InterceptionEvent> completableFuture = new CompletableFuture<>();
+          completableFuture.completeExceptionally(expectedException);
+          return completableFuture;
+        });
       }
     });
     startFlowWithInterceptors(interceptor);
@@ -623,10 +624,9 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
                                                          Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
-        action.proceed();
-        return supplyAsync(() -> {
+        return action.proceed().thenCompose(result -> supplyAsync(() -> {
           throw expectedException;
-        });
+        }));
       }
     });
     startFlowWithInterceptors(interceptor);
@@ -694,10 +694,9 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
                                                          Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
-        action.skip();
-        return supplyAsync(() -> {
+        return action.skip().thenCompose(result -> supplyAsync(() -> {
           throw expectedException;
-        });
+        }));
       }
     });
     startFlowWithInterceptors(interceptor);
@@ -1025,11 +1024,10 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
                                                          Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
-        action.proceed();
-        return supplyAsync(() -> {
-          event.message(Message.of(TEST_PAYLOAD));
-          return event;
-        });
+        return action.proceed().thenCompose(result -> supplyAsync(() -> {
+          result.message(Message.of(TEST_PAYLOAD));
+          return result;
+        }));
       }
     });
     ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
@@ -1471,8 +1469,11 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
                                                          Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
-        action.proceed();
-        throw expectedException;
+        return action.proceed().thenCompose(result -> {
+          final CompletableFuture<InterceptionEvent> completableFuture = new CompletableFuture<>();
+          completableFuture.completeExceptionally(expectedException);
+          return completableFuture;
+        });
       }
     });
     ProcessorInterceptor interceptor2 = prepareInterceptor(new TestProcessorInterceptor("inner") {});
@@ -1508,8 +1509,11 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
       public CompletableFuture<InterceptionEvent> around(ComponentLocation location,
                                                          Map<String, ProcessorParameterValue> parameters,
                                                          InterceptionEvent event, InterceptionAction action) {
-        action.proceed();
-        throw expectedException;
+        return action.proceed().thenCompose(result -> {
+          final CompletableFuture<InterceptionEvent> completableFuture = new CompletableFuture<>();
+          completableFuture.completeExceptionally(expectedException);
+          return completableFuture;
+        });
       }
     });
     startFlowWithInterceptors(interceptor1, interceptor2);
@@ -1728,7 +1732,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
     process(flow, eventBuilder(muleContext).message(Message.of("")).build());
 
-    assertThat(threadAfter.get().getName(), threadAfter.get().getName(),
+    assertThat(threadAfter.get().getName(), threadAfter.get().getThreadGroup().getName(),
                not(is(NonBlockingProcessorInApp.SELECTOR_EMULATOR_SCHEDULER_NAME)));
     assertThat(threadAfter.get().getName(), threadAfter.get().getThreadGroup().getName(),
                is(threadBefore.get().getThreadGroup().getName()));

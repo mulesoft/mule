@@ -8,9 +8,6 @@ package org.mule.runtime.core.internal.processor.strategy;
 
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
-import static org.mule.runtime.core.internal.processor.strategy.TransactionAwareProcessingStrategyFactory.LAZY_TX_CHECK;
-import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -55,21 +52,14 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
 
   @Override
   public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
-    return !LAZY_TX_CHECK && isTransactionActive()
+    return isTransactionActive()
         ? BLOCKING_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline)
         : delegate.onPipeline(pipeline);
   }
 
   @Override
   public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-    if (LAZY_TX_CHECK) {
-      // If there is a tx active, force the processing to the main thread right after the processor.
-      // This is needed because non blocking processors will do a thread switch internally regardless of the presence of a tx
-      // (which is ok, an http:request shouldn't bother that a previous db component opened a transaction).
-      return publisher -> from(publisher)
-          .flatMap(event -> just(event)
-              .transform(isTransactionActive() ? BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor) : processor));
-    } else if (isTransactionActive()) {
+    if (isTransactionActive()) {
       return BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor);
     } else {
       return delegate.onProcessor(processor);

@@ -159,8 +159,9 @@ public class DefaultInterceptionEvent implements InternalInterceptionEvent {
     return interceptedInput;
   }
 
-  public void reset(InternalEvent newEvent) {
+  public DefaultInterceptionEvent reset(InternalEvent newEvent) {
     this.interceptedInput = newEvent;
     this.interceptedOutput = InternalEvent.builder(newEvent);
+    return this;
   }
 }
