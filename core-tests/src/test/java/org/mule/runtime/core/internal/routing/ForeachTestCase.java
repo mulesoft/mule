@@ -26,6 +26,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_COUNTER_VARIABLE;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAGE_VARIABLE;
+import static org.mule.runtime.core.internal.routing.ForeachRouter.MAP_NOT_SUPPORTED_MESSAGE;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
 import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
@@ -34,6 +35,10 @@ import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ForeachStory.FOR_EACH;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+import org.hamcrest.Matchers;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
@@ -43,6 +48,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
@@ -68,20 +74,19 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Feature(ROUTERS)
 @Story(FOR_EACH)
 public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   private static final Logger LOGGER = getLogger(ForeachTestCase.class);
+  private static final String MULE_FOREACH_CONTEXT_KEY = "mule.foreach.router.foreachContext";
 
   protected Foreach foreach;
-  protected Foreach simpleForeach;
-  protected Foreach nestedForeach;
-  protected ArrayList<CoreEvent> processedEvents;
+  private Foreach simpleForeach;
+  private Foreach nestedForeach;
+  private ArrayList<CoreEvent> processedEvents;
   protected Map<String, TypedValue<?>> variables;
 
   private static String ERR_NUMBER_MESSAGES = "Not a correct number of messages processed";
@@ -118,7 +123,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
       if (event.getMessage().getPayload().getValue() instanceof List) {
         // With batch size a simple list is not used, rather a list of typed values. This appears inconsistent but is transparent
         // to the user.
-        payload = ((List<TypedValue>) event.getMessage().getPayload().getValue()).stream().map(typeValue -> typeValue.getValue())
+        payload = ((List<TypedValue>) event.getMessage().getPayload().getValue()).stream().map(TypedValue::getValue)
             .collect(toList()).toString();
       } else {
         payload = event.getMessage().getPayload().getValue().toString();
@@ -136,7 +141,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     return lmp;
   }
 
-  private List<Processor> getNestedMessageProcessors() throws MuleException {
+  private List<Processor> getNestedMessageProcessors() {
     List<Processor> lmp = new ArrayList<>();
     Foreach internalForeach = createForeach();
     internalForeach.setMessageProcessors(getSimpleMessageProcessors(new TestMessageProcessor("zas")));
@@ -202,14 +207,15 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   @Test
   public void mapPayload() throws Exception {
     expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage(Foreach.MAP_NOT_SUPPORTED_MESSAGE);
+    expectedException.expectMessage(MAP_NOT_SUPPORTED_MESSAGE);
     process(simpleForeach, eventBuilder(muleContext).message(of(singletonMap("foo", "bar"))).build());
   }
 
   @Test
   public void mapEntrySetExpression() throws Exception {
     simpleForeach.setCollectionExpression("#[dw::core::Objects::entrySet(payload)]");
-    process(simpleForeach, eventBuilder(muleContext).message(of(singletonMap("foo", "bar"))).build());
+    CoreEvent event = process(simpleForeach, eventBuilder(muleContext).message(of(singletonMap("foo", "bar"))).build());
+    assertNoForEachContext((InternalEvent) event);
   }
 
   @Test
@@ -289,43 +295,49 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   public void failingNestedProcessor() throws Exception {
+    AtomicReference<CoreEvent> eventReference = new AtomicReference<>();
     RuntimeException throwable = new BufferOverflowException();
     foreach = createForeach();
     SensingNullMessageProcessor firstProcessor = new SensingNullMessageProcessor();
     InternalTestProcessor failingProcessor = event -> {
+      eventReference.set(event);
       throw throwable;
     };
     foreach.setMessageProcessors(asList(firstProcessor, failingProcessor));
     initialiseIfNeeded(foreach, muleContext);
     try {
-      expectNestedProessorException(throwable, failingProcessor);
+      expectNestedProcessorException(throwable, failingProcessor);
       process(foreach, eventBuilder(muleContext).message(of(new DummyNestedIterableClass().iterator())).build(), false);
     } finally {
       assertThat(firstProcessor.invocations, equalTo(1));
+      assertNoForEachContext((InternalEvent) eventReference.get());
     }
   }
 
-  private void expectNestedProessorException(RuntimeException throwable, InternalTestProcessor failingProcessor) {
-    expectedException.expect(is(MessagingException.class));
+  private void expectNestedProcessorException(RuntimeException throwable, InternalTestProcessor failingProcessor) {
+    expectedException.expect(MessagingException.class);
     expectedException.expect(new FailingProcessorMatcher(failingProcessor));
     expectedException.expectCause(is(throwable));
   }
 
   @Test
   public void failingNestedProcessorInChain() throws Exception {
+    AtomicReference<CoreEvent> eventReference = new AtomicReference<>();
     RuntimeException throwable = new BufferOverflowException();
     foreach = createForeach();
     SensingNullMessageProcessor firstProcessor = new SensingNullMessageProcessor();
     InternalTestProcessor failingProcessor = event -> {
+      eventReference.set(event);
       throw throwable;
     };
     foreach.setMessageProcessors(asList(firstProcessor, failingProcessor));
     initialiseIfNeeded(foreach, muleContext);
     try {
-      expectNestedProessorException(throwable, failingProcessor);
+      expectNestedProcessorException(throwable, failingProcessor);
       processInChain(foreach, eventBuilder(muleContext).message(of(new DummyNestedIterableClass().iterator())).build());
     } finally {
       assertThat(firstProcessor.invocations, equalTo(1));
+      assertNoForEachContext((InternalEvent) eventReference.get());
     }
   }
 
@@ -391,6 +403,9 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     assertThat(processedEvents, hasSize(2));
     assertThat(((PrivilegedEvent) processedEvents.get(0)).getMessageAsString(muleContext), is("[1, 2]:foo:zas"));
     assertThat(((PrivilegedEvent) processedEvents.get(1)).getMessageAsString(muleContext), is("[3]:foo:zas"));
+
+    assertNoForEachContext((InternalEvent) processedEvents.get(0));
+    assertNoForEachContext((InternalEvent) processedEvents.get(1));
   }
 
   @Test
@@ -406,6 +421,9 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     assertThat(processedEvents, hasSize(2));
     assertThat(((PrivilegedEvent) processedEvents.get(0)).getMessageAsString(muleContext), is("[1, 2]:foo:zas"));
     assertThat(((PrivilegedEvent) processedEvents.get(1)).getMessageAsString(muleContext), is("[3]:foo:zas"));
+
+    assertNoForEachContext((InternalEvent) processedEvents.get(0));
+    assertNoForEachContext((InternalEvent) processedEvents.get(1));
   }
 
   @Test
@@ -423,7 +441,8 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     assertThat(variables.get(DEFAULT_ROOT_MESSAGE_VARIABLE).getDataType(), is(assignableTo(MULE_MESSAGE)));
     assertThat(variables.get(DEFAULT_ROOT_MESSAGE_VARIABLE).getValue(), equalTo(in.getMessage()));
 
-    assertThat(variables.get(DEFAULT_COUNTER_VARIABLE).getDataType(), equalTo(DataType.builder().type(Integer.class).build()));
+    assertThat(variables.get(DEFAULT_COUNTER_VARIABLE).getDataType(),
+               equalTo(DataType.builder().type(Integer.class).build()));
     assertThat(variables.get(DEFAULT_COUNTER_VARIABLE).getValue(), equalTo(2));
   }
 
@@ -496,6 +515,9 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     assertTrue(ERR_PAYLOAD_TYPE, processedEvents.get(1).getMessage().getPayload().getValue() instanceof String);
     assertEquals(ERR_OUTPUT, "bar:foo:zas", processedEvents.get(0).getMessage().getPayload().getValue());
     assertEquals(ERR_OUTPUT, "zip:foo:zas", processedEvents.get(1).getMessage().getPayload().getValue());
+
+    assertNoForEachContext((InternalEvent) processedEvents.get(0));
+    assertNoForEachContext((InternalEvent) processedEvents.get(1));
   }
 
   private void assertNestedProcessedMessages() {
@@ -503,17 +525,24 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     assertEquals(ERR_NUMBER_MESSAGES, 6, processedEvents.size());
     for (int i = 0; i < processedEvents.size(); i++) {
       assertTrue(ERR_PAYLOAD_TYPE, processedEvents.get(i).getMessage().getPayload().getValue() instanceof String);
+      assertNoForEachContext((InternalEvent) processedEvents.get(i));
     }
     for (int i = 0; i < processedEvents.size(); i++) {
       assertEquals(ERR_OUTPUT, expectedOutputs[i], processedEvents.get(i).getMessage().getPayload().getValue());
+      assertNoForEachContext((InternalEvent) processedEvents.get(i));
     }
+  }
+
+  private void assertNoForEachContext(InternalEvent event) {
+    Map<String, Object> forEachContext = event.getInternalParameter(MULE_FOREACH_CONTEXT_KEY);
+    assertThat(forEachContext.isEmpty(), Matchers.is(true));
   }
 
   public class DummySimpleIterableClass implements Iterable<String> {
 
-    public List<String> strings = new ArrayList<>();
+    List<String> strings = new ArrayList<>();
 
-    public DummySimpleIterableClass() {
+    DummySimpleIterableClass() {
       strings.add("bar");
       strings.add("zip");
     }
@@ -528,7 +557,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
     private final List<DummySimpleIterableClass> iterables = new ArrayList<>();
 
-    public DummyNestedIterableClass() {
+    DummyNestedIterableClass() {
       DummySimpleIterableClass dsi1 = new DummySimpleIterableClass();
       dsi1.strings = new ArrayList<>();
       dsi1.strings.add("a1");
