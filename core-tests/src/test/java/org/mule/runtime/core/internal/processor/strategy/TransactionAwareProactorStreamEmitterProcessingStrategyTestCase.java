@@ -20,11 +20,11 @@ import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.DEFAULT;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.TransactionAwareProcessingStrategyTestCase;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory.TransactionAwareProactorStreamEmitterProcessingStrategy;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.Collection;
@@ -33,7 +33,6 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.After;
-import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -44,20 +43,13 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
     extends ProactorStreamEmitterProcessingStrategyTestCase
     implements TransactionAwareProcessingStrategyTestCase {
 
-  @Rule
-  public SystemProperty lazyTxCheck;
-
-  public TransactionAwareProactorStreamEmitterProcessingStrategyTestCase(Mode mode, boolean lazyTxCheck) {
+  public TransactionAwareProactorStreamEmitterProcessingStrategyTestCase(Mode mode) {
     super(mode);
-    this.lazyTxCheck =
-        new SystemProperty(TransactionAwareProcessingStrategyFactory.class.getName() + ".LAZY_TX_CHECK", "" + lazyTxCheck);
   }
 
-  @Parameterized.Parameters(name = "{0}, {1}")
-  public static Collection<Object[]> parameters() {
-    return asList(new Object[][] {
-        {Mode.FLOW, true}, {SOURCE, true},
-        {Mode.FLOW, false}, {SOURCE, false}});
+  @Parameterized.Parameters(name = "{0}")
+  public static Collection<Mode> parameters() {
+    return asList(new Mode[] {Mode.FLOW, SOURCE});
   }
 
   @After

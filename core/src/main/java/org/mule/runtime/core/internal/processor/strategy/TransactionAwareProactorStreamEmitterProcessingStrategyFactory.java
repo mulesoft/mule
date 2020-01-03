@@ -11,8 +11,6 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
-import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
@@ -109,22 +107,6 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
     }
 
     @Override
-    protected ReactiveProcessor onNonBlockingProcessorTxAware(ReactiveProcessor processor) {
-      if (LAZY_TX_CHECK) {
-        // If there is a tx active, force the processing to the main thread right after the processor.
-        // This is needed because non blocking processors will do a thread switch internally regardless of the presence of a tx
-        // (which is ok, an http:reqeust shouldn't bother that a previous db component opened a transaction).
-
-        return publisher -> from(publisher)
-            .flatMap(event -> just(event)
-                .transform(isTransactionActive() ? BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor) : processor));
-      } else {
-        return super.onNonBlockingProcessorTxAware(processor);
-      }
-
-    }
-
-    @Override
     protected ScheduledExecutorService decorateScheduler(ScheduledExecutorService scheduler) {
       return new ConditionalExecutorServiceDecorator(super.decorateScheduler(scheduler),
                                                      currentScheduler -> isTransactionActive());
@@ -132,13 +114,15 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyFactory exte
 
     @Override
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
-      return !LAZY_TX_CHECK && isTransactionActive() ? BLOCKING_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline)
+      return isTransactionActive()
+          ? BLOCKING_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline)
           : super.onPipeline(pipeline);
     }
 
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
-      return !LAZY_TX_CHECK && isTransactionActive() ? BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor)
+      return isTransactionActive()
+          ? BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor)
           : super.onProcessor(processor);
     }
   }
