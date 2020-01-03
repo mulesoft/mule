@@ -183,6 +183,7 @@ class ExtensionPluginMetadataGenerator {
           return Class.forName(extensionClassName);
         } catch (ClassNotFoundException e) {
           TroubleshootingUtils.copyPluginToAuxJenkinsFolderForTroubleshooting(firstURL);
+          TroubleshootingUtils.copyOsRunningProcessesToAuxJenkinsFolder(firstURL);
           TroubleshootingUtils.generateHeapDumpInAuxJenkinsFolder(firstURL);
           List<URL> classpath = new ClassPathUrlProvider().getURLs();
           logger.warn("CLASSPATH URLs:");
