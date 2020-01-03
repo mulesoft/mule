@@ -480,6 +480,7 @@ public class MuleExtensionUtils {
    *
    * @param extensionModel the extension model to check
    * @return a boolean indicating if the the extension model is being build on runtime or not
+   * @since 4.3.0
    */
   public static boolean isCompileTime(ExtensionModel extensionModel) {
     return extensionModel.getModelProperty(CompileTimeModelProperty.class).isPresent();
