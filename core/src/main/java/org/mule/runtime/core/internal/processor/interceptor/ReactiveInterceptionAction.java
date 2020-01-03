@@ -25,9 +25,9 @@ import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
-import org.slf4j.Logger;
-
 import java.util.concurrent.CompletableFuture;
+
+import org.slf4j.Logger;
 
 /**
  * Implementation of {@link InterceptionAction} that does the needed hooks with {@code Reactor} into the pipeline.
@@ -38,11 +38,11 @@ class ReactiveInterceptionAction implements InterceptionAction {
 
   private static final Logger LOGGER = getLogger(ReactiveInterceptionAction.class);
 
-  private ErrorTypeLocator errorTypeLocator;
+  private final ErrorTypeLocator errorTypeLocator;
 
-  private Processor processor;
-  private ReactiveProcessor next;
-  private DefaultInterceptionEvent interceptionEvent;
+  private final Processor processor;
+  private final ReactiveProcessor next;
+  private final DefaultInterceptionEvent interceptionEvent;
 
   public ReactiveInterceptionAction(DefaultInterceptionEvent interceptionEvent,
                                     ReactiveProcessor next, Processor processor, ErrorTypeLocator errorTypeLocator) {
@@ -62,10 +62,7 @@ class ReactiveInterceptionAction implements InterceptionAction {
         .cast(CoreEvent.class)
         .transform(next)
         .cast(InternalEvent.class)
-        .map(event -> {
-          interceptionEvent.reset(event);
-          return interceptionEvent;
-        })
+        .map(interceptionEvent::reset)
         .cast(InterceptionEvent.class)
         .toFuture();
   }

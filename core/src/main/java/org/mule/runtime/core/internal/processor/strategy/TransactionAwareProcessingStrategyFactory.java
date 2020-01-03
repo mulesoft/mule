@@ -18,7 +18,4 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
  */
 public interface TransactionAwareProcessingStrategyFactory extends ProcessingStrategyFactory {
 
-  static final boolean LAZY_TX_CHECK =
-      Boolean.getBoolean(TransactionAwareProcessingStrategyFactory.class.getName() + ".LAZY_TX_CHECK");
-
 }
