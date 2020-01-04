@@ -8,26 +8,34 @@ package org.mule.runtime.oauth.api;
 
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
-import org.mule.runtime.oauth.api.exception.RequestAuthenticationException;
-import org.mule.runtime.oauth.api.listener.ClientCredentialsListener;
+import org.mule.runtime.oauth.api.builder.OAuthPlatformManagedDancerBuilder;
+import org.mule.runtime.oauth.api.listener.PlatformManagedListener;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Allows to manipulate access and refresh tokens that are obtained and managed by the Anypoint Platform. Each instance is
+ * preconfigured by an {@link OAuthPlatformManagedDancerBuilder} to point to a specific connection id.
+ * <p>
+ * Since the authorizations are performed by the platform, this dancer remains agnostic of the grant type that was used to
+ * obtain them.
+ * <p>
+ * Platform Managed OAuth is an experimental feature. It will only be enabled on selected environments and scenarios.
+ * Backwards compatibility is not guaranteed.
+ *
+ * @since 4.3.0
+ */
 @NoImplement
 @Experimental
 public interface PlatformManagedOAuthDancer {
 
   /**
-   * Will query the internal state (the {@code tokensStore} parameter passed to the service to build the
-   * {@link ClientCredentialsOAuthDancer}) to get the appropriate accessToken. This requires that the authorization has been
-   * performed beforehand, otherwise, a {@link RequestAuthenticationException} will be thrown.
+   * Obtains the current access token for the connection that this dancer was configured for.
    *
-   * @return a future with the token to send on the authorized request. This will be immediately available unless a refresh has to
-   *         be made.
-   * @throws RequestAuthenticationException if called for a {@code resourceOwner} that has not yet been authorized.
+   * @return a future with the token to send on the authorized request.
    */
-  CompletableFuture<String> accessToken() throws RequestAuthenticationException;
+  CompletableFuture<String> accessToken();
 
   /**
    * Performs the refresh of the access token.
@@ -51,18 +59,16 @@ public interface PlatformManagedOAuthDancer {
   /**
    * Adds the {@code listener}. Listeners will be invoked in the same order as they were added
    *
-   * @param listener the {@link ClientCredentialsListener} to be added
+   * @param listener the {@link PlatformManagedListener} to be added
    * @throws IllegalArgumentException if the {@code listener} is {@code null}
-   * @since 4.2.1
    */
-  void addListener(ClientCredentialsListener listener);
+  void addListener(PlatformManagedListener listener);
 
   /**
    * Removes the {@code listener}. Nothing happens if it wasn't part of {@code this} dancer.
    *
-   * @param listener the {@link ClientCredentialsListener} to be removed
+   * @param listener the {@link PlatformManagedListener} to be removed
    * @throws IllegalArgumentException if the {@code listener} is {@code null}
-   * @since 4.2.1
    */
-  void removeListener(ClientCredentialsListener listener);
+  void removeListener(PlatformManagedListener listener);
 }
