@@ -20,7 +20,7 @@ public interface LegacyConnector extends Lifecycle, NameableObject, Connectable,
 
   /**
    * Only use this method to use the Connector's MuleContext. Otherwise you can be used the wrong MuleContext because a Connector
-   * can be defined at the domain level or de app level.
+   * can be defined at the domain or app level.
    *
    * @return MuleContext in which this connector has been created. If the Connector was defined in a Domain then it will return
    *         the MuleContext of the domain. If the Connector was defined in a Mule app then it will return the MuleContext of the
