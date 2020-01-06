@@ -444,13 +444,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     process(simpleForeach, in);
 
     List<Integer> sequences = processedEvents.stream()
-        .map(e -> {
-          if (e.getItemSequenceInfo().isPresent()) {
-            return e.getItemSequenceInfo().get().getPosition();
-          } else {
-            return -1;
-          }
-        })
+        .map(e ->  e.getItemSequenceInfo().map(i -> i.getPosition()).orElse(-1))
         .collect(toList());
 
     assertThat(ERR_INVALID_ITEM_SEQUENCE, sequences, is(asList(0, 1, 2, 3)));
