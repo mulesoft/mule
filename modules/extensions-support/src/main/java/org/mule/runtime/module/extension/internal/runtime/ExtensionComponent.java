@@ -17,6 +17,7 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
@@ -515,14 +516,14 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       return empty();
     }
 
-    if (!isConfigurationSpecified() || configurationProvider.get().isDynamic()) {
+    if (configurationResolver == null || usesDynamicConfiguration()) {
       return empty();
     }
 
     CoreEvent initialiserEvent = null;
     try {
-      initialiserEvent = getInitialiserEvent(muleContext);
-      return of(configurationProvider.get().get(initialiserEvent));
+      initialiserEvent = getNullEvent(muleContext);
+      return configurationResolver.apply(initialiserEvent);
     } finally {
       if (initialiserEvent != null) {
         ((BaseEventContext) initialiserEvent.getContext()).success();
