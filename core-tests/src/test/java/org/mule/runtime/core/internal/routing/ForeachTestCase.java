@@ -12,11 +12,11 @@ import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
@@ -28,8 +28,13 @@ import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAG
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+import static org.mule.test.allure.AllureConstants.RoutersFeature.ForeachStory.FOR_EACH;
+import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -55,12 +60,14 @@ import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 
 import java.nio.BufferOverflowException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.Iterator;
 import java.util.Optional;
 
+@Feature(ROUTERS)
+@Story(FOR_EACH)
 public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   private static final Logger LOGGER = getLogger(ForeachTestCase.class);
@@ -74,6 +81,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   private static String ERR_NUMBER_MESSAGES = "Not a correct number of messages processed";
   private static String ERR_PAYLOAD_TYPE = "Type error on processed payloads";
   private static String ERR_OUTPUT = "Messages processed incorrectly";
+  private static final String ERR_INVALID_ITEM_SEQUENCE = "Null ItemSequence received";
 
   @Rule
   public ExpectedException expectedException = none();
@@ -419,6 +427,26 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
     assertThat(result.getMessage(), equalTo(input.getMessage()));
     assertThat(processedEvents, hasSize(0));
+  }
+
+  @Test
+  @Issue("MULE-16764")
+  @io.qameta.allure.Description("ForEach is not setting itemSequenceInfo")
+  public void testItemSequences() throws Exception {
+    List<String> payload = new ArrayList<>();
+    payload.add("one");
+    payload.add("two");
+    payload.add("three");
+    payload.add("four");
+
+    CoreEvent in = eventBuilder(muleContext).message(of(payload)).build();
+    process(simpleForeach, in);
+
+    List<Integer> sequences = processedEvents.stream()
+        .map(e -> e.getItemSequenceInfo().map(i -> i.getPosition()).orElse(-1))
+        .collect(toList());
+
+    assertThat(ERR_INVALID_ITEM_SEQUENCE, sequences, is(asList(0, 1, 2, 3)));
   }
 
   private CoreEvent processInChain(Processor processor, CoreEvent event) throws Exception {
