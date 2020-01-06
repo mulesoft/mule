@@ -226,22 +226,6 @@
           "classSimpleName": "ValidationPhaseTemplate",
           "elementKind": "interface",
           "justification": "MULE-17390: Dead and unused code that hurts performance"
-        },
-        {
-          "code": "java.class.removed",
-          "old": "interface org.mule.runtime.core.privileged.transport.LegacyConnector",
-          "package": "org.mule.runtime.core.privileged.transport",
-          "classSimpleName": "LegacyConnector",
-          "elementKind": "interface",
-          "justification": "MULE-17390: Dead and unused code that hurts performance"
-        },
-        {
-          "code": "java.class.removed",
-          "old": "interface org.mule.runtime.core.privileged.transport.LegacyInboundEndpoint",
-          "package": "org.mule.runtime.core.privileged.transport",
-          "classSimpleName": "LegacyInboundEndpoint",
-          "elementKind": "interface",
-          "justification": "MULE-17390: Dead and unused code that hurts performance"
         }
       ]
     }
