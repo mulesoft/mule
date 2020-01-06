@@ -17,7 +17,7 @@ import java.util.concurrent.TimeoutException;
  * Decorates a {@link HttpClient} so that invocations to {@link HttpClient#start()} and {@link HttpClient#stop()} have no effect.
  * <p>
  * This is useful (and recommended) for cases in which a given component owns an {@link HttpClient} but needs to expose said
- * client to other consumers. Since hte lifecycle of the client should only be handled by the owner, it is good practice to use
+ * client to other consumers. Since the lifecycle of the client should only be handled by the owner, it is good practice to use
  * this decorator whenever the client is exposed, to guarantee that faulty consumers don't interfere with its lifecycle.
  *
  * @since 4.3.0

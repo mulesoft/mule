@@ -46,7 +46,6 @@ public interface OAuthPlatformManagedDancerBuilder extends OAuthDancerBuilder<Pl
    *
    * @param listener the {@link PlatformManagedOAuthStateListener} to be added
    * @throws IllegalArgumentException if the {@code listener} is {@code null}
-   * @since 4.2.1
    */
   OAuthPlatformManagedDancerBuilder addListener(PlatformManagedOAuthStateListener listener);
 
