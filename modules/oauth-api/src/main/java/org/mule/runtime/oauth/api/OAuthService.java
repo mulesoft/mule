@@ -59,7 +59,7 @@ public interface OAuthService extends Service {
                                                                                   MuleExpressionLanguage expressionEvaluator);
 
   /**
-   * Creates a builder for an {@link PlatformManagedOAuthDancer} that obtains access tokens that are provisioned and managed
+   * Creates a builder for a {@link PlatformManagedOAuthDancer} that obtains access tokens that are provisioned and managed
    * by the Anypoint Platform.
    * <p>
    * Platform Managed OAuth is an experimental feature. It will only be enabled on selected environments and scenarios.
