@@ -20,7 +20,7 @@ import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
  */
 @Experimental
 @NoImplement
-public interface PlatformManagedListener extends OAuthStateListener {
+public interface PlatformManagedOAuthStateListener extends OAuthStateListener {
 
   /**
    * Invoked each time an access token has been obtained from the platform

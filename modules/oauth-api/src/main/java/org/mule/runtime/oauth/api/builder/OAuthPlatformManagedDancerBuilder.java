@@ -12,7 +12,7 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 import org.mule.runtime.oauth.api.PlatformManagedOAuthDancer;
-import org.mule.runtime.oauth.api.listener.PlatformManagedListener;
+import org.mule.runtime.oauth.api.listener.PlatformManagedOAuthStateListener;
 
 import java.nio.charset.Charset;
 import java.util.function.Function;
@@ -44,11 +44,11 @@ public interface OAuthPlatformManagedDancerBuilder extends OAuthDancerBuilder<Pl
   /**
    * Adds the {@code listener}. Listeners will be invoked in the same order as they were added
    *
-   * @param listener the {@link PlatformManagedListener} to be added
+   * @param listener the {@link PlatformManagedOAuthStateListener} to be added
    * @throws IllegalArgumentException if the {@code listener} is {@code null}
    * @since 4.2.1
    */
-  OAuthPlatformManagedDancerBuilder addListener(PlatformManagedListener listener);
+  OAuthPlatformManagedDancerBuilder addListener(PlatformManagedOAuthStateListener listener);
 
   /**
    * {@inheritDoc}
@@ -129,7 +129,7 @@ public interface OAuthPlatformManagedDancerBuilder extends OAuthDancerBuilder<Pl
    */
   @Override
   default OAuthDancerBuilder<PlatformManagedOAuthDancer> resourceOwnerIdTransformer(
-      Function<String, String> resourceOwnerIdTransformer) {
+                                                                                    Function<String, String> resourceOwnerIdTransformer) {
     throw new UnsupportedOperationException("This operation does not apply to this builder type");
   }
 

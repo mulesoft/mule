@@ -9,7 +9,7 @@ package org.mule.runtime.oauth.api;
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.oauth.api.builder.OAuthPlatformManagedDancerBuilder;
-import org.mule.runtime.oauth.api.listener.PlatformManagedListener;
+import org.mule.runtime.oauth.api.listener.PlatformManagedOAuthStateListener;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.util.concurrent.CompletableFuture;
@@ -59,16 +59,16 @@ public interface PlatformManagedOAuthDancer {
   /**
    * Adds the {@code listener}. Listeners will be invoked in the same order as they were added
    *
-   * @param listener the {@link PlatformManagedListener} to be added
+   * @param listener the {@link PlatformManagedOAuthStateListener} to be added
    * @throws IllegalArgumentException if the {@code listener} is {@code null}
    */
-  void addListener(PlatformManagedListener listener);
+  void addListener(PlatformManagedOAuthStateListener listener);
 
   /**
    * Removes the {@code listener}. Nothing happens if it wasn't part of {@code this} dancer.
    *
-   * @param listener the {@link PlatformManagedListener} to be removed
+   * @param listener the {@link PlatformManagedOAuthStateListener} to be removed
    * @throws IllegalArgumentException if the {@code listener} is {@code null}
    */
-  void removeListener(PlatformManagedListener listener);
+  void removeListener(PlatformManagedOAuthStateListener listener);
 }
