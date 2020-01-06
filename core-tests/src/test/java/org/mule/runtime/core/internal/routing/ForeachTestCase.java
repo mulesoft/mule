@@ -9,14 +9,15 @@ package org.mule.runtime.core.internal.routing;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
-import static java.util.stream.Collectors.*;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE;
@@ -27,10 +28,14 @@ import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAG
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+import static org.mule.test.allure.AllureConstants.RoutersFeature.ForeachStory.FOR_EACH;
+import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -56,9 +61,14 @@ import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 
 import java.nio.BufferOverflowException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Iterator;
+import java.util.Optional;
 
+@Feature(ROUTERS)
+@Story(FOR_EACH)
 public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   private static final Logger LOGGER = getLogger(ForeachTestCase.class);
@@ -72,7 +82,6 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   private static String ERR_NUMBER_MESSAGES = "Not a correct number of messages processed";
   private static String ERR_PAYLOAD_TYPE = "Type error on processed payloads";
   private static String ERR_OUTPUT = "Messages processed incorrectly";
-  private static final String ERR_NUMBER_ITEM_SEQUENCE = "ItemSequence expected in event";
   private static final String ERR_INVALID_ITEM_SEQUENCE = "Null ItemSequence received";
 
   @Rule
@@ -422,22 +431,29 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   }
 
   @Test
+  @Issue("MULE-16764")
+  @io.qameta.allure.Description("ForEach is not setting itemSequenceInfo")
   public void testItemSequences() throws Exception {
-    List<String> arrayList = new ArrayList<>();
-    arrayList.add("one");
-    arrayList.add("two");
-    arrayList.add("three");
-    arrayList.add("four");
+    List<String> payload = new ArrayList<>();
+    payload.add("one");
+    payload.add("two");
+    payload.add("three");
+    payload.add("four");
 
-    CoreEvent in = eventBuilder(muleContext).message(of(arrayList)).build();
+    CoreEvent in = eventBuilder(muleContext).message(of(payload)).build();
     process(simpleForeach, in);
 
-    Set<ItemSequenceInfo> sequences = processedEvents.stream()
-        .map(e -> e.getItemSequenceInfo().orElse(null))
-        .collect(toSet());
+    List<Integer> sequences = processedEvents.stream()
+        .map(e -> {
+          if (e.getItemSequenceInfo().isPresent()) {
+            return e.getItemSequenceInfo().get().getPosition();
+          } else {
+            return -1;
+          }
+        })
+        .collect(toList());
 
-    assertFalse(ERR_INVALID_ITEM_SEQUENCE, sequences.contains(null));
-    assertEquals(ERR_NUMBER_ITEM_SEQUENCE, arrayList.size(), sequences.size());
+    assertThat(ERR_INVALID_ITEM_SEQUENCE, sequences, is(asList(0, 1, 2, 3)));
   }
 
   private CoreEvent processInChain(Processor processor, CoreEvent event) throws Exception {
