@@ -26,7 +26,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadLoggingExecutorServiceDecorator;
-import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
 import org.mule.runtime.core.internal.processor.strategy.StreamEmitterProcessingStrategyFactory.StreamEmitterProcessingStrategy;
 import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
 
@@ -34,6 +33,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -76,20 +76,14 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
     return ProactorStreamEmitterProcessingStrategy.class;
   }
 
+  public static interface OperationInnerProcessor extends ReactiveProcessor {
+
+    boolean isAsync();
+  }
+
   static class ProactorStreamEmitterProcessingStrategy extends StreamEmitterProcessingStrategy {
 
     private static final Logger LOGGER = getLogger(ProactorStreamEmitterProcessingStrategy.class);
-
-    private static Class<ClassLoader> SDK_OPERATION_CLASS;
-
-    static {
-      try {
-        SDK_OPERATION_CLASS = (Class<ClassLoader>) ProactorStreamEmitterProcessingStrategy.class.getClassLoader()
-            .loadClass("org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor");
-      } catch (ClassNotFoundException e) {
-        LOGGER.debug("OperationMessageProcessor interface not available in current context", e);
-      }
-    }
 
     private final boolean isThreadLoggingEnabled;
     private final Supplier<Scheduler> blockingSchedulerSupplier;
@@ -161,6 +155,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
       }
     }
 
+
     protected ReactiveProcessor proactor(ReactiveProcessor processor, ScheduledExecutorService scheduler) {
       LOGGER.debug("Doing proactor() for {} on {}. maxConcurrency={}, parallelism={}, subscribers={}", processor, scheduler,
                    maxConcurrency, getParallelism(), subscribers);
@@ -174,10 +169,8 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
         return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
             .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
       } else if (maxConcurrency == MAX_VALUE) {
-        if (processor.getProcessingType() == CPU_INTENSIVE
-            && (processor instanceof InterceptedReactiveProcessor)
-            && SDK_OPERATION_CLASS != null
-            && SDK_OPERATION_CLASS.isAssignableFrom(((InterceptedReactiveProcessor) processor).getProcessor().getClass())) {
+        if (processor instanceof OperationInnerProcessor
+            && ((OperationInnerProcessor) processor).isAsync()) {
           // For no limit, the java SDK already does a flatMap internally, so no need to do an additional one here
           return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
               .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));

@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 
+import org.mockito.Mockito;
+
 /**
  * {@link SchedulerService} implementation that provides a shared {@link SimpleUnitTestSupportScheduler}.
  *
@@ -216,6 +218,7 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
   }
 
   public void clearCreatedSchedulers() {
+    decorators.forEach(Mockito::reset);
     decorators.clear();
   }
 
@@ -227,6 +230,7 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
             .getDecorated() instanceof SimpleUnitTestSupportCustomScheduler) {
       customSchedulers.remove(((SimpleUnitTestSupportLifecycleSchedulerDecorator) scheduler).getDecorated());
     }
+    Mockito.reset(scheduler);
   }
 
   public int getScheduledTasks() {

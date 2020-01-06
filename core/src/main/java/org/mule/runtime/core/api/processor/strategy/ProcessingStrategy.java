@@ -48,6 +48,10 @@ public interface ProcessingStrategy {
     Flux.from(flux).subscribe();
   }
 
+  default Publisher<CoreEvent> registerInternalFlux(Publisher<CoreEvent> flux) {
+    return flux;
+  }
+
   /**
    * Enrich {@link Processor} function by adding pre/post operators to implement processing strategy behaviour.
    *

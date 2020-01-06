@@ -103,7 +103,7 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   }
 
   @Override
-  public ProcessingType getProcessingType() {
+  public ProcessingType getInnerProcessingType() {
     ProcessingType processingType = asProcessingType(componentModel.getExecutionType());
     if (processingType == CPU_LITE && !componentModel.isBlocking()) {
       // If processing type is CPU_LITE and operation is non-blocking then use CPU_LITE_ASYNC processing type so that the Flow can

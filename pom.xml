@@ -299,6 +299,9 @@
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>validate</formatterGoal>
         <oldMuleArtifactVersion>4.2.2</oldMuleArtifactVersion>
+        
+        <surefire.args.base>-Dfile.encoding=UTF-8 -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'</surefire.args.base>
+        <surefire.args>${surefire.args.base}</surefire.args>
     </properties>
 
     <dependencies>
@@ -1572,7 +1575,7 @@
                     <version>${maven.surefire.plugin.version}</version>
                     <configuration>
                         <workingDirectory>${project.build.directory}</workingDirectory>
-                        <argLine>-Dfile.encoding=UTF-8 -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'</argLine>
+                        <argLine>${surefire.args}</argLine>
                         <trimStackTrace>false</trimStackTrace>
                         <excludes>
                             <!-- Surefire should be able to detect that classes are abstract but it seems it isn't -->
@@ -2003,6 +2006,13 @@
             </activation>
             <properties>
                 <vmtype>org.eclipse.jdt.internal.launching.macosx.MacOSXType</vmtype>
+            </properties>
+        </profile>
+        <profile>
+            <id>yourkit-agent</id>
+            <properties>
+<!--                 <yourkit.agent.path>/Applications/YourKit-Java-Profiler-2019.8.app/Contents/Resources/bin/mac/libyjpagent.dylib</yourkit.agent.path> -->
+                <surefire.args>-agentpath:'${yourkit.agent.path}'=disablestacktelemetry,exceptions=disable,probe_disable=*,listen=all ${surefire.args.base}</surefire.args>
             </properties>
         </profile>
 		<profile>

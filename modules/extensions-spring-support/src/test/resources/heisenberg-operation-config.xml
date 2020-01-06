@@ -70,7 +70,7 @@
     </flow>
 
     <flow name="expressionEnemy">
-        <heisenberg:get-enemy config-ref="heisenberg" index="#[mel:flowVars['enemy']]"/>
+        <heisenberg:get-enemy config-ref="heisenberg" index="#[vars.enemy]"/>
     </flow>
 
     <flow name="getInlineInfo">
@@ -148,7 +148,7 @@
     </flow>
 
     <flow name="knockManyByExpression">
-        <heisenberg:knock-many doors="#[mel:doors]"/>
+        <heisenberg:knock-many doors="#[vars.doors]"/>
     </flow>
 
     <flow name="callSaul">
@@ -244,7 +244,7 @@
                     <heisenberg:recursive-pojo/>
                 </heisenberg:childs>
                 <heisenberg:mapped-childs>
-                    <heisenberg:mapped-child key="someKey" value="#[mel:new org.mule.test.heisenberg.extension.model.RecursivePojo()"/>
+                    <heisenberg:mapped-child key="someKey" value="#[{} as Object {class: 'new org.mule.test.heisenberg.extension.model.RecursivePojo'}]"/>
                 </heisenberg:mapped-childs>
             </heisenberg:recursive-pojo>
         </heisenberg:approve>
