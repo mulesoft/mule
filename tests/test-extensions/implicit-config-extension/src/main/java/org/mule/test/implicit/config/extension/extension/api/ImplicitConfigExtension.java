@@ -23,9 +23,10 @@ import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.test.implicit.config.extension.extension.internal.ImplicitConnectionProvider;
 import org.mule.test.implicit.config.extension.extension.internal.ImplicitOperations;
+import org.mule.test.implicit.config.extension.extension.internal.ImplicitStatefulOperation;
 
 @Extension(name = "implicit")
-@Operations({ImplicitOperations.class})
+@Operations({ImplicitOperations.class, ImplicitStatefulOperation.class})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/implicit", prefix = "implicit")
 @ConnectionProviders(ImplicitConnectionProvider.class)
 public class ImplicitConfigExtension implements Initialisable, Startable, MuleContextAware {

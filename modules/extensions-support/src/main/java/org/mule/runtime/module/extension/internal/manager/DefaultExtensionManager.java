@@ -164,13 +164,20 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
    * {@inheritDoc}
    */
   @Override
-  public Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel,
+  public Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel,
+                                                          ComponentModel componentModel,
                                                           CoreEvent muleEvent) {
 
-    ConfigurationInstance instance =
-        getConfigurationProvider(extensionModel, componentModel).map(p -> p.get(muleEvent)).orElse(null);
-    if (instance != null) {
-      return of(instance);
+    return getConfigurationProvider(extensionModel, componentModel, muleEvent).map(p -> p.get(muleEvent));
+  }
+
+  public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel,
+                                                                  ComponentModel componentModel,
+                                                                  CoreEvent muleEvent) {
+
+    Optional<ConfigurationProvider> configurationProvider = getConfigurationProvider(extensionModel, componentModel);
+    if (configurationProvider.isPresent()) {
+      return configurationProvider;
     }
 
     Optional<ConfigurationModel> configurationModel =
@@ -178,8 +185,8 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
                                                                                        componentModel));
     if (configurationModel.isPresent()) {
       createImplicitConfiguration(extensionModel, configurationModel.get(), muleEvent);
-      return of(getConfiguration(getImplicitConfigurationProviderName(extensionModel, configurationModel.get()),
-                                 muleEvent));
+      return getConfiguration(getImplicitConfigurationProviderName(extensionModel, configurationModel.get()),
+                              muleEvent));
     }
 
     return empty();
@@ -204,26 +211,26 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     return extensionRegistry.getConfigurationProvider(configurationProviderName);
   }
 
-  private void createImplicitConfiguration(ExtensionModel extensionModel, ConfigurationModel implicitConfigurationModel,
-                                           CoreEvent muleEvent) {
+  private ConfigurationProvider createImplicitConfiguration(ExtensionModel extensionModel,
+                                                            ConfigurationModel implicitConfigurationModel,
+                                                            CoreEvent muleEvent) {
     String implicitConfigurationProviderName = getImplicitConfigurationProviderName(extensionModel, implicitConfigurationModel);
-    if (!extensionRegistry
-        .getConfigurationProvider(implicitConfigurationProviderName)
-        .isPresent()) {
+    return extensionRegistry.getConfigurationProvider(implicitConfigurationProviderName).orElseGet(() -> {
       synchronized (extensionModel) {
         // check that another thread didn't beat us to create the instance
-        if (!extensionRegistry
-            .getConfigurationProvider(implicitConfigurationProviderName)
-            .isPresent()) {
-          registerConfigurationProvider(implicitConfigurationProviderFactory.createImplicitConfigurationProvider(extensionModel,
-                                                                                                                 implicitConfigurationModel,
-                                                                                                                 muleEvent,
-                                                                                                                 getReflectionCache(),
-                                                                                                                 expressionManager,
-                                                                                                                 muleContext));
-        }
+        return extensionRegistry.getConfigurationProvider(implicitConfigurationProviderName).orElseGet(() -> {
+          ConfigurationProvider implicitConfigurationProvider =
+              implicitConfigurationProviderFactory.createImplicitConfigurationProvider(extensionModel,
+                                                                                       implicitConfigurationModel,
+                                                                                       muleEvent,
+                                                                                       getReflectionCache(),
+                                                                                       expressionManager,
+                                                                                       muleContext);
+          registerConfigurationProvider(implicitConfigurationProvider);
+          return implicitConfigurationProvider;
+        });
       }
-    }
+    });
   }
 
   private Optional<ConfigurationModel> getConfigurationModelForExtension(ExtensionModel extensionModel,

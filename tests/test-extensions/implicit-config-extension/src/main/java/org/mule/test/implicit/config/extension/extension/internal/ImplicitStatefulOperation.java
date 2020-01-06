@@ -15,10 +15,10 @@ public class ImplicitStatefulOperation {
 
   @Parameter
   @ConfigOverride
-  private String optionalNoDefault;
+  private String optionalWithDefault;
 
   public String getEnrichedName(@Config ImplicitConfigExtension config) {
-    return config.getName() + " " + optionalNoDefault;
+    return config.getName() + " " + optionalWithDefault;
   }
 
 }

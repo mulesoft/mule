@@ -24,7 +24,7 @@ import java.util.Set;
  * <p>
  * This class is also the access point to obtaining {@link ConfigurationInstance configuration instances} of the extensions in
  * use.
- *
+ * <p>
  * For an extension to be usable, it has to be registered in this manager through the {@link #registerExtension(ExtensionModel)}
  * method
  *
@@ -68,7 +68,7 @@ public interface ExtensionManager {
    * updated for the returned {@link ConfigurationInstance}
    *
    * @param configurationProviderName the name of a previously registered {@link ConfigurationProvider}
-   * @param event the current Event
+   * @param event                     the current Event
    * @return a {@link ConfigurationInstance}
    */
   ConfigurationInstance getConfiguration(String configurationProviderName, CoreEvent event);
@@ -96,12 +96,17 @@ public interface ExtensionManager {
    *
    * @param extensionModel the {@link ExtensionModel} for which a configuration is wanted
    * @param componentModel the {@link ComponentModel} associated to a {@link ConfigurationInstance}
-   * @param muleEvent the current Event
+   * @param muleEvent      the current Event
    * @return an {@link Optional} for a {@link ConfigurationInstance}
    * @throws IllegalStateException if none or too many {@link ConfigurationProvider} are found to be suitable
    */
-  Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel,
+  Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel,
+                                                   ComponentModel componentModel,
                                                    CoreEvent muleEvent);
+
+  Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel,
+                                                           ComponentModel componentModel,
+                                                           CoreEvent muleEvent);
 
   /**
    * Locates and returns the {@link ConfigurationProvider} which would serve an invocation to the
@@ -116,7 +121,7 @@ public interface ExtensionManager {
 
   /**
    * Locates and returns (if there is any) a suitable {@link ConfigurationProvider} for the given {@link ComponentModel}.
-   * 
+   *
    * @param extensionModel the {@link ExtensionModel} for which a configuration is wanted
    * @param componentModel the {@link ComponentModel} for which a configuration is wanted
    * @return an {@link Optional} {@link ConfigurationProvider}
@@ -134,10 +139,11 @@ public interface ExtensionManager {
 
   /**
    * Performs actions related to the disposal of the configuration in the extension manager
-   * 
-   * @param key the key for the configuration to be disposed
+   *
+   * @param key           the key for the configuration to be disposed
    * @param configuration the configuration to be disposed.
    */
-  default void disposeConfiguration(String key, ConfigurationInstance configuration) {}
+  default void disposeConfiguration(String key, ConfigurationInstance configuration) {
+  }
 
 }

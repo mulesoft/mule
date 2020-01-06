@@ -98,6 +98,7 @@ import org.mule.runtime.module.extension.internal.runtime.execution.OperationArg
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigOverrideValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -262,11 +263,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       } else {
         operationExecutionFunction = (parameters, operationEvent, callback) -> {
           ExecutionContextAdapter<T> operationContext = createExecutionContext(
-                                                                               configuration,
-                                                                               parameters,
-                                                                               operationEvent,
-                                                                               currentScheduler != null ? currentScheduler
-                                                                                   : IMMEDIATE_SCHEDULER);
+              configuration,
+              parameters,
+              operationEvent,
+              currentScheduler != null ? currentScheduler
+                  : IMMEDIATE_SCHEDULER);
 
           executeOperation(operationContext, mapped(callback, operationContext, operationEvent));
         };
@@ -411,7 +412,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return delegate;
   }
 
-  private CompletableComponentExecutor<T> createComponentExecutor() {
+  private CompletableComponentExecutor<T> createComponentExecutor() throws InitialisationException {
     Map<String, Object> params = new HashMap<>();
 
     LazyValue<ValueResolvingContext> resolvingContext =
@@ -429,35 +430,40 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           }
         });
 
-    componentModel.getParameterGroupModels().stream().forEach(group -> {
+    for (ParameterGroupModel group : componentModel.getParameterGroupModels()) {
       if (group.getName().equals(DEFAULT_GROUP_NAME)) {
-        group.getParameterModels().stream()
-            .filter(p -> p.getModelProperty(FieldOperationParameterModelProperty.class).isPresent())
-            .forEach(p -> {
-              ValueResolver<?> resolver = resolverSet.getResolvers().get(p.getName());
-              if (resolver != null) {
-                try {
-                  params.put(getMemberName(p), resolveValue(resolver, resolvingContext.get()));
-                } catch (MuleException e) {
-                  throw new MuleRuntimeException(e);
-                } finally {
-                  resolvingContext.get().close();
-                }
-              }
-            });
+        for (ParameterModel p : group.getParameterModels()) {
+          if (!p.getModelProperty(FieldOperationParameterModelProperty.class).isPresent()) {
+            continue;
+          }
+
+          ValueResolver<?> resolver = resolverSet.getResolvers().get(p.getName());
+          if (resolver != null) {
+            if (resolver instanceof ConfigOverrideValueResolverWrapper && usesImplicitConfig()) {
+              throw new InitialisationException(new RuntimeException("tu vieja"), this);
+            }
+            try {
+              params.put(getMemberName(p), resolveValue(resolver, resolvingContext.get()));
+            } catch (MuleException e) {
+              throw new MuleRuntimeException(e);
+            } finally {
+              resolvingContext.get().close();
+            }
+          }
+        }
       } else {
         ParameterGroupDescriptor groupDescriptor = group.getModelProperty(ParameterGroupModelProperty.class)
             .map(g -> g.getDescriptor())
             .orElse(null);
 
         if (groupDescriptor == null) {
-          return;
+          continue;
         }
 
         List<ParameterModel> fieldParameters = getGroupsOfFieldParameters(group);
 
         if (fieldParameters.isEmpty()) {
-          return;
+          continue;
         }
 
         ObjectBuilder groupBuilder = createFieldParameterGroupBuilder(groupDescriptor, fieldParameters);
@@ -470,7 +476,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           resolvingContext.get().close();
         }
       }
-    });
+    }
 
     return getOperationExecutorFactory(componentModel).createExecutor(componentModel, params);
   }
@@ -598,10 +604,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private void addCursorResetInterceptor(InterceptorChain.Builder chainBuilder) {
     List<String> streamParams = new ArrayList<>(5);
     componentModel.getAllParameterModels().forEach(
-                                                   p -> getType(p.getType(), getClassLoader(extensionModel))
-                                                       .filter(clazz -> InputStream.class.isAssignableFrom(clazz)
-                                                           || Iterator.class.isAssignableFrom(clazz))
-                                                       .ifPresent(clazz -> streamParams.add(p.getName())));
+        p -> getType(p.getType(), getClassLoader(extensionModel))
+            .filter(clazz -> InputStream.class.isAssignableFrom(clazz)
+                || Iterator.class.isAssignableFrom(clazz))
+            .ifPresent(clazz -> streamParams.add(p.getName())));
 
     if (!streamParams.isEmpty()) {
       chainBuilder.addInterceptor(new CursorResetInterceptor(streamParams));

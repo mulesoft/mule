@@ -154,6 +154,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   protected MetadataCacheIdGenerator<ComponentAst> cacheIdGenerator;
 
   private Function<CoreEvent, Optional<ConfigurationInstance>> configurationResolver;
+  private boolean implicitConfig = false;
 
 
   protected ExtensionComponent(ExtensionModel extensionModel,
@@ -228,6 +229,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       };
     } else {
       // obtain implicit instance
+      implicitConfig = true;
       configurationResolver = event -> extensionManager.getConfiguration(extensionModel, componentModel, event);
     }
   }
@@ -505,6 +507,10 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   protected boolean usesDynamicConfiguration() {
     return isConfigurationSpecified() && configurationProvider.get().isDynamic();
+  }
+
+  protected boolean usesImplicitConfig() {
+    return implicitConfig;
   }
 
   /**

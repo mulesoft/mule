@@ -87,8 +87,10 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
   }
 
   @Override
-  public Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel,
+  public Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel,
+                                                          ComponentModel componentModel,
                                                           CoreEvent event) {
+
     Optional<ConfigurationInstance> configuration = childExtensionManager.getConfiguration(extensionModel, componentModel, event);
 
     if (configuration.isPresent()) {
