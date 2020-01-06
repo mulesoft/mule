@@ -66,9 +66,17 @@ public class ConcurrencyUtils {
     }
   }
 
-  public static <T> CompletableFuture<T> exceptionallyCompleted(Throwable t) {
+  /**
+   * Returns a {@link CompletableFuture} already exceptionally completed with the given {@code throwable}
+   *
+   * @param throwable the {@link Throwable} that completed the future
+   * @param <T>       the future's generic type
+   * @return an exceptionally completed future
+   * @since 4.3.0
+   */
+  public static <T> CompletableFuture<T> exceptionallyCompleted(Throwable throwable) {
     CompletableFuture<T> f = new CompletableFuture<>();
-    f.completeExceptionally(t);
+    f.completeExceptionally(throwable);
 
     return f;
   }
