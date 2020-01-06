@@ -274,10 +274,12 @@ class UntilSuccessfulRouter {
       if (throwable instanceof MessagingException) {
         exceptionEvent = ((MessagingException) throwable).getEvent();
       }
+      // MessagingException cause is set to null in order to avoid RETRY:EXHAUSTED ErrorType replacement
+      // during ErrorType resolution (see ChainErrorHandlingUtils and MessagingExceptionResolver)
       return new MessagingException(exceptionEvent,
                                     new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX,
                                                                                           cause.getMessage()),
-                                                                      cause, owner),
+                                                                      null, owner),
                                     owner);
     };
   }
