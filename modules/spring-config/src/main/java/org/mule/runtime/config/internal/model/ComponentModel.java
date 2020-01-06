@@ -292,6 +292,10 @@ public abstract class ComponentModel {
         ((ComponentAst) ComponentModel.this).recursiveStream()
             // .filter(childComp -> childComp != ComponentModel.this)
             .map(childComp -> (ComponentModel) childComp)
+            .filter(childComp -> childComp.getType() != null)
+            .filter(childComp -> !childComp.getModel(ParameterizedModel.class).isPresent())
+            // Will be set later when processing connection providers
+            .filter(childComp -> !extensionModelHelper.findConnectionProviderModel(childComp.getIdentifier()).isPresent())
             .forEach(childComp -> childComp
                 .setMetadataTypeModelAdapter(findParameterModel(extensionModelHelper, model, childComp)));
       }
