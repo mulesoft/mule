@@ -9,12 +9,15 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.After;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -22,7 +25,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
 
-  private static final String TARGET = "myFlowVar";
+  protected static final String TARGET = "myFlowVar";
 
   @Override
   protected ReturnDelegate createReturnDelegate() {
@@ -42,5 +45,18 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
 
     assertThat(message, is(notNullValue()));
     return message;
+  }
+
+  @Override
+  @Test
+  public void evaluateEvent() {
+    CoreEvent event = mock(CoreEvent.class);
+    final String payload = "Hello there!";
+    Message message = Message.of(payload);
+    when(event.getMessage()).thenReturn(message);
+
+    CoreEvent resultEvent = delegate.asReturnValue(event, operationContext);
+    Message resultMessage = getOutputMessage(resultEvent);
+    assertThat(resultMessage.getPayload().getValue(), is(payload));
   }
 }

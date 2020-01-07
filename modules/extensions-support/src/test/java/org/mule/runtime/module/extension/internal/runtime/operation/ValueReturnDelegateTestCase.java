@@ -8,12 +8,16 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.tck.size.SmallTest;
 
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -33,5 +37,11 @@ public class ValueReturnDelegateTestCase extends ValueReturnDelegateContractTest
 
     assertThat(message, is(notNullValue()));
     return message;
+  }
+
+  @Test
+  public void evaluateEvent() {
+    CoreEvent event = mock(CoreEvent.class);
+    assertThat(delegate.asReturnValue(event, operationContext), is(sameInstance(event)));
   }
 }
