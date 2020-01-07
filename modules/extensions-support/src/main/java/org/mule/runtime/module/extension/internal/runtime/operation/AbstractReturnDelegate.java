@@ -23,6 +23,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionHandler;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
@@ -114,6 +115,10 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
   }
 
   protected Message toMessage(Object value, ExecutionContextAdapter operationContext) {
+    if (value instanceof Event) {
+      return ((Event) value).getMessage();
+    }
+
     Map<String, Object> params = operationContext.getParameters();
     MediaType contextMimeTypeParam = getContextMimeType(params);
     Charset contextEncodingParam = getContextEncoding(params);
