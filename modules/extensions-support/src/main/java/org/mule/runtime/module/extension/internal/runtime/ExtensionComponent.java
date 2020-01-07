@@ -23,6 +23,7 @@ import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKN
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.AbstractComponent;
@@ -93,7 +94,6 @@ import java.util.function.Function;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Class that groups all the common behaviour between different extension's components, like {@link OperationMessageProcessor} and
@@ -107,7 +107,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     implements MuleContextAware, MetadataKeyProvider, MetadataProvider<T>, ComponentValueProvider,
     Lifecycle {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(ExtensionComponent.class);
+  private final static Logger LOGGER = getLogger(ExtensionComponent.class);
 
   private final TemplateParser expressionParser = createMuleStyleParser();
   private final ExtensionModel extensionModel;

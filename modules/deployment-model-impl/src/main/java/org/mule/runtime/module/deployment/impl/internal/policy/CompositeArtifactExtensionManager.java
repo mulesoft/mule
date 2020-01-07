@@ -8,12 +8,12 @@
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
@@ -47,7 +47,7 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
    * Creates a composed extension manager
    *
    * @param parentExtensionManager extension manager for the parent artifact. Non null
-   * @param childExtensionManager extension manager for the child artifact. Non null
+   * @param childExtensionManager  extension manager for the child artifact. Non null
    */
   public CompositeArtifactExtensionManager(ExtensionManager parentExtensionManager,
                                            ExtensionManager childExtensionManager) {
@@ -81,9 +81,9 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
   public ConfigurationInstance getConfiguration(String configurationProviderName, CoreEvent event) {
     return getConfigurationProvider(configurationProviderName).map(provider -> provider.get(event))
         .orElseThrow(() -> new IllegalArgumentException(
-                                                        format(
-                                                               "There is no registered configurationProvider under name '%s'",
-                                                               configurationProviderName)));
+            format(
+                "There is no registered configurationProvider under name '%s'",
+                configurationProviderName)));
   }
 
   @Override
@@ -91,20 +91,30 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
                                                           ComponentModel componentModel,
                                                           CoreEvent event) {
 
-    Optional<ConfigurationInstance> configuration = childExtensionManager.getConfiguration(extensionModel, componentModel, event);
+    Optional<ConfigurationProvider> configurationProvider = getConfigurationProvider(extensionModel, componentModel, event);
+    if (configurationProvider.isPresent()) {
+      return configurationProvider.map(p -> p.get(event));
+    }
+
+    throw new IllegalArgumentException(format(
+        "There is no registered configuration provider for extension '%s'",
+        extensionModel.getName()));
+  }
+
+
+  @Override
+  public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel,
+                                                                  ComponentModel componentModel,
+                                                                  CoreEvent event) {
+    Optional<ConfigurationProvider> configuration = childExtensionManager.getConfigurationProvider(extensionModel,
+                                                                                                   componentModel,
+                                                                                                   event);
 
     if (configuration.isPresent()) {
       return configuration;
     } else {
-      Optional<ConfigurationProvider> provider = getConfigurationProvider(extensionModel, componentModel);
-      if (provider.isPresent()) {
-        return ofNullable(provider.get().get(event));
-      }
+      return getConfigurationProvider(extensionModel, componentModel);
     }
-
-    throw new IllegalArgumentException(format(
-                                              "There is no registered configuration provider for extension '%s'",
-                                              extensionModel.getName()));
   }
 
   @Override
@@ -125,7 +135,8 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
 
     if (!configurationModel.isPresent()) {
       configurationModel =
-          parentExtensionManager.getConfigurationProvider(extensionModel, componentModel);;
+          parentExtensionManager.getConfigurationProvider(extensionModel, componentModel);
+      ;
     }
 
     return configurationModel;
