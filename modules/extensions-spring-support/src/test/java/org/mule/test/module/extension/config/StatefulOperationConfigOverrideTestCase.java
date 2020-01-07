@@ -13,11 +13,11 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import org.junit.Test;
 
-public class ImplicitConfigWithStatefulOperationOverrideTestCase extends AbstractExtensionFunctionalTestCase {
+public class StatefulOperationConfigOverrideTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "implicit-stateful-override-config.xml";
+    return "stateful-override-config.xml";
   }
 
   @Test

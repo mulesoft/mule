@@ -10,11 +10,11 @@ import org.mule.test.module.extension.InvalidExtensionConfigTestCase;
 
 import org.junit.rules.ExpectedException;
 
-public class ImplicitDynamicConfigWithStatefulOperationOverrideTestCase extends InvalidExtensionConfigTestCase {
+public class DynamicConfigWithStatefulOperationConfigurationOverrideTestCase extends InvalidExtensionConfigTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "implicit-dynamic-stateful-override-config.xml";
+    return "dynamic-stateful-override-config.xml";
   }
 
   @Override
