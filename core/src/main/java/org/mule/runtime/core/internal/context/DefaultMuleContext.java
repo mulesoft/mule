@@ -208,7 +208,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   private ClusterConfiguration clusterConfiguration = new NullClusterConfiguration();
   private String clusterNodeIdPrefix = "";
-  private String clusterUUID = recalculateClusterUUID(clusterNodeIdPrefix);
 
   private final SingleResourceTransactionFactoryManager singleResourceTransactionFactoryManager =
       new SingleResourceTransactionFactoryManager();
@@ -866,10 +865,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   @Override
   public String getUniqueIdString() {
-    return clusterUUID;
-  }
-
-  private String recalculateClusterUUID(String clusterNodeIdPrefix) {
     return getClusterUUID(clusterNodeIdPrefix);
   }
 
@@ -970,7 +965,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     if (overriddenClusterConfiguration != null) {
       this.clusterConfiguration = overriddenClusterConfiguration;
       this.clusterNodeIdPrefix = overriddenClusterConfiguration.getClusterNodeId() + "-";
-      clusterUUID = recalculateClusterUUID(clusterNodeIdPrefix);
     }
   }
 
