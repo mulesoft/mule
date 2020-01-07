@@ -74,7 +74,24 @@ public interface ExtensionManager {
   ConfigurationInstance getConfiguration(String configurationProviderName, CoreEvent event);
 
   /**
-   * Returns a {@link ConfigurationInstance} for the given {@code extensionModel} and {@code componentModel}.
+   * Delegates into {@link #getConfigurationProvider(ExtensionModel, ComponentModel, CoreEvent)} to locate a suitable provider
+   * and uses the given {@code muleEvent} to obtain a {@link ConfigurationInstance} out of it.
+   * <p>
+   * By the mere fact of this configuration being returned, the value of {@link ConfigurationStats#getLastUsedMillis()} will be
+   * updated for the returned {@link ConfigurationInstance}
+   *
+   * @param extensionModel the {@link ExtensionModel} for which a configuration is wanted
+   * @param componentModel the {@link ComponentModel} associated to a {@link ConfigurationInstance}
+   * @param muleEvent      the current Event
+   * @return an {@link Optional} for a {@link ConfigurationInstance}
+   * @throws IllegalStateException if none or too many {@link ConfigurationProvider} are found to be suitable
+   */
+  Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel,
+                                                   ComponentModel componentModel,
+                                                   CoreEvent muleEvent);
+
+  /**
+   * Returns an optional {@link ConfigurationProvider} for the given {@code extensionModel} and {@code componentModel}.
    * <p>
    * Because no {@link ConfigurationProvider} is specified, the following algorithm will be applied to
    * try and determine the
@@ -90,20 +107,14 @@ public interface ExtensionManager {
    * {@link ConfigurationProvider} is created and registered for that model.</li>
    * <li>If none of the above conditions is met, then an {@link IllegalStateException} is thrown</li>
    * </ul>
-   * <p>
-   * By the mere fact of this configuration being returned, the value of {@link ConfigurationStats#getLastUsedMillis()} will be
-   * updated for the returned {@link ConfigurationInstance}
    *
    * @param extensionModel the {@link ExtensionModel} for which a configuration is wanted
    * @param componentModel the {@link ComponentModel} associated to a {@link ConfigurationInstance}
    * @param muleEvent      the current Event
-   * @return an {@link Optional} for a {@link ConfigurationInstance}
+   * @return an {@link Optional} for a {@link ConfigurationProvider}
    * @throws IllegalStateException if none or too many {@link ConfigurationProvider} are found to be suitable
+   * @since 4.3.0
    */
-  Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel,
-                                                   ComponentModel componentModel,
-                                                   CoreEvent muleEvent);
-
   Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel,
                                                            ComponentModel componentModel,
                                                            CoreEvent muleEvent);
