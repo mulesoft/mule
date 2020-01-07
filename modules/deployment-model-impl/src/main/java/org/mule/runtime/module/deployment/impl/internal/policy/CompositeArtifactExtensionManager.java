@@ -81,9 +81,9 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
   public ConfigurationInstance getConfiguration(String configurationProviderName, CoreEvent event) {
     return getConfigurationProvider(configurationProviderName).map(provider -> provider.get(event))
         .orElseThrow(() -> new IllegalArgumentException(
-            format(
-                "There is no registered configurationProvider under name '%s'",
-                configurationProviderName)));
+                                                        format(
+                                                               "There is no registered configurationProvider under name '%s'",
+                                                               configurationProviderName)));
   }
 
   @Override
@@ -97,8 +97,8 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
     }
 
     throw new IllegalArgumentException(format(
-        "There is no registered configuration provider for extension '%s'",
-        extensionModel.getName()));
+                                              "There is no registered configuration provider for extension '%s'",
+                                              extensionModel.getName()));
   }
 
 
@@ -135,8 +135,7 @@ public class CompositeArtifactExtensionManager implements ExtensionManager, Life
 
     if (!configurationModel.isPresent()) {
       configurationModel =
-          parentExtensionManager.getConfigurationProvider(extensionModel, componentModel);
-      ;
+          parentExtensionManager.getConfigurationProvider(extensionModel, componentModel);;
     }
 
     return configurationModel;

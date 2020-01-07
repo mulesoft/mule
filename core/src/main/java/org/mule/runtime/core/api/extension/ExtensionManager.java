@@ -143,7 +143,6 @@ public interface ExtensionManager {
    * @param key           the key for the configuration to be disposed
    * @param configuration the configuration to be disposed.
    */
-  default void disposeConfiguration(String key, ConfigurationInstance configuration) {
-  }
+  default void disposeConfiguration(String key, ConfigurationInstance configuration) {}
 
 }

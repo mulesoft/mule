@@ -85,7 +85,7 @@ public final class ConfigOverrideValueResolverWrapper<T> implements ValueResolve
     return resolveConfigOverrideParameter(context.getConfig().get());
   }
 
-  public T resolveWithoutConfig(ValueResolvingContext context) throws MuleException  {
+  public T resolveWithoutConfig(ValueResolvingContext context) throws MuleException {
     return delegate.resolve(context);
   }
 

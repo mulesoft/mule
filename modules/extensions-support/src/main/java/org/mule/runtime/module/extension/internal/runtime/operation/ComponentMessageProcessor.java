@@ -263,11 +263,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       } else {
         operationExecutionFunction = (parameters, operationEvent, callback) -> {
           ExecutionContextAdapter<T> operationContext = createExecutionContext(
-              configuration,
-              parameters,
-              operationEvent,
-              currentScheduler != null ? currentScheduler
-                  : IMMEDIATE_SCHEDULER);
+                                                                               configuration,
+                                                                               parameters,
+                                                                               operationEvent,
+                                                                               currentScheduler != null ? currentScheduler
+                                                                                   : IMMEDIATE_SCHEDULER);
 
           executeOperation(operationContext, mapped(callback, operationContext, operationEvent));
         };
@@ -431,9 +431,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         });
 
     LazyValue<Boolean> dynamicConfig = new LazyValue<>(
-        () -> extensionManager.getConfigurationProvider(extensionModel, componentModel, resolvingContext.get().getEvent())
-            .map(ConfigurationProvider::isDynamic)
-            .orElse(false));
+                                                       () -> extensionManager
+                                                           .getConfigurationProvider(extensionModel, componentModel,
+                                                                                     resolvingContext.get().getEvent())
+                                                           .map(ConfigurationProvider::isDynamic)
+                                                           .orElse(false));
 
     try {
       for (ParameterGroupModel group : componentModel.getParameterGroupModels()) {
@@ -482,19 +484,20 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private Object resolveComponentExecutorParam(LazyValue<ValueResolvingContext> resolvingContext,
                                                LazyValue<Boolean> dynamicConfig,
                                                ParameterModel p,
-                                               ValueResolver<?> resolver) throws InitialisationException {
+                                               ValueResolver<?> resolver)
+      throws InitialisationException {
     Object resolvedValue;
     try {
       if (resolver instanceof ConfigOverrideValueResolverWrapper) {
         resolvedValue = ((ConfigOverrideValueResolverWrapper<?>) resolver).resolveWithoutConfig(resolvingContext.get());
-        if (resolvedValue == null && usesImplicitConfig() && dynamicConfig.get()) {
+        if (resolvedValue == null && dynamicConfig.get()) {
           String message = format(
-              "Component '%s' at %s uses a dynamic configuration and defines configuration override parameter '%s' which "
-                  + "is assigned on initialization. That combination is not supported. Please use a non dynamic configuration "
-                  + "or don't set the parameter.",
-              getLocation().getComponentIdentifier().getIdentifier().toString(),
-              getLocation().getLocation(),
-              p.getName());
+                                  "Component '%s' at %s uses a dynamic configuration and defines configuration override parameter '%s' which "
+                                      + "is assigned on initialization. That combination is not supported. Please use a non dynamic configuration "
+                                      + "or don't set the parameter.",
+                                  getLocation().getComponentIdentifier().getIdentifier().toString(),
+                                  getLocation().getLocation(),
+                                  p.getName());
           throw new InitialisationException(createStaticMessage(message), this);
         }
       } else {
@@ -632,10 +635,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private void addCursorResetInterceptor(InterceptorChain.Builder chainBuilder) {
     List<String> streamParams = new ArrayList<>(5);
     componentModel.getAllParameterModels().forEach(
-        p -> getType(p.getType(), getClassLoader(extensionModel))
-            .filter(clazz -> InputStream.class.isAssignableFrom(clazz)
-                || Iterator.class.isAssignableFrom(clazz))
-            .ifPresent(clazz -> streamParams.add(p.getName())));
+                                                   p -> getType(p.getType(), getClassLoader(extensionModel))
+                                                       .filter(clazz -> InputStream.class.isAssignableFrom(clazz)
+                                                           || Iterator.class.isAssignableFrom(clazz))
+                                                       .ifPresent(clazz -> streamParams.add(p.getName())));
 
     if (!streamParams.isEmpty()) {
       chainBuilder.addInterceptor(new CursorResetInterceptor(streamParams));

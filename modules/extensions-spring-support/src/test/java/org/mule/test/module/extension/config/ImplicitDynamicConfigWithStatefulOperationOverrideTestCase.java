@@ -20,9 +20,9 @@ public class ImplicitDynamicConfigWithStatefulOperationOverrideTestCase extends 
   @Override
   protected void additionalExceptionAssertions(ExpectedException expectedException) {
     expectedException.expectMessage("Component 'implicit:get-enriched-name' at implicitConfig/processors/0 uses a dynamic "
-                                        + "configuration and defines configuration override parameter 'optionalWithDefault' which is "
-                                        + "assigned on initialization. That combination is not supported. Please use a non dynamic "
-                                        + "configuration or don't set the parameter.");
+        + "configuration and defines configuration override parameter 'optionalWithDefault' which is "
+        + "assigned on initialization. That combination is not supported. Please use a non dynamic "
+        + "configuration or don't set the parameter.");
   }
 
 }
