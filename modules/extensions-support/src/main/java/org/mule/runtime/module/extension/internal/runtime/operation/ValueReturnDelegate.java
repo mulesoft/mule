@@ -46,6 +46,10 @@ final class ValueReturnDelegate extends AbstractReturnDelegate {
    */
   @Override
   public CoreEvent asReturnValue(Object value, ExecutionContextAdapter operationContext) {
+    if (value instanceof CoreEvent) {
+      return (CoreEvent) value;
+    }
+
     return value instanceof EventedResult
         ? ((EventedResult) value).getEvent()
         : CoreEvent.builder(operationContext.getEvent())
