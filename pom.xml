@@ -290,7 +290,7 @@
         <aetherVersion>1.0.2.v20150114</aetherVersion>
         <aetherProviderVersion>3.3.9</aetherProviderVersion>
         <plexusUtilsVersion>3.0.24</plexusUtilsVersion>
-        <semver4jVersion>2.0.3</semver4jVersion>
+        <semver4jVersion>3.1.0</semver4jVersion>
         <powermockVersion>2.0.0</powermockVersion>
         <allure.maven.plugin.version>2.9</allure.maven.plugin.version>
         <jacoco.version>0.8.2</jacoco.version>
