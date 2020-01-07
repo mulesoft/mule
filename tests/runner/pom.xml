@@ -58,6 +58,12 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-maven-client-impl</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.vdurmont</groupId>
+                    <artifactId>semver4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Mule Runtime dependencies -->
