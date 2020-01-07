@@ -22,7 +22,6 @@ import static org.mule.test.allure.AllureConstants.MuleEvent.MULE_EVENT;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
-import org.hamcrest.core.Is;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -299,7 +298,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     CoreEvent secondEvent = getEventBuilder().message(of("second")).build();
 
     assertThat("Duplicated correlationID", firstEvent.getContext().getCorrelationId(),
-                             not(Is.is(secondEvent.getContext().getCorrelationId())));
+                             not(is(secondEvent.getContext().getCorrelationId())));
   }
 
   private SecurityContext createTestAuthentication() {
