@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.util.Optional.of;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertNotNull;
@@ -18,6 +19,8 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -31,7 +34,7 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
@@ -45,14 +48,12 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Ignore
 public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ComponentMessageProcessorTestCase.class);
@@ -100,12 +101,12 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
     processor.setCacheIdGeneratorFactory(mock(MetadataCacheIdGeneratorFactory.class));
 
     initialiseIfNeeded(processor, muleContext);
-    LifecycleUtils.startIfNeeded(processor);
+    startIfNeeded(processor);
   }
 
   @After
   public void after() throws MuleException {
-    LifecycleUtils.stopIfNeeded(processor);
+    stopIfNeeded(processor);
     disposeIfNeeded(processor, LOGGER);
   }
 
@@ -153,7 +154,9 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
 
       @Override
       public boolean matches(Object o) {
-        assertThat((Exception) unwrap((Exception) o), is(sameInstance(expect)));
+        Exception e = (Exception) unwrap((Exception) o);
+        assertThat(e, is(instanceOf(MessagingException.class)));
+        assertThat(e.getCause(), is(sameInstance(expect)));
 
         return true;
       }

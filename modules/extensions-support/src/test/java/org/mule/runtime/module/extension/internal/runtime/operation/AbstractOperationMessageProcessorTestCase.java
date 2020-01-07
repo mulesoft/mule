@@ -31,6 +31,10 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 import static org.mule.tck.MuleTestUtils.stubComponentExecutor;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
@@ -112,15 +116,20 @@ import java.util.Collections;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractOperationMessageProcessorTestCase extends AbstractMuleContextTestCase {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractOperationMessageProcessorTestCase.class);
 
   protected static final String EXTENSION_NAMESPACE = "extension_namespace";
   protected static final String CONFIG_NAME = "config";
@@ -379,6 +388,12 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     messageProcessor = setUpOperationMessageProcessor();
   }
 
+  @After
+  public void after() throws MuleException {
+    stopIfNeeded(messageProcessor);
+    disposeIfNeeded(messageProcessor, LOGGER);
+  }
+
   protected CoreEvent configureEvent() throws Exception {
     when(message.getPayload())
         .thenReturn(new TypedValue<>(TEST_PAYLOAD,
@@ -392,8 +407,10 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     OperationMessageProcessor messageProcessor = createOperationMessageProcessor();
     messageProcessor.setMuleContext(context);
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManagerAdapter);
-    muleContext.getInjector().inject(messageProcessor);
-    messageProcessor.initialise();
+
+    initialiseIfNeeded(messageProcessor, muleContext);
+    startIfNeeded(messageProcessor);
+
     return messageProcessor;
   }
 
@@ -407,7 +424,6 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
   @Test
   public void start() throws Exception {
-    messageProcessor.start();
     verify((Startable) operationExecutor).start();
   }
 
