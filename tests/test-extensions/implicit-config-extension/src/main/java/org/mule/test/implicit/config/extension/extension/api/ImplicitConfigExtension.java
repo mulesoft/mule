@@ -20,11 +20,13 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.test.implicit.config.extension.extension.internal.ImplicitConnectionProvider;
 import org.mule.test.implicit.config.extension.extension.internal.ImplicitOperations;
+import org.mule.test.implicit.config.extension.extension.internal.ImplicitStatefulOperation;
 
 @Extension(name = "implicit")
-@Operations({ImplicitOperations.class})
+@Operations({ImplicitOperations.class, ImplicitStatefulOperation.class})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/implicit", prefix = "implicit")
 @ConnectionProviders(ImplicitConnectionProvider.class)
 public class ImplicitConfigExtension implements Initialisable, Startable, MuleContextAware {
@@ -32,6 +34,9 @@ public class ImplicitConfigExtension implements Initialisable, Startable, MuleCo
   private MuleContext muleContext;
   private int initialise = 0;
   private int start = 0;
+
+  @RefName
+  private String name;
 
   @Parameter
   @Optional
@@ -84,6 +89,10 @@ public class ImplicitConfigExtension implements Initialisable, Startable, MuleCo
 
   public NullSafeParameterGroup getNullSafeGroup() {
     return nullSafeGroup;
+  }
+
+  public String getName() {
+    return name;
   }
 
   public void setNullSafeGroup(NullSafeParameterGroup nullSafeGroup) {

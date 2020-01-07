@@ -17,11 +17,13 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.AbstractComponent;
@@ -92,7 +94,6 @@ import java.util.function.Function;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Class that groups all the common behaviour between different extension's components, like {@link OperationMessageProcessor} and
@@ -106,7 +107,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     implements MuleContextAware, MetadataKeyProvider, MetadataProvider<T>, ComponentValueProvider,
     Lifecycle {
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(ExtensionComponent.class);
+  private final static Logger LOGGER = getLogger(ExtensionComponent.class);
 
   private final TemplateParser expressionParser = createMuleStyleParser();
   private final ExtensionModel extensionModel;
@@ -153,7 +154,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   protected MetadataCacheIdGenerator<ComponentAst> cacheIdGenerator;
 
   private Function<CoreEvent, Optional<ConfigurationInstance>> configurationResolver;
-
 
   protected ExtensionComponent(ExtensionModel extensionModel,
                                T componentModel,
@@ -515,14 +515,14 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       return empty();
     }
 
-    if (!isConfigurationSpecified() || configurationProvider.get().isDynamic()) {
+    if (configurationResolver == null || usesDynamicConfiguration()) {
       return empty();
     }
 
     CoreEvent initialiserEvent = null;
     try {
-      initialiserEvent = getInitialiserEvent(muleContext);
-      return of(configurationProvider.get().get(initialiserEvent));
+      initialiserEvent = getNullEvent(muleContext);
+      return configurationResolver.apply(initialiserEvent);
     } finally {
       if (initialiserEvent != null) {
         ((BaseEventContext) initialiserEvent.getContext()).success();

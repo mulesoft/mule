@@ -24,7 +24,7 @@ import java.util.Set;
  * <p>
  * This class is also the access point to obtaining {@link ConfigurationInstance configuration instances} of the extensions in
  * use.
- *
+ * <p>
  * For an extension to be usable, it has to be registered in this manager through the {@link #registerExtension(ExtensionModel)}
  * method
  *
@@ -68,13 +68,30 @@ public interface ExtensionManager {
    * updated for the returned {@link ConfigurationInstance}
    *
    * @param configurationProviderName the name of a previously registered {@link ConfigurationProvider}
-   * @param event the current Event
+   * @param event                     the current Event
    * @return a {@link ConfigurationInstance}
    */
   ConfigurationInstance getConfiguration(String configurationProviderName, CoreEvent event);
 
   /**
-   * Returns a {@link ConfigurationInstance} for the given {@code extensionModel} and {@code componentModel}.
+   * Delegates into {@link #getConfigurationProvider(ExtensionModel, ComponentModel, CoreEvent)} to locate a suitable provider
+   * and uses the given {@code muleEvent} to obtain a {@link ConfigurationInstance} out of it.
+   * <p>
+   * By the mere fact of this configuration being returned, the value of {@link ConfigurationStats#getLastUsedMillis()} will be
+   * updated for the returned {@link ConfigurationInstance}
+   *
+   * @param extensionModel the {@link ExtensionModel} for which a configuration is wanted
+   * @param componentModel the {@link ComponentModel} associated to a {@link ConfigurationInstance}
+   * @param muleEvent      the current Event
+   * @return an {@link Optional} for a {@link ConfigurationInstance}
+   * @throws IllegalStateException if none or too many {@link ConfigurationProvider} are found to be suitable
+   */
+  Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel,
+                                                   ComponentModel componentModel,
+                                                   CoreEvent muleEvent);
+
+  /**
+   * Returns an optional {@link ConfigurationProvider} for the given {@code extensionModel} and {@code componentModel}.
    * <p>
    * Because no {@link ConfigurationProvider} is specified, the following algorithm will be applied to
    * try and determine the
@@ -90,18 +107,17 @@ public interface ExtensionManager {
    * {@link ConfigurationProvider} is created and registered for that model.</li>
    * <li>If none of the above conditions is met, then an {@link IllegalStateException} is thrown</li>
    * </ul>
-   * <p>
-   * By the mere fact of this configuration being returned, the value of {@link ConfigurationStats#getLastUsedMillis()} will be
-   * updated for the returned {@link ConfigurationInstance}
    *
    * @param extensionModel the {@link ExtensionModel} for which a configuration is wanted
    * @param componentModel the {@link ComponentModel} associated to a {@link ConfigurationInstance}
-   * @param muleEvent the current Event
-   * @return an {@link Optional} for a {@link ConfigurationInstance}
+   * @param muleEvent      the current Event
+   * @return an {@link Optional} for a {@link ConfigurationProvider}
    * @throws IllegalStateException if none or too many {@link ConfigurationProvider} are found to be suitable
+   * @since 4.3.0
    */
-  Optional<ConfigurationInstance> getConfiguration(ExtensionModel extensionModel, ComponentModel componentModel,
-                                                   CoreEvent muleEvent);
+  Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel,
+                                                           ComponentModel componentModel,
+                                                           CoreEvent muleEvent);
 
   /**
    * Locates and returns the {@link ConfigurationProvider} which would serve an invocation to the
@@ -116,7 +132,7 @@ public interface ExtensionManager {
 
   /**
    * Locates and returns (if there is any) a suitable {@link ConfigurationProvider} for the given {@link ComponentModel}.
-   * 
+   *
    * @param extensionModel the {@link ExtensionModel} for which a configuration is wanted
    * @param componentModel the {@link ComponentModel} for which a configuration is wanted
    * @return an {@link Optional} {@link ConfigurationProvider}
@@ -134,8 +150,8 @@ public interface ExtensionManager {
 
   /**
    * Performs actions related to the disposal of the configuration in the extension manager
-   * 
-   * @param key the key for the configuration to be disposed
+   *
+   * @param key           the key for the configuration to be disposed
    * @param configuration the configuration to be disposed.
    */
   default void disposeConfiguration(String key, ConfigurationInstance configuration) {}

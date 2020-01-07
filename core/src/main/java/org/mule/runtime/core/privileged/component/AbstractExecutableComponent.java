@@ -36,9 +36,11 @@ import org.mule.runtime.core.privileged.processor.MessageProcessors;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**
@@ -155,7 +157,7 @@ public abstract class AbstractExecutableComponent extends AbstractComponent impl
 
   /**
    * Template method that allows to return a function to execute for this component. It may not be redefine by implementation of
-   * this class if they are already instances of {@link Function<Publisher<CoreEvent>, Publisher<InternalEvent>>}
+   * this class if they are already instances of {@link Function< Publisher<CoreEvent>, Publisher<InternalEvent>>}
    *
    * @return an executable function. It must not be null.
    */

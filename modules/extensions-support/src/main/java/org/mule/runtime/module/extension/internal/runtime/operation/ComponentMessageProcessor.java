@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.ComponentLocationProvider.resolveProcessorRepresentation;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
@@ -33,7 +34,6 @@ import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlin
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.operation.ImmutableProcessorChainExecutor.INNER_CHAIN_CTX_MAPPING;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberField;
@@ -98,6 +98,7 @@ import org.mule.runtime.module.extension.internal.runtime.execution.OperationArg
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigOverrideValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -411,7 +412,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return delegate;
   }
 
-  private CompletableComponentExecutor<T> createComponentExecutor() {
+  private CompletableComponentExecutor<T> createComponentExecutor() throws InitialisationException {
     Map<String, Object> params = new HashMap<>();
 
     LazyValue<ValueResolvingContext> resolvingContext =
@@ -429,50 +430,86 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           }
         });
 
-    componentModel.getParameterGroupModels().stream().forEach(group -> {
-      if (group.getName().equals(DEFAULT_GROUP_NAME)) {
-        group.getParameterModels().stream()
-            .filter(p -> p.getModelProperty(FieldOperationParameterModelProperty.class).isPresent())
-            .forEach(p -> {
-              ValueResolver<?> resolver = resolverSet.getResolvers().get(p.getName());
-              if (resolver != null) {
-                try {
-                  params.put(getMemberName(p), resolveValue(resolver, resolvingContext.get()));
-                } catch (MuleException e) {
-                  throw new MuleRuntimeException(e);
-                } finally {
-                  resolvingContext.get().close();
-                }
-              }
-            });
-      } else {
-        ParameterGroupDescriptor groupDescriptor = group.getModelProperty(ParameterGroupModelProperty.class)
-            .map(g -> g.getDescriptor())
-            .orElse(null);
+    LazyValue<Boolean> dynamicConfig = new LazyValue<>(
+                                                       () -> extensionManager
+                                                           .getConfigurationProvider(extensionModel, componentModel,
+                                                                                     resolvingContext.get().getEvent())
+                                                           .map(ConfigurationProvider::isDynamic)
+                                                           .orElse(false));
 
-        if (groupDescriptor == null) {
-          return;
-        }
+    try {
+      for (ParameterGroupModel group : componentModel.getParameterGroupModels()) {
+        if (group.getName().equals(DEFAULT_GROUP_NAME)) {
+          for (ParameterModel p : group.getParameterModels()) {
+            if (!p.getModelProperty(FieldOperationParameterModelProperty.class).isPresent()) {
+              continue;
+            }
 
-        List<ParameterModel> fieldParameters = getGroupsOfFieldParameters(group);
+            ValueResolver<?> resolver = resolverSet.getResolvers().get(p.getName());
+            if (resolver != null) {
+              params.put(getMemberName(p), resolveComponentExecutorParam(resolvingContext, dynamicConfig, p, resolver));
+            }
+          }
+        } else {
+          ParameterGroupDescriptor groupDescriptor = group.getModelProperty(ParameterGroupModelProperty.class)
+              .map(g -> g.getDescriptor())
+              .orElse(null);
 
-        if (fieldParameters.isEmpty()) {
-          return;
-        }
+          if (groupDescriptor == null) {
+            continue;
+          }
 
-        ObjectBuilder groupBuilder = createFieldParameterGroupBuilder(groupDescriptor, fieldParameters);
+          List<ParameterModel> fieldParameters = getGroupsOfFieldParameters(group);
 
-        try {
-          params.put(((Field) groupDescriptor.getContainer()).getName(), groupBuilder.build(resolvingContext.get()));
-        } catch (MuleException e) {
-          throw new MuleRuntimeException(e);
-        } finally {
-          resolvingContext.get().close();
+          if (fieldParameters.isEmpty()) {
+            continue;
+          }
+
+          ObjectBuilder groupBuilder = createFieldParameterGroupBuilder(groupDescriptor, fieldParameters);
+
+          try {
+            params.put(((Field) groupDescriptor.getContainer()).getName(), groupBuilder.build(resolvingContext.get()));
+          } catch (MuleException e) {
+            throw new MuleRuntimeException(e);
+          }
         }
       }
-    });
 
-    return getOperationExecutorFactory(componentModel).createExecutor(componentModel, params);
+      return getOperationExecutorFactory(componentModel).createExecutor(componentModel, params);
+    } finally {
+      resolvingContext.ifComputed(ValueResolvingContext::close);
+    }
+  }
+
+  private Object resolveComponentExecutorParam(LazyValue<ValueResolvingContext> resolvingContext,
+                                               LazyValue<Boolean> dynamicConfig,
+                                               ParameterModel p,
+                                               ValueResolver<?> resolver)
+      throws InitialisationException {
+    Object resolvedValue;
+    try {
+      if (resolver instanceof ConfigOverrideValueResolverWrapper) {
+        resolvedValue = ((ConfigOverrideValueResolverWrapper<?>) resolver).resolveWithoutConfig(resolvingContext.get());
+        if (resolvedValue == null && dynamicConfig.get()) {
+          String message = format(
+                                  "Component '%s' at %s uses a dynamic configuration and defines configuration override parameter '%s' which "
+                                      + "is assigned on initialization. That combination is not supported. Please use a non dynamic configuration "
+                                      + "or don't set the parameter.",
+                                  getLocation().getComponentIdentifier().getIdentifier().toString(),
+                                  getLocation().getLocation(),
+                                  p.getName());
+          throw new InitialisationException(createStaticMessage(message), this);
+        }
+      } else {
+        resolvedValue = resolveValue(resolver, resolvingContext.get());
+      }
+
+      return resolvedValue;
+    } catch (InitialisationException e) {
+      throw e;
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   private ObjectBuilder createFieldParameterGroupBuilder(ParameterGroupDescriptor groupDescriptor,
@@ -618,7 +655,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Override
   protected ParameterValueResolver getParameterValueResolver() {
-    CoreEvent event = getInitialiserEvent(muleContext);
+    CoreEvent event = getNullEvent(muleContext);
     try (ValueResolvingContext ctx = ValueResolvingContext.builder(event, expressionManager).build()) {
       LazyExecutionContext executionContext = new LazyExecutionContext<>(resolverSet, componentModel, extensionModel, ctx);
       return new OperationParameterValueResolver(executionContext, resolverSet, reflectionCache, expressionManager);

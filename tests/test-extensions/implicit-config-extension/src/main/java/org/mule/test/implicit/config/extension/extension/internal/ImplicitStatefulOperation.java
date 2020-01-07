@@ -4,21 +4,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.implicit.config.extension.extension.internal;
 
 import org.mule.runtime.extension.api.annotation.param.Config;
-import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.test.implicit.config.extension.extension.api.Counter;
+import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
+import org.mule.runtime.extension.api.annotation.param.MediaType;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.test.implicit.config.extension.extension.api.ImplicitConfigExtension;
 
-public class ImplicitOperations {
+public class ImplicitStatefulOperation {
 
-  public ImplicitConfigExtension getConfig(@Config ImplicitConfigExtension config) {
-    return config;
+  @Parameter
+  @ConfigOverride
+  private String optionalWithDefault;
+
+  @MediaType("text/plain")
+  public String getEnrichedName(@Config ImplicitConfigExtension config) {
+    return config.getName() + " " + optionalWithDefault;
   }
 
-  public Counter getConnection(@Connection Counter connection) {
-    return connection;
-  }
 }
