@@ -66,6 +66,7 @@ import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
@@ -97,10 +98,11 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   private Sink sink;
 
+  private QueueBackpressureHandler backpressureHandler;
+
   private final MessageProcessorChainBuilder delegateBuilder;
   protected MessageProcessorChain delegate;
   private reactor.core.scheduler.Scheduler reactorScheduler;
-  private Scheduler queueDispatcherScheduler;
   protected String name;
   private Integer maxConcurrency;
 
@@ -146,6 +148,9 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     delegate = delegateBuilder.build();
     initialiseIfNeeded(delegate, getMuleContext());
 
+    backpressureHandler = new QueueBackpressureHandler(schedulerService, () -> muleContext.getSchedulerBaseConfig(),
+                                                       this::dispatchEvent, name != null ? name : getLocation().getLocation());
+
     super.initialise();
   }
 
@@ -178,30 +183,13 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         .createSink(getFromAnnotatedObject(componentLocator, this).filter(c -> c instanceof FlowConstruct).orElse(null),
                     processAsyncChainFunction());
 
-    final SchedulerConfig schedulerConfigQ =
-        getMuleContext().getSchedulerBaseConfig()
-            .withName(name != null ? name : getLocation().getLocation() + " - queue dispatcher");
-    queueDispatcherScheduler = schedulerService.ioScheduler(schedulerConfigQ);
-
-    queueDispatcherScheduler.scheduleWithFixedDelay(() -> {
-      try {
-        final CoreEvent event = asyncQueue.peek();
-        if (event != null) {
-          processingStrategy.checkBackpressureAccepting(event);
-          asyncQueue.remove(event);
-          sink.accept(event);
-        }
-      } catch (FromFlowRejectedExecutionException free) {
-        // nothing to do, a retry will come next
-      }
-    }, 0, 10, MILLISECONDS);
-
     final SchedulerConfig schedulerConfig =
         getMuleContext().getSchedulerBaseConfig().withName(name != null ? name : getLocation().getLocation());
     reactorScheduler = fromExecutorService(processingStrategy.isSynchronous()
         ? schedulerService.ioScheduler(schedulerConfig)
         : schedulerService.cpuLightScheduler(schedulerConfig));
 
+    startIfNeeded(backpressureHandler);
     startIfNeeded(delegate);
     super.start();
   }
@@ -210,12 +198,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   public void stop() throws MuleException {
     super.stop();
     stopIfNeeded(delegate);
-
-    if (queueDispatcherScheduler != null) {
-      queueDispatcherScheduler.stop();
-      queueDispatcherScheduler = null;
-    }
-
+    stopIfNeeded(backpressureHandler);
     disposeIfNeeded(sink, logger);
     sink = null;
 
@@ -253,10 +236,9 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
           asyncPublisher
               .map(event -> {
                 try {
-                  processingStrategy.checkBackpressureAccepting(event);
-                  sink.accept(event);
+                  dispatchEvent(event);
                 } catch (FromFlowRejectedExecutionException free) {
-                  asyncQueue.offer(event);
+                  backpressureHandler.handleBackpressure(event);
                 }
                 return event;
               })
@@ -265,7 +247,10 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         .cast(CoreEvent.class);
   }
 
-  private final BlockingQueue<CoreEvent> asyncQueue = new LinkedBlockingQueue<>();
+  private void dispatchEvent(CoreEvent event) {
+    processingStrategy.checkBackpressureAccepting(event);
+    sink.accept(event);
+  }
 
   private CoreEvent asyncEvent(PrivilegedEvent event) {
     // Clone event, make it async and remove ReplyToHandler
@@ -323,5 +308,58 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   protected List<Processor> getOwnedObjects() {
     // Lifecycle of inner objects is already handled by this class' lifecycle methods
     return emptyList();
+  }
+
+  private static class QueueBackpressureHandler implements Startable, Stoppable {
+
+    private final BlockingQueue<CoreEvent> asyncQueue;
+    private final SchedulerService schedulerService;
+    private final Supplier<SchedulerConfig> schedulerConfigSupplier;
+    private final String location;
+    private final Consumer<CoreEvent> eventDispatcher;
+
+    private Scheduler queueDispatcherScheduler;
+
+    public QueueBackpressureHandler(SchedulerService schedulerService, Supplier<SchedulerConfig> schedulerConfigSupplier,
+                                    Consumer<CoreEvent> eventDispatcher, String location) {
+      this.schedulerService = schedulerService;
+      this.schedulerConfigSupplier = schedulerConfigSupplier;
+
+      this.asyncQueue = new LinkedBlockingQueue<>();
+      this.eventDispatcher = eventDispatcher;
+
+      this.location = location;
+    }
+
+    public void handleBackpressure(CoreEvent event) {
+      asyncQueue.offer(event);
+    }
+
+    @Override
+    public void start() {
+      final SchedulerConfig schedulerConfig = schedulerConfigSupplier.get().withName(location + " - queue dispatcher");
+      queueDispatcherScheduler = schedulerService.ioScheduler(schedulerConfig);
+
+      queueDispatcherScheduler.scheduleWithFixedDelay(() -> {
+        try {
+          final CoreEvent event = asyncQueue.peek();
+          if (event != null) {
+            eventDispatcher.accept(event);
+            asyncQueue.remove(event);
+          }
+        } catch (FromFlowRejectedExecutionException free) {
+          // nothing to do, a retry will come next
+        }
+      }, 0, 2, MILLISECONDS);
+    }
+
+    @Override
+    public void stop() {
+      if (queueDispatcherScheduler != null) {
+        queueDispatcherScheduler.stop();
+        queueDispatcherScheduler = null;
+      }
+      asyncQueue.clear();
+    }
   }
 }

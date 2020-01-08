@@ -76,11 +76,6 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
     return ProactorStreamEmitterProcessingStrategy.class;
   }
 
-  public static interface OperationInnerProcessor extends ReactiveProcessor {
-
-    boolean isAsync();
-  }
-
   static class ProactorStreamEmitterProcessingStrategy extends StreamEmitterProcessingStrategy {
 
     private static final Logger LOGGER = getLogger(ProactorStreamEmitterProcessingStrategy.class);
