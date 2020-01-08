@@ -8,11 +8,12 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
-import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.mule.runtime.api.functional.Either.left;
+import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.ComponentLocationProvider.resolveProcessorRepresentation;
@@ -21,17 +22,18 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
-import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.createRoundRobinFluxSupplier;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
@@ -44,8 +46,8 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.create;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
@@ -54,6 +56,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -64,7 +67,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -75,12 +77,12 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.internal.policy.DeferredMonoSinkExecutorCallback;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.strategy.OperationInnerProcessor;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -101,6 +103,8 @@ import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
+import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
+import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.OperationExecutionParams;
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
@@ -162,7 +166,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private static final Logger LOGGER = getLogger(ComponentMessageProcessor.class);
 
-  private static final String EXEC_PARAMS_KEY = "sdk.operation.exec.params";
   static final String INVALID_TARGET_MESSAGE =
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
 
@@ -191,6 +194,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private Optional<ProcessingStrategy> processingStrategy;
   private FluxSinkSupplier<CoreEvent> fluxSupplier;
   private final Object fluxSupplierDisposeLock = new Object();
+
+  private Scheduler outerFluxCompletionScheduler;
 
   private final AtomicInteger activeOuterPublishersCount = new AtomicInteger(0);
 
@@ -230,20 +235,32 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook =
         getLocalOperatorErrorHook(this, errorTypeLocator, exceptionContextProviders);
 
-    final Flux<CoreEvent> transformed = from(publisher)
-        // This flatMap allows the operation to run in parallel. The processing strategy relies on this
-        // (ProactorStreamProcessingStrategy#proactor) to do some performance optimizations.
-        .flatMap(event -> {
-          // Force the error mapper from the chain to be used.
-          // When using Mono.create with sink.error, the error mapper from the context is ignored, so it has to be
-          // explicitly used here.
-          DeferredMonoSinkExecutorCallback<CoreEvent> callback =
-              new DeferredMonoSinkExecutorCallback<>(t -> localOperatorErrorHook.apply(t, event));
+    final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
-          onEvent(event, callback);
+    Flux<CoreEvent> transformed = from(propagateCompletion(from(publisher), create(errorSwitchSinkSinkRef)
+        .map(result -> result.reduce(me -> {
+          throw propagateWrappingFatal(me);
+        }, response -> response)), pub -> from(pub)
+            .doOnNext(event -> onEvent(event, new ExecutorCallback() {
 
-          return create(callback::setSink);
-        });
+              @Override
+              public void error(Throwable e) {
+                // if `sink.error` is called here, it will cancel the flux altogether. That's why an `Either` is used here, so
+                // the error can be propagated afterwards in a way consistent with our expected error handling.
+                errorSwitchSinkSinkRef.next(left(
+                                                 // Force the error mapper from the chain to be used.
+                                                 // When using Mono.create with sink.error, the error mapper from the context is
+                                                 // ignored, so it has to be explicitly used here.
+                                                 localOperatorErrorHook.apply(e, event), CoreEvent.class));
+              }
+
+              @Override
+              public void complete(Object value) {
+                errorSwitchSinkSinkRef.next(right(Throwable.class, (CoreEvent) value));
+              }
+            })), () -> errorSwitchSinkSinkRef.complete(), t -> errorSwitchSinkSinkRef.error(t),
+                                                           muleContext.getConfiguration().getShutdownTimeout(),
+                                                           outerFluxCompletionScheduler));
 
     if (publisher instanceof Flux) {
       return transformed
@@ -260,10 +277,17 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       final Optional<ConfigurationInstance> configuration = resolveConfiguration(event);
       final Map<String, Object> resolutionResult = getResolutionResult(event, configuration);
 
-      OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent, callback) -> fluxSupplier.get()
-          .next(quickCopy(operationEvent,
-                          singletonMap(EXEC_PARAMS_KEY,
-                                       new OperationExecutionParams(configuration, parameters, operationEvent, callback))));
+      OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent, callback) -> {
+        SdkInternalContext sdkInternalContext =
+            (SdkInternalContext) ((InternalEvent) operationEvent).<SdkInternalContext>getSdkInternalContext();
+        if (((InternalEvent) operationEvent).getSdkInternalContext() == null) {
+          sdkInternalContext = new SdkInternalContext();
+          ((InternalEvent) operationEvent).setSdkInternalContext(sdkInternalContext);
+        }
+        sdkInternalContext.setOperationExecutionParams(configuration, resolutionResult, operationEvent, callback);
+
+        fluxSupplier.get().next(operationEvent);
+      };
 
       if (getLocation() != null) {
         ((DefaultFlowCallStack) event.getFlowCallStack())
@@ -337,10 +361,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       executionMediator = createExecutionMediator();
       initialiseIfNeeded(componentExecutor, true, muleContext);
 
-      if (getLocation() != null) {
-        resolvedProcessorRepresentation =
-            resolveProcessorRepresentation(muleContext.getConfiguration().getId(), getLocation().getLocation(), this);
-      }
+      resolvedProcessorRepresentation =
+          resolveProcessorRepresentation(muleContext.getConfiguration().getId(), toString(), this);
 
       initProcessingStrategy();
       initialised = true;
@@ -352,7 +374,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         ? getFromAnnotatedObject(componentLocator, this).orElse(null)
         : null;
     if (rootContainer instanceof FlowConstruct) {
-      processingStrategy = of(((Pipeline) rootContainer).getProcessingStrategy());
+      processingStrategy = of(((FlowConstruct) rootContainer).getProcessingStrategy());
     } else {
       processingStrategy = empty();
     }
@@ -370,34 +392,16 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         @Override
         public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
           return subscriberContext()
-              .flatMapMany(ctx -> {
-                if (isAsync()) {
-                  return from(publisher)
-                      .flatMap(event -> {
-                        OperationExecutionParams oep = ((InternalEvent) event).getInternalParameter(EXEC_PARAMS_KEY);
-
-                        final DeferredMonoSinkExecutorCallback<CoreEvent> deferredMonoSinkExecutorCallback =
-                            new DeferredMonoSinkExecutorCallback<>(t -> t);
-
-                        prepareAndExecuteOperation(event, () -> deferredMonoSinkExecutorCallback, ctx);
-
-                        return create(deferredMonoSinkExecutorCallback::setSink)
-                            .doOnNext(result -> oep.getCallback().complete(result))
-                            .doOnError(t -> oep.getCallback().error(t))
-                            .cast(CoreEvent.class);
-                      });
-                } else {
-                  return from(publisher)
-                      .doOnNext(event -> prepareAndExecuteOperation(event,
-                                                                    () -> {
-                                                                      final OperationExecutionParams oep =
-                                                                          (OperationExecutionParams) ((InternalEvent) event)
-                                                                              .getInternalParameter(EXEC_PARAMS_KEY);
-                                                                      return oep.getCallback();
-                                                                    },
-                                                                    ctx));
-                }
-              });
+              .flatMapMany(ctx -> from(publisher)
+                  .doOnNext(event -> prepareAndExecuteOperation(event,
+                                                                () -> {
+                                                                  OperationExecutionParams oep =
+                                                                      ((SdkInternalContext) ((InternalEvent) event)
+                                                                          .<SdkInternalContext>getSdkInternalContext())
+                                                                              .getOperationExecutionParams();
+                                                                  return oep.getCallback();
+                                                                },
+                                                                ctx)));
         }
 
         @Override
@@ -408,7 +412,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
       final Flux<CoreEvent> transformed = from(p)
           .transform(processingStrategy.map(ps -> ps.onProcessor(operationInnerProcessor)).orElse(operationInnerProcessor))
-          .onErrorContinue((t, event) -> LOGGER.error("Unhandler error in operation (" + getLocation().getLocation() + ") flux",
+          .onErrorContinue((t, event) -> LOGGER.error("Unhandler error in operation (" + toString() + ") flux",
                                                       t));
       return from(processingStrategy.map(ps -> ps.registerInternalFlux(transformed)).orElse(transformed));
     },
@@ -416,7 +420,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private void prepareAndExecuteOperation(CoreEvent event, Supplier<ExecutorCallback> callbackSupplier, Context ctx) {
-    OperationExecutionParams oep = ((InternalEvent) event).getInternalParameter(EXEC_PARAMS_KEY);
+    OperationExecutionParams oep =
+        ((SdkInternalContext) ((InternalEvent) event).<SdkInternalContext>getSdkInternalContext())
+            .getOperationExecutionParams();
 
     final Scheduler currentScheduler = (Scheduler) ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY)
         .orElse(IMMEDIATE_SCHEDULER);
@@ -433,39 +439,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
 
     executeOperation(operationContext, mapped(callbackSupplier.get(), operationContext));
-  }
-
-  private static final class OperationExecutionParams {
-
-    private final Optional<ConfigurationInstance> configuration;
-    private final Map<String, Object> parameters;
-    private final CoreEvent operationEvent;
-    private final ExecutorCallback callback;
-
-    public OperationExecutionParams(Optional<ConfigurationInstance> configuration, Map<String, Object> parameters,
-                                    CoreEvent operationEvent, ExecutorCallback callback) {
-      this.configuration = configuration;
-      this.parameters = parameters;
-      this.operationEvent = operationEvent;
-      this.callback = callback;
-    }
-
-    public Optional<ConfigurationInstance> getConfiguration() {
-      return configuration;
-    }
-
-    public Map<String, Object> getParameters() {
-      return parameters;
-    }
-
-    public CoreEvent getOperationEvent() {
-      return operationEvent;
-    }
-
-    public ExecutorCallback getCallback() {
-      return callback;
-    }
-
   }
 
   private void initRetryPolicyResolver() {
@@ -585,8 +558,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                   "Component '%s' at %s uses a dynamic configuration and defines configuration override parameter '%s' which "
                                       + "is assigned on initialization. That combination is not supported. Please use a non dynamic configuration "
                                       + "or don't set the parameter.",
-                                  getLocation().getComponentIdentifier().getIdentifier().toString(),
-                                  getLocation().getLocation(),
+                                  getLocation() != null ? getLocation().getComponentIdentifier().getIdentifier().toString()
+                                      : toString(),
+                                  toString(),
                                   p.getName());
           throw new InitialisationException(createStaticMessage(message), this);
         }
@@ -687,6 +661,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Override
   public void doStart() throws MuleException {
     startIfNeeded(componentExecutor);
+
+    outerFluxCompletionScheduler = muleContext.getSchedulerService().ioScheduler(muleContext.getSchedulerBaseConfig()
+        .withMaxConcurrentTasks(1).withName(toString() + ".outer.flux."));
+
     startInnerFlux();
   }
 
@@ -694,6 +672,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   public void doStop() throws MuleException {
     stopIfNeeded(componentExecutor);
     stopInnerFlux();
+
+    if (outerFluxCompletionScheduler != null) {
+      outerFluxCompletionScheduler.stop();
+      outerFluxCompletionScheduler = null;
+    }
   }
 
   private void outerPublisherSubscribedTo() {
@@ -829,5 +812,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       return location.equals(component.getLocation());
     }
     return false;
+  }
+
+  @Override
+  public String toString() {
+    return getLocation() != null ? getLocation().getLocation() : super.toString();
   }
 }

@@ -404,6 +404,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   }
 
   protected OperationMessageProcessor setUpOperationMessageProcessor() throws Exception {
+    after();
     OperationMessageProcessor messageProcessor = createOperationMessageProcessor();
     messageProcessor.setMuleContext(context);
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManagerAdapter);

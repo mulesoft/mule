@@ -322,7 +322,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Test
   public void operationWithExpressionInTargetParameter() throws Exception {
     String flowName = FLOW_NAME;
-    target = "#[mel:someExpression]";
+    target = "#[someExpression]";
+    after();
     messageProcessor = createOperationMessageProcessor();
 
     registerIntoMockContext(context, OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(context));
@@ -348,6 +349,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     String flowName = "flowName";
     target = TARGET_VAR;
     targetValue = TARGET_VAR;
+    after();
     messageProcessor = createOperationMessageProcessor();
 
     registerIntoMockContext(context, OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(context));
