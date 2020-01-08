@@ -11,7 +11,6 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
@@ -20,6 +19,7 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -246,8 +246,8 @@ public class CompositeArtifactExtensionManagerTestCase extends AbstractMuleTestC
     ConfigurationProvider childConfigurationProvider = mock(ConfigurationProvider.class);
     ConfigurationInstance configurationInstance = mock(ConfigurationInstance.class);
     when(childConfigurationProvider.get(event)).thenReturn(configurationInstance);
-    when(childExtensionManager.getConfiguration(childExtension, operationModel, event)).thenReturn(
-                                                                                                   ofNullable(configurationInstance));
+    when(childExtensionManager.getConfigurationProvider(childExtension, operationModel, event))
+        .thenReturn(of(childConfigurationProvider));
     when(parentExtensionManager.getConfigurationProvider(childExtension, operationModel)).thenReturn(empty());
 
     Optional<ConfigurationInstance> configuration = extensionManager.getConfiguration(childExtension, operationModel, event);
@@ -266,9 +266,6 @@ public class CompositeArtifactExtensionManagerTestCase extends AbstractMuleTestC
                                                                                                childExtensionManager);
     CoreEvent event = mock(CoreEvent.class);
 
-    ConfigurationProvider childConfigurationProvider = mock(ConfigurationProvider.class);
-    ConfigurationInstance configurationInstance = mock(ConfigurationInstance.class);
-    when(childConfigurationProvider.get(event)).thenReturn(configurationInstance);
     when(childExtensionManager.getConfiguration(childExtension, operationModel, event)).thenReturn(empty());
     when(childExtensionManager.getConfigurationProvider(childExtension, operationModel)).thenReturn(empty());
     when(parentExtensionManager.getConfigurationProvider(childExtension, operationModel)).thenReturn(empty());
