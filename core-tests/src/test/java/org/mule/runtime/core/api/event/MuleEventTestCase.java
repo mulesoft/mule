@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.event;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -16,7 +17,11 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
+import static org.mule.test.allure.AllureConstants.MuleEvent.MULE_EVENT;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -41,13 +46,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import io.qameta.allure.Description;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 
+@Feature(MULE_EVENT)
 public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Rule
@@ -283,6 +288,17 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
                is(event.getSecurityContext().getAuthentication().getProperties().get("key1")));
     assertThat(deserialized.getSecurityContext().getAuthentication().getCredentials(),
                is(event.getSecurityContext().getAuthentication().getCredentials()));
+  }
+
+  @Test
+  @Description("Validates that the correlation IDs are unique")
+  @Issue("MULE-17926")
+  public void uniqueCorrelationIDs() throws MuleException {
+    CoreEvent firstEvent = getEventBuilder().message(of("first")).build();
+    CoreEvent secondEvent = getEventBuilder().message(of("second")).build();
+
+    assertThat("Duplicated correlationID", firstEvent.getContext().getCorrelationId(),
+               not(is(secondEvent.getContext().getCorrelationId())));
   }
 
   private SecurityContext createTestAuthentication() {

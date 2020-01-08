@@ -597,6 +597,11 @@ public interface AllureConstants {
 
   }
 
+  interface MuleEvent {
+
+    String MULE_EVENT = "Mule Event";
+
+  }
 
   interface XmlSdk {
 
