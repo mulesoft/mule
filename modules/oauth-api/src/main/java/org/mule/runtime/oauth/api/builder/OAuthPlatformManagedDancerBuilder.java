@@ -31,8 +31,20 @@ public interface OAuthPlatformManagedDancerBuilder extends OAuthDancerBuilder<Pl
    */
   OAuthPlatformManagedDancerBuilder connectionId(String connectionId);
 
+  /**
+   * Sets the ID of the organization that defined the connection in the Anypoint Platform
+   *
+   * @param organizationId an organizationId
+   * @return {@code this} builder
+   */
   OAuthPlatformManagedDancerBuilder organizationId(String organizationId);
 
+  /**
+   * Sets the url of the platform API that serves the managed tokens
+   *
+   * @param platformUrl the url of the platform API that serves the managed tokens
+   * @return {@code this} builder
+   */
   OAuthPlatformManagedDancerBuilder platformUrl(String platformUrl);
 
   /**
