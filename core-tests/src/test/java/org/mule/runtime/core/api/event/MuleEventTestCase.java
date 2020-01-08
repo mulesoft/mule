@@ -298,7 +298,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     CoreEvent secondEvent = getEventBuilder().message(of("second")).build();
 
     assertThat("Duplicated correlationID", firstEvent.getContext().getCorrelationId(),
-                             not(is(secondEvent.getContext().getCorrelationId())));
+               not(is(secondEvent.getContext().getCorrelationId())));
   }
 
   private SecurityContext createTestAuthentication() {
