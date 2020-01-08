@@ -3,6 +3,17 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.field.serialVersionUIDUnchanged",
+          "old": "field org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.serialVersionUID",
+          "new": "field org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.serialVersionUID",
+          "serialVersionUID": "-3754163327838153655",
+          "package": "org.mule.runtime.http.api.domain",
+          "classSimpleName": "CaseInsensitiveMultiMap",
+          "fieldName": "serialVersionUID",
+          "elementKind": "field",
+          "justification": "Change HTTP MultiMap parameters to CaseInsensitiveMultiMap"
+        },
+        {
           "code": "java.field.typeChanged",
           "old": "field org.mule.runtime.http.api.domain.message.HttpMessageBuilder<B extends org.mule.runtime.http.api.domain.message.HttpMessageBuilder, M extends org.mule.runtime.http.api.domain.message.HttpMessage>.headers",
           "new": "field org.mule.runtime.http.api.domain.message.HttpMessageBuilder<B extends org.mule.runtime.http.api.domain.message.HttpMessageBuilder, M extends org.mule.runtime.http.api.domain.message.HttpMessage>.headers",

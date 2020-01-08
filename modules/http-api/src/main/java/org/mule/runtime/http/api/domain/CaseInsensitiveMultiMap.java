@@ -9,16 +9,15 @@ package org.mule.runtime.http.api.domain;
 
 import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.el.DataTypeAware;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.api.util.MultiMap;
-import org.slf4j.Logger;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 
 /**
  * {@link MultiMap} where the key's case is not taken into account when looking for it, adding or aggregating it.
@@ -27,8 +26,6 @@ import java.util.LinkedHashMap;
  */
 @NoExtend
 public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements DataTypeAware {
-
-  private static final Logger LOGGER = getLogger(CaseInsensitiveMultiMap.class);
 
   private static final long serialVersionUID = -3754163327838153655L;
 
@@ -62,11 +59,9 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
 
   public CaseInsensitiveMultiMap() {
     this(!PRESERVE_HEADER_CASE);
-    LOGGER.error("Constructor without parameters, line 58");
   }
 
   public CaseInsensitiveMultiMap(boolean optimized) {
-    LOGGER.error("Constructor with boolean optimized, line 62");
     this.optimized = optimized;
     this.paramsMap = optimized
         ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>())
@@ -75,25 +70,49 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
 
   public CaseInsensitiveMultiMap(MultiMap<String, String> paramsMap) {
     this(paramsMap, !PRESERVE_HEADER_CASE);
-    LOGGER.error("Constructor with Multimap paramsMap, line 71");
   }
 
-  public CaseInsensitiveMultiMap(MultiMap<String, String> paramsMap, boolean optimized) {
+  public CaseInsensitiveMultiMap(MultiMap<String, String> multiMap, boolean optimized) {
     this.optimized = optimized;
-    this.paramsMap = optimized
-        ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>())
-        : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
-    putAll(paramsMap);
-    LOGGER.error("Constructor with Multimap paramsMap & boolean optimized, line 80");
+    if (multiMap instanceof CaseInsensitiveMultiMap) {
+      //this.paramsMap = ((CaseInsensitiveMapWrapper)((CaseInsensitiveMultiMap)multiMap).paramsMap).copy();
+      this.createParamsMap((CaseInsensitiveMultiMap) multiMap);
+    } else {
+      this.paramsMap = optimized
+          ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>())
+          : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
+      putAll(multiMap);
+    }
   }
 
-  public CaseInsensitiveMultiMap(CaseInsensitiveMultiMap multiMap) {
-    this(multiMap, !PRESERVE_HEADER_CASE);
+  private void createParamsMap(CaseInsensitiveMultiMap multiMap) {
+    if (optimized) {
+
+      if (multiMap.paramsMap instanceof OptimizedCaseInsensitiveMapWrapper) {
+        this.paramsMap = ((OptimizedCaseInsensitiveMapWrapper<LinkedList<String>>) multiMap.paramsMap).copy();
+      } else {
+        new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
+        if (!multiMap.isEmpty()) {
+          putAll(multiMap);
+        }
+      }
+
+    } else {
+
+      if (multiMap.paramsMap instanceof CaseInsensitiveMapWrapper) {
+        this.paramsMap = ((CaseInsensitiveMapWrapper<LinkedList<String>>) multiMap.paramsMap).copy();
+      } else {
+        new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
+        if (!multiMap.isEmpty()) {
+          putAll(multiMap);
+        }
+      }
+
+    }
   }
 
   @Override
   public CaseInsensitiveMultiMap toImmutableMultiMap() {
-    LOGGER.error("toImmutableMultiMap, line 85");
     if (this.isEmpty() && emptyCaseInsensitiveMultiMap() != null) {
       return emptyCaseInsensitiveMultiMap();
     }
@@ -108,12 +127,10 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
     public ImmutableCaseInsensitiveMultiMap(CaseInsensitiveMultiMap caseInsensitiveMultiMap) {
       super(caseInsensitiveMultiMap, caseInsensitiveMultiMap.optimized);
       this.paramsMap = unmodifiableMap(paramsMap);
-      LOGGER.error("ImmutableCaseInsensitiveMultiMap with CaseInsensitiveMultiMap parameter, line 100");
     }
 
     @Override
     public CaseInsensitiveMultiMap toImmutableMultiMap() {
-      LOGGER.error("toImmutableMultiMap return this, line 105");
       return this;
     }
   }
