@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.http.api.domain.message.response;
 
-import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 import org.mule.runtime.http.api.domain.message.HttpMessageBuilder;
 
 /**
@@ -75,7 +74,7 @@ public final class HttpResponseBuilder extends HttpMessageBuilder<HttpResponseBu
    */
   @Override
   public HttpResponse build() {
-    return new DefaultHttpResponse(responseStatus, headers.get(), entity);
+    return new DefaultHttpResponse(responseStatus, headers, entity);
   }
 
 }

@@ -50,7 +50,7 @@ public abstract class BaseMessageWithHeaders implements MessageWithHeaders {
   }
 
   @Override
-  public CaseInsensitiveMultiMap getHeaders() {
+  public MultiMap<String, String> getHeaders() {
     return headers.toImmutableMultiMap();
   }
 

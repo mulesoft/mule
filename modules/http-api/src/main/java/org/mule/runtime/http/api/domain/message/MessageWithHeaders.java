@@ -64,7 +64,7 @@ public interface MessageWithHeaders {
   Collection<String> getHeaderValuesIgnoreCase(String headerName);
 
   /**
-   * @return an immutable {@link MultiMap} containing all headers
+   * @return an immutable {@link CaseInsensitiveMultiMap} containing all headers
    */
-  CaseInsensitiveMultiMap getHeaders();
+  MultiMap<String, String> getHeaders();
 }
