@@ -89,7 +89,6 @@ import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
-import org.mule.runtime.core.privileged.processor.MessageProcessors;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
@@ -195,7 +194,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private String resolvedProcessorRepresentation;
   private boolean initialised = false;
 
-  private ProcessingStrategy processingStrategy;
+  private Optional<ProcessingStrategy> processingStrategy;
   private Optional<ProcessingStrategyFactory> processingStrategyFactory;
   private FluxSinkSupplier<CoreEvent> fluxSupplier;
   private final Object fluxSupplierDisposeLock = new Object();
@@ -379,14 +378,14 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         ? getFromAnnotatedObject(componentLocator, this).orElse(null)
         : null;
     if (rootContainer instanceof FlowConstruct) {
-      processingStrategy = ((FlowConstruct) rootContainer).getProcessingStrategy();
+      processingStrategy = of(((FlowConstruct) rootContainer).getProcessingStrategy());
       if (rootContainer instanceof Pipeline) {
         processingStrategyFactory = of(((Pipeline) rootContainer).getProcessingStrategyFactory());
       } else {
         processingStrategyFactory = empty();
       }
     } else {
-      processingStrategy = MessageProcessors.createDefaultProcessingStrategyFactory().create(muleContext, toString() + ".ps");
+      processingStrategy = empty();
       processingStrategyFactory = empty();
     }
   }
@@ -422,10 +421,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       };
 
       final Flux<CoreEvent> transformed = from(p)
-          .transform(processingStrategy.onProcessor(operationInnerProcessor))
+          .transform(processingStrategy.map(ps -> ps.onProcessor(operationInnerProcessor)).orElse(operationInnerProcessor))
           .onErrorContinue((t, event) -> LOGGER.error("Unhandler error in operation (" + toString() + ") flux",
                                                       t));
-      return from(processingStrategy.registerInternalFlux(transformed));
+      return from(processingStrategy.map(ps -> ps.registerInternalFlux(transformed)).orElse(transformed));
     },
                                                 processingStrategyFactory.map(psf -> {
                                                   if (psf instanceof AbstractProcessingStrategyFactory) {
