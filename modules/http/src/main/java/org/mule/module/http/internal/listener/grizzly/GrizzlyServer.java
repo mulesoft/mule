@@ -14,12 +14,22 @@ import org.mule.module.http.internal.listener.async.RequestHandler;
 import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 
 import java.io.IOException;
+import java.nio.channels.SelectableChannel;
+import java.nio.channels.SocketChannel;
 
+import org.glassfish.grizzly.nio.transport.TCPNIOConnection;
 import org.glassfish.grizzly.nio.transport.TCPNIOServerConnection;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
+import org.glassfish.grizzly.CloseListener;
+import org.glassfish.grizzly.CloseType;
+import org.glassfish.grizzly.Connection;
+import org.glassfish.grizzly.ConnectionProbe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GrizzlyServer implements Server
 {
+    public static final Logger logger = LoggerFactory.getLogger(GrizzlyServer.class);
 
     private final TCPNIOTransport transport;
     private final ServerAddress serverAddress;
@@ -39,6 +49,7 @@ public class GrizzlyServer implements Server
     public synchronized void start() throws IOException
     {
         serverConnection = transport.bind(serverAddress.getIp(), serverAddress.getPort());
+        serverConnection.getMonitoringConfig().addProbes(new CloseAcceptedConnectionsOnServerCloseProbe());
         stopped = false;
     }
 
@@ -78,5 +89,93 @@ public class GrizzlyServer implements Server
     public RequestHandlerManager addRequestHandler(ListenerRequestMatcher listenerRequestMatcher, RequestHandler requestHandler)
     {
         return this.listenerRegistry.addRequestHandler(this, requestHandler, listenerRequestMatcher);
+    }
+
+    private static class CloseAcceptedConnectionsOnServerCloseProbe extends ConnectionProbe.Adapter
+    {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void onAcceptEvent(Connection serverConnection, Connection clientConnection)
+        {
+            final CloseAcceptedConnectionOnServerClose callback = new CloseAcceptedConnectionOnServerClose(clientConnection);
+            serverConnection.addCloseListener(callback);
+            clientConnection.addCloseListener(new RemoveCloseListenerOnClientClosed(serverConnection, callback));
+        }
+    }
+
+    private static class CloseAcceptedConnectionOnServerClose implements CloseListener<TCPNIOServerConnection, CloseType>
+    {
+
+        private SocketChannel acceptedChannel;
+
+        private CloseAcceptedConnectionOnServerClose(Connection acceptedConnection)
+        {
+            this.acceptedChannel = getSocketChannel(acceptedConnection);
+        }
+
+        private static SocketChannel getSocketChannel(Connection acceptedConnection)
+        {
+            if (!(acceptedConnection instanceof TCPNIOConnection))
+            {
+                if (logger.isWarnEnabled())
+                {
+                    logger.warn("The accepted connection is not an instance of TCPNIOConnection");
+                }
+                return null;
+            }
+
+            SelectableChannel selectableChannel = ((TCPNIOConnection) acceptedConnection).getChannel();
+            if (!(selectableChannel instanceof SocketChannel))
+            {
+                if (logger.isWarnEnabled())
+                {
+                    logger.warn("The accepted connection doesn't hold a SocketChannel");
+                }
+                return null;
+            }
+
+            return (SocketChannel) selectableChannel;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void onClosed(TCPNIOServerConnection closeable, CloseType type) throws IOException
+        {
+            if (acceptedChannel != null)
+            {
+                acceptedChannel.shutdownInput();
+            }
+        }
+    }
+
+    private static class RemoveCloseListenerOnClientClosed implements CloseListener<TCPNIOConnection, CloseType>
+    {
+
+        private CloseAcceptedConnectionOnServerClose callbackToRemove;
+        private Connection serverConnection;
+
+        private RemoveCloseListenerOnClientClosed(Connection serverConnection,
+                                                  CloseAcceptedConnectionOnServerClose callbackToRemove)
+        {
+            this.serverConnection = serverConnection;
+            this.callbackToRemove = callbackToRemove;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void onClosed(TCPNIOConnection closeable, CloseType type) throws IOException
+        {
+            if (serverConnection.isOpen())
+            {
+                serverConnection.removeCloseListener(callbackToRemove);
+            }
+        }
     }
 }
