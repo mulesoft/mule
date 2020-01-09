@@ -38,7 +38,7 @@ public abstract class AbstractProcessingStrategyFactory implements AsyncProcessi
    *
    * @return the maximum concurrency
    */
-  public int getMaxConcurrency() {
+  protected int getMaxConcurrency() {
     return maxConcurrency;
   }
 

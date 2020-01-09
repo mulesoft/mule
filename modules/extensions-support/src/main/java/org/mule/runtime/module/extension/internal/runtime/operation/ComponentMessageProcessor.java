@@ -67,13 +67,11 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -83,13 +81,11 @@ import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
-import org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.OperationInnerProcessor;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
-import org.mule.runtime.core.privileged.processor.MessageProcessors;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
@@ -195,8 +191,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private String resolvedProcessorRepresentation;
   private boolean initialised = false;
 
-  private ProcessingStrategy processingStrategy;
-  private Optional<ProcessingStrategyFactory> processingStrategyFactory;
+  private Optional<ProcessingStrategy> processingStrategy;
   private FluxSinkSupplier<CoreEvent> fluxSupplier;
   private final Object fluxSupplierDisposeLock = new Object();
 
@@ -379,15 +374,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         ? getFromAnnotatedObject(componentLocator, this).orElse(null)
         : null;
     if (rootContainer instanceof FlowConstruct) {
-      processingStrategy = ((FlowConstruct) rootContainer).getProcessingStrategy();
-      if (rootContainer instanceof Pipeline) {
-        processingStrategyFactory = of(((Pipeline) rootContainer).getProcessingStrategyFactory());
-      } else {
-        processingStrategyFactory = empty();
-      }
+      processingStrategy = of(((FlowConstruct) rootContainer).getProcessingStrategy());
     } else {
-      processingStrategy = MessageProcessors.createDefaultProcessingStrategyFactory().create(muleContext, toString() + ".ps");
-      processingStrategyFactory = empty();
+      processingStrategy = empty();
     }
   }
 
@@ -422,21 +411,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       };
 
       final Flux<CoreEvent> transformed = from(p)
-          .transform(processingStrategy.onProcessor(operationInnerProcessor))
+          .transform(processingStrategy.map(ps -> ps.onProcessor(operationInnerProcessor)).orElse(operationInnerProcessor))
           .onErrorContinue((t, event) -> LOGGER.error("Unhandler error in operation (" + toString() + ") flux",
                                                       t));
-      return from(processingStrategy.registerInternalFlux(transformed));
+      return from(processingStrategy.map(ps -> ps.registerInternalFlux(transformed)).orElse(transformed));
     },
-                                                processingStrategyFactory.map(psf -> {
-                                                  if (psf instanceof AbstractProcessingStrategyFactory) {
-                                                    return Math
-                                                        .min(((AbstractProcessingStrategyFactory) processingStrategyFactory.get())
-                                                            .getMaxConcurrency(),
-                                                             getRuntime().availableProcessors());
-                                                  } else {
-                                                    return getRuntime().availableProcessors();
-                                                  }
-                                                }).orElse(getRuntime().availableProcessors()));
+                                                getRuntime().availableProcessors());
   }
 
   private void prepareAndExecuteOperation(CoreEvent event, Supplier<ExecutorCallback> callbackSupplier, Context ctx) {
