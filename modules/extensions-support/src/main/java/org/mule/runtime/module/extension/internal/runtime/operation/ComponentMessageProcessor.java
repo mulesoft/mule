@@ -370,7 +370,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private void initProcessingStrategy() throws InitialisationException {
-    Object rootContainer = getLocation() != null
+    Object rootContainer = getLocation() != null && getRootContainerLocation() != null
         ? getFromAnnotatedObject(componentLocator, this).orElse(null)
         : null;
     if (rootContainer instanceof FlowConstruct) {
