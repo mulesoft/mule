@@ -91,38 +91,47 @@ public class GrizzlyServer implements Server
         return this.listenerRegistry.addRequestHandler(this, requestHandler, listenerRequestMatcher);
     }
 
-    private static class CloseAcceptedConnectionsOnServerCloseProbe extends ConnectionProbe.Adapter {
+    private static class CloseAcceptedConnectionsOnServerCloseProbe extends ConnectionProbe.Adapter
+    {
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void onAcceptEvent(Connection serverConnection, Connection clientConnection) {
+        public void onAcceptEvent(Connection serverConnection, Connection clientConnection)
+        {
             final CloseAcceptedConnectionOnServerClose callback = new CloseAcceptedConnectionOnServerClose(clientConnection);
             serverConnection.addCloseListener(callback);
             clientConnection.addCloseListener(new RemoveCloseListenerOnClientClosed(serverConnection, callback));
         }
     }
 
-    private static class CloseAcceptedConnectionOnServerClose implements CloseListener<TCPNIOServerConnection, CloseType> {
+    private static class CloseAcceptedConnectionOnServerClose implements CloseListener<TCPNIOServerConnection, CloseType>
+    {
 
         private SocketChannel acceptedChannel;
 
-        private CloseAcceptedConnectionOnServerClose(Connection acceptedConnection) {
+        private CloseAcceptedConnectionOnServerClose(Connection acceptedConnection)
+        {
             this.acceptedChannel = getSocketChannel(acceptedConnection);
         }
 
-        private static SocketChannel getSocketChannel(Connection acceptedConnection) {
-            if (!(acceptedConnection instanceof TCPNIOConnection)) {
-                if (logger.isWarnEnabled()) {
+        private static SocketChannel getSocketChannel(Connection acceptedConnection)
+        {
+            if (!(acceptedConnection instanceof TCPNIOConnection))
+            {
+                if (logger.isWarnEnabled())
+                {
                     logger.warn("The accepted connection is not an instance of TCPNIOConnection");
                 }
                 return null;
             }
 
             SelectableChannel selectableChannel = ((TCPNIOConnection) acceptedConnection).getChannel();
-            if (!(selectableChannel instanceof SocketChannel)) {
-                if (logger.isWarnEnabled()) {
+            if (!(selectableChannel instanceof SocketChannel))
+            {
+                if (logger.isWarnEnabled())
+                {
                     logger.warn("The accepted connection doesn't hold a SocketChannel");
                 }
                 return null;
@@ -135,20 +144,24 @@ public class GrizzlyServer implements Server
          * {@inheritDoc}
          */
         @Override
-        public void onClosed(TCPNIOServerConnection closeable, CloseType type) throws IOException {
-            if (acceptedChannel != null) {
+        public void onClosed(TCPNIOServerConnection closeable, CloseType type) throws IOException
+        {
+            if (acceptedChannel != null)
+            {
                 acceptedChannel.shutdownInput();
             }
         }
     }
 
-    private static class RemoveCloseListenerOnClientClosed implements CloseListener<TCPNIOConnection, CloseType> {
+    private static class RemoveCloseListenerOnClientClosed implements CloseListener<TCPNIOConnection, CloseType>
+    {
 
         private CloseAcceptedConnectionOnServerClose callbackToRemove;
         private Connection serverConnection;
 
         private RemoveCloseListenerOnClientClosed(Connection serverConnection,
-                                                  CloseAcceptedConnectionOnServerClose callbackToRemove) {
+                                                  CloseAcceptedConnectionOnServerClose callbackToRemove)
+        {
             this.serverConnection = serverConnection;
             this.callbackToRemove = callbackToRemove;
         }
@@ -157,8 +170,10 @@ public class GrizzlyServer implements Server
          * {@inheritDoc}
          */
         @Override
-        public void onClosed(TCPNIOConnection closeable, CloseType type) throws IOException {
-            if (serverConnection.isOpen()) {
+        public void onClosed(TCPNIOConnection closeable, CloseType type) throws IOException
+        {
+            if (serverConnection.isOpen())
+            {
                 serverConnection.removeCloseListener(callbackToRemove);
             }
         }
