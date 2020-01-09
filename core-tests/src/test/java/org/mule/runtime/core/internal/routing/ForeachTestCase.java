@@ -36,6 +36,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -83,6 +84,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   private static String ERR_PAYLOAD_TYPE = "Type error on processed payloads";
   private static String ERR_OUTPUT = "Messages processed incorrectly";
   private static final String ERR_INVALID_ITEM_SEQUENCE = "Null ItemSequence received";
+  private static final String ERR_SEQUENCE_OVERRIDDEN = "Sequence should't be overridden after foreach";
 
   @Rule
   public ExpectedException expectedException = none();
@@ -432,8 +434,8 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   @Test
   @Issue("MULE-16764")
-  @io.qameta.allure.Description("ForEach is not setting itemSequenceInfo")
-  public void testItemSequences() throws Exception {
+  @io.qameta.allure.Description("ForEach should set itemSequenceInfo")
+  public void itemSequences() throws Exception {
     List<String> payload = new ArrayList<>();
     payload.add("one");
     payload.add("two");
@@ -448,6 +450,24 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
         .collect(toList());
 
     assertThat(ERR_INVALID_ITEM_SEQUENCE, sequences, is(asList(0, 1, 2, 3)));
+  }
+
+  @Test
+  @Issue("MULE-16764")
+  @io.qameta.allure.Description("ForEach doesn't override any itemSequence after completion")
+  public void notOverrideParentSequence() throws Exception {
+    List<String> payload = new ArrayList<>();
+    Optional<ItemSequenceInfo> inEventItemSequence = Optional.of(ItemSequenceInfo.of(666));
+
+    payload.add("A");
+    payload.add("B");
+    payload.add("C");
+
+    CoreEvent in = eventBuilder(muleContext).itemSequenceInfo(inEventItemSequence).message(of(payload)).build();
+
+    CoreEvent processedEvent = process(simpleForeach, in);
+
+    assertThat(ERR_SEQUENCE_OVERRIDDEN, processedEvent.getItemSequenceInfo(), is(inEventItemSequence));
   }
 
   private CoreEvent processInChain(Processor processor, CoreEvent event) throws Exception {
