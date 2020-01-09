@@ -280,6 +280,9 @@ public class MuleObjectStoreManager implements ObjectStoreManager, Initialisable
       this.store = store;
       this.entryTTL = entryTTL;
       this.maxEntries = maxEntries;
+      if (this.entryTTL < UNBOUNDED) {
+        LOGGER.warn("Partition {} configured with negative max entries, defaulting to UNBOUNDED", partitionName);
+      }
     }
 
     @Override
@@ -288,7 +291,7 @@ public class MuleObjectStoreManager implements ObjectStoreManager, Initialisable
         try {
           store.expire(entryTTL, maxEntries, partitionName);
         } catch (Exception e) {
-          LOGGER.warn("Running expirty on partition " + partitionName + " of " + store + " threw " + e + ":" + e.getMessage());
+          LOGGER.warn("Running expiry on partition " + partitionName + " of " + store + " threw " + e + ":" + e.getMessage());
         }
       }
     }
