@@ -201,7 +201,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
           }
         }))
         .takeLast(1)
-        .map(s -> CoreEvent.builder(currentEvent.get()).message(request.getMessage()).build())
+            .map(s -> CoreEvent.builder(currentEvent.get()).message(request.getMessage())
+                    .itemSequenceInfo(request.getItemSequenceInfo()).build())
         .onErrorStop();
   }
 
