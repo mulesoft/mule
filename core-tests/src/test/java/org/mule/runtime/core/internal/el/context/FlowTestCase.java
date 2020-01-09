@@ -27,13 +27,13 @@ public class FlowTestCase extends AbstractELTestCase {
   }
 
   @Test
-  public void flowName() throws Exception {
+  public void flowName() {
     CoreEvent event = InternalEvent.builder(context).message(of("")).build();
     assertEquals("flowName", evaluate("flow.name", event));
   }
 
   @Test
-  public void assignToFlowName() throws Exception {
+  public void assignToFlowName() {
     CoreEvent event = InternalEvent.builder(context).message(of("")).build();
     assertFinalProperty("flow.name='foo'", event);
   }
