@@ -8,8 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.functional.Either.left;
@@ -24,7 +22,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
-import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
@@ -66,7 +63,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -86,6 +82,7 @@ import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.processor.MessageProcessors;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
@@ -284,7 +281,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           sdkInternalContext = new SdkInternalContext();
           ((InternalEvent) operationEvent).setSdkInternalContext(sdkInternalContext);
         }
-        sdkInternalContext.setOperationExecutionParams(configuration, resolutionResult, operationEvent, callback);
+        sdkInternalContext.setOperationExecutionParams(configuration, parameters, operationEvent, callback);
 
         fluxSupplier.get().next(operationEvent);
       };
@@ -370,14 +367,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private void initProcessingStrategy() throws InitialisationException {
-    Object rootContainer = getLocation() != null && getRootContainerLocation() != null
-        ? getFromAnnotatedObject(componentLocator, this).orElse(null)
-        : null;
-    if (rootContainer instanceof FlowConstruct) {
-      processingStrategy = of(((FlowConstruct) rootContainer).getProcessingStrategy());
-    } else {
-      processingStrategy = empty();
-    }
+    processingStrategy = MessageProcessors.getProcessingStrategy(componentLocator, getRootContainerLocation());
   }
 
   private void startInnerFlux() {
