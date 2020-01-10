@@ -144,7 +144,7 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategyAd
       long remainingCapacity = fluxSink.requestedFromDownstream();
       if (remainingCapacity == 0) {
         return EVENTS_ACCUMULATED;
-      } else if (remainingCapacity > (bufferSize > CORES * 4 ? CORES : 0)) {
+      } else if (remainingCapacity > (bufferSize > CORES * 2 ? CORES : 0)) {
         // If there is sufficient room in buffer to significantly reduce change of concurrent emission when buffer is full then
         // emit without synchronized block.
         fluxSink.next(intoSink(event));
