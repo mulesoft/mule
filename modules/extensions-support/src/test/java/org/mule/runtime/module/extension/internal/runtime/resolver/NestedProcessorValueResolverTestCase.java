@@ -19,8 +19,10 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.route.Chain;
+import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Before;
@@ -30,6 +32,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -44,6 +47,7 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
   @Before
   public void before() throws Exception {
     final CoreEvent testEvent = testEvent();
+    ((InternalEvent) testEvent).setSdkInternalContext(new SdkInternalContext());
     when(messageProcessor.process(any(CoreEvent.class))).thenReturn(testEvent);
     when(messageProcessor.apply(any(Publisher.class))).thenReturn(Mono.just(testEvent));
   }

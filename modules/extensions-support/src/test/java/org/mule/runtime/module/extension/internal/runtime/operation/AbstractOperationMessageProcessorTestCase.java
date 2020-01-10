@@ -26,6 +26,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static org.mule.runtime.api.meta.model.operation.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
@@ -246,6 +247,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
     when(operationModel.getName()).thenReturn(getClass().getName());
     when(operationModel.isBlocking()).thenReturn(true);
+    when(operationModel.getExecutionType()).thenReturn(BLOCKING);
     when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("test-extension").build());
     when(operationModel.getOutput())
         .thenReturn(new ImmutableOutputModel("Message.Payload", toMetadataType(String.class), false, emptySet()));

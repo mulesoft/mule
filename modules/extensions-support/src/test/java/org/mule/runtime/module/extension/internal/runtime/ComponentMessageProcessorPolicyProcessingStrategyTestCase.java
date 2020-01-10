@@ -58,6 +58,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,6 +138,9 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
 
     rootContainer = mock(FlowConstruct.class);
     processingStrategy = mock(ProcessingStrategy.class);
+    when(processingStrategy.onProcessor(any(ReactiveProcessor.class))).thenAnswer(inv -> inv.getArgument(0));
+    when(processingStrategy.registerInternalFlux(any(Publisher.class))).thenAnswer(inv -> inv.getArgument(0));
+
     when(componentLocator.find(mpRootContainerLocation)).thenReturn(of(rootContainer));
     when(rootContainer.getProcessingStrategy()).thenReturn(processingStrategy);
 
