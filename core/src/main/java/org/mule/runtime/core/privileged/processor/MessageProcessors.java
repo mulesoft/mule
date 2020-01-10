@@ -615,7 +615,8 @@ public class MessageProcessors {
    */
   public static Optional<ProcessingStrategy> getProcessingStrategy(ConfigurationComponentLocator locator,
                                                                    Location rootContainerLocation) {
-    return locator.find(rootContainerLocation).filter(loc -> loc instanceof FlowConstruct)
+    return locator.find(rootContainerLocation)
+        .filter(loc -> loc instanceof FlowConstruct)
         .map(loc -> ((FlowConstruct) loc).getProcessingStrategy());
   }
 
