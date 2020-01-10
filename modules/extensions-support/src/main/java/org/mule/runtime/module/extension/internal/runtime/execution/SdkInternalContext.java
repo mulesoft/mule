@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
+import static java.util.function.Function.identity;
+
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -13,10 +15,15 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+
+import reactor.util.context.Context;
 
 public class SdkInternalContext implements EventInternalContext<SdkInternalContext> {
 
   private OperationExecutionParams operationExecutionParams;
+
+  private Function<Context, Context> innerChainSubscriberContextMapping = identity();
 
   public OperationExecutionParams getOperationExecutionParams() {
     return operationExecutionParams;
@@ -25,6 +32,14 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
   public void setOperationExecutionParams(Optional<ConfigurationInstance> configuration, Map<String, Object> parameters,
                                           CoreEvent operationEvent, ExecutorCallback callback) {
     this.operationExecutionParams = new OperationExecutionParams(configuration, parameters, operationEvent, callback);
+  }
+
+  public Function<Context, Context> getInnerChainSubscriberContextMapping() {
+    return innerChainSubscriberContextMapping;
+  }
+
+  public void setInnerChainSubscriberContextMapping(Function<Context, Context> innerChainSubscriberContextMapping) {
+    this.innerChainSubscriberContextMapping = innerChainSubscriberContextMapping;
   }
 
   @Override

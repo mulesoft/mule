@@ -24,6 +24,7 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedResult;
+import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -38,8 +39,6 @@ import reactor.util.context.Context;
  * @since 4.0
  */
 public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcessors {
-
-  public static final String INNER_CHAIN_CTX_MAPPING = "mule.sdk.innerChainContextMapping";
 
   /**
    * Processor that will be executed upon calling process
@@ -122,7 +121,8 @@ public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcess
 
     public void execute() {
       final Function<Context, Context> innerChainCtxMapping =
-          ((InternalEvent) event).getInternalParameter(INNER_CHAIN_CTX_MAPPING);
+          ((SdkInternalContext) ((InternalEvent) event).<SdkInternalContext>getSdkInternalContext())
+              .getInnerChainSubscriberContextMapping();
 
       from(processWithChildContextDontComplete(event, chain, ofNullable(chain.getLocation())))
           .doOnSuccess(this::handleSuccess)

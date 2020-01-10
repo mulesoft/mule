@@ -15,7 +15,6 @@ import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.ComponentLocationProvider.resolveProcessorRepresentation;
-import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -25,7 +24,6 @@ import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
-import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
@@ -43,7 +41,6 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
-import static org.mule.runtime.module.extension.internal.runtime.operation.ImmutableProcessorChainExecutor.INNER_CHAIN_CTX_MAPPING;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
@@ -449,10 +446,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         }
         return innerChainCtx;
       };
-      return quickCopy(event, of(INNER_CHAIN_CTX_MAPPING, context));
-    } else {
-      return event;
+
+      ((SdkInternalContext) ((InternalEvent) event).<SdkInternalContext>getSdkInternalContext())
+          .setInnerChainSubscriberContextMapping(context);
     }
+
+    return event;
   }
 
   private void prepareAndExecuteOperation(CoreEvent event, Supplier<ExecutorCallback> callbackSupplier, Context ctx) {
@@ -465,13 +464,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     ExecutionContextAdapter<T> operationContext;
     if (shouldUsePrecalculatedContext(event)) {
-      // operationContext = getPrecalculatedContext(addContextToEvent(oep.getOperationEvent(), ctx));
       operationContext = getPrecalculatedContext(oep.getOperationEvent());
       operationContext.setCurrentScheduler(currentScheduler);
     } else {
       operationContext = createExecutionContext(oep.getConfiguration(),
                                                 oep.getParameters(),
-                                                // addContextToEvent(oep.getOperationEvent(), ctx),
                                                 oep.getOperationEvent(),
                                                 currentScheduler);
     }
