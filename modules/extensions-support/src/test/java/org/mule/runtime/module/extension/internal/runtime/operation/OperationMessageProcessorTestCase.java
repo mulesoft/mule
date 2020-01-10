@@ -517,4 +517,9 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
         .attributes(attributes)
         .build());
   }
+
+  @Override
+  protected boolean isGracefulShutdown() {
+    return true;
+  }
 }

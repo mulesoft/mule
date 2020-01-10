@@ -244,9 +244,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
           Flux<CoreEvent> transformed = from(propagateCompletion(from(publisher), create(errorSwitchSinkSinkRef)
-              .map(result -> result.reduce(me -> {
-                throw propagateWrappingFatal(me);
-              }, response -> response)), pub -> from(pub)
+              .map(result -> {
+                return result.reduce(me -> {
+                  throw propagateWrappingFatal(me);
+                }, response -> response);
+              }), pub -> from(pub)
                   .map(event -> addContextToEvent(event, ctx))
                   .doOnNext(event -> onEvent(event, new ExecutorCallback() {
 
