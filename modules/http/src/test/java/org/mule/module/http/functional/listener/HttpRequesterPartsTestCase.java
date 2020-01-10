@@ -28,6 +28,7 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.IOUtils;
 
 import com.ning.http.client.multipart.PartBase;
+import com.sun.mail.util.LineInputStream;
 
 public class HttpRequesterPartsTestCase extends FunctionalTestCase
 {
@@ -59,6 +60,14 @@ public class HttpRequesterPartsTestCase extends FunctionalTestCase
         Field headersCharset = PartBase.class.getDeclaredField(HEADERS_CHARSET);
         headersCharset.setAccessible(true);
         headersCharset.set(null, charset);
+        setDefaultUtf8(charset.equals(UTF_8));
+    }
+
+    private void setDefaultUtf8(boolean defaultUtf8) throws NoSuchFieldException, IllegalAccessException
+    {
+        Field defaultutf8 = LineInputStream.class.getDeclaredField("defaultutf8");
+        defaultutf8.setAccessible(true);
+        defaultutf8.set(null, defaultUtf8);
     }
 
     @Override
