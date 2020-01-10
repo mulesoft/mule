@@ -19,6 +19,7 @@ import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantT
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
+import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
@@ -123,6 +124,11 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
                                                                          extensionModel,
                                                                          expressionManager,
                                                                          muleContext));
+      }
+
+      @Override
+      public void visit(PlatformManagedOAuthGrantType grantType) {
+        //TODO: OAUTH MG -> crear aca el builder
       }
     });
 
