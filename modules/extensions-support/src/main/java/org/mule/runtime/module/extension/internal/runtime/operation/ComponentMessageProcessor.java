@@ -33,6 +33,7 @@ import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessi
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.createRoundRobinFluxSupplier;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.createDefaultProcessingStrategyFactory;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
@@ -238,44 +239,46 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook =
         getLocalOperatorErrorHook(this, errorTypeLocator, exceptionContextProviders);
 
-    final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
+    return subscriberContext()
+        .flatMapMany(ctx -> {
+          final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
-    Flux<CoreEvent> transformed = from(propagateCompletion(from(publisher), create(errorSwitchSinkSinkRef)
-        .map(result -> result.reduce(me -> {
-          throw propagateWrappingFatal(me);
-        }, response -> response)), pub -> subscriberContext()
-            .flatMapMany(ctx -> from(pub)
-                .map(event -> addContextToEvent(event, ctx))
-                .doOnNext(event -> onEvent(event, new ExecutorCallback() {
+          Flux<CoreEvent> transformed = from(propagateCompletion(from(publisher), create(errorSwitchSinkSinkRef)
+              .map(result -> result.reduce(me -> {
+                throw propagateWrappingFatal(me);
+              }, response -> response)), pub -> from(pub)
+                  .map(event -> addContextToEvent(event, ctx))
+                  .doOnNext(event -> onEvent(event, new ExecutorCallback() {
 
-                  @Override
-                  public void error(Throwable e) {
-                    // if `sink.error` is called here, it will cancel the flux altogether. That's why an `Either` is used here, so
-                    // the error can be propagated afterwards in a way consistent with our expected error handling.
-                    errorSwitchSinkSinkRef.next(left(
-                                                     // Force the error mapper from the chain to be used.
-                                                     // When using Mono.create with sink.error, the error mapper from the context
-                                                     // is
-                                                     // ignored, so it has to be explicitly used here.
-                                                     localOperatorErrorHook.apply(e, event), CoreEvent.class));
-                  }
+                    @Override
+                    public void error(Throwable e) {
+                      // if `sink.error` is called here, it will cancel the flux altogether. That's why an `Either` is used here,
+                      // so the error can be propagated afterwards in a way consistent with our expected error handling.
+                      errorSwitchSinkSinkRef.next(left(
+                                                       // Force the error mapper from the chain to be used.
+                                                       // When using Mono.create with sink.error, the error mapper from the
+                                                       // context is ignored, so it has to be explicitly used here.
+                                                       localOperatorErrorHook.apply(e, event), CoreEvent.class));
+                    }
 
-                  @Override
-                  public void complete(Object value) {
-                    errorSwitchSinkSinkRef.next(right(Throwable.class, (CoreEvent) value));
-                  }
-                }))), () -> errorSwitchSinkSinkRef.complete(), t -> errorSwitchSinkSinkRef.error(t),
-                                                           muleContext.getConfiguration().getShutdownTimeout(),
-                                                           outerFluxCompletionScheduler));
+                    @Override
+                    public void complete(Object value) {
+                      errorSwitchSinkSinkRef.next(right(Throwable.class, (CoreEvent) value));
+                    }
+                  })), () -> errorSwitchSinkSinkRef.complete(), t -> errorSwitchSinkSinkRef.error(t),
+                                                                 muleContext.getConfiguration().getShutdownTimeout(),
+                                                                 outerFluxCompletionScheduler));
 
-    if (publisher instanceof Flux) {
-      return transformed
-          .doAfterTerminate(this::outerPublisherTerminated)
-          .doOnSubscribe(s -> outerPublisherSubscribedTo());
-    } else {
-      // Extensions client uses Mono, so we don't want to dispose the inner stuff after the first event comes through
-      return transformed;
-    }
+          if (publisher instanceof Flux && !ctx.getOrEmpty(WITHIN_PROCESS_TO_APPLY).isPresent()) {
+            return transformed
+                .doAfterTerminate(this::outerPublisherTerminated)
+                .doOnSubscribe(s -> outerPublisherSubscribedTo());
+          } else {
+            // Certain features (ext client, batch, flow runner) use Mono, so we don't want to dispose the inner stuff after the
+            // first event comes through
+            return transformed;
+          }
+        });
   }
 
   private void onEvent(CoreEvent event, ExecutorCallback executorCallback) {

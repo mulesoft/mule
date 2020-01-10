@@ -142,6 +142,9 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategyAd
       // Optimization to avoid using synchronized block for all emissions.
       // See: https://github.com/reactor/reactor-core/issues/1037
       long remainingCapacity = fluxSink.requestedFromDownstream();
+
+      System.out.println(" >> remainingCapacity: " + remainingCapacity);
+
       if (remainingCapacity == 0) {
         return EVENTS_ACCUMULATED;
       } else if (remainingCapacity > (bufferSize > CORES * 4 ? CORES : 0)) {
