@@ -7,6 +7,7 @@
 package org.mule.util.store;
 
 import static java.io.File.separator;
+import static java.lang.Boolean.TRUE;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
@@ -24,6 +25,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.CoreMatchers;
@@ -128,17 +130,30 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
     }
 
     @Test
-    public void disposePartitionRemovesPartitionDirectory() throws ObjectStoreException
+    public void disposePartitionRemovesPartitionDirectoryByDefault() throws ObjectStoreException
+    {
+        verifyPartitionFolder(false);
+    }
+
+    @Test
+    public void disposePartitionRemovesPartitionDirectoryIfPropertySet() throws Exception
+    {
+        setOnlyClearEntriesOnDispose(true);
+        verifyPartitionFolder(true);
+        setOnlyClearEntriesOnDispose(false);
+    }
+
+    private void verifyPartitionFolder(boolean partionExistsAfterDispose) throws ObjectStoreException
     {
         String partitionName = "custom";
         String key = "key";
-        String value = "value";     
+        String value = "value";
         File partitionDirectory = getPartitionDirectory(partitionName);
         os.open(partitionName);
         os.store(key, value, partitionName);
         assertThat(partitionDirectory.exists(), equalTo(true));
         os.disposePartition(partitionName);
-        assertThat(partitionDirectory.exists(), equalTo(false));
+        assertThat(partitionDirectory.exists(), equalTo(partionExistsAfterDispose));
     }
 
     private File getPartitionDirectory(String partitionName)
@@ -269,7 +284,7 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
             return muleContext;
         }
     }
-    
+
     private static class TestPartitionedPersistentObjectStore extends PartitionedPersistentObjectStore<Serializable>
     {
         public TestPartitionedPersistentObjectStore(MuleContext mockMuleContext)
@@ -282,6 +297,13 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
         {
             return partitionName;
         }
+    }
+
+    private void setOnlyClearEntriesOnDispose(boolean value) throws Exception
+    {
+        Field onlyClearEntriesOnDisposeField = PartitionedPersistentObjectStore.class.getDeclaredField("onlyClearEntriesOnDispose");
+        onlyClearEntriesOnDisposeField.setAccessible(TRUE);
+        onlyClearEntriesOnDisposeField.set(null, value);
     }
 
 }

@@ -8,6 +8,7 @@ package org.mule.util.store;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.PartitionableExpirableObjectStore;
@@ -15,6 +16,9 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.util.FileUtils;
 import org.mule.util.UUID;
+
+import static java.lang.Boolean.getBoolean;
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -26,8 +30,12 @@ import java.util.List;
 import java.util.Map;
 
 public class PartitionedPersistentObjectStore<T extends Serializable> extends
-        AbstractPartitionedObjectStore<T> implements MuleContextAware, PartitionableExpirableObjectStore<T>
+    AbstractPartitionedObjectStore<T> implements MuleContextAware, PartitionableExpirableObjectStore<T>
 {
+
+    public static final String ONLY_CLEAR_ENTRIES_ON_DISPOSE = SYSTEM_PROPERTY_PREFIX + "partitioned.persistent.os.only.clear.keys.on.dispose";
+
+    public static Boolean onlyClearEntriesOnDispose = getBoolean(ONLY_CLEAR_ENTRIES_ON_DISPOSE);
 
     public static final String OBJECT_STORE_DIR = "objectstore";
 
@@ -128,13 +136,13 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends
     {
         return getPartitionObjectStore(partitionName).remove(key.toString());
     }
-    
+
     @Override
     public List<Serializable> allKeys(String partitionName) throws ObjectStoreException
     {
         return getPartitionObjectStore(partitionName).allKeys();
     }
-    
+
     @Override
     public void clear(String partitionName) throws ObjectStoreException
     {
@@ -245,7 +253,14 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends
     @Override
     public void disposePartition(String partitionName) throws ObjectStoreException
     {
-        this.getPartitionObjectStore(partitionName).close();
+        if (onlyClearEntriesOnDispose)
+        {
+            clear(partitionName);
+        }
+        else
+        {
+            this.getPartitionObjectStore(partitionName).close();
+        }
     }
 
     @Override
