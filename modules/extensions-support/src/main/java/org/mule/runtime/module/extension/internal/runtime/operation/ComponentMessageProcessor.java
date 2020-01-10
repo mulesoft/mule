@@ -15,6 +15,7 @@ import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.ComponentLocationProvider.resolveProcessorRepresentation;
+import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -24,18 +25,25 @@ import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
+import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS;
+import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.createRoundRobinFluxSupplier;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.createDefaultProcessingStrategyFactory;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+import static org.mule.runtime.module.extension.internal.runtime.operation.ImmutableProcessorChainExecutor.INNER_CHAIN_CTX_MAPPING;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
@@ -59,6 +67,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -82,7 +91,6 @@ import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
-import org.mule.runtime.core.privileged.processor.MessageProcessors;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
@@ -188,7 +196,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private String resolvedProcessorRepresentation;
   private boolean initialised = false;
 
-  private Optional<ProcessingStrategy> processingStrategy;
+  private ProcessingStrategy processingStrategy;
+  private boolean ownedProcessingStrategy = false;
   private FluxSinkSupplier<CoreEvent> fluxSupplier;
   private final Object fluxSupplierDisposeLock = new Object();
 
@@ -237,25 +246,28 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     Flux<CoreEvent> transformed = from(propagateCompletion(from(publisher), create(errorSwitchSinkSinkRef)
         .map(result -> result.reduce(me -> {
           throw propagateWrappingFatal(me);
-        }, response -> response)), pub -> from(pub)
-            .doOnNext(event -> onEvent(event, new ExecutorCallback() {
+        }, response -> response)), pub -> subscriberContext()
+            .flatMapMany(ctx -> from(pub)
+                .map(event -> addContextToEvent(event, ctx))
+                .doOnNext(event -> onEvent(event, new ExecutorCallback() {
 
-              @Override
-              public void error(Throwable e) {
-                // if `sink.error` is called here, it will cancel the flux altogether. That's why an `Either` is used here, so
-                // the error can be propagated afterwards in a way consistent with our expected error handling.
-                errorSwitchSinkSinkRef.next(left(
-                                                 // Force the error mapper from the chain to be used.
-                                                 // When using Mono.create with sink.error, the error mapper from the context is
-                                                 // ignored, so it has to be explicitly used here.
-                                                 localOperatorErrorHook.apply(e, event), CoreEvent.class));
-              }
+                  @Override
+                  public void error(Throwable e) {
+                    // if `sink.error` is called here, it will cancel the flux altogether. That's why an `Either` is used here, so
+                    // the error can be propagated afterwards in a way consistent with our expected error handling.
+                    errorSwitchSinkSinkRef.next(left(
+                                                     // Force the error mapper from the chain to be used.
+                                                     // When using Mono.create with sink.error, the error mapper from the context
+                                                     // is
+                                                     // ignored, so it has to be explicitly used here.
+                                                     localOperatorErrorHook.apply(e, event), CoreEvent.class));
+                  }
 
-              @Override
-              public void complete(Object value) {
-                errorSwitchSinkSinkRef.next(right(Throwable.class, (CoreEvent) value));
-              }
-            })), () -> errorSwitchSinkSinkRef.complete(), t -> errorSwitchSinkSinkRef.error(t),
+                  @Override
+                  public void complete(Object value) {
+                    errorSwitchSinkSinkRef.next(right(Throwable.class, (CoreEvent) value));
+                  }
+                }))), () -> errorSwitchSinkSinkRef.complete(), t -> errorSwitchSinkSinkRef.error(t),
                                                            muleContext.getConfiguration().getShutdownTimeout(),
                                                            outerFluxCompletionScheduler));
 
@@ -367,7 +379,16 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private void initProcessingStrategy() throws InitialisationException {
-    processingStrategy = MessageProcessors.getProcessingStrategy(componentLocator, getRootContainerLocation());
+    final Optional<ProcessingStrategy> processingStrategyFromRootContainer =
+        getProcessingStrategy(componentLocator, getRootContainerLocation());
+
+    processingStrategy = processingStrategyFromRootContainer
+        .orElseGet(() -> createDefaultProcessingStrategyFactory().create(muleContext, toString() + ".ps"));
+
+    if (!processingStrategyFromRootContainer.isPresent()) {
+      ownedProcessingStrategy = true;
+      initialiseIfNeeded(processingStrategy);
+    }
   }
 
   private void startInnerFlux() {
@@ -401,12 +422,37 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       };
 
       final Flux<CoreEvent> transformed = from(p)
-          .transform(processingStrategy.map(ps -> ps.onProcessor(operationInnerProcessor)).orElse(operationInnerProcessor))
+          .transform(processingStrategy.onProcessor(operationInnerProcessor))
           .onErrorContinue((t, event) -> LOGGER.error("Unhandler error in operation (" + toString() + ") flux",
                                                       t));
-      return from(processingStrategy.map(ps -> ps.registerInternalFlux(transformed)).orElse(transformed));
+      return from(processingStrategy.registerInternalFlux(transformed));
     },
                                                 getRuntime().availableProcessors());
+  }
+
+  protected boolean hasChainNested() {
+    return componentModel.getNestedComponents().stream()
+        .flatMap(nestedComp -> ((NestedComponentModel) nestedComp).getAllowedStereotypes().stream())
+        .anyMatch(st -> st.isAssignableTo(PROCESSOR));
+  }
+
+  private CoreEvent addContextToEvent(CoreEvent event, Context ctx) {
+    if (hasChainNested()
+        && (ctx.hasKey(POLICY_NEXT_OPERATION) || ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))) {
+      Function<Context, Context> context = innerChainCtx -> {
+        if (ctx.hasKey(POLICY_NEXT_OPERATION)) {
+          innerChainCtx = innerChainCtx.put(POLICY_NEXT_OPERATION, ctx.get(POLICY_NEXT_OPERATION));
+        }
+        if (ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)) {
+          innerChainCtx = innerChainCtx.put(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS,
+                                            ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS));
+        }
+        return innerChainCtx;
+      };
+      return quickCopy(event, of(INNER_CHAIN_CTX_MAPPING, context));
+    } else {
+      return event;
+    }
   }
 
   private void prepareAndExecuteOperation(CoreEvent event, Supplier<ExecutorCallback> callbackSupplier, Context ctx) {
@@ -419,11 +465,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     ExecutionContextAdapter<T> operationContext;
     if (shouldUsePrecalculatedContext(event)) {
+      // operationContext = getPrecalculatedContext(addContextToEvent(oep.getOperationEvent(), ctx));
       operationContext = getPrecalculatedContext(oep.getOperationEvent());
       operationContext.setCurrentScheduler(currentScheduler);
     } else {
       operationContext = createExecutionContext(oep.getConfiguration(),
                                                 oep.getParameters(),
+                                                // addContextToEvent(oep.getOperationEvent(), ctx),
                                                 oep.getOperationEvent(),
                                                 currentScheduler);
     }
@@ -652,6 +700,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   public void doStart() throws MuleException {
     startIfNeeded(componentExecutor);
 
+    if (ownedProcessingStrategy) {
+      startIfNeeded(processingStrategy);
+    }
     outerFluxCompletionScheduler = muleContext.getSchedulerService().ioScheduler(muleContext.getSchedulerBaseConfig()
         .withMaxConcurrentTasks(1).withName(toString() + ".outer.flux."));
 
@@ -662,6 +713,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   public void doStop() throws MuleException {
     stopIfNeeded(componentExecutor);
     stopInnerFlux();
+
+    if (ownedProcessingStrategy) {
+      stopIfNeeded(processingStrategy);
+    }
 
     if (outerFluxCompletionScheduler != null) {
       outerFluxCompletionScheduler.stop();
@@ -693,6 +748,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Override
   public void doDispose() {
     disposeIfNeeded(componentExecutor, LOGGER);
+    if (ownedProcessingStrategy) {
+      disposeIfNeeded(processingStrategy, LOGGER);
+    }
     initialised = false;
   }
 
