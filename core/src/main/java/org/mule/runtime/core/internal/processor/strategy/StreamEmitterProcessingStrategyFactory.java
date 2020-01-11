@@ -161,7 +161,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       final long shutdownTimeout = flowConstruct.getMuleContext().getConfiguration().getShutdownTimeout();
 
       List<ReactorSink<CoreEvent>> sinks = new ArrayList<>();
-      final int bufferQueueSize = getBufferQueueSize() * 2;
+      final int bufferQueueSize = getBufferQueueSize();
 
       for (int i = 0; i < sinksCount; i++) {
         Latch completionLatch = new Latch();

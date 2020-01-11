@@ -83,6 +83,7 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.internal.policy.SynchronousSinkExecutorCallback;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.strategy.OperationInnerProcessor;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
@@ -241,44 +242,57 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     return subscriberContext()
         .flatMapMany(ctx -> {
-          final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
+          if (isAsync() || getInnerProcessingType() != CPU_LITE) {
+            final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
-          Flux<CoreEvent> transformed = from(propagateCompletion(from(publisher), create(errorSwitchSinkSinkRef)
-              .map(result -> {
-                return result.reduce(me -> {
-                  throw propagateWrappingFatal(me);
-                }, response -> response);
-              }), pub -> from(pub)
-                  .map(event -> addContextToEvent(event, ctx))
-                  .doOnNext(event -> onEvent(event, new ExecutorCallback() {
+            Flux<CoreEvent> transformed = from(propagateCompletion(from(publisher), create(errorSwitchSinkSinkRef)
+                .map(result -> {
+                  return result.reduce(me -> {
+                    throw propagateWrappingFatal(me);
+                  }, response -> response);
+                }), pub -> from(pub)
+                    .map(event -> addContextToEvent(event, ctx))
+                    .doOnNext(event -> onEvent(event, new ExecutorCallback() {
 
-                    @Override
-                    public void error(Throwable e) {
-                      // if `sink.error` is called here, it will cancel the flux altogether. That's why an `Either` is used here,
-                      // so the error can be propagated afterwards in a way consistent with our expected error handling.
-                      errorSwitchSinkSinkRef.next(left(
-                                                       // Force the error mapper from the chain to be used.
-                                                       // When using Mono.create with sink.error, the error mapper from the
-                                                       // context is ignored, so it has to be explicitly used here.
-                                                       localOperatorErrorHook.apply(e, event), CoreEvent.class));
-                    }
+                      @Override
+                      public void error(Throwable e) {
+                        // if `sink.error` is called here, it will cancel the flux altogether.
+                        // That's why an `Either` is used here,
+                        // so the error can be propagated afterwards in a way consistent with our expected error handling.
+                        errorSwitchSinkSinkRef.next(left(
+                                                         // Force the error mapper from the chain to be used.
+                                                         // When using Mono.create with sink.error, the error mapper from the
+                                                         // context is ignored, so it has to be explicitly used here.
+                                                         localOperatorErrorHook.apply(e, event), CoreEvent.class));
+                      }
 
-                    @Override
-                    public void complete(Object value) {
-                      errorSwitchSinkSinkRef.next(right(Throwable.class, (CoreEvent) value));
-                    }
-                  })), () -> errorSwitchSinkSinkRef.complete(), t -> errorSwitchSinkSinkRef.error(t),
-                                                                 muleContext.getConfiguration().getShutdownTimeout(),
-                                                                 outerFluxCompletionScheduler));
+                      @Override
+                      public void complete(Object value) {
+                        errorSwitchSinkSinkRef.next(right(Throwable.class, (CoreEvent) value));
+                      }
+                    })), () -> errorSwitchSinkSinkRef.complete(), t -> errorSwitchSinkSinkRef.error(t),
+                                                                   muleContext.getConfiguration().getShutdownTimeout(),
+                                                                   outerFluxCompletionScheduler));
 
-          if (publisher instanceof Flux && !ctx.getOrEmpty(WITHIN_PROCESS_TO_APPLY).isPresent()) {
-            return transformed
-                .doAfterTerminate(this::outerPublisherTerminated)
-                .doOnSubscribe(s -> outerPublisherSubscribedTo());
+            if (publisher instanceof Flux && !ctx.getOrEmpty(WITHIN_PROCESS_TO_APPLY).isPresent()) {
+              return transformed
+                  .doAfterTerminate(this::outerPublisherTerminated)
+                  .doOnSubscribe(s -> outerPublisherSubscribedTo());
+            } else {
+              // Certain features (ext client, batch, flow runner) use Mono, so we don't want to dispose the inner stuff after the
+              // first event comes through
+              return transformed;
+            }
           } else {
-            // Certain features (ext client, batch, flow runner) use Mono, so we don't want to dispose the inner stuff after the
-            // first event comes through
-            return transformed;
+            // TODO
+            return from(publisher)
+                .handle((event, sink) -> {
+                  try {
+                    onEventSynchronous(event, new SynchronousSinkExecutorCallback(sink), ctx);
+                  } catch (Throwable t) {
+                    sink.error(unwrap(t));
+                  }
+                });
           }
         });
   }
@@ -309,6 +323,37 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         // If this operation has no component location then it is internal. Don't apply policies on internal operations.
         operationExecutionFunction.execute(resolutionResult, event, executorCallback);
       }
+    } catch (Throwable t) {
+      executorCallback.error(unwrap(t));
+    }
+  }
+
+  private void onEventSynchronous(CoreEvent event, ExecutorCallback executorCallback, Context ctx) {
+    try {
+      final Optional<ConfigurationInstance> configuration = resolveConfiguration(event);
+      final Map<String, Object> resolutionResult = getResolutionResult(event, configuration);
+
+      OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent, callback) -> {
+        SdkInternalContext sdkInternalContext =
+            (SdkInternalContext) ((InternalEvent) operationEvent).<SdkInternalContext>getSdkInternalContext();
+        if (((InternalEvent) operationEvent).getSdkInternalContext() == null) {
+          sdkInternalContext = new SdkInternalContext();
+          ((InternalEvent) operationEvent).setSdkInternalContext(sdkInternalContext);
+        }
+        sdkInternalContext.setOperationExecutionParams(configuration, parameters, operationEvent, callback);
+
+        prepareAndExecuteOperation(event, () -> callback, ctx);
+      };
+
+      // if (getLocation() != null) {
+      // ((DefaultFlowCallStack) event.getFlowCallStack())
+      // .setCurrentProcessorPath(resolvedProcessorRepresentation);
+      // policyManager.createOperationPolicy(this, event, () -> resolutionResult)
+      // .process(event, operationExecutionFunction, () -> resolutionResult, getLocation(), executorCallback);
+      // } else {
+      // If this operation has no component location then it is internal. Don't apply policies on internal operations.
+      operationExecutionFunction.execute(resolutionResult, event, executorCallback);
+      // }
     } catch (Throwable t) {
       executorCallback.error(unwrap(t));
     }
