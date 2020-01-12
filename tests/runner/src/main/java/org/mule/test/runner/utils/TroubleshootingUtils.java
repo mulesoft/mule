@@ -7,6 +7,10 @@
 
 package org.mule.test.runner.utils;
 
+import static java.util.Optional.ofNullable;
+
+import org.mule.runtime.api.util.Reference;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +33,7 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -41,7 +46,7 @@ import org.slf4j.LoggerFactory;
 
 public class TroubleshootingUtils {
 
-  private static final String JENKINS_WORKSPACE_PATH = System.getProperty("jenkins.workspace.path");
+  private static final Optional<String> JENKINS_WORKSPACE_PATH = ofNullable(System.getProperty("jenkins.workspace.path"));
   private static final String HEISENBERG_ARTIFACT_LOCATION = "org/mule/tests/mule-heisenberg-extension/4.3.0-SNAPSHOT";
 
   private static final String OS_NAME = System.getProperty("os.name").toLowerCase();
@@ -65,10 +70,10 @@ public class TroubleshootingUtils {
     return getPathOfFileContaining(pluginJsonUrl, ".m2").getParent();
   }
 
-  public static Path getJenkinsWorkspacePath() {
+  public static Optional<Path> getJenkinsWorkspacePath() {
     // The workspace name change from job to job with the form <folder>_<job name>_<branch>. Ex 'Mule-"runtime_mule-ee_mule-4.x'
     // So we use the ".m2" folder which is in the root of the workspace in all jobs and also works running locally.
-    return Paths.get(JENKINS_WORKSPACE_PATH);
+    return JENKINS_WORKSPACE_PATH.map(p -> Paths.get(p));
   }
 
   public static Path getJenkinsWorkspacePath(URL pluginJsonUrl) {
@@ -144,27 +149,39 @@ public class TroubleshootingUtils {
   }
 
   public static void copyRepoContentsToAuxJenkinsFolder() throws IOException {
-    Path heisenbergSnapshotRoot =
-        Paths.get(getJenkinsWorkspacePath().toString(), ".m2", "repository", HEISENBERG_ARTIFACT_LOCATION);
+    Reference<IOException> exceptionReference = new Reference<>();
+    getJenkinsWorkspacePath().ifPresent(
+                                        jenkinsWorkspacePath -> {
+                                          Path heisenbergSnapshotRoot = jenkinsWorkspacePath.resolve(".m2").resolve("repository")
+                                              .resolve(HEISENBERG_ARTIFACT_LOCATION);
 
-    if (!heisenbergSnapshotRoot.toFile().exists()) {
-      return;
+                                          if (!heisenbergSnapshotRoot.toFile().exists()) {
+                                            return;
+                                          }
+
+                                          try {
+                                            Path jenkinsTroubleshootingFolderPath =
+                                                getJenkinsTroubleshootingFolderPath(heisenbergSnapshotRoot);
+
+                                            Path repoContents = jenkinsTroubleshootingFolderPath.resolve("repoContents");
+
+                                            if (repoContents.toFile().exists()) {
+                                              return;
+                                            }
+
+                                            repoContents.toFile().mkdirs();
+
+                                            for (File f : heisenbergSnapshotRoot.toFile().listFiles()) {
+                                              Files.copy(f.toPath(), repoContents.resolve(f.getName()));
+                                            }
+                                          } catch (IOException e) {
+                                            exceptionReference.set(e);
+                                          }
+                                        });
+
+    if (exceptionReference.get() != null) {
+      throw exceptionReference.get();
     }
-
-    Path jenkinsTroubleshootingFolderPath = getJenkinsTroubleshootingFolderPath(heisenbergSnapshotRoot);
-
-    Path repoContents = Paths.get(jenkinsTroubleshootingFolderPath.toString(), "repoContents");
-
-    if (repoContents.toFile().exists()) {
-      return;
-    }
-
-    repoContents.toFile().mkdirs();
-
-    for (File f : heisenbergSnapshotRoot.toFile().listFiles()) {
-      Files.copy(f.toPath(), repoContents.resolve(f.getName()));
-    }
-
   }
 
   public static void copyFileToAuxJenkinsFolder(Path fileToCopy) throws IOException {
