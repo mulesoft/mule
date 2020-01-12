@@ -61,7 +61,7 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultPolicyManager.class);
 
-  private static final OperationPolicy NO_POLICY_OPERATION =
+  public static final OperationPolicy NO_POLICY_OPERATION =
       (operationEvent, operationExecutionFunction, opParamProcessor, componentLocation, callback) -> operationExecutionFunction
           .execute(opParamProcessor.getOperationParameters(), operationEvent, callback);
 

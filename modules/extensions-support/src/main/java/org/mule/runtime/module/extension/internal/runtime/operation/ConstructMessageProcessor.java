@@ -44,11 +44,6 @@ public class ConstructMessageProcessor extends ComponentMessageProcessor<Constru
   }
 
   @Override
-  protected boolean hasChainNested() {
-    return true;
-  }
-
-  @Override
   protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {
     // Constructs are config-less
   }

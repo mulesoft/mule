@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
 import static org.mule.tck.probe.PollingProber.probe;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
@@ -116,7 +117,7 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
 
       @Override
       public ProcessingType getInnerProcessingType() {
-        return ProcessingType.CPU_LITE;
+        return CPU_LITE_ASYNC;
       }
 
       @Override

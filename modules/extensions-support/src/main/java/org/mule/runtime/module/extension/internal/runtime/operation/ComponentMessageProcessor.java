@@ -27,6 +27,7 @@ import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
+import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.NO_POLICY_OPERATION;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
@@ -66,6 +67,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
+import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -83,7 +85,6 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.core.internal.policy.SynchronousSinkExecutorCallback;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.strategy.OperationInnerProcessor;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
@@ -177,6 +178,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private final RetryPolicyTemplate fallbackRetryPolicyTemplate = new NoRetryPolicyTemplate();
 
   protected final ExtensionModel extensionModel;
+  private final boolean hasChainNested;
   protected final ResolverSet resolverSet;
   protected final String target;
   protected final String targetValue;
@@ -228,6 +230,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     this.policyManager = policyManager;
     this.retryPolicyTemplate = retryPolicyTemplate;
     this.reflectionCache = reflectionCache;
+
+    this.hasChainNested = componentModel.getNestedComponents().stream()
+        .anyMatch(nestedComp -> {
+          return nestedComp instanceof NestedRouteModel
+              || ((NestedComponentModel) nestedComp).getAllowedStereotypes().stream()
+                  .anyMatch(st -> st.isAssignableTo(PROCESSOR));
+        });
   }
 
   @Override
@@ -242,17 +251,23 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     return subscriberContext()
         .flatMapMany(ctx -> {
-          if (isAsync() || getInnerProcessingType() != CPU_LITE) {
-            final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
+          final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
-            Flux<CoreEvent> transformed = from(propagateCompletion(from(publisher), create(errorSwitchSinkSinkRef)
-                .map(result -> {
-                  return result.reduce(me -> {
-                    throw propagateWrappingFatal(me);
-                  }, response -> response);
-                }), pub -> from(pub)
-                    .map(event -> addContextToEvent(event, ctx))
-                    .doOnNext(event -> onEvent(event, new ExecutorCallback() {
+          Flux<CoreEvent> transformed = from(propagateCompletion(from(publisher), create(errorSwitchSinkSinkRef)
+              .map(result -> {
+                return result.reduce(me -> {
+                  throw propagateWrappingFatal(me);
+                }, response -> response);
+              }), pub -> from(pub)
+                  .map(event -> {
+                    try {
+                      return addContextToEvent(event, ctx);
+                    } catch (MuleException t) {
+                      throw propagateWrappingFatal(localOperatorErrorHook.apply(t, event));
+                    }
+                  })
+                  .doOnNext(event -> {
+                    final ExecutorCallback executorCallback = new ExecutorCallback() {
 
                       @Override
                       public void error(Throwable e) {
@@ -270,45 +285,40 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                       public void complete(Object value) {
                         errorSwitchSinkSinkRef.next(right(Throwable.class, (CoreEvent) value));
                       }
-                    })), () -> errorSwitchSinkSinkRef.complete(), t -> errorSwitchSinkSinkRef.error(t),
-                                                                   muleContext.getConfiguration().getShutdownTimeout(),
-                                                                   outerFluxCompletionScheduler));
+                    };
 
-            if (publisher instanceof Flux && !ctx.getOrEmpty(WITHIN_PROCESS_TO_APPLY).isPresent()) {
-              return transformed
-                  .doAfterTerminate(this::outerPublisherTerminated)
-                  .doOnSubscribe(s -> outerPublisherSubscribedTo());
-            } else {
-              // Certain features (ext client, batch, flow runner) use Mono, so we don't want to dispose the inner stuff after the
-              // first event comes through
-              return transformed;
-            }
+                    if (!isAsync() && NO_POLICY_OPERATION
+                        .equals(((SdkInternalContext) ((InternalEvent) event).<SdkInternalContext>getSdkInternalContext())
+                            .getPolicyToApply())) {
+                      onEventSynchronous(event, executorCallback, ctx);
+                    } else {
+                      onEvent(event, executorCallback);
+                    }
+                  }), () -> errorSwitchSinkSinkRef.complete(), t -> errorSwitchSinkSinkRef.error(t),
+                                                                 muleContext.getConfiguration().getShutdownTimeout(),
+                                                                 outerFluxCompletionScheduler));
+
+          if (publisher instanceof Flux && !ctx.getOrEmpty(WITHIN_PROCESS_TO_APPLY).isPresent()) {
+            return transformed
+                .doAfterTerminate(this::outerPublisherTerminated)
+                .doOnSubscribe(s -> outerPublisherSubscribedTo());
           } else {
-            // TODO
-            return from(publisher)
-                .handle((event, sink) -> {
-                  try {
-                    onEventSynchronous(event, new SynchronousSinkExecutorCallback(sink), ctx);
-                  } catch (Throwable t) {
-                    sink.error(unwrap(t));
-                  }
-                });
+            // Certain features (ext client, batch, flow runner) use Mono, so we don't want to dispose the inner stuff after the
+            // first event comes through
+            return transformed;
           }
         });
   }
 
   private void onEvent(CoreEvent event, ExecutorCallback executorCallback) {
     try {
-      final Optional<ConfigurationInstance> configuration = resolveConfiguration(event);
-      final Map<String, Object> resolutionResult = getResolutionResult(event, configuration);
+      SdkInternalContext sdkInternalContext =
+          ((SdkInternalContext) ((InternalEvent) event).<SdkInternalContext>getSdkInternalContext());
+
+      final Optional<ConfigurationInstance> configuration = sdkInternalContext.getConfiguration();
+      final Map<String, Object> resolutionResult = sdkInternalContext.getResolutionResult();
 
       OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent, callback) -> {
-        SdkInternalContext sdkInternalContext =
-            (SdkInternalContext) ((InternalEvent) operationEvent).<SdkInternalContext>getSdkInternalContext();
-        if (((InternalEvent) operationEvent).getSdkInternalContext() == null) {
-          sdkInternalContext = new SdkInternalContext();
-          ((InternalEvent) operationEvent).setSdkInternalContext(sdkInternalContext);
-        }
         sdkInternalContext.setOperationExecutionParams(configuration, parameters, operationEvent, callback);
 
         fluxSupplier.get().next(operationEvent);
@@ -317,8 +327,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       if (getLocation() != null) {
         ((DefaultFlowCallStack) event.getFlowCallStack())
             .setCurrentProcessorPath(resolvedProcessorRepresentation);
-        policyManager.createOperationPolicy(this, event, () -> resolutionResult)
-            .process(event, operationExecutionFunction, () -> resolutionResult, getLocation(), executorCallback);
+        sdkInternalContext.getPolicyToApply().process(event, operationExecutionFunction, () -> resolutionResult, getLocation(),
+                                                      executorCallback);
       } else {
         // If this operation has no component location then it is internal. Don't apply policies on internal operations.
         operationExecutionFunction.execute(resolutionResult, event, executorCallback);
@@ -330,30 +340,19 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private void onEventSynchronous(CoreEvent event, ExecutorCallback executorCallback, Context ctx) {
     try {
-      final Optional<ConfigurationInstance> configuration = resolveConfiguration(event);
-      final Map<String, Object> resolutionResult = getResolutionResult(event, configuration);
+      SdkInternalContext sdkInternalContext =
+          ((SdkInternalContext) ((InternalEvent) event).<SdkInternalContext>getSdkInternalContext());
+
+      final Optional<ConfigurationInstance> configuration = sdkInternalContext.getConfiguration();
+      final Map<String, Object> resolutionResult = sdkInternalContext.getResolutionResult();
 
       OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent, callback) -> {
-        SdkInternalContext sdkInternalContext =
-            (SdkInternalContext) ((InternalEvent) operationEvent).<SdkInternalContext>getSdkInternalContext();
-        if (((InternalEvent) operationEvent).getSdkInternalContext() == null) {
-          sdkInternalContext = new SdkInternalContext();
-          ((InternalEvent) operationEvent).setSdkInternalContext(sdkInternalContext);
-        }
         sdkInternalContext.setOperationExecutionParams(configuration, parameters, operationEvent, callback);
 
         prepareAndExecuteOperation(event, () -> callback, ctx);
       };
 
-      // if (getLocation() != null) {
-      // ((DefaultFlowCallStack) event.getFlowCallStack())
-      // .setCurrentProcessorPath(resolvedProcessorRepresentation);
-      // policyManager.createOperationPolicy(this, event, () -> resolutionResult)
-      // .process(event, operationExecutionFunction, () -> resolutionResult, getLocation(), executorCallback);
-      // } else {
-      // If this operation has no component location then it is internal. Don't apply policies on internal operations.
       operationExecutionFunction.execute(resolutionResult, event, executorCallback);
-      // }
     } catch (Throwable t) {
       executorCallback.error(unwrap(t));
     }
@@ -477,16 +476,17 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                                 getRuntime().availableProcessors());
   }
 
-  protected boolean hasChainNested() {
-    return componentModel.getNestedComponents().stream()
-        .flatMap(nestedComp -> ((NestedComponentModel) nestedComp).getAllowedStereotypes().stream())
-        .anyMatch(st -> st.isAssignableTo(PROCESSOR));
-  }
+  private CoreEvent addContextToEvent(CoreEvent event, Context ctx) throws MuleException {
+    SdkInternalContext sdkInternalContext =
+        (SdkInternalContext) ((InternalEvent) event).<SdkInternalContext>getSdkInternalContext();
+    if (((InternalEvent) event).getSdkInternalContext() == null) {
+      sdkInternalContext = new SdkInternalContext();
+      ((InternalEvent) event).setSdkInternalContext(sdkInternalContext);
+    }
 
-  private CoreEvent addContextToEvent(CoreEvent event, Context ctx) {
-    if (hasChainNested()
+    if (hasChainNested
         && (ctx.hasKey(POLICY_NEXT_OPERATION) || ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))) {
-      Function<Context, Context> context = innerChainCtx -> {
+      sdkInternalContext.setInnerChainSubscriberContextMapping(innerChainCtx -> {
         if (ctx.hasKey(POLICY_NEXT_OPERATION)) {
           innerChainCtx = innerChainCtx.put(POLICY_NEXT_OPERATION, ctx.get(POLICY_NEXT_OPERATION));
         }
@@ -495,16 +495,16 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                             ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS));
         }
         return innerChainCtx;
-      };
-
-      SdkInternalContext sdkInternalContext =
-          (SdkInternalContext) ((InternalEvent) event).<SdkInternalContext>getSdkInternalContext();
-      if (((InternalEvent) event).getSdkInternalContext() == null) {
-        sdkInternalContext = new SdkInternalContext();
-        ((InternalEvent) event).setSdkInternalContext(sdkInternalContext);
-      }
-      sdkInternalContext.setInnerChainSubscriberContextMapping(context);
+      });
     }
+
+    sdkInternalContext.setConfiguration(resolveConfiguration(event));
+    final Map<String, Object> resolutionResult = getResolutionResult(event, sdkInternalContext.getConfiguration());
+    sdkInternalContext.setResolutionResult(resolutionResult);
+    sdkInternalContext.setPolicyToApply(getLocation() != null
+        ? policyManager.createOperationPolicy(this, event, () -> resolutionResult)
+        : NO_POLICY_OPERATION);
+
     return event;
   }
 

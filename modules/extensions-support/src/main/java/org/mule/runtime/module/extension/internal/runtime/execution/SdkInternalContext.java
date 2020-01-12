@@ -10,6 +10,7 @@ import static java.util.function.Function.identity;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.EventInternalContext;
+import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
@@ -24,6 +25,12 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
   private OperationExecutionParams operationExecutionParams;
 
   private Function<Context, Context> innerChainSubscriberContextMapping = identity();
+
+  private Optional<ConfigurationInstance> configuration;
+
+  private Map<String, Object> resolutionResult;
+
+  private OperationPolicy policyToApply;
 
   public OperationExecutionParams getOperationExecutionParams() {
     return operationExecutionParams;
@@ -40,6 +47,30 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
 
   public void setInnerChainSubscriberContextMapping(Function<Context, Context> innerChainSubscriberContextMapping) {
     this.innerChainSubscriberContextMapping = innerChainSubscriberContextMapping;
+  }
+
+  public Optional<ConfigurationInstance> getConfiguration() {
+    return configuration;
+  }
+
+  public void setConfiguration(Optional<ConfigurationInstance> configuration) {
+    this.configuration = configuration;
+  }
+
+  public Map<String, Object> getResolutionResult() {
+    return resolutionResult;
+  }
+
+  public void setResolutionResult(Map<String, Object> resolutionResult) {
+    this.resolutionResult = resolutionResult;
+  }
+
+  public OperationPolicy getPolicyToApply() {
+    return policyToApply;
+  }
+
+  public void setPolicyToApply(OperationPolicy policyToApply) {
+    this.policyToApply = policyToApply;
   }
 
   @Override
