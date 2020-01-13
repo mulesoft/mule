@@ -76,6 +76,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private MuleSession session;
   private SecurityContext securityContext;
   private EventInternalContext sdkInternalContext;
+  private EventInternalContext sourcePolicyContext;
+  private EventInternalContext operationPolicyContext;
   private InternalEvent originalEvent;
   private boolean modified;
   private boolean internalParametersInitialized = false;
@@ -103,6 +105,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.originalVars = (CaseInsensitiveHashMap<String, TypedValue<?>>) event.getVariables();
     this.internalParameters = (Map<String, Object>) event.getInternalParameters();
     sdkInternalContext = copyOf(event.getSdkInternalContext());
+    sourcePolicyContext = copyOf(event.getSourcePolicyContext());
+    operationPolicyContext = copyOf(event.getOperationPolicyContext());
   }
 
   public DefaultEventBuilder(BaseEventContext messageContext, InternalEvent event) {
@@ -307,6 +311,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
                                              securityContext,
                                              itemSequenceInfo,
                                              sdkInternalContext,
+                                             sourcePolicyContext,
+                                             operationPolicyContext,
                                              error,
                                              legacyCorrelationId,
                                              notificationsEnabled);
@@ -372,6 +378,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     private transient Map<String, ?> internalParameters;
     private transient EventInternalContext sdkInternalContext;
+    private transient EventInternalContext sourcePolicyContext;
+    private transient EventInternalContext operationPolicyContext;
     private transient LazyValue<BindingContext> bindingContextBuilder =
         new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
 
@@ -385,6 +393,9 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.legacyCorrelationId = null;
       this.error = null;
       this.itemSequenceInfo = null;
+      this.sdkInternalContext = null;
+      this.sourcePolicyContext = null;
+      this.operationPolicyContext = null;
       this.internalParameters = new SmallMap<>();
     }
 
@@ -397,6 +408,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
                                         SecurityContext securityContext,
                                         Optional<ItemSequenceInfo> itemSequenceInfo,
                                         EventInternalContext sdkInternalContext,
+                                        EventInternalContext sourcePolicyContext,
+                                        EventInternalContext operationPolicyContext,
                                         Error error,
                                         String legacyCorrelationId,
                                         boolean notificationsEnabled) {
@@ -409,6 +422,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
       this.itemSequenceInfo = itemSequenceInfo.orElse(null);
       this.sdkInternalContext = sdkInternalContext;
+      this.sourcePolicyContext = sourcePolicyContext;
+      this.operationPolicyContext = operationPolicyContext;
       this.error = error;
       this.legacyCorrelationId = legacyCorrelationId;
 
@@ -593,6 +608,26 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     @Override
     public void setSdkInternalContext(EventInternalContext sdkInternalContext) {
       this.sdkInternalContext = sdkInternalContext;
+    }
+
+    @Override
+    public EventInternalContext getSourcePolicyContext() {
+      return sourcePolicyContext;
+    }
+
+    @Override
+    public void setSourcePolicyContext(EventInternalContext sourcePolicyContext) {
+      this.sourcePolicyContext = sourcePolicyContext;
+    }
+
+    @Override
+    public EventInternalContext getOperationPolicyContext() {
+      return operationPolicyContext;
+    }
+
+    @Override
+    public void setOperationPolicyContext(EventInternalContext operationPolicyContext) {
+      this.operationPolicyContext = operationPolicyContext;
     }
 
     @Override

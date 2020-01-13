@@ -18,12 +18,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.internal.policy.SourcePolicyContext.SOURCE_POLICY_CONTEXT;
 import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.policy.api.OperationPolicyPointcutParametersFactory;
@@ -71,7 +71,7 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
     SourcePolicyContext ctx = mock(SourcePolicyContext.class);
     when(ctx.getPointcutParameters()).thenReturn(parameters);
 
-    when(event.getInternalParameter(SOURCE_POLICY_CONTEXT)).thenReturn(ctx);
+    when(event.getSourcePolicyContext()).thenReturn((EventInternalContext) ctx);
   }
 
   @Test
@@ -162,7 +162,7 @@ public class PolicyPointcutParametersManagerTestCase extends AbstractMuleTestCas
   public void createOperationParametersWhenEmptyFactoryAndEmptySourceParameters() {
     Map<String, Object> operationParameters = new HashMap<>();
 
-    when(event.getInternalParameter(any())).thenReturn(null);
+    when(event.getSourcePolicyContext()).thenReturn(null);
     PolicyPointcutParameters parameters =
         parametersManager.createOperationPointcutParameters(component, event, operationParameters);
 

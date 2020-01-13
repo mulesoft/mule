@@ -165,6 +165,8 @@ public class FlowProcessMediator implements Initialisable {
       final CompletableFuture<Void> responseCompletion = new CompletableFuture<>();
       final FlowProcessor flowExecutionProcessor = new FlowProcessor(template, flowConstruct);
       final CoreEvent event = createEvent(template, messageSource, responseCompletion, flowConstruct);
+      policyManager.addSourcePointcutParametersIntoEvent(messageSource, event.getMessage().getAttributes(),
+                                                         (InternalEvent) event);
 
       try {
         final SourcePolicy policy =
@@ -469,7 +471,6 @@ public class FlowProcessMediator implements Initialisable {
                                  ((BaseEventContext) eventCtx).getRootContext());
       }
 
-      policyManager.addSourcePointcutParametersIntoEvent(source, eventMessage.getAttributes(), eventBuilder);
       return eventMessage;
     }).build();
   }

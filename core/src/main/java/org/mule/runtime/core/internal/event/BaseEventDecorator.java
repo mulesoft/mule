@@ -171,6 +171,26 @@ abstract class BaseEventDecorator implements InternalEvent, DeserializationPostI
     event.setSdkInternalContext(context);
   }
 
+  @Override
+  public <T extends EventInternalContext> EventInternalContext<T> getSourcePolicyContext() {
+    return event.getSourcePolicyContext();
+  }
+
+  @Override
+  public <T extends EventInternalContext> void setSourcePolicyContext(EventInternalContext<T> context) {
+    event.setSourcePolicyContext(context);
+  }
+
+  @Override
+  public <T extends EventInternalContext> EventInternalContext<T> getOperationPolicyContext() {
+    return event.getOperationPolicyContext();
+  }
+
+  @Override
+  public <T extends EventInternalContext> void setOperationPolicyContext(EventInternalContext<T> context) {
+    event.setOperationPolicyContext(context);
+  }
+
   /**
    * Invoked after deserialization. This is called when the marker interface {@link DeserializationPostInitialisable} is used.
    * This will get invoked after the object has been deserialized passing in the current MuleContext.

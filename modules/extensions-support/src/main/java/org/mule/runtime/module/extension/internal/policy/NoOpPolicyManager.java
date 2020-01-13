@@ -10,7 +10,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.internal.message.InternalEvent.Builder;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
 import org.mule.runtime.core.internal.policy.NoSourcePolicy;
 import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
@@ -39,7 +39,7 @@ public class NoOpPolicyManager implements PolicyManager {
 
   @Override
   public PolicyPointcutParameters addSourcePointcutParametersIntoEvent(Component source, TypedValue<?> attributes,
-                                                                       Builder eventBuilder) {
+                                                                       InternalEvent event) {
     return new PolicyPointcutParameters(source);
   }
 

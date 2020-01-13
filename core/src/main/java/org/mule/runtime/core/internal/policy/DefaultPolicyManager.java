@@ -10,7 +10,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.notification.FlowConstructNotification.FLOW_CONSTRUCT_STOPPED;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.internal.policy.SourcePolicyContext.SOURCE_POLICY_CONTEXT;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
@@ -160,10 +159,10 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
 
   @Override
   public PolicyPointcutParameters addSourcePointcutParametersIntoEvent(Component source, TypedValue<?> attributes,
-                                                                       InternalEvent.Builder eventBuilder) {
+                                                                       InternalEvent event) {
     final PolicyPointcutParameters sourcePolicyParams =
         policyPointcutParametersManager.createSourcePointcutParameters(source, attributes);
-    eventBuilder.addInternalParameter(SOURCE_POLICY_CONTEXT, new SourcePolicyContext(sourcePolicyParams));
+    event.setSourcePolicyContext(new SourcePolicyContext(sourcePolicyParams));
     return sourcePolicyParams;
   }
 

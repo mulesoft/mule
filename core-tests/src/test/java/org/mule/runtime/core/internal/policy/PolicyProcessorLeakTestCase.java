@@ -6,14 +6,10 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static com.google.common.collect.ImmutableMap.of;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
-import static org.mule.runtime.core.internal.policy.OperationPolicyContext.OPERATION_POLICY_CONTEXT;
-import static org.mule.runtime.core.internal.policy.SourcePolicyContext.SOURCE_POLICY_CONTEXT;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static reactor.core.publisher.Mono.just;
 
@@ -22,6 +18,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -57,8 +54,9 @@ public class PolicyProcessorLeakTestCase extends AbstractMuleTestCase {
   @Override
   protected CoreEvent testEvent() throws MuleException {
     CoreEvent event = super.testEvent();
-    return quickCopy(event, of(OPERATION_POLICY_CONTEXT, mock(OperationPolicyContext.class, RETURNS_DEEP_STUBS),
-                               SOURCE_POLICY_CONTEXT, new SourcePolicyContext(mock(PolicyPointcutParameters.class))));
+    ((InternalEvent) event).setSourcePolicyContext(new SourcePolicyContext(mock(PolicyPointcutParameters.class)));
+    ((InternalEvent) event).setOperationPolicyContext(mock(OperationPolicyContext.class, RETURNS_DEEP_STUBS));
+    return event;
   }
 
   @Test

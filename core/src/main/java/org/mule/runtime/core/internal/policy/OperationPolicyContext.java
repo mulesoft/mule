@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
@@ -15,22 +16,16 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
  *
  * @since 4.3.0
  */
-public class OperationPolicyContext {
+public class OperationPolicyContext implements EventInternalContext<OperationPolicyContext> {
 
   /**
-   * The key under which an instance of this class is stored as an internal parameter in a {@link InternalEvent}
-   */
-  public static final String OPERATION_POLICY_CONTEXT = "operation.policy.context";
-
-  /**
-   * Extracts an instance stored as an internal parameter in the given {@code result} under the {@link #OPERATION_POLICY_CONTEXT}
-   * key
+   * Extracts an instance stored as an internal parameter in the given {@code event}.
    *
    * @param event
    * @return an {@link OperationPolicyContext} or {@code null} if none was set on the event
    */
   public static OperationPolicyContext from(CoreEvent event) {
-    return ((InternalEvent) event).getInternalParameter(OPERATION_POLICY_CONTEXT);
+    return (OperationPolicyContext) ((InternalEvent) event).<OperationPolicyContext>getOperationPolicyContext();
   }
 
   private CoreEvent originalEvent;
@@ -45,6 +40,11 @@ public class OperationPolicyContext {
     this.operationParametersProcessor = operationParametersProcessor;
     this.operationExecutionFunction = operationExecutionFunction;
     this.operationCallerCallback = operationCallerCallback;
+  }
+
+  @Override
+  public OperationPolicyContext copy() {
+    return this;
   }
 
   public CoreEvent getOriginalEvent() {
