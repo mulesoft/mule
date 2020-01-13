@@ -6,19 +6,34 @@
  */
 package org.mule.runtime.core.api.retry.policy;
 
+import org.mule.runtime.api.exception.ComposedErrorException;
+import org.mule.runtime.api.exception.ErrorMessageAwareException;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.lifecycle.FatalException;
 import org.mule.runtime.api.i18n.I18nMessage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This exception is thrown when a Retry policy has made all the retry attempts it wants to make and is still failing.
  */
-public final class RetryPolicyExhaustedException extends FatalException {
+public final class RetryPolicyExhaustedException extends FatalException
+    implements ComposedErrorException {
 
   /** Serial version */
   private static final long serialVersionUID = 3300563235465630595L;
 
+  private final List<Error> errors = new ArrayList<>();
+
   public RetryPolicyExhaustedException(I18nMessage message, Object component) {
     super(message, component);
+  }
+
+  public RetryPolicyExhaustedException(I18nMessage message, Object component, List<Error> errors) {
+    super(message, component);
+    this.errors.addAll(errors);
   }
 
   public RetryPolicyExhaustedException(I18nMessage message, Throwable cause, Object component) {
@@ -27,5 +42,10 @@ public final class RetryPolicyExhaustedException extends FatalException {
 
   public RetryPolicyExhaustedException(Throwable cause, Object component) {
     super(cause, component);
+  }
+
+  @Override
+  public List<Error> getErrors() {
+    return errors;
   }
 }
