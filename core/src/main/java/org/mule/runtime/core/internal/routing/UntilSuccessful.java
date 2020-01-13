@@ -21,6 +21,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.routing.UntilSuccessfulRouter.RetryContextInitializationException;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
@@ -45,6 +46,9 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   @Inject
   private ExtendedExpressionManager expressionManager;
+
+  @Inject
+  private ErrorTypeLocator errorTypeLocator;
 
   private String maxRetries = DEFAULT_RETRIES;
   private String millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
@@ -94,7 +98,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return new UntilSuccessfulRouter(this, publisher, nestedChain, expressionManager, shouldRetry, timer, maxRetries,
-                                     millisBetweenRetries).getDownstreamPublisher();
+                                     millisBetweenRetries, errorTypeLocator).getDownstreamPublisher();
   }
 
 

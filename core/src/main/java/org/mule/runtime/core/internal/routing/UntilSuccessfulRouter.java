@@ -24,6 +24,7 @@ import static reactor.util.context.Context.empty;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.functional.Either;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -31,13 +32,13 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -86,6 +87,8 @@ class UntilSuccessfulRouter {
   private Function<ExpressionManagerSession, Integer> delaySupplier;
   private Function<CoreEvent, ExpressionManagerSession> sessionSupplier;
 
+  private ErrorTypeLocator errorTypeLocator;
+
   // When using an until successful scope in a blocking flow (for example, calling the owner flow with a Processor#process call),
   // this leads to a reactor completion signal being emitted while the event is being re-injected for retrials. This is solved by
   // deferring the downstream publisher completion until all events have evacuated the scope.
@@ -94,7 +97,8 @@ class UntilSuccessfulRouter {
 
   UntilSuccessfulRouter(Component owner, Publisher<CoreEvent> publisher, MessageProcessorChain nestedChain,
                         ExtendedExpressionManager expressionManager, Predicate<CoreEvent> shouldRetry, Scheduler delayScheduler,
-                        String maxRetries, String millisBetweenRetries) {
+                        String maxRetries, String millisBetweenRetries, ErrorTypeLocator errorTypeLocator) {
+    this.errorTypeLocator = errorTypeLocator;
     this.owner = owner;
     this.shouldRetry = shouldRetry;
     this.delayScheduler = new ConditionalExecutorServiceDecorator(delayScheduler, s -> isTransactionActive());
@@ -185,8 +189,8 @@ class UntilSuccessfulRouter {
       } else { // Retries exhausted
         // Current context already pooped. No need to re-insert it
         LOGGER.error("Retry attempts exhausted. Failing...");
-        Throwable resolvedError = getThrowableFunction(ctx.event).apply(error);
         // Delete current context from event
+        Throwable resolvedError = getThrowableFunction(ctx.event).apply(error);
         eventWithCurrentContextDeleted(messagingError.getEvent());
         downstreamRecorder.next(left(resolvedError, CoreEvent.class));
         completeRouterIfNecessary();
@@ -269,17 +273,24 @@ class UntilSuccessfulRouter {
 
   private Function<Throwable, Throwable> getThrowableFunction(CoreEvent event) {
     return throwable -> {
-      Throwable cause = getMessagingExceptionCause(throwable);
-      CoreEvent exceptionEvent = event;
+      CoreEvent exhaustionCauseEvent = event;
       if (throwable instanceof MessagingException) {
-        exceptionEvent = ((MessagingException) throwable).getEvent();
+        exhaustionCauseEvent = ((MessagingException) throwable).getEvent();
       }
-      return new MessagingException(exceptionEvent,
-                                    new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX,
-                                                                                          cause.getMessage()),
-                                                                      cause, owner),
-                                    owner);
+      Throwable exhaustionCause = getMessagingExceptionCause(throwable);
+      Throwable retryExhaustedException =
+          new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, exhaustionCause.getMessage()),
+                                            exhaustionCause, owner);
+      CoreEvent retryExhaustedEvent = getRetryExhaustedEvent(exhaustionCauseEvent, retryExhaustedException);
+      return new MessagingException(retryExhaustedEvent, retryExhaustedException, owner);
     };
+  }
+
+  private CoreEvent getRetryExhaustedEvent(CoreEvent exhaustionCauseEvent, Throwable retryExhaustedException) {
+    ErrorBuilder errorBuilder = ErrorBuilder.builder(retryExhaustedException)
+        .errorType(errorTypeLocator.lookupErrorType(retryExhaustedException));
+    exhaustionCauseEvent.getError().ifPresent(error -> errorBuilder.errors(Collections.singletonList(error)));
+    return CoreEvent.builder(exhaustionCauseEvent).error(errorBuilder.build()).build();
   }
 
   /**
