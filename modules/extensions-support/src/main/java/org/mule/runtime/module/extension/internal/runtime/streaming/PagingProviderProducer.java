@@ -52,7 +52,6 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   private final ExtensionConnectionSupplier connectionSupplier;
   private final ExecutionContextAdapter executionContext;
   private final ConnectionSupplierFactory connectionSupplierFactory;
-  private boolean isFirstPage = true;
 
   public PagingProviderProducer(PagingProvider<Object, T> delegate,
                                 ConfigurationInstance config,
@@ -94,7 +93,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     RetryPolicyTemplate retryPolicy =
         (RetryPolicyTemplate) executionContext.getRetryPolicyTemplate().orElseGet(NoRetryPolicyTemplate::new);
     CompletableFuture<R> future = retryPolicy.applyPolicy(() -> completedFuture(withConnection(function)),
-                                                          e -> isFirstPage && shouldRetry(e, executionContext),
+                                                          e -> shouldRetry(e, executionContext),
                                                           e -> {
                                                           },
                                                           e -> stats.ifPresent(s -> s.discountInflightOperation()),
@@ -113,7 +112,6 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       connectionSupplier = connectionSupplierFactory.getConnectionSupplier();
       try {
         R result = function.apply(connectionSupplier.getConnection());
-        isFirstPage = false;
         connectionSupplier.close();
         return result;
       } catch (Exception e) {

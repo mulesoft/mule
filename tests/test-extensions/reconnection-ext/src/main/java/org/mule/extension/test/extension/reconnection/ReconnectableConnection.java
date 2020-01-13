@@ -6,7 +6,6 @@
  */
 package org.mule.extension.test.extension.reconnection;
 
-
 /**
  * This class represents an extension connection just as example (there is no real connection with anything here c:).
  */
