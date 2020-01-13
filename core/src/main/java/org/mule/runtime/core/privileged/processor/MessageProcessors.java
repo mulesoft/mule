@@ -68,6 +68,7 @@ import reactor.core.publisher.Mono;
  */
 public class MessageProcessors {
 
+  public static final String WITHIN_PROCESS_TO_APPLY = "messageProcessors.withinProcessToApply";
   private static final String WITHIN_PROCESS_WITH_CHILD_CONTEXT = "messageProcessors.withinProcessWithChildContext";
   private static final Logger LOGGER = LoggerFactory.getLogger(MessageProcessors.class);
 
@@ -188,6 +189,7 @@ public class MessageProcessors {
           .switchIfEmpty(from(alternate))
           .doOnSuccess(completeSuccessIfNeeded((event.getContext()), completeContext))
           .doOnError(completeErrorIfNeeded((event.getContext()), completeContext))
+          .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_TO_APPLY, true))
           .block();
     } catch (Throwable e) {
       if (e.getCause() instanceof InterruptedException) {
@@ -450,7 +452,8 @@ public class MessageProcessors {
             .map(propagateErrorResponseMapper())
             .toProcessor())
         .map(MessageProcessors::toParentContext)
-        .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true));
+        .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
+            .put(WITHIN_PROCESS_TO_APPLY, true));
   }
 
   private static Publisher<CoreEvent> internalProcessWithChildContextAlwaysComplete(CoreEvent event,
@@ -615,7 +618,8 @@ public class MessageProcessors {
    */
   public static Optional<ProcessingStrategy> getProcessingStrategy(ConfigurationComponentLocator locator,
                                                                    Location rootContainerLocation) {
-    return locator.find(rootContainerLocation).filter(loc -> loc instanceof FlowConstruct)
+    return locator.find(rootContainerLocation)
+        .filter(loc -> loc instanceof FlowConstruct)
         .map(loc -> ((FlowConstruct) loc).getProcessingStrategy());
   }
 

@@ -45,11 +45,12 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.junit.Rule;
+import org.junit.Test;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Rule;
-import org.junit.Test;
 
 @Feature(STREAMING)
 @Story(BYTES_STREAMING)
@@ -352,4 +353,8 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
     return s -> s.equals(BARGAIN_SPELL);
   }
 
+  @Override
+  protected boolean isGracefulShutdown() {
+    return true;
+  }
 }

@@ -6,7 +6,7 @@
                http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
 
     <heisenberg:config name="heisenberg"
-                       myName="#[mel:myName]"
+                       myName="#[vars.myName]"
                        age="50"
                        cancer="true"
                        dateOfBirth="1959-09-07T00:00:00"
@@ -50,11 +50,11 @@
     </heisenberg:config>
 
     <flow name="laundry">
-        <heisenberg:launder config-ref="heisenberg" amount="#[mel:payload]" />
+        <heisenberg:launder config-ref="heisenberg" amount="#[payload]" />
     </flow>
 
     <flow name="staticLaundry">
-        <heisenberg:launder config-ref="staticHeisenberg" amount="#[mel:payload]" />
+        <heisenberg:launder config-ref="staticHeisenberg" amount="#[payload]" />
     </flow>
 
 </mule>

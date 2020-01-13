@@ -24,20 +24,22 @@ import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedResult;
+import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import reactor.core.publisher.Mono;
 
@@ -57,6 +59,7 @@ public class ProcessorChainExecutorTestCase extends AbstractMuleContextTestCase 
   @Before
   public void setUp() throws Exception {
     this.coreEvent = testEvent();
+    ((InternalEvent) this.coreEvent).setSdkInternalContext(new SdkInternalContext());
     when(chain.getLocation()).thenReturn(null);
     when(chain.apply(any())).thenAnswer(inv -> Mono.<CoreEvent>from(inv.getArgument(0))
         .map(event -> CoreEvent.builder(event)
@@ -69,7 +72,6 @@ public class ProcessorChainExecutorTestCase extends AbstractMuleContextTestCase 
   @Test
   public void testDoProcessSuccessOnce() throws InterruptedException {
     ImmutableProcessorChainExecutor chainExecutor = new ImmutableProcessorChainExecutor(coreEvent, chain);
-
 
     AtomicInteger successCalls = new AtomicInteger(0);
     AtomicInteger errorCalls = new AtomicInteger(0);

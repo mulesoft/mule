@@ -38,14 +38,23 @@ public interface ProcessingStrategy {
   Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline);
 
   /**
-   * For sinks created internally by the components in a flow, have them accounted for in the processing strategy for a graceful
-   * shutdown.
+   * For sinks created internally by the components in a flow, have them accounted for in the processing strategy.
    *
-   * @param flux the flux whose sink will be registered
+   * @param publisher the publisher whose sink will be registered
    * @param sinkRepresentation a representation of the chain for it to appear in log entries.
    */
-  default void registerInternalSink(Publisher<CoreEvent> flux, String sinkRepresentation) {
-    Flux.from(flux).subscribe();
+  default void registerInternalSink(Publisher<CoreEvent> publisher, String sinkRepresentation) {
+    Flux.from(publisher).subscribe();
+  }
+
+  /**
+   * For publishers created outside of the main publisher of a flow, have them accounted for in the processing strategy.
+   *
+   * @param publisher the publishers whose lifecycle will be tied to the main publisher of the flow.
+   * @return the provided publishers with the additional callbacks observed.
+   */
+  default Publisher<CoreEvent> configureInternalPublisher(Publisher<CoreEvent> publisher) {
+    return publisher;
   }
 
   /**

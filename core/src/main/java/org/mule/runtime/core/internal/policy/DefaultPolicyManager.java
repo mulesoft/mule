@@ -64,6 +64,21 @@ public class DefaultPolicyManager implements PolicyManager, Initialisable, Dispo
       (operationEvent, operationExecutionFunction, opParamProcessor, componentLocation, callback) -> operationExecutionFunction
           .execute(opParamProcessor.getOperationParameters(), operationEvent, callback);
 
+  /**
+   * @return A no-op policy that will directly execute the operation function.
+   */
+  public static OperationPolicy noPolicyOperation() {
+    return NO_POLICY_OPERATION;
+  }
+
+  /**
+   * @param policy the {@link OperationPolicy} to evaluate
+   * @return {@code true} if the provided policy is a no-op, {@code false} if a policy is actually applied.
+   */
+  public static boolean isNoPolicyOperation(OperationPolicy policy) {
+    return NO_POLICY_OPERATION.equals(policy);
+  }
+
   @Inject
   private ErrorTypeLocator errorTypeLocator;
 
