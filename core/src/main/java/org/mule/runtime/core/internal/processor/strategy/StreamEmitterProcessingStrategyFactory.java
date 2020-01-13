@@ -191,7 +191,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     }
 
     @Override
-    public void registerInternalSinkForShutdown(Publisher<CoreEvent> flux, String sinkRepresentation) {
+    public void registerInternalSink(Publisher<CoreEvent> flux, String sinkRepresentation) {
       Latch completionLatch = new Latch();
 
       Flux.from(flux).subscribe(null, e -> {
@@ -208,7 +208,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     }
 
     @Override
-    public Publisher<CoreEvent> configureInternalFluxForShutdown(Publisher<CoreEvent> flux) {
+    public Publisher<CoreEvent> configureInternalPublisher(Publisher<CoreEvent> flux) {
       return Flux.from(flux)
           .doAfterTerminate(() -> stopSchedulersIfNeeded())
           .doOnSubscribe(s -> activeSinksCount.incrementAndGet());

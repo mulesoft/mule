@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.core.internal.processor;
 
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.yield;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.api.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
@@ -39,6 +40,7 @@ import org.mule.runtime.api.notification.AsyncMessageNotification;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -66,7 +68,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -269,12 +270,10 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         .doOnNext(event -> {
           fireAsyncCompleteNotification(event, null);
           ((BaseEventContext) event.getContext()).success(event);
-          backpressureHandler.asyncTaskFinished();
         })
         .doOnError(MessagingException.class, e -> {
           fireAsyncCompleteNotification(e.getEvent(), e);
           ((BaseEventContext) e.getEvent().getContext()).error(e);
-          backpressureHandler.asyncTaskFinished();
         })
         .doOnError(throwable -> logger.warn("Error occurred during asynchronous processing at:" + getLocation().getLocation()
             + " . To handle this error include a <try> scope in the <async> scope.", throwable));
@@ -318,67 +317,61 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   private static class QueueBackpressureHandler implements Startable, Stoppable {
 
     private final BlockingQueue<CoreEvent> asyncQueue;
-    private final SchedulerService schedulerService;
-    private final Supplier<SchedulerConfig> schedulerConfigSupplier;
-    private final String location;
     private final Consumer<CoreEvent> eventDispatcher;
 
-    private Scheduler queueDispatcherScheduler;
-    private volatile ScheduledFuture<?> scheduledDrain;
+    private final LazyValue<Scheduler> queueDispatcherScheduler;
 
     public QueueBackpressureHandler(SchedulerService schedulerService, Supplier<SchedulerConfig> schedulerConfigSupplier,
                                     Consumer<CoreEvent> eventDispatcher, String location) {
-      this.schedulerService = schedulerService;
-      this.schedulerConfigSupplier = schedulerConfigSupplier;
-
       this.asyncQueue = new LinkedBlockingQueue<>();
       this.eventDispatcher = eventDispatcher;
 
-      this.location = location;
+      this.queueDispatcherScheduler = new LazyValue(() -> {
+        final SchedulerConfig schedulerConfig = schedulerConfigSupplier.get().withName(location + " - queue dispatcher")
+            .withMaxConcurrentTasks(1);
+        return schedulerService.customScheduler(schedulerConfig);
+      });
     }
 
     public void handleBackpressure(CoreEvent event) {
       asyncQueue.offer(event);
-    }
 
-    public void asyncTaskFinished() {
-      if (scheduledDrain == null) {
-        synchronized (this) {
-          if (scheduledDrain == null) {
-            scheduledDrain = queueDispatcherScheduler.schedule(() -> {
-              while (asyncQueue.size() > 0) {
-                try {
-                  final CoreEvent event = asyncQueue.peek();
-                  if (event != null) {
-                    eventDispatcher.accept(event);
-                    asyncQueue.remove(event);
-                  }
-                } catch (FromFlowRejectedExecutionException free) {
-                  synchronized (this) {
-                    scheduledDrain = null;
-                  }
-                  // nothing to do, a retry will come next
-                  return;
-                }
+      synchronized (asyncQueue) {
+        asyncQueue.notify();
+      }
+
+      queueDispatcherScheduler.get().execute(() -> {
+        while (!currentThread().isInterrupted()) {
+          try {
+            final CoreEvent queuedEvent = asyncQueue.peek();
+            if (queuedEvent != null) {
+              eventDispatcher.accept(queuedEvent);
+              asyncQueue.remove(queuedEvent);
+            } else {
+              synchronized (asyncQueue) {
+                asyncQueue.wait();
               }
-            }, 200, MILLISECONDS);
+            }
+          } catch (FromFlowRejectedExecutionException free) {
+            // Nothing to do, let next iteration catch it.
+            yield();
+          } catch (InterruptedException e) {
+            currentThread().interrupt();
+            return;
           }
         }
-      }
+      });
     }
 
     @Override
     public void start() {
-      final SchedulerConfig schedulerConfig = schedulerConfigSupplier.get().withName(location + " - queue dispatcher");
-      queueDispatcherScheduler = schedulerService.ioScheduler(schedulerConfig);
+      // Nothing to do
     }
 
     @Override
     public void stop() {
-      if (queueDispatcherScheduler != null) {
-        queueDispatcherScheduler.stop();
-        queueDispatcherScheduler = null;
-      }
+      queueDispatcherScheduler.ifComputed(Scheduler::stop);
+
       asyncQueue.clear();
     }
   }

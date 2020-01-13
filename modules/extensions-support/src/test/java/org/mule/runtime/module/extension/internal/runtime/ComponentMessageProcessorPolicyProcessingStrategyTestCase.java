@@ -140,7 +140,7 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
     rootContainer = mock(FlowConstruct.class);
     processingStrategy = mock(ProcessingStrategy.class);
     when(processingStrategy.onProcessor(any(ReactiveProcessor.class))).thenAnswer(inv -> inv.getArgument(0));
-    when(processingStrategy.configureInternalFluxForShutdown(any(Publisher.class))).thenAnswer(inv -> inv.getArgument(0));
+    when(processingStrategy.configureInternalPublisher(any(Publisher.class))).thenAnswer(inv -> inv.getArgument(0));
 
     when(componentLocator.find(mpRootContainerLocation)).thenReturn(of(rootContainer));
     when(rootContainer.getProcessingStrategy()).thenReturn(processingStrategy);
