@@ -314,7 +314,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     return emptyList();
   }
 
-  private static class QueueBackpressureHandler implements Startable, Stoppable {
+  private static class QueueBackpressureHandler implements Stoppable {
 
     private final BlockingQueue<CoreEvent> asyncQueue;
     private final Consumer<CoreEvent> eventDispatcher;
@@ -361,11 +361,6 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
           }
         }
       });
-    }
-
-    @Override
-    public void start() {
-      // Nothing to do
     }
 
     @Override
