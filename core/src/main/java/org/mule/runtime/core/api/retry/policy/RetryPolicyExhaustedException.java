@@ -20,7 +20,7 @@ import java.util.List;
  * This exception is thrown when a Retry policy has made all the retry attempts it wants to make and is still failing.
  */
 public final class RetryPolicyExhaustedException extends FatalException
-    implements ComposedErrorException, ErrorMessageAwareException {
+    implements ComposedErrorException {
 
   /** Serial version */
   private static final long serialVersionUID = 3300563235465630595L;
@@ -42,11 +42,6 @@ public final class RetryPolicyExhaustedException extends FatalException
 
   public RetryPolicyExhaustedException(Throwable cause, Object component) {
     super(cause, component);
-  }
-
-  @Override
-  public Message getErrorMessage() {
-    return Message.of(getMessage());
   }
 
   @Override
