@@ -44,7 +44,7 @@ public interface ProcessingStrategy {
    * @param flux the flux whose sink will be registered
    * @param sinkRepresentation a representation of the chain for it to appear in log entries.
    */
-  default void registerInternalSink(Publisher<CoreEvent> flux, String sinkRepresentation) {
+  default void registerInternalSinkForShutdown(Publisher<CoreEvent> flux, String sinkRepresentation) {
     Flux.from(flux).subscribe();
   }
 
@@ -55,7 +55,7 @@ public interface ProcessingStrategy {
    * @param flux the flux whose lifecycle will be tied to the main flux.
    * @return the provided flux with the additional callbacks observed.
    */
-  default Publisher<CoreEvent> configureInternalFlux(Publisher<CoreEvent> flux) {
+  default Publisher<CoreEvent> configureInternalFluxForShutdown(Publisher<CoreEvent> flux) {
     return flux;
   }
 

@@ -442,7 +442,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     // This is a round robin so it can handle concurrent events, and its lifecycle is tied to the lifecycle of the main flux.
     fluxSupplier = createRoundRobinFluxSupplier(p -> {
       return from(processingStrategy
-          .configureInternalFlux(from(p)
+          .configureInternalFluxForShutdown(from(p)
               .transform(processingStrategy.onProcessor(new OperationInnerProcessor() {
 
                 @Override

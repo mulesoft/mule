@@ -808,7 +808,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     final Sink sink = ps.createSink(flow, flow);
 
     final FluxSinkRecorder<CoreEvent> internalSink = new FluxSinkRecorder<>();
-    ps.registerInternalSink(Flux.create(internalSink), "internalSink");
+    ps.registerInternalSinkForShutdown(Flux.create(internalSink), "internalSink");
 
     disposeIfNeeded(sink, LOGGER);
     verify(cpuLight, never()).stop();

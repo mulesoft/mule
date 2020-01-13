@@ -11,6 +11,9 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 /**
  * Specialization of {@link ReactiveProcessor} that allows to perform certain optimizations when the processor is not
  * asynchronous, as indicated by its {@link #isAsync()} method.
+ * </p>
+ * <b>IMPORTANT!</b> The processing strategy will delegate the parallel processing of events to the implementation, so it is
+ * required that implementations properly handle parallel processing.
  *
  * @since 4.3
  */

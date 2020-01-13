@@ -143,7 +143,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
           .doOnNext(TemplateOnErrorHandler.this::resolveHandling);
 
       if (processingStrategy.isPresent()) {
-        processingStrategy.get().registerInternalSink(onErrorFlux, "error handler '" + getLocation().getLocation() + "'");
+        processingStrategy.get().registerInternalSinkForShutdown(onErrorFlux,
+                                                                 "error handler '" + getLocation().getLocation() + "'");
       } else {
         onErrorFlux.subscribe();
       }
