@@ -12,6 +12,7 @@ import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
+import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
@@ -23,12 +24,7 @@ import java.util.Optional;
  *
  * @since 4.3.0
  */
-public class SourcePolicyContext {
-
-  /**
-   * The key under which an instance of this class is stored as an internal parameter in a {@link InternalEvent}
-   */
-  public static final String SOURCE_POLICY_CONTEXT = "source.policy.context";
+public class SourcePolicyContext implements EventInternalContext<SourcePolicyContext> {
 
   /**
    * Extracts an instance stored as an internal parameter in the given {@code result} under the {@link #SOURCE_POLICY_CONTEXT} key
@@ -37,7 +33,7 @@ public class SourcePolicyContext {
    * @return an {@link SourcePolicyContext} or {@code null} if none was set on the event
    */
   public static SourcePolicyContext from(CoreEvent event) {
-    return ((InternalEvent) event).getInternalParameter(SOURCE_POLICY_CONTEXT);
+    return (SourcePolicyContext) ((InternalEvent) event).<SourcePolicyContext>getSourcePolicyContext();
   }
 
   private final PolicyPointcutParameters pointcutParameters;
@@ -57,6 +53,11 @@ public class SourcePolicyContext {
                         CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> callback) {
     this.responseParametersProcessor = responseParametersProcessor;
     this.processCallback = callback;
+  }
+
+  @Override
+  public SourcePolicyContext copy() {
+    return this;
   }
 
   public PolicyPointcutParameters getPointcutParameters() {

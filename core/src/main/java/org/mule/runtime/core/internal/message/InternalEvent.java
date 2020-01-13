@@ -60,6 +60,34 @@ public interface InternalEvent extends PrivilegedEvent {
   <T extends EventInternalContext> void setSdkInternalContext(EventInternalContext<T> context);
 
   /**
+   * @return a {@link EventInternalContext} with state from the policy infrastructure relative to sources
+   * @since 4.3.0
+   */
+  <T extends EventInternalContext> EventInternalContext<T> getSourcePolicyContext();
+
+  /**
+   * Sets context related to the policy infrastructure relative to sources
+   *
+   * @param context an {@link EventInternalContext}
+   * @since 4.3.0
+   */
+  <T extends EventInternalContext> void setSourcePolicyContext(EventInternalContext<T> context);
+
+  /**
+   * @return a {@link EventInternalContext} with state from the policy infrastructure relative to operations
+   * @since 4.3.0
+   */
+  <T extends EventInternalContext> EventInternalContext<T> getOperationPolicyContext();
+
+  /**
+   * Sets context related to the policy infrastructure relative to operations
+   *
+   * @param context an {@link EventInternalContext}
+   * @since 4.3.0
+   */
+  <T extends EventInternalContext> void setOperationPolicyContext(EventInternalContext<T> context);
+
+  /**
    * Create new {@link Builder} based on an existing {@link CoreEvent} instance. The existing {@link EventContext} is conserved.
    *
    * @param event existing event to use as a template to create builder instance

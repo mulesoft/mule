@@ -45,7 +45,7 @@ public interface PolicyManager {
    * @return the created source parameters.
    */
   PolicyPointcutParameters addSourcePointcutParametersIntoEvent(Component source, TypedValue<?> attributes,
-                                                                InternalEvent.Builder eventBuilder);
+                                                                InternalEvent event);
 
   /**
    * Creates a policy to be applied to an operation. The creation must have into consideration the {@code operationIdentifier} to
