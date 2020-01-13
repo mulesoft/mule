@@ -2011,7 +2011,9 @@
         <profile>
             <id>yourkit-agent</id>
             <properties>
-<!--                 <yourkit.agent.path>/Applications/YourKit-Java-Profiler-2019.8.app/Contents/Resources/bin/mac/libyjpagent.dylib</yourkit.agent.path> -->
+                <!-- When using this profile, the location of the YourKit agent has to be provided with a vm argument -->
+                <!-- A typical agent location in OSX is like: -->
+                <!-- -Dyourkit.agent.path=/Applications/YourKit-Java-Profiler-2019.8.app/Contents/Resources/bin/mac/libyjpagent.dylib -->
                 <surefire.args>-agentpath:'${yourkit.agent.path}'=disablestacktelemetry,exceptions=disable,probe_disable=*,listen=all ${surefire.args.base}</surefire.args>
             </properties>
         </profile>

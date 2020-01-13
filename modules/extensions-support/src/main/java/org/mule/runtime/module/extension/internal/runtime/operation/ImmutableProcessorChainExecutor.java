@@ -10,6 +10,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
+import static org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.from;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.message.Message;
@@ -17,7 +18,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.HasMessageProcessors;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -120,9 +120,11 @@ public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcess
     }
 
     public void execute() {
-      final Function<Context, Context> innerChainCtxMapping =
-          ((SdkInternalContext) ((InternalEvent) event).<SdkInternalContext>getSdkInternalContext())
-              .getInnerChainSubscriberContextMapping();
+      final SdkInternalContext sdkInternalCtx = from(event);
+      Function<Context, Context> innerChainCtxMapping = identity();
+      if (sdkInternalCtx != null) {
+        innerChainCtxMapping = sdkInternalCtx.getInnerChainSubscriberContextMapping();
+      }
 
       from(processWithChildContextDontComplete(event, chain, ofNullable(chain.getLocation())))
           .doOnSuccess(this::handleSuccess)
@@ -133,7 +135,7 @@ public class ImmutableProcessorChainExecutor implements Chain, HasMessageProcess
               this.handleError(error, event);
             }
           })
-          .subscriberContext(innerChainCtxMapping != null ? innerChainCtxMapping : identity())
+          .subscriberContext(innerChainCtxMapping)
           .subscribe();
     }
 

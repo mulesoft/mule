@@ -52,8 +52,8 @@ public abstract class ProcessingStrategyDecorator implements ProcessingStrategy,
   }
 
   @Override
-  public Publisher<CoreEvent> registerInternalFlux(Publisher<CoreEvent> flux) {
-    return delegate.registerInternalFlux(flux);
+  public Publisher<CoreEvent> configureInternalFlux(Publisher<CoreEvent> flux) {
+    return delegate.configureInternalFlux(flux);
   }
 
   @Override

@@ -27,7 +27,7 @@ import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
-import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.NO_POLICY_OPERATION;
+import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.noPolicyOperation;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
@@ -43,6 +43,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+import static org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.from;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
@@ -178,11 +179,15 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private final RetryPolicyTemplate fallbackRetryPolicyTemplate = new NoRetryPolicyTemplate();
 
   protected final ExtensionModel extensionModel;
-  private final boolean hasChainNested;
+  private final boolean hasNestedChain;
   protected final ResolverSet resolverSet;
   protected final String target;
   protected final String targetValue;
   protected final RetryPolicyTemplate retryPolicyTemplate;
+
+  private final Object fluxSupplierDisposeLock = new Object();
+
+  private final AtomicInteger activeOuterPublishersCount = new AtomicInteger(0);
 
   @Inject
   private ErrorTypeLocator errorTypeLocator;
@@ -200,11 +205,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private ProcessingStrategy processingStrategy;
   private boolean ownedProcessingStrategy = false;
   private FluxSinkSupplier<CoreEvent> fluxSupplier;
-  private final Object fluxSupplierDisposeLock = new Object();
 
   private Scheduler outerFluxCompletionScheduler;
-
-  private final AtomicInteger activeOuterPublishersCount = new AtomicInteger(0);
 
   protected ExecutionMediator executionMediator;
   protected CompletableComponentExecutor componentExecutor;
@@ -231,7 +233,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     this.retryPolicyTemplate = retryPolicyTemplate;
     this.reflectionCache = reflectionCache;
 
-    this.hasChainNested = componentModel.getNestedComponents().stream()
+    this.hasNestedChain = componentModel.getNestedComponents().stream()
         .anyMatch(nestedComp -> {
           return nestedComp instanceof NestedRouteModel
               || ((NestedComponentModel) nestedComp).getAllowedStereotypes().stream()
@@ -287,16 +289,16 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                       }
                     };
 
-                    if (!isAsync() && NO_POLICY_OPERATION
-                        .equals(((SdkInternalContext) ((InternalEvent) event).<SdkInternalContext>getSdkInternalContext())
-                            .getPolicyToApply())) {
+                    if (!isAsync() && from(event).isNoPolicyOperation()) {
                       onEventSynchronous(event, executorCallback, ctx);
                     } else {
                       onEvent(event, executorCallback);
                     }
                   }), () -> errorSwitchSinkSinkRef.complete(), t -> errorSwitchSinkSinkRef.error(t),
                                                                  muleContext.getConfiguration().getShutdownTimeout(),
-                                                                 outerFluxCompletionScheduler));
+                                                                 outerFluxCompletionScheduler))
+                                                                     .doOnNext(event -> ((InternalEvent) event)
+                                                                         .setSdkInternalContext(null));
 
           if (publisher instanceof Flux && !ctx.getOrEmpty(WITHIN_PROCESS_TO_APPLY).isPresent()) {
             return transformed
@@ -312,8 +314,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private void onEvent(CoreEvent event, ExecutorCallback executorCallback) {
     try {
-      SdkInternalContext sdkInternalContext =
-          ((SdkInternalContext) ((InternalEvent) event).<SdkInternalContext>getSdkInternalContext());
+      SdkInternalContext sdkInternalContext = from(event);
 
       final Optional<ConfigurationInstance> configuration = sdkInternalContext.getConfiguration();
       final Map<String, Object> resolutionResult = sdkInternalContext.getResolutionResult();
@@ -340,8 +341,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private void onEventSynchronous(CoreEvent event, ExecutorCallback executorCallback, Context ctx) {
     try {
-      SdkInternalContext sdkInternalContext =
-          ((SdkInternalContext) ((InternalEvent) event).<SdkInternalContext>getSdkInternalContext());
+      SdkInternalContext sdkInternalContext = from(event);
 
       final Optional<ConfigurationInstance> configuration = sdkInternalContext.getConfiguration();
       final Map<String, Object> resolutionResult = sdkInternalContext.getResolutionResult();
@@ -438,53 +438,44 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private void startInnerFlux() {
+    // Create and register an internal flux, which will be the one to really use the processing strategy for this operation.
+    // This is a round robin so it can handle concurrent events, and its lifecycle is tied to the lifecycle of the main flux.
     fluxSupplier = createRoundRobinFluxSupplier(p -> {
-      final OperationInnerProcessor operationInnerProcessor = new OperationInnerProcessor() {
+      return from(processingStrategy
+          .configureInternalFlux(from(p)
+              .transform(processingStrategy.onProcessor(new OperationInnerProcessor() {
 
-        @Override
-        public ProcessingType getProcessingType() {
-          return getInnerProcessingType();
-        }
+                @Override
+                public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+                  return subscriberContext()
+                      .flatMapMany(ctx -> from(publisher)
+                          .doOnNext(event -> prepareAndExecuteOperation(event,
+                                                                        () -> from(event).getOperationExecutionParams()
+                                                                            .getCallback(),
+                                                                        ctx)));
+                }
 
-        @Override
-        public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-          return subscriberContext()
-              .flatMapMany(ctx -> from(publisher)
-                  .doOnNext(event -> prepareAndExecuteOperation(event,
-                                                                () -> {
-                                                                  OperationExecutionParams oep =
-                                                                      ((SdkInternalContext) ((InternalEvent) event)
-                                                                          .<SdkInternalContext>getSdkInternalContext())
-                                                                              .getOperationExecutionParams();
-                                                                  return oep.getCallback();
-                                                                },
-                                                                ctx)));
-        }
+                @Override
+                public ProcessingType getProcessingType() {
+                  return getInnerProcessingType();
+                }
 
-        @Override
-        public boolean isAsync() {
-          return ComponentMessageProcessor.this.isAsync();
-        }
-      };
-
-      final Flux<CoreEvent> transformed = from(p)
-          .transform(processingStrategy.onProcessor(operationInnerProcessor))
-          .onErrorContinue((t, event) -> LOGGER.error("Unhandler error in operation (" + toString() + ") flux",
-                                                      t));
-      return from(processingStrategy.registerInternalFlux(transformed));
+                @Override
+                public boolean isAsync() {
+                  return ComponentMessageProcessor.this.isAsync();
+                }
+              }))
+              .onErrorContinue((t, event) -> LOGGER.error("Unhandler error in operation (" + toString() + ") flux",
+                                                          t))));
     },
                                                 getRuntime().availableProcessors());
   }
 
   private CoreEvent addContextToEvent(CoreEvent event, Context ctx) throws MuleException {
-    SdkInternalContext sdkInternalContext =
-        (SdkInternalContext) ((InternalEvent) event).<SdkInternalContext>getSdkInternalContext();
-    if (((InternalEvent) event).getSdkInternalContext() == null) {
-      sdkInternalContext = new SdkInternalContext();
-      ((InternalEvent) event).setSdkInternalContext(sdkInternalContext);
-    }
+    SdkInternalContext sdkInternalContext = new SdkInternalContext();
+    ((InternalEvent) event).setSdkInternalContext(sdkInternalContext);
 
-    if (hasChainNested
+    if (hasNestedChain
         && (ctx.hasKey(POLICY_NEXT_OPERATION) || ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))) {
       sdkInternalContext.setInnerChainSubscriberContextMapping(innerChainCtx -> {
         if (ctx.hasKey(POLICY_NEXT_OPERATION)) {
@@ -503,15 +494,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     sdkInternalContext.setResolutionResult(resolutionResult);
     sdkInternalContext.setPolicyToApply(getLocation() != null
         ? policyManager.createOperationPolicy(this, event, () -> resolutionResult)
-        : NO_POLICY_OPERATION);
+        : noPolicyOperation());
 
     return event;
   }
 
   private void prepareAndExecuteOperation(CoreEvent event, Supplier<ExecutorCallback> callbackSupplier, Context ctx) {
-    OperationExecutionParams oep =
-        ((SdkInternalContext) ((InternalEvent) event).<SdkInternalContext>getSdkInternalContext())
-            .getOperationExecutionParams();
+    OperationExecutionParams oep = from(event).getOperationExecutionParams();
 
     final Scheduler currentScheduler = (Scheduler) ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY)
         .orElse(IMMEDIATE_SCHEDULER);
@@ -861,6 +850,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
   }
 
+  /**
+   * This is the processing type that is actually taken into account when the processing strategy is applied. This is used by the
+   * flux created in {@link #startInnerFlux()}.
+   */
   public ProcessingType getInnerProcessingType() {
     return CPU_LITE;
   }

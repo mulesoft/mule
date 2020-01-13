@@ -10,6 +10,8 @@ import static java.util.function.Function.identity;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.EventInternalContext;
+import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.policy.DefaultPolicyManager;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
@@ -20,7 +22,22 @@ import java.util.function.Function;
 
 import reactor.util.context.Context;
 
+/**
+ * Contains internal context handled by SDK operations.
+ *
+ * @since 4.3
+ */
 public class SdkInternalContext implements EventInternalContext<SdkInternalContext> {
+
+  /**
+   * Extracts an instance stored in the given {@code event}
+   *
+   * @param event
+   * @return an {@link SdkInternalContext} or {@code null} if none was set on the event
+   */
+  public static SdkInternalContext from(CoreEvent event) {
+    return (SdkInternalContext) ((InternalEvent) event).<SdkInternalContext>getSdkInternalContext();
+  }
 
   private OperationExecutionParams operationExecutionParams;
 
@@ -31,6 +48,13 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
   private Map<String, Object> resolutionResult;
 
   private OperationPolicy policyToApply;
+
+  /**
+   * @return {@code true} if the policy to be applied is a no-op, {@code false} if a policy is actually applied.
+   */
+  public boolean isNoPolicyOperation() {
+    return DefaultPolicyManager.isNoPolicyOperation(getPolicyToApply());
+  }
 
   public OperationExecutionParams getOperationExecutionParams() {
     return operationExecutionParams;

@@ -208,7 +208,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     }
 
     @Override
-    public Publisher<CoreEvent> registerInternalFlux(Publisher<CoreEvent> flux) {
+    public Publisher<CoreEvent> configureInternalFlux(Publisher<CoreEvent> flux) {
       return Flux.from(flux)
           .doAfterTerminate(() -> stopSchedulersIfNeeded())
           .doOnSubscribe(s -> activeSinksCount.incrementAndGet());

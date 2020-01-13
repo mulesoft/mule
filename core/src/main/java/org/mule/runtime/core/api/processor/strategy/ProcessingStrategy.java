@@ -48,7 +48,14 @@ public interface ProcessingStrategy {
     Flux.from(flux).subscribe();
   }
 
-  default Publisher<CoreEvent> registerInternalFlux(Publisher<CoreEvent> flux) {
+  /**
+   * For fluxes created outside of the main flux for a flow, have them accounted for in the processing strategy for a graceful
+   * shutdown.
+   *
+   * @param flux the flux whose lifecycle will be tied to the main flux.
+   * @return the provided flux with the additional callbacks observed.
+   */
+  default Publisher<CoreEvent> configureInternalFlux(Publisher<CoreEvent> flux) {
     return flux;
   }
 

@@ -150,7 +150,6 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
       }
     }
 
-
     protected ReactiveProcessor proactor(ReactiveProcessor processor, ScheduledExecutorService scheduler) {
       LOGGER.debug("Doing proactor() for {} on {}. maxConcurrency={}, parallelism={}, subscribers={}", processor, scheduler,
                    maxConcurrency, getParallelism(), subscribers);
@@ -165,7 +164,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
             .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
       } else if (maxConcurrency == MAX_VALUE) {
         if (processor instanceof OperationInnerProcessor) {
-          // For no limit, the java SDK already does a flatMap internally, so no need to do an additional one here
+          // For no limit, the java SDK already handles parallelism internally, so no need to do that here
           return publisher -> scheduleProcessor(processor, retryScheduler, from(publisher))
               .subscriberContext(ctx -> ctx.put(PROCESSOR_SCHEDULER_CONTEXT_KEY, scheduler));
         } else {
