@@ -8,6 +8,7 @@ package org.mule.test.module.extension.reconnection;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
 import static org.mule.tck.probe.PollingProber.check;
 
@@ -15,6 +16,8 @@ import org.mule.extension.test.extension.reconnection.ReconnectableConnection;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.streaming.object.CursorIterator;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicy;
@@ -22,6 +25,7 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.time.Duration;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -77,6 +81,13 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   @Test
+  public void pagedOperationWithCachedConnectionIsClosedDuringConnectionException() throws Exception {
+    switchConnection();
+    Iterator<ReconnectableConnection> iterator = getCursor("pagedOperation");
+    assertThat(iterator.next().getDisconnectCalls(), is(1));
+  }
+
+  @Test
   public void getRetryPolicyTemplateFromConfig() throws Exception {
     RetryPolicyTemplate template = (RetryPolicyTemplate) flowRunner("getReconnectionFromConfig").run()
         .getMessage().getPayload().getValue();
@@ -104,5 +115,13 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
 
   private void switchConnection() throws Exception {
     flowRunner("switchConnection").run();
+  }
+
+  private <T> CursorIterator<T> getCursor(String flowName) throws Exception {
+    CursorIteratorProvider provider =
+        (CursorIteratorProvider) flowRunner(flowName).keepStreamsOpen().run().getMessage().getPayload()
+            .getValue();
+
+    return provider.openCursor();
   }
 }

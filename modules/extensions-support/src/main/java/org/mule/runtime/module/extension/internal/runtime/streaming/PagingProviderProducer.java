@@ -7,11 +7,19 @@
 
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static java.util.function.Function.identity;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.extension.internal.util.ExecutionUtils.getMutableConfigurationStats;
+import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
+
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.iterator.Producer;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -19,11 +27,14 @@ import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 /**
@@ -35,11 +46,13 @@ import java.util.function.Function;
 public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
   public static final String COULD_NOT_OBTAIN_A_CONNECTION = "Could not obtain a connection for the configuration";
+  public static final String COULD_NOT_RECONNECT = "Failed to reconnect";
   private PagingProvider<Object, T> delegate;
   private final ConfigurationInstance config;
   private final ExtensionConnectionSupplier connectionSupplier;
   private final ExecutionContextAdapter executionContext;
   private final ConnectionSupplierFactory connectionSupplierFactory;
+  private boolean isFirstPage = true;
 
   public PagingProviderProducer(PagingProvider<Object, T> delegate,
                                 ConfigurationInstance config,
@@ -77,16 +90,38 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    * @return
    */
   private <R> R performWithConnection(Function<Object, R> function) {
-    ConnectionSupplier connectionSupplier = null;
+    Optional<MutableConfigurationStats> stats = getMutableConfigurationStats(executionContext);
+    RetryPolicyTemplate retryPolicy =
+        (RetryPolicyTemplate) executionContext.getRetryPolicyTemplate().orElseGet(NoRetryPolicyTemplate::new);
+    CompletableFuture<R> future = retryPolicy.applyPolicy(() -> completedFuture(withConnection(function)),
+                                                          e -> isFirstPage && shouldRetry(e, executionContext),
+                                                          e -> {
+                                                          },
+                                                          e -> stats.ifPresent(s -> s.discountInflightOperation()),
+                                                          identity(),
+                                                          executionContext.getCurrentScheduler());
+    try {
+      return future.get();
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_RECONNECT), e);
+    }
+  }
+
+  private <R> R withConnection(Function<Object, R> function) {
+    ConnectionSupplier connectionSupplier;
     try {
       connectionSupplier = connectionSupplierFactory.getConnectionSupplier();
-      return function.apply(connectionSupplier.getConnection());
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
-    } finally {
-      if (connectionSupplier != null) {
+      try {
+        R result = function.apply(connectionSupplier.getConnection());
+        isFirstPage = false;
         connectionSupplier.close();
+        return result;
+      } catch (Exception e) {
+        connectionSupplier.invalidateConnection();
+        throw new ConnectionException(COULD_NOT_OBTAIN_A_CONNECTION, e);
       }
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
     }
   }
 
@@ -120,6 +155,10 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   private boolean isTransactional() {
     Transaction tx = TransactionCoordination.getInstance().getTransaction();
     return tx != null && tx.hasResource(new ExtensionTransactionKey(config));
+  }
+
+  private boolean isFirstPage() {
+    return isFirstPage;
   }
 
   private interface ConnectionSupplierFactory {
@@ -176,6 +215,8 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     Object getConnection() throws MuleException;
 
     void close();
+
+    void invalidateConnection();
   }
 
 
@@ -194,6 +235,10 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     public void close() {
       connectionHandler.release();
     }
+
+    public void invalidateConnection() {
+      connectionHandler.invalidate();
+    }
   }
 
 
@@ -205,13 +250,15 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       this.connection = connection;
     }
 
-    @Override
     public Object getConnection() throws MuleException {
       return connection;
     }
 
-    @Override
     public void close() {
+
+    }
+
+    public void invalidateConnection() {
 
     }
   }

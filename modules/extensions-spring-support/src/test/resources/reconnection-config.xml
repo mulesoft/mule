@@ -27,6 +27,10 @@
         <reconnection:switch-connection />
     </flow>
 
+    <flow name="pagedOperation">
+        <reconnection:paged-operation config-ref="reconnection_Config"/>
+    </flow>
+
     <flow name="getReconnectionFromConfig">
         <reconnection:get-retry-policy-template config-ref="reconnection_Config"/>
     </flow>
