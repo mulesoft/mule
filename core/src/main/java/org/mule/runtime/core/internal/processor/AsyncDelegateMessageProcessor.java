@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
+import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.publisher.Flux.from;
@@ -65,6 +66,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -198,7 +200,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   public void stop() throws MuleException {
     super.stop();
     stopIfNeeded(delegate);
-    stopIfNeeded(backpressureHandler);
+
+    safely(() -> stopIfNeeded(backpressureHandler));
     disposeIfNeeded(sink, logger);
     sink = null;
 
@@ -266,10 +269,12 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         .doOnNext(event -> {
           fireAsyncCompleteNotification(event, null);
           ((BaseEventContext) event.getContext()).success(event);
+          backpressureHandler.asyncTaskFinished();
         })
         .doOnError(MessagingException.class, e -> {
           fireAsyncCompleteNotification(e.getEvent(), e);
           ((BaseEventContext) e.getEvent().getContext()).error(e);
+          backpressureHandler.asyncTaskFinished();
         })
         .doOnError(throwable -> logger.warn("Error occurred during asynchronous processing at:" + getLocation().getLocation()
             + " . To handle this error include a <try> scope in the <async> scope.", throwable));
@@ -319,6 +324,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     private final Consumer<CoreEvent> eventDispatcher;
 
     private Scheduler queueDispatcherScheduler;
+    private volatile ScheduledFuture<?> scheduledDrain;
 
     public QueueBackpressureHandler(SchedulerService schedulerService, Supplier<SchedulerConfig> schedulerConfigSupplier,
                                     Consumer<CoreEvent> eventDispatcher, String location) {
@@ -335,22 +341,36 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
       asyncQueue.offer(event);
     }
 
+    public void asyncTaskFinished() {
+      if (scheduledDrain == null) {
+        synchronized (this) {
+          if (scheduledDrain == null) {
+            scheduledDrain = queueDispatcherScheduler.schedule(() -> {
+              while (asyncQueue.size() > 0) {
+                try {
+                  final CoreEvent event = asyncQueue.peek();
+                  if (event != null) {
+                    eventDispatcher.accept(event);
+                    asyncQueue.remove(event);
+                  }
+                } catch (FromFlowRejectedExecutionException free) {
+                  synchronized (this) {
+                    scheduledDrain = null;
+                  }
+                  // nothing to do, a retry will come next
+                  return;
+                }
+              }
+            }, 200, MILLISECONDS);
+          }
+        }
+      }
+    }
+
     @Override
     public void start() {
       final SchedulerConfig schedulerConfig = schedulerConfigSupplier.get().withName(location + " - queue dispatcher");
       queueDispatcherScheduler = schedulerService.ioScheduler(schedulerConfig);
-
-      queueDispatcherScheduler.scheduleWithFixedDelay(() -> {
-        try {
-          final CoreEvent event = asyncQueue.peek();
-          if (event != null) {
-            eventDispatcher.accept(event);
-            asyncQueue.remove(event);
-          }
-        } catch (FromFlowRejectedExecutionException free) {
-          // nothing to do, a retry will come next
-        }
-      }, 0, 2, MILLISECONDS);
     }
 
     @Override
