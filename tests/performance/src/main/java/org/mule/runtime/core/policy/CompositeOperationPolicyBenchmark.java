@@ -15,7 +15,10 @@ import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.blo
 
 import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyChain;
@@ -29,6 +32,7 @@ import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.annotations.Threads;
 import org.reactivestreams.Publisher;
 
@@ -38,15 +42,27 @@ public class CompositeOperationPolicyBenchmark extends AbstractBenchmark {
 
   private OperationPolicy handler;
 
+  private Scheduler fluxCompleteScheduler;
+
   @Setup(Level.Trial)
-  public void setUp() {
+  public void setUp() throws MuleException {
+    MuleContext muleContext = createMuleContextWithServices();
+    this.fluxCompleteScheduler = muleContext.getSchedulerService().ioScheduler();
+
     handler = new CompositeOperationPolicy(new AbstractComponent() {}, asList(new Policy(new PolicyChain() {
 
       @Override
       public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
         return publisher;
       }
-    }, "")), empty(), (policy, nextProcessor) -> nextProcessor);
+    }, "")), empty(), (policy, nextProcessor) -> nextProcessor,
+                                           muleContext.getConfiguration().getShutdownTimeout(),
+                                           fluxCompleteScheduler);
+  }
+
+  @TearDown(Level.Trial)
+  public void tearDown() {
+    this.fluxCompleteScheduler.stop();
   }
 
   @Benchmark
