@@ -220,7 +220,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private TestModuleDiscoverer moduleDiscoverer;
 
   @Parameterized.Parameters(name = "Parallel: {0}")
-  public static List<Boolean> parameters() {
+  public static List<Boolean> params() {
     return asList(false, true);
   }
 
