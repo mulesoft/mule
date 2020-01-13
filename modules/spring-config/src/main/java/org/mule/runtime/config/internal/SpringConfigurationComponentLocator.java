@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.util.ClassUtils.memoize;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -79,7 +80,7 @@ public class SpringConfigurationComponentLocator implements ConfigurationCompone
    */
   @Override
   public Optional<Component> find(Location location) {
-    if (isTemplateLocationFunction.apply(location.getGlobalName())) {
+    if (location == null || isTemplateLocationFunction.apply(location.getGlobalName())) {
       return empty();
     }
     return ofNullable(componentsMap.get(location.toString()));

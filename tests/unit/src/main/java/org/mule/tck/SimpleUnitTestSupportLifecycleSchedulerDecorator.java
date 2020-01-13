@@ -195,13 +195,13 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
   }
 
   protected void cancelStillActiveTasks() {
-    List<ScheduledFuture> stillaCtiveRecurrentTasks = recurrentTasks.stream()
+    List<ScheduledFuture> stillActiveRecurrentTasks = recurrentTasks.stream()
         .filter(recurrentTask -> !(recurrentTask.isDone() || recurrentTask.isCancelled())).collect(toList());
-    if (!stillaCtiveRecurrentTasks.isEmpty()) {
+    if (!stillActiveRecurrentTasks.isEmpty()) {
       LOGGER.warn("Scheduler '" + name + "' stopped while it still has active recurrent tasks:"
-          + stillaCtiveRecurrentTasks.toString());
+          + stillActiveRecurrentTasks.toString());
     }
-    stillaCtiveRecurrentTasks.forEach(recurrentTask -> recurrentTask.cancel(true));
+    stillActiveRecurrentTasks.forEach(recurrentTask -> recurrentTask.cancel(true));
   }
 
   @Override

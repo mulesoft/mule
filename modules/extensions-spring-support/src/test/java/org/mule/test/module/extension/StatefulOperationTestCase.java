@@ -15,9 +15,9 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
-import org.junit.Test;
-
 import java.math.BigDecimal;
+
+import org.junit.Test;
 
 public class StatefulOperationTestCase extends AbstractExtensionFunctionalTestCase {
 

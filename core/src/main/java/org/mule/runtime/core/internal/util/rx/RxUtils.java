@@ -68,7 +68,9 @@ public class RxUtils {
                                                                     Flux<U> deferredSubscriber) {
     return triggeringSubscriber
         .compose(eventPub -> subscriberContext()
-            .flatMapMany(ctx -> eventPub.doOnSubscribe(s -> deferredSubscriber.subscriberContext(ctx).subscribe())));
+            .flatMapMany(ctx -> eventPub.doOnSubscribe(s -> deferredSubscriber
+                .subscriberContext(ctx)
+                .subscribe())));
   }
 
   /**

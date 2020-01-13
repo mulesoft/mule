@@ -47,8 +47,13 @@ public abstract class ProcessingStrategyDecorator implements ProcessingStrategy,
   }
 
   @Override
-  public void registerInternalSink(Publisher<CoreEvent> flux, String sinkRepresentation) {
-    delegate.registerInternalSink(flux, sinkRepresentation);
+  public void registerInternalSink(Publisher<CoreEvent> publisher, String sinkRepresentation) {
+    delegate.registerInternalSink(publisher, sinkRepresentation);
+  }
+
+  @Override
+  public Publisher<CoreEvent> configureInternalPublisher(Publisher<CoreEvent> publisher) {
+    return delegate.configureInternalPublisher(publisher);
   }
 
   @Override

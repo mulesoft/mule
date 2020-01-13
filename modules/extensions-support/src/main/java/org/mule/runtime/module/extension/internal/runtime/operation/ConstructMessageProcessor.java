@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
@@ -49,15 +49,8 @@ public class ConstructMessageProcessor extends ComponentMessageProcessor<Constru
   }
 
   @Override
-  protected boolean isAsync() {
-    return true;
-  }
-
-  @Override
-  public ProcessingType getProcessingType() {
-    // If processing type is CPU_LITE and operation is non-blocking then use CPU_LITE_ASYNC processing type so that the Flow can
-    // return processing to a Flow thread.
-    return CPU_LITE_ASYNC;
+  public ProcessingType getInnerProcessingType() {
+    return CPU_LITE;
   }
 
 }

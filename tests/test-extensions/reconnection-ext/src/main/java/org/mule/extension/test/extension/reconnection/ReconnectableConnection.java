@@ -21,4 +21,9 @@ public final class ReconnectableConnection {
   public int getReconnectionAttempts() {
     return reconnectionAttempts;
   }
+
+  @Override
+  public String toString() {
+    return "ReconnectableConnection: " + reconnectionAttempts;
+  }
 }

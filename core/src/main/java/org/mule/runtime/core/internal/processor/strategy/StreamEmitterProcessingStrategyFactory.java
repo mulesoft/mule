@@ -161,10 +161,11 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       final long shutdownTimeout = flowConstruct.getMuleContext().getConfiguration().getShutdownTimeout();
 
       List<ReactorSink<CoreEvent>> sinks = new ArrayList<>();
+      final int bufferQueueSize = getBufferQueueSize();
 
       for (int i = 0; i < sinksCount; i++) {
         Latch completionLatch = new Latch();
-        EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(getBufferQueueSize());
+        EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(bufferQueueSize);
         AtomicReference<Throwable> failedSubscriptionCause = new AtomicReference<>();
         processor.transform(function)
             .subscribe(null, getThrowableConsumer(flowConstruct, completionLatch, failedSubscriptionCause),
@@ -181,7 +182,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
                                                                   currentTimeMillis());
                                        stopSchedulersIfNeeded();
                                      },
-                                     onEventConsumer, getBufferQueueSize());
+                                     onEventConsumer, bufferQueueSize);
         sinks.add(sink);
       }
 
@@ -204,6 +205,13 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
                                 });
 
       activeSinksCount.incrementAndGet();
+    }
+
+    @Override
+    public Publisher<CoreEvent> configureInternalPublisher(Publisher<CoreEvent> flux) {
+      return Flux.from(flux)
+          .doAfterTerminate(() -> stopSchedulersIfNeeded())
+          .doOnSubscribe(s -> activeSinksCount.incrementAndGet());
     }
 
     @Override

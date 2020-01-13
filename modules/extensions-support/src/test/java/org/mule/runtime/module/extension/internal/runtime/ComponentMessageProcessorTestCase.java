@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.util.Optional.of;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertNotNull;
@@ -18,6 +19,8 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -31,7 +34,9 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
+import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
@@ -62,6 +67,8 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
   private ResolverSet resolverSet;
   private ExtensionManager extensionManager;
 
+  private PolicyManager mockPolicyManager;
+
   @Rule
   public ExpectedException expected = ExpectedException.none();
 
@@ -78,28 +85,32 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
     resolverSet = mock(ResolverSet.class);
 
     extensionManager = mock(ExtensionManager.class);
+    mockPolicyManager = mock(PolicyManager.class);
 
     processor = new ComponentMessageProcessor<ComponentModel>(extensionModel,
                                                               componentModel, null, null, null,
                                                               resolverSet, null, null,
                                                               extensionManager,
-                                                              null, null) {
+                                                              mockPolicyManager, null) {
 
       @Override
       protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {}
 
       @Override
-      public ProcessingType getProcessingType() {
+      public ProcessingType getInnerProcessingType() {
         return ProcessingType.CPU_LITE;
       }
     };
+    processor.setComponentLocator(componentLocator);
     processor.setCacheIdGeneratorFactory(mock(MetadataCacheIdGeneratorFactory.class));
 
     initialiseIfNeeded(processor, muleContext);
+    startIfNeeded(processor);
   }
 
   @After
-  public void after() {
+  public void after() throws MuleException {
+    stopIfNeeded(processor);
     disposeIfNeeded(processor, LOGGER);
   }
 
@@ -128,7 +139,7 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     when(resolverSet.resolve(any(ValueResolvingContext.class))).thenThrow(thrown);
 
-    expect(thrown);
+    expectWrapped(thrown);
     from(processor.apply(just(testEvent()))).block();
   }
 
@@ -147,7 +158,28 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
 
       @Override
       public boolean matches(Object o) {
-        assertThat((Exception) unwrap((Exception) o), is(sameInstance(expect)));
+        Exception e = (Exception) unwrap((Exception) o);
+        //        assertThat(e, is(instanceOf(MessagingException.class)));
+        assertThat(e, is(sameInstance(expect)));
+
+        return true;
+      }
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("condition not met");
+      }
+    });
+  }
+
+  private void expectWrapped(Exception expect) {
+    expected.expect(new BaseMatcher<Exception>() {
+
+      @Override
+      public boolean matches(Object o) {
+        Exception e = (Exception) unwrap((Exception) o);
+        assertThat(e, is(instanceOf(MessagingException.class)));
+        assertThat(e.getCause(), is(sameInstance(expect)));
 
         return true;
       }

@@ -140,7 +140,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Inject
   protected MuleMetadataService metadataService;
 
-  @Inject
   protected ConfigurationComponentLocator componentLocator;
 
   @Inject
@@ -589,5 +588,10 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Inject
   public void setCacheIdGeneratorFactory(MetadataCacheIdGeneratorFactory<ComponentAst> cacheIdGeneratorFactory) {
     this.cacheIdGeneratorFactory = cacheIdGeneratorFactory;
+  }
+
+  @Inject
+  public void setComponentLocator(ConfigurationComponentLocator componentLocator) {
+    this.componentLocator = componentLocator;
   }
 }

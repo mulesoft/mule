@@ -36,6 +36,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
@@ -94,7 +95,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.google.common.reflect.TypeToken;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -102,6 +102,8 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import com.google.common.reflect.TypeToken;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -125,7 +127,9 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
                                       cursorStreamProviderFactory, new NoRetryPolicyTemplate(), extensionManager,
                                       mockPolicyManager, reflectionCache);
     operationMessageProcessor.setAnnotations(getFlowComponentLocationAnnotations(FLOW_NAME));
-    return muleContext.getInjector().inject(operationMessageProcessor);
+    operationMessageProcessor.setComponentLocator(componentLocator);
+
+    return operationMessageProcessor;
   }
 
   @Test
@@ -318,7 +322,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Test
   public void operationWithExpressionInTargetParameter() throws Exception {
     String flowName = FLOW_NAME;
-    target = "#[mel:someExpression]";
+    target = "#[someExpression]";
+    after();
     messageProcessor = createOperationMessageProcessor();
 
     registerIntoMockContext(context, OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(context));
@@ -329,6 +334,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(flowConstruct.getName()).thenReturn(flowName);
 
     messageProcessor.setMuleContext(context);
+    context.getInjector().inject(messageProcessor);
 
     expectedException.expect(IllegalOperationException.class);
     expectedException.expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), "an expression",
@@ -343,6 +349,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     String flowName = "flowName";
     target = TARGET_VAR;
     targetValue = TARGET_VAR;
+    after();
     messageProcessor = createOperationMessageProcessor();
 
     registerIntoMockContext(context, OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(context));
@@ -354,6 +361,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(flowConstruct.getName()).thenReturn(flowName);
 
     messageProcessor.setMuleContext(context);
+    context.getInjector().inject(messageProcessor);
 
     expectedException.expect(IllegalOperationException.class);
     expectedException
@@ -479,7 +487,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
   private void assertProcessingType(ExecutionType executionType, ProcessingType expectedProcessingType) {
     when(operationModel.getExecutionType()).thenReturn(executionType);
-    assertThat(messageProcessor.getProcessingType(), is(expectedProcessingType));
+    assertThat(messageProcessor.getInnerProcessingType(), is(expectedProcessingType));
+    assertThat(messageProcessor.getProcessingType(), is(ProcessingType.CPU_LITE));
   }
 
   private void setUpValueResolvers() throws MuleException {
@@ -491,10 +500,13 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   }
 
   private void setUpOperationReturning(Object payload, Type type) throws MuleException {
+    after();
+
     messageProcessor = createOperationMessageProcessor();
     MetadataType mapType = new DefaultExtensionsTypeLoaderFactory().createTypeLoader().load(type);
     when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("desc", mapType, false, emptySet()));
     initialiseIfNeeded(messageProcessor, muleContext);
+    startIfNeeded(messageProcessor);
     stubComponentExecutor(operationExecutor, payload);
   }
 
@@ -504,5 +516,10 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
         .mediaType(mediaType)
         .attributes(attributes)
         .build());
+  }
+
+  @Override
+  protected boolean isGracefulShutdown() {
+    return true;
   }
 }
