@@ -157,10 +157,6 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     return tx != null && tx.hasResource(new ExtensionTransactionKey(config));
   }
 
-  private boolean isFirstPage() {
-    return isFirstPage;
-  }
-
   private interface ConnectionSupplierFactory {
 
     ConnectionSupplier getConnectionSupplier() throws MuleException;

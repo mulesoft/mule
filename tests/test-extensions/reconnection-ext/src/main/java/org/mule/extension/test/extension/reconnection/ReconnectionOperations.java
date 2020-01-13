@@ -9,9 +9,17 @@ package org.mule.extension.test.extension.reconnection;
 import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.fail;
 
 import org.mule.extension.test.extension.reconnection.metadata.RetryPolicyOutputResolver;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.error.MuleErrors;
+import org.mule.runtime.extension.api.exception.ModuleException;
+import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -30,5 +38,28 @@ public class ReconnectionOperations {
   public RetryPolicyTemplate getRetryPolicyTemplate(@Connection ReconnectableConnection connection,
                                                     RetryPolicyTemplate template) {
     return template;
+  }
+
+  public PagingProvider<ReconnectableConnection, ReconnectableConnection> pagedOperation() {
+    return new PagingProvider<ReconnectableConnection, ReconnectableConnection>() {
+
+      @Override
+      public List<ReconnectableConnection> getPage(ReconnectableConnection connection) {
+        if (fail) {
+          throw new ModuleException(MuleErrors.CONNECTIVITY, new ConnectionException("Failed to retrieve Page"));
+        }
+        return Collections.singletonList(connection);
+      }
+
+      @Override
+      public Optional<Integer> getTotalResults(ReconnectableConnection connection) {
+        return Optional.empty();
+      }
+
+      @Override
+      public void close(ReconnectableConnection connection) {
+
+      }
+    };
   }
 }
