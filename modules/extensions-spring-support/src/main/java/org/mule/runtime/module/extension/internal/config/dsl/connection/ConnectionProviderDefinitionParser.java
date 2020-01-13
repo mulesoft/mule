@@ -23,6 +23,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinition
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials.ClientCredentialsOAuthHandler;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials.PlatformManagedOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 
 /**
@@ -55,6 +56,7 @@ public final class ConnectionProviderDefinitionParser extends ExtensionDefinitio
         .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
         .withConstructorParameterDefinition(fromReferenceObject(AuthorizationCodeOAuthHandler.class).build())
         .withConstructorParameterDefinition(fromReferenceObject(ClientCredentialsOAuthHandler.class).build())
+        .withConstructorParameterDefinition(fromReferenceObject(PlatformManagedOAuthHandler.class).build())
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
         .withSetterParameterDefinition("reconnectionConfig",
                                        fromChildConfiguration(ReconnectionConfig.class).build())

@@ -21,6 +21,8 @@ import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthCo
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.RESOURCE_OWNER_ID_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.SCOPES_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getCallbackValuesExtractors;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -71,7 +73,7 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
     super(providerModel, resolverSet, poolingProfile, reconnectionConfig, extensionModel, expressionManager, muleContext);
     this.authCodeHandler = authCodeHandler;
     this.grantType = grantType;
-    callbackValues = getCallbackValues();
+    callbackValues = getCallbackValuesExtractors(providerModel);
   }
 
   @Override

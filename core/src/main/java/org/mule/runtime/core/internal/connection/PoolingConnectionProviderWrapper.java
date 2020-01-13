@@ -14,7 +14,7 @@ import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import java.util.Optional;
 
 /**
- * A {@link ConnectionProviderWrapper} which decorates the {@link #delegate} with a user configured {@link PoolingProfile} or the
+ * A {@link AbstractConnectionProviderWrapper} which decorates the {@link #delegate} with a user configured {@link PoolingProfile} or the
  * default one if is was not supplied by the user.
  *
  * @since 4.0

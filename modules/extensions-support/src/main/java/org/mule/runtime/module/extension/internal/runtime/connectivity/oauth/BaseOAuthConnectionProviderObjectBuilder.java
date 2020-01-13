@@ -13,6 +13,7 @@ import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthCo
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.OBJECT_STORE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement.HEADERS;
 import static org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement.QUERY_PARAMS;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -25,7 +26,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.oauth.OAuthCallbackValuesModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MapValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -33,9 +33,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -120,12 +118,6 @@ public abstract class BaseOAuthConnectionProviderObjectBuilder<C> extends Defaul
     initialiseIfNeeded(result, muleContext);
 
     return result;
-  }
-
-  protected Map<Field, String> getCallbackValues() {
-    return providerModel.getModelProperty(OAuthCallbackValuesModelProperty.class)
-        .map(OAuthCallbackValuesModelProperty::getCallbackValues)
-        .orElseGet(Collections::emptyMap);
   }
 
   protected CustomOAuthParameters getCustomParameters(ResolverSetResult result) {

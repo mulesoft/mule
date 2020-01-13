@@ -11,14 +11,20 @@ import static org.mule.runtime.extension.api.security.CredentialsPlacement.BASIC
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.BODY;
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.QUERY_PARAMS;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.security.CredentialsPlacement;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.loader.java.property.oauth.OAuthCallbackValuesModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.ImmutableAuthorizationCodeState;
 import org.mule.runtime.oauth.api.builder.ClientCredentialsLocation;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
+
+import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * Utility methods for the OAuth support on the SDK
@@ -59,6 +65,13 @@ public final class ExtensionsOAuthUtils {
         unwrapProviderWrapper(config.getConnectionProvider().get(), OAuthConnectionProviderWrapper.class);
     return provider instanceof OAuthConnectionProviderWrapper ? (OAuthConnectionProviderWrapper) provider : null;
   }
+
+  public static Map<Field, String> getCallbackValuesExtractors(ConnectionProviderModel providerModel) {
+    return providerModel.getModelProperty(OAuthCallbackValuesModelProperty.class)
+        .map(OAuthCallbackValuesModelProperty::getCallbackValues)
+        .orElseGet(Collections::emptyMap);
+  }
+
 
   private ExtensionsOAuthUtils() {}
 }

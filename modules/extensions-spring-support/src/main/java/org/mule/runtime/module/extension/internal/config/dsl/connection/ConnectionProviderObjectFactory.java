@@ -27,6 +27,8 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.aut
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials.ClientCredentialsConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials.ClientCredentialsOAuthHandler;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthConnectionProviderObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
@@ -47,6 +49,7 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
   private final ExtensionModel extensionModel;
   private final AuthorizationCodeOAuthHandler authCodeHandler;
   private final ClientCredentialsOAuthHandler clientCredentialsHandler;
+  private final PlatformManagedOAuthHandler platformManagedOAuthHandler;
 
   private PoolingProfile poolingProfile = null;
   private ReconnectionConfig reconnectionConfig = ReconnectionConfig.getDefault();
@@ -58,12 +61,14 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
                                          ExtensionModel extensionModel,
                                          AuthorizationCodeOAuthHandler authCodeHandler,
                                          ClientCredentialsOAuthHandler clientCredentialsHandler,
+                                         PlatformManagedOAuthHandler platformManagedOAuthHandler,
                                          MuleContext muleContext) {
     super(muleContext);
     this.providerModel = providerModel;
     this.extensionModel = extensionModel;
     this.authCodeHandler = authCodeHandler;
     this.clientCredentialsHandler = clientCredentialsHandler;
+    this.platformManagedOAuthHandler = platformManagedOAuthHandler;
   }
 
   @Override
@@ -128,7 +133,16 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
 
       @Override
       public void visit(PlatformManagedOAuthGrantType grantType) {
-        //TODO: OAUTH MG -> crear aca el builder
+        builder.set(new PlatformManagedOAuthConnectionProviderObjectBuilder(providerModel,
+                                                                            resolverSet,
+                                                                            poolingProfile,
+                                                                            reconnectionConfig,
+                                                                            grantType,
+                                                                            platformManagedOAuthHandler,
+                                                                            properties,
+                                                                            extensionModel,
+                                                                            expressionManager,
+                                                                            muleContext));
       }
     });
 

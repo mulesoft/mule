@@ -72,7 +72,10 @@ public abstract class OAuthHandler<Dancer> implements Lifecycle {
   protected boolean started = false;
 
   protected Map<String, String> getParameterExtractors(OAuthConfig config) {
-    Map<Field, String> extractors = config.getParameterExtractors();
+    return getParameterExtractors(config.getParameterExtractors());
+  }
+
+  protected Map<String, String> getParameterExtractors(Map<Field, String> extractors) {
     return extractors.entrySet().stream()
         .collect(toMap(entry -> entry.getKey().getName(), entry -> entry.getValue()));
   }
@@ -113,7 +116,7 @@ public abstract class OAuthHandler<Dancer> implements Lifecycle {
     // no default action
   }
 
-  private Function<OAuthConfig, ObjectStore> buildObjectStoreLocator() {
+  protected Function<OAuthConfig, ObjectStore> buildObjectStoreLocator() {
     return config -> {
       Optional<OAuthObjectStoreConfig> storeConfig = config.getStoreConfig();
       String storeName = storeConfig

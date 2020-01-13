@@ -72,8 +72,7 @@ final class ConnectionManagementStrategyFactory {
   private <C> ConnectionManagementStrategy<C> pooling(ConnectionProvider<C> connectionProvider) {
     PoolingProfile poolingProfile = defaultPoolingProfile;
     if (connectionProvider instanceof ConnectionProviderWrapper) {
-      poolingProfile =
-          (PoolingProfile) ((ConnectionProviderWrapper) connectionProvider).getPoolingProfile().orElse(poolingProfile);
+      poolingProfile = ((ConnectionProviderWrapper) connectionProvider).getPoolingProfile().orElse(poolingProfile);
     }
 
     return poolingProfile.isDisabled() ? withoutManagement(connectionProvider)
