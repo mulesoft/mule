@@ -53,6 +53,8 @@ import java.util.List;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
+import reactor.util.context.Context;
+
 /**
  * Wraps the invocation of a list of nested processors {@link org.mule.runtime.core.api.processor.Processor} with a transaction.
  * If the {@link org.mule.runtime.core.api.transaction.TransactionConfig} is null then no transaction is used and the next
@@ -74,9 +76,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    if (nestedChain == null) {
-      return publisher;
-    } else if (isTransactionActive() || transactionConfig.getAction() != ACTION_INDIFFERENT) {
+    if (isTransactionActive() || transactionConfig.getAction() != ACTION_INDIFFERENT) {
       ExecutionTemplate<CoreEvent> executionTemplate = createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
       final I18nMessage txErrorMessage = errorInvokingMessageProcessorWithinTransaction(nestedChain, transactionConfig);
 
@@ -87,25 +87,8 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
                 Transaction previousTx = getCurrentTx();
                 try {
                   sink.next(executionTemplate.execute(() -> {
-                    Transaction currentTx = getCurrentTx();
-                    // Whether there wasn't a tx and now there is, or if there is a newer one (if we have a nested tx, using xa)
-                    // we must set the component location of this try scope
-                    if ((!txPrevoiuslyActive && isTransactionActive()) || (txPrevoiuslyActive && previousTx != currentTx)) {
-                      TransactionAdapter transaction = (TransactionAdapter) currentTx;
-                      transaction.setComponentLocation(getLocation());
-                    }
-                    try {
-                      return just(event)
-                          .transform(nestedChain)
-                          .onErrorStop()
-                          .subscriberContext(ctx)
-                          .block();
-                    } catch (Throwable e) {
-                      if (e.getCause() instanceof InterruptedException) {
-                        currentThread().interrupt();
-                      }
-                      throw rxExceptionToMuleException(e);
-                    }
+                    handlePreviousTransaction(txPrevoiuslyActive, previousTx, getCurrentTx());
+                    return processBlocking(ctx, event);
                   }));
                 } catch (Exception e) {
                   final Throwable unwrapped = unwrap(e);
@@ -119,6 +102,30 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
               }));
     } else {
       return from(publisher).transform(nestedChain);
+    }
+  }
+
+  private void handlePreviousTransaction(final boolean txPrevoiuslyActive, Transaction previousTx, Transaction currentTx) {
+    // Whether there wasn't a tx and now there is, or if there is a newer one (if we have a nested tx, using xa)
+    // we must set the component location of this try scope
+    if ((!txPrevoiuslyActive && isTransactionActive()) || (txPrevoiuslyActive && previousTx != currentTx)) {
+      TransactionAdapter transaction = (TransactionAdapter) currentTx;
+      transaction.setComponentLocation(getLocation());
+    }
+  }
+
+  private CoreEvent processBlocking(Context ctx, CoreEvent event) throws MuleException {
+    try {
+      return just(event)
+          .transform(nestedChain)
+          .onErrorStop()
+          .subscriberContext(ctx)
+          .block();
+    } catch (Throwable e) {
+      if (e.getCause() instanceof InterruptedException) {
+        currentThread().interrupt();
+      }
+      throw rxExceptionToMuleException(e);
     }
   }
 

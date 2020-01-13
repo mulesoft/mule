@@ -179,7 +179,7 @@ public class CompositeOperationPolicy
                   return t;
                 }
               });
-            }), () -> sinkRecorder.complete(), t -> sinkRecorder.error(t),
+            }), sinkRecorder::complete, sinkRecorder::error,
                                     shutdownTimeout,
                                     completionCallbackScheduler))
                                         .doOnNext(response -> from(response)
