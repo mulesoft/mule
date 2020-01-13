@@ -44,6 +44,8 @@ public interface PlatformManagedOAuthDancer {
    */
   CompletableFuture<Void> refreshToken();
 
+  CompletableFuture<PlatformManagedConnectionDescriptor> getConnectionDescriptor();
+
   /**
    * Clears the oauth context.
    */
