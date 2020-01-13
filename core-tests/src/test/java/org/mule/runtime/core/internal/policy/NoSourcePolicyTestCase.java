@@ -17,7 +17,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.block;
-import static org.mule.runtime.core.internal.policy.SourcePolicyContext.SOURCE_POLICY_CONTEXT;
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.functional.Either;
@@ -25,6 +24,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -63,7 +63,7 @@ public class NoSourcePolicyTestCase extends AbstractMuleTestCase {
     noSourcePolicy = new NoSourcePolicy(flowProcessor);
 
     when(initialEvent.getVariables()).thenReturn(new CaseInsensitiveHashMap<>());
-    when(initialEvent.getInternalParameter(SOURCE_POLICY_CONTEXT)).thenReturn(sourcePolicyContext);
+    when(initialEvent.getSourcePolicyContext()).thenReturn((EventInternalContext) sourcePolicyContext);
   }
 
   @Test

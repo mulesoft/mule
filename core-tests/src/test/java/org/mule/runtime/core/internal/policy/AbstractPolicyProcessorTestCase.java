@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static com.google.common.collect.ImmutableMap.of;
 import static java.util.UUID.randomUUID;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -15,10 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
-import static org.mule.runtime.core.internal.policy.OperationPolicyContext.OPERATION_POLICY_CONTEXT;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
-import static org.mule.runtime.core.internal.policy.SourcePolicyContext.SOURCE_POLICY_CONTEXT;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static reactor.core.publisher.Mono.from;
@@ -33,6 +29,7 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder;
@@ -44,6 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Mono;
 
 public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCase {
@@ -72,8 +70,8 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     operationPolicyContext = mock(OperationPolicyContext.class, RETURNS_DEEP_STUBS);
     sourcePolicyContext = new SourcePolicyContext(mock(PolicyPointcutParameters.class));
     initialEvent = createTestEvent();
-    initialEvent = quickCopy(initialEvent, of(OPERATION_POLICY_CONTEXT, operationPolicyContext,
-                                              SOURCE_POLICY_CONTEXT, sourcePolicyContext));
+    ((InternalEvent) initialEvent).setSourcePolicyContext(sourcePolicyContext);
+    ((InternalEvent) initialEvent).setOperationPolicyContext(operationPolicyContext);
 
     when(flowProcessor.apply(any())).thenAnswer(invocation -> invocation.getArgument(0));
     policyProcessor = getProcessor();

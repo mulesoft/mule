@@ -12,10 +12,7 @@ import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
-import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock.readWriteLock;
-import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
-import static org.mule.runtime.core.internal.policy.OperationPolicyContext.OPERATION_POLICY_CONTEXT;
 import static org.mule.runtime.core.internal.policy.OperationPolicyContext.from;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 import static reactor.core.Exceptions.propagate;
@@ -228,13 +225,12 @@ public class CompositeOperationPolicy
                                                             operationExecutionFunction,
                                                             callback);
     if (getParametersTransformer().isPresent()) {
-      return InternalEvent.builder(operationEvent)
+      operationEvent = InternalEvent.builder(operationEvent)
           .message(getParametersTransformer().get().fromParametersToMessage(parametersProcessor.getOperationParameters()))
-          .addInternalParameter(OPERATION_POLICY_CONTEXT, ctx)
           .build();
-    } else {
-      return quickCopy(operationEvent, of(OPERATION_POLICY_CONTEXT, ctx));
     }
+    ((InternalEvent) operationEvent).setOperationPolicyContext(ctx);
+    return operationEvent;
   }
 
   @Override
