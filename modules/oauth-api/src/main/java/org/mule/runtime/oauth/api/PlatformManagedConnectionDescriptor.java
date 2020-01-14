@@ -40,7 +40,7 @@ public interface PlatformManagedConnectionDescriptor {
 
   /**
    * Returns parameters additional to the standard OAuth ones that the user has configured for this connection. These usually
-   * correspond to custom parameters tha the service provider accepts or requires on its requests, but may contain other
+   * correspond to custom parameters that the service provider accepts or requires on its requests, but may contain other
    * parameters as well.
    *
    * @return A {@link Map} which keys are the parameter names
