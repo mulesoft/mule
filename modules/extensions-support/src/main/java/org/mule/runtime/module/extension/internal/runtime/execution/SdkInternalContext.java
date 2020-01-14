@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static java.util.function.Function.identity;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -39,62 +41,71 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     return (SdkInternalContext) ((InternalEvent) event).<SdkInternalContext>getSdkInternalContext();
   }
 
-  private final Map<ComponentLocation, LocationSpecificSdkInternalContext> locationSpecificContext = new SmallMap<>();
+  /*
+   * SDK components may be nested within each other, so some of the context must be kept separately for the component it belongs
+   * to.
+   */
+  private final Map<String, LocationSpecificSdkInternalContext> locationSpecificContext = new SmallMap<>();
+
+  private Function<Context, Context> innerChainSubscriberContextMapping = identity();
 
   public void clearContextForLocation(ComponentLocation location) {
-    locationSpecificContext.remove(location);
+    locationSpecificContext.remove(resolveLocation(location));
+  }
+
+  public void setConfiguration(ComponentLocation location, Optional<ConfigurationInstance> configuration) {
+    final LocationSpecificSdkInternalContext ctx = new LocationSpecificSdkInternalContext();
+    ctx.setConfiguration(configuration);
+    locationSpecificContext.put(resolveLocation(location), ctx);
+  }
+
+  public Optional<ConfigurationInstance> getConfiguration(ComponentLocation location) {
+    return locationSpecificContext.get(resolveLocation(location)).getConfiguration();
   }
 
   public void setOperationExecutionParams(ComponentLocation location, Optional<ConfigurationInstance> configuration,
                                           Map<String, Object> parameters, CoreEvent operationEvent, ExecutorCallback callback) {
-
-    final LocationSpecificSdkInternalContext ctx = new LocationSpecificSdkInternalContext();
-    ctx.setOperationExecutionParams(configuration, parameters, operationEvent, callback);
-    locationSpecificContext.put(location, ctx);
+    locationSpecificContext.get(resolveLocation(location)).setOperationExecutionParams(configuration, parameters, operationEvent,
+                                                                                       callback);
   }
 
   public OperationExecutionParams getOperationExecutionParams(ComponentLocation location) {
-    return locationSpecificContext.get(location).operationExecutionParams;
-  }
-
-  public Function<Context, Context> getInnerChainSubscriberContextMapping(ComponentLocation location) {
-    return locationSpecificContext.get(location).getInnerChainSubscriberContextMapping();
-  }
-
-  public void setInnerChainSubscriberContextMapping(ComponentLocation location,
-                                                    Function<Context, Context> innerChainSubscriberContextMapping) {
-    locationSpecificContext.get(location).setInnerChainSubscriberContextMapping(innerChainSubscriberContextMapping);
-  }
-
-  public Optional<ConfigurationInstance> getConfiguration(ComponentLocation location) {
-    return locationSpecificContext.get(location).getConfiguration();
-  }
-
-  public void setConfiguration(ComponentLocation location, Optional<ConfigurationInstance> configuration) {
-    locationSpecificContext.get(location).setConfiguration(configuration);
+    return locationSpecificContext.get(resolveLocation(location)).getOperationExecutionParams();
   }
 
   public Map<String, Object> getResolutionResult(ComponentLocation location) {
-    return locationSpecificContext.get(location).getResolutionResult();
+    return locationSpecificContext.get(resolveLocation(location)).getResolutionResult();
   }
 
   public void setResolutionResult(ComponentLocation location, Map<String, Object> resolutionResult) {
-    locationSpecificContext.get(location).setResolutionResult(resolutionResult);
+    locationSpecificContext.get(resolveLocation(location)).setResolutionResult(resolutionResult);
   }
 
   public OperationPolicy getPolicyToApply(ComponentLocation location) {
-    return locationSpecificContext.get(location).getPolicyToApply();
+    return locationSpecificContext.get(resolveLocation(location)).getPolicyToApply();
   }
 
   public void setPolicyToApply(ComponentLocation location, OperationPolicy policyToApply) {
-    locationSpecificContext.get(location).setPolicyToApply(policyToApply);
+    locationSpecificContext.get(resolveLocation(location)).setPolicyToApply(policyToApply);
+  }
+
+  private String resolveLocation(ComponentLocation location) {
+    return location != null ? location.getLocation() : "(null)";
   }
 
   /**
    * @return {@code true} if the policy to be applied is a no-op, {@code false} if a policy is actually applied.
    */
-  public boolean isNoPolicyOperation() {
-    return DefaultPolicyManager.isNoPolicyOperation(getPolicyToApply());
+  public boolean isNoPolicyOperation(ComponentLocation location) {
+    return DefaultPolicyManager.isNoPolicyOperation(getPolicyToApply(location));
+  }
+
+  public Function<Context, Context> getInnerChainSubscriberContextMapping() {
+    return innerChainSubscriberContextMapping;
+  }
+
+  public void setInnerChainSubscriberContextMapping(Function<Context, Context> innerChainSubscriberContextMapping) {
+    this.innerChainSubscriberContextMapping = innerChainSubscriberContextMapping;
   }
 
   @Override
@@ -106,25 +117,19 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
 
     private OperationExecutionParams operationExecutionParams;
 
-    private Function<Context, Context> innerChainSubscriberContextMapping = identity();
-
     private Optional<ConfigurationInstance> configuration;
 
     private Map<String, Object> resolutionResult;
 
     private OperationPolicy policyToApply;
 
+    public OperationExecutionParams getOperationExecutionParams() {
+      return operationExecutionParams;
+    }
+
     public void setOperationExecutionParams(Optional<ConfigurationInstance> configuration, Map<String, Object> parameters,
                                             CoreEvent operationEvent, ExecutorCallback callback) {
       this.operationExecutionParams = new OperationExecutionParams(configuration, parameters, operationEvent, callback);
-    }
-
-    public Function<Context, Context> getInnerChainSubscriberContextMapping() {
-      return innerChainSubscriberContextMapping;
-    }
-
-    public void setInnerChainSubscriberContextMapping(Function<Context, Context> innerChainSubscriberContextMapping) {
-      this.innerChainSubscriberContextMapping = innerChainSubscriberContextMapping;
     }
 
     public Optional<ConfigurationInstance> getConfiguration() {
