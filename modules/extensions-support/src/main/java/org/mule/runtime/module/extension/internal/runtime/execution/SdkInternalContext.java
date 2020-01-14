@@ -39,15 +39,56 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     return (SdkInternalContext) ((InternalEvent) event).<SdkInternalContext>getSdkInternalContext();
   }
 
-  private OperationExecutionParams operationExecutionParams;
+  private final Map<ComponentLocation, LocationSpecificSdkInternalContext> locationSpecificContext = new SmallMap<>();
 
-  private Function<Context, Context> innerChainSubscriberContextMapping = identity();
+  public void clearContextForLocation(ComponentLocation location) {
+    locationSpecificContext.remove(location);
+  }
 
-  private Optional<ConfigurationInstance> configuration;
+  public void setOperationExecutionParams(ComponentLocation location, Optional<ConfigurationInstance> configuration,
+                                          Map<String, Object> parameters, CoreEvent operationEvent, ExecutorCallback callback) {
 
-  private Map<String, Object> resolutionResult;
+    final LocationSpecificSdkInternalContext ctx = new LocationSpecificSdkInternalContext();
+    ctx.setOperationExecutionParams(configuration, parameters, operationEvent, callback);
+    locationSpecificContext.put(location, ctx);
+  }
 
-  private OperationPolicy policyToApply;
+  public OperationExecutionParams getOperationExecutionParams(ComponentLocation location) {
+    return locationSpecificContext.get(location).operationExecutionParams;
+  }
+
+  public Function<Context, Context> getInnerChainSubscriberContextMapping(ComponentLocation location) {
+    return locationSpecificContext.get(location).getInnerChainSubscriberContextMapping();
+  }
+
+  public void setInnerChainSubscriberContextMapping(ComponentLocation location,
+                                                    Function<Context, Context> innerChainSubscriberContextMapping) {
+    locationSpecificContext.get(location).setInnerChainSubscriberContextMapping(innerChainSubscriberContextMapping);
+  }
+
+  public Optional<ConfigurationInstance> getConfiguration(ComponentLocation location) {
+    return locationSpecificContext.get(location).getConfiguration();
+  }
+
+  public void setConfiguration(ComponentLocation location, Optional<ConfigurationInstance> configuration) {
+    locationSpecificContext.get(location).setConfiguration(configuration);
+  }
+
+  public Map<String, Object> getResolutionResult(ComponentLocation location) {
+    return locationSpecificContext.get(location).getResolutionResult();
+  }
+
+  public void setResolutionResult(ComponentLocation location, Map<String, Object> resolutionResult) {
+    locationSpecificContext.get(location).setResolutionResult(resolutionResult);
+  }
+
+  public OperationPolicy getPolicyToApply(ComponentLocation location) {
+    return locationSpecificContext.get(location).getPolicyToApply();
+  }
+
+  public void setPolicyToApply(ComponentLocation location, OperationPolicy policyToApply) {
+    locationSpecificContext.get(location).setPolicyToApply(policyToApply);
+  }
 
   /**
    * @return {@code true} if the policy to be applied is a no-op, {@code false} if a policy is actually applied.
@@ -56,50 +97,59 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     return DefaultPolicyManager.isNoPolicyOperation(getPolicyToApply());
   }
 
-  public OperationExecutionParams getOperationExecutionParams() {
-    return operationExecutionParams;
-  }
-
-  public void setOperationExecutionParams(Optional<ConfigurationInstance> configuration, Map<String, Object> parameters,
-                                          CoreEvent operationEvent, ExecutorCallback callback) {
-    this.operationExecutionParams = new OperationExecutionParams(configuration, parameters, operationEvent, callback);
-  }
-
-  public Function<Context, Context> getInnerChainSubscriberContextMapping() {
-    return innerChainSubscriberContextMapping;
-  }
-
-  public void setInnerChainSubscriberContextMapping(Function<Context, Context> innerChainSubscriberContextMapping) {
-    this.innerChainSubscriberContextMapping = innerChainSubscriberContextMapping;
-  }
-
-  public Optional<ConfigurationInstance> getConfiguration() {
-    return configuration;
-  }
-
-  public void setConfiguration(Optional<ConfigurationInstance> configuration) {
-    this.configuration = configuration;
-  }
-
-  public Map<String, Object> getResolutionResult() {
-    return resolutionResult;
-  }
-
-  public void setResolutionResult(Map<String, Object> resolutionResult) {
-    this.resolutionResult = resolutionResult;
-  }
-
-  public OperationPolicy getPolicyToApply() {
-    return policyToApply;
-  }
-
-  public void setPolicyToApply(OperationPolicy policyToApply) {
-    this.policyToApply = policyToApply;
-  }
-
   @Override
   public SdkInternalContext copy() {
     return this;
+  }
+
+  public static final class LocationSpecificSdkInternalContext {
+
+    private OperationExecutionParams operationExecutionParams;
+
+    private Function<Context, Context> innerChainSubscriberContextMapping = identity();
+
+    private Optional<ConfigurationInstance> configuration;
+
+    private Map<String, Object> resolutionResult;
+
+    private OperationPolicy policyToApply;
+
+    public void setOperationExecutionParams(Optional<ConfigurationInstance> configuration, Map<String, Object> parameters,
+                                            CoreEvent operationEvent, ExecutorCallback callback) {
+      this.operationExecutionParams = new OperationExecutionParams(configuration, parameters, operationEvent, callback);
+    }
+
+    public Function<Context, Context> getInnerChainSubscriberContextMapping() {
+      return innerChainSubscriberContextMapping;
+    }
+
+    public void setInnerChainSubscriberContextMapping(Function<Context, Context> innerChainSubscriberContextMapping) {
+      this.innerChainSubscriberContextMapping = innerChainSubscriberContextMapping;
+    }
+
+    public Optional<ConfigurationInstance> getConfiguration() {
+      return configuration;
+    }
+
+    public void setConfiguration(Optional<ConfigurationInstance> configuration) {
+      this.configuration = configuration;
+    }
+
+    public Map<String, Object> getResolutionResult() {
+      return resolutionResult;
+    }
+
+    public void setResolutionResult(Map<String, Object> resolutionResult) {
+      this.resolutionResult = resolutionResult;
+    }
+
+    public OperationPolicy getPolicyToApply() {
+      return policyToApply;
+    }
+
+    public void setPolicyToApply(OperationPolicy policyToApply) {
+      this.policyToApply = policyToApply;
+    }
   }
 
   public static final class OperationExecutionParams {
