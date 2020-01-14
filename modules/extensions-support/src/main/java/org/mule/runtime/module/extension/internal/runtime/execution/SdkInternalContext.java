@@ -16,6 +16,8 @@ import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -39,30 +41,66 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     return (SdkInternalContext) ((InternalEvent) event).<SdkInternalContext>getSdkInternalContext();
   }
 
-  private OperationExecutionParams operationExecutionParams;
+  /*
+   * SDK components may be nested within each other, so some of the context must be kept separately for the component it belongs
+   * to.
+   */
+  private final Deque<LocationSpecificSdkInternalContext> locationSpecificContext = new ArrayDeque<>();
 
   private Function<Context, Context> innerChainSubscriberContextMapping = identity();
 
-  private Optional<ConfigurationInstance> configuration;
+  public void popContext() {
+    locationSpecificContext.pop();
+  }
 
-  private Map<String, Object> resolutionResult;
+  public void pushContext() {
+    locationSpecificContext.push(new LocationSpecificSdkInternalContext());
+  }
 
-  private OperationPolicy policyToApply;
+  /**
+   * For a given location, this method has to always be called first, so the context for this location is properly initialized.
+   *
+   * @param configuration the configuration of the operation.
+   */
+  public void setConfiguration(Optional<ConfigurationInstance> configuration) {
+    locationSpecificContext.peek().setConfiguration(configuration);
+  }
+
+  public Optional<ConfigurationInstance> getConfiguration() {
+    return locationSpecificContext.peek().getConfiguration();
+  }
+
+  public void setOperationExecutionParams(Optional<ConfigurationInstance> configuration,
+                                          Map<String, Object> parameters, CoreEvent operationEvent, ExecutorCallback callback) {
+    locationSpecificContext.peek().setOperationExecutionParams(configuration, parameters, operationEvent,
+                                                               callback);
+  }
+
+  public OperationExecutionParams getOperationExecutionParams() {
+    return locationSpecificContext.peek().getOperationExecutionParams();
+  }
+
+  public Map<String, Object> getResolutionResult() {
+    return locationSpecificContext.peek().getResolutionResult();
+  }
+
+  public void setResolutionResult(Map<String, Object> resolutionResult) {
+    locationSpecificContext.peek().setResolutionResult(resolutionResult);
+  }
+
+  public OperationPolicy getPolicyToApply() {
+    return locationSpecificContext.peek().getPolicyToApply();
+  }
+
+  public void setPolicyToApply(OperationPolicy policyToApply) {
+    locationSpecificContext.peek().setPolicyToApply(policyToApply);
+  }
 
   /**
    * @return {@code true} if the policy to be applied is a no-op, {@code false} if a policy is actually applied.
    */
   public boolean isNoPolicyOperation() {
     return DefaultPolicyManager.isNoPolicyOperation(getPolicyToApply());
-  }
-
-  public OperationExecutionParams getOperationExecutionParams() {
-    return operationExecutionParams;
-  }
-
-  public void setOperationExecutionParams(Optional<ConfigurationInstance> configuration, Map<String, Object> parameters,
-                                          CoreEvent operationEvent, ExecutorCallback callback) {
-    this.operationExecutionParams = new OperationExecutionParams(configuration, parameters, operationEvent, callback);
   }
 
   public Function<Context, Context> getInnerChainSubscriberContextMapping() {
@@ -73,33 +111,53 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     this.innerChainSubscriberContextMapping = innerChainSubscriberContextMapping;
   }
 
-  public Optional<ConfigurationInstance> getConfiguration() {
-    return configuration;
-  }
-
-  public void setConfiguration(Optional<ConfigurationInstance> configuration) {
-    this.configuration = configuration;
-  }
-
-  public Map<String, Object> getResolutionResult() {
-    return resolutionResult;
-  }
-
-  public void setResolutionResult(Map<String, Object> resolutionResult) {
-    this.resolutionResult = resolutionResult;
-  }
-
-  public OperationPolicy getPolicyToApply() {
-    return policyToApply;
-  }
-
-  public void setPolicyToApply(OperationPolicy policyToApply) {
-    this.policyToApply = policyToApply;
-  }
-
   @Override
   public SdkInternalContext copy() {
     return this;
+  }
+
+  public static final class LocationSpecificSdkInternalContext {
+
+    private OperationExecutionParams operationExecutionParams;
+
+    private Optional<ConfigurationInstance> configuration;
+
+    private Map<String, Object> resolutionResult;
+
+    private OperationPolicy policyToApply;
+
+    public OperationExecutionParams getOperationExecutionParams() {
+      return operationExecutionParams;
+    }
+
+    public void setOperationExecutionParams(Optional<ConfigurationInstance> configuration, Map<String, Object> parameters,
+                                            CoreEvent operationEvent, ExecutorCallback callback) {
+      this.operationExecutionParams = new OperationExecutionParams(configuration, parameters, operationEvent, callback);
+    }
+
+    public Optional<ConfigurationInstance> getConfiguration() {
+      return configuration;
+    }
+
+    public void setConfiguration(Optional<ConfigurationInstance> configuration) {
+      this.configuration = configuration;
+    }
+
+    public Map<String, Object> getResolutionResult() {
+      return resolutionResult;
+    }
+
+    public void setResolutionResult(Map<String, Object> resolutionResult) {
+      this.resolutionResult = resolutionResult;
+    }
+
+    public OperationPolicy getPolicyToApply() {
+      return policyToApply;
+    }
+
+    public void setPolicyToApply(OperationPolicy policyToApply) {
+      this.policyToApply = policyToApply;
+    }
   }
 
   public static final class OperationExecutionParams {
@@ -132,8 +190,5 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     public ExecutorCallback getCallback() {
       return callback;
     }
-
   }
-
-
 }
