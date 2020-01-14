@@ -7,9 +7,22 @@
 
 package org.mule.test.runner.api;
 
+import static com.google.common.base.Joiner.on;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.internal.AetherRepositoryState;
 import org.mule.maven.client.internal.AetherResolutionContext;
+
+import java.io.File;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.eclipse.aether.RepositorySystem;
@@ -36,17 +49,6 @@ import org.eclipse.aether.util.graph.visitor.PathRecordingDependencyVisitor;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-
-import static com.google.common.base.Joiner.on;
-import static java.util.Optional.empty;
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 /**
  * Provides {@link Dependency}s resolutions for Maven {@link Artifact} based on {@link RepositorySystem} and
@@ -100,7 +102,7 @@ public class DependencyResolver {
     checkNotNull(artifact, "artifact cannot be null");
 
     final ArtifactDescriptorRequest request =
-        new ArtifactDescriptorRequest(artifact, resolutionContext.getRemoteRepositories(), null);
+        new ArtifactDescriptorRequest(artifact, resolveRepositories(), null);
     return repositoryState.getSystem().readArtifactDescriptor(repositoryState.getSession(), request);
   }
 
@@ -117,14 +119,7 @@ public class DependencyResolver {
     checkNotNull(artifact, "artifact cannot be null");
 
     final ArtifactDescriptorRequest request =
-        new ArtifactDescriptorRequest(artifact, resolutionContext.getRemoteRepositories(), null);
-    // Has to set authentication to these remote repositories as they may come from a pom descriptor
-    remoteRepositories.forEach(remoteRepository -> {
-      RemoteRepository authenticatedRemoteRepository = setAuthentication(remoteRepository);
-      if (!request.getRepositories().contains(authenticatedRemoteRepository)) {
-        request.addRepository(authenticatedRemoteRepository);
-      }
-    });
+        new ArtifactDescriptorRequest(artifact, resolveRepositories(remoteRepositories), null);
 
     return repositoryState.getSystem().readArtifactDescriptor(repositoryState.getSession(), request);
   }
@@ -139,7 +134,7 @@ public class DependencyResolver {
   public ArtifactResult resolveArtifact(Artifact artifact) throws ArtifactResolutionException {
     checkNotNull(artifact, "artifact cannot be null");
 
-    final ArtifactRequest request = new ArtifactRequest(artifact, resolutionContext.getRemoteRepositories(), null);
+    final ArtifactRequest request = new ArtifactRequest(artifact, resolveRepositories(), null);
     return repositoryState.getSystem().resolveArtifact(repositoryState.getSession(), request);
   }
 
@@ -155,14 +150,7 @@ public class DependencyResolver {
       throws ArtifactResolutionException {
     checkNotNull(artifact, "artifact cannot be null");
 
-    final ArtifactRequest request = new ArtifactRequest(artifact, resolutionContext.getRemoteRepositories(), null);
-    // Has to set authentication to these remote repositories as they may come from a pom descriptor
-    remoteRepositories.forEach(remoteRepository -> {
-      RemoteRepository authenticatedRemoteRepository = setAuthentication(remoteRepository);
-      if (!request.getRepositories().contains(authenticatedRemoteRepository)) {
-        request.addRepository(authenticatedRemoteRepository);
-      }
-    });
+    final ArtifactRequest request = new ArtifactRequest(artifact, resolveRepositories(remoteRepositories), null);
     return repositoryState.getSystem().resolveArtifact(repositoryState.getSession(), request);
   }
 
@@ -222,14 +210,7 @@ public class DependencyResolver {
     collectRequest.setRoot(root);
     collectRequest.setDependencies(directDependencies);
     collectRequest.setManagedDependencies(managedDependencies);
-    collectRequest.setRepositories(resolutionContext.getRemoteRepositories());
-    // Has to set authentication to these remote repositories as they may come from a pom descriptor
-    remoteRepositories.forEach(remoteRepository -> {
-      RemoteRepository authenticatedRemoteRepository = setAuthentication(remoteRepository);
-      if (!collectRequest.getRepositories().contains(authenticatedRemoteRepository)) {
-        collectRequest.addRepository(authenticatedRemoteRepository);
-      }
-    });
+    collectRequest.setRepositories(resolveRepositories(remoteRepositories));
 
     DependencyNode node;
     try {
@@ -274,11 +255,16 @@ public class DependencyResolver {
     return collectRequest.getRoot() + " -> " + collectRequest.getDependencies() + " < " + stringBuilder.toString();
   }
 
-  private RemoteRepository setAuthentication(RemoteRepository remoteRepository) {
-    RemoteRepository.Builder authenticated = new RemoteRepository.Builder(remoteRepository);
-    this.resolutionContext.getAuthenticatorSelector()
-        .ifPresent(authSelector -> authenticated.setAuthentication(authSelector.getAuthentication(remoteRepository)));
-    return authenticated.build();
+  private List<RemoteRepository> resolveRepositories() {
+    return resolveRepositories(emptyList());
+  }
+
+  private List<RemoteRepository> resolveRepositories(List<RemoteRepository> remoteRepositories) {
+    return repositoryState.getSystem().newResolutionRepositories(repositoryState.getSession(),
+                                                                 Stream
+                                                                     .of(remoteRepositories,
+                                                                         resolutionContext.getRemoteRepositories())
+                                                                     .flatMap(Collection::stream).collect(toList()));
   }
 
   private void logDependencyGraph(DependencyNode node, Object request) {
