@@ -8,8 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static java.util.function.Function.identity;
 
-import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -18,6 +16,8 @@ import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -45,97 +45,62 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
    * SDK components may be nested within each other, so some of the context must be kept separately for the component it belongs
    * to.
    */
-  private final Map<String, LocationSpecificSdkInternalContext> locationSpecificContext = new SmallMap<>();
+  private final Deque<LocationSpecificSdkInternalContext> locationSpecificContext = new ArrayDeque<>();
 
   private Function<Context, Context> innerChainSubscriberContextMapping = identity();
 
-  public void clearContextForLocation(ComponentLocation location) {
-    locationSpecificContext.remove(resolveLocation(location));
+  public void popContext() {
+    locationSpecificContext.pop();
+  }
+
+  public void pushContext() {
+    locationSpecificContext.push(new LocationSpecificSdkInternalContext());
   }
 
   /**
    * For a given location, this method has to always be called first, so the context for this location is properly initialized.
    *
-   * @param location the location that the provided configuration is for.
    * @param configuration the configuration of the operation.
    */
-  public void setConfiguration(ComponentLocation location, Optional<ConfigurationInstance> configuration) {
-    final LocationSpecificSdkInternalContext ctx = new LocationSpecificSdkInternalContext();
-    ctx.setConfiguration(configuration);
-    locationSpecificContext.put(resolveLocation(location), ctx);
+  public void setConfiguration(Optional<ConfigurationInstance> configuration) {
+    locationSpecificContext.peek().setConfiguration(configuration);
   }
 
-  /**
-   * @throws NullPointerException if {@link #setConfiguration(ComponentLocation, Optional)} was not previously called for the
-   *         given {@code location}.
-   */
-  public Optional<ConfigurationInstance> getConfiguration(ComponentLocation location) {
-    return locationSpecificContext.get(resolveLocation(location)).getConfiguration();
+  public Optional<ConfigurationInstance> getConfiguration() {
+    return locationSpecificContext.peek().getConfiguration();
   }
 
-  /**
-   * @throws NullPointerException if {@link #setConfiguration(ComponentLocation, Optional)} was not previously called for the
-   *         given {@code location}.
-   */
-  public void setOperationExecutionParams(ComponentLocation location, Optional<ConfigurationInstance> configuration,
+  public void setOperationExecutionParams(Optional<ConfigurationInstance> configuration,
                                           Map<String, Object> parameters, CoreEvent operationEvent, ExecutorCallback callback) {
-    locationSpecificContext.get(resolveLocation(location)).setOperationExecutionParams(configuration, parameters, operationEvent,
-                                                                                       callback);
+    locationSpecificContext.peek().setOperationExecutionParams(configuration, parameters, operationEvent,
+                                                               callback);
   }
 
-  /**
-   * @throws NullPointerException if {@link #setConfiguration(ComponentLocation, Optional)} was not previously called for the
-   *         given {@code location}.
-   */
-  public OperationExecutionParams getOperationExecutionParams(ComponentLocation location) {
-    return locationSpecificContext.get(resolveLocation(location)).getOperationExecutionParams();
+  public OperationExecutionParams getOperationExecutionParams() {
+    return locationSpecificContext.peek().getOperationExecutionParams();
   }
 
-  /**
-   * @throws NullPointerException if {@link #setConfiguration(ComponentLocation, Optional)} was not previously called for the
-   *         given {@code location}.
-   */
-  public Map<String, Object> getResolutionResult(ComponentLocation location) {
-    return locationSpecificContext.get(resolveLocation(location)).getResolutionResult();
+  public Map<String, Object> getResolutionResult() {
+    return locationSpecificContext.peek().getResolutionResult();
   }
 
-  /**
-   * @throws NullPointerException if {@link #setConfiguration(ComponentLocation, Optional)} was not previously called for the
-   *         given {@code location}.
-   */
-  public void setResolutionResult(ComponentLocation location, Map<String, Object> resolutionResult) {
-    locationSpecificContext.get(resolveLocation(location)).setResolutionResult(resolutionResult);
+  public void setResolutionResult(Map<String, Object> resolutionResult) {
+    locationSpecificContext.peek().setResolutionResult(resolutionResult);
   }
 
-  /**
-   * @throws NullPointerException if {@link #setConfiguration(ComponentLocation, Optional)} was not previously called for the
-   *         given {@code location}.
-   */
-  public OperationPolicy getPolicyToApply(ComponentLocation location) {
-    return locationSpecificContext.get(resolveLocation(location)).getPolicyToApply();
+  public OperationPolicy getPolicyToApply() {
+    return locationSpecificContext.peek().getPolicyToApply();
   }
 
-  /**
-   * @throws NullPointerException if {@link #setConfiguration(ComponentLocation, Optional)} was not previously called for the
-   *         given {@code location}.
-   */
-  public void setPolicyToApply(ComponentLocation location, OperationPolicy policyToApply) {
-    locationSpecificContext.get(resolveLocation(location)).setPolicyToApply(policyToApply);
-  }
-
-  private String resolveLocation(ComponentLocation location) {
-    return location != null ? location.getLocation() : "(null)";
+  public void setPolicyToApply(OperationPolicy policyToApply) {
+    locationSpecificContext.peek().setPolicyToApply(policyToApply);
   }
 
   /**
    * @return {@code true} if the policy to be applied is a no-op, {@code false} if a policy is actually applied.
    */
-  /**
-   * @throws NullPointerException if {@link #setConfiguration(ComponentLocation, Optional)} was not previously called for the
-   *         given {@code location}.
-   */
-  public boolean isNoPolicyOperation(ComponentLocation location) {
-    return DefaultPolicyManager.isNoPolicyOperation(getPolicyToApply(location));
+  public boolean isNoPolicyOperation() {
+    return DefaultPolicyManager.isNoPolicyOperation(getPolicyToApply());
   }
 
   public Function<Context, Context> getInnerChainSubscriberContextMapping() {
@@ -225,8 +190,5 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     public ExecutorCallback getCallback() {
       return callback;
     }
-
   }
-
-
 }
