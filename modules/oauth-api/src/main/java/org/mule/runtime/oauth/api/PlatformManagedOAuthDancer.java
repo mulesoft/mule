@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Allows to manipulate access and refresh tokens that are obtained and managed by the Anypoint Platform. Each instance is
- * preconfigured by an {@link OAuthPlatformManagedDancerBuilder} to point to a specific connection id.
+ * preconfigured by an {@link OAuthPlatformManagedDancerBuilder} to point to a specific connection URI.
  * <p>
  * Since the authorizations are performed by the platform, this dancer remains agnostic of the grant type that was used to
  * obtain them.
@@ -44,6 +44,10 @@ public interface PlatformManagedOAuthDancer {
    */
   CompletableFuture<Void> refreshToken();
 
+  /**
+   * Obtains a {@link PlatformManagedConnectionDescriptor} which describes the connection this dancer accesses
+   * @return a {@link CompletableFuture} which returns a {@link PlatformManagedConnectionDescriptor}
+   */
   CompletableFuture<PlatformManagedConnectionDescriptor> getConnectionDescriptor();
 
   /**
