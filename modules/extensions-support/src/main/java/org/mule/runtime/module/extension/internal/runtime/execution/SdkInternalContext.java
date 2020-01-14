@@ -53,38 +53,72 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     locationSpecificContext.remove(resolveLocation(location));
   }
 
+  /**
+   * For a given location, this method has to always be called first, so the context for this location is properly initialized.
+   *
+   * @param location the location that the provided configuration is for.
+   * @param configuration the configuration of the operation.
+   */
   public void setConfiguration(ComponentLocation location, Optional<ConfigurationInstance> configuration) {
     final LocationSpecificSdkInternalContext ctx = new LocationSpecificSdkInternalContext();
     ctx.setConfiguration(configuration);
     locationSpecificContext.put(resolveLocation(location), ctx);
   }
 
+  /**
+   * @throws NullPointerException if {@link #setConfiguration(ComponentLocation, Optional)} was not previously called for the
+   *         given {@code location}.
+   */
   public Optional<ConfigurationInstance> getConfiguration(ComponentLocation location) {
     return locationSpecificContext.get(resolveLocation(location)).getConfiguration();
   }
 
+  /**
+   * @throws NullPointerException if {@link #setConfiguration(ComponentLocation, Optional)} was not previously called for the
+   *         given {@code location}.
+   */
   public void setOperationExecutionParams(ComponentLocation location, Optional<ConfigurationInstance> configuration,
                                           Map<String, Object> parameters, CoreEvent operationEvent, ExecutorCallback callback) {
     locationSpecificContext.get(resolveLocation(location)).setOperationExecutionParams(configuration, parameters, operationEvent,
                                                                                        callback);
   }
 
+  /**
+   * @throws NullPointerException if {@link #setConfiguration(ComponentLocation, Optional)} was not previously called for the
+   *         given {@code location}.
+   */
   public OperationExecutionParams getOperationExecutionParams(ComponentLocation location) {
     return locationSpecificContext.get(resolveLocation(location)).getOperationExecutionParams();
   }
 
+  /**
+   * @throws NullPointerException if {@link #setConfiguration(ComponentLocation, Optional)} was not previously called for the
+   *         given {@code location}.
+   */
   public Map<String, Object> getResolutionResult(ComponentLocation location) {
     return locationSpecificContext.get(resolveLocation(location)).getResolutionResult();
   }
 
+  /**
+   * @throws NullPointerException if {@link #setConfiguration(ComponentLocation, Optional)} was not previously called for the
+   *         given {@code location}.
+   */
   public void setResolutionResult(ComponentLocation location, Map<String, Object> resolutionResult) {
     locationSpecificContext.get(resolveLocation(location)).setResolutionResult(resolutionResult);
   }
 
+  /**
+   * @throws NullPointerException if {@link #setConfiguration(ComponentLocation, Optional)} was not previously called for the
+   *         given {@code location}.
+   */
   public OperationPolicy getPolicyToApply(ComponentLocation location) {
     return locationSpecificContext.get(resolveLocation(location)).getPolicyToApply();
   }
 
+  /**
+   * @throws NullPointerException if {@link #setConfiguration(ComponentLocation, Optional)} was not previously called for the
+   *         given {@code location}.
+   */
   public void setPolicyToApply(ComponentLocation location, OperationPolicy policyToApply) {
     locationSpecificContext.get(resolveLocation(location)).setPolicyToApply(policyToApply);
   }
@@ -95,6 +129,10 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
 
   /**
    * @return {@code true} if the policy to be applied is a no-op, {@code false} if a policy is actually applied.
+   */
+  /**
+   * @throws NullPointerException if {@link #setConfiguration(ComponentLocation, Optional)} was not previously called for the
+   *         given {@code location}.
    */
   public boolean isNoPolicyOperation(ComponentLocation location) {
     return DefaultPolicyManager.isNoPolicyOperation(getPolicyToApply(location));
