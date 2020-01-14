@@ -82,6 +82,7 @@ import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
@@ -256,6 +257,19 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
           Flux<CoreEvent> transformed = from(propagateCompletion(from(publisher), create(errorSwitchSinkSinkRef)
+              .doOnNext(result -> {
+                result.apply(me -> {
+                  final SdkInternalContext sdkCtx = from(((MessagingException) me).getEvent());
+                  if (sdkCtx != null) {
+                    sdkCtx.popContext();
+                  }
+                }, response -> {
+                  final SdkInternalContext sdkCtx = from(response);
+                  if (sdkCtx != null) {
+                    sdkCtx.popContext();
+                  }
+                });
+              })
               .map(result -> {
                 return result.reduce(me -> {
                   throw propagateWrappingFatal(me);
@@ -296,9 +310,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                     }
                   }), () -> errorSwitchSinkSinkRef.complete(), t -> errorSwitchSinkSinkRef.error(t),
                                                                  muleContext.getConfiguration().getShutdownTimeout(),
-                                                                 outerFluxCompletionScheduler))
-                                                                     .doOnNext(event -> ((InternalEvent) event)
-                                                                         .setSdkInternalContext(null));
+                                                                 outerFluxCompletionScheduler));
 
           if (publisher instanceof Flux && !ctx.getOrEmpty(WITHIN_PROCESS_TO_APPLY).isPresent()) {
             return transformed
@@ -450,7 +462,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                   return subscriberContext()
                       .flatMapMany(ctx -> from(publisher)
                           .doOnNext(event -> prepareAndExecuteOperation(event,
-                                                                        () -> from(event).getOperationExecutionParams()
+                                                                        () -> from(event)
+                                                                            .getOperationExecutionParams()
                                                                             .getCallback(),
                                                                         ctx)));
                 }
@@ -465,15 +478,19 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                   return ComponentMessageProcessor.this.isAsync();
                 }
               }))
-              .onErrorContinue((t, event) -> LOGGER.error("Unhandler error in operation (" + toString() + ") flux",
+              .onErrorContinue((t, event) -> LOGGER.error("Unhandled error in operation (" + toString() + ") flux",
                                                           t))));
     },
                                                 getRuntime().availableProcessors());
   }
 
   private CoreEvent addContextToEvent(CoreEvent event, Context ctx) throws MuleException {
-    SdkInternalContext sdkInternalContext = new SdkInternalContext();
-    ((InternalEvent) event).setSdkInternalContext(sdkInternalContext);
+    SdkInternalContext sdkInternalContext = from(event);
+    if (sdkInternalContext == null) {
+      sdkInternalContext = new SdkInternalContext();
+      ((InternalEvent) event).setSdkInternalContext(sdkInternalContext);
+    }
+    sdkInternalContext.pushContext();
 
     if (hasNestedChain
         && (ctx.hasKey(POLICY_NEXT_OPERATION) || ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))) {
