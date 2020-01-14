@@ -24,12 +24,12 @@ import org.mule.runtime.oauth.api.listener.PlatformManagedOAuthStateListener;
 public interface OAuthPlatformManagedDancerBuilder extends OAuthDancerBuilder<PlatformManagedOAuthDancer> {
 
   /**
-   * Sets the ID of the connection that is defined in the Anypoint Platform
+   * Sets the URI that identifies the connection that is defined in the Anypoint Platform
    *
-   * @param connectionId the id of the connection which token we want to obtain
+   * @param connectionUri the id of the connection which token we want to obtain
    * @return {@code this} builder
    */
-  OAuthPlatformManagedDancerBuilder connectionId(String connectionId);
+  OAuthPlatformManagedDancerBuilder connectionUri(String connectionUri);
 
   /**
    * Sets the ID of the organization that defined the connection in the Anypoint Platform
