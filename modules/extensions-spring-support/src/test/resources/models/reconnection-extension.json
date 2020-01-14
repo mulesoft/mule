@@ -702,6 +702,50 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "Number",
+                    "annotations": {
+                      "classInformation": {
+                        "classname": "java.lang.Integer",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [
+                          "java.lang.Comparable"
+                        ],
+                        "parent": "java.lang.Number",
+                        "genericTypes": [],
+                        "isMap": false
+                      },
+                      "int": {}
+                    }
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 1
+                  },
+                  "allowedStereotypeModels": [],
+                  "name": "failOn",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Object",
                     "annotations": {
                       "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
@@ -723,7 +767,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 5
+                    "order": 3
                   },
                   "allowedStereotypeModels": [
                     {
@@ -883,7 +927,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 4,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -908,7 +952,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 0
+                "order": 1
               },
               "showInDsl": false,
               "name": "General",
@@ -937,7 +981,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 1,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -969,7 +1013,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 2,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -986,7 +1030,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 1
+                "order": 2
               },
               "showInDsl": false,
               "name": "Output",
@@ -1147,7 +1191,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 6,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1172,7 +1216,7 @@
                 "password": false,
                 "text": false,
                 "query": false,
-                "order": 2
+                "order": 3
               },
               "showInDsl": false,
               "name": "Connection",
