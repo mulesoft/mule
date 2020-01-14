@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.soap.internal.loader;
 import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
+import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.metadata.NullMetadataResolver.NULL_RESOLVER_NAME;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
@@ -131,8 +132,8 @@ public class SoapInvokeOperationDeclarer {
 
     Map<String, String> inputResolversByParam = inputResolver
         .entrySet().stream()
-        .collect(Collectors.toImmutableMap(Map.Entry::getKey,
-                                           e -> e.getValue().get().getResolverName()));
+        .collect(toImmutableMap(Map.Entry::getKey,
+                                e -> e.getValue().get().getResolverName()));
     String outputResolver = outputResolverSupplier.get().getResolverName();
     String attributesResolver = NULL_RESOLVER_NAME;
     String keysResolver = keysResolverSupplier.get().getResolverName();
