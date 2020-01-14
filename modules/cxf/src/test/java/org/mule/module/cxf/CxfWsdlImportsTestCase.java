@@ -63,6 +63,18 @@ public class CxfWsdlImportsTestCase extends FunctionalTestCase
     private static final String ECHO_TEST_ERROR_MESSAGE = "tag name \"wrongEcho\" is not allowed";
 
     private static final String LOG_TEST_ERROR_MESSAGE = "tag name \"wrongLog\" is not allowed";
+    
+    private static final String VALID_RESPONSE_LOG = "<ns1:logResponse xmlns:ns1=\"http://www.log.org\"/>";
+
+    private static final Object VALID_RESPONSE_ECHO = "<ns1:echoResponse xmlns:ns1=\"http://www.echo.org\">"
+                                                     + "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+                                                     + "<soap:Body> " +
+                                                     "<echo xmlns=\"http://www.echo.org\">" +
+                                                     "<echo>Testing echo</echo>" +
+                                                     "</echo>"
+                                                     + "</soap:Body>"
+                                                     + "</soap:Envelope>"
+                                                     + "</ns1:echoResponse>";
 
     @Rule
     public final DynamicPort httpPort = new DynamicPort("port1");
@@ -75,14 +87,17 @@ public class CxfWsdlImportsTestCase extends FunctionalTestCase
 
     @Parameter(2)
     public String errorMessage;
+    
+    @Parameter(3)
+    public String validResponse;
 
     @Parameters
     public static Collection<Object[]> data()
     {
         return Arrays.asList(new Object[][]
                                      {
-                                             {VALID_REQUEST_ECHO, INVALID_REQUEST_ECHO, ECHO_TEST_ERROR_MESSAGE},
-                                             {VALID_REQUEST_LOG, INVALID_REQUEST_LOG, LOG_TEST_ERROR_MESSAGE}
+                                             {VALID_REQUEST_ECHO, INVALID_REQUEST_ECHO, ECHO_TEST_ERROR_MESSAGE, VALID_RESPONSE_ECHO},
+                                             {VALID_REQUEST_LOG, INVALID_REQUEST_LOG, LOG_TEST_ERROR_MESSAGE, VALID_RESPONSE_LOG}
                                      });
     }
 
@@ -97,7 +112,7 @@ public class CxfWsdlImportsTestCase extends FunctionalTestCase
     public void testValidRequest() throws Exception
     {
         MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPort.getNumber() + "/services/test", getTestMuleMessage(validPayload));
-        assertThat(response.getPayloadAsString(), is(validPayload));
+        assertThat(response.getPayloadAsString(), is(validResponse));
     }
 
     @Test
