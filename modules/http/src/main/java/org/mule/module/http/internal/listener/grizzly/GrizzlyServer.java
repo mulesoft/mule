@@ -14,8 +14,6 @@ import org.mule.module.http.internal.listener.async.RequestHandler;
 import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 
 import java.io.IOException;
-import java.nio.channels.SelectableChannel;
-import java.nio.channels.SocketChannel;
 
 import org.glassfish.grizzly.nio.transport.TCPNIOConnection;
 import org.glassfish.grizzly.nio.transport.TCPNIOServerConnection;
@@ -109,35 +107,11 @@ public class GrizzlyServer implements Server
     private static class CloseAcceptedConnectionOnServerClose implements CloseListener<TCPNIOServerConnection, CloseType>
     {
 
-        private SocketChannel acceptedChannel;
+        private final Connection acceptedConnection;
 
         private CloseAcceptedConnectionOnServerClose(Connection acceptedConnection)
         {
-            this.acceptedChannel = getSocketChannel(acceptedConnection);
-        }
-
-        private static SocketChannel getSocketChannel(Connection acceptedConnection)
-        {
-            if (!(acceptedConnection instanceof TCPNIOConnection))
-            {
-                if (logger.isWarnEnabled())
-                {
-                    logger.warn("The accepted connection is not an instance of TCPNIOConnection");
-                }
-                return null;
-            }
-
-            SelectableChannel selectableChannel = ((TCPNIOConnection) acceptedConnection).getChannel();
-            if (!(selectableChannel instanceof SocketChannel))
-            {
-                if (logger.isWarnEnabled())
-                {
-                    logger.warn("The accepted connection doesn't hold a SocketChannel");
-                }
-                return null;
-            }
-
-            return (SocketChannel) selectableChannel;
+            this.acceptedConnection = acceptedConnection;
         }
 
         /**
@@ -146,10 +120,7 @@ public class GrizzlyServer implements Server
         @Override
         public void onClosed(TCPNIOServerConnection closeable, CloseType type) throws IOException
         {
-            if (acceptedChannel != null)
-            {
-                acceptedChannel.shutdownInput();
-            }
+            acceptedConnection.closeSilently();
         }
     }
 
