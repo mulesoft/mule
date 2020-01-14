@@ -40,12 +40,15 @@ public class ReconnectionOperations {
     return template;
   }
 
-  public PagingProvider<ReconnectableConnection, ReconnectableConnection> pagedOperation() {
+  public PagingProvider<ReconnectableConnection, ReconnectableConnection> pagedOperation(Integer failOn) {
     return new PagingProvider<ReconnectableConnection, ReconnectableConnection>() {
+
+      Integer counter = 0;
 
       @Override
       public List<ReconnectableConnection> getPage(ReconnectableConnection connection) {
-        if (fail) {
+        counter++;
+        if (counter == failOn) {
           throw new ModuleException(MuleErrors.CONNECTIVITY, new ConnectionException("Failed to retrieve Page"));
         }
         return Collections.singletonList(connection);

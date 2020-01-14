@@ -8,7 +8,6 @@ package org.mule.test.module.extension.reconnection;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
 import static org.mule.tck.probe.PollingProber.check;
 
@@ -82,16 +81,14 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Test
   public void pagedOperationConnectionIsClosedDuringConnectionExceptionOnFirstPage() throws Exception {
-    switchConnection();
-    Iterator<ReconnectableConnection> iterator = getCursor("pagedOperation");
+    Iterator<ReconnectableConnection> iterator = getCursor("pagedOperation", 1);
     assertThat(iterator.next().getDisconnectCalls(), is(1));
   }
 
   @Test
   public void pagedOperationConnectionIsClosedDuringConnectionExceptionOnSecondPage() throws Exception {
-    Iterator<ReconnectableConnection> iterator = getCursor("pagedOperation");
+    Iterator<ReconnectableConnection> iterator = getCursor("pagedOperation", 2);
     assertThat(iterator.next().getDisconnectCalls(), is(0));
-    switchConnection();
     assertThat(iterator.next().getDisconnectCalls(), is(1));
   }
 
@@ -125,9 +122,9 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     flowRunner("switchConnection").run();
   }
 
-  private <T> CursorIterator<T> getCursor(String flowName) throws Exception {
+  private <T> CursorIterator<T> getCursor(String flowName, Integer failOn) throws Exception {
     CursorIteratorProvider provider =
-        (CursorIteratorProvider) flowRunner(flowName).keepStreamsOpen().run().getMessage().getPayload()
+        (CursorIteratorProvider) flowRunner(flowName).withPayload(failOn).keepStreamsOpen().run().getMessage().getPayload()
             .getValue();
 
     return provider.openCursor();

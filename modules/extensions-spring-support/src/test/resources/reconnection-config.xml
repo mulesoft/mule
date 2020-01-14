@@ -28,7 +28,7 @@
     </flow>
 
     <flow name="pagedOperation">
-        <reconnection:paged-operation config-ref="reconnection_Config"/>
+        <reconnection:paged-operation failOn="#[payload]" config-ref="reconnection_Config"/>
     </flow>
 
     <flow name="getReconnectionFromConfig">

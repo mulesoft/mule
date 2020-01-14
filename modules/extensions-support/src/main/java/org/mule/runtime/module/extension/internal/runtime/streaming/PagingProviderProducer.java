@@ -13,7 +13,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.ExecutionUtils.getMutableConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
 
-import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -107,18 +106,16 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   }
 
   private <R> R withConnection(Function<Object, R> function) {
-    ConnectionSupplier connectionSupplier;
+    ConnectionSupplier connectionSupplier = null;
     try {
       connectionSupplier = connectionSupplierFactory.getConnectionSupplier();
-      try {
-        R result = function.apply(connectionSupplier.getConnection());
-        connectionSupplier.close();
-        return result;
-      } catch (Exception e) {
-        connectionSupplier.invalidateConnection();
-        throw new ConnectionException(COULD_NOT_OBTAIN_A_CONNECTION, e);
-      }
+      R result = function.apply(connectionSupplier.getConnection());
+      connectionSupplier.close();
+      return result;
     } catch (Exception e) {
+      if (connectionSupplier != null) {
+        connectionSupplier.invalidateConnection();
+      }
       throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
     }
   }
