@@ -45,7 +45,7 @@ import java.util.function.Function;
 public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
   public static final String COULD_NOT_OBTAIN_A_CONNECTION = "Could not obtain a connection for the configuration";
-  public static final String COULD_NOT_RECONNECT = "Failed to reconnect";
+  public static final String COULD_NOT_EXECUTE = "Could not execute operation with connection";
   private PagingProvider<Object, T> delegate;
   private final ConfigurationInstance config;
   private final ExtensionConnectionSupplier connectionSupplier;
@@ -88,7 +88,8 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    * @return
    */
   private <R> R performWithConnection(Function<Object, R> function) {
-    Optional<MutableConfigurationStats> stats = getMutableConfigurationStats(executionContext);
+    return withConnection(function);
+    /*    Optional<MutableConfigurationStats> stats = getMutableConfigurationStats(executionContext);
     RetryPolicyTemplate retryPolicy =
         (RetryPolicyTemplate) executionContext.getRetryPolicyTemplate().orElseGet(NoRetryPolicyTemplate::new);
     CompletableFuture<R> future = retryPolicy.applyPolicy(() -> completedFuture(withConnection(function)),
@@ -101,8 +102,8 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     try {
       return future.get();
     } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_RECONNECT), e);
-    }
+      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_EXECUTE), e);
+    }*/
   }
 
   private <R> R withConnection(Function<Object, R> function) {

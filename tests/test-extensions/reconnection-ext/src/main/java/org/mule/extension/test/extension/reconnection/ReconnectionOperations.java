@@ -27,6 +27,8 @@ import java.util.Optional;
  */
 public class ReconnectionOperations {
 
+  private int pagedOperationCalls = 0;
+
   /**
    * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
    */
@@ -41,14 +43,12 @@ public class ReconnectionOperations {
   }
 
   public PagingProvider<ReconnectableConnection, ReconnectableConnection> pagedOperation(Integer failOn) {
+    pagedOperationCalls++;
     return new PagingProvider<ReconnectableConnection, ReconnectableConnection>() {
-
-      Integer counter = 0;
 
       @Override
       public List<ReconnectableConnection> getPage(ReconnectableConnection connection) {
-        counter++;
-        if (counter == failOn) {
+        if (pagedOperationCalls == failOn) {
           throw new ModuleException(MuleErrors.CONNECTIVITY, new ConnectionException("Failed to retrieve Page"));
         }
         return Collections.singletonList(connection);
