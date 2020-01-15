@@ -41,7 +41,9 @@ public class DefaultFlowCallStack implements FlowCallStack {
   }
 
   private DefaultFlowCallStack(final Deque<FlowStackElement> innerStack) {
-    this.innerStack = new ArrayDeque<>(innerStack);
+    synchronized (innerStack) {
+      this.innerStack = new ArrayDeque<>(innerStack);
+    }
   }
 
   /**
@@ -60,7 +62,9 @@ public class DefaultFlowCallStack implements FlowCallStack {
       throw new EventContextDeepNestingException(messageBuilder.toString());
     }
 
-    innerStack.push(flowStackElement);
+    synchronized (innerStack) {
+      innerStack.push(flowStackElement);
+    }
   }
 
   /**
@@ -71,7 +75,9 @@ public class DefaultFlowCallStack implements FlowCallStack {
    */
   public void setCurrentProcessorPath(String processorPath) {
     if (!innerStack.isEmpty()) {
-      innerStack.push(new FlowStackElement(innerStack.pop().getFlowName(), processorPath));
+      synchronized (innerStack) {
+        innerStack.push(new FlowStackElement(innerStack.pop().getFlowName(), processorPath));
+      }
     }
   }
 
@@ -82,7 +88,9 @@ public class DefaultFlowCallStack implements FlowCallStack {
    * @throws EmptyStackException if this stack is empty.
    */
   public FlowStackElement pop() {
-    return innerStack.pop();
+    synchronized (innerStack) {
+      return innerStack.pop();
+    }
   }
 
   /**
@@ -92,17 +100,23 @@ public class DefaultFlowCallStack implements FlowCallStack {
    * @throws EmptyStackException if this stack is empty.
    */
   public FlowStackElement peek() {
-    return innerStack.peek();
+    synchronized (innerStack) {
+      return innerStack.peek();
+    }
   }
 
   @Override
   public List<FlowStackElement> getElements() {
-    return new ArrayList<>(innerStack);
+    synchronized (innerStack) {
+      return new ArrayList<>(innerStack);
+    }
   }
 
   @Override
   public DefaultFlowCallStack clone() {
-    return new DefaultFlowCallStack(innerStack);
+    synchronized (innerStack) {
+      return new DefaultFlowCallStack(innerStack);
+    }
   }
 
   @Override
@@ -118,10 +132,12 @@ public class DefaultFlowCallStack implements FlowCallStack {
     StringBuilder stackString = new StringBuilder();
 
     int i = 0;
-    for (FlowStackElement flowStackElement : innerStack) {
-      stackString.append("at ").append(toString.apply(flowStackElement));
-      if (++i != innerStack.size()) {
-        stackString.append(lineSeparator());
+    synchronized (innerStack) {
+      for (FlowStackElement flowStackElement : innerStack) {
+        stackString.append("at ").append(toString.apply(flowStackElement));
+        if (++i != innerStack.size()) {
+          stackString.append(lineSeparator());
+        }
       }
     }
     return stackString.toString();
