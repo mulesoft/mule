@@ -20,7 +20,7 @@ import java.util.List;
  * This exception is thrown when a Retry policy has made all the retry attempts it wants to make and is still failing.
  */
 public final class RetryPolicyExhaustedException extends FatalException
-    implements ComposedErrorException, ErrorMessageAwareException {
+    implements ComposedErrorException {
 
   /** Serial version */
   private static final long serialVersionUID = 3300563235465630595L;
@@ -31,15 +31,13 @@ public final class RetryPolicyExhaustedException extends FatalException
     super(message, component);
   }
 
-  public RetryPolicyExhaustedException(I18nMessage message, Throwable cause, Object component) {
-    super(message, cause, component);
+  public RetryPolicyExhaustedException(I18nMessage message, Object component, List<Error> errors) {
+    super(message, component);
+    this.errors.addAll(errors);
   }
 
-  // TODO: Validates that this change is possible (involves regenerating the serialVersionUID or adding an exception in api-changes)
-  // (perhaps we can create a new MuleException extending this one)
-  public RetryPolicyExhaustedException(I18nMessage message, Throwable cause, Object component, List<Error> errors) {
+  public RetryPolicyExhaustedException(I18nMessage message, Throwable cause, Object component) {
     super(message, cause, component);
-    this.errors.addAll(errors);
   }
 
   public RetryPolicyExhaustedException(Throwable cause, Object component) {
@@ -49,10 +47,5 @@ public final class RetryPolicyExhaustedException extends FatalException
   @Override
   public List<Error> getErrors() {
     return errors;
-  }
-
-  @Override
-  public Message getErrorMessage() {
-    return Message.of(getMessage());
   }
 }

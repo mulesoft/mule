@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.lang.Integer.parseInt;
-import static java.util.Collections.singletonList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.functional.Either.left;
@@ -39,7 +38,6 @@ import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorato
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -287,12 +285,11 @@ class UntilSuccessfulRouter {
         exhaustionCauseEvent = ((MessagingException) throwable).getEvent();
       }
       Throwable exhaustionCause = getMessagingExceptionCause(throwable);
-      // TODO: Replace the singletonList with all the errors that occurred instead of the last one
-      RetryPolicyExhaustedException retryExhaustedExceptionCause =
+      RetryPolicyExhaustedException retryExhaustedException =
           new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, exhaustionCause.getMessage()),
-                                            exhaustionCause, owner, singletonList(exhaustionCauseEvent.getError().get()));
-      CoreEvent retryExhaustedEvent = getRetryExhaustedEvent(exhaustionCauseEvent, retryExhaustedExceptionCause);
-      return new MessagingException(retryExhaustedEvent, retryExhaustedExceptionCause, owner);
+                                            exhaustionCause, owner);
+      CoreEvent retryExhaustedEvent = getRetryExhaustedEvent(exhaustionCauseEvent, retryExhaustedException);
+      return new MessagingException(retryExhaustedEvent, retryExhaustedException, owner);
     };
   }
 
