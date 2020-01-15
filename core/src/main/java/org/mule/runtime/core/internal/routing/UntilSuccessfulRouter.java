@@ -89,7 +89,7 @@ class UntilSuccessfulRouter {
   private Function<ExpressionManagerSession, Integer> delaySupplier;
   private Function<CoreEvent, ExpressionManagerSession> sessionSupplier;
 
-  private ErrorType retryExhaustedErrorType;
+  private final ErrorType retryExhaustedErrorType;
 
   // When using an until successful scope in a blocking flow (for example, calling the owner flow with a Processor#process call),
   // this leads to a reactor completion signal being emitted while the event is being re-injected for retrials. This is solved by
