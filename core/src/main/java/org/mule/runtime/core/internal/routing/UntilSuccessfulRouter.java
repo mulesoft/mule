@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static java.lang.Integer.parseInt;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
@@ -20,14 +23,19 @@ import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.util.context.Context.empty;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.el.ExpressionManagerSession;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.HashMap;
@@ -42,15 +50,16 @@ import java.util.function.Predicate;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
 /**
  * Router with {@link UntilSuccessful} retry logic.
- * 
+ *
  * The retrial chain isolation is implemented using two {@link reactor.core.publisher.FluxSink}s, one for the entry inside the
  * retrial chain, and another for publishing successful events, or exhaustion errors.
- * 
+ *
  * @since 4.2.3, 4.3.0
  */
 class UntilSuccessfulRouter {
@@ -62,22 +71,25 @@ class UntilSuccessfulRouter {
       "'until-successful' retries exhausted. Last exception message was: %s";
   private final EventInternalContextResolver<Map<String, RetryContext>> retryContextResolver;
 
-  private Component owner;
-  private Predicate<CoreEvent> shouldRetry;
-  private ConditionalExecutorServiceDecorator delayScheduler;
+  private final Component owner;
+  private final Predicate<CoreEvent> shouldRetry;
+  private final ConditionalExecutorServiceDecorator delayScheduler;
 
-  private Flux<CoreEvent> upstreamFlux;
-  private Flux<CoreEvent> innerFlux;
-  private Flux<CoreEvent> downstreamFlux;
-  private FluxSinkRecorder<CoreEvent> innerRecorder = new FluxSinkRecorder<>();
-  private FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
+  private final Flux<CoreEvent> upstreamFlux;
+  private final Flux<CoreEvent> innerFlux;
+  private final Flux<CoreEvent> downstreamFlux;
+  private final FluxSinkRecorder<CoreEvent> innerRecorder = new FluxSinkRecorder<>();
+  private final FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
   private final AtomicReference<Context> downstreamCtxReference = new AtomicReference(empty());
 
   // Retry settings, such as the maximum number of retries, and the delay between them
   // are managed by suppliers. By doing this, the implementations remains agnostic of whether
   // they are expressions or not.
-  private Integer maxRetries;
-  private Long millisBetweenRetries;
+  private Function<ExpressionManagerSession, Integer> maxRetriesSupplier;
+  private Function<ExpressionManagerSession, Integer> delaySupplier;
+  private Function<CoreEvent, ExpressionManagerSession> sessionSupplier;
+
+  private final ErrorType retryExhaustedErrorType;
 
   // When using an until successful scope in a blocking flow (for example, calling the owner flow with a Processor#process call),
   // this leads to a reactor completion signal being emitted while the event is being re-injected for retrials. This is solved by
@@ -86,8 +98,9 @@ class UntilSuccessfulRouter {
   private final AtomicBoolean completeDeferred = new AtomicBoolean(false);
 
   UntilSuccessfulRouter(Component owner, Publisher<CoreEvent> publisher, MessageProcessorChain nestedChain,
-                        Predicate<CoreEvent> shouldRetry, Scheduler delayScheduler,
-                        Integer maxRetries, Long millisBetweenRetries) {
+                        ExtendedExpressionManager expressionManager, Predicate<CoreEvent> shouldRetry, Scheduler delayScheduler,
+                        String maxRetries, String millisBetweenRetries, ErrorTypeLocator errorTypeLocator) {
+    this.retryExhaustedErrorType = errorTypeLocator.lookupErrorType(RetryPolicyExhaustedException.class);
     this.owner = owner;
     this.shouldRetry = shouldRetry;
     this.delayScheduler = new ConditionalExecutorServiceDecorator(delayScheduler, s -> isTransactionActive());
@@ -98,7 +111,7 @@ class UntilSuccessfulRouter {
     upstreamFlux = Flux.from(publisher)
         .doOnNext(event -> {
           // Inject event into retrial execution chain
-          RetryContext ctx = new RetryContext(event, this.maxRetries, this.millisBetweenRetries);
+          RetryContext ctx = new RetryContext(event, sessionSupplier, maxRetriesSupplier, delaySupplier);
           inflightEvents.getAndIncrement();
           innerRecorder.next(eventWithCurrentContext(event, ctx));
         })
@@ -131,9 +144,25 @@ class UntilSuccessfulRouter {
         .doOnNext(event -> inflightEvents.decrementAndGet())
         .map(getScopeResultMapper());
 
+    if (expressionManager.isExpression(maxRetries)) {
+      maxRetriesSupplier = expressionToIntegerSupplierFor(maxRetries);
+    } else {
+      maxRetriesSupplier = session -> (Integer) parseInt(maxRetries);
+    }
 
-    this.maxRetries = maxRetries;
-    this.millisBetweenRetries = millisBetweenRetries;
+    if (expressionManager.isExpression(millisBetweenRetries)) {
+      delaySupplier = expressionToIntegerSupplierFor(millisBetweenRetries);
+    } else {
+      delaySupplier = session -> (Integer) parseInt(millisBetweenRetries);
+    }
+
+    // If neither is an expression, we won't need an expression session at all. To keep type consistency, use a
+    // no-op expressionSessionSupplier
+    if (!expressionManager.isExpression(maxRetries) && !expressionManager.isExpression(millisBetweenRetries)) {
+      sessionSupplier = event -> null;
+    } else {
+      sessionSupplier = event -> expressionManager.openSession(owner.getLocation(), event, NULL_BINDING_CONTEXT);
+    }
   }
 
   private Function<Either<Throwable, CoreEvent>, CoreEvent> getScopeResultMapper() {
@@ -158,7 +187,7 @@ class UntilSuccessfulRouter {
 
         // Schedule retry with delay
         UntilSuccessfulRouter.this.delayScheduler.schedule(() -> innerRecorder.next(eventWithCurrentContext(ctx.event, ctx)),
-                                                           ctx.millisBetweenRetries, MILLISECONDS);
+                                                           ctx.delayInMillis, MILLISECONDS);
       } else { // Retries exhausted
         // Current context already pooped. No need to re-insert it
         LOGGER.error("Retry attempts exhausted. Failing...");
@@ -190,7 +219,7 @@ class UntilSuccessfulRouter {
 
   /**
    * Assembles and returns the downstream {@link Publisher<CoreEvent>}.
-   * 
+   *
    * @return the successful {@link CoreEvent} or retries exhaustion errors {@link Publisher}
    */
   Publisher<CoreEvent> getDownstreamPublisher() {
@@ -215,7 +244,7 @@ class UntilSuccessfulRouter {
 
   /**
    * Insert the ctx as the event's current {@link RetryContext}, and updates the {@link CoreEvent} internal parameters.
-   * 
+   *
    * @param event the current retrial {@link CoreEvent}
    * @param ctx the current {@link RetryContext}
    * @return the {@link CoreEvent} with the retry context saved as internal parameter
@@ -246,17 +275,23 @@ class UntilSuccessfulRouter {
 
   private Function<Throwable, Throwable> getThrowableFunction(CoreEvent event) {
     return throwable -> {
-      Throwable cause = getMessagingExceptionCause(throwable);
-      CoreEvent exceptionEvent = event;
+      CoreEvent exhaustionCauseEvent = event;
       if (throwable instanceof MessagingException) {
-        exceptionEvent = ((MessagingException) throwable).getEvent();
+        exhaustionCauseEvent = ((MessagingException) throwable).getEvent();
       }
-      return new MessagingException(exceptionEvent,
-                                    new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX,
-                                                                                          cause.getMessage()),
-                                                                      cause, owner),
-                                    owner);
+      Throwable exhaustionCause = getMessagingExceptionCause(throwable);
+      Throwable retryExhaustedException =
+          new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, exhaustionCause.getMessage()),
+                                            exhaustionCause, owner);
+      CoreEvent retryExhaustedEvent = getRetryExhaustedEvent(exhaustionCauseEvent, retryExhaustedException);
+      return new MessagingException(retryExhaustedEvent, retryExhaustedException, owner);
     };
+  }
+
+  private CoreEvent getRetryExhaustedEvent(CoreEvent exhaustionCauseEvent, Throwable retryExhaustedException) {
+    ErrorBuilder errorBuilder = ErrorBuilder.builder(retryExhaustedException)
+        .errorType(retryExhaustedErrorType);
+    return CoreEvent.builder(exhaustionCauseEvent).error(errorBuilder.build()).build();
   }
 
   /**
@@ -266,20 +301,44 @@ class UntilSuccessfulRouter {
 
     CoreEvent event;
     AtomicInteger retryCount = new AtomicInteger();
+
+    Integer delayInMillis;
     Integer maxRetries;
-    Long millisBetweenRetries;
 
     RetryContext(CoreEvent event,
-                 Integer maxRetries,
-                 Long millisBetweenRetries) {
+                 Function<CoreEvent, ExpressionManagerSession> sessionSupplier,
+                 Function<ExpressionManagerSession, Integer> maxRetriesSupplier,
+                 Function<ExpressionManagerSession, Integer> delayTimeSupplier) {
       this.event = event;
-      this.maxRetries = maxRetries;
-      this.millisBetweenRetries = millisBetweenRetries;
-      retryCount.set(this.maxRetries);
+
+      ExpressionManagerSession session = sessionSupplier.apply(event);
+      maxRetries = maxRetriesSupplier.apply(session);
+      delayInMillis = delayTimeSupplier.apply(session);
+      retryCount.set(maxRetries);
     }
 
     int getAttemptNumber() {
       return maxRetries - retryCount.get();
+    }
+  }
+
+  private Function<ExpressionManagerSession, Integer> expressionToIntegerSupplierFor(String anExpression) {
+    return session -> {
+      try {
+        return (Integer) session.evaluate(anExpression, NUMBER).getValue();
+      } catch (Exception evaluationException) {
+        throw new RetryContextInitializationException(evaluationException);
+      }
+    };
+  }
+
+  /**
+   * Wrap all exceptions caused in {@link RetryContext} initialization, so that they can be propagated outside of the innerFlux.
+   */
+  static class RetryContextInitializationException extends RuntimeException {
+
+    public RetryContextInitializationException(Throwable cause) {
+      super(cause);
     }
   }
 
