@@ -6,24 +6,32 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.BASIC_AUTH_HEADER;
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.BODY;
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.QUERY_PARAMS;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
+import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
+import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.security.CredentialsPlacement;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.oauth.OAuthCallbackValuesModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.ImmutableAuthorizationCodeState;
+import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.runtime.oauth.api.builder.ClientCredentialsLocation;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.lang.reflect.Field;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -72,6 +80,27 @@ public final class ExtensionsOAuthUtils {
         .orElseGet(Collections::emptyMap);
   }
 
+  public static <C, T> FieldSetter<ConnectionProvider<C>, T> getOAuthStateSetter(ConnectionProvider<C> delegate,
+                                                                                 Class<T> stateType,
+                                                                                 OAuthGrantType grantType) {
+    List<Field> stateFields = getFields(delegate.getClass()).stream()
+        .filter(f -> f.getType().equals(stateType))
+        .collect(toList());
 
-  private ExtensionsOAuthUtils() {}
+    if (stateFields.size() != 1) {
+      throw new IllegalConnectionProviderModelDefinitionException(
+          format("Connection Provider of class '%s' uses OAuth2 %s grant type and thus should contain "
+                     + "one (and only one) field of type %s. %d were found",
+                 delegate.getClass().getName(),
+                 grantType.getName(),
+                 stateType,
+                 stateFields.size()));
+    }
+
+    return new FieldSetter<>(stateFields.get(0));
+  }
+
+
+  private ExtensionsOAuthUtils() {
+  }
 }

@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getOAuthStateSetter;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -52,7 +54,7 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends OAuthConnecti
     super(delegate, reconnectionConfig, callbackValues);
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
-    oauthStateSetter = getOAuthStateSetter(delegate, ClientCredentialsState.class, "Client Credentials");
+    oauthStateSetter = getOAuthStateSetter(delegate, ClientCredentialsState.class, oauthConfig.getGrantType());
     dance = Once.of(this::updateOAuthState);
   }
 

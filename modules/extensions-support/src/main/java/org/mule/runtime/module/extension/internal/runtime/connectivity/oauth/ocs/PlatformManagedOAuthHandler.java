@@ -124,7 +124,7 @@ public class PlatformManagedOAuthHandler extends OAuthHandler<PlatformManagedOAu
     final PlatformManagedOAuthGrantType grantType = config.getGrantType();
 
     dancerBuilder
-        .connectionId(config.getConnectionUri())
+        .connectionUri(config.getConnectionUri())
         .platformUrl(config.getServiceUrl())
         .organizationId(config.getOrgId())
         .name(config.getOwnerConfigName())

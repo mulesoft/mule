@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode;
 
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getOAuthStateSetter;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -51,7 +53,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends OAuthConnecti
     super(delegate, reconnectionConfig, callbackValues);
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
-    authCodeStateSetter = getOAuthStateSetter(delegate, AuthorizationCodeState.class, "Authorization Code");
+    authCodeStateSetter = getOAuthStateSetter(delegate, AuthorizationCodeState.class, oauthConfig.getGrantType());
     dance = Once.of(this::updateAuthState);
   }
 

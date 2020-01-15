@@ -76,15 +76,20 @@ public class PlatformManagedOAuthConnectionProviderObjectBuilder<C> extends Base
   @Override
   public Pair<ConnectionProvider<C>, ResolverSetResult> build(ValueResolvingContext context) throws MuleException {
     final Pair<ConnectionProviderModel, OAuthGrantType> delegateModel = getDelegateOAuthConnectionProviderModel(context);
-    final ResolverSetResult result = resolverSet.resolve(context);
     final String ownerConfigName = context.getConfig().get().getName();
-    final String connectionUri = (String) result.get(PLATFORM_MANAGED_CONNECTION_URI_PARAMETER_NAME);
+    final String connectionUri = (String) context.getConfig().get()
+        .getState()
+        .getConnectionParameters()
+        .get(PLATFORM_MANAGED_CONNECTION_URI_PARAMETER_NAME);
+
     final PlatformManagedOAuthConfig config = from(ownerConfigName,
-                                             connectionUri,
-                                             grantType,
-                                             delegateModel.getFirst(),
-                                             delegateModel.getSecond(),
-                                             configurationProperties);
+                                                   connectionUri,
+                                                   grantType,
+                                                   context.getConfig().get(),
+                                                   extensionModel,
+                                                   delegateModel.getFirst(),
+                                                   delegateModel.getSecond(),
+                                                   configurationProperties);
 
     return new PlatformManagedOAuthConnectionProvider<C>()
 

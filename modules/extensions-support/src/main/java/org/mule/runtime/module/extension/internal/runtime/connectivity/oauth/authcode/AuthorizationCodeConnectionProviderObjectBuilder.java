@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode;
 
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.ACCESS_TOKEN_URL_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.AFTER_FLOW_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.AUTHORIZATION_URL_PARAMETER_NAME;
@@ -20,7 +21,6 @@ import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthCo
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.OAUTH_CALLBACK_GROUP_NAME;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.RESOURCE_OWNER_ID_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.SCOPES_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getCallbackValuesExtractors;
 
 import org.mule.runtime.api.config.PoolingProfile;
@@ -180,7 +180,7 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
     ValueResolvingContext ctxForConfig = null;
     ValueResolvingContext ctxForCallback = null;
     try {
-      initialiserEvent = getInitialiserEvent(muleContext);
+      initialiserEvent = getNullEvent(muleContext);
       ValueResolver<?> oauthAuthCodeGroup = resolverSet.getResolvers().get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME);
 
       MapValueResolver mapResolver = staticOnly((MapValueResolver) oauthAuthCodeGroup);
