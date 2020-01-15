@@ -6,13 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs;
 
-import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.CLIENT_ID_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.CLIENT_SECRET_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.OAUTH_AUTHORIZATION_CODE_GROUP_NAME;
-import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.OAUTH_CLIENT_CREDENTIALS_GROUP_NAME;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.PLATFORM_MANAGED_CONNECTION_URI_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.SCOPES_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.TOKEN_URL_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthConfig.from;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -25,7 +19,6 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
@@ -34,14 +27,9 @@ import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.BaseOAuthConnectionProviderObjectBuilder;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials.ClientCredentialsConfig;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials.ClientCredentialsConnectionProviderWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
-
-import java.util.Map;
 
 public class PlatformManagedOAuthConnectionProviderObjectBuilder<C> extends BaseOAuthConnectionProviderObjectBuilder<C> {
 
@@ -66,15 +54,8 @@ public class PlatformManagedOAuthConnectionProviderObjectBuilder<C> extends Base
   }
 
   @Override
-  protected ConnectionProvider<C> doBuild(ResolverSetResult result) throws MuleException {
-    ConnectionProvider<C> provider = super.doBuild(result);
-    provider = wrapProvider(result, provider, getClientCredentialsParams(result));
-
-    return provider;
-  }
-
-  @Override
   public Pair<ConnectionProvider<C>, ResolverSetResult> build(ValueResolvingContext context) throws MuleException {
+    final ResolverSetResult resolverSetResult = resolverSet.resolve(context);
     final Pair<ConnectionProviderModel, OAuthGrantType> delegateModel = getDelegateOAuthConnectionProviderModel(context);
     final String ownerConfigName = context.getConfig().get().getName();
     final String connectionUri = (String) context.getConfig().get()
@@ -91,12 +72,12 @@ public class PlatformManagedOAuthConnectionProviderObjectBuilder<C> extends Base
                                                    delegateModel.getSecond(),
                                                    configurationProperties);
 
-    return new PlatformManagedOAuthConnectionProvider<C>()
+    ConnectionProvider<C> provider = new PlatformManagedOAuthConnectionProvider<C>(config,
+                                                                                   platformHandler,
+                                                                                   reconnectionConfig,
+                                                                                   poolingProfile);
 
-    ConnectionProvider<C> provider = super.doBuild(result);
-
-    provider = wrapProvider(result, provider, getClientCredentialsParams(context.getEvent()));
-    return new Pair<>(provider, result);
+    return new Pair<>(provider, resolverSetResult);
   }
 
   private Pair<ConnectionProviderModel, OAuthGrantType> getDelegateOAuthConnectionProviderModel(ValueResolvingContext context) {
@@ -130,47 +111,10 @@ public class PlatformManagedOAuthConnectionProviderObjectBuilder<C> extends Base
       }
     }
 
-
     if (authCodePair.get() != null) {
       return authCodePair.get();
     } else {
       return clientCredentialsPair.get();
-    }
-  }
-
-  private ConnectionProvider<C> wrapProvider(ResolverSetResult result, ConnectionProvider<C> provider,
-                                             Map<String, String> clientCredentialsParams) {
-    CustomOAuthParameters customParameters = getCustomParameters(result);
-
-    ClientCredentialsConfig config = new ClientCredentialsConfig(ownerConfigName,
-                                                                 buildOAuthObjectStoreConfig(result),
-                                                                 customParameters.getQueryParams(),
-                                                                 customParameters.getHeaders(),
-                                                                 callbackValues,
-                                                                 clientCredentialsParams.get(CLIENT_ID_PARAMETER_NAME),
-                                                                 clientCredentialsParams.get(CLIENT_SECRET_PARAMETER_NAME),
-                                                                 clientCredentialsParams.get(TOKEN_URL_PARAMETER_NAME),
-                                                                 clientCredentialsParams.get(SCOPES_PARAMETER_NAME),
-                                                                 grantType.getCredentialsPlacement(),
-                                                                 grantType);
-
-
-    provider = new ClientCredentialsConnectionProviderWrapper<>(provider,
-                                                                config,
-                                                                callbackValues,
-                                                                platformHandler,
-                                                                reconnectionConfig);
-    return provider;
-  }
-
-  private Map<String, String> getClientCredentialsParams(ResolverSetResult result) {
-    return (Map<String, String>) result.get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME);
-  }
-
-  private Map<String, String> getClientCredentialsParams(CoreEvent event) throws MuleException {
-    ValueResolver<?> valueResolver = resolverSet.getResolvers().get(OAUTH_CLIENT_CREDENTIALS_GROUP_NAME);
-    try (ValueResolvingContext context = getResolvingContextFor(event)) {
-      return (Map<String, String>) valueResolver.resolve(context);
     }
   }
 }

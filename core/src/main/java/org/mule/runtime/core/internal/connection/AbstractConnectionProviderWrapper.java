@@ -54,13 +54,7 @@ public abstract class AbstractConnectionProviderWrapper<C> implements Connection
 
   @Override
   public C connect() throws ConnectionException {
-    try {
-      return delegate.connect();
-    } catch (ConnectionException ce) {
-      throw ce;
-    } catch (Exception e) {
-      throw new ConnectionException(e);
-    }
+    return ConnectionUtils.connect(delegate);
   }
 
   /**

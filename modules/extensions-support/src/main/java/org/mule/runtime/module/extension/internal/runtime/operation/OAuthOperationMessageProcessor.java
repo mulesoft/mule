@@ -31,7 +31,6 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConnectionProviderWrapper;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConnectionProviderWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
@@ -102,14 +101,15 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
 
           @Override
           public void visit(AuthorizationCodeGrantType grantType) {
-            AuthorizationCodeConnectionProviderWrapper cp = (AuthorizationCodeConnectionProviderWrapper) connectionProvider;
-            String rsId = cp.getResourceOwnerId();
+            String rsId = connectionProvider.getResourceOwnerId();
             resourceOwnerIdReference.set(of(rsId));
 
-            LOGGER.debug("AccessToken for resourceOwner '{}' expired while executing operation '{}:{}' using config '{}'. "
-                             + "Will attempt to refresh token and retry operation",
-                         rsId, getExtensionModel().getName(), operationContext.getComponentModel().getName(),
-                         operationContext.getConfiguration().get().getName());
+            if (LOGGER.isDebugEnabled()) {
+              LOGGER.debug("AccessToken for resourceOwner '{}' expired while executing operation '{}:{}' using config '{}'. "
+                  + "Will attempt to refresh token and retry operation",
+                           rsId, getExtensionModel().getName(), operationContext.getComponentModel().getName(),
+                           operationContext.getConfiguration().get().getName());
+            }
           }
 
           @Override
@@ -123,10 +123,12 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
           }
 
           private void logRefresh() {
-            LOGGER.debug("AccessToken for expired while executing operation '{}:{}' using config '{}'. "
-                    + "Will attempt to refresh token and retry operation",
-                getExtensionModel().getName(), operationContext.getComponentModel().getName(),
-                operationContext.getConfiguration().get().getName());
+            if (LOGGER.isDebugEnabled()) {
+              LOGGER.debug("AccessToken for expired while executing operation '{}:{}' using config '{}'. "
+                  + "Will attempt to refresh token and retry operation",
+                           getExtensionModel().getName(), operationContext.getComponentModel().getName(),
+                           operationContext.getConfiguration().get().getName());
+            }
           }
         });
 
@@ -136,21 +138,21 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
           connectionProvider.refreshToken(resourceOwnerId.orElse(""));
         } catch (Exception refreshException) {
           callback.error(new MuleRuntimeException(createStaticMessage(format(
-              "AccessToken %s expired while executing operation '%s:%s' using config '%s'. Refresh token "
-                  + "workflow was attempted but failed with the following exception",
-              forResourceOwner(resourceOwnerId),
-              getExtensionModel().getName(),
-              operationContext.getComponentModel().getName(),
-              operationContext.getConfiguration().get()
-                  .getName())),
+                                                                             "AccessToken %s expired while executing operation '%s:%s' using config '%s'. Refresh token "
+                                                                                 + "workflow was attempted but failed with the following exception",
+                                                                             forResourceOwner(resourceOwnerId),
+                                                                             getExtensionModel().getName(),
+                                                                             operationContext.getComponentModel().getName(),
+                                                                             operationContext.getConfiguration().get()
+                                                                                 .getName())),
                                                   refreshException));
 
           return;
         }
 
-          LOGGER.debug("Access Token successfully refreshed {} on config '{}'",
-                       forResourceOwner(resourceOwnerId),
-                       operationContext.getConfiguration().get().getName());
+        LOGGER.debug("Access Token successfully refreshed {} on config '{}'",
+                     forResourceOwner(resourceOwnerId),
+                     operationContext.getConfiguration().get().getName());
 
         OAuthOperationMessageProcessor.super.executeOperation(operationContext, callback);
       }

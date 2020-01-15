@@ -61,7 +61,9 @@ public class PlatformManagedOAuthHandler extends OAuthHandler<PlatformManagedOAu
       dancer.refreshToken().get();
     } catch (Exception e) {
       throw new MuleRuntimeException(
-          createStaticMessage(format("Could not refresh token for config '%s'", config.getOwnerConfigName())), e);
+                                     createStaticMessage(format("Could not refresh token for config '%s'",
+                                                                config.getOwnerConfigName())),
+                                     e);
     }
   }
 
@@ -87,9 +89,9 @@ public class PlatformManagedOAuthHandler extends OAuthHandler<PlatformManagedOAu
         contextForResourceOwner = dancer.getContext();
       } catch (Exception e) {
         throw new MuleRuntimeException(
-            createStaticMessage(format("Could not obtain access token for config '%s'",
-                                       config.getOwnerConfigName())),
-            e);
+                                       createStaticMessage(format("Could not obtain access token for config '%s'",
+                                                                  config.getOwnerConfigName())),
+                                       e);
       }
     }
 
@@ -111,14 +113,15 @@ public class PlatformManagedOAuthHandler extends OAuthHandler<PlatformManagedOAu
   }
 
   private PlatformManagedOAuthDancer createDancer(PlatformManagedOAuthConfig config,
-                                                  List<PlatformManagedOAuthStateListener> listeners) throws MuleException {
+                                                  List<PlatformManagedOAuthStateListener> listeners)
+      throws MuleException {
     checkArgument(listeners != null, "listeners cannot be null");
 
     OAuthPlatformManagedDancerBuilder dancerBuilder =
         oauthService.get().platformManagedOAuthDancerBuilder(lockFactory,
                                                              new LazyObjectStoreToMapAdapter(
-                                                                 () -> objectStoreLocator
-                                                                     .apply(config)),
+                                                                                             () -> objectStoreLocator
+                                                                                                 .apply(config)),
                                                              expressionEvaluator);
 
     final PlatformManagedOAuthGrantType grantType = config.getGrantType();
@@ -138,7 +141,8 @@ public class PlatformManagedOAuthHandler extends OAuthHandler<PlatformManagedOAu
         .resourceOwnerIdTransformer(ownerId -> ownerId + "-" + config.getOwnerConfigName());
 
     dancerBuilder.customParametersExtractorsExprs(
-        getParameterExtractors(getCallbackValuesExtractors(config.getDelegateConnectionProviderModel())));
+                                                  getParameterExtractors(getCallbackValuesExtractors(config
+                                                      .getDelegateConnectionProviderModel())));
 
     listeners.forEach(dancerBuilder::addListener);
 

@@ -14,24 +14,30 @@ import org.mule.runtime.oauth.api.listener.PlatformManagedOAuthStateListener;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 abstract class BasePlatformOAuthStateAdapter implements OAuthState {
 
   private String accessToken;
   private Optional<String> expiresIn;
 
-  public BasePlatformOAuthStateAdapter(PlatformManagedOAuthDancer dancer) {
+  public BasePlatformOAuthStateAdapter(PlatformManagedOAuthDancer dancer, Consumer<ResourceOwnerOAuthContext> onUpdate) {
     updateState(dancer.getContext());
     dancer.addListener(new PlatformManagedOAuthStateListener() {
 
       @Override
       public void onAccessToken(ResourceOwnerOAuthContext context) {
-        updateState(context);
+        doUpdate(context);
       }
 
       @Override
       public void onTokenRefreshed(ResourceOwnerOAuthContext context) {
+        doUpdate(context);
+      }
+
+      private void doUpdate(ResourceOwnerOAuthContext context) {
         updateState(context);
+        onUpdate.accept(context);
       }
     });
   }

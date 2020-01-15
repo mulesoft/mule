@@ -8,10 +8,14 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.oc
 
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsState;
 import org.mule.runtime.oauth.api.PlatformManagedOAuthDancer;
+import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
+
+import java.util.function.Consumer;
 
 public class PlatformClientCredentialsOAuthStateAdapter extends BasePlatformOAuthStateAdapter implements ClientCredentialsState {
 
-  public PlatformClientCredentialsOAuthStateAdapter(PlatformManagedOAuthDancer dancer) {
-    super(dancer);
+  public PlatformClientCredentialsOAuthStateAdapter(PlatformManagedOAuthDancer dancer,
+                                                    Consumer<ResourceOwnerOAuthContext> onUpdate) {
+    super(dancer, onUpdate);
   }
 }

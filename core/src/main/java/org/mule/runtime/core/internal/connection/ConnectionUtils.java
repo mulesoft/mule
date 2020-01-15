@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
@@ -14,12 +16,21 @@ import java.util.Optional;
 
 public final class ConnectionUtils {
 
-  private ConnectionUtils() {
-  }
+  private ConnectionUtils() {}
 
   public static RetryPolicyTemplate getRetryPolicyTemplate(Optional<ReconnectionConfig> reconnectionConfig) {
     return reconnectionConfig
         .map(ReconnectionConfig::getRetryPolicyTemplate)
         .orElseGet(NoRetryPolicyTemplate::new);
+  }
+
+  public static <C> C connect(ConnectionProvider<C> delegate) throws ConnectionException {
+    try {
+      return delegate.connect();
+    } catch (ConnectionException ce) {
+      throw ce;
+    } catch (Exception e) {
+      throw new ConnectionException(e);
+    }
   }
 }

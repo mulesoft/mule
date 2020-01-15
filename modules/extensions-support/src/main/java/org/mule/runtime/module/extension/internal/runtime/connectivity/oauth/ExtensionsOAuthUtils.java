@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.core.api.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.BASIC_AUTH_HEADER;
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.BODY;
@@ -15,6 +16,7 @@ import static org.mule.runtime.extension.api.security.CredentialsPlacement.QUERY
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
@@ -89,18 +91,43 @@ public final class ExtensionsOAuthUtils {
 
     if (stateFields.size() != 1) {
       throw new IllegalConnectionProviderModelDefinitionException(
-          format("Connection Provider of class '%s' uses OAuth2 %s grant type and thus should contain "
-                     + "one (and only one) field of type %s. %d were found",
-                 delegate.getClass().getName(),
-                 grantType.getName(),
-                 stateType,
-                 stateFields.size()));
+                                                                  format("Connection Provider of class '%s' uses OAuth2 %s grant type and thus should contain "
+                                                                      + "one (and only one) field of type %s. %d were found",
+                                                                         delegate.getClass().getName(),
+                                                                         grantType.getName(),
+                                                                         stateType,
+                                                                         stateFields.size()));
     }
 
     return new FieldSetter<>(stateFields.get(0));
   }
 
-
-  private ExtensionsOAuthUtils() {
+  public static <C> void updateOAuthParameters(ConnectionProvider<C> delegate,
+                                               Map<Field, String> callbackValues,
+                                               ResourceOwnerOAuthContext context) {
+    Map<String, Object> responseParameters = context.getTokenResponseParameters();
+    callbackValues.keySet().forEach(field -> {
+      String key = field.getName();
+      if (responseParameters.containsKey(key)) {
+        new FieldSetter<>(field).set(delegate, responseParameters.get(key));
+      }
+    });
   }
+
+  public static <C> ConnectionValidationResult validateConnection(ConnectionProvider<C> delegate,
+                                                                  C connection,
+                                                                  ResourceOwnerOAuthContext context) {
+    try {
+      if (context.getAccessToken() != null) {
+        return delegate.validate(connection);
+      } else {
+        String message = "Server did not granted an access token";
+        return failure(message, new IllegalStateException(message));
+      }
+    } catch (Exception e) {
+      return failure("Could not obtain an access token", e);
+    }
+  }
+
+  private ExtensionsOAuthUtils() {}
 }

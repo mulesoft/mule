@@ -11,15 +11,19 @@ import static java.util.Optional.empty;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.oauth.api.PlatformManagedConnectionDescriptor;
 import org.mule.runtime.oauth.api.PlatformManagedOAuthDancer;
+import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class PlatformAuthorizationCodeStateAdapter extends BasePlatformOAuthStateAdapter implements AuthorizationCodeState {
 
   private final PlatformManagedConnectionDescriptor descriptor;
 
-  public PlatformAuthorizationCodeStateAdapter(PlatformManagedOAuthDancer dancer, PlatformManagedConnectionDescriptor descriptor) {
-    super(dancer);
+  public PlatformAuthorizationCodeStateAdapter(PlatformManagedOAuthDancer dancer,
+                                               PlatformManagedConnectionDescriptor descriptor,
+                                               Consumer<ResourceOwnerOAuthContext> onUpdate) {
+    super(dancer, onUpdate);
     this.descriptor = descriptor;
   }
 

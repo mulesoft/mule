@@ -9,13 +9,17 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.oc
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
+import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getCallbackValuesExtractors;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.updateOAuthParameters;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.validateConnection;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -27,14 +31,13 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
+import org.mule.runtime.core.api.util.func.Once;
+import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.core.internal.connection.ConnectionUtils;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -50,7 +53,7 @@ import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDe
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials.UpdatingClientCredentialsState;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConnectionProviderWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
@@ -60,22 +63,26 @@ import org.mule.runtime.oauth.api.PlatformManagedConnectionDescriptor;
 import org.mule.runtime.oauth.api.PlatformManagedOAuthDancer;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
+import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-public class PlatformManagedOAuthConnectionProvider<C> implements ConnectionProviderWrapper<C> {
+public class PlatformManagedOAuthConnectionProvider<C> implements OAuthConnectionProviderWrapper<C> {
 
   private static final Logger LOGGER = getLogger(PlatformManagedOAuthConnectionProvider.class);
 
   private final PlatformManagedOAuthConfig oauthConfig;
   private final PlatformManagedOAuthHandler oauthHandler;
-  private final Pair<ConnectionProviderModel, OAuthGrantType> delegateModel;
   private final PoolingProfile poolingProfile;
   private final ReconnectionConfig reconnectionConfig;
+  private final Map<Field, String> callbackValues;
+  private final RunOnce dance = Once.of(this::updateOAuthState);
 
   @Inject
   private MuleContext muleContext;
@@ -84,19 +91,35 @@ public class PlatformManagedOAuthConnectionProvider<C> implements ConnectionProv
   private ExpressionManager expressionManager;
 
   private PlatformManagedOAuthDancer dancer;
-  private ConnectionProvider delegate;
+  private ConnectionProvider<C> delegate;
   private FieldSetter<ConnectionProvider<C>, OAuthState> oauthStateFieldSetter;
+  private PlatformManagedConnectionDescriptor descriptor;
 
   public PlatformManagedOAuthConnectionProvider(PlatformManagedOAuthConfig oauthConfig,
-                                                Pair<ConnectionProviderModel, OAuthGrantType> delegateModel,
                                                 PlatformManagedOAuthHandler oauthHandler,
                                                 ReconnectionConfig reconnectionConfig,
                                                 PoolingProfile poolingProfile) {
     this.oauthConfig = oauthConfig;
-    this.delegateModel = delegateModel;
     this.oauthHandler = oauthHandler;
     this.reconnectionConfig = reconnectionConfig;
     this.poolingProfile = poolingProfile;
+    callbackValues = getCallbackValuesExtractors(oauthConfig.getDelegateConnectionProviderModel());
+  }
+
+  @Override
+  public C connect() throws ConnectionException {
+    dance.runOnce();
+    return ConnectionUtils.connect(getDelegate());
+  }
+
+  @Override
+  public ConnectionValidationResult validate(C connection) {
+    return validateConnection(getDelegate(), connection, getContext());
+  }
+
+  @Override
+  public void disconnect(C connection) {
+    getDelegate().disconnect(connection);
   }
 
   @Override
@@ -109,9 +132,9 @@ public class PlatformManagedOAuthConnectionProvider<C> implements ConnectionProv
     dancer = oauthHandler.register(oauthConfig);
 
     try {
-      PlatformManagedConnectionDescriptor descriptor = fetchConnectionDescriptor();
+      descriptor = fetchConnectionDescriptor();
       delegate = createDelegate(descriptor);
-      initialiseDelegate(descriptor);
+      initialiseDelegate();
       startIfNeeded(getRetryPolicyTemplate());
     } catch (MuleException e) {
       stopIfNeeded(dancer);
@@ -120,7 +143,26 @@ public class PlatformManagedOAuthConnectionProvider<C> implements ConnectionProv
     }
   }
 
-  private void initialiseDelegate(PlatformManagedConnectionDescriptor descriptor) throws MuleException {
+  @Override
+  public void stop() throws MuleException {
+    try {
+      stopIfNeeded(dancer);
+    } finally {
+      safely(() -> stopIfNeeded(getRetryPolicyTemplate()),
+             e -> LOGGER.error(format("Error stopping %s for Platform Connection %s",
+                                      RetryPolicyTemplate.class.getName(),
+                                      oauthConfig.getConfigurationInstance()),
+                               e));
+    }
+  }
+
+  @Override
+  public void dispose() {
+    disposeIfNeeded(dancer, LOGGER);
+    disposeIfNeeded(getRetryPolicyTemplate(), LOGGER);
+  }
+
+  private void initialiseDelegate() throws MuleException {
     initialiseIfNeeded(delegate, true, muleContext);
     try {
       startIfNeeded(delegate);
@@ -181,7 +223,9 @@ public class PlatformManagedOAuthConnectionProvider<C> implements ConnectionProv
 
   private MuleException newConnectionDescriptorException(Throwable e) {
     return new DefaultMuleException(
-        "Could not obtain descriptor for Platform Managed OAuth Connection " + oauthConfig.getConnectionUri(), e);
+                                    "Could not obtain descriptor for Platform Managed OAuth Connection "
+                                        + oauthConfig.getConnectionUri(),
+                                    e);
   }
 
   private FieldSetter<ConnectionProvider<C>, OAuthState> getOAuthStateSetter(ConnectionProvider<C> delegate) {
@@ -209,32 +253,11 @@ public class PlatformManagedOAuthConnectionProvider<C> implements ConnectionProv
 
   private IllegalConnectionProviderModelDefinitionException illegalDelegateException() {
     return new IllegalConnectionProviderModelDefinitionException(format(
-        "Configuration '%s' cannot have a platform managed OAuth connection that delegates into itself",
-        oauthConfig.getOwnerConfigName()));
+                                                                        "Configuration '%s' cannot have a platform managed OAuth connection that delegates into itself",
+                                                                        oauthConfig.getOwnerConfigName()));
   }
 
 
-
-  @Override
-  public C connect() throws ConnectionException {
-    dance.runOnce();
-    return super.connect();
-  }
-
-  @Override
-  public ConnectionValidationResult validate(C connection) {
-    try {
-      ResourceOwnerOAuthContext context = getContext();
-      if (context.getAccessToken() != null) {
-        return getDelegate().validate(connection);
-      } else {
-        String message = "Server did not granted an access token";
-        return failure(message, new IllegalStateException(message));
-      }
-    } catch (Exception e) {
-      return failure("Could not obtain an access token", e);
-    }
-  }
 
   @Override
   public void refreshToken(String resourceOwnerId) {
@@ -252,16 +275,19 @@ public class PlatformManagedOAuthConnectionProvider<C> implements ConnectionProv
   }
 
   private void updateOAuthState() {
+    Consumer<ResourceOwnerOAuthContext> onUpdate = context -> updateOAuthParameters(delegate, callbackValues, context);
     oauthConfig.getDelegateGrantType().accept(new OAuthGrantTypeVisitor() {
 
       @Override
       public void visit(AuthorizationCodeGrantType grantType) {
-        oauthStateFieldSetter.set(delegate, new PlatformAuthorizationCodeStateAdapter(dancer, descriptor));
+        oauthStateFieldSetter.set(delegate, new PlatformAuthorizationCodeStateAdapter(dancer,
+                                                                                      descriptor,
+                                                                                      onUpdate));
       }
 
       @Override
       public void visit(ClientCredentialsGrantType grantType) {
-        oauthStateFieldSetter.set(delegate, new PlatformClientCredentialsOAuthStateAdapter(dancer));
+        oauthStateFieldSetter.set(delegate, new PlatformClientCredentialsOAuthStateAdapter(dancer, onUpdate));
       }
 
       @Override
@@ -270,16 +296,7 @@ public class PlatformManagedOAuthConnectionProvider<C> implements ConnectionProv
       }
     });
 
-    // TODO: Figure out the consumer and the callbackValues
-    final ConnectionProvider<C> delegate = getDelegate();
-    ResourceOwnerOAuthContext context = getContext();
-    oauthStateSetter.set(delegate, new UpdatingClientCredentialsState(
-        dancer,
-        context,
-        updatedContext -> updateOAuthParameters(delegate,
-                                                updatedContext)));
-
-    updateOAuthParameters(delegate, context);
+    onUpdate.accept(oauthHandler.getOAuthContext(oauthConfig));
   }
 
   private ResourceOwnerOAuthContext getContext() {
@@ -297,7 +314,18 @@ public class PlatformManagedOAuthConnectionProvider<C> implements ConnectionProv
   }
 
   @Override
+  public String getResourceOwnerId() {
+    return getContext().getResourceOwnerId();
+  }
+
+  @Override
   public RetryPolicyTemplate getRetryPolicyTemplate() {
     return ConnectionUtils.getRetryPolicyTemplate(getReconnectionConfig());
+  }
+
+  @Override
+  public ConnectionProvider<C> getDelegate() {
+    checkState(delegate != null, "ConnectionProvider has not been started yet");
+    return delegate;
   }
 }

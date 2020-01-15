@@ -10,6 +10,7 @@ package org.mule.runtime.core.api.config;
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.util.MuleSystemProperties;
 
@@ -171,6 +172,9 @@ public class MuleProperties {
    * @since 4.2.1
    */
   public static final String OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER = "extensions.clientCredentials.handler";
+
+  @Experimental
+  public static final String OBJECT_EXTENSION_PLATFORM_MANAGED_HANDLER = "extensions.ocs.handler";
 
   public static final String OBJECT_TIME_SUPPLIER = "_muleTimeSupplier";
   public static final String OBJECT_CONNECTION_MANAGER = "_muleConnectionManager";
