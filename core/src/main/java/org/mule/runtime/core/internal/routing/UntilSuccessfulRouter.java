@@ -273,11 +273,6 @@ class UntilSuccessfulRouter {
     return e -> (e instanceof MessagingException && shouldRetry.test(((MessagingException) e).getEvent()));
   }
 
-  /**
-   * Returns a {@link MessagingException} that represents a retry exhausted error
-   * @param event {@link CoreEvent} that caused the exhaustion
-   * @return {@link MessagingException}
-   */
   private Function<Throwable, Throwable> getThrowableFunction(CoreEvent event) {
     return throwable -> {
       CoreEvent exhaustionCauseEvent = event;
@@ -285,7 +280,7 @@ class UntilSuccessfulRouter {
         exhaustionCauseEvent = ((MessagingException) throwable).getEvent();
       }
       Throwable exhaustionCause = getMessagingExceptionCause(throwable);
-      RetryPolicyExhaustedException retryExhaustedException =
+      Throwable retryExhaustedException =
           new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, exhaustionCause.getMessage()),
                                             exhaustionCause, owner);
       CoreEvent retryExhaustedEvent = getRetryExhaustedEvent(exhaustionCauseEvent, retryExhaustedException);
@@ -293,14 +288,7 @@ class UntilSuccessfulRouter {
     };
   }
 
-  /**
-   * Creates a {@link CoreEvent} that represents a retry exhausted error
-   * @param exhaustionCauseEvent Failing event that caused the retry exhaustion
-   * @param retryExhaustedException {@link RetryPolicyExhaustedException} that will be returned by {@link CoreEvent#getError()}
-   * @return {@link CoreEvent}
-   */
-  private CoreEvent getRetryExhaustedEvent(CoreEvent exhaustionCauseEvent,
-                                           RetryPolicyExhaustedException retryExhaustedException) {
+  private CoreEvent getRetryExhaustedEvent(CoreEvent exhaustionCauseEvent, Throwable retryExhaustedException) {
     ErrorBuilder errorBuilder = ErrorBuilder.builder(retryExhaustedException)
         .errorType(retryExhaustedErrorType);
     return CoreEvent.builder(exhaustionCauseEvent).error(errorBuilder.build()).build();
