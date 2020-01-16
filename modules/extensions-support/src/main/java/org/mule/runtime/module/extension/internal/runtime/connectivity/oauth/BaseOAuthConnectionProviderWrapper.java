@@ -7,10 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
 import static java.util.Collections.unmodifiableMap;
-import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.validateConnection;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.validateOAuthConnection;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
@@ -18,6 +19,12 @@ import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import java.lang.reflect.Field;
 import java.util.Map;
 
+/**
+ * Base class for an OAuth enabled {@link ConnectionProviderWrapper}.
+ *
+ * @param <C> the generic type of the returned connection
+ * @since 4.3.0
+ */
 public abstract class BaseOAuthConnectionProviderWrapper<C> extends ReconnectableConnectionProviderWrapper<C> implements
     OAuthConnectionProviderWrapper<C> {
 
@@ -32,7 +39,7 @@ public abstract class BaseOAuthConnectionProviderWrapper<C> extends Reconnectabl
 
   @Override
   public ConnectionValidationResult validate(C connection) {
-    return validateConnection(getDelegate(), connection, getContext());
+    return validateOAuthConnection(getDelegate(), connection, getContext());
   }
 
   @Override

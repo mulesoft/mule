@@ -19,7 +19,7 @@ import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getCallbackValuesExtractors;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.updateOAuthParameters;
-import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.validateConnection;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.validateOAuthConnection;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -73,6 +73,12 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
+/**
+ * An {@link OAuthConnectionProviderWrapper} for OAuth connections managed on the Anypoint Platform
+ *
+ * @param <C> the generic type of the generated connections
+ * @since 4.3.0
+ */
 public class PlatformManagedOAuthConnectionProvider<C> implements OAuthConnectionProviderWrapper<C> {
 
   private static final Logger LOGGER = getLogger(PlatformManagedOAuthConnectionProvider.class);
@@ -114,7 +120,7 @@ public class PlatformManagedOAuthConnectionProvider<C> implements OAuthConnectio
 
   @Override
   public ConnectionValidationResult validate(C connection) {
-    return validateConnection(getDelegate(), connection, getContext());
+    return validateOAuthConnection(getDelegate(), connection, getContext());
   }
 
   @Override
@@ -256,8 +262,6 @@ public class PlatformManagedOAuthConnectionProvider<C> implements OAuthConnectio
                                                                         "Configuration '%s' cannot have a platform managed OAuth connection that delegates into itself",
                                                                         oauthConfig.getOwnerConfigName()));
   }
-
-
 
   @Override
   public void refreshToken(String resourceOwnerId) {

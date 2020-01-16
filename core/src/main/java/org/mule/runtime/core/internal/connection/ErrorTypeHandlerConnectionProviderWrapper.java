@@ -27,7 +27,7 @@ import org.mule.runtime.extension.api.exception.ModuleException;
 import java.util.Optional;
 
 /**
- * {@link AbstractConnectionProviderWrapper} implementation which handles the exceptions occurred when {@link #connect()} and the
+ * {@link ConnectionProviderWrapper} implementation which handles the exceptions occurred when {@link #connect()} and the
  * failed {@link ConnectionValidationResult} from the {@link #validate(Object)}, this wrapper consumes these outputs and if a
  * {@link ErrorTypeDefinition} is provided transforms it and communicates the proper {@link ErrorType}
  *

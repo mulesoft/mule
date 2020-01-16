@@ -16,7 +16,12 @@ import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class PlatformAuthorizationCodeStateAdapter extends BasePlatformOAuthStateAdapter implements AuthorizationCodeState {
+/**
+ * Implementation of {@link AbstractPlatformOAuthStateAdapter} that implements {@link AuthorizationCodeState}
+ *
+ * @since 4.3.0
+ */
+public class PlatformAuthorizationCodeStateAdapter extends AbstractPlatformOAuthStateAdapter implements AuthorizationCodeState {
 
   private final PlatformManagedConnectionDescriptor descriptor;
 

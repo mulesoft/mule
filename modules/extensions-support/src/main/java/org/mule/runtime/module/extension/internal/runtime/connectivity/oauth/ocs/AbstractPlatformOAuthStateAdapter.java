@@ -16,12 +16,18 @@ import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-abstract class BasePlatformOAuthStateAdapter implements OAuthState {
+/**
+ * Base class for an adapter that bridges implementations of {@link OAuthState} with {@link ResourceOwnerOAuthContext}
+ * instances obtained through a {@link PlatformManagedOAuthDancer}
+ *
+ * @since 4.3.0
+ */
+abstract class AbstractPlatformOAuthStateAdapter implements OAuthState {
 
   private String accessToken;
   private Optional<String> expiresIn;
 
-  public BasePlatformOAuthStateAdapter(PlatformManagedOAuthDancer dancer, Consumer<ResourceOwnerOAuthContext> onUpdate) {
+  public AbstractPlatformOAuthStateAdapter(PlatformManagedOAuthDancer dancer, Consumer<ResourceOwnerOAuthContext> onUpdate) {
     updateState(dancer.getContext());
     dancer.addListener(new PlatformManagedOAuthStateListener() {
 

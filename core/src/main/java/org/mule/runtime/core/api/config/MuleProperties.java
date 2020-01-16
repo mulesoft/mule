@@ -173,6 +173,14 @@ public class MuleProperties {
    */
   public static final String OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER = "extensions.clientCredentials.handler";
 
+  /**
+   * Registry key for the {@code PlatformManagedOAuthHandler}
+   * <p>
+   * Platform Managed OAuth is an experimental feature. It will only be enabled on selected environments and scenarios.
+   * Backwards compatibility is not guaranteed.
+   *
+   * @since 4.3.0
+   */
   @Experimental
   public static final String OBJECT_EXTENSION_PLATFORM_MANAGED_HANDLER = "extensions.ocs.handler";
 

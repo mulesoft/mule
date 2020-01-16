@@ -27,6 +27,11 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAu
 
 import java.nio.charset.Charset;
 
+/**
+ * {@link OAuthConfig} implementation for the {@link PlatformManagedOAuthGrantType}
+ *
+ * @since 4.3.0
+ */
 public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuthGrantType> {
 
   private final String connectionUri;

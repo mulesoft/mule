@@ -20,7 +20,7 @@ import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import java.util.Optional;
 
 /**
- * An {@link AbstractConnectionProviderWrapper} which performs base tasks as handling reconnection strategies, DI, etc.
+ * An {@link ConnectionProviderWrapper} which performs base tasks as handling reconnection strategies, DI, etc.
  *
  * @param <C> the generic type of the connections that the {@link #delegate} produces
  * @since 4.0

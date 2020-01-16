@@ -12,7 +12,13 @@ import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.util.function.Consumer;
 
-public class PlatformClientCredentialsOAuthStateAdapter extends BasePlatformOAuthStateAdapter implements ClientCredentialsState {
+/**
+ * Implementation of {@link AbstractPlatformOAuthStateAdapter} that implements {@link ClientCredentialsState}
+ *
+ * @since 4.3.0
+ */
+public class PlatformClientCredentialsOAuthStateAdapter extends AbstractPlatformOAuthStateAdapter
+    implements ClientCredentialsState {
 
   public PlatformClientCredentialsOAuthStateAdapter(PlatformManagedOAuthDancer dancer,
                                                     Consumer<ResourceOwnerOAuthContext> onUpdate) {

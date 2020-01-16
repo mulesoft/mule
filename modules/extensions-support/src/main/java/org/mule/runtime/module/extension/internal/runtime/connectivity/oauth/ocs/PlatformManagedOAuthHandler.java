@@ -30,18 +30,30 @@ import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * A {@link OAuthHandler} implementation that works with a {@link PlatformManagedOAuthDancer}
+ *
+ * @since 4.3.0
+ */
 public class PlatformManagedOAuthHandler extends OAuthHandler<PlatformManagedOAuthDancer> {
 
   /**
-   * Becomes aware of the given {@code config} and makes sure that the access token callback
-   * and authorization endpoints are provisioned.
+   * Returns a {@link PlatformManagedOAuthDancer} configured after the given {@code config}
    *
    * @param config an {@link PlatformManagedOAuthConfig}
+   * @return a {@link PlatformManagedOAuthDancer}
    */
   public PlatformManagedOAuthDancer register(PlatformManagedOAuthConfig config) {
     return register(config, emptyList());
   }
 
+  /**
+   * Returns a {@link PlatformManagedOAuthDancer} configured after the given {@code config}
+   *
+   * @param config an {@link PlatformManagedOAuthConfig}
+   * @param listeners a list of {@link PlatformManagedOAuthStateListener listeners} to be registered into the dancer
+   * @return a {@link PlatformManagedOAuthDancer}
+   */
   public PlatformManagedOAuthDancer register(PlatformManagedOAuthConfig config,
                                              List<PlatformManagedOAuthStateListener> listeners) {
     return dancers.computeIfAbsent(config.getOwnerConfigName(),

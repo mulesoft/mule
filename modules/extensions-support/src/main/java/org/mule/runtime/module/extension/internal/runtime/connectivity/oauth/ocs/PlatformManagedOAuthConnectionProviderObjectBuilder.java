@@ -31,6 +31,13 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
+/**
+ * A {@link BaseOAuthConnectionProviderObjectBuilder} implementation that yields {@link PlatformManagedOAuthConnectionProvider}
+ * instances
+ *
+ * @param <C> the generic type of the produced connections
+ * @since 4.3.0
+ */
 public class PlatformManagedOAuthConnectionProviderObjectBuilder<C> extends BaseOAuthConnectionProviderObjectBuilder<C> {
 
   private final PlatformManagedOAuthHandler platformHandler;
@@ -72,10 +79,10 @@ public class PlatformManagedOAuthConnectionProviderObjectBuilder<C> extends Base
                                                    delegateModel.getSecond(),
                                                    configurationProperties);
 
-    ConnectionProvider<C> provider = new PlatformManagedOAuthConnectionProvider<C>(config,
-                                                                                   platformHandler,
-                                                                                   reconnectionConfig,
-                                                                                   poolingProfile);
+    ConnectionProvider<C> provider = new PlatformManagedOAuthConnectionProvider<>(config,
+                                                                                  platformHandler,
+                                                                                  reconnectionConfig,
+                                                                                  poolingProfile);
 
     return new Pair<>(provider, resolverSetResult);
   }
