@@ -325,6 +325,17 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         });
   }
 
+  @Override
+  public ProcessingType getProcessingType() {
+    if (isAsync()) {
+      // In this case, any thread switch will be done in the innerFlux
+      return CPU_LITE;
+    } else {
+      // The innerFlux will not be used in this case, so the outer PS needs to be aware of the actual ProcessingType
+      return getInnerProcessingType();
+    }
+  }
+
   private void onEvent(CoreEvent event, ExecutorCallback executorCallback) {
     try {
       SdkInternalContext sdkInternalContext = from(event);
