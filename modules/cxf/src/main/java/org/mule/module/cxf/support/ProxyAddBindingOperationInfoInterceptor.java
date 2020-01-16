@@ -26,8 +26,8 @@ import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 
 /**
- * Sets the correct operation when the binding style is RPC. The processing of the message content
- * is delegated to the StaxDataBindingInterceptor.
+ * Sets the correct operation when the binding style is RPC. The processing of the message content is delegated to the
+ * StaxDataBindingInterceptor.
  *
  */
 public class ProxyAddBindingOperationInfoInterceptor extends AbstractInDatabindingInterceptor
@@ -39,7 +39,8 @@ public class ProxyAddBindingOperationInfoInterceptor extends AbstractInDatabindi
         addBefore(StaxDataBindingInterceptor.class.getName());
     }
 
-    private BindingOperationInfo getOperation(Message message, QName opName) {
+    private BindingOperationInfo getOperation(Message message, QName opName)
+    {
         BindingOperationInfo bop = ServiceModelUtil.getOperation(message.getExchange(), opName);
         if (bop == null)
         {
@@ -59,7 +60,8 @@ public class ProxyAddBindingOperationInfoInterceptor extends AbstractInDatabindi
                     if (output)
                     {
                         body = info.getOutput().getExtensor(SoapBody.class);
-                    } else
+                    }
+                    else
                     {
                         body = info.getInput().getExtensor(SoapBody.class);
                     }
@@ -77,14 +79,14 @@ public class ProxyAddBindingOperationInfoInterceptor extends AbstractInDatabindi
     @Override
     public void handleMessage(Message message) throws Fault
     {
-        // In case there already exists an action, the binding operation should
+        // In case there already exists an action or the binding was already added, the binding operation should
         // not be added.
         String action = (String) message.get(SOAP_ACTION);
-        if (!isEmpty(action))
+        if (!isEmpty(action) || message.getExchange().get(BindingOperationInfo.class) != null)
         {
             return;
         }
-        
+
         DepthXMLStreamReader xmlReader = getXMLStreamReader(message);
 
         if (!StaxUtils.toNextElement(xmlReader))
