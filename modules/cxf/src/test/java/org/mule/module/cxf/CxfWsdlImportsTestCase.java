@@ -67,14 +67,8 @@ public class CxfWsdlImportsTestCase extends FunctionalTestCase
     private static final String VALID_RESPONSE_LOG = "<ns1:logResponse xmlns:ns1=\"http://www.log.org\"/>";
 
     private static final Object VALID_RESPONSE_ECHO = "<ns1:echoResponse xmlns:ns1=\"http://www.echo.org\">"
-                                                     + "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-                                                     + "<soap:Body> " +
-                                                     "<echo xmlns=\"http://www.echo.org\">" +
-                                                     "<echo>Testing echo</echo>" +
-                                                     "</echo>"
-                                                     + "</soap:Body>"
-                                                     + "</soap:Envelope>"
-                                                     + "</ns1:echoResponse>";
+                                                      + VALID_REQUEST_ECHO
+                                                      + "</ns1:echoResponse>";
 
     @Rule
     public final DynamicPort httpPort = new DynamicPort("port1");
