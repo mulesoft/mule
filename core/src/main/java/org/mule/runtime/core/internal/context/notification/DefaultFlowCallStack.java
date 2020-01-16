@@ -129,7 +129,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
   }
 
   private String doToString(Function<FlowStackElement, String> toString) {
-    StringBuilder stackString = new StringBuilder();
+    StringBuilder stackString = new StringBuilder(256);
 
     int i = 0;
     synchronized (innerStack) {

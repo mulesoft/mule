@@ -92,11 +92,11 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   public void before() throws MuleException {
     originalVerboseExceptions = MuleException.verboseExceptions;
 
-    locationProvider.setMuleContext(mockContext);
-
     DefaultMuleConfiguration mockConfiguration = mock(DefaultMuleConfiguration.class);
     when(mockConfiguration.getId()).thenReturn("MessagingExceptionTestCase");
     when(mockContext.getConfiguration()).thenReturn(mockConfiguration);
+
+    locationProvider.setMuleContext(mockContext);
 
     testEvent = eventBuilder(muleContext).message(of(TEST_PAYLOAD)).build();
   }

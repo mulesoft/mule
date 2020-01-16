@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static java.util.Collections.singletonMap;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
@@ -23,26 +24,28 @@ import java.util.Map;
  */
 public class MessagingExceptionLocationProvider extends LocationExecutionContextProvider implements MuleContextAware {
 
-  private MuleContext muleContext;
+  private String appId;
 
   @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
+  public void setMuleContext(MuleContext muleContext) {
+    appId = muleContext.getConfiguration().getId();
   }
 
   @Override
   public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
-    Map<String, Object> contextInfo = of(INFO_LOCATION_KEY, resolveProcessorRepresentation(muleContext.getConfiguration().getId(),
-                                                                                           lastProcessed.getLocation() != null
-                                                                                               ? lastProcessed.getLocation()
-                                                                                                   .getLocation()
-                                                                                               : null,
-                                                                                           lastProcessed));
-    String sourceXML = getSourceXML(lastProcessed);
-    if (sourceXML != null) {
-      contextInfo.put(INFO_SOURCE_XML_KEY, sourceXML);
-    }
+    final String processorRepresentation = resolveProcessorRepresentation(appId,
+                                                                          lastProcessed.getLocation() != null
+                                                                              ? lastProcessed.getLocation()
+                                                                                  .getLocation()
+                                                                              : null,
+                                                                          lastProcessed);
+    final String sourceXML = getSourceXML(lastProcessed);
 
-    return contextInfo;
+    if (sourceXML != null) {
+      return of(INFO_LOCATION_KEY, processorRepresentation,
+                INFO_SOURCE_XML_KEY, sourceXML);
+    } else {
+      return singletonMap(INFO_LOCATION_KEY, processorRepresentation);
+    }
   }
 }

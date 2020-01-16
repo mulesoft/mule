@@ -9,9 +9,11 @@ package org.mule.runtime.core.api.util;
 import static java.lang.System.lineSeparator;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -261,7 +263,7 @@ public class ExceptionUtils {
   }
 
   public static Optional<ComponentIdentifier> getComponentIdentifier(Component obj) {
-    return Optional.ofNullable((ComponentIdentifier) obj.getAnnotation(ANNOTATION_NAME));
+    return ofNullable((ComponentIdentifier) obj.getAnnotation(ANNOTATION_NAME));
   }
 
   private ExceptionUtils() {}

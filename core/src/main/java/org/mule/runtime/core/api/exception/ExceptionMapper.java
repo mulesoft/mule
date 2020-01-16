@@ -8,9 +8,10 @@ package org.mule.runtime.core.api.exception;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.internal.exception.ExceptionMapping;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.util.Optional;
 import java.util.Set;
@@ -19,18 +20,18 @@ import java.util.TreeSet;
 /**
  * Defines a set of mappings between exception types and error types. Such configuration is later used to resolve the
  * {@link ErrorType} that must be used when an {@link Exception} is thrown by a mule component.
- * 
+ *
  * To create instances of {@link ExceptionMapper} you must use the {@link #builder()} method.
- * 
+ *
  * @since 4.0
  */
 public final class ExceptionMapper {
 
-  private Set<ExceptionMapping> exceptionMappings = new TreeSet<>();
+  private final Set<ExceptionMapping> exceptionMappings;
 
   /**
    * Creates a new {@link ExceptionMapper}
-   * 
+   *
    * @param exceptionMappings set of mappings between exceptions and error types/
    */
   private ExceptionMapper(Set<ExceptionMapping> exceptionMappings) {
@@ -65,18 +66,18 @@ public final class ExceptionMapper {
 
   /**
    * Builder to create instances of {@link ExceptionMapper}
-   * 
+   *
    * @since 4.0
    */
   public static class Builder {
 
     private Builder() {}
 
-    private Set<ExceptionMapping> exceptionMappings = new TreeSet<>();
+    private final Set<ExceptionMapping> exceptionMappings = new TreeSet<>();
 
     /**
      * Adds a mapping between an exception and an error type.
-     * 
+     *
      * @param exceptionType the exception type.
      * @param errorType the error type.
      * @return {@code this} builder

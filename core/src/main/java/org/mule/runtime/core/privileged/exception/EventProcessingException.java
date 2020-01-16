@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.privileged.exception;
 
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.TypedException;
@@ -60,8 +62,7 @@ public class EventProcessingException extends MuleException {
   }
 
   private static CoreEvent eventWithError(CoreEvent event, TypedException cause) {
-    return CoreEvent.builder(event)
-        .error(ErrorBuilder.builder(cause.getCause()).errorType(cause.getErrorType()).build()).build();
+    return quickCopy(ErrorBuilder.builder(cause.getCause()).errorType(cause.getErrorType()).build(), event);
   }
 
 }

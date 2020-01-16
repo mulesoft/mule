@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.exception;
 
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
@@ -14,11 +15,15 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.exception.ExceptionMapper;
 
-import org.apache.commons.collections.map.HashedMap;
 import java.util.Map;
 import java.util.Optional;
+
+import org.apache.commons.collections.map.HashedMap;
+
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
 /**
  * Locator for error types.
@@ -31,14 +36,16 @@ import java.util.Optional;
  *
  * To create an {@code ErrorTypeLocator} you must use the {@code Builder}. An instance of the builder can be created using the
  * static method {@code #builder}.
- * 
+ *
  * @since 4.0
  */
 public class ErrorTypeLocator {
 
-  private ExceptionMapper defaultExceptionMapper;
-  private Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers;
+  private final ExceptionMapper defaultExceptionMapper;
+  private final Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers;
   private final ErrorType defaultError;
+
+  private final LoadingCache<Pair<ComponentIdentifier, Class<? extends Throwable>>, ErrorType> componentErrorTypeCache;
 
   private ErrorTypeLocator(ExceptionMapper defaultExceptionMapper,
                            Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers,
@@ -46,11 +53,20 @@ public class ErrorTypeLocator {
     this.defaultExceptionMapper = defaultExceptionMapper;
     this.componentExceptionMappers = componentExceptionMappers;
     this.defaultError = defaultError;
+
+    this.componentErrorTypeCache = newBuilder().build(params -> {
+      ExceptionMapper exceptionMapper = componentExceptionMappers.get(params.getFirst());
+      Optional<ErrorType> errorType = empty();
+      if (exceptionMapper != null) {
+        errorType = exceptionMapper.resolveErrorType(params.getSecond());
+      }
+      return errorType.orElseGet(() -> lookupErrorType(params.getSecond()));
+    });
   }
 
   /**
    * Finds the {@code ErrorType} related to the provided {@code exception} based on the general mapping rules of the runtime.
-   * 
+   *
    * @param exception the exception related to the error type
    * @return the error type related to the exception. If there's no mapping then the error type related to UNKNOWN will be
    *         returned.
@@ -73,28 +89,22 @@ public class ErrorTypeLocator {
   /**
    * Finds the {@code ErrorType} related to a component defined by the {@link ComponentIdentifier} based on the exception thrown
    * by the component and the mappings configured in the {@code ErrorTypeLocator}.
-   * 
+   * <p>
    * If no mapping is available then the {@link #lookupErrorType(Throwable)} rules applies.
-   * 
+   *
    * @param componentIdentifier the identifier of the component that throw the exception.
    * @param exception the exception thrown by the component.
    * @return the error type related to the exception based on the component mappings. If there's no mapping then the error type
    *         related to UNKNOWN will be returned.
    */
   public ErrorType lookupComponentErrorType(ComponentIdentifier componentIdentifier, Class<? extends Throwable> exception) {
-
-    ExceptionMapper exceptionMapper = componentExceptionMappers.get(componentIdentifier);
-    Optional<ErrorType> errorType = empty();
-    if (exceptionMapper != null) {
-      errorType = exceptionMapper.resolveErrorType(exception);
-    }
-    return errorType.orElseGet(() -> lookupErrorType(exception));
+    return componentErrorTypeCache.get(new Pair<>(componentIdentifier, exception));
   }
 
   /**
    * Finds the {@code ErrorType} related to a component defined by the {@link ComponentIdentifier} based on the exception thrown
    * by the component and the mappings configured in the {@code ErrorTypeLocator}.
-   *
+   * <p>
    * If no mapping is available then the {@link #lookupErrorType(Throwable)} rules applies.
    *
    * @param componentIdentifier the identifier of the component that throw the exception.
@@ -110,7 +120,6 @@ public class ErrorTypeLocator {
   private Optional<ErrorType> getErrorTypeFromException(Throwable exception) {
     return exception instanceof ConnectionException ? ((ConnectionException) exception).getErrorType() : empty();
   }
-
 
   /**
    * Adds an {@link ExceptionMapper} for a particular component identified by a {@link ComponentIdentifier}.
@@ -134,7 +143,7 @@ public class ErrorTypeLocator {
 
   /**
    * Builder for {@link ErrorTypeLocator}
-   * 
+   *
    * @since 4.0
    */
   public static class Builder {
@@ -148,11 +157,11 @@ public class ErrorTypeLocator {
 
     private ErrorType defaultError;
     private ExceptionMapper defaultExceptionMapper;
-    private Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers = new HashedMap();
+    private final Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers = new HashedMap();
 
     /**
      * Sets the default exception mapper to use when a component doesn't define a mapping for an exception type.
-     * 
+     *
      * @param exceptionMapper default exception mapper.
      * @return {@code this} builder.
      */
@@ -163,7 +172,7 @@ public class ErrorTypeLocator {
 
     /**
      * Adds an {@link ExceptionMapper} for a particular component identified by the componentIdentifier.
-     * 
+     *
      * @param componentIdentifier identifier of a component.
      * @param exceptionMapper exception mapper for the component.
      * @return {@code this} builder.
@@ -175,7 +184,7 @@ public class ErrorTypeLocator {
 
     /**
      * Builds an {@link ErrorTypeLocator} instance with the provided configuration.
-     * 
+     *
      * @return an {@link ErrorTypeLocator} instance.
      */
     public ErrorTypeLocator build() {

@@ -19,6 +19,7 @@ import org.mule.runtime.api.util.ComponentLocationProvider;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +52,7 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
   public static void addMetadataAnnotationsFromXml(Map<QName, Object> beanAnnotations, String sourceCode,
                                                    Map<String, Object> customAttributes) {
     if (sourceCode != null) {
-      beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, sourceCode);
+      beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, maskPasswords(sourceCode));
     }
 
     String documentationName = (String) customAttributes
@@ -76,7 +77,7 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
   public static void addMetadataAnnotationsFromDocAttributes(Map<QName, Object> beanAnnotations, String sourceCode,
                                                              Map<String, String> docAttributes) {
     if (sourceCode != null) {
-      beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, sourceCode);
+      beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, maskPasswords(sourceCode));
     }
 
     beanAnnotations.putAll(docAttributes.entrySet().stream()
@@ -84,8 +85,7 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
   }
 
   protected static String getSourceXML(Component element) {
-    Object sourceXml = element.getAnnotation(SOURCE_ELEMENT_ANNOTATION_KEY);
-    return sourceXml != null ? maskPasswords(sourceXml.toString()) : null;
+    return Objects.toString(element.getAnnotation(SOURCE_ELEMENT_ANNOTATION_KEY), null);
   }
 
   public static String maskPasswords(String xml, String passwordMask) {

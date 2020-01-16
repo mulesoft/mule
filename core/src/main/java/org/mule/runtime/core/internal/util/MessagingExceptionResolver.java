@@ -25,7 +25,6 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
@@ -111,18 +110,16 @@ public class MessagingExceptionResolver {
 
   private Optional<Pair<Throwable, ErrorType>> findRoot(Component obj, MessagingException me, ErrorTypeLocator locator) {
     List<Pair<Throwable, ErrorType>> errors = collectErrors(obj, me, locator);
+
     if (errors.isEmpty()) {
       return collectCritical(obj, me, locator).stream().findFirst();
     }
     // We look if there is a more specific error in the chain that matches with the root error (is child or has the same error)
-    SingleErrorTypeMatcher matcher = new SingleErrorTypeMatcher(errors.get(0).getSecond());
-    Reference<Pair<Throwable, ErrorType>> result = new Reference<>();
-    errors.forEach(p -> {
-      if (matcher.match(p.getSecond())) {
-        result.set(p);
-      }
-    });
-    return Optional.ofNullable(result.get());
+    SingleErrorTypeMatcher matcher = new SingleErrorTypeMatcher(errors.get(errors.size() - 1).getSecond());
+
+    return errors.stream()
+        .filter(p -> matcher.match(p.getSecond()))
+        .findFirst();
   }
 
   private List<Pair<Throwable, ErrorType>> collectErrors(Component obj, MessagingException me, ErrorTypeLocator locator) {
@@ -130,7 +127,7 @@ public class MessagingExceptionResolver {
     getExceptionsAsList(me).forEach(e -> {
       ErrorType type = errorTypeFromException(obj, locator, e);
       if (!isUnknownMuleError(type) && !isCriticalMuleError(type)) {
-        errors.add(new Pair<>(e, type));
+        errors.add(0, new Pair<>(e, type));
       }
     });
     return errors;

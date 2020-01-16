@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 
 import java.io.Serializable;
@@ -63,15 +62,11 @@ public final class FlowStackElement implements Serializable {
     if (processorPath == null) {
       return flowName;
     } else {
-      return format("%s(%s)", flowName, processorPath);
+      return flowName.concat("(").concat(processorPath).concat(")");
     }
   }
 
   public String toStringWithElapsedTime() {
-    if (processorPath == null) {
-      return format("%s %d ms", flowName, getElapsedTime());
-    } else {
-      return format("%s(%s) %d ms", flowName, processorPath, getElapsedTime());
-    }
+    return toString().concat(" ").concat(getElapsedTime().toString()).concat(" ms");
   }
 }

@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.event;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
 
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -16,6 +17,7 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Utilities for creating new events without copying all of its the internal state.
@@ -72,6 +74,14 @@ public final class EventQuickCopy {
     }
   }
 
+  public static CoreEvent quickCopy(Error error, CoreEvent event) {
+    if (event instanceof InternalEvent) {
+      return new EventQuickCopyErrorDecorator(error, (InternalEvent) event);
+    } else {
+      return CoreEvent.builder(event).error(error).build();
+    }
+  }
+
   /**
    * Creates a new {@link CoreEvent} based on an existing {@link CoreEvent} instance and a {@link Map} of
    * {@link InternalEvent#getInternalParameters()}.
@@ -120,6 +130,23 @@ public final class EventQuickCopy {
     @Override
     public String getCorrelationId() {
       return getLegacyCorrelationId() != null ? getLegacyCorrelationId() : getContext().getCorrelationId();
+    }
+  }
+
+  private static class EventQuickCopyErrorDecorator extends BaseEventDecorator {
+
+    private static final long serialVersionUID = 7605973213141261979L;
+
+    private final Error error;
+
+    public EventQuickCopyErrorDecorator(Error error, InternalEvent event) {
+      super(event);
+      this.error = error;
+    }
+
+    @Override
+    public Optional<Error> getError() {
+      return Optional.of(error);
     }
   }
 

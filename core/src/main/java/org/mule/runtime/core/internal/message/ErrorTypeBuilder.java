@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
+
 import org.mule.runtime.api.message.ErrorType;
 
 import java.util.Objects;
@@ -90,14 +91,20 @@ public final class ErrorTypeBuilder {
    */
   private final static class ErrorTypeImplementation implements ErrorType {
 
-    private String identifier;
-    private String namespace;
-    private ErrorType parentErrorType;
+    private static final long serialVersionUID = -3716206147606234572L;
+
+    private final String identifier;
+    private final String namespace;
+    private final ErrorType parentErrorType;
+
+    private final String asString;
 
     private ErrorTypeImplementation(String identifier, String namespace, ErrorType parentErrorType) {
       this.identifier = identifier;
       this.namespace = namespace;
       this.parentErrorType = parentErrorType;
+
+      this.asString = format("%s:%s", namespace, identifier);
     }
 
     /**
@@ -126,7 +133,7 @@ public final class ErrorTypeBuilder {
 
     @Override
     public String toString() {
-      return format("%s:%s", namespace, identifier);
+      return asString;
     }
 
     @Override
