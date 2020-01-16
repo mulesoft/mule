@@ -785,7 +785,6 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
 
     private final Map<Location, ComponentModel> components = new HashMap<>();
 
-
     Locator(ApplicationModel app) {
       app.getRootComponentModel().getInnerComponents().forEach(this::addComponent);
     }
