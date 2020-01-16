@@ -251,6 +251,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook =
         getLocalOperatorErrorHook(this, errorTypeLocator, exceptionContextProviders);
+    final boolean async = isAsync();
 
     return subscriberContext()
         .flatMapMany(ctx -> {
@@ -303,7 +304,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                       }
                     };
 
-                    if (!isAsync() && from(event).isNoPolicyOperation()) {
+                    if (!async && from(event).isNoPolicyOperation()) {
                       onEventSynchronous(event, executorCallback, ctx);
                     } else {
                       onEvent(event, executorCallback);
