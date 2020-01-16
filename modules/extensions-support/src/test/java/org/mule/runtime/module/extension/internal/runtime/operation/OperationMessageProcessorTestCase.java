@@ -122,6 +122,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
   @Override
   protected OperationMessageProcessor createOperationMessageProcessor() throws MuleException {
+    when(operationModel.isBlocking()).thenReturn(false);
+
     OperationMessageProcessor operationMessageProcessor =
         new OperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
                                       cursorStreamProviderFactory, new NoRetryPolicyTemplate(), extensionManager,
@@ -431,7 +433,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Test
   public void getProcessingType() {
     assertProcessingType(CPU_INTENSIVE, ProcessingType.CPU_INTENSIVE);
-    assertProcessingType(CPU_LITE, ProcessingType.CPU_LITE);
+    assertProcessingType(CPU_LITE, ProcessingType.CPU_LITE_ASYNC);
     assertProcessingType(BLOCKING, ProcessingType.BLOCKING);
   }
 

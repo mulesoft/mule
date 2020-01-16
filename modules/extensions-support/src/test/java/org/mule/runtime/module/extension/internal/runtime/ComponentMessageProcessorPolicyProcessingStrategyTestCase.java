@@ -295,7 +295,7 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
     when(processingStrategy.onProcessor(any(ReactiveProcessor.class)))
         .thenAnswer(inv -> {
           final ProcessingType processingType = inv.getArgument(0, ReactiveProcessor.class).getProcessingType();
-          if(processingType.equals(CPU_LITE_ASYNC)) {
+          if (processingType.equals(CPU_LITE_ASYNC)) {
             return (ReactiveProcessor) t -> Mono.from(t)
                 .transform(inv.getArgument(0, ReactiveProcessor.class))
                 .publishOn(fromExecutorService(threadSwitcher));
