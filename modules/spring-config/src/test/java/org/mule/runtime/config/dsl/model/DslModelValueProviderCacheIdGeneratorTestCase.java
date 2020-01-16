@@ -23,6 +23,7 @@ import static org.hamcrest.core.IsNot.not;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -331,10 +332,10 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
       return empty();
     });
     when(extension.getOperationModels()).thenReturn(asList(operation));
-    when(extension.getOperationModel(anyString())).thenReturn(of(operation));
+    when(extension.getOperationModel(eq(OPERATION_NAME))).thenReturn(of(operation));
 
     when(extension.getSourceModels()).thenReturn(asList(source));
-    when(extension.getSourceModel(anyString())).thenReturn(of(source));
+    when(extension.getSourceModel(eq(SOURCE_NAME))).thenReturn(of(source));
     when(extension.getConnectionProviders()).thenReturn(asList(connectionProvider));
     when(extension.getConnectionProviderModel(anyString())).thenReturn(of(connectionProvider));
   }
