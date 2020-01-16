@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
 import static java.util.Optional.of;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.hamcrest.Matchers.is;
@@ -21,7 +22,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
+import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.noPolicyOperation;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.tck.probe.PollingProber.probe;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
@@ -36,10 +41,10 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
-import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
@@ -53,25 +58,33 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import reactor.core.publisher.Mono;
 
+@RunWith(Parameterized.class)
 public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends AbstractMuleContextTestCase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ComponentMessageProcessorPolicyProcessingStrategyTestCase.class);
 
-  private static final OperationPolicy NO_POLICY_OPERATION =
-      (operationEvent, operationExecutionFunction, opParamProcessor, componentLocation, callback) -> operationExecutionFunction
-          .execute(opParamProcessor.getOperationParameters(), operationEvent, callback);
+  @Parameters(name = "async: {0}, processingType: {1}")
+  public static List<Object[]> parameters() {
+    return asList(new Object[] {true, CPU_LITE_ASYNC},
+                  new Object[] {false, CPU_INTENSIVE},
+                  new Object[] {true, CPU_INTENSIVE});
+  }
 
   private ComponentMessageProcessor<ComponentModel> processor;
   private Location mpRootContainerLocation;
@@ -87,6 +100,14 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
 
   private final ExecutorService threadSwitcher = newFixedThreadPool(2);
   private final AssertingExecutionMediator mediator = new AssertingExecutionMediator();
+
+  private final boolean async;
+  private final ProcessingType processingType;
+
+  public ComponentMessageProcessorPolicyProcessingStrategyTestCase(boolean async, ProcessingType processingType) {
+    this.async = async;
+    this.processingType = processingType;
+  }
 
   @Before
   public void before() throws MuleException {
@@ -117,7 +138,7 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
 
       @Override
       public ProcessingType getInnerProcessingType() {
-        return CPU_LITE_ASYNC;
+        return processingType;
       }
 
       @Override
@@ -133,6 +154,11 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
       @Override
       public Location getRootContainerLocation() {
         return mpRootContainerLocation;
+      }
+
+      @Override
+      protected boolean requiresConfig() {
+        return async;
       }
 
     };
@@ -175,16 +201,6 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
   }
 
   @Test
-  public void noOpPolicy() throws MuleException {
-    when(policyManager.createOperationPolicy(eq(processor), any(CoreEvent.class), any(OperationParametersProcessor.class)))
-        .thenReturn(NO_POLICY_OPERATION);
-
-    processor.process(testEvent());
-    assertThat(mediator.executed, is(true));
-    assertThat(mediator.executionThread, sameInstance(currentThread()));
-  }
-
-  @Test
   public void policyChangesThreadBefore() throws MuleException {
     AtomicReference<Thread> switchedRef = new AtomicReference<>();
 
@@ -198,7 +214,7 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
 
         });
 
-    processor.process(testEvent());
+    processToApply(testEvent(), processingStrategy.onProcessor(processor));
 
     probe(() -> {
       assertThat(mediator.executed, is(true));
@@ -229,8 +245,75 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
           });
         });
 
-    processor.process(testEvent());
+    processToApply(testEvent(), processingStrategy.onProcessor(processor));
 
+    probe(() -> {
+      assertThat(mediator.executed, is(true));
+      assertThat(mediator.executionThread, sameInstance(currentThread()));
+      return true;
+    });
+  }
+
+  @Test
+  public void noPolicyProcessingStrategyChangesThreadBefore() throws MuleException {
+    AtomicReference<Thread> switchedRef = new AtomicReference<>();
+
+    when(processingStrategy.onProcessor(any(ReactiveProcessor.class)))
+        .thenAnswer(inv -> {
+          final ProcessingType processingType = inv.getArgument(0, ReactiveProcessor.class).getProcessingType();
+          if (processingType.equals(CPU_LITE_ASYNC) || processingType.equals(CPU_LITE)) {
+            return (ReactiveProcessor) t -> Mono.from(t)
+                .transform(inv.getArgument(0, ReactiveProcessor.class));
+          } else {
+            return (ReactiveProcessor) t -> Mono.from(t)
+                .publishOn(fromExecutorService(threadSwitcher))
+                .doOnNext(e -> switchedRef.set(currentThread()))
+                .transform(inv.getArgument(0, ReactiveProcessor.class));
+          }
+        });
+
+    stopIfNeeded(processor);
+    disposeIfNeeded(processor, LOGGER);
+    initialiseIfNeeded(processor, muleContext);
+    startIfNeeded(processor);
+
+    when(policyManager.createOperationPolicy(eq(processor), any(CoreEvent.class), any(OperationParametersProcessor.class)))
+        .thenReturn(noPolicyOperation());
+
+    processToApply(testEvent(), processingStrategy.onProcessor(processor));
+    probe(() -> {
+      assertThat(mediator.executed, is(true));
+      assertThat(mediator.executionThread, processingType.equals(CPU_LITE_ASYNC)
+          ? sameInstance(currentThread())
+          : sameInstance(switchedRef.get()));
+      return true;
+    });
+  }
+
+  @Test
+  public void noPolicyProcessingStrategyChangesThreadAfter() throws MuleException {
+    when(processingStrategy.onProcessor(any(ReactiveProcessor.class)))
+        .thenAnswer(inv -> {
+          final ProcessingType processingType = inv.getArgument(0, ReactiveProcessor.class).getProcessingType();
+          if (processingType.equals(CPU_LITE_ASYNC)) {
+            return (ReactiveProcessor) t -> Mono.from(t)
+                .transform(inv.getArgument(0, ReactiveProcessor.class))
+                .publishOn(fromExecutorService(threadSwitcher));
+          } else {
+            return (ReactiveProcessor) t -> Mono.from(t)
+                .transform(inv.getArgument(0, ReactiveProcessor.class));
+          }
+        });
+
+    stopIfNeeded(processor);
+    disposeIfNeeded(processor, LOGGER);
+    initialiseIfNeeded(processor, muleContext);
+    startIfNeeded(processor);
+
+    when(policyManager.createOperationPolicy(eq(processor), any(CoreEvent.class), any(OperationParametersProcessor.class)))
+        .thenReturn(noPolicyOperation());
+
+    processToApply(testEvent(), processingStrategy.onProcessor(processor));
     probe(() -> {
       assertThat(mediator.executed, is(true));
       assertThat(mediator.executionThread, sameInstance(currentThread()));
@@ -244,10 +327,16 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
 
     when(processingStrategy.onProcessor(any(ReactiveProcessor.class)))
         .thenAnswer(inv -> {
-          return (ReactiveProcessor) t -> Mono.from(t)
-              .publishOn(fromExecutorService(threadSwitcher))
-              .doOnNext(e -> switchedRef.set(currentThread()))
-              .transform(inv.getArgument(0, ReactiveProcessor.class));
+          final ProcessingType processingType = inv.getArgument(0, ReactiveProcessor.class).getProcessingType();
+          if (processingType.equals(CPU_LITE_ASYNC) || processingType.equals(CPU_LITE)) {
+            return (ReactiveProcessor) t -> Mono.from(t)
+                .transform(inv.getArgument(0, ReactiveProcessor.class));
+          } else {
+            return (ReactiveProcessor) t -> Mono.from(t)
+                .publishOn(fromExecutorService(threadSwitcher))
+                .doOnNext(e -> switchedRef.set(currentThread()))
+                .transform(inv.getArgument(0, ReactiveProcessor.class));
+          }
         });
 
     stopIfNeeded(processor);
@@ -260,10 +349,12 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
           operationExecutionFunction.execute(opParamProcessor.getOperationParameters(), operationEvent, callback);
         });
 
-    processor.process(testEvent());
+    processToApply(testEvent(), processingStrategy.onProcessor(processor));
     probe(() -> {
       assertThat(mediator.executed, is(true));
-      assertThat(mediator.executionThread, sameInstance(switchedRef.get()));
+      assertThat(mediator.executionThread, processingType.equals(CPU_LITE_ASYNC)
+          ? sameInstance(currentThread())
+          : sameInstance(switchedRef.get()));
       return true;
     });
   }
@@ -272,9 +363,15 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
   public void processingStrategyChangesThreadAfter() throws MuleException {
     when(processingStrategy.onProcessor(any(ReactiveProcessor.class)))
         .thenAnswer(inv -> {
-          return (ReactiveProcessor) t -> Mono.from(t)
-              .transform(inv.getArgument(0, ReactiveProcessor.class))
-              .publishOn(fromExecutorService(threadSwitcher));
+          final ProcessingType processingType = inv.getArgument(0, ReactiveProcessor.class).getProcessingType();
+          if (processingType.equals(CPU_LITE_ASYNC)) {
+            return (ReactiveProcessor) t -> Mono.from(t)
+                .transform(inv.getArgument(0, ReactiveProcessor.class))
+                .publishOn(fromExecutorService(threadSwitcher));
+          } else {
+            return (ReactiveProcessor) t -> Mono.from(t)
+                .transform(inv.getArgument(0, ReactiveProcessor.class));
+          }
         });
 
     stopIfNeeded(processor);
@@ -287,7 +384,7 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
           operationExecutionFunction.execute(opParamProcessor.getOperationParameters(), operationEvent, callback);
         });
 
-    processor.process(testEvent());
+    processToApply(testEvent(), processingStrategy.onProcessor(processor));
     probe(() -> {
       assertThat(mediator.executed, is(true));
       assertThat(mediator.executionThread, sameInstance(currentThread()));
