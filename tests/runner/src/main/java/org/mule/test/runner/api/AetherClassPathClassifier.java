@@ -37,7 +37,6 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 import org.mule.test.runner.classification.PatternInclusionsDependencyFilter;
-import org.mule.test.runner.utils.TroubleshootingUtils;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -160,12 +159,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   @Override
   public ArtifactsUrlClassification classify(final ClassPathClassifierContext context) {
     checkNotNull(context, "context cannot be null");
-
-    try {
-      TroubleshootingUtils.copyRepoContentsToAuxJenkinsFolder();
-    } catch (IOException e) {
-      logger.debug(e.getMessage());
-    }
 
     logger.info("Running dependencies classification on: '{}' in order to build Mule class loaders", context.getRootArtifact());
 

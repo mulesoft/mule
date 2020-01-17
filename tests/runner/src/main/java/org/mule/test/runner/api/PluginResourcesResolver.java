@@ -77,7 +77,6 @@ public class PluginResourcesResolver {
         mulePluginModel = new MulePluginModelJsonSerializer()
             .deserialize(IOUtils.toString(classLoader.getResourceAsStream(pluginDescriptorLocation)));
       } catch (IOException e) {
-        TroubleshootingUtils.copyPluginToAuxJenkinsFolderForTroubleshooting(pluginJsonUrl);
         throw new IllegalArgumentException(format("Could not read extension describer on plugin '%s' from JAR with MD5 '%s'",
                                                   pluginJsonUrl, TroubleshootingUtils.getMD5FromFile(pluginJsonUrl)),
                                            e);

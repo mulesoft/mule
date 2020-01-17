@@ -37,7 +37,6 @@ import org.mule.test.runner.utils.TroubleshootingUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
@@ -160,11 +159,7 @@ class ExtensionPluginMetadataGenerator {
     final URL firstURL = urls.stream().findFirst().get();
     logger.warn("Scanning plugin '{}' for annotated Extension class from {}", plugin, firstURL);
     logger.warn("Available URLS: {}", urls);
-    try {
-      logger.warn("Contents of firstURL: {}", TroubleshootingUtils.listEntriesInJar(new File(firstURL.toURI())));
-    } catch (IOException | URISyntaxException e) {
-      //do nothing
-    }
+
     ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
     scanner.addIncludeFilter(new AnnotationTypeFilter(Extension.class));
     try (URLClassLoader classLoader = new URLClassLoader(new URL[] {firstURL}, null)) {
@@ -182,9 +177,6 @@ class ExtensionPluginMetadataGenerator {
               + "' using classpath: " + new ClassPathUrlProvider().getURLs());
           return Class.forName(extensionClassName);
         } catch (ClassNotFoundException e) {
-          TroubleshootingUtils.copyPluginToAuxJenkinsFolderForTroubleshooting(firstURL);
-          TroubleshootingUtils.copyOsRunningProcessesToAuxJenkinsFolder(firstURL);
-          TroubleshootingUtils.generateHeapDumpInAuxJenkinsFolder(firstURL);
           List<URL> classpath = new ClassPathUrlProvider().getURLs();
           logger.warn("CLASSPATH URLs:");
           classpath.forEach(url -> logger.warn(url.toString()));
