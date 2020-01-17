@@ -47,8 +47,10 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
    */
   @Override
   public void close(C connection) throws MuleException {
-    closed = true;
-    delegate.close(connection);
+    if (!closed) {
+      closed = true;
+      delegate.close(connection);
+    }
   }
 
   private void handleCloseException(Throwable t) {
