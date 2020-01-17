@@ -21,8 +21,8 @@ public class ErrorMapping {
 
   public static QName ANNOTATION_ERROR_MAPPINGS = new QName("operator", "errorMappings");
 
-  private ErrorTypeMatcher sourceMatcher;
-  private ErrorType target;
+  private final ErrorTypeMatcher sourceMatcher;
+  private final ErrorType target;
 
   public ErrorMapping(ErrorTypeMatcher sourceMatcher, ErrorType target) {
     this.sourceMatcher = sourceMatcher;

@@ -159,7 +159,6 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
       @Override
       public boolean matches(Object o) {
         Exception e = (Exception) unwrap((Exception) o);
-        //        assertThat(e, is(instanceOf(MessagingException.class)));
         assertThat(e, is(sameInstance(expect)));
 
         return true;

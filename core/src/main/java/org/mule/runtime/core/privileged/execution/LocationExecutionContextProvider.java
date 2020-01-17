@@ -82,6 +82,8 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
 
     beanAnnotations.putAll(docAttributes.entrySet().stream()
         .collect(toMap(e -> QName.valueOf(e.getKey()), e -> e.getValue())));
+
+    // beanAnnotations.put(REPRESENTATION_ANNOTATION_KEY, resolveProcessorRepresentation("", "", null));
   }
 
   protected static String getSourceXML(Component element) {

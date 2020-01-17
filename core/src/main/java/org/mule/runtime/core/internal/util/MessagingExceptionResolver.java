@@ -12,13 +12,15 @@ import static org.mule.runtime.api.exception.MuleException.INFO_ALREADY_LOGGED_K
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
-import static org.mule.runtime.core.api.util.ExceptionUtils.getComponentIdentifier;
+import static org.mule.runtime.core.api.util.ExceptionUtils.getComponentIdentifierOf;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
 import static org.mule.runtime.core.api.util.ExceptionUtils.isUnknownMuleError;
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.createErrorEvent;
-import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErrorMappings;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
@@ -29,8 +31,8 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
+import org.mule.runtime.core.internal.exception.ErrorMappingsAware;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.policy.FlowExecutionException;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
@@ -80,15 +82,17 @@ public class MessagingExceptionResolver {
     ErrorType rootErrorType = rootCause.get().getSecond();
     Component failingComponent = getFailingProcessor(me, root).orElse(component);
 
-    ErrorType errorType = getErrorMappings(component)
-        .stream()
-        .filter(m -> m.match(rootErrorType))
-        .findFirst()
-        .map(ErrorMapping::getTarget)
-        .orElse(rootErrorType);
+    ErrorType errorType = rootErrorType;
+    if (component instanceof ErrorMappingsAware) {
+      errorType = ((ErrorMappingsAware) component).getErrorMappings()
+          .stream()
+          .filter(m -> m.match(rootErrorType))
+          .findFirst()
+          .map(ErrorMapping::getTarget)
+          .orElse(rootErrorType);
+    }
 
-    Error error = ErrorBuilder.builder(getMessagingExceptionCause(root)).errorType(errorType).build();
-    CoreEvent event = CoreEvent.builder(me.getEvent()).error(error).build();
+    CoreEvent event = quickCopy(builder(getMessagingExceptionCause(root)).errorType(errorType).build(), me.getEvent());
 
     MessagingException result;
     if (root instanceof MessagingException) {
@@ -164,18 +168,20 @@ public class MessagingExceptionResolver {
   }
 
   private ErrorType errorTypeFromException(Component failing, ErrorTypeLocator locator, Throwable e) {
-    final Optional<ErrorType> mapped;
+    final ErrorType mapped;
     if (isMessagingExceptionWithError(e)) {
-      mapped = ((MessagingException) e).getEvent().getError().map(Error::getErrorType);
+      mapped = ((MessagingException) e).getEvent().getError().map(Error::getErrorType).orElse(null);
     } else {
-      mapped = getComponentIdentifier(failing).map(ci -> locator.lookupComponentErrorType(ci, e));
+      final ComponentIdentifier identifier = getComponentIdentifierOf(failing);
+
+      if (identifier != null) {
+        mapped = locator.lookupComponentErrorType(identifier, e);
+      } else {
+        mapped = null;
+      }
     }
 
-    if (mapped.isPresent()) {
-      return mapped.orElse(null);
-    } else {
-      return locator.lookupErrorType(e);
-    }
+    return mapped != null ? mapped : locator.lookupErrorType(e);
   }
 
   private boolean isMessagingExceptionWithError(Throwable cause) {

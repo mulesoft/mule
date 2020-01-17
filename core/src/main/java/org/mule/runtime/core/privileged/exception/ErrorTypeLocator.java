@@ -18,10 +18,9 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.exception.ExceptionMapper;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import org.apache.commons.collections.map.HashedMap;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
@@ -113,12 +112,19 @@ public class ErrorTypeLocator {
    *         related to UNKNOWN will be returned.
    */
   public ErrorType lookupComponentErrorType(ComponentIdentifier componentIdentifier, Throwable exception) {
-    return getErrorTypeFromException(exception)
-        .orElseGet(() -> lookupComponentErrorType(componentIdentifier, exception.getClass()));
+    ErrorType errorTypeFromException = getErrorTypeFromException(exception);
+    if (errorTypeFromException == null) {
+      errorTypeFromException = lookupComponentErrorType(componentIdentifier, exception.getClass());
+    }
+    return errorTypeFromException;
   }
 
-  private Optional<ErrorType> getErrorTypeFromException(Throwable exception) {
-    return exception instanceof ConnectionException ? ((ConnectionException) exception).getErrorType() : empty();
+  private ErrorType getErrorTypeFromException(Throwable exception) {
+    if (exception instanceof ConnectionException) {
+      return ((ConnectionException) exception).getErrorType().orElse(null);
+    } else {
+      return null;
+    }
   }
 
   /**
@@ -157,7 +163,7 @@ public class ErrorTypeLocator {
 
     private ErrorType defaultError;
     private ExceptionMapper defaultExceptionMapper;
-    private final Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers = new HashedMap();
+    private final Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers = new HashMap<>();
 
     /**
      * Sets the default exception mapper to use when a component doesn't define a mapping for an exception type.

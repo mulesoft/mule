@@ -12,7 +12,6 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
-import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -263,7 +262,11 @@ public class ExceptionUtils {
   }
 
   public static Optional<ComponentIdentifier> getComponentIdentifier(Component obj) {
-    return ofNullable((ComponentIdentifier) obj.getAnnotation(ANNOTATION_NAME));
+    return ofNullable(getComponentIdentifierOf(obj));
+  }
+
+  public static ComponentIdentifier getComponentIdentifierOf(Component obj) {
+    return obj.getIdentifier();
   }
 
   private ExceptionUtils() {}
