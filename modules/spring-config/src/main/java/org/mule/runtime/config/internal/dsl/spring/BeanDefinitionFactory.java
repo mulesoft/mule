@@ -8,6 +8,8 @@ package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
+import static org.mule.runtime.api.component.Component.Annotations.REPRESENTATION_ANNOTATION_KEY;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_DOMAIN_IDENTIFIER;
@@ -34,6 +36,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.functional.Either;
+import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
 import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
@@ -41,6 +44,7 @@ import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,11 +56,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-import com.google.common.collect.ImmutableSet;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.w3c.dom.Element;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * The {@code BeanDefinitionFactory} is the one that knows how to convert a {@code ComponentModel} to an actual
@@ -102,6 +107,7 @@ public class BeanDefinitionFactory {
           .build();
 
 
+  private final String artifactId;
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
   private final BeanDefinitionCreator componentModelProcessor;
   private final ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
@@ -110,7 +116,8 @@ public class BeanDefinitionFactory {
    * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the
    *        artifact.
    */
-  public BeanDefinitionFactory(ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
+  public BeanDefinitionFactory(String artifactId, ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
+    this.artifactId = artifactId;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.componentModelProcessor = buildComponentModelProcessorChainOfResponsability();
     this.ignoredMuleExtensionComponentIdentifiers = new HashSet<>();
@@ -185,9 +192,47 @@ public class BeanDefinitionFactory {
         });
 
     addAnnotation(LOCATION_KEY, componentModel.getComponentLocation(), componentModel);
+    addAnnotation(REPRESENTATION_ANNOTATION_KEY, resolveProcessorRepresentation(artifactId,
+                                                                                componentModel.getComponentLocation(),
+                                                                                componentModel.getMetadata()),
+                  componentModel);
 
     BeanDefinition beanDefinition = componentModel.getBeanDefinition();
     return beanDefinition;
+  }
+
+  /**
+   * Generates a representation of a flow element to be logged in a standard way.
+   *
+   * @param appId
+   * @param processorPath
+   * @param element
+   * @return
+   */
+  public static String resolveProcessorRepresentation(String appId, DefaultComponentLocation processorPath,
+                                                      ComponentMetadataAst metadata) {
+    StringBuilder stringBuilder = new StringBuilder();
+
+    stringBuilder.append(processorPath.getLocation())
+        .append(" @ ")
+        .append(appId);
+
+    String sourceFile = metadata.getFileName().orElse(null);
+    if (sourceFile != null) {
+      stringBuilder.append(":")
+          .append(sourceFile)
+          .append(":")
+          .append(metadata.getStartLine().orElse(-1));
+    }
+
+    Object docName = metadata.getDocAttributes().get(NAME_ANNOTATION_KEY.getLocalPart());
+    if (docName != null) {
+      stringBuilder.append(" (")
+          .append(docName)
+          .append(")");
+    }
+
+    return stringBuilder.toString();
   }
 
   private void processMuleConfiguration(ComponentModel componentModel, BeanDefinitionRegistry registry) {

@@ -13,8 +13,6 @@ import static org.mule.runtime.api.util.collection.SmallMap.of;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 
 import java.util.Map;
@@ -22,23 +20,11 @@ import java.util.Map;
 /**
  * Generates location info to augment MessagingExceptions with.
  */
-public class MessagingExceptionLocationProvider extends LocationExecutionContextProvider implements MuleContextAware {
-
-  private String appId;
-
-  @Override
-  public void setMuleContext(MuleContext muleContext) {
-    appId = muleContext.getConfiguration().getId();
-  }
+public class MessagingExceptionLocationProvider extends LocationExecutionContextProvider {
 
   @Override
   public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
-    final String processorRepresentation = resolveProcessorRepresentation(appId,
-                                                                          lastProcessed.getLocation() != null
-                                                                              ? lastProcessed.getLocation()
-                                                                                  .getLocation()
-                                                                              : null,
-                                                                          lastProcessed);
+    final String processorRepresentation = lastProcessed.getRepresentation();
     final String sourceXML = getSourceXML(lastProcessed);
 
     if (sourceXML != null) {

@@ -610,9 +610,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   @Override
   public void setAnnotations(Map<QName, Object> newAnnotations) {
+    super.setAnnotations(newAnnotations);
+
     List<ErrorMapping> list = (List<ErrorMapping>) getAnnotation(ANNOTATION_ERROR_MAPPINGS);
     this.errorMappings = list != null ? list : emptyList();
-
-    super.setAnnotations(newAnnotations);
   }
 }

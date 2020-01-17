@@ -100,16 +100,9 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
    * @param notification the notification that contains the event and the processor that is about to be invoked.
    */
   public void onMessageProcessorNotificationPreInvoke(MessageProcessorNotification notification) {
-    String resolveProcessorRepresentation =
-        resolveProcessorRepresentation(contextId,
-                                       notification.getComponent().getLocation() != null
-                                           ? notification.getComponent().getLocation().getLocation()
-                                           : null,
-                                       notification.getComponent());
-
     FlowCallStack flowCallStack = ((CoreEvent) notification.getEvent()).getFlowCallStack();
     if (flowCallStack != null) {
-      ((DefaultFlowCallStack) flowCallStack).setCurrentProcessorPath(resolveProcessorRepresentation);
+      ((DefaultFlowCallStack) flowCallStack).setCurrentProcessorPath(notification.getComponent().getRepresentation());
     }
   }
 

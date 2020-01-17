@@ -119,7 +119,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   private final Optional<String> target;
   private final String targetValue;
   private CompiledExpression targetValueExpression;
-  private List<ErrorMapping> errorMappings= emptyList();
+  private List<ErrorMapping> errorMappings = emptyList();
 
   public ModuleOperationMessageProcessor(Map<String, String> properties,
                                          Map<String, String> parameters,
@@ -404,9 +404,9 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
 
   @Override
   public void setAnnotations(Map<QName, Object> newAnnotations) {
+    super.setAnnotations(newAnnotations);
+
     List<ErrorMapping> list = (List<ErrorMapping>) getAnnotation(ANNOTATION_ERROR_MAPPINGS);
     this.errorMappings = list != null ? list : emptyList();
-
-    super.setAnnotations(newAnnotations);
   }
 }

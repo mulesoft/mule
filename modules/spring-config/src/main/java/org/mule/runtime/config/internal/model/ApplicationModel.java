@@ -19,6 +19,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.disjunction;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
@@ -46,7 +47,6 @@ import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoes
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -529,9 +529,11 @@ public class ApplicationModel implements ArtifactAst {
                                                                        OptionalInt.of(configLine.getLineNumber()),
                                                                        OptionalInt.of(configLine.getStartColumn()));
                   providerComponent.setAnnotations(ImmutableMap.<QName, Object>builder()
-                      .put(AbstractComponent.LOCATION_KEY,
+                      .put(LOCATION_KEY,
                            new DefaultComponentLocation(of(componentIdentifier.getName()),
                                                         singletonList(locationPart)))
+
+                      // beanAnnotations.put(REPRESENTATION_ANNOTATION_KEY, resolveProcessorRepresentation(artifactId, "", null));
                       .build());
                 }
                 configConfigurationPropertiesProviders.add(provider);
