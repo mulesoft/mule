@@ -29,6 +29,7 @@ import org.mule.runtime.api.connection.PoolingConnectionProvider;
 public class ReconnectableConnectionProvider implements CachedConnectionProvider<ReconnectableConnection> {
 
   public static volatile boolean fail;
+  public static volatile int closePagingProviderCalls = 0;
   private int reconnectionAttempts = 0;
   private int disconnectCalls = 0;
 
@@ -42,7 +43,8 @@ public class ReconnectableConnectionProvider implements CachedConnectionProvider
       fail = false;
     }
 
-    ReconnectableConnection connection = new ReconnectableConnection(reconnectionAttempts, disconnectCalls);
+    ReconnectableConnection connection =
+        new ReconnectableConnection(reconnectionAttempts, disconnectCalls, closePagingProviderCalls);
     reconnectionAttempts = 0;
 
     return connection;

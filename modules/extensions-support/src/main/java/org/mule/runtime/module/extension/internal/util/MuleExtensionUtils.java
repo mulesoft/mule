@@ -56,8 +56,10 @@ import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
@@ -74,6 +76,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Intercept
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationExecutorFactoryWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -505,6 +508,18 @@ public class MuleExtensionUtils {
     } else {
       return false;
     }
+  }
+
+  /**
+   * @return the {@link MutableConfigurationStats} for a given {@link ExecutionContext}
+   *
+   * @since 4.2.3
+   */
+  public static Optional<MutableConfigurationStats> getMutableConfigurationStats(ExecutionContext<?> context) {
+    return context.getConfiguration()
+        .map(ConfigurationInstance::getStatistics)
+        .filter(s -> s instanceof MutableConfigurationStats)
+        .map(s -> (MutableConfigurationStats) s);
   }
 
 }

@@ -15,8 +15,19 @@ import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
+/**
+ * Utilities for handling reconnection on operations that use a connection.
+ *
+ * @since 4.2.3
+ */
 public class ReconnectionUtils {
 
+  /**
+   * @param t the {@link Throwable} thrown during the execution of the operation
+   * @param context the {@link ExecutionContextAdapter} that contains the context information about the operation's execution
+   *
+   * @return whether or not the operation should be retried
+   */
   public static boolean shouldRetry(Throwable t, ExecutionContextAdapter<?> context) {
     if (Boolean.valueOf(context.getVariable(DO_NOT_RETRY)) || !extractConnectionException(t).isPresent()) {
       return false;

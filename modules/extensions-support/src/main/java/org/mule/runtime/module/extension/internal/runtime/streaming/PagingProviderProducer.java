@@ -10,7 +10,7 @@ package org.mule.runtime.module.extension.internal.runtime.streaming;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.function.Function.identity;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.extension.internal.util.ExecutionUtils.getMutableConfigurationStats;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
 
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -51,6 +51,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   private final ExtensionConnectionSupplier connectionSupplier;
   private final ExecutionContextAdapter executionContext;
   private final ConnectionSupplierFactory connectionSupplierFactory;
+  private Boolean isFirstPage = true;
 
   public PagingProviderProducer(PagingProvider<Object, T> delegate,
                                 ConfigurationInstance config,
@@ -69,7 +70,9 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    */
   @Override
   public List<T> produce() {
-    return performWithConnection(connection -> delegate.getPage(connection));
+    List<T> page = performWithConnection(connection -> delegate.getPage(connection));
+    isFirstPage = false;
+    return page;
   }
 
   /**
@@ -88,12 +91,11 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    * @return
    */
   private <R> R performWithConnection(Function<Object, R> function) {
-    return withConnection(function);
-    /*    Optional<MutableConfigurationStats> stats = getMutableConfigurationStats(executionContext);
+    Optional<MutableConfigurationStats> stats = getMutableConfigurationStats(executionContext);
     RetryPolicyTemplate retryPolicy =
         (RetryPolicyTemplate) executionContext.getRetryPolicyTemplate().orElseGet(NoRetryPolicyTemplate::new);
     CompletableFuture<R> future = retryPolicy.applyPolicy(() -> completedFuture(withConnection(function)),
-                                                          e -> shouldRetry(e, executionContext),
+                                                          e -> !isFirstPage && shouldRetry(e, executionContext),
                                                           e -> {
                                                           },
                                                           e -> stats.ifPresent(s -> s.discountInflightOperation()),
@@ -103,7 +105,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       return future.get();
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(COULD_NOT_EXECUTE), e);
-    }*/
+    }
   }
 
   private <R> R withConnection(Function<Object, R> function) {
@@ -177,6 +179,8 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
   private class StickyConnectionSupplierFactory implements ConnectionSupplierFactory {
 
+    private ConnectionHandler connectionHandler;
+
     private final LazyValue<ConnectionSupplier> stickyConnection = new LazyValue<>(new CheckedSupplier<ConnectionSupplier>() {
 
       @Override
@@ -185,8 +189,6 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
         return new StickyConnectionSupplier(StickyConnectionSupplierFactory.this.connectionHandler.getConnection());
       }
     });
-
-    private ConnectionHandler connectionHandler;
 
     @Override
     public ConnectionSupplier getConnectionSupplier() throws MuleException {

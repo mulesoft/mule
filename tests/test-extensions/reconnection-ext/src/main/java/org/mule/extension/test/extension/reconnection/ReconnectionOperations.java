@@ -6,18 +6,20 @@
  */
 package org.mule.extension.test.extension.reconnection;
 
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.closePagingProviderCalls;
 import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.fail;
+import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
 
 import org.mule.extension.test.extension.reconnection.metadata.RetryPolicyOutputResolver;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,8 +28,6 @@ import java.util.Optional;
  * This class is a container for operations, every public method in this class will be taken as an extension operation.
  */
 public class ReconnectionOperations {
-
-  private int pagedOperationCalls = 0;
 
   /**
    * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
@@ -43,25 +43,27 @@ public class ReconnectionOperations {
   }
 
   public PagingProvider<ReconnectableConnection, ReconnectableConnection> pagedOperation(Integer failOn) {
-    pagedOperationCalls++;
     return new PagingProvider<ReconnectableConnection, ReconnectableConnection>() {
+
+      private int getPageCalls = 0;
 
       @Override
       public List<ReconnectableConnection> getPage(ReconnectableConnection connection) {
-        if (pagedOperationCalls == failOn) {
-          throw new ModuleException(MuleErrors.CONNECTIVITY, new ConnectionException("Failed to retrieve Page"));
+        closePagingProviderCalls++;
+        if (closePagingProviderCalls == failOn) {
+          throw new ModuleException(CONNECTIVITY, new ConnectionException("Failed to retrieve Page"));
         }
-        return Collections.singletonList(connection);
+        return singletonList(connection);
       }
 
       @Override
       public Optional<Integer> getTotalResults(ReconnectableConnection connection) {
-        return Optional.empty();
+        return empty();
       }
 
       @Override
       public void close(ReconnectableConnection connection) {
-
+        closePagingProviderCalls++;
       }
     };
   }

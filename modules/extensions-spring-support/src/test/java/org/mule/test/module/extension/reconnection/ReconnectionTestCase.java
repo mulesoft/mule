@@ -80,17 +80,27 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   @Test
-  public void connectionIsClosedDuringConnectionExceptionOnPagedOperation() throws Exception {
+  public void connectionIsClosedDuringConnectionExceptionOnFirstPage() throws Exception {
     Iterator<ReconnectableConnection> iterator = getCursor("pagedOperation", 1);
-    assertThat(iterator.next().getDisconnectCalls(), is(1));
+    ReconnectableConnection firstPage = iterator.next();
+    assertThat(firstPage.getDisconnectCalls(), is(1));
+    assertThat(firstPage.getClosePagingProviderCalls(), is(1));
+    assertThat(firstPage.getDisconnectCalls(), is(1));
+    assertThat(firstPage.getDisconnectCalls(), is(1));
   }
 
-  /*  @Test
-  public void pagedOperationConnectionIsClosedDuringConnectionExceptionOnSecondPage() throws Exception {
+  @Test
+  public void connectionIsClosedDuringConnectionExceptionOnSecondPage() throws Exception {
     Iterator<ReconnectableConnection> iterator = getCursor("pagedOperation", 2);
-    assertThat(iterator.next().getDisconnectCalls(), is(0));
-    assertThat(iterator.next().getDisconnectCalls(), is(1));
-  }*/
+
+    ReconnectableConnection firstPage = iterator.next();
+    assertThat(firstPage.getDisconnectCalls(), is(0));
+    assertThat(firstPage.getClosePagingProviderCalls(), is(0));
+
+    ReconnectableConnection secondPage = iterator.next();
+    assertThat(secondPage.getDisconnectCalls(), is(1));
+    assertThat(secondPage.getClosePagingProviderCalls(), is(1));
+  }
 
   @Test
   public void getRetryPolicyTemplateFromConfig() throws Exception {
