@@ -17,6 +17,7 @@ import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 
@@ -35,7 +36,7 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
 
   private final PagingProvider<C, T> delegate;
   private final ExtensionModel extensionModel;
-  private boolean closed = false;
+  private AtomicBoolean closed = new AtomicBoolean(false);
 
   public PagingProviderWrapper(PagingProvider<C, T> delegate, ExtensionModel extensionModel) {
     this.delegate = delegate;
@@ -47,8 +48,8 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
    */
   @Override
   public void close(C connection) throws MuleException {
-    if (!closed) {
-      closed = true;
+    if (!closed.get()) {
+      closed.set(true);
       delegate.close(connection);
     }
   }
@@ -65,7 +66,7 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
    */
   @Override
   public List<T> getPage(C connection) {
-    if (closed) {
+    if (closed.get()) {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("paging delegate is closed. Returning null");
       }
