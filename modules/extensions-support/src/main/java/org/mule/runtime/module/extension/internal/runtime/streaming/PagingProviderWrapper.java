@@ -48,8 +48,7 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
    */
   @Override
   public void close(C connection) throws MuleException {
-    if (!closed.get()) {
-      closed.set(true);
+    if (closed.compareAndSet(false, true)) {
       delegate.close(connection);
     }
   }
