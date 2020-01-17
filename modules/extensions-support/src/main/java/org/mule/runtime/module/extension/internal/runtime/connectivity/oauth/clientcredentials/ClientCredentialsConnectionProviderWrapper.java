@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials;
 
-import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getOAuthStateSetter;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.updateOAuthParameters;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
@@ -18,7 +19,7 @@ import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbackValue;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConnectionProviderWrapper;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.BaseOAuthConnectionProviderWrapper;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
@@ -34,7 +35,7 @@ import java.util.Map;
  *
  * @since 4.2.1
  */
-public class ClientCredentialsConnectionProviderWrapper<C> extends OAuthConnectionProviderWrapper<C> {
+public class ClientCredentialsConnectionProviderWrapper<C> extends BaseOAuthConnectionProviderWrapper<C> {
 
   private final ClientCredentialsConfig oauthConfig;
 
@@ -52,7 +53,7 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends OAuthConnecti
     super(delegate, reconnectionConfig, callbackValues);
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
-    oauthStateSetter = getOAuthStateSetter(delegate, ClientCredentialsState.class, "Client Credentials");
+    oauthStateSetter = getOAuthStateSetter(delegate, ClientCredentialsState.class, oauthConfig.getGrantType());
     dance = Once.of(this::updateOAuthState);
   }
 
@@ -60,21 +61,6 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends OAuthConnecti
   public C connect() throws ConnectionException {
     dance.runOnce();
     return super.connect();
-  }
-
-  @Override
-  public ConnectionValidationResult validate(C connection) {
-    try {
-      ResourceOwnerOAuthContext context = getContext();
-      if (context.getAccessToken() != null) {
-        return getDelegate().validate(connection);
-      } else {
-        String message = "Server did not granted an access token";
-        return failure(message, new IllegalStateException(message));
-      }
-    } catch (Exception e) {
-      return failure("Could not obtain an access token", e);
-    }
   }
 
   @Override
@@ -99,12 +85,14 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends OAuthConnecti
                                                                       dancer,
                                                                       context,
                                                                       updatedContext -> updateOAuthParameters(delegate,
+                                                                                                              callbackValues,
                                                                                                               updatedContext)));
 
-    updateOAuthParameters(delegate, context);
+    updateOAuthParameters(delegate, callbackValues, context);
   }
 
-  private ResourceOwnerOAuthContext getContext() {
+  @Override
+  protected ResourceOwnerOAuthContext getContext() {
     return oauthHandler.getOAuthContext(oauthConfig);
   }
 

@@ -52,7 +52,6 @@ public class UpdatingAuthorizationCodeState implements AuthorizationCodeState {
         delegate = toAuthorizationCodeState(config, context);
         invalidated = false;
         onUpdate.accept(context);
-
       }
     });
   }

@@ -34,7 +34,7 @@ import java.util.Optional;
  * @param <C>
  * @since 4.0
  */
-public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends ConnectionProviderWrapper<C> {
+public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends AbstractConnectionProviderWrapper<C> {
 
   private final ErrorTypeRepository errorTypeRepository;
   private final String prefix;

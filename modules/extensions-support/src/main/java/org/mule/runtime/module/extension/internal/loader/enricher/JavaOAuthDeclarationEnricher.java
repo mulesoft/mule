@@ -40,6 +40,7 @@ import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantT
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
+import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
@@ -110,6 +111,11 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
               @Override
               public void visit(ClientCredentialsGrantType grantType) {
                 supportsClientCredentials.set(true);
+              }
+
+              @Override
+              public void visit(PlatformManagedOAuthGrantType grantType) {
+                // This grant type functions over completely synthetic connection providers
               }
             }));
 

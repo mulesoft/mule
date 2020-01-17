@@ -6,66 +6,38 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
-import static java.lang.String.format;
-import static java.util.Collections.unmodifiableMap;
-import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
-import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
-import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
-import org.mule.runtime.module.extension.internal.util.FieldSetter;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
+/**
+ * Base contract for a {@link ConnectionProviderWrapper} that is OAuth enabled
+ *
+ * @param <C> the connection's generic type
+ * @since 4.3.0
+ */
+public interface OAuthConnectionProviderWrapper<C> extends ConnectionProviderWrapper<C> {
 
-public abstract class OAuthConnectionProviderWrapper<C> extends ReconnectableConnectionProviderWrapper<C> {
+  /**
+   * @return the id of the OAuth resource owner
+   */
+  String getResourceOwnerId();
 
-  protected final Map<Field, String> callbackValues;
+  /**
+   * @return the configured {@link OAuthGrantType}
+   */
+  OAuthGrantType getGrantType();
 
-  public OAuthConnectionProviderWrapper(ConnectionProvider<C> delegate,
-                                        ReconnectionConfig reconnectionConfig,
-                                        Map<Field, String> callbackValues) {
-    super(delegate, reconnectionConfig);
-    this.callbackValues = unmodifiableMap(callbackValues);
-  }
+  /**
+   * Executes a refresh token for the given {@code resourceOwnerId}
+   *
+   * @param resourceOwnerId a resource owner Id
+   */
+  void refreshToken(String resourceOwnerId);
 
-  public abstract OAuthGrantType getGrantType();
-
-  public abstract void refreshToken(String resourceOwnerId);
-
-  public abstract void invalidate(String resourceOwnerId);
-
-  protected <T> FieldSetter<ConnectionProvider<C>, T> getOAuthStateSetter(ConnectionProvider<C> delegate,
-                                                                          Class<T> stateType,
-                                                                          String grantTypeName) {
-    List<Field> stateFields = getFields(delegate.getClass()).stream()
-        .filter(f -> f.getType().equals(stateType))
-        .collect(toList());
-
-    if (stateFields.size() != 1) {
-      throw new IllegalConnectionProviderModelDefinitionException(
-                                                                  format("Connection Provider of class '%s' uses OAuth2 %s grant type and thus should contain "
-                                                                      + "one (and only one) field of type %s. %d were found",
-                                                                         delegate.getClass().getName(),
-                                                                         grantTypeName,
-                                                                         stateType,
-                                                                         stateFields.size()));
-    }
-
-    return new FieldSetter<>(stateFields.get(0));
-  }
-
-  protected void updateOAuthParameters(ConnectionProvider<C> delegate, ResourceOwnerOAuthContext context) {
-    Map<String, Object> responseParameters = context.getTokenResponseParameters();
-    callbackValues.keySet().forEach(field -> {
-      String key = field.getName();
-      if (responseParameters.containsKey(key)) {
-        new FieldSetter<>(field).set(delegate, responseParameters.get(key));
-      }
-    });
-  }
+  /**
+   * Invalidates the context of the given {@code resourceOwnerId}
+   *
+   * @param resourceOwnerId
+   */
+  void invalidate(String resourceOwnerId);
 }

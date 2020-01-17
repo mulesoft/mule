@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -19,12 +20,12 @@ import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import java.util.Optional;
 
 /**
- * A {@link ConnectionProviderWrapper} which performs base tasks as handling reconnection strategies, DI, etc.
+ * An {@link ConnectionProviderWrapper} which performs base tasks as handling reconnection strategies, DI, etc.
  *
  * @param <C> the generic type of the connections that the {@link #delegate} produces
  * @since 4.0
  */
-public class DefaultConnectionProviderWrapper<C> extends ConnectionProviderWrapper<C> {
+public class DefaultConnectionProviderWrapper<C> extends AbstractConnectionProviderWrapper<C> {
 
   private final MuleContext muleContext;
 
@@ -81,7 +82,8 @@ public class DefaultConnectionProviderWrapper<C> extends ConnectionProviderWrapp
   @Override
   public Optional<PoolingProfile> getPoolingProfile() {
     ConnectionProvider<C> delegate = getDelegate();
-    return delegate instanceof ConnectionProviderWrapper ? ((ConnectionProviderWrapper) delegate).getPoolingProfile()
-        : Optional.empty();
+    return delegate instanceof ConnectionProviderWrapper
+        ? ((ConnectionProviderWrapper) delegate).getPoolingProfile()
+        : empty();
   }
 }

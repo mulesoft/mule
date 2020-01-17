@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.connection;
 
 import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -17,20 +18,20 @@ import java.util.Optional;
 /**
  * A {@link ConnectionProviderWrapper} which includes a {@link RetryPolicyTemplate}
  * for reconnecting in case of problems establishing the connection.
- *
+ * <p>
  * It also contains the ability to skip connection validation.
  *
  * @param <C> The generic type of the connections provided by the {@link #delegate}
- *           @since 4.0
+ * @since 4.0
  */
-public class ReconnectableConnectionProviderWrapper<C> extends ConnectionProviderWrapper<C> {
+public class ReconnectableConnectionProviderWrapper<C> extends AbstractConnectionProviderWrapper<C> {
 
   private final ReconnectionConfig reconnectionConfig;
 
   /**
    * Creates a new instance
    *
-   * @param delegate the {@link ConnectionProvider} to be wrapped
+   * @param delegate           the {@link ConnectionProvider} to be wrapped
    * @param reconnectionConfig The {@link ReconnectionConfig} for retrying failed connection attempts
    */
   public ReconnectableConnectionProviderWrapper(ConnectionProvider<C> delegate, ReconnectionConfig reconnectionConfig) {

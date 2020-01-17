@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode;
 
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getOAuthStateSetter;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.updateOAuthParameters;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -17,7 +20,7 @@ import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbac
 import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConnectionProviderWrapper;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.BaseOAuthConnectionProviderWrapper;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
@@ -33,7 +36,7 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class AuthorizationCodeConnectionProviderWrapper<C> extends OAuthConnectionProviderWrapper<C>
+public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConnectionProviderWrapper<C>
     implements NoConnectivityTest {
 
   private final AuthorizationCodeConfig oauthConfig;
@@ -51,7 +54,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends OAuthConnecti
     super(delegate, reconnectionConfig, callbackValues);
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
-    authCodeStateSetter = getOAuthStateSetter(delegate, AuthorizationCodeState.class, "Authorization Code");
+    authCodeStateSetter = getOAuthStateSetter(delegate, AuthorizationCodeState.class, oauthConfig.getGrantType());
     dance = Once.of(this::updateAuthState);
   }
 
@@ -65,9 +68,13 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends OAuthConnecti
     final ConnectionProvider<C> delegate = getDelegate();
     ResourceOwnerOAuthContext context = getContext();
     authCodeStateSetter
-        .set(delegate, new UpdatingAuthorizationCodeState(oauthConfig, dancer, context,
-                                                          updatedContext -> updateOAuthParameters(delegate, updatedContext)));
-    updateOAuthParameters(delegate, context);
+        .set(delegate, new UpdatingAuthorizationCodeState(oauthConfig,
+                                                          dancer,
+                                                          context,
+                                                          updatedContext -> updateOAuthParameters(delegate,
+                                                                                                  callbackValues,
+                                                                                                  updatedContext)));
+    updateOAuthParameters(delegate, callbackValues, context);
   }
 
   @Override
@@ -85,11 +92,8 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends OAuthConnecti
     return oauthConfig.getGrantType();
   }
 
-  public String getResourceOwnerId() {
-    return getContext().getResourceOwnerId();
-  }
-
-  private ResourceOwnerOAuthContext getContext() {
+  @Override
+  protected ResourceOwnerOAuthContext getContext() {
     return oauthHandler.getOAuthContext(oauthConfig)
         .orElseThrow(() -> new IllegalArgumentException("OAuth authorization dance not yet performed for resourceOwnerId "
             + oauthConfig.getResourceOwnerId()));

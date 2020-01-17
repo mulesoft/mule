@@ -16,6 +16,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
+import org.mule.runtime.core.internal.connection.AbstractConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.retry.HasReconnectionConfig;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
@@ -24,12 +25,12 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 
 /**
- * A {@link ConnectionProviderWrapper} which makes sure that all delegate methods are executed with a given {@link #classLoader}
+ * An {@link ConnectionProviderWrapper} which makes sure that all delegate methods are executed with a given {@link #classLoader}
  *
  * @param <C> the generic type of the connections the delegate produces
  * @since 4.1.6
  */
-public class ClassLoaderConnectionProviderWrapper<C> extends ConnectionProviderWrapper<C> {
+public class ClassLoaderConnectionProviderWrapper<C> extends AbstractConnectionProviderWrapper<C> {
 
   /**
    * Creates a new wrapper for the given {@code provider}
