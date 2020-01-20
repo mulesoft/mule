@@ -189,16 +189,6 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   protected StreamingManager streamingManager = spy(new DefaultStreamingManager());
   private NotificationDispatcher notificationDispatcher;
 
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    ErrorTypeRepository errorTypeRepository = Mockito.mock(ErrorTypeRepository.class);
-    when(errorTypeRepository.getErrorType(FLOW_BACK_PRESSURE)).thenReturn(of(mock(ErrorType.class)));
-
-    Map<String, Object> registryObjects = new HashMap<>();
-    registryObjects.put("errorTypeRepository", errorTypeRepository);
-    return registryObjects;
-  }
-
   @Before
   public void before() throws Exception {
     initMocks(this);
