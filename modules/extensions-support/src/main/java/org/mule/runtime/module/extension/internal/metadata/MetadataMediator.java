@@ -171,7 +171,7 @@ public final class MetadataMediator<T extends ComponentModel> {
       }
 
       keyValue = keyValueResult.get();
-      if (keyValue == null && !keyIdObjectResolver.isKeyLess()) {
+      if (keyValue == null && keyIdObjectResolver.isKeyRequired()) {
         return failure(newFailure().withFailureCode(INVALID_METADATA_KEY).withMessage("MetadataKey resolved to null")
             .onComponent());
       }

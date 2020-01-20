@@ -182,6 +182,10 @@
         <metadata:metadata-key-with-default-value config-ref="config"/>
     </flow>
 
+    <flow name="metadataKeyOptional">
+        <metadata:metadata-key-optional config-ref="config"/>
+    </flow>
+
     <flow name="multilevelMetadataKeyDefaultValue">
         <metadata:simple-multi-level-key-resolver config-ref="config"/>
     </flow>
