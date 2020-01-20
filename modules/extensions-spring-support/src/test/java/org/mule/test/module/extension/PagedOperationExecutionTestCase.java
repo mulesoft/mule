@@ -13,6 +13,8 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.isIn;
 import static org.hamcrest.core.Is.is;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.INVOLVED_PEOPLE;
+import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.closeEmptyOperationCalls;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
@@ -55,6 +57,7 @@ public class PagedOperationExecutionTestCase extends AbstractExtensionFunctional
     CursorIterator iterator = getCursor("emptyPagedOperation");
     assertThat(iterator.hasNext(), is(false));
     assertThat(iterator.getSize(), is(0));
+    assertThat(closeEmptyOperationCalls, is(1));
   }
 
   @Test
