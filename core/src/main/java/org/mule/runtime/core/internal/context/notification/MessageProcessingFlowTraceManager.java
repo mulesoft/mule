@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
-import static java.util.Collections.singletonMap;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -15,7 +13,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.api.notification.PipelineMessageNotification;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
@@ -24,6 +21,7 @@ import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -44,7 +42,6 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
   private final MessageProcessorTextDebugger messageProcessorTextDebugger;
 
   private ServerNotificationManager notificationManager;
-  private String contextId;
 
   private volatile boolean listenersAdded = false;
   private final PropertyChangeListener logConfigChangeListener = evt -> handleNotificationListeners();
@@ -136,16 +133,18 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
 
   @Override
   public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
-    return singletonMap(FLOW_STACK_INFO_KEY, ((CoreEvent) notificationInfo.getEvent()).getFlowCallStack().toString());
+    final Map<String, Object> info = new HashMap<>();
+    putContextInfo(info, notificationInfo, lastProcessed);
+    return info;
+  }
+
+  @Override
+  public void putContextInfo(Map<String, Object> info, EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
+    info.putIfAbsent(FLOW_STACK_INFO_KEY, ((CoreEvent) notificationInfo.getEvent()).getFlowCallStack().clone());
   }
 
   @Inject
   public void setNotificationManager(ServerNotificationManager notificationManager) {
     this.notificationManager = notificationManager;
-  }
-
-  @Inject
-  public void setMuleContext(MuleContext muleContext) {
-    this.contextId = muleContext.getConfiguration().getId();
   }
 }

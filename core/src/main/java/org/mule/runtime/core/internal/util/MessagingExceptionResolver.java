@@ -191,9 +191,9 @@ public class MessagingExceptionResolver {
   private <T extends MuleException> T enrich(T me, Component failing, Component handling, CoreEvent event,
                                              Collection<ExceptionContextProvider> exceptionContextProviders) {
     EnrichedNotificationInfo notificationInfo = createInfo(event, me, null);
-    exceptionContextProviders.forEach(cp -> {
-      cp.getContextInfo(notificationInfo, failing).forEach((k, v) -> me.getInfo().putIfAbsent(k, v));
-    });
+    for (ExceptionContextProvider exceptionContextProvider : exceptionContextProviders) {
+      exceptionContextProvider.putContextInfo(me.getInfo(), notificationInfo, failing);
+    }
     return me;
   }
 

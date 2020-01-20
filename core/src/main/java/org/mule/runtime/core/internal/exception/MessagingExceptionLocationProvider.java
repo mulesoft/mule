@@ -6,15 +6,14 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static java.util.Collections.singletonMap;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY;
-import static org.mule.runtime.api.util.collection.SmallMap.of;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -24,14 +23,18 @@ public class MessagingExceptionLocationProvider extends LocationExecutionContext
 
   @Override
   public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
-    final String processorRepresentation = lastProcessed.getRepresentation();
-    final String sourceXML = getSourceXML(lastProcessed);
+    final Map<String, Object> info = new HashMap<>();
+    putContextInfo(info, notificationInfo, lastProcessed);
+    return info;
+  }
 
+  @Override
+  public void putContextInfo(Map<String, Object> info, EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
+    info.put(INFO_LOCATION_KEY, lastProcessed.getRepresentation());
+
+    final String sourceXML = getSourceXML(lastProcessed);
     if (sourceXML != null) {
-      return of(INFO_LOCATION_KEY, processorRepresentation,
-                INFO_SOURCE_XML_KEY, sourceXML);
-    } else {
-      return singletonMap(INFO_LOCATION_KEY, processorRepresentation);
+      info.put(INFO_SOURCE_XML_KEY, sourceXML);
     }
   }
 }

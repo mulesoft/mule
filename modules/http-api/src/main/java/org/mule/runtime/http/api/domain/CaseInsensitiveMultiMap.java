@@ -38,7 +38,7 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
    *
    * <pre>
    *
-   * CaseInsensitiveMultiMap s = CaseInsensitiveMultiMap.emptyMultiMap();
+   * CaseInsensitiveMultiMap s = CaseInsensitiveMultiMap.emptyCaseInsensitiveMultiMap();
    * </pre>
    *
    * @return an empty case-insensitive-multi-map

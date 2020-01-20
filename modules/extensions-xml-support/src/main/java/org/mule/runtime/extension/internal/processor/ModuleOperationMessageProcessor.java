@@ -237,9 +237,9 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
         // cause of the exception, which means the Mule application will <b>only see</b> the logs of the application's call to the
         // smart connector's <operation/>, rather than the internals of the smart connector's internals.
         EnrichedNotificationInfo notificationInfo = createInfo(event, me, null);
-        exceptionContextProviders
-            .forEach(cp -> cp.getContextInfo(notificationInfo, ModuleOperationMessageProcessor.this)
-                .forEach(me::addInfo));
+        for (ExceptionContextProvider exceptionContextProvider : exceptionContextProviders) {
+          exceptionContextProvider.putContextInfo(me.getInfo(), notificationInfo, ModuleOperationMessageProcessor.this);
+        }
 
         ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
         handleSubChainException(me,

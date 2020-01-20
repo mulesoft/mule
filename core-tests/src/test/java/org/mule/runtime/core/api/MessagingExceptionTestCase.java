@@ -47,7 +47,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketException;
-import java.util.Optional;
 
 import org.hamcrest.core.Is;
 import org.junit.After;
@@ -220,7 +219,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     AnnotatedProcessor mockProcessor = mock(AnnotatedProcessor.class);
     when(mockProcessor.getRepresentation()).thenReturn("Mock@1 @ MessagingExceptionTestCase:unknown:-1");
     MessagingException exception = new MessagingException(createStaticMessage(""), testEvent, mockProcessor);
-    exception.getInfo().putAll(locationProvider.getContextInfo(createInfo(testEvent, exception, mockProcessor), mockProcessor));
+    locationProvider.putContextInfo(exception.getInfo(), createInfo(testEvent, exception, mockProcessor), mockProcessor);
     assertThat(exception.getInfo().get(INFO_LOCATION_KEY).toString(),
                is("Mock@1 @ MessagingExceptionTestCase:unknown:-1"));
   }

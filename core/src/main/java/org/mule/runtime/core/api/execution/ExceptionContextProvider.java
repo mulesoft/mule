@@ -24,10 +24,21 @@ import java.util.Map;
 public interface ExceptionContextProvider {
 
   /**
-   *
    * @param notificationInfo
    * @return info entries to be added to the logged exception message
+   *
+   * @deprecated Use {@link #putContextInfo(Map, EnrichedNotificationInfo, Component)} instead.
    */
+  @Deprecated
   Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Component lastProcessed);
+
+  /**
+   * @param info the map to put the entries to be added to the logged exception message into
+   * @param notificationInfo
+   * @param lastProcessed
+   *
+   * @since 4.3
+   */
+  void putContextInfo(Map<String, Object> info, EnrichedNotificationInfo notificationInfo, Component lastProcessed);
 
 }

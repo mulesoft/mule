@@ -30,9 +30,9 @@ public final class SourceErrorException extends MuleRuntimeException {
 
   private static final long serialVersionUID = 160215774280116876L;
 
-  private CoreEvent event;
-  private ErrorType errorType;
-  private MessagingException originalCause;
+  private final CoreEvent event;
+  private final ErrorType errorType;
+  private final MessagingException originalCause;
 
   public SourceErrorException(CoreEvent event, ErrorType errorType, Throwable cause) {
     super(cause);
@@ -69,9 +69,9 @@ public final class SourceErrorException extends MuleRuntimeException {
         .build(), getCause());
 
     EnrichedNotificationInfo notificationInfo = createInfo(messagingException.getEvent(), messagingException, null);
-    exceptionContextProviders.forEach(cp -> {
-      cp.getContextInfo(notificationInfo, messageSource).forEach((k, v) -> messagingException.getInfo().putIfAbsent(k, v));
-    });
+    for (ExceptionContextProvider exceptionContextProvider : exceptionContextProviders) {
+      exceptionContextProvider.putContextInfo(messagingException.getInfo(), notificationInfo, messageSource);
+    }
 
     return messagingException;
   }
