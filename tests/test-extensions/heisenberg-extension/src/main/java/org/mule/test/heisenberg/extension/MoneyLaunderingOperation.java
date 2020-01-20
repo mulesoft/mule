@@ -41,6 +41,8 @@ public class MoneyLaunderingOperation {
                                                                   new PersonalInfo("Gus", 45),
                                                                   new PersonalInfo("Tood", 22));
 
+  public static Integer closeEmptyOperationCalls = 0;
+
   private long totalLaunderedAmount = 0;
 
   public synchronized Long launder(@Config HeisenbergExtension config, long amount) {
@@ -97,6 +99,7 @@ public class MoneyLaunderingOperation {
       @Override
       public void close(HeisenbergConnection connection) throws MuleException {
         timesClosed++;
+        closeEmptyOperationCalls = timesClosed;
         if (timesClosed > 1) {
           throw new RuntimeException("Expected to be closed only once but was called twice");
         }
