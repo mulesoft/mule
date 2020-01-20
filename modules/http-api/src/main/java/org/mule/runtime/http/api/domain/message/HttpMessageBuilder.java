@@ -27,18 +27,21 @@ import java.util.Optional;
  */
 public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends HttpMessage> {
 
-  protected CaseInsensitiveMultiMap headers = this.initHeaders();
+  protected CaseInsensitiveMultiMap headers;
   protected HttpEntity entity = new EmptyHttpEntity();
 
-  public HttpMessageBuilder() {}
+  public HttpMessageBuilder() {
+    this.initHeaders();
+  }
 
   protected HttpMessageBuilder(HttpMessage httpMessage) {
+    this.initHeaders();
     entity(httpMessage.getEntity());
     headers(httpMessage.getHeaders());
   }
 
-  protected CaseInsensitiveMultiMap initHeaders() {
-    return new CaseInsensitiveMultiMap();
+  protected void initHeaders() {
+    this.headers = new CaseInsensitiveMultiMap();
   }
 
   /**

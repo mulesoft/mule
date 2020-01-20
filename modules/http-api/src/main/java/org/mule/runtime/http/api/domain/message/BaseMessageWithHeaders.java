@@ -11,6 +11,8 @@ import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
 
 import java.util.Collection;
 
+import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.fromMultiMap;
+
 /**
  * Base class for implementations of {@link MessageWithHeaders}
  *
@@ -21,11 +23,7 @@ public abstract class BaseMessageWithHeaders implements MessageWithHeaders {
   protected CaseInsensitiveMultiMap headers;
 
   public BaseMessageWithHeaders(MultiMap<String, String> headers) {
-    if (headers instanceof CaseInsensitiveMultiMap) {
-        this.headers = (CaseInsensitiveMultiMap) headers;
-    } else {
-        this.headers = new CaseInsensitiveMultiMap(headers);
-    }
+    this.headers = fromMultiMap(headers);
   }
 
   @Override
