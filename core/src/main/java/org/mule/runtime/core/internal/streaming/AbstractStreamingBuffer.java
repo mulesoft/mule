@@ -31,7 +31,7 @@ import org.slf4j.Logger;
  */
 public abstract class AbstractStreamingBuffer {
 
-  private static Logger LOGGER = getLogger(AbstractStreamingBuffer.class);
+  private static final Logger LOGGER = getLogger(AbstractStreamingBuffer.class);
 
   protected final AtomicBoolean closed = new AtomicBoolean(false);
   private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();

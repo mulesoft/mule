@@ -489,17 +489,16 @@ public class FlowProcessMediator implements Initialisable {
    *        parameter.
    */
   private void onTerminate(PhaseContext ctx, Either<Throwable, CoreEvent> result) {
-    final Either<MessagingException, CoreEvent> withMappedException = result.mapLeft(throwable -> {
+    safely(result.mapLeft(throwable -> {
       if (throwable instanceof MessagingException) {
         return (MessagingException) throwable;
       } else if (throwable instanceof SourceErrorException) {
-        return ((SourceErrorException) throwable)
-            .toMessagingException(ctx.flowConstruct.getMuleContext().getExceptionContextProviders(), ctx.messageSource);
+        return ((SourceErrorException) throwable).toMessagingException(exceptionContextProviders, ctx.messageSource);
       } else {
         return null;
       }
+    }), mapped -> ctx.terminateConsumer.accept(mapped), e -> {
     });
-    safely(() -> ctx.terminateConsumer.accept(withMappedException));
   }
 
   private void fireNotification(Component source, CoreEvent event, FlowConstruct flow, int action) {

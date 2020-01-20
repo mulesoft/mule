@@ -324,8 +324,8 @@ public class SourceAdapter implements Lifecycle {
 
     @Override
     public void onTerminate(Either<MessagingException, CoreEvent> result) throws Exception {
-      CoreEvent event = result.reduce(me -> me.getEvent(), identity());
-      onTerminateExecutor.execute(event, emptyMap(), context, always(context::releaseConnection));
+      onTerminateExecutor.execute(result.reduce(MessagingException::getEvent, identity()), emptyMap(), context,
+                                  always(context::releaseConnection));
     }
 
     private void commit() {
