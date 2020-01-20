@@ -53,7 +53,6 @@ import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
-import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
@@ -201,10 +200,6 @@ public class MuleContextUtils {
     ErrorTypeRepository errorTypeRepository = mock(ErrorTypeRepository.class, withSettings().lenient());
     when(muleContext.getErrorTypeRepository()).thenReturn(errorTypeRepository);
     when(errorTypeRepository.getErrorType(any(ComponentIdentifier.class))).thenReturn(of(mock(ErrorType.class)));
-
-    ErrorTypeLocator typeLocator = mock(ErrorTypeLocator.class);
-    when(((PrivilegedMuleContext) muleContext).getErrorTypeLocator()).thenReturn(typeLocator);
-
     final MuleRegistry registry = muleContext.getRegistry();
 
     NotificationListenerRegistry notificationListenerRegistry = mock(NotificationListenerRegistry.class);
@@ -223,7 +218,6 @@ public class MuleContextUtils {
       injectableObjects.put(MuleContext.class, muleContext);
       injectableObjects.put(SchedulerService.class, schedulerService);
       injectableObjects.put(ErrorTypeRepository.class, errorTypeRepository);
-      injectableObjects.put(ErrorTypeLocator.class, typeLocator);
       injectableObjects.put(ExtendedExpressionManager.class, muleContext.getExpressionManager());
       injectableObjects.put(StreamingManager.class, muleContext.getRegistry().lookupObject(StreamingManager.class));
       injectableObjects.put(ObjectStoreManager.class, muleContext.getRegistry().lookupObject(OBJECT_STORE_MANAGER));

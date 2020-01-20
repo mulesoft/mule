@@ -10,7 +10,6 @@ import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.createDefaultNotificationManager;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
-
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -89,13 +88,6 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
     muleContext.setArtifactType(artifactType);
 
-    if (errorTypeRepository == null) {
-      errorTypeRepository = createDefaultErrorTypeRepository();
-    }
-
-    muleContext.setErrorTypeRepository(errorTypeRepository);
-    muleContext.setErrorTypeLocator(createDefaultErrorTypeLocator(errorTypeRepository));
-
     final SimpleRegistry registry = new SimpleRegistry(muleContext, muleContext.getLifecycleInterceptor());
     muleContext.setRegistry(registry);
     muleContext.setInjector(registry);
@@ -107,6 +99,13 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     muleContext.setDeploymentProperties(getDeploymentProperties());
     muleContext.setListeners(listeners);
     getObjectSerializer(muleContext);
+
+    if (errorTypeRepository == null) {
+      errorTypeRepository = createDefaultErrorTypeRepository();
+    }
+
+    muleContext.setErrorTypeRepository(errorTypeRepository);
+    muleContext.setErrorTypeLocator(createDefaultErrorTypeLocator(errorTypeRepository));
 
     return muleContext;
   }
@@ -243,12 +242,10 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
         + ", notificationManager=" + notificationManager + "}";
   }
 
-  @Override
   public void setDeploymentProperties(Optional<Properties> deploymentProperties) {
     this.deploymentProperties = deploymentProperties;
   }
 
-  @Override
   public void setListeners(List<MuleContextListener> listeners) {
     this.listeners = listeners;
   }

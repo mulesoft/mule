@@ -7,25 +7,26 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
+import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.routing.UntilSuccessfulRouter.RetryContextInitializationException;
-import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
@@ -38,20 +39,16 @@ import org.reactivestreams.Publisher;
  */
 public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
-  private static final String DEFAULT_MILLIS_BETWEEN_RETRIES = "60000";
-  private static final String DEFAULT_RETRIES = "5";
+  private static final String UNTIL_SUCCESSFUL_MSG_PREFIX =
+      "'until-successful' retries exhausted. Last exception message was: %s";
+  private static final long DEFAULT_MILLIS_BETWEEN_RETRIES = 60 * 1000;
+  private static final int DEFAULT_RETRIES = 5;
 
   @Inject
   private SchedulerService schedulerService;
 
-  @Inject
-  private ExtendedExpressionManager expressionManager;
-
-  @Inject
-  private ErrorTypeLocator errorTypeLocator;
-
-  private String maxRetries = DEFAULT_RETRIES;
-  private String millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
+  private int maxRetries = DEFAULT_RETRIES;
+  private Long millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
   private MessageProcessorChain nestedChain;
   private Predicate<CoreEvent> shouldRetry;
   private Scheduler timer;
@@ -80,32 +77,20 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
-    try {
-      return processToApply(event, this);
-    } catch (Exception error) {
-      Throwable cause = error.getCause();
-      if (cause != null && cause instanceof RetryContextInitializationException &&
-          cause.getCause() instanceof ExpressionRuntimeException) {
-        // Runtime exception caused by Retry Ctx initialization, propagating
-        throw ((ExpressionRuntimeException) cause.getCause());
-      } else {
-        // Not caused by context initialization. Throwing as raised.
-        throw error;
-      }
-    }
+    return processToApply(event, this);
   }
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return new UntilSuccessfulRouter(this, publisher, nestedChain, expressionManager, shouldRetry, timer, maxRetries,
-                                     millisBetweenRetries, errorTypeLocator).getDownstreamPublisher();
+    return new UntilSuccessfulRouter(this, publisher, nestedChain, shouldRetry, timer, maxRetries,
+                                     millisBetweenRetries).getDownstreamPublisher();
   }
 
 
   /**
    * @return the number of times the scope will retry before failing. Default value is 5.
    */
-  public String getMaxRetries() {
+  public int getMaxRetries() {
     return maxRetries;
   }
 
@@ -113,21 +98,21 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
    *
    * @param maxRetries the number of times the scope will retry before failing. Default value is 5.
    */
-  public void setMaxRetries(final String maxRetries) {
+  public void setMaxRetries(final int maxRetries) {
     this.maxRetries = maxRetries;
   }
 
   /**
    * @return the number of milliseconds between retries. Default value is 60000.
    */
-  public String getMillisBetweenRetries() {
+  public long getMillisBetweenRetries() {
     return millisBetweenRetries;
   }
 
   /**
    * @param millisBetweenRetries the number of milliseconds between retries. Default value is 60000.
    */
-  public void setMillisBetweenRetries(String millisBetweenRetries) {
+  public void setMillisBetweenRetries(long millisBetweenRetries) {
     this.millisBetweenRetries = millisBetweenRetries;
   }
 
