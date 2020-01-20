@@ -16,7 +16,9 @@ import org.mule.runtime.http.api.domain.message.HttpMessageBuilder;
  */
 public final class HttpResponseBuilder extends HttpMessageBuilder<HttpResponseBuilder, HttpResponse> {
 
-  HttpResponseBuilder() {}
+  HttpResponseBuilder() {
+    this.initHeaders();
+  }
 
   private ResponseStatus responseStatus = new ResponseStatus();
 

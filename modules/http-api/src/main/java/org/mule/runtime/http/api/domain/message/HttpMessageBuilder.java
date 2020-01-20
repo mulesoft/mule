@@ -30,9 +30,7 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
   protected CaseInsensitiveMultiMap headers;
   protected HttpEntity entity = new EmptyHttpEntity();
 
-  public HttpMessageBuilder() {
-    this.initHeaders();
-  }
+  public HttpMessageBuilder() {}
 
   protected HttpMessageBuilder(HttpMessage httpMessage) {
     this.initHeaders();
