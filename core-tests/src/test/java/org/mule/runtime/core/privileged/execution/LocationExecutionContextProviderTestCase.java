@@ -35,6 +35,13 @@ public class LocationExecutionContextProviderTestCase extends AbstractMuleTestCa
   }
 
   @Test
+  public void sanitizedUrlWithSpecialChars() {
+    withXmlElement(component, "<sftp:outbound-endpoint url=\"sftp://muletest:****@localhost:22198/~/testdir");
+    String sanitized = getSourceXML(component);
+    assertThat(sanitized, equalTo("<sftp:outbound-endpoint url=\"sftp://<<credentials>>@localhost:22198/~/testdir"));
+  }
+
+  @Test
   public void sanitizedAddress() {
     withXmlElement(component, "<sftp:outbound-endpoint address=\"sftp://muletest:muletest@localhost:22198/~/testdir");
     String sanitized = getSourceXML(component);
@@ -46,7 +53,13 @@ public class LocationExecutionContextProviderTestCase extends AbstractMuleTestCa
     withXmlElement(component, "<sftp:config username=\"user\" password=\"pass\" />");
     String sanitized = getSourceXML(component);
     assertThat(sanitized, equalTo("<sftp:config username=\"user\" password=\"<<credentials>>\" />"));
+  }
 
+  @Test
+  public void sanitizedPasswordAttributeWithSpecialChars() {
+    withXmlElement(component, "<sftp:config username=\"user\" password=\"****\" />");
+    String sanitized = getSourceXML(component);
+    assertThat(sanitized, equalTo("<sftp:config username=\"user\" password=\"<<credentials>>\" />"));
   }
 
   @Test
