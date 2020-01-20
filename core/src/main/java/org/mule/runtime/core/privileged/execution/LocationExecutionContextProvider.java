@@ -8,6 +8,7 @@ package org.mule.runtime.core.privileged.execution;
 
 import static java.lang.String.format;
 import static java.util.regex.Pattern.compile;
+import static java.util.regex.Pattern.quote;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
@@ -93,7 +94,7 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
 
     Matcher matcher = PASSWORD_PATTERN.matcher(xml);
     if (matcher.find() && matcher.groupCount() > 0) {
-      xml = xml.replaceAll(maskPasswordAttribute(matcher.group(1)), maskPasswordAttribute(passwordMask));
+      xml = xml.replaceAll(quote(maskPasswordAttribute(matcher.group(1))), maskPasswordAttribute(passwordMask));
     }
     xml = maskUrlPassword(xml, PASSWORD_PATTERN, passwordMask);
 
@@ -107,7 +108,7 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
   private static String maskUrlPassword(String xml, Pattern pattern, String passwordMask) {
     Matcher matcher = pattern.matcher(xml);
     if (matcher.find() && matcher.groupCount() > 0) {
-      xml = xml.replaceAll(matcher.group(1), passwordMask);
+      xml = xml.replaceAll(quote(matcher.group(1)), passwordMask);
     }
     return xml;
   }
