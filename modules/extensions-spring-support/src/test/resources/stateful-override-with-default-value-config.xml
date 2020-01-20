@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:implicitexclusive="http://www.mulesoft.org/schema/mule/implicitexclusive"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/implicitexclusive http://www.mulesoft.org/schema/mule/implicitexclusive/current/mule-implicitexclusive.xsd">
+
+    <implicitexclusive:bla-with-default-config name="with-assigned-value" optionalWithStaticDefault="Custom value in config!"/>
+
+    <flow name="configValueOverriden">
+        <implicitexclusive:get-string optionalWithStaticDefault="Custom value in operation!"/>
+    </flow>
+
+    <flow name="withConfigValueFromImplicitConfig">
+        <implicitexclusive:get-string/>
+    </flow>
+
+    <flow name="customConfigValue">
+        <implicitexclusive:get-string config-ref="with-assigned-value"/>
+    </flow>
+
+</mule>

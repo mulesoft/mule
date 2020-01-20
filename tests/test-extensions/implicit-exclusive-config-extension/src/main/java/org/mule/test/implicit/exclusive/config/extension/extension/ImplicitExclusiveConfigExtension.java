@@ -14,7 +14,7 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 
 @Extension(name = "implicitExclusive")
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/implicitexclusive", prefix = "implicitexclusive")
-@Configurations(value = {BlaConfig.class, BleConfig.class, NonImplicitConfig.class})
+@Configurations(value = {BlaConfig.class, BleConfig.class, NonImplicitConfig.class, ImplicitConfigWithOptionalParameter.class})
 @Export(classes = ConfigWithNumber.class)
 public class ImplicitExclusiveConfigExtension {
 }
