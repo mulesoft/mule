@@ -660,16 +660,20 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     try {
       if (resolver instanceof ConfigOverrideValueResolverWrapper) {
         resolvedValue = ((ConfigOverrideValueResolverWrapper<?>) resolver).resolveWithoutConfig(resolvingContext.get());
-        if (resolvedValue == null && dynamicConfig.get()) {
-          String message = format(
-                                  "Component '%s' at %s uses a dynamic configuration and defines configuration override parameter '%s' which "
-                                      + "is assigned on initialization. That combination is not supported. Please use a non dynamic configuration "
-                                      + "or don't set the parameter.",
-                                  getLocation() != null ? getLocation().getComponentIdentifier().getIdentifier().toString()
-                                      : toString(),
-                                  toString(),
-                                  p.getName());
-          throw new InitialisationException(createStaticMessage(message), this);
+        if (resolvedValue == null) {
+          if (dynamicConfig.get()) {
+            String message = format(
+                                    "Component '%s' at %s uses a dynamic configuration and defines configuration override parameter '%s' which "
+                                        + "is assigned on initialization. That combination is not supported. Please use a non dynamic configuration "
+                                        + "or don't set the parameter.",
+                                    getLocation() != null ? getLocation().getComponentIdentifier().getIdentifier().toString()
+                                        : toString(),
+                                    toString(),
+                                    p.getName());
+            throw new InitialisationException(createStaticMessage(message), this);
+          } else {
+            resolvedValue = resolver.resolve(resolvingContext.get());
+          }
         }
       } else {
         resolvedValue = resolveValue(resolver, resolvingContext.get());
