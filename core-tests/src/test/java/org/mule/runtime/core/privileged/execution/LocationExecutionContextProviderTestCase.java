@@ -6,30 +6,39 @@
  */
 package org.mule.runtime.core.privileged.execution;
 
+import static java.util.Collections.emptyMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
+import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromDocAttributes;
 import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.getSourceXML;
+
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.namespace.QName;
+
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class LocationExecutionContextProviderTestCase extends AbstractMuleTestCase {
 
-  @Mock
-  private Component component;
+  private final Component component = new AbstractComponent() {};
 
   @Test
   public void sanitizedUrl() {
     withXmlElement(component, "<sftp:outbound-endpoint url=\"sftp://muletest:muletest@localhost:22198/~/testdir");
+    String sanitized = getSourceXML(component);
+    assertThat(sanitized, equalTo("<sftp:outbound-endpoint url=\"sftp://<<credentials>>@localhost:22198/~/testdir"));
+  }
+
+  @Test
+  public void sanitizedUrlWithSpecialChars() {
+    withXmlElement(component, "<sftp:outbound-endpoint url=\"sftp://muletest:****@localhost:22198/~/testdir");
     String sanitized = getSourceXML(component);
     assertThat(sanitized, equalTo("<sftp:outbound-endpoint url=\"sftp://<<credentials>>@localhost:22198/~/testdir"));
   }
@@ -46,7 +55,13 @@ public class LocationExecutionContextProviderTestCase extends AbstractMuleTestCa
     withXmlElement(component, "<sftp:config username=\"user\" password=\"pass\" />");
     String sanitized = getSourceXML(component);
     assertThat(sanitized, equalTo("<sftp:config username=\"user\" password=\"<<credentials>>\" />"));
+  }
 
+  @Test
+  public void sanitizedPasswordAttributeWithSpecialChars() {
+    withXmlElement(component, "<sftp:config username=\"user\" password=\"****\" />");
+    String sanitized = getSourceXML(component);
+    assertThat(sanitized, equalTo("<sftp:config username=\"user\" password=\"<<credentials>>\" />"));
   }
 
   @Test
@@ -64,6 +79,9 @@ public class LocationExecutionContextProviderTestCase extends AbstractMuleTestCa
 
 
   private void withXmlElement(Component component, String value) {
-    when(component.getAnnotation(SOURCE_ELEMENT_ANNOTATION_KEY)).thenReturn(value);
+    final Map<QName, Object> annotations = new HashMap<>();
+    addMetadataAnnotationsFromDocAttributes(annotations, value, emptyMap());
+
+    component.setAnnotations(annotations);
   }
 }
