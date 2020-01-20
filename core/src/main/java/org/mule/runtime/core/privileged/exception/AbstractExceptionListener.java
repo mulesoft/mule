@@ -72,6 +72,8 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   protected FlowConstructStatistics statistics;
 
+  private String representation;
+
   public List<Processor> getMessageProcessors() {
     return messageProcessors;
   }
@@ -97,6 +99,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     if (!initialised.get()) {
       doInitialise();
       super.initialise();
+      representation = this.getClass().getSimpleName() + (getLocation() != null ? " @ " + getLocation().getLocation() : "");
       initialised.set(true);
     }
   }
@@ -248,6 +251,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName() + (getLocation() != null ? " @ " + getLocation().getLocation() : "");
+    return representation;
   }
 }

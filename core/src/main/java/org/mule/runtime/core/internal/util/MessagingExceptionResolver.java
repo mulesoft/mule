@@ -84,12 +84,16 @@ public class MessagingExceptionResolver {
 
     ErrorType errorType = rootErrorType;
     if (component instanceof ErrorMappingsAware) {
-      errorType = ((ErrorMappingsAware) component).getErrorMappings()
-          .stream()
-          .filter(m -> m.match(rootErrorType))
-          .findFirst()
-          .map(ErrorMapping::getTarget)
-          .orElse(rootErrorType);
+      if (((ErrorMappingsAware) component).getErrorMappings().isEmpty()) {
+        errorType = rootErrorType;
+      } else {
+        errorType = ((ErrorMappingsAware) component).getErrorMappings()
+            .stream()
+            .filter(m -> m.match(rootErrorType))
+            .findFirst()
+            .map(ErrorMapping::getTarget)
+            .orElse(rootErrorType);
+      }
     }
 
     CoreEvent event = quickCopy(builder(getMessagingExceptionCause(root)).errorType(errorType).build(), me.getEvent());
@@ -128,23 +132,25 @@ public class MessagingExceptionResolver {
 
   private List<Pair<Throwable, ErrorType>> collectErrors(Component obj, MessagingException me, ErrorTypeLocator locator) {
     List<Pair<Throwable, ErrorType>> errors = new LinkedList<>();
-    getExceptionsAsList(me).forEach(e -> {
+    final List<Throwable> exceptionsAsList = getExceptionsAsList(me);
+    for (Throwable e : exceptionsAsList) {
       ErrorType type = errorTypeFromException(obj, locator, e);
       if (!isUnknownMuleError(type) && !isCriticalMuleError(type)) {
         errors.add(0, new Pair<>(e, type));
       }
-    });
+    }
     return errors;
   }
 
   private List<Pair<Throwable, ErrorType>> collectCritical(Component obj, MessagingException me, ErrorTypeLocator locator) {
     List<Pair<Throwable, ErrorType>> errors = new LinkedList<>();
-    getExceptionsAsList(me).forEach(e -> {
+    final List<Throwable> exceptionsAsList = getExceptionsAsList(me);
+    for (Throwable e : exceptionsAsList) {
       ErrorType type = errorTypeFromException(obj, locator, e);
       if (isCriticalMuleError(type)) {
         errors.add(new Pair<>(e, type));
       }
-    });
+    }
     return errors;
   }
 

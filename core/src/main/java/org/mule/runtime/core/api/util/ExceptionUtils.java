@@ -240,6 +240,39 @@ public class ExceptionUtils {
   }
 
   /**
+   * Executes the given {@code runnable} knowing that it might throw an {@link Exception} of type {@code expectedExceptionType}.
+   * If that happens, then it will re throw such exception.
+   * <p>
+   * If the {@code runnable} throws a {@link RuntimeException} of a different type, then it is also re-thrown. Finally, if an
+   * exception of any different type is thrown, then it is handled by delegating into the {@code exceptionHandler}, which might in
+   * turn also throw an exception or handle it returning a value.
+   *
+   * @param expectedExceptionType the type of exception which is expected to be thrown
+   * @param runnable the delegate to be executed
+   * @param exceptionHandler a {@link ExceptionHandler} in case an unexpected exception is found instead
+   * @param <T> the generic type of the return value
+   * @param <E> the generic type of the expected exception
+   * @throws E if the expected exception is actually thrown
+   */
+  public static <T, E extends Exception> void tryExpecting(Class<E> expectedExceptionType, Runnable runnable,
+                                                           ExceptionHandler<T, E> exceptionHandler)
+      throws E {
+    try {
+      runnable.run();
+    } catch (Exception e) {
+      if (expectedExceptionType.isInstance(e)) {
+        throw (E) e;
+      }
+
+      if (e instanceof RuntimeException) {
+        throw (RuntimeException) e;
+      }
+
+      exceptionHandler.handle(e);
+    }
+  }
+
+  /**
    * Checks if an error type is MULE:UNKNOWN
    */
   public static boolean isUnknownMuleError(ErrorType type) {

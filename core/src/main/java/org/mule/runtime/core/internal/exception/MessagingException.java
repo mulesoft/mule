@@ -21,13 +21,13 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.config.ExceptionHelper;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * <code>MessagingException</code> is a general message exception thrown when errors specific to Message processing occur..
@@ -118,8 +118,9 @@ public class MessagingException extends EventProcessingException {
     StringBuilder buf = new StringBuilder(80);
 
     if (message != null) {
-      buf.append(message.getMessage());
-      String trimmedMessage = message.getMessage().trim();
+      final String msg = message.getMessage();
+      buf.append(msg);
+      String trimmedMessage = msg.trim();
       if (StringUtils.isNotBlank(trimmedMessage) && trimmedMessage.charAt(trimmedMessage.length() - 1) != '.') {
         buf.append(".");
       }

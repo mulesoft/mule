@@ -137,16 +137,16 @@ public final class EventQuickCopy {
 
     private static final long serialVersionUID = 7605973213141261979L;
 
-    private final Error error;
+    private final Optional<Error> error;
 
     public EventQuickCopyErrorDecorator(Error error, InternalEvent event) {
       super(event);
-      this.error = error;
+      this.error = Optional.of(error);
     }
 
     @Override
     public Optional<Error> getError() {
-      return Optional.of(error);
+      return error;
     }
   }
 

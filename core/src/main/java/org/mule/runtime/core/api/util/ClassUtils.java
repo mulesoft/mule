@@ -19,8 +19,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 
-import com.google.common.primitives.Primitives;
-
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.File;
@@ -49,6 +47,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
+
+import com.google.common.primitives.Primitives;
 
 /**
  * Extend the Apache Commons ClassUtils to provide additional functionality.
@@ -856,9 +856,8 @@ public class ClassUtils {
    */
   public static void withContextClassLoader(ClassLoader classLoader, Runnable runnable) {
     try {
-      withContextClassLoader(classLoader, () -> {
-        runnable.run();
-        return null;
+      withContextClassLoader(classLoader, runnable, RuntimeException.class, e -> {
+        throw new MuleRuntimeException(e);
       });
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
@@ -879,6 +878,44 @@ public class ClassUtils {
     return withContextClassLoader(classLoader, callable, RuntimeException.class, e -> {
       throw new MuleRuntimeException(e);
     });
+  }
+
+  /**
+   * Executes the given {@code runnable} using the given {@code classLoader} as the current {@link Thread}'s context classloader.
+   * <p>
+   * This method guarantees that whatever the outcome, the thread's context classloader is set back to the value that it had
+   * before executing this method.
+   * <p>
+   * This method also accounts for the possibility of the {@code runnable} to throw and exception of type
+   * {@code expectedExceptionType}. If that happens, then the exception is re-thrown. If the {@code runnable} throws a
+   * {@link RuntimeException} of a different type, it is also re-thrown. Finally, if an exception of any other type is found, then
+   * it is handled delegating into the {@code exceptionHandler} which might in turn throw another exception of
+   * {@code expectedExceptionType} or return a value
+   *
+   * @param classLoader the context {@link ClassLoader} on which the {@code runnable} should be executed
+   * @param runnable a {@link Runnable}
+   * @param expectedExceptionType the type of exception which is expected to be thrown
+   * @param exceptionHandler a {@link ExceptionHandler} in case an unexpected exception is found instead
+   * @param <T> the generic type of the return value
+   * @param <E> the generic type of the expected exception
+   * @throws E if the expected exception is actually thrown
+   */
+  public static <T, E extends Exception> void withContextClassLoader(ClassLoader classLoader, Runnable runnable,
+                                                                     Class<E> expectedExceptionType,
+                                                                     ExceptionHandler<T, E> exceptionHandler)
+      throws E {
+    final Thread currentThread = Thread.currentThread();
+    final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+    if (currentClassLoader != classLoader) {
+      currentThread.setContextClassLoader(classLoader);
+    }
+    try {
+      tryExpecting(expectedExceptionType, runnable, exceptionHandler);
+    } finally {
+      if (currentClassLoader != classLoader) {
+        currentThread.setContextClassLoader(currentClassLoader);
+      }
+    }
   }
 
   /**

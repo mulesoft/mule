@@ -19,7 +19,6 @@ import org.mule.runtime.api.util.ComponentLocationProvider;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -84,10 +83,6 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
 
     beanAnnotations.putAll(docAttributes.entrySet().stream()
         .collect(toMap(e -> QName.valueOf(e.getKey()), e -> e.getValue())));
-  }
-
-  protected static String getSourceXML(Component element) {
-    return Objects.toString(element.getAnnotation(SOURCE_ELEMENT_ANNOTATION_KEY), null);
   }
 
   public static String maskPasswords(String xml, String passwordMask) {

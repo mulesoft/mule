@@ -32,7 +32,7 @@ public class MessagingExceptionLocationProvider extends LocationExecutionContext
   public void putContextInfo(Map<String, Object> info, EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
     info.put(INFO_LOCATION_KEY, lastProcessed.getRepresentation());
 
-    final String sourceXML = getSourceXML(lastProcessed);
+    final String sourceXML = lastProcessed.getDslSource();
     if (sourceXML != null) {
       info.put(INFO_SOURCE_XML_KEY, sourceXML);
     }
