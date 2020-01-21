@@ -17,10 +17,15 @@ import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.function.Function;
 
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -29,11 +34,8 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mockito.invocation.InvocationOnMock;
 import org.reactivestreams.Publisher;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.function.Function;
-
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 
@@ -78,6 +80,10 @@ public abstract class AbstractCompositePolicyTestCase extends AbstractMuleContex
   }
 
   protected CoreEvent createTestEvent() {
+    final FlowExceptionHandler flowExceptionHandler = mock(FlowExceptionHandler.class);
+    when(flowExceptionHandler.apply(any())).thenAnswer(inv -> Mono.error(inv.getArgument(0, Throwable.class)));
+
+    when(mockFlowConstruct.getExceptionListener()).thenReturn(flowExceptionHandler);
     return CoreEvent.builder(create(mockFlowConstruct, fromSingleComponent("http")))
         .message(Message.builder().nullValue().build()).build();
   }
