@@ -1119,6 +1119,36 @@
               },
               "parameterName": "Web Service Configuration",
               "categoryName": "InvokeOperationCategory"
+            },
+            "typeResolversInformation": {
+              "category": "InvokeOperationCategory",
+              "outputResolver": {
+                "resolverName": "InvokeOutput",
+                "requiresConnection": true,
+                "requiresConfiguration": true
+              },
+              "keysResolver": {
+                "resolverName": "keys",
+                "requiresConnection": true,
+                "requiresConfiguration": true
+              },
+              "inputResolvers": {
+                "headers": {
+                  "resolverName": "InvokeInputHeaders",
+                  "requiresConnection": true,
+                  "requiresConfiguration": true
+                },
+                "attachments": {
+                  "resolverName": "InvokeInputAttachments",
+                  "requiresConnection": true,
+                  "requiresConfiguration": true
+                },
+                "body": {
+                  "resolverName": "InvokeRequest",
+                  "requiresConnection": true,
+                  "requiresConfiguration": true
+                }
+              }
             }
           },
           "kind": "operation"
