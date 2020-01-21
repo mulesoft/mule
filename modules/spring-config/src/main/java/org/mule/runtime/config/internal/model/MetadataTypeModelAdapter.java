@@ -221,7 +221,7 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
 
     @Override
     public MetadataType getType() {
-      return wrappedFieldType;
+      return wrappedFieldType.getValue();
     }
 
     @Override

@@ -19,7 +19,9 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.util.NameUtils.COMPONENT_NAME_SEPARATOR;
 import static org.mule.runtime.api.util.NameUtils.toCamelCase;
 
+import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
@@ -51,9 +53,11 @@ import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeHandlerManagerFactory;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -61,6 +65,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Helper class to work with a set of {@link ExtensionModel}s
@@ -87,6 +92,7 @@ public class ExtensionModelHelper {
 
   private final JavaTypeLoader javaTypeLoader = new JavaTypeLoader(ExtensionModelHelper.class.getClassLoader(),
                                                                    new ExtensionsTypeHandlerManagerFactory());
+  private final DslResolvingContext dslResolvingContext;
 
   /**
    * @param extensionModels the set of {@link ExtensionModel}s to work with. Usually this is the set of models configured within a
@@ -100,6 +106,7 @@ public class ExtensionModelHelper {
     this.extensionsModels = extensionModels;
     this.dslSyntaxResolversByExtension =
         Caffeine.newBuilder().build(key -> DslSyntaxResolver.getDefault(key, dslResolvingCtx));
+    this.dslResolvingContext = dslResolvingCtx;
   }
 
   /**
@@ -261,7 +268,9 @@ public class ExtensionModelHelper {
                 if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                   modelRef.set(model);
                 }
-              };
+              }
+
+          ;
 
             }.walk(currentExtension);
 
@@ -344,7 +353,9 @@ public class ExtensionModelHelper {
                 delegate.onConnectionProvider(model);
                 stop();
               }
-            };
+            }
+
+        ;
 
             @Override
             protected void onOperation(HasOperationModels owner, OperationModel model) {
@@ -396,6 +407,33 @@ public class ExtensionModelHelper {
     return extensionsModels.stream()
         .filter(e -> e.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace()))
         .findFirst();
+  }
+
+  public Optional<DslElementSyntax> resolveDslElementModel(MetadataType type, ComponentIdentifier componentIdentifier) {
+    return lookupExtensionModelFor(componentIdentifier)
+        .flatMap(currentExtension -> {
+          final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(currentExtension);
+
+          return dslSyntaxResolver.resolve(type);
+        });
+  }
+
+  public Map<ObjectType, Optional<DslElementSyntax>> resolveSubTypes(ObjectType type) {
+    ImmutableMap.Builder<ObjectType, Optional<DslElementSyntax>> mapBuilder = ImmutableMap.builder();
+    for (ObjectType subType : dslResolvingContext.getTypeCatalog().getSubTypes(type)) {
+      subType.getAnnotation(TypeIdAnnotation.class).map(TypeIdAnnotation::getValue).ifPresent(
+                                                                                              typeId -> dslResolvingContext
+                                                                                                  .getTypeCatalog()
+                                                                                                  .getDeclaringExtension(typeId)
+                                                                                                  .ifPresent(extensionName -> dslResolvingContext
+                                                                                                      .getExtension(extensionName)
+                                                                                                      .ifPresent(extensionModel -> mapBuilder
+                                                                                                          .put(subType,
+                                                                                                               dslSyntaxResolversByExtension
+                                                                                                                   .get(extensionModel)
+                                                                                                                   .resolve(subType)))));
+    }
+    return mapBuilder.build();
   }
 
   /**
