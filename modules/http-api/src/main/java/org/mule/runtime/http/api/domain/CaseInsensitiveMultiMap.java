@@ -123,13 +123,9 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
     }
   }
 
-  public static MultiMap<String, String> toMultiMap(CaseInsensitiveMultiMap multiMap) {
-    return new MultiMap<>(multiMap);
-  }
-
   @Override
   public CaseInsensitiveMultiMap toImmutableMultiMap() {
-    if (this.isEmpty() && emptyCaseInsensitiveMultiMap() != null) {
+    if (this.isEmpty() && EMPTY_MAP != null) {
       return emptyCaseInsensitiveMultiMap();
     }
 
