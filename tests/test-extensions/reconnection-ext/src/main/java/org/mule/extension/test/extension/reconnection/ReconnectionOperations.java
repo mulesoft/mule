@@ -8,6 +8,7 @@ package org.mule.extension.test.extension.reconnection;
 
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
+import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.closePagingProviderCalls;
 import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.fail;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
 
@@ -28,9 +29,6 @@ import java.util.Optional;
  */
 public class ReconnectionOperations {
 
-  public static volatile int closePagingProviderCalls = 0;
-  public static volatile int getPageCalls = 0;
-
   /**
    * Example of a simple operation that receives a string parameter and returns a new string message that will be set on the payload.
    */
@@ -47,10 +45,12 @@ public class ReconnectionOperations {
   public PagingProvider<ReconnectableConnection, ReconnectableConnection> pagedOperation(Integer failOn) {
     return new PagingProvider<ReconnectableConnection, ReconnectableConnection>() {
 
+      private int getPageCalls = 0;
+
       @Override
       public List<ReconnectableConnection> getPage(ReconnectableConnection connection) {
-        getPageCalls++;
-        if (getPageCalls == failOn) {
+        closePagingProviderCalls++;
+        if (closePagingProviderCalls == failOn) {
           throw new ModuleException(CONNECTIVITY, new ConnectionException("Failed to retrieve Page"));
         }
         return singletonList(connection);
@@ -66,39 +66,5 @@ public class ReconnectionOperations {
         closePagingProviderCalls++;
       }
     };
-  }
-
-  public PagingProvider<ReconnectableConnection, ReconnectableConnection> stickyPagedOperation(Integer failOn) {
-    return new PagingProvider<ReconnectableConnection, ReconnectableConnection>() {
-
-      @Override
-      public List<ReconnectableConnection> getPage(ReconnectableConnection connection) {
-        getPageCalls++;
-        if (getPageCalls == failOn) {
-          throw new ModuleException(CONNECTIVITY, new ConnectionException("Failed to retrieve Page"));
-        }
-        return singletonList(connection);
-      }
-
-      @Override
-      public Optional<Integer> getTotalResults(ReconnectableConnection connection) {
-        return empty();
-      }
-
-      @Override
-      public void close(ReconnectableConnection connection) {
-        closePagingProviderCalls++;
-      }
-
-      @Override
-      public boolean useStickyConnections() {
-        return true;
-      }
-    };
-  }
-
-  public static void resetCounters() {
-    closePagingProviderCalls = 0;
-    getPageCalls = 0;
   }
 }
