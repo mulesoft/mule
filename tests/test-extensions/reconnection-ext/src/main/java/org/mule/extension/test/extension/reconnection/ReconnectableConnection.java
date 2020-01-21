@@ -13,12 +13,10 @@ public final class ReconnectableConnection {
 
   private final int reconnectionAttempts;
   private final int disconnectCalls;
-  private final int closePagingProviderCalls;
 
-  public ReconnectableConnection(int reconnectionAttempts, int disconnectCalls, int closePagingProviderCalls) {
+  public ReconnectableConnection(int reconnectionAttempts, int disconnectCalls) {
     this.reconnectionAttempts = reconnectionAttempts;
     this.disconnectCalls = disconnectCalls;
-    this.closePagingProviderCalls = closePagingProviderCalls;
   }
 
   public int getReconnectionAttempts() {
@@ -27,9 +25,5 @@ public final class ReconnectableConnection {
 
   public int getDisconnectCalls() {
     return disconnectCalls;
-  }
-
-  public int getClosePagingProviderCalls() {
-    return closePagingProviderCalls;
   }
 }
