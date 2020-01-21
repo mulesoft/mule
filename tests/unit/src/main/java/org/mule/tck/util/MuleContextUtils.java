@@ -8,6 +8,7 @@ package org.mule.tck.util;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mockito.ArgumentMatchers.any;
@@ -62,6 +63,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -148,6 +150,8 @@ public class MuleContextUtils {
     private Object resolveObjectToInject(Class<?> dependencyType) {
       if (objects.containsKey(dependencyType)) {
         return objects.get(dependencyType);
+      } else if (Collection.class.isAssignableFrom(dependencyType)) {
+        return emptySet();
       } else {
         return mock(dependencyType);
       }
