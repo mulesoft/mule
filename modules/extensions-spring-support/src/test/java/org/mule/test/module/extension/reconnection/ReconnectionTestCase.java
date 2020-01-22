@@ -9,6 +9,7 @@ package org.mule.test.module.extension.reconnection;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.closePagingProviderCalls;
 import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.resetCounters;
 import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
@@ -52,7 +53,7 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   @Rule
-  public ExpectedException expectedException;
+  public ExpectedException expectedException = none();
 
   @Override
   protected String getConfigFile() {
