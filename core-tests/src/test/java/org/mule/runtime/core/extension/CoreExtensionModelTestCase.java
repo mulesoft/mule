@@ -9,6 +9,7 @@ package org.mule.runtime.core.extension;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -65,6 +66,7 @@ import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.core.api.source.scheduler.Scheduler;
+import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Iterator;
@@ -474,6 +476,9 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   @Test
   public void parallelForeach() {
     final ConstructModel parallelForeach = coreExtensionModel.getConstructModel("parallelForeach").get();
+
+    assertThat(parallelForeach.getModelProperty(SinceMuleVersionModelProperty.class).map(mp -> mp.getVersion().toString())
+        .orElse("NO MODEL PROPERTY"), equalTo("4.2.0"));
 
     NestableElementModel processorsChain = parallelForeach.getNestedComponents().get(0);
     assertThat(processorsChain, instanceOf(NestedChainModel.class));

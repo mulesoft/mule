@@ -100,11 +100,12 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
       return ofNullable(getRawParameters().get(NAME_ATTRIBUTE_NAME));
     } else if (getModel(ParameterizedModel.class).isPresent()) {
       populateParameterAsts();
-      return ofNullable(componentId);
-    } else {
-      // fallback for dsl elements that do not have an extension model declaration
-      return ofNullable(getRawParameters().get(NAME_ATTRIBUTE_NAME));
+      if (componentId != null) {
+        return of(componentId);
+      }
     }
+    // fallback for dsl elements that do not have an extension model declaration
+    return ofNullable(getRawParameters().get(NAME_ATTRIBUTE_NAME));
   }
 
   @Override

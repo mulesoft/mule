@@ -92,6 +92,7 @@ import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProvider
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
+import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
 
@@ -640,7 +641,7 @@ class MuleExtensionModelDeclarer {
   private void declareParallelForEach(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer parallelForeach = extensionDeclarer.withConstruct("parallelForeach")
         .describedAs("Splits the same message and processes each part in parallel.")
-        .withErrorModel(compositeRoutingError);
+        .withErrorModel(compositeRoutingError).withModelProperty(new SinceMuleVersionModelProperty("4.2.0"));
 
     parallelForeach.withChain();
 
