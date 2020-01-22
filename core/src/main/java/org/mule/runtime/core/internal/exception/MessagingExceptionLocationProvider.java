@@ -10,6 +10,7 @@ import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.exception.MuleExceptionInfo;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 
@@ -24,17 +25,22 @@ public class MessagingExceptionLocationProvider extends LocationExecutionContext
   @Override
   public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
     final Map<String, Object> info = new HashMap<>();
-    putContextInfo(info, notificationInfo, lastProcessed);
+    info.put(INFO_LOCATION_KEY, lastProcessed.getRepresentation());
+
+    final String source = lastProcessed.getDslSource();
+    if (source != null) {
+      info.put(INFO_SOURCE_XML_KEY, source);
+    }
     return info;
   }
 
   @Override
-  public void putContextInfo(Map<String, Object> info, EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
-    info.put(INFO_LOCATION_KEY, lastProcessed.getRepresentation());
+  public void putContextInfo(MuleExceptionInfo info, EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
+    info.setLocation(lastProcessed.getRepresentation());
 
-    final String sourceXML = lastProcessed.getDslSource();
-    if (sourceXML != null) {
-      info.put(INFO_SOURCE_XML_KEY, sourceXML);
+    final String source = lastProcessed.getDslSource();
+    if (source != null) {
+      info.setDslSource(source);
     }
   }
 }

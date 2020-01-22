@@ -238,7 +238,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
         // smart connector's <operation/>, rather than the internals of the smart connector's internals.
         EnrichedNotificationInfo notificationInfo = createInfo(event, me, null);
         for (ExceptionContextProvider exceptionContextProvider : exceptionContextProviders) {
-          exceptionContextProvider.putContextInfo(me.getInfo(), notificationInfo, ModuleOperationMessageProcessor.this);
+          exceptionContextProvider.putContextInfo(me.getExceptionInfo(), notificationInfo, ModuleOperationMessageProcessor.this);
         }
 
         ((DefaultFlowCallStack) event.getFlowCallStack()).pop();

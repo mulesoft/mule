@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.execution;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.exception.MuleExceptionInfo;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 
 import java.util.Map;
@@ -39,6 +40,6 @@ public interface ExceptionContextProvider {
    *
    * @since 4.3
    */
-  void putContextInfo(Map<String, Object> info, EnrichedNotificationInfo notificationInfo, Component lastProcessed);
+  void putContextInfo(MuleExceptionInfo info, EnrichedNotificationInfo notificationInfo, Component lastProcessed);
 
 }

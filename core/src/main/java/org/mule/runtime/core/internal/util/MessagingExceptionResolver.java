@@ -198,7 +198,7 @@ public class MessagingExceptionResolver {
                                              Collection<ExceptionContextProvider> exceptionContextProviders) {
     EnrichedNotificationInfo notificationInfo = createInfo(event, me, null);
     for (ExceptionContextProvider exceptionContextProvider : exceptionContextProviders) {
-      exceptionContextProvider.putContextInfo(me.getInfo(), notificationInfo, failing);
+      exceptionContextProvider.putContextInfo(me.getExceptionInfo(), notificationInfo, failing);
     }
     return me;
   }

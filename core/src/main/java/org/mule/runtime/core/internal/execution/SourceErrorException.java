@@ -70,7 +70,7 @@ public final class SourceErrorException extends MuleRuntimeException {
 
     EnrichedNotificationInfo notificationInfo = createInfo(messagingException.getEvent(), messagingException, null);
     for (ExceptionContextProvider exceptionContextProvider : exceptionContextProviders) {
-      exceptionContextProvider.putContextInfo(messagingException.getInfo(), notificationInfo, messageSource);
+      exceptionContextProvider.putContextInfo(messagingException.getExceptionInfo(), notificationInfo, messageSource);
     }
 
     return messagingException;

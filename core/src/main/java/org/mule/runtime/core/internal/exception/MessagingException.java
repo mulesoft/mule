@@ -94,7 +94,7 @@ public class MessagingException extends EventProcessingException {
     super(original.getI18nMessage(), event, original.getCause());
     this.failingComponent = original.getFailingComponent();
     this.handled = original.handled();
-    original.getInfo().forEach((key, value) -> addInfo(key, value));
+    original.getInfo().forEach(this::addInfo);
     extractMuleMessage(event);
     storeErrorTypeInfo();
     setMessage(original.getMessage());

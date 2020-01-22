@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.context.notification;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.exception.MuleExceptionInfo;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -36,7 +37,7 @@ import org.apache.logging.log4j.spi.LoggerContext;
 public class MessageProcessingFlowTraceManager extends LocationExecutionContextProvider
     implements FlowTraceManager, Initialisable, Disposable {
 
-  public static final String FLOW_STACK_INFO_KEY = "FlowStack";
+  public static final String FLOW_STACK_INFO_KEY = MuleExceptionInfo.FLOW_STACK_INFO_KEY;
 
   private final FlowNotificationTextDebugger pipelineProcessorDebugger;
   private final MessageProcessorTextDebugger messageProcessorTextDebugger;
@@ -134,13 +135,15 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
   @Override
   public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
     final Map<String, Object> info = new HashMap<>();
-    putContextInfo(info, notificationInfo, lastProcessed);
+    info.putIfAbsent(FLOW_STACK_INFO_KEY, ((CoreEvent) notificationInfo.getEvent()).getFlowCallStack().clone());
     return info;
   }
 
   @Override
-  public void putContextInfo(Map<String, Object> info, EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
-    info.putIfAbsent(FLOW_STACK_INFO_KEY, ((CoreEvent) notificationInfo.getEvent()).getFlowCallStack().clone());
+  public void putContextInfo(MuleExceptionInfo info, EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
+    if (info.getFlowStack() != null) {
+      info.setFlowStack(((CoreEvent) notificationInfo.getEvent()).getFlowCallStack().clone());
+    }
   }
 
   @Inject

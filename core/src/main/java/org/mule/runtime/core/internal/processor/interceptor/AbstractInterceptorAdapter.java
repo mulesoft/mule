@@ -113,7 +113,7 @@ class AbstractInterceptorAdapter {
                                                         Optional<MessagingException> original) {
     MessagingExceptionResolver exceptionResolver = new MessagingExceptionResolver(processor);
     MessagingException me = new MessagingException(event, cause, processor);
-    original.ifPresent(error -> error.getInfo().forEach((name, info) -> me.addInfo(name, info)));
+    original.ifPresent(error -> error.getInfo().forEach(me::addInfo));
 
     return exceptionResolver.resolve(me, errorTypeLocator, exceptionContextProviders);
   }
