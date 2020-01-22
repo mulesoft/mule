@@ -48,6 +48,14 @@ public interface OAuthPlatformManagedDancerBuilder extends OAuthDancerBuilder<Pl
   OAuthPlatformManagedDancerBuilder platformUrl(String platformUrl);
 
   /**
+   * Sets the environment identifier that needs to be connected to.
+   *
+   * @param environmentId and environment Id
+   * @return {@code this} builder
+   */
+  OAuthPlatformManagedDancerBuilder environmentId(String environmentId);
+
+  /**
    * Adds the {@code listener}. Listeners will be invoked in the same order as they were added
    *
    * @param listener the {@link PlatformManagedOAuthStateListener} to be added

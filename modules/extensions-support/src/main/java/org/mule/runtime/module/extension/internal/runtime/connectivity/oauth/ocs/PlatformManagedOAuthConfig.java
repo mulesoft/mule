@@ -13,6 +13,7 @@ import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_ID;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_SECRET;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_ENVIRONMENT_ID;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_ORG_ID;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_SERVICE_URL;
@@ -40,6 +41,7 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
   private final String clientId;
   private final String clientSecret;
   private final String orgId;
+  private final String environmentId;
   private final Charset encoding;
   private final PlatformManagedOAuthGrantType grantType;
   private final ConfigurationInstance configurationInstance;
@@ -62,6 +64,7 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
                                           getProperty(configurationProperties, OCS_CLIENT_ID),
                                           getProperty(configurationProperties, OCS_CLIENT_SECRET),
                                           getProperty(configurationProperties, OCS_ORG_ID),
+                                          getProperty(configurationProperties, OCS_ENVIRONMENT_ID),
                                           UTF_8,
                                           grantType,
                                           configurationInstance,
@@ -82,6 +85,7 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
                                     String clientId,
                                     String clientSecret,
                                     String orgId,
+                                    String environmentId,
                                     Charset encoding,
                                     PlatformManagedOAuthGrantType grantType,
                                     ConfigurationInstance configurationInstance,
@@ -95,6 +99,7 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
     this.clientId = clientId;
     this.clientSecret = clientSecret;
     this.orgId = orgId;
+    this.environmentId = environmentId;
     this.encoding = encoding;
     this.grantType = grantType;
     this.configurationInstance = configurationInstance;
@@ -127,6 +132,9 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
     return orgId;
   }
 
+  public String getEnvironmentId() {
+    return environmentId;
+  }
   public Charset getEncoding() {
     return encoding;
   }
