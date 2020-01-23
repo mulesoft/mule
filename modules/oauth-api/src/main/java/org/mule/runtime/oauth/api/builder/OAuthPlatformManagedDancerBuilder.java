@@ -50,7 +50,7 @@ public interface OAuthPlatformManagedDancerBuilder extends OAuthDancerBuilder<Pl
   /**
    * Sets the environment identifier that needs to be connected to.
    *
-   * @param environmentId and environment Id
+   * @param environmentId an environment Id
    * @return {@code this} builder
    */
   OAuthPlatformManagedDancerBuilder environmentId(String environmentId);
