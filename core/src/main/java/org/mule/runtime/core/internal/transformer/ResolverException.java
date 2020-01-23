@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
  */
 public class ResolverException extends TransformerException {
 
-  private static final long serialVersionUID = 389248508135507436L;
+  private static final long serialVersionUID = 389248508135507438L;
 
   public ResolverException(I18nMessage message) {
     super(message);

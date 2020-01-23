@@ -141,7 +141,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
 
   @Override
   public void putContextInfo(MuleExceptionInfo info, EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
-    if (info.getFlowStack() != null) {
+    if (info.getFlowStack() == null) {
       info.setFlowStack(((CoreEvent) notificationInfo.getEvent()).getFlowCallStack().clone());
     }
   }

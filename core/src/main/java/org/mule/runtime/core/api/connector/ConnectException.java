@@ -21,7 +21,7 @@ import java.util.concurrent.Executor;
 public class ConnectException extends LocatedMuleException {
 
   /** Serial version */
-  private static final long serialVersionUID = -7802483584780922653L;
+  private static final long serialVersionUID = -7802483584780922651L;
 
   /** Resource which has disconnected */
   private transient Connectable failed;

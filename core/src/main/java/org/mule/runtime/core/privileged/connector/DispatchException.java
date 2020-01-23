@@ -18,7 +18,7 @@ public class DispatchException extends RoutingException {
   /**
    * Serial version
    */
-  private static final long serialVersionUID = -8204621943732496606L;
+  private static final long serialVersionUID = -8204621943732496604L;
 
   public DispatchException(Processor target) {
     super(target);

@@ -37,7 +37,7 @@ public final class CompositeRoutingException extends MuleException implements Co
 
   private static final String MESSAGE_TITLE = "Exception(s) were found for route(s): ";
 
-  private static final long serialVersionUID = -4421728527040579607L;
+  private static final long serialVersionUID = -4421728527040579605L;
 
   private final RoutingResult routingResult;
 

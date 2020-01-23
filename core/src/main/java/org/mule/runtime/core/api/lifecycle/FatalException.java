@@ -18,7 +18,7 @@ public class FatalException extends LifecycleException {
   /**
    * Serial version
    */
-  private static final long serialVersionUID = -330442983239074937L;
+  private static final long serialVersionUID = -330442983239074935L;
 
   /**
    * @param message the exception message

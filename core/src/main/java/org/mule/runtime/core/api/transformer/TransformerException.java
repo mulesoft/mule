@@ -25,7 +25,7 @@ public class TransformerException extends MuleException {
   /**
    * Serial version
    */
-  private static final long serialVersionUID = 2943589828020763649L;
+  private static final long serialVersionUID = 2943589828020763651L;
 
   private transient Transformer transformer;
 

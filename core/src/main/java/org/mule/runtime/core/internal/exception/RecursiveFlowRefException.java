@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.processor.Processor;
  */
 public class RecursiveFlowRefException extends LifecycleException {
 
-  private static final long serialVersionUID = 336572098969292321L;
+  private static final long serialVersionUID = 336572098969292323L;
 
   public RecursiveFlowRefException(String offendingFlowName, Processor flowRefProcessor) {
     super(createStaticMessage("Found a possible infinite recursion involving flows named " + offendingFlowName),

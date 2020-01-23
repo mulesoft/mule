@@ -23,7 +23,7 @@ import org.mule.runtime.core.internal.message.ErrorBuilder;
  */
 public class EventProcessingException extends MuleException {
 
-  private static final long serialVersionUID = 8849038142532938068L;
+  private static final long serialVersionUID = 8849038142532938070L;
 
   protected final transient CoreEvent event;
 

@@ -18,7 +18,7 @@ public final class RoutePathNotFoundException extends RoutingException {
   /**
    * Serial version
    */
-  private static final long serialVersionUID = -8481434966594513066L;
+  private static final long serialVersionUID = -8481434966594513064L;
 
   public RoutePathNotFoundException(Processor target) {
     super(target);

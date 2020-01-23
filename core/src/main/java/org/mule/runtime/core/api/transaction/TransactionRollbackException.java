@@ -15,7 +15,7 @@ public final class TransactionRollbackException extends TransactionException {
   /**
    * Serial version
    */
-  private static final long serialVersionUID = -3247455113055556221L;
+  private static final long serialVersionUID = -3247455113055556219L;
 
   /**
    * @param message the exception message

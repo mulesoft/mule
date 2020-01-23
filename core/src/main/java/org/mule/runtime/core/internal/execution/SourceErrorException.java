@@ -28,7 +28,7 @@ import java.util.Optional;
  */
 public final class SourceErrorException extends MuleRuntimeException {
 
-  private static final long serialVersionUID = 160215774280116876L;
+  private static final long serialVersionUID = 160215774280116878L;
 
   private final CoreEvent event;
   private final ErrorType errorType;

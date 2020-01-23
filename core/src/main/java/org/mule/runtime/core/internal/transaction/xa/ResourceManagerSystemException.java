@@ -14,7 +14,7 @@ public class ResourceManagerSystemException extends ResourceManagerException {
   /**
    * Serial version
    */
-  private static final long serialVersionUID = 1202058044460490597L;
+  private static final long serialVersionUID = 1202058044460490599L;
 
   /**
    * @param message

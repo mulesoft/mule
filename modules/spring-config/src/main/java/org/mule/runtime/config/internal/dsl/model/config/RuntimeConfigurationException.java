@@ -17,7 +17,7 @@ public class RuntimeConfigurationException extends MuleRuntimeException {
   /**
    * Serial version
    */
-  private static final long serialVersionUID = 3658822340943734960L;
+  private static final long serialVersionUID = 3658822340943734963L;
 
   public RuntimeConfigurationException(I18nMessage message) {
     super(message);

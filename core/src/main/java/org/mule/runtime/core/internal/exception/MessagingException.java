@@ -41,7 +41,7 @@ public class MessagingException extends EventProcessingException {
   /**
    * Serial version
    */
-  private static final long serialVersionUID = 6941498759267936649L;
+  private static final long serialVersionUID = 6941498759267936651L;
 
   /**
    * The Message being processed when the error occurred

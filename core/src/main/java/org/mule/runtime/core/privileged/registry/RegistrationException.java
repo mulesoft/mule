@@ -11,7 +11,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
 
 public final class RegistrationException extends MuleException {
 
-  private static final long serialVersionUID = 9143114426140546637L;
+  private static final long serialVersionUID = 9143114426140546639L;
 
   public RegistrationException(I18nMessage message) {
     super(message);

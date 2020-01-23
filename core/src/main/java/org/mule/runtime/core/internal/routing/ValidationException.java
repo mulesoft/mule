@@ -16,6 +16,6 @@ import org.mule.runtime.api.exception.MuleException;
  */
 public class ValidationException extends MuleException {
 
-  private static final long serialVersionUID = -4883468665512566234L;
+  private static final long serialVersionUID = -4883468665512566232L;
 
 }

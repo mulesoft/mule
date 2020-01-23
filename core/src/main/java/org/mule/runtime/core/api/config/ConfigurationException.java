@@ -14,7 +14,7 @@ public class ConfigurationException extends MuleException {
   /**
    * Serial version
    */
-  private static final long serialVersionUID = 3658822340943734960L;
+  private static final long serialVersionUID = 3658822340943734962L;
 
   public ConfigurationException(I18nMessage message) {
     super(message);

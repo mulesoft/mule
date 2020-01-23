@@ -34,7 +34,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 public class FunctionalTestNotification extends CustomNotification {
 
   /** Serial version */
-  private static final long serialVersionUID = -3435373745940904597L;
+  private static final long serialVersionUID = -3435373745940904594L;
 
   public static final int EVENT_RECEIVED = -999999;
 

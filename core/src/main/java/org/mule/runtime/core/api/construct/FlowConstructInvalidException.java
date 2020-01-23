@@ -11,7 +11,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
 
 public final class FlowConstructInvalidException extends MuleException {
 
-  private static final long serialVersionUID = -8170840339166473625L;
+  private static final long serialVersionUID = -8170840339166473623L;
 
   public FlowConstructInvalidException(I18nMessage message, Throwable cause) {
     super(message, cause);

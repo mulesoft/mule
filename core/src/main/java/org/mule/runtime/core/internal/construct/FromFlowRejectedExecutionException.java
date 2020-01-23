@@ -17,7 +17,7 @@ import java.util.concurrent.RejectedExecutionException;
  */
 public class FromFlowRejectedExecutionException extends RejectedExecutionException {
 
-  private static final long serialVersionUID = 4393720264347573009L;
+  private static final long serialVersionUID = 4393720264347573011L;
 
   private final BackPressureReason reason;
 

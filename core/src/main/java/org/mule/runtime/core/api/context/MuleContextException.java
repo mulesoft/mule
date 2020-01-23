@@ -17,7 +17,7 @@ public final class MuleContextException extends MuleException {
   /**
    * Serial version
    */
-  private static final long serialVersionUID = -1526680893293714180L;
+  private static final long serialVersionUID = -1526680893293714178L;
 
   /**
    * @param message the exception message

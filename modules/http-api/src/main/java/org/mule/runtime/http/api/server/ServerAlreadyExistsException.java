@@ -15,7 +15,7 @@ import static java.lang.String.format;
  */
 public final class ServerAlreadyExistsException extends ServerCreationException {
 
-  private static final long serialVersionUID = -3622168573395746887L;
+  private static final long serialVersionUID = -3622168573395746884L;
   private static final String SERVER_ALREADY_EXISTS_FORMAT =
       "A server in port(%s) already exists for host(%s) or one overlapping it (0.0.0.0).";
 

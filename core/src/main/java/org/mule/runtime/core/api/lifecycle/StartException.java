@@ -15,7 +15,7 @@ import org.mule.runtime.api.lifecycle.Startable;
 public final class StartException extends LifecycleException {
 
   /** Serial version */
-  private static final long serialVersionUID = 1714192220605243678L;
+  private static final long serialVersionUID = 1714192220605243680L;
 
   /**
    * @param message the exception message
