@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.http.api.domain.message;
 
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
@@ -57,6 +59,16 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @return this builder
    */
   public B headers(MultiMap<String, String> headersMap) {
+    if (this.headers == null) {
+
+      if (headersMap instanceof CaseInsensitiveMultiMap) {
+        this.headers = (CaseInsensitiveMultiMap) headersMap;
+        return (B) this;
+
+      } else {
+        this.initHeaders();
+      }
+    }
     this.headers.putAll(headersMap);
     return (B) this;
   }
@@ -70,6 +82,9 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @return this builder
    */
   public B addHeader(String name, String value) {
+    if (this.headers == null) {
+      this.initHeaders();
+    }
     headers.put(name, value);
     return (B) this;
   }
@@ -82,6 +97,9 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @return this builder
    */
   public B addHeaders(String name, Collection<String> values) {
+    if (this.headers == null) {
+      this.initHeaders();
+    }
     headers.put(name, values);
     return (B) this;
   }
@@ -93,7 +111,9 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @return this builder
    */
   public B removeHeader(String name) {
-    headers.remove(name);
+    if (this.headers != null && !this.headers.isEmpty()) {
+      headers.remove(name);
+    }
     return (B) this;
   }
 
@@ -105,6 +125,9 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @return the value of the header or {@code null} if there isn't one
    */
   public Optional<String> getHeaderValue(String name) {
+    if (this.headers == null || this.headers.isEmpty()) {
+      return empty();
+    }
     return ofNullable(headers.get(name));
   }
 
@@ -115,6 +138,9 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @return an immutable {@link Collection} of {@link String} values for the header
    */
   public Collection<String> getHeaderValues(String name) {
+    if (this.headers == null || this.headers.isEmpty()) {
+      return emptyList();
+    }
     return headers.getAll(name);
   }
 
@@ -122,6 +148,9 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @return an immutable version of the current headers in the builder.
    */
   public MultiMap<String, String> getHeaders() {
+    if (this.headers == null) {
+      this.initHeaders();
+    }
     return headers.toImmutableMultiMap();
   }
 
