@@ -40,7 +40,10 @@ import static org.mule.runtime.api.exception.MuleException.INFO_ALREADY_LOGGED_K
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
+import static org.mule.runtime.core.api.rx.Exceptions.checkedFunction;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
+import static org.mule.runtime.core.internal.util.rx.Operators.nullSafeMap;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorTypeThat;
 import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
@@ -147,10 +150,10 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
   @Parameters(name = "{1}, {0}")
   public static Collection<Object[]> data() {
     return asList(new Object[][] {
-        {true, new ProcessorInApp()},
+        {true, new ProcessorInApp(true)},
         {true, new NonBlockingProcessorInApp()},
         {true, new OperationProcessorInApp()},
-        {false, new ProcessorInApp()},
+        {false, new ProcessorInApp(false)},
         {false, new NonBlockingProcessorInApp()},
         {false, new OperationProcessorInApp()}
     });
@@ -1798,7 +1801,11 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
 
   private static class ProcessorInApp extends AbstractComponent implements Processor {
 
-    public ProcessorInApp() {
+    private final boolean useMockInterceptor;
+
+    public ProcessorInApp(boolean useMockInterceptor) {
+      this.useMockInterceptor = useMockInterceptor;
+
       setAnnotations(ImmutableMap.<QName, Object>builder()
           .put(ANNOTATION_PARAMETERS, singletonMap("param", "#[payload]"))
           .put(LOCATION_KEY, buildLocation("test:processor"))
@@ -1808,6 +1815,18 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
       return event;
+    }
+
+    @Override
+    public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+      return from(publisher)
+          .handle(nullSafeMap(checkedFunction(this::process)))
+          .subscriberContext(ctx -> {
+            if (useMockInterceptor) {
+              assertThat(ctx.getOrDefault(WITHIN_PROCESS_TO_APPLY, false), is(true));
+            }
+            return ctx;
+          });
     }
 
     @Override

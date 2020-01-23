@@ -29,6 +29,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
 
+import reactor.util.context.Context;
+
 /**
  * Implementation of {@link InterceptionAction} that does the needed hooks with {@code Reactor} into the pipeline.
  *
@@ -42,12 +44,14 @@ class ReactiveInterceptionAction implements InterceptionAction {
 
   private final Processor processor;
   private final ReactiveProcessor next;
+  private final Context ctx;
   private final DefaultInterceptionEvent interceptionEvent;
 
   public ReactiveInterceptionAction(DefaultInterceptionEvent interceptionEvent,
-                                    ReactiveProcessor next, Processor processor, ErrorTypeLocator errorTypeLocator) {
+                                    ReactiveProcessor next, Context ctx, Processor processor, ErrorTypeLocator errorTypeLocator) {
     this.interceptionEvent = interceptionEvent;
     this.next = next;
+    this.ctx = ctx;
     this.processor = processor;
     this.errorTypeLocator = errorTypeLocator;
   }
@@ -64,6 +68,7 @@ class ReactiveInterceptionAction implements InterceptionAction {
         .cast(InternalEvent.class)
         .map(interceptionEvent::reset)
         .cast(InterceptionEvent.class)
+        .subscriberContext(ctx)
         .toFuture();
   }
 

@@ -52,7 +52,7 @@ public interface Processor extends ReactiveProcessor {
    */
   @Override
   default Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return from(publisher).handle(nullSafeMap(checkedFunction(event -> process(event))));
+    return from(publisher).handle(nullSafeMap(checkedFunction(this::process)));
   }
 
 }

@@ -17,9 +17,11 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNO
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_PARAMS;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
+import static reactor.core.publisher.Mono.just;
+import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -94,19 +96,22 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
     if (implementsBeforeOrAfter(interceptor)) {
       LOGGER.debug("Configuring interceptor '{}' before and after processor '{}'...", interceptor,
                    componentLocation.getLocation());
-      return publisher -> from(publisher)
-          .concatMap(event -> just(event)
-              .cast(InternalEvent.class)
-              .map(doBefore(interceptor, (Component) component, dslParameters))
-              .cast(CoreEvent.class)
-              .transform(next)
-              .onErrorMap(MessagingException.class,
-                          error -> createMessagingException(doAfter(interceptor, (Component) component, of(error.getCause()))
-                              .apply((InternalEvent) error.getEvent()),
-                                                            error.getCause(), (Component) component, of(error)))
-              .cast(InternalEvent.class)
-              .map(doAfter(interceptor, (Component) component, empty()))
-              .onErrorStop());
+
+      return publisher -> subscriberContext()
+          .flatMapMany(ctx -> from(publisher)
+              .flatMap(event -> just(event)
+                  .cast(InternalEvent.class)
+                  .map(doBefore(interceptor, (Component) component, dslParameters))
+                  .cast(CoreEvent.class)
+                  .transform(next)
+                  .onErrorMap(MessagingException.class,
+                              error -> createMessagingException(doAfter(interceptor, (Component) component, of(error.getCause()))
+                                  .apply((InternalEvent) error.getEvent()),
+                                                                error.getCause(), (Component) component, of(error)))
+                  .cast(InternalEvent.class)
+                  .map(doAfter(interceptor, (Component) component, empty()))
+                  .subscriberContext(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true))
+                  .onErrorStop()));
     } else {
       return next;
     }
