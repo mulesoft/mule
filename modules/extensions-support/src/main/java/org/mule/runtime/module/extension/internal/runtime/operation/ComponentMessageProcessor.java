@@ -318,8 +318,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                 .doAfterTerminate(this::outerPublisherTerminated)
                 .doOnSubscribe(s -> outerPublisherSubscribedTo());
           } else {
-            // Certain features (ext client, batch, flow runner) use Mono, so we don't want to dispose the inner stuff after the
-            // first event comes through
+            // Certain features (ext client, batch, flow runner, interception-api) use Mono, so we don't want to dispose the inner
+            // stuff after the first event comes through
             return transformed;
           }
         });

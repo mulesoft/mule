@@ -246,7 +246,8 @@ public class MessageProcessors {
         })
         .switchIfEmpty(from(((BaseEventContext) event.getContext()).getResponsePublisher()))
         .doOnSuccess(completeSuccessIfNeeded((event.getContext()), true))
-        .doOnError(completeErrorIfNeeded((event.getContext()), true));
+        .doOnError(completeErrorIfNeeded((event.getContext()), true))
+        .subscriberContext(ctx -> ctx.put(WITHIN_PROCESS_TO_APPLY, true));
   }
 
   /**

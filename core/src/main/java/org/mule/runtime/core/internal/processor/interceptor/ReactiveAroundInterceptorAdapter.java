@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromFuture;
+import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -31,6 +32,8 @@ import java.util.concurrent.CompletionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import reactor.util.context.Context;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s
@@ -54,10 +57,13 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
                                       ProcessorInterceptor interceptor, Map<String, String> dslParameters) {
     if (implementsAround(interceptor)) {
       LOGGER.debug("Configuring interceptor '{}' around processor '{}'...", interceptor, componentLocation.getLocation());
-      return publisher -> from(publisher)
-          .cast(InternalEvent.class)
-          .flatMap(event -> fromFuture(doAround(event, interceptor, component, dslParameters, next))
-              .onErrorMap(CompletionException.class, completionException -> completionException.getCause()));
+
+      return publisher -> subscriberContext()
+          .flatMapMany(ctx -> from(publisher)
+              .cast(InternalEvent.class)
+              .flatMap(event -> fromFuture(doAround(event, interceptor, component, dslParameters, next, ctx))
+                  .onErrorMap(CompletionException.class,
+                              completionException -> completionException.getCause())));
     } else {
       return next;
     }
@@ -75,12 +81,12 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
 
   private CompletableFuture<InternalEvent> doAround(InternalEvent event, ProcessorInterceptor interceptor,
                                                     Processor component, Map<String, String> dslParameters,
-                                                    ReactiveProcessor next) {
+                                                    ReactiveProcessor next, Context ctx) {
     final InternalEvent eventWithResolvedParams = addResolvedParameters(event, (Component) component, dslParameters);
 
     DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
     final ReactiveInterceptionAction reactiveInterceptionAction =
-        new ReactiveInterceptionAction(interceptionEvent, next, component, errorTypeLocator);
+        new ReactiveInterceptionAction(interceptionEvent, next, ctx, component, errorTypeLocator);
 
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Calling around() for '{}' in processor '{}'...", interceptor,
