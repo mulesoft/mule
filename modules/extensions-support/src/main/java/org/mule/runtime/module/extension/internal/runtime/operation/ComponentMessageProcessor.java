@@ -48,6 +48,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -70,7 +71,9 @@ import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
+import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
@@ -281,7 +284,15 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
    */
   private Publisher<CoreEvent> doProcessWithErrorMapping(CoreEvent operationEvent, ExecutionContextAdapter<T> operationContext) {
     return doProcess(operationEvent, operationContext)
-        .onErrorMap(e -> !(e instanceof MessagingException), e -> new MessagingException(operationEvent, e, this));
+        .onErrorMap(e -> !(e instanceof MessagingException),
+                    e -> {
+                      MessagingException ex = new MessagingException(operationEvent, e, this);
+                      if (e instanceof TypedException) {
+                        return new MessagingExceptionResolver(this).resolve(ex, operationContext.getMuleContext());
+                      } else {
+                        return ex;
+                      }
+                    });
   }
 
   private PrecalculatedExecutionContextAdapter<T> getPrecalculatedContext(CoreEvent event) {
