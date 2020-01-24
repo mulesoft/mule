@@ -41,7 +41,8 @@ public class DefaultFlowCallStack implements FlowCallStack {
   }
 
   private DefaultFlowCallStack(final Deque<FlowStackElement> innerStack) {
-    this.innerStack = new ArrayDeque<>(innerStack);
+    // this.innerStack = new ArrayDeque<>(innerStack);
+    this.innerStack = ((ArrayDeque) innerStack).clone();
   }
 
   /**
@@ -74,7 +75,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
   public void setCurrentProcessorPath(String processorPath) {
     if (!innerStack.isEmpty()) {
       synchronized (innerStack) {
-        innerStack.push(new FlowStackElement(innerStack.pop().getFlowName(), processorPath));
+        innerStack.peek().setProcessorPath(processorPath);
       }
     }
   }

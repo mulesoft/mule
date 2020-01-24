@@ -114,6 +114,13 @@ public class ModuleExceptionHandler {
   }
 
   private Throwable getExceptionCause(Throwable throwable) {
-    return throwable.getClass().equals(ModuleException.class) ? throwable.getCause() : throwable;
+    // For subclasses of ModuleException, we use it as it already contains additional information
+    if (throwable.getClass().equals(ModuleException.class)) {
+      return throwable.getCause() != null
+          ? throwable.getCause()
+          : new MuleRuntimeException(createStaticMessage(throwable.getMessage()));
+    } else {
+      return throwable;
+    }
   }
 }

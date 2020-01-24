@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.internal.util;
 
+import static java.util.Optional.of;
 import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionsAsList;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
@@ -35,6 +36,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.FlowExecutionException;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -102,15 +104,17 @@ public class MessagingExceptionResolver {
   }
 
   private CoreEvent resolveEvent(final MessagingException me, Throwable root, ErrorType errorType) {
-    if (!me.getEvent()
-        .getError()
-        .map(e -> e.getErrorType().equals(errorType) && e.getCause() == root)
-        .orElse(false)) {
-      return quickCopy(builder(getMessagingExceptionCause(root)).errorType(errorType)
-          .build(), me.getEvent());
-    } else {
-      return me.getEvent();
-    }
+    final Throwable messagingExceptionCause = getMessagingExceptionCause(root);
+    // if (!me.getEvent()
+    // .getError()
+    // .map(e -> e.getErrorType().equals(errorType)
+    // && e.getCause() == root)
+    // .orElse(false)) {
+    return quickCopy(builder(messagingExceptionCause).errorType(errorType)
+        .build(), me.getEvent());
+    // } else {
+    // return me.getEvent();
+    // }
   }
 
   private ErrorType resolveErrorType(ErrorType rootErrorType) {
@@ -140,6 +144,11 @@ public class MessagingExceptionResolver {
     if (errors.isEmpty()) {
       return collectCritical(obj, me, locator).stream().findFirst();
     }
+
+    if (errors.size() == 1) {
+      return of(errors.get(0));
+    }
+
     // We look if there is a more specific error in the chain that matches with the root error (is child or has the same error)
     SingleErrorTypeMatcher matcher = new SingleErrorTypeMatcher(errors.get(errors.size() - 1).getSecond());
 
@@ -149,12 +158,12 @@ public class MessagingExceptionResolver {
   }
 
   private List<Pair<Throwable, ErrorType>> collectErrors(Component obj, MessagingException me, ErrorTypeLocator locator) {
-    List<Pair<Throwable, ErrorType>> errors = new LinkedList<>();
+    List<Pair<Throwable, ErrorType>> errors = new ArrayList<>(4);
     final List<Throwable> exceptionsAsList = getExceptionsAsList(me);
     for (Throwable e : exceptionsAsList) {
       ErrorType type = errorTypeFromException(obj, locator, e);
       if (!isUnknownMuleError(type) && !isCriticalMuleError(type)) {
-        errors.add(0, new Pair<>(e, type));
+        errors.add(new Pair<>(e, type));
       }
     }
     return errors;
@@ -166,7 +175,7 @@ public class MessagingExceptionResolver {
     for (Throwable e : exceptionsAsList) {
       ErrorType type = errorTypeFromException(obj, locator, e);
       if (isCriticalMuleError(type)) {
-        errors.add(new Pair<>(e, type));
+        errors.add(0, new Pair<>(e, type));
       }
     }
     return errors;

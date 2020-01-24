@@ -20,10 +20,8 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
 /**
@@ -190,15 +188,13 @@ public class ExceptionUtils {
       return empty();
     }
 
-    Set<Throwable> causes = new HashSet<>();
-
-    for (throwable = throwable.getCause(); throwable != null; throwable = throwable.getCause()) {
-      if (!causes.add(throwable)) {
+    for (Throwable cause = throwable.getCause(); cause != null; cause = cause.getCause()) {
+      if (cause == throwable) {
         return empty();
       }
 
-      if (throwableType.isInstance(throwable)) {
-        return of((T) throwable);
+      if (throwableType.isInstance(cause)) {
+        return of((T) cause);
       }
     }
 

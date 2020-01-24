@@ -20,7 +20,7 @@ public final class FlowStackElement implements Serializable {
   private static final long serialVersionUID = -2372094725681872367L;
 
   private final String flowName;
-  private final String processorPath;
+  private String processorPath;
   private final long creationTime;
 
   public FlowStackElement(String flowName, String processorPath) {
@@ -34,6 +34,10 @@ public final class FlowStackElement implements Serializable {
    */
   public String getProcessorPath() {
     return processorPath;
+  }
+
+  public void setProcessorPath(String processorPath) {
+    this.processorPath = processorPath;
   }
 
   /**
