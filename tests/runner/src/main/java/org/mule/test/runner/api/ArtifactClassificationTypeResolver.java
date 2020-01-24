@@ -12,6 +12,8 @@ import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescrip
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
+import static org.mule.test.runner.api.ArtifactClassificationType.SERVICE;
+
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
@@ -35,8 +37,8 @@ public class ArtifactClassificationTypeResolver {
 
   private static final String MULE_EXTENSION_CLASSIFIER = "mule-extension";
   private static final String MULE_MODULE_PROPERTIES = "META-INF/mule-module.properties";
-  private static final String PLUGIN_PROPERTIES = "plugin.properties";
   private static final String JAR_EXTENSION = "jar";
+  private static final String MULE_SERVICE_CLASSIFIER = "mule-service";
 
   private DependencyResolver dependencyResolver;
 
@@ -59,6 +61,9 @@ public class ArtifactClassificationTypeResolver {
    */
   public ArtifactClassificationType resolveArtifactClassificationType(Artifact artifact) {
     try (URLClassLoader artifactClassLoader = createArtifactClassLoader(artifact)) {
+      if (isMuleService(artifact)) {
+        return SERVICE;
+      }
       if (isMulePlugin(artifact)) {
         return PLUGIN;
       }
@@ -79,6 +84,14 @@ public class ArtifactClassificationTypeResolver {
    */
   private boolean isMulePlugin(Artifact artifact) {
     return artifact.getExtension().equals(MULE_PLUGIN_CLASSIFIER) || artifact.getExtension().equals(MULE_EXTENSION_CLASSIFIER);
+  }
+
+  /**
+   * @param artifact {@link Artifact} to check if it is a service.
+   * @return true if it is classified as {@value MULE_SERVICE_CLASSIFIER}
+   */
+  private boolean isMuleService(Artifact artifact) {
+    return artifact.getExtension().equals(MULE_SERVICE_CLASSIFIER);
   }
 
   /**
