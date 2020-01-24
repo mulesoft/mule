@@ -135,6 +135,7 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
   public String getEnvironmentId() {
     return environmentId;
   }
+
   public Charset getEncoding() {
     return encoding;
   }
