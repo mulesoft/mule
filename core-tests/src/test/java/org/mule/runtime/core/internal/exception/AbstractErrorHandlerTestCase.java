@@ -8,11 +8,13 @@ package org.mule.runtime.core.internal.exception;
 
 import static java.util.Arrays.asList;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.exception.MuleExceptionInfo;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -59,6 +61,8 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
 
     context = create(flow, TEST_CONNECTOR_LOCATION);
     muleEvent = InternalEvent.builder(context).message(of("")).build();
+
+    when(mockException.getExceptionInfo()).thenReturn(new MuleExceptionInfo());
   }
 
   @After

@@ -57,7 +57,6 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
 
   protected MuleContext muleContext = mockContextWithServices();
   private static final String DEFAULT_LOG_MESSAGE = "LOG";
-  private static final int DEFAULT_TIMEOUT = 5;
 
   @Rule
   public ExpectedException expectedException = none();

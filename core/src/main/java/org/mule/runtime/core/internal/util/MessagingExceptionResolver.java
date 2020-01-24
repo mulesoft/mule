@@ -8,7 +8,6 @@
 package org.mule.runtime.core.internal.util;
 
 import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionsAsList;
-import static org.mule.runtime.api.exception.MuleException.INFO_ALREADY_LOGGED_KEY;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
@@ -79,9 +78,42 @@ public class MessagingExceptionResolver {
     }
 
     Throwable root = rootCause.get().getFirst();
-    ErrorType rootErrorType = rootCause.get().getSecond();
     Component failingComponent = getFailingProcessor(me, root).orElse(component);
 
+    CoreEvent event = resolveEvent(me, root, resolveErrorType(rootCause.get().getSecond()));
+    MessagingException result = resolveResultException(me, root, failingComponent, event);
+
+    propagateAlreadyLogged(me, result);
+    return enrich(result, failingComponent, component, event, exceptionContextProviders);
+  }
+
+  private MessagingException resolveResultException(final MessagingException me, Throwable root, Component failingComponent,
+                                                    CoreEvent event) {
+    MessagingException result;
+    if (root instanceof MessagingException) {
+      ((MessagingException) root).setProcessedEvent(event);
+      result = ((MessagingException) root);
+    } else {
+      result = me instanceof FlowExecutionException
+          ? new FlowExecutionException(event, root, failingComponent)
+          : new MessagingException(event, root, failingComponent);
+    }
+    return result;
+  }
+
+  private CoreEvent resolveEvent(final MessagingException me, Throwable root, ErrorType errorType) {
+    if (!me.getEvent()
+        .getError()
+        .map(e -> e.getErrorType().equals(errorType) && e.getCause() == root)
+        .orElse(false)) {
+      return quickCopy(builder(getMessagingExceptionCause(root)).errorType(errorType)
+          .build(), me.getEvent());
+    } else {
+      return me.getEvent();
+    }
+  }
+
+  private ErrorType resolveErrorType(ErrorType rootErrorType) {
     ErrorType errorType = rootErrorType;
     if (component instanceof ErrorMappingsAware) {
       if (((ErrorMappingsAware) component).getErrorMappings().isEmpty()) {
@@ -95,25 +127,11 @@ public class MessagingExceptionResolver {
             .orElse(rootErrorType);
       }
     }
-
-    CoreEvent event = quickCopy(builder(getMessagingExceptionCause(root)).errorType(errorType).build(), me.getEvent());
-
-    MessagingException result;
-    if (root instanceof MessagingException) {
-      ((MessagingException) root).setProcessedEvent(event);
-      result = ((MessagingException) root);
-    } else {
-      result = me instanceof FlowExecutionException ? new FlowExecutionException(event, root, failingComponent)
-          : new MessagingException(event, root, failingComponent);
-    }
-    propagateAlreadyLogged(me, result);
-    return enrich(result, failingComponent, component, event, exceptionContextProviders);
+    return errorType;
   }
 
   private void propagateAlreadyLogged(MessagingException origin, MuleException result) {
-    if (origin.getInfo().containsKey(INFO_ALREADY_LOGGED_KEY)) {
-      result.addInfo(INFO_ALREADY_LOGGED_KEY, origin.getInfo().get(INFO_ALREADY_LOGGED_KEY));
-    }
+    result.getExceptionInfo().setAlreadyLogged(origin.getExceptionInfo().isAlreadyLogged());
   }
 
   private Optional<Pair<Throwable, ErrorType>> findRoot(Component obj, MessagingException me, ErrorTypeLocator locator) {
