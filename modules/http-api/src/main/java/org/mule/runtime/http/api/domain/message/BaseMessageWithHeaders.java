@@ -23,7 +23,9 @@ public abstract class BaseMessageWithHeaders implements MessageWithHeaders {
   protected CaseInsensitiveMultiMap headers;
 
   public BaseMessageWithHeaders(MultiMap<String, String> headers) {
-    this.headers = fromMultiMap(headers);
+    if (headers != null) {
+      this.headers = fromMultiMap(headers);
+    }
   }
 
   @Override
