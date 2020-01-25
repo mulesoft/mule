@@ -280,8 +280,8 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     InOrder inOrder = inOrder(sink, processor, processingStrategy);
 
     inOrder.verify((Startable) processingStrategy).start();
-    inOrder.verify(processingStrategy).createSink(any(FlowConstruct.class), any(ReactiveProcessor.class));
     inOrder.verify((Startable) processor).start();
+    inOrder.verify(processingStrategy).createSink(any(FlowConstruct.class), any(ReactiveProcessor.class));
 
     flow.stop();
 
@@ -316,8 +316,8 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
 
     inOrder.verify((Startable) processingStrategy).start();
     inOrder.verify((Startable) errorHandler).start();
-    inOrder.verify(processingStrategy).createSink(any(FlowConstruct.class), any(ReactiveProcessor.class));
     inOrder.verify((Startable) processor).start();
+    inOrder.verify(processingStrategy).createSink(any(FlowConstruct.class), any(ReactiveProcessor.class));
 
     flow.stop();
 

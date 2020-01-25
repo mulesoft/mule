@@ -181,6 +181,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   @Override
   public void start() throws MuleException {
     startIfNeeded(processingStrategy);
+    startIfNeeded(delegate);
 
     sink = processingStrategy
         .createSink(getFromAnnotatedObject(componentLocator, this).filter(c -> c instanceof FlowConstruct).orElse(null),
@@ -193,18 +194,17 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         : schedulerService.cpuLightScheduler(schedulerConfig));
 
     startIfNeeded(backpressureHandler);
-    startIfNeeded(delegate);
     super.start();
   }
 
   @Override
   public void stop() throws MuleException {
     super.stop();
-    stopIfNeeded(delegate);
 
     safely(() -> stopIfNeeded(backpressureHandler));
     disposeIfNeeded(sink, logger);
     sink = null;
+    stopIfNeeded(delegate);
 
     if (reactorScheduler != null) {
       reactorScheduler.dispose();

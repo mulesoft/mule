@@ -80,7 +80,7 @@ class UntilSuccessfulRouter {
   private final Flux<CoreEvent> downstreamFlux;
   private final FluxSinkRecorder<CoreEvent> innerRecorder = new FluxSinkRecorder<>();
   private final FluxSinkRecorder<Either<Throwable, CoreEvent>> downstreamRecorder = new FluxSinkRecorder<>();
-  private final AtomicReference<Context> downstreamCtxReference = new AtomicReference(empty());
+  private final AtomicReference<Context> downstreamCtxReference = new AtomicReference<>(empty());
 
   // Retry settings, such as the maximum number of retries, and the delay between them
   // are managed by suppliers. By doing this, the implementations remains agnostic of whether

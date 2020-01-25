@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Long.MIN_VALUE;
-import static java.lang.System.currentTimeMillis;
 import static java.lang.System.nanoTime;
 import static java.lang.Thread.currentThread;
 import static java.time.Duration.ofMillis;
@@ -177,9 +176,9 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
         ReactorSink<CoreEvent> sink =
             new DefaultReactorSink<>(processor.sink(BUFFER),
-                                     () -> {
+                                     prepareDisposeTimestamp -> {
                                        awaitSubscribersCompletion(flowConstruct, shutdownTimeout, completionLatch,
-                                                                  currentTimeMillis());
+                                                                  prepareDisposeTimestamp);
                                        stopSchedulersIfNeeded();
                                      },
                                      onEventConsumer, bufferQueueSize);
@@ -318,7 +317,13 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       }
 
       @Override
+      public void prepareDispose() {
+        fluxSinks.stream().forEach(sink -> sink.prepareDispose());
+      }
+
+      @Override
       public void dispose() {
+        fluxSinks.stream().forEach(sink -> sink.prepareDispose());
         fluxSinks.stream().forEach(sink -> sink.dispose());
       }
 

@@ -20,6 +20,7 @@ import static org.mule.runtime.core.api.construct.BackPressureReason.EVENTS_ACCU
 import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
 import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
 import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
@@ -52,7 +53,6 @@ import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.exception.Errors;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
@@ -147,8 +147,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     processingStrategy = this.processingStrategyFactory.create(muleContext, getName());
     backpressureStrategySelector = new BackPressureStrategySelector(this);
-    FLOW_BACKPRESSURE_ERROR_TYPE = muleContext.getErrorTypeRepository()
-        .getErrorType(Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE).get();
+    FLOW_BACKPRESSURE_ERROR_TYPE = muleContext.getErrorTypeRepository().getErrorType(FLOW_BACK_PRESSURE).get();
   }
 
   /**
@@ -281,14 +280,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected Function<Publisher<CoreEvent>, Publisher<CoreEvent>> routeThroughProcessingStrategyTransformer() {
     FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder = new FluxSinkRecorder<>();
 
-    return eventPub -> propagateCompletion(eventPub,
-                                           create(sinkRecorder)
-                                               .map(result -> {
-                                                 result.applyLeft(t -> {
-                                                   throw propagate(t);
-                                                 });
-                                                 return result.getRight();
-                                               }),
+    return pub -> from(propagateCompletion(pub,
+                                           create(sinkRecorder),
                                            innerEventPub -> from(innerEventPub)
                                                .doOnNext(event -> {
                                                  // Retrieve response publisher before error is communicated
@@ -311,10 +304,17 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                                                // ProactorStreamProcessingStrategy. See MULE-16988.
                                                .doOnNext(getSource() == null || getSource().getBackPressureStrategy() == WAIT
                                                    ? event -> sink.accept(event)
-                                                   : event -> sinkEmit(event)),
+                                                   : event -> sinkEmit(event))
+                                               .map(e -> Either.empty()),
                                            () -> sinkRecorder.complete(), t -> sinkRecorder.error(t),
                                            muleContext.getConfiguration().getShutdownTimeout(),
-                                           completionCallbackScheduler);
+                                           completionCallbackScheduler))
+                                               .map(result -> {
+                                                 result.applyLeft(t -> {
+                                                   throw propagate(t);
+                                                 });
+                                                 return result.getRight();
+                                               });
   }
 
   /**
@@ -449,8 +449,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected void doStart() throws MuleException {
     super.doStart();
     try {
-      sink = processingStrategy.createSink(this, processFlowFunction());
+      // Each component in the chain must be started before `apply` is called on them, ...
       startIfStartable(pipeline);
+      // ... which happens when the sink is created
+      sink = processingStrategy.createSink(this, processFlowFunction());
     } catch (Exception e) {
       stopOnFailure(e);
       return;
@@ -513,10 +515,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     stopSafely(() -> stopIfStoppable(source));
     canProcessMessage = false;
 
-    if (completionCallbackScheduler != null) {
-      completionCallbackScheduler.stop();
-    }
-
     stopSafely(() -> disposeIfDisposable(sink));
     sink = null;
     stopIfStoppable(pipeline);
@@ -526,6 +524,11 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   @Override
   protected void doStopProcessingStrategy() throws MuleException {
     stopIfStoppable(processingStrategy);
+
+    if (completionCallbackScheduler != null) {
+      completionCallbackScheduler.stop();
+    }
+
     super.doStopProcessingStrategy();
   }
 
