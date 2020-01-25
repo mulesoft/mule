@@ -11,10 +11,13 @@ import static java.lang.Integer.getInteger;
 import static java.lang.Integer.max;
 import static java.lang.Long.max;
 import static java.lang.Runtime.getRuntime;
+import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+import static java.lang.System.getProperty;
 import static java.lang.Thread.currentThread;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_PESSIMISTIC_DISPOSE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.util.concurrent.Queues.isPowerOfTwo;
@@ -128,13 +131,24 @@ public abstract class AbstractStreamProcessingStrategyFactory extends AbstractPr
                                               CountDownLatch completionLatch, long startMillis) {
       try {
         if (!completionLatch.await(max(startMillis - currentTimeMillis() + shutdownTimeout, 0l), MILLISECONDS)) {
-          LOGGER.warn("Subscribers of ProcessingStrategy for flow '{}' not completed in {} ms", flowConstruct.getName(),
-                      shutdownTimeout);
+          if (getProperty(MULE_LIFECYCLE_PESSIMISTIC_DISPOSE) != null) {
+            throw new IllegalStateException(format("Subscribers of ProcessingStrategy for flow '%s' not completed in %d ms",
+                                                   flowConstruct.getName(),
+                                                   shutdownTimeout));
+          } else {
+            LOGGER.warn("Subscribers of ProcessingStrategy for flow '{}' not completed in {} ms", flowConstruct.getName(),
+                        shutdownTimeout);
+          }
         }
       } catch (InterruptedException e) {
-        LOGGER.warn("Subscribers of ProcessingStrategy for flow '{}' not completed before thread interruption",
-                    flowConstruct.getName());
         currentThread().interrupt();
+        if (getProperty(MULE_LIFECYCLE_PESSIMISTIC_DISPOSE) != null) {
+          throw new IllegalStateException(format("Subscribers of ProcessingStrategy for flow '%s' not completed before thread interruption",
+                                                 flowConstruct.getName()));
+        } else {
+          LOGGER.warn("Subscribers of ProcessingStrategy for flow '{}' not completed before thread interruption",
+                      flowConstruct.getName());
+        }
       }
     }
 

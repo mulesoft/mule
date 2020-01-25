@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.construct;
 
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+import static java.lang.System.getProperty;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.api.functional.Either.left;
@@ -16,6 +17,7 @@ import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createI
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_START;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_PESSIMISTIC_DISPOSE;
 import static org.mule.runtime.core.api.construct.BackPressureReason.EVENTS_ACCUMULATED;
 import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
 import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
@@ -492,10 +494,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     try {
       task.run();
     } catch (Exception e) {
-      LOGGER.warn(format(
-                         "Stopping pipeline '%s' due to error on starting, but another exception was also found while shutting down: %s",
-                         getName(), e.getMessage()),
-                  e);
+      if (getProperty(MULE_LIFECYCLE_PESSIMISTIC_DISPOSE) != null) {
+        throw e;
+      } else {
+        LOGGER.warn(format(
+                           "Stopping pipeline '%s' due to error on starting, but another exception was also found while shutting down: %s",
+                           getName(), e.getMessage()),
+                    e);
+      }
     }
   }
 

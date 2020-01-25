@@ -151,7 +151,6 @@ public interface AllureConstants {
       String SUPPORT_FUNCTIONS = "Support Functions";
       String SUPPORT_MVEL_DW = "Support both MVEL and DW";
     }
-
   }
 
   interface ExtensionsClientFeature {
@@ -163,9 +162,7 @@ public interface AllureConstants {
       String BLOCKING_CLIENT = "Blocking Client";
       String NON_BLOCKING_CLIENT = "Non-Blocking Client";
     }
-
   }
-
 
   interface FileFeature {
 
@@ -191,7 +188,6 @@ public interface AllureConstants {
       String LOGGER = "Logger";
 
     }
-
   }
 
   interface FtpFeature {
@@ -466,9 +462,13 @@ public interface AllureConstants {
 
     interface ArtifactObjectsDependencyInjectionStory {
 
-      String ARTIFACT_OBJECTS_DEPENDENCY_INJECTION_STORY = "Artifact Objects Dependency injection Store";
+      String ARTIFACT_OBJECTS_DEPENDENCY_INJECTION_STORY = "Artifact Objects Dependency injection";
     }
 
+    interface GracefulShutdownStory {
+
+      String GRACEFUL_SHUTDOWN_STORY = "Graceful shutdown";
+    }
   }
 
   interface TransactionFeature {

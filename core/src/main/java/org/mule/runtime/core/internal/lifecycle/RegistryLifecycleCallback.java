@@ -7,10 +7,13 @@
 package org.mule.runtime.core.internal.lifecycle;
 
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.exception.ExceptionHelper.unwrap;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_PESSIMISTIC_DISPOSE;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -105,7 +108,8 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
       }
     } catch (Exception e) {
       interceptor.afterPhaseExecution(phase, target, of(e));
-      if (phase.getName().equals(Disposable.PHASE_NAME) || phase.getName().equals(Stoppable.PHASE_NAME)) {
+      if (getProperty(MULE_LIFECYCLE_PESSIMISTIC_DISPOSE) == null
+          && (phase.getName().equals(Disposable.PHASE_NAME) || phase.getName().equals(Stoppable.PHASE_NAME))) {
         LOGGER.info(format("Failure executing phase %s over object %s, error message is: %s", phase.getName(), target,
                            e.getMessage()),
                     e.getMessage());
