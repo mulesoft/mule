@@ -38,7 +38,7 @@ public class FlowTraceUtils {
     public CoreEvent process(CoreEvent event) throws MuleException {
       eventContextService.getCurrentlyActiveFlowStacks().stream()
           .filter(fsde -> fsde.getEventId().equals(event.getContext().getId())).findAny()
-          .ifPresent(dumpEntry -> stackToAssert = dumpEntry.getFlowCallStack());
+          .ifPresent(dumpEntry -> stackToAssert = dumpEntry.getFlowCallStack().clone());
 
       return event;
     }
