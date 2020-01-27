@@ -17,7 +17,7 @@ import static java.lang.System.getProperty;
 import static java.lang.Thread.currentThread;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_PESSIMISTIC_DISPOSE;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.util.concurrent.Queues.isPowerOfTwo;
@@ -131,7 +131,7 @@ public abstract class AbstractStreamProcessingStrategyFactory extends AbstractPr
                                               CountDownLatch completionLatch, long startMillis) {
       try {
         if (!completionLatch.await(max(startMillis - currentTimeMillis() + shutdownTimeout, 0l), MILLISECONDS)) {
-          if (getProperty(MULE_LIFECYCLE_PESSIMISTIC_DISPOSE) != null) {
+          if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
             throw new IllegalStateException(format("Subscribers of ProcessingStrategy for flow '%s' not completed in %d ms",
                                                    flowConstruct.getName(),
                                                    shutdownTimeout));
@@ -142,7 +142,7 @@ public abstract class AbstractStreamProcessingStrategyFactory extends AbstractPr
         }
       } catch (InterruptedException e) {
         currentThread().interrupt();
-        if (getProperty(MULE_LIFECYCLE_PESSIMISTIC_DISPOSE) != null) {
+        if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
           throw new IllegalStateException(format("Subscribers of ProcessingStrategy for flow '%s' not completed before thread interruption",
                                                  flowConstruct.getName()));
         } else {
