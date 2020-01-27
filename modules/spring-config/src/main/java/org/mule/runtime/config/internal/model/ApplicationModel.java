@@ -529,11 +529,8 @@ public class ApplicationModel implements ArtifactAst {
                                                                        OptionalInt.of(configLine.getLineNumber()),
                                                                        OptionalInt.of(configLine.getStartColumn()));
                   providerComponent.setAnnotations(ImmutableMap.<QName, Object>builder()
-                      .put(LOCATION_KEY,
-                           new DefaultComponentLocation(of(componentIdentifier.getName()),
-                                                        singletonList(locationPart)))
-
-                      // beanAnnotations.put(REPRESENTATION_ANNOTATION_KEY, resolveProcessorRepresentation(artifactId, "", null));
+                      .put(LOCATION_KEY, new DefaultComponentLocation(of(componentIdentifier.getName()),
+                                                                      singletonList(locationPart)))
                       .build());
                 }
                 configConfigurationPropertiesProviders.add(provider);

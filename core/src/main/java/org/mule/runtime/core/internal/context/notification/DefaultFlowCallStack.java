@@ -41,7 +41,6 @@ public class DefaultFlowCallStack implements FlowCallStack {
   }
 
   private DefaultFlowCallStack(final Deque<FlowStackElement> innerStack) {
-    // this.innerStack = new ArrayDeque<>(innerStack);
     this.innerStack = ((ArrayDeque) innerStack).clone();
   }
 

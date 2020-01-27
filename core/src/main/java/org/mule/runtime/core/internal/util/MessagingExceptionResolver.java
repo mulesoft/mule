@@ -104,17 +104,8 @@ public class MessagingExceptionResolver {
   }
 
   private CoreEvent resolveEvent(final MessagingException me, Throwable root, ErrorType errorType) {
-    final Throwable messagingExceptionCause = getMessagingExceptionCause(root);
-    // if (!me.getEvent()
-    // .getError()
-    // .map(e -> e.getErrorType().equals(errorType)
-    // && e.getCause() == root)
-    // .orElse(false)) {
-    return quickCopy(builder(messagingExceptionCause).errorType(errorType)
+    return quickCopy(builder(getMessagingExceptionCause(root)).errorType(errorType)
         .build(), me.getEvent());
-    // } else {
-    // return me.getEvent();
-    // }
   }
 
   private ErrorType resolveErrorType(ErrorType rootErrorType) {
