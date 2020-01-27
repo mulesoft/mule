@@ -143,43 +143,43 @@ public class CompositeOperationPolicy
   protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy lastPolicy) {
     FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder = new FluxSinkRecorder<>();
 
-    return from(propagateCompletion(from(eventPub), create(sinkRecorder)
-        .map(result -> {
-          result.applyLeft(t -> {
-            throw propagate(t);
+    return from(propagateCompletion(from(eventPub), create(sinkRecorder), pub -> from(pub)
+        .doOnNext(event -> {
+          OperationPolicyContext ctx = from(event);
+          OperationExecutionFunction operationExecutionFunction = ctx.getOperationExecutionFunction();
+
+          operationExecutionFunction.execute(resolveOperationParameters(event, ctx), event, new ExecutorCallback() {
+
+            @Override
+            public void complete(Object value) {
+              sinkRecorder.next(right(Throwable.class, (CoreEvent) value));
+            }
+
+            @Override
+            public void error(Throwable e) {
+              // if `sink.error` is called here, it will cancel the flux altogether. That's why an `Either` is used here, so
+              // the error can be propagated afterwards in a way consistent with our expected error handling.
+              sinkRecorder.next(left(mapError(e, event), CoreEvent.class));
+            }
+
+            private Throwable mapError(Throwable t, CoreEvent event) {
+              t = Exceptions.unwrap(t);
+              if (!(t instanceof MessagingException)) {
+                t = new MessagingException(event, t, operation);
+              }
+              return t;
+            }
           });
-          return result.getRight();
-        }), pub -> from(pub)
-            .doOnNext(event -> {
-              OperationPolicyContext ctx = from(event);
-              OperationExecutionFunction operationExecutionFunction = ctx.getOperationExecutionFunction();
-
-              operationExecutionFunction.execute(resolveOperationParameters(event, ctx), event, new ExecutorCallback() {
-
-                @Override
-                public void complete(Object value) {
-                  sinkRecorder.next(right(Throwable.class, (CoreEvent) value));
-                }
-
-                @Override
-                public void error(Throwable e) {
-                  // if `sink.error` is called here, it will cancel the flux altogether. That's why an `Either` is used here, so
-                  // the error can be propagated afterwards in a way consistent with our expected error handling.
-                  sinkRecorder.next(left(mapError(e, event), CoreEvent.class));
-                }
-
-                private Throwable mapError(Throwable t, CoreEvent event) {
-                  t = Exceptions.unwrap(t);
-                  if (!(t instanceof MessagingException)) {
-                    t = new MessagingException(event, t, operation);
-                  }
-                  return t;
-                }
-              });
-            }), sinkRecorder::complete, sinkRecorder::error,
+        })
+        .map(e -> Either.empty()), sinkRecorder::complete, sinkRecorder::error,
                                     shutdownTimeout,
                                     completionCallbackScheduler))
-                                        .doOnNext(response -> from(response)
+                                        .map(result -> {
+                                          result.applyLeft(t -> {
+                                            throw propagate(t);
+                                          });
+                                          return result.getRight();
+                                        }).doOnNext(response -> from(response)
                                             .setNextOperationResponse((InternalEvent) response));
   }
 

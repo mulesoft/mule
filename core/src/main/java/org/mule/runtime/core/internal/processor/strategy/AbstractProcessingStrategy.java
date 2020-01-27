@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static java.lang.System.currentTimeMillis;
 import static java.util.function.Function.identity;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.construct.BackPressureReason.EVENTS_ACCUMULATED;
@@ -110,6 +111,8 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategyAd
 
     E intoSink(CoreEvent event);
 
+    void prepareDispose();
+
   }
 
   /**
@@ -118,14 +121,16 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategyAd
   static class DefaultReactorSink<E> implements ReactorSink<E> {
 
     private final FluxSink<E> fluxSink;
-    private final reactor.core.Disposable disposable;
-    private final Consumer onEventConsumer;
+    private final Consumer<Long> disposer;
+    private final Consumer<CoreEvent> onEventConsumer;
     private final int bufferSize;
 
-    DefaultReactorSink(FluxSink<E> fluxSink, reactor.core.Disposable disposable,
+    private long prepareDisposeTimestamp = -1;
+
+    DefaultReactorSink(FluxSink<E> fluxSink, Consumer<Long> disposer,
                        Consumer<CoreEvent> onEventConsumer, int bufferSize) {
       this.fluxSink = fluxSink;
-      this.disposable = disposable;
+      this.disposer = disposer;
       this.onEventConsumer = onEventConsumer;
       this.bufferSize = bufferSize;
     }
@@ -168,9 +173,19 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategyAd
     }
 
     @Override
-    public final void dispose() {
+    public void prepareDispose() {
+      prepareDisposeTimestamp = currentTimeMillis();
       fluxSink.complete();
-      disposable.dispose();
+    }
+
+    @Override
+    public final void dispose() {
+      if (prepareDisposeTimestamp == -1) {
+        fluxSink.complete();
+        disposer.accept(currentTimeMillis());
+      } else {
+        disposer.accept(prepareDisposeTimestamp);
+      }
     }
 
   }

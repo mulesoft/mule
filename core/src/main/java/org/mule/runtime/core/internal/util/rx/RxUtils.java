@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.subscriberContext;
@@ -59,8 +60,8 @@ public class RxUtils {
    * In this method, A corresponds to <it>deferredSubscriber</it>; and B to <it>triggeringSubscriber</it>.
    *
    * @param triggeringSubscriber the {@link Flux} whose subscription will trigger the subscription of the
-   *                             <it>deferredSubscriber</it> {@link Flux}, on the same context as the former one.
-   * @param deferredSubscriber   the {@link Flux} whose subscription will be deferred
+   *        <it>deferredSubscriber</it> {@link Flux}, on the same context as the former one.
+   * @param deferredSubscriber the {@link Flux} whose subscription will be deferred
    * @return the triggeringSubscriber {@link Flux}, decorated with the callback that will perform this deferred subscription.
    * @since 4.3
    */
@@ -94,10 +95,18 @@ public class RxUtils {
    * @param delayedExecutor the executor that will delay the completion or cancellation propagation when there are pending items
    * @return an enriched downstream where items and events will be triggered according to the rules defined for this method.
    */
-  public static <T> Publisher<T> propagateCompletion(Publisher<T> upstream, Publisher<T> downstream,
-                                                     Function<Publisher<T>, Publisher<T>> transformer,
-                                                     CheckedRunnable completionCallback, CheckedConsumer<Throwable> errorCallback,
-                                                     long completionTimeoutMillis, ScheduledExecutorService delayedExecutor) {
+  public static <T, U> Publisher<T> propagateCompletion(Publisher<U> upstream, Publisher<T> downstream,
+                                                        Function<Publisher<U>, Publisher<T>> transformer,
+                                                        CheckedRunnable completionCallback,
+                                                        CheckedConsumer<Throwable> errorCallback,
+                                                        long completionTimeoutMillis, ScheduledExecutorService delayedExecutor) {
+    requireNonNull(upstream, "'upstream' must not be null");
+    requireNonNull(downstream, "'downstream' must not be null");
+    requireNonNull(transformer, "'transformer' must not be null");
+    requireNonNull(completionCallback, "'completionCallback' must not be null");
+    requireNonNull(errorCallback, "'errorCallback' must not be null");
+    requireNonNull(delayedExecutor, "'delayedExecutor' must not be null");
+
     AtomicInteger inflightCounter = new AtomicInteger(0);
     AtomicBoolean upstreamComplete = new AtomicBoolean(false);
     AtomicReference<Throwable> upstreamError = new AtomicReference<>();
@@ -174,7 +183,7 @@ public class RxUtils {
    * class-loaders.
    *
    * @param publisher the publisher to transform
-   * @param mapper    the mapper to map publisher items with
+   * @param mapper the mapper to map publisher items with
    * @return the transformed publisher
    * @since 4.3
    */
@@ -187,7 +196,7 @@ public class RxUtils {
    * {@link ReactiveProcessor} in other class-loaders.
    *
    * @param publisher the publisher to transform
-   * @param function  the function to apply to each event.
+   * @param function the function to apply to each event.
    * @param component the component that implements this functionality.
    * @return the transformed publisher
    * @since 4.3
@@ -202,7 +211,7 @@ public class RxUtils {
   /**
    * Creates a new {@link Publisher} that will emit the given {@code event}, publishing it on the given {@code executor}.
    *
-   * @param event    the {@link CoreEvent} to emit
+   * @param event the {@link CoreEvent} to emit
    * @param executor the thread pool where the event will be published.
    * @return the created publisher
    * @since 4.3
@@ -216,7 +225,7 @@ public class RxUtils {
    * through the given {@code configurer}.
    *
    * @param configurer a {@link Function} that receives the blank {@link Flux} and returns a configured one
-   * @param <T>        the Flux generic type
+   * @param <T> the Flux generic type
    * @return a {@link Supplier} that returns a new {@link FluxSink} each time.
    */
   public static <T> Supplier<FluxSink<T>> createFluxSupplier(Function<Flux<T>, Flux<?>> configurer) {
@@ -234,8 +243,8 @@ public class RxUtils {
    * given {@code configurer}.
    *
    * @param configurer a {@link Function} that receives the blank {@link Flux} and returns a configured one
-   * @param size       the round robin size
-   * @param <T>        the Flux generic type
+   * @param size the round robin size
+   * @param <T> the Flux generic type
    * @return a new {@link FluxSinkSupplier}
    */
   public static <T> FluxSinkSupplier<T> createRoundRobinFluxSupplier(Function<Flux<T>, Flux<?>> configurer, int size) {

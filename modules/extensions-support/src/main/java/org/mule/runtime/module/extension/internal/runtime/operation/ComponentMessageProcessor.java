@@ -256,61 +256,65 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         .flatMapMany(ctx -> {
           final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
-          Flux<CoreEvent> transformed = from(propagateCompletion(from(publisher), create(errorSwitchSinkSinkRef)
-              .doOnNext(result -> {
-                result.apply(me -> {
-                  final SdkInternalContext sdkCtx = from(((MessagingException) me).getEvent());
-                  if (sdkCtx != null) {
-                    sdkCtx.popContext();
-                  }
-                }, response -> {
-                  final SdkInternalContext sdkCtx = from(response);
-                  if (sdkCtx != null) {
-                    sdkCtx.popContext();
-                  }
-                });
+          Flux<CoreEvent> transformed = from(propagateCompletion(from(publisher), create(errorSwitchSinkSinkRef), pub -> from(pub)
+              .map(event -> {
+                try {
+                  return addContextToEvent(event, ctx);
+                } catch (MuleException t) {
+                  throw propagateWrappingFatal(localOperatorErrorHook.apply(t, event));
+                }
               })
-              .map(result -> {
-                return result.reduce(me -> {
-                  throw propagateWrappingFatal(me);
-                }, response -> response);
-              }), pub -> from(pub)
-                  .map(event -> {
-                    try {
-                      return addContextToEvent(event, ctx);
-                    } catch (MuleException t) {
-                      throw propagateWrappingFatal(localOperatorErrorHook.apply(t, event));
-                    }
-                  })
-                  .doOnNext(event -> {
-                    final ExecutorCallback executorCallback = new ExecutorCallback() {
+              .doOnNext(event -> {
+                final ExecutorCallback executorCallback = new ExecutorCallback() {
 
-                      @Override
-                      public void error(Throwable e) {
-                        // if `sink.error` is called here, it will cancel the flux altogether.
-                        // That's why an `Either` is used here,
-                        // so the error can be propagated afterwards in a way consistent with our expected error handling.
-                        errorSwitchSinkSinkRef.next(left(
-                                                         // Force the error mapper from the chain to be used.
-                                                         // When using Mono.create with sink.error, the error mapper from the
-                                                         // context is ignored, so it has to be explicitly used here.
-                                                         localOperatorErrorHook.apply(e, event), CoreEvent.class));
-                      }
+                  @Override
+                  public void error(Throwable e) {
+                    // if `sink.error` is called here, it will cancel the flux altogether.
+                    // That's why an `Either` is used here,
+                    // so the error can be propagated afterwards in a way consistent with our expected error handling.
+                    errorSwitchSinkSinkRef.next(left(
+                                                     // Force the error mapper from the chain to be used.
+                                                     // When using Mono.create with sink.error, the error mapper from the
+                                                     // context is ignored, so it has to be explicitly used here.
+                                                     localOperatorErrorHook.apply(e, event), CoreEvent.class));
+                  }
 
-                      @Override
-                      public void complete(Object value) {
-                        errorSwitchSinkSinkRef.next(right(Throwable.class, (CoreEvent) value));
-                      }
-                    };
+                  @Override
+                  public void complete(Object value) {
+                    errorSwitchSinkSinkRef.next(right(Throwable.class, (CoreEvent) value));
+                  }
+                };
 
-                    if (!async && from(event).isNoPolicyOperation()) {
-                      onEventSynchronous(event, executorCallback, ctx);
-                    } else {
-                      onEvent(event, executorCallback);
-                    }
-                  }), () -> errorSwitchSinkSinkRef.complete(), t -> errorSwitchSinkSinkRef.error(t),
+                if (!async && from(event).isNoPolicyOperation()) {
+                  onEventSynchronous(event, executorCallback, ctx);
+                } else {
+                  onEvent(event, executorCallback);
+                }
+              })
+              .map(e -> Either.empty()),
+                                                                 () -> errorSwitchSinkSinkRef.complete(),
+                                                                 t -> errorSwitchSinkSinkRef.error(t),
                                                                  muleContext.getConfiguration().getShutdownTimeout(),
-                                                                 outerFluxCompletionScheduler));
+                                                                 outerFluxCompletionScheduler))
+                                                                     .doOnNext(result -> {
+                                                                       result.apply(me -> {
+                                                                         final SdkInternalContext sdkCtx =
+                                                                             from(((MessagingException) me).getEvent());
+                                                                         if (sdkCtx != null) {
+                                                                           sdkCtx.popContext();
+                                                                         }
+                                                                       }, response -> {
+                                                                         final SdkInternalContext sdkCtx = from(response);
+                                                                         if (sdkCtx != null) {
+                                                                           sdkCtx.popContext();
+                                                                         }
+                                                                       });
+                                                                     })
+                                                                     .map(result -> {
+                                                                       return result.reduce(me -> {
+                                                                         throw propagateWrappingFatal(me);
+                                                                       }, response -> response);
+                                                                     });
 
           if (publisher instanceof Flux && !ctx.getOrEmpty(WITHIN_PROCESS_TO_APPLY).isPresent()) {
             return transformed
