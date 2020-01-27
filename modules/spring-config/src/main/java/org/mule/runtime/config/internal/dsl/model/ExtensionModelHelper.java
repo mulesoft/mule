@@ -418,6 +418,15 @@ public class ExtensionModelHelper {
         });
   }
 
+  public DslElementSyntax resolveDslElementModel(ParameterModel parameterModel, ComponentIdentifier componentIdentifier) {
+    Optional<ExtensionModel> optionalExtensionModel = lookupExtensionModelFor(componentIdentifier);
+    ExtensionModel extensionModel = optionalExtensionModel.orElseThrow(() -> new IllegalStateException("Extension Model in context not present for componentIdentifier: " + componentIdentifier));
+
+    final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(extensionModel);
+
+    return dslSyntaxResolver.resolve(parameterModel);
+  }
+
   public Map<ObjectType, Optional<DslElementSyntax>> resolveSubTypes(ObjectType type) {
     ImmutableMap.Builder<ObjectType, Optional<DslElementSyntax>> mapBuilder = ImmutableMap.builder();
     for (ObjectType subType : dslResolvingContext.getTypeCatalog().getSubTypes(type)) {
