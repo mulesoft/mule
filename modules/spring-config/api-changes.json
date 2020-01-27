@@ -1,4 +1,106 @@
 {
+  "4.3.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.field.nowFinal",
+          "old": "field org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY @ org.mule.runtime.config.api.dsl.ConfigurableObjectFactory<T>",
+          "new": "field org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY @ org.mule.runtime.config.api.dsl.ConfigurableObjectFactory<T>",
+          "oldModifiers": "public static",
+          "newModifiers": "public static final",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "ConfigurableObjectFactory",
+          "fieldName": "LOCATION_KEY",
+          "elementKind": "field",
+          "justification": "Value must be constant"
+        },
+        {
+          "code": "java.field.nowFinal",
+          "old": "field org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY @ org.mule.runtime.config.api.dsl.ConfigurableObjectFactory<T>",
+          "new": "field org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY @ org.mule.runtime.config.api.dsl.ConfigurableObjectFactory<T>",
+          "oldModifiers": "public static",
+          "newModifiers": "public static final",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "ConfigurableObjectFactory",
+          "fieldName": "ROOT_CONTAINER_NAME_KEY",
+          "elementKind": "field",
+          "justification": "Value must be constant"
+        },
+        {
+          "code": "java.field.nowFinal",
+          "old": "field org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY @ org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider",
+          "new": "field org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY @ org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider",
+          "oldModifiers": "public static",
+          "newModifiers": "public static final",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "DefaultConfigurationPropertiesProvider",
+          "fieldName": "LOCATION_KEY",
+          "elementKind": "field",
+          "justification": "Value must be constant"
+        },
+        {
+          "code": "java.field.nowFinal",
+          "old": "field org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY @ org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider",
+          "new": "field org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY @ org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider",
+          "oldModifiers": "public static",
+          "newModifiers": "public static final",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "DefaultConfigurationPropertiesProvider",
+          "fieldName": "ROOT_CONTAINER_NAME_KEY",
+          "elementKind": "field",
+          "justification": "Value must be constant"
+        },
+        {
+          "code": "java.field.nowFinal",
+          "old": "field org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY @ org.mule.runtime.config.api.factories.streaming.AbstractCursorProviderObjectFactory<T>",
+          "new": "field org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY @ org.mule.runtime.config.api.factories.streaming.AbstractCursorProviderObjectFactory<T>",
+          "oldModifiers": "public static",
+          "newModifiers": "public static final",
+          "package": "org.mule.runtime.config.api.factories.streaming",
+          "classSimpleName": "AbstractCursorProviderObjectFactory",
+          "fieldName": "LOCATION_KEY",
+          "elementKind": "field",
+          "justification": "Value must be constant"
+        },
+        {
+          "code": "java.field.nowFinal",
+          "old": "field org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY @ org.mule.runtime.config.api.factories.streaming.AbstractCursorProviderObjectFactory<T>",
+          "new": "field org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY @ org.mule.runtime.config.api.factories.streaming.AbstractCursorProviderObjectFactory<T>",
+          "oldModifiers": "public static",
+          "newModifiers": "public static final",
+          "package": "org.mule.runtime.config.api.factories.streaming",
+          "classSimpleName": "AbstractCursorProviderObjectFactory",
+          "fieldName": "ROOT_CONTAINER_NAME_KEY",
+          "elementKind": "field",
+          "justification": "Value must be constant"
+        },
+        {
+          "code": "java.field.nowFinal",
+          "old": "field org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY @ org.mule.runtime.config.privileged.dsl.processor.MessageProcessorChainFactoryBean",
+          "new": "field org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY @ org.mule.runtime.config.privileged.dsl.processor.MessageProcessorChainFactoryBean",
+          "oldModifiers": "public static",
+          "newModifiers": "public static final",
+          "package": "org.mule.runtime.config.privileged.dsl.processor",
+          "classSimpleName": "MessageProcessorChainFactoryBean",
+          "fieldName": "LOCATION_KEY",
+          "elementKind": "field",
+          "justification": "Value must be constant"
+        },
+        {
+          "code": "java.field.nowFinal",
+          "old": "field org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY @ org.mule.runtime.config.privileged.dsl.processor.MessageProcessorChainFactoryBean",
+          "new": "field org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY @ org.mule.runtime.config.privileged.dsl.processor.MessageProcessorChainFactoryBean",
+          "oldModifiers": "public static",
+          "newModifiers": "public static final",
+          "package": "org.mule.runtime.config.privileged.dsl.processor",
+          "classSimpleName": "MessageProcessorChainFactoryBean",
+          "fieldName": "ROOT_CONTAINER_NAME_KEY",
+          "elementKind": "field",
+          "justification": "Value must be constant"
+        }
+      ]
+    }
+  },
   "4.2.0": {
     "revapi": {
       "ignore": [
