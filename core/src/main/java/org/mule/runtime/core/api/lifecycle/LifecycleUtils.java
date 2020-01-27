@@ -7,7 +7,9 @@
 package org.mule.runtime.core.api.lifecycle;
 
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 
@@ -233,7 +235,11 @@ public class LifecycleUtils {
       try {
         ((Disposable) object).dispose();
       } catch (Exception e) {
-        logger.error("Exception found trying to dispose object. Shutdown will continue", e);
+        if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
+          throw e;
+        } else {
+          logger.error("Exception found trying to dispose object. Shutdown will continue", e);
+        }
       }
     }
   }
