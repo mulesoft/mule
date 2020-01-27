@@ -45,13 +45,13 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
    * @param sourceCode the source code representation of the element definition.
    * @param customAttributes the custom attributes of the element definition.
    *
-   * @deprecated Use {@link #addMetadataAnnotationsFromDocAttributes(Map, String, Map)} instead
+   * @deprecated Use {@link #addMetadataAnnotationsFromDocAttributes(String, Map, String, Map)} instead
    */
   @Deprecated
   public static void addMetadataAnnotationsFromXml(Map<QName, Object> beanAnnotations, String sourceCode,
                                                    Map<String, Object> customAttributes) {
     if (sourceCode != null) {
-      beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, sourceCode);
+      beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, maskPasswords(sourceCode));
     }
 
     String documentationName = (String) customAttributes
@@ -72,20 +72,17 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
    * @param beanAnnotations the map with annotations to populate
    * @param sourceCode the source code representation of the element definition.
    * @param docAttributes the doc attributes of the element definition.
+   * @deprecated Use {@link #addMetadataAnnotationsFromDocAttributes(String, Map, String, Map)} instead
    */
+  @Deprecated
   public static void addMetadataAnnotationsFromDocAttributes(Map<QName, Object> beanAnnotations, String sourceCode,
                                                              Map<String, String> docAttributes) {
     if (sourceCode != null) {
-      beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, sourceCode);
+      beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, maskPasswords(sourceCode));
     }
 
     beanAnnotations.putAll(docAttributes.entrySet().stream()
         .collect(toMap(e -> QName.valueOf(e.getKey()), e -> e.getValue())));
-  }
-
-  protected static String getSourceXML(Component element) {
-    Object sourceXml = element.getAnnotation(SOURCE_ELEMENT_ANNOTATION_KEY);
-    return sourceXml != null ? maskPasswords(sourceXml.toString()) : null;
   }
 
   public static String maskPasswords(String xml, String passwordMask) {
@@ -101,7 +98,7 @@ public abstract class LocationExecutionContextProvider extends ComponentLocation
     return xml;
   }
 
-  protected static String maskPasswords(String xml) {
+  public static String maskPasswords(String xml) {
     return maskPasswords(xml, PASSWORD_MASK);
   }
 

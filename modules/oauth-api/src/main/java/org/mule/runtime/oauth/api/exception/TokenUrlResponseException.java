@@ -20,7 +20,7 @@ import java.io.IOException;
  */
 public final class TokenUrlResponseException extends MuleException {
 
-  private static final long serialVersionUID = 201036315336735350L;
+  private static final long serialVersionUID = 201036315336735353L;
 
   public TokenUrlResponseException(String tokenUrl, HttpResponse response, String body) throws IOException {
     super(createStaticMessage(format("Error response when calling token URL '%s'. Response was:"

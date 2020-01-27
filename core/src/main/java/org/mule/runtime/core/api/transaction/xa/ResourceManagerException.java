@@ -14,7 +14,7 @@ public class ResourceManagerException extends MuleException {
   /**
    * Serial version
    */
-  private static final long serialVersionUID = -2710661653314559260L;
+  private static final long serialVersionUID = -2710661653314559258L;
 
   /**
    * 

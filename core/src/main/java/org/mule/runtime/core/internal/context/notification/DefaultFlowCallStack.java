@@ -41,9 +41,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
   }
 
   private DefaultFlowCallStack(final Deque<FlowStackElement> innerStack) {
-    synchronized (innerStack) {
-      this.innerStack = new ArrayDeque<>(innerStack);
-    }
+    this.innerStack = ((ArrayDeque) innerStack).clone();
   }
 
   /**
@@ -76,7 +74,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
   public void setCurrentProcessorPath(String processorPath) {
     if (!innerStack.isEmpty()) {
       synchronized (innerStack) {
-        innerStack.push(new FlowStackElement(innerStack.pop().getFlowName(), processorPath));
+        innerStack.peek().setProcessorPath(processorPath);
       }
     }
   }
@@ -129,7 +127,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
   }
 
   private String doToString(Function<FlowStackElement, String> toString) {
-    StringBuilder stackString = new StringBuilder();
+    StringBuilder stackString = new StringBuilder(256);
 
     int i = 0;
     synchronized (innerStack) {

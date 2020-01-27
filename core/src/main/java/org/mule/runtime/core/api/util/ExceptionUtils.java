@@ -9,9 +9,10 @@ package org.mule.runtime.core.api.util;
 import static java.lang.System.lineSeparator;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
-import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -19,10 +20,8 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
 /**
@@ -189,15 +188,13 @@ public class ExceptionUtils {
       return empty();
     }
 
-    Set<Throwable> causes = new HashSet<>();
-
-    for (throwable = throwable.getCause(); throwable != null; throwable = throwable.getCause()) {
-      if (!causes.add(throwable)) {
+    for (Throwable cause = throwable.getCause(); cause != null; cause = cause.getCause()) {
+      if (cause == throwable) {
         return empty();
       }
 
-      if (throwableType.isInstance(throwable)) {
-        return of((T) throwable);
+      if (throwableType.isInstance(cause)) {
+        return of((T) cause);
       }
     }
 
@@ -239,6 +236,39 @@ public class ExceptionUtils {
   }
 
   /**
+   * Executes the given {@code runnable} knowing that it might throw an {@link Exception} of type {@code expectedExceptionType}.
+   * If that happens, then it will re throw such exception.
+   * <p>
+   * If the {@code runnable} throws a {@link RuntimeException} of a different type, then it is also re-thrown. Finally, if an
+   * exception of any different type is thrown, then it is handled by delegating into the {@code exceptionHandler}, which might in
+   * turn also throw an exception or handle it returning a value.
+   *
+   * @param expectedExceptionType the type of exception which is expected to be thrown
+   * @param runnable the delegate to be executed
+   * @param exceptionHandler a {@link ExceptionHandler} in case an unexpected exception is found instead
+   * @param <T> the generic type of the return value
+   * @param <E> the generic type of the expected exception
+   * @throws E if the expected exception is actually thrown
+   */
+  public static <T, E extends Exception> void tryExpecting(Class<E> expectedExceptionType, Runnable runnable,
+                                                           ExceptionHandler<T, E> exceptionHandler)
+      throws E {
+    try {
+      runnable.run();
+    } catch (Exception e) {
+      if (expectedExceptionType.isInstance(e)) {
+        throw (E) e;
+      }
+
+      if (e instanceof RuntimeException) {
+        throw (RuntimeException) e;
+      }
+
+      exceptionHandler.handle(e);
+    }
+  }
+
+  /**
    * Checks if an error type is MULE:UNKNOWN
    */
   public static boolean isUnknownMuleError(ErrorType type) {
@@ -261,7 +291,11 @@ public class ExceptionUtils {
   }
 
   public static Optional<ComponentIdentifier> getComponentIdentifier(Component obj) {
-    return Optional.ofNullable((ComponentIdentifier) obj.getAnnotation(ANNOTATION_NAME));
+    return ofNullable(getComponentIdentifierOf(obj));
+  }
+
+  public static ComponentIdentifier getComponentIdentifierOf(Component obj) {
+    return obj.getIdentifier();
   }
 
   private ExceptionUtils() {}

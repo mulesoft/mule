@@ -14,7 +14,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
  */
 public final class RequestAuthenticationException extends MuleException {
 
-  private static final long serialVersionUID = 5053323135035970690L;
+  private static final long serialVersionUID = 5053323135035970693L;
 
   public RequestAuthenticationException(I18nMessage message) {
     super(message);

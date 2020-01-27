@@ -14,7 +14,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
  */
 public final class InvalidExpressionException extends ExpressionRuntimeException {
 
-  private static final long serialVersionUID = 7812777734559472971L;
+  private static final long serialVersionUID = 7812777734559472973L;
 
   private String expression;
 

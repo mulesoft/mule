@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static org.mule.runtime.api.functional.Either.left;
+import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.FlowProcessingTemplate;
@@ -64,9 +63,11 @@ final class ExtensionsFlowProcessingTemplate extends FlowProcessingTemplate {
 
   @Override
   public void afterPhaseExecution(Either<MessagingException, CoreEvent> either) {
-    either.apply((CheckedConsumer<MessagingException>) messagingException -> completionHandler
-        .onTerminate(left(messagingException)),
-                 (CheckedConsumer<CoreEvent>) event -> completionHandler.onTerminate(either));
+    try {
+      completionHandler.onTerminate(either);
+    } catch (Exception e) {
+      throw propagateWrappingFatal(e);
+    }
   }
 
 }

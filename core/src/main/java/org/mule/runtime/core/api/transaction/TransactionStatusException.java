@@ -15,7 +15,7 @@ public class TransactionStatusException extends TransactionException {
   /**
    * Serial version
    */
-  private static final long serialVersionUID = -2408368544426562868L;
+  private static final long serialVersionUID = -2408368544426562866L;
 
   /**
    * @param message the exception message

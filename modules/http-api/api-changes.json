@@ -3,6 +3,54 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.field.constantValueChanged",
+          "old": "field org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY @ org.mule.runtime.http.api.server.ServerAlreadyExistsException",
+          "new": "field org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY @ org.mule.runtime.http.api.server.ServerAlreadyExistsException",
+          "oldValue": "Element XML",
+          "newValue": "Element DSL",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "ServerAlreadyExistsException",
+          "fieldName": "INFO_SOURCE_XML_KEY",
+          "elementKind": "field",
+          "justification": "Make the message more generic"
+        },
+        {
+          "code": "java.field.constantValueChanged",
+          "old": "field org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY @ org.mule.runtime.http.api.server.ServerCreationException",
+          "new": "field org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY @ org.mule.runtime.http.api.server.ServerCreationException",
+          "oldValue": "Element XML",
+          "newValue": "Element DSL",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "ServerCreationException",
+          "fieldName": "INFO_SOURCE_XML_KEY",
+          "elementKind": "field",
+          "justification": "Make the message more generic"
+        },
+        {
+          "code": "java.field.constantValueChanged",
+          "old": "field org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY @ org.mule.runtime.http.api.server.ServerNotFoundException",
+          "new": "field org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY @ org.mule.runtime.http.api.server.ServerNotFoundException",
+          "oldValue": "Element XML",
+          "newValue": "Element DSL",
+          "package": "org.mule.runtime.http.api.server",
+          "classSimpleName": "ServerNotFoundException",
+          "fieldName": "INFO_SOURCE_XML_KEY",
+          "elementKind": "field",
+          "justification": "Make the message more generic"
+        },
+        {
+          "code": "java.field.constantValueChanged",
+          "old": "field org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY @ org.mule.runtime.http.api.server.ws.WebSocketConnectionRejectedException",
+          "new": "field org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY @ org.mule.runtime.http.api.server.ws.WebSocketConnectionRejectedException",
+          "oldValue": "Element XML",
+          "newValue": "Element DSL",
+          "package": "org.mule.runtime.http.api.server.ws",
+          "classSimpleName": "WebSocketConnectionRejectedException",
+          "fieldName": "INFO_SOURCE_XML_KEY",
+          "elementKind": "field",
+          "justification": "Make the message more generic"
+        },
+        {
           "code": "java.class.nonFinalClassInheritsFromNewClass",
           "old": "class org.mule.runtime.http.api.domain.OptimizedCaseInsensitiveMapWrapper<T extends java.lang.Object>",
           "new": "class org.mule.runtime.http.api.domain.OptimizedCaseInsensitiveMapWrapper<T extends java.lang.Object>",

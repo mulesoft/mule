@@ -20,7 +20,7 @@ import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 @NoInstantiate
 public final class ClassNotFoundInRegionException extends ClassNotFoundException {
 
-  private static final long serialVersionUID = -2800293812538208279L;
+  private static final long serialVersionUID = -2800293812538208276L;
 
   private String className;
   private String regionName;

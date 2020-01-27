@@ -180,7 +180,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   protected List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
   private org.mule.runtime.core.internal.registry.Registry originalRegistry;
   private final ExtensionManager extensionManager;
-  private boolean disableXmlValidations;
+  private final boolean disableXmlValidations;
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -244,7 +244,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
           .forEach(componentBuildingDefinitionRegistry::register);
     }
 
-    this.beanDefinitionFactory = new BeanDefinitionFactory(componentBuildingDefinitionRegistry);
+    this.beanDefinitionFactory =
+        new BeanDefinitionFactory(muleContext.getConfiguration().getId(), componentBuildingDefinitionRegistry);
 
     this.applicationModel = createApplicationModel();
   }

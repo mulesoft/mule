@@ -2,6 +2,42 @@
   "4.3.0": {
     "revapi": {
       "ignore": [
+       {
+         "code": "java.field.constantValueChanged",
+         "old": "field org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY @ org.mule.runtime.oauth.api.exception.RequestAuthenticationException",
+         "new": "field org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY @ org.mule.runtime.oauth.api.exception.RequestAuthenticationException",
+         "oldValue": "Element XML",
+         "newValue": "Element DSL",
+         "package": "org.mule.runtime.oauth.api.exception",
+         "classSimpleName": "RequestAuthenticationException",
+         "fieldName": "INFO_SOURCE_XML_KEY",
+         "elementKind": "field",
+         "justification": "Make the message more generic"
+       },
+       {
+         "code": "java.field.constantValueChanged",
+         "old": "field org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY @ org.mule.runtime.oauth.api.exception.TokenNotFoundException",
+         "new": "field org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY @ org.mule.runtime.oauth.api.exception.TokenNotFoundException",
+         "oldValue": "Element XML",
+         "newValue": "Element DSL",
+         "package": "org.mule.runtime.oauth.api.exception",
+         "classSimpleName": "TokenNotFoundException",
+         "fieldName": "INFO_SOURCE_XML_KEY",
+         "elementKind": "field",
+         "justification": "Make the message more generic"
+       },
+       {
+         "code": "java.field.constantValueChanged",
+         "old": "field org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY @ org.mule.runtime.oauth.api.exception.TokenUrlResponseException",
+         "new": "field org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY @ org.mule.runtime.oauth.api.exception.TokenUrlResponseException",
+         "oldValue": "Element XML",
+         "newValue": "Element DSL",
+         "package": "org.mule.runtime.oauth.api.exception",
+         "classSimpleName": "TokenUrlResponseException",
+         "fieldName": "INFO_SOURCE_XML_KEY",
+         "elementKind": "field",
+         "justification": "Make the message more generic"
+        },
         {
           "code": "java.method.addedToInterface",
           "new": "method void org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer::addListener(org.mule.runtime.oauth.api.builder.AuthorizationCodeListener)",

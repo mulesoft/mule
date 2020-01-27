@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsNamespace;
+
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.exception.TypedException;
@@ -17,9 +20,12 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
 /**
  * Handler of {@link ModuleException ModuleExceptions}, which given a {@link Throwable} checks whether the exceptions is
@@ -29,21 +35,44 @@ import java.util.Set;
  */
 public class ModuleExceptionHandler {
 
-  private final ComponentModel componentModel;
-  private ExtensionModel extensionModel;
-  private final ErrorTypeRepository typeRepository;
   private final Set<ErrorModel> allowedErrorTypes;
   private final String extensionNamespace;
 
+  private final LoadingCache<ErrorTypeDefinition, Function<Throwable, ErrorType>> errorTypeCache;
+
   public ModuleExceptionHandler(ComponentModel componentModel, ExtensionModel extensionModel,
                                 ErrorTypeRepository typeRepository) {
-
-    this.componentModel = componentModel;
-    this.extensionModel = extensionModel;
-    this.typeRepository = typeRepository;
-
     allowedErrorTypes = componentModel.getErrorModels();
-    extensionNamespace = MuleExtensionUtils.getExtensionsNamespace(extensionModel);
+    extensionNamespace = getExtensionsNamespace(extensionModel);
+
+    errorTypeCache = newBuilder().build(errorDefinition -> {
+      final Optional<ErrorType> errorTypeLookedUp = typeRepository.lookupErrorType(builder()
+          .namespace(extensionNamespace)
+          .name(errorDefinition.getType())
+          .build());
+
+      if (errorTypeLookedUp.isPresent()) {
+        final ErrorType errorType = errorTypeLookedUp.get();
+
+        if (isAllowedError(errorType)) {
+          return exception -> errorType;
+        } else {
+          return exception -> {
+            throw new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but"
+                + " only %s errors are allowed.", componentModel.getName(), extensionModel.getName(),
+                                                               extensionNamespace + ":" + errorDefinition, allowedErrorTypes),
+                                           exception.getCause());
+          };
+        }
+      } else {
+        return exception -> {
+          throw new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but it was not registered "
+              + "in the Error Repository", componentModel.getName(), extensionModel.getName(),
+                                                             extensionNamespace + ":" + errorDefinition),
+                                         getExceptionCause(exception));
+        };
+      }
+    });
   }
 
   /**
@@ -59,30 +88,13 @@ public class ModuleExceptionHandler {
    */
   public Throwable processException(Throwable throwable) {
     if (throwable instanceof ModuleException) {
-      ErrorTypeDefinition errorDefinition = ((ModuleException) throwable).getType();
-      return handleTypedException(throwable, errorDefinition);
+      return handleTypedException(throwable, ((ModuleException) throwable).getType());
     }
     return throwable;
   }
 
   private Throwable handleTypedException(final Throwable exception, ErrorTypeDefinition errorDefinition) {
-    ErrorType errorType = typeRepository.lookupErrorType(builder()
-        .namespace(extensionNamespace)
-        .name(errorDefinition.getType())
-        .build())
-        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but it was not registered "
-            + "in the Error Repository", componentModel.getName(), extensionModel.getName(),
-                                                                        extensionNamespace + ":" + errorDefinition),
-                                                    getExceptionCause(exception)));
-
-    if (!isAllowedError(errorType)) {
-      throw new MuleRuntimeException(createStaticMessage("The component '%s' from the connector '%s' attempted to throw '%s', but"
-          + " only %s errors are allowed.", componentModel.getName(), extensionModel.getName(),
-                                                         extensionNamespace + ":" + errorDefinition, allowedErrorTypes),
-                                     exception.getCause());
-    }
-
-    return new TypedException(getExceptionCause(exception), errorType);
+    return new TypedException(getExceptionCause(exception), errorTypeCache.get(errorDefinition).apply(exception));
   }
 
 
@@ -102,6 +114,13 @@ public class ModuleExceptionHandler {
   }
 
   private Throwable getExceptionCause(Throwable throwable) {
-    return throwable.getClass().equals(ModuleException.class) ? throwable.getCause() : throwable;
+    // For subclasses of ModuleException, we use it as it already contains additional information
+    if (throwable.getClass().equals(ModuleException.class)) {
+      return throwable.getCause() != null
+          ? throwable.getCause()
+          : new MuleRuntimeException(createStaticMessage(throwable.getMessage()));
+    } else {
+      return throwable;
+    }
   }
 }

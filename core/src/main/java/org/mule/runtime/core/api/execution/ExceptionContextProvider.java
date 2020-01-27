@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.execution;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.exception.MuleExceptionInfo;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 
 import java.util.Map;
@@ -24,10 +25,21 @@ import java.util.Map;
 public interface ExceptionContextProvider {
 
   /**
-   *
    * @param notificationInfo
    * @return info entries to be added to the logged exception message
+   *
+   * @deprecated Use {@link #putContextInfo(Map, EnrichedNotificationInfo, Component)} instead.
    */
+  @Deprecated
   Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Component lastProcessed);
+
+  /**
+   * @param info the map to put the entries to be added to the logged exception message into
+   * @param notificationInfo
+   * @param lastProcessed
+   *
+   * @since 4.3
+   */
+  void putContextInfo(MuleExceptionInfo info, EnrichedNotificationInfo notificationInfo, Component lastProcessed);
 
 }

@@ -18,7 +18,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
  */
 public class MuleSoftReferenceBusterException extends MuleException {
 
-  private static final long serialVersionUID = 3114378370421458490L;
+  private static final long serialVersionUID = 3114378370421458493L;
 
   public static final String EXCEPTION_MESSAGE = "Error on busting references for '%s': '%s'";
 

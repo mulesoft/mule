@@ -20,7 +20,7 @@ public final class EncryptionStrategyNotFoundException extends MuleException {
   /**
    * Serial version
    */
-  private static final long serialVersionUID = 3916371211189075139L;
+  private static final long serialVersionUID = 3916371211189075141L;
 
   public EncryptionStrategyNotFoundException(String strategyName) {
     super(createStaticMessage("There is no Encryption Strategy registered called '%s'", strategyName));

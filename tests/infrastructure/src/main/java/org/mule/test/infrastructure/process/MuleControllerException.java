@@ -9,7 +9,7 @@ package org.mule.test.infrastructure.process;
 
 public class MuleControllerException extends RuntimeException {
 
-  private static final long serialVersionUID = -235062000492669536L;
+  private static final long serialVersionUID = -235062000492669533L;
 
   /**
    * Constructs a new runtime exception with null as its detail message. The cause is not initialized, and may subsequently be

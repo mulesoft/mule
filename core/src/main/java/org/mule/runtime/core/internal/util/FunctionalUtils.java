@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 
 import java.util.function.Consumer;
@@ -37,6 +38,21 @@ public class FunctionalUtils extends org.mule.runtime.api.util.FunctionalUtils {
   public static void safely(CheckedRunnable task, Consumer<Exception> exceptionHandler) {
     try {
       task.run();
+    } catch (Exception e) {
+      exceptionHandler.accept(e);
+    }
+  }
+
+  /**
+   * Executes the given {@code task}, feeding any thrown exceptions into the given {@code exceptionHandler}
+   *
+   * @param item the object to perform the task on
+   * @param task a task
+   * @param exceptionHandler an exception {@link Consumer}
+   */
+  public static <T> void safely(T item, CheckedConsumer<T> task, Consumer<Exception> exceptionHandler) {
+    try {
+      task.accept(item);
     } catch (Exception e) {
       exceptionHandler.accept(e);
     }

@@ -30,7 +30,7 @@ public final class NotExportedClassException extends ClassNotFoundException {
 
   private static final Logger logger = LoggerFactory.getLogger(NotExportedClassException.class);
 
-  private static final long serialVersionUID = 2510347069070514569L;
+  private static final long serialVersionUID = 2510347069070514572L;
 
   private String className;
   private String artifactName;

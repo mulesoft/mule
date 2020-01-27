@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 
 import java.io.Serializable;
@@ -18,11 +17,11 @@ import java.io.Serializable;
  */
 public final class FlowStackElement implements Serializable {
 
-  private static final long serialVersionUID = 192333659386101806L;
+  private static final long serialVersionUID = -2372094725681872367L;
 
   private final String flowName;
-  private final String processorPath;
-  private final Long creationTime;
+  private String processorPath;
+  private final long creationTime;
 
   public FlowStackElement(String flowName, String processorPath) {
     this.flowName = flowName;
@@ -37,6 +36,10 @@ public final class FlowStackElement implements Serializable {
     return processorPath;
   }
 
+  public void setProcessorPath(String processorPath) {
+    this.processorPath = processorPath;
+  }
+
   /**
    * @return the name of the flow which execution is represented by this element.
    */
@@ -47,13 +50,33 @@ public final class FlowStackElement implements Serializable {
   /**
    * @return the time when the flow stack was created.
    */
-  public Long getCreationTime() {
+  public long getCreationTimeLong() {
     return creationTime;
   }
 
   /**
    * @return the milliseconds elapsed between its creation and now.
    */
+  public long getElapsedTimeLong() {
+    return currentTimeMillis() - creationTime;
+  }
+
+  /**
+   * @return the time when the flow stack was created.
+   *
+   * @deprecated Use {@link #getCreationTimeLong()} instead.
+   */
+  @Deprecated
+  public Long getCreationTime() {
+    return creationTime;
+  }
+
+  /**
+   * @return the milliseconds elapsed between its creation and now.
+   *
+   * @deprecated Use {@link #getElapsedTimeLong()} instead.
+   */
+  @Deprecated
   public Long getElapsedTime() {
     return currentTimeMillis() - creationTime;
   }
@@ -63,15 +86,11 @@ public final class FlowStackElement implements Serializable {
     if (processorPath == null) {
       return flowName;
     } else {
-      return format("%s(%s)", flowName, processorPath);
+      return flowName.concat("(").concat(processorPath).concat(")");
     }
   }
 
   public String toStringWithElapsedTime() {
-    if (processorPath == null) {
-      return format("%s %d ms", flowName, getElapsedTime());
-    } else {
-      return format("%s(%s) %d ms", flowName, processorPath, getElapsedTime());
-    }
+    return toString().concat(" ").concat(Long.toString(getElapsedTimeLong())).concat(" ms");
   }
 }

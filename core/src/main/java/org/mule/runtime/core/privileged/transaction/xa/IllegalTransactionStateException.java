@@ -17,7 +17,7 @@ public final class IllegalTransactionStateException extends TransactionStatusExc
   /**
    * Serial version
    */
-  private static final long serialVersionUID = -1062247038945694389L;
+  private static final long serialVersionUID = -1062247038945694387L;
 
   /**
    * @param message the exception message

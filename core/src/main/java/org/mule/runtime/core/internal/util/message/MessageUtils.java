@@ -203,12 +203,15 @@ public final class MessageUtils {
   private static Message toMessage(Result<?, ?> result, DataType dataType, Object value) {
     Message.Builder builder = Message.builder().payload(new TypedValue<>(value, dataType, result.getByteLength()));
 
-    result.getAttributes().ifPresent(att -> {
-      DataType attDataType = result.getAttributesMediaType()
-          .map(amt -> builder().type(att.getClass()).mediaType(amt).build())
-          .orElseGet(() -> DataType.fromObject(att));
-      builder.attributes(new TypedValue<>(att, attDataType, OptionalLong.empty()));
-    });
+    if (result.getAttributes().isPresent()) {
+      Object att = result.getAttributes().get();
+
+      final Optional<MediaType> attributesMediaType = result.getAttributesMediaType();
+      builder.attributes(new TypedValue<>(att, attributesMediaType.isPresent()
+          ? builder().type(att.getClass()).mediaType(attributesMediaType.get()).build()
+          : DataType.fromObject(att),
+                                          OptionalLong.empty()));
+    }
 
     return builder.build();
   }

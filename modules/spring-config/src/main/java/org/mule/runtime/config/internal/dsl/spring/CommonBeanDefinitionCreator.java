@@ -12,13 +12,14 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.beanutils.BeanUtils.copyProperty;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
+import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_PROTOTYPE_OBJECT;
 import static org.mule.runtime.config.internal.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.CUSTOM_TRANSFORMER_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
-import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromDocAttributes;
+import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.maskPasswords;
 import static org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
@@ -28,6 +29,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.internal.model.ComponentModel;
@@ -150,13 +152,30 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
       return annotations;
     } else {
       if (Component.class.isAssignableFrom(builder.getBeanDefinition().getBeanClass())) {
-        addMetadataAnnotationsFromDocAttributes(annotations, componentModel.getSourceCode(),
-                                                componentModel.getMetadata().getDocAttributes());
+        addMetadataAnnotationsFromDocAttributes(annotations, componentModel.getMetadata());
         builder.getBeanDefinition().getPropertyValues().addPropertyValue(ANNOTATIONS_PROPERTY_NAME, annotations);
       }
 
       return annotations;
     }
+  }
+
+  /**
+   * Populates the passed beanAnnotations with the other passed parameters.
+   *
+   * @param beanAnnotations the map with annotations to populate
+   * @param metadata the parser metadata for the object being created
+   */
+  public static void addMetadataAnnotationsFromDocAttributes(Map<QName, Object> beanAnnotations,
+                                                             ComponentMetadataAst metadata) {
+    String sourceCode = metadata.getSourceCode().orElse(null);
+
+    if (sourceCode != null) {
+      beanAnnotations.put(SOURCE_ELEMENT_ANNOTATION_KEY, maskPasswords(sourceCode));
+    }
+
+    beanAnnotations.putAll(metadata.getDocAttributes().entrySet().stream()
+        .collect(toMap(e -> QName.valueOf(e.getKey()), e -> e.getValue())));
   }
 
   private Class<?> retrieveComponentType(final ComponentModel componentModel,

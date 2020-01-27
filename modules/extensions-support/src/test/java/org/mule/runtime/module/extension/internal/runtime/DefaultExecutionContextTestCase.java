@@ -87,7 +87,7 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
   @Mock
   private RetryPolicyTemplate retryPolicyTemplate;
 
-  private Object configurationInstance = new Object();
+  private final Object configurationInstance = new Object();
   private ConfigurationInstance configuration;
   private DefaultExecutionContext<OperationModel> operationContext;
 
@@ -137,17 +137,17 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
     assertThat(operationContext.getVariable(key), is(nullValue()));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void setNullKeyVariable() {
     operationContext.setVariable(null, "");
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void setNullValueVariable() {
     operationContext.setVariable("key", null);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void removeNullValueVariable() {
     operationContext.removeVariable(null);
   }

@@ -23,7 +23,7 @@ public final class CryptoFailureException extends MuleException {
   /**
    * Serial version
    */
-  private static final long serialVersionUID = 1336343718508294379L;
+  private static final long serialVersionUID = 1336343718508294381L;
 
   private transient EncryptionStrategy encryptionStrategy;
 

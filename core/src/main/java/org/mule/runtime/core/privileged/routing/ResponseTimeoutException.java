@@ -18,7 +18,7 @@ public final class ResponseTimeoutException extends RoutingException {
   /**
    * Serial version
    */
-  private static final long serialVersionUID = 6882278747922113240L;
+  private static final long serialVersionUID = 6882278747922113242L;
 
   public ResponseTimeoutException(I18nMessage message, Processor target) {
     super(message, target);

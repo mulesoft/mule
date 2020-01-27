@@ -17,7 +17,7 @@ public final class BootstrapException extends ConfigurationException {
   /**
    * Serial version
    */
-  private static final long serialVersionUID = 3658223240493754960L;
+  private static final long serialVersionUID = 3658223240493754962L;
 
   public BootstrapException(I18nMessage message, Throwable cause) {
     super(message, cause);

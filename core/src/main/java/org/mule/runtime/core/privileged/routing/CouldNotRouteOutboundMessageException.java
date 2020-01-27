@@ -18,7 +18,7 @@ public final class CouldNotRouteOutboundMessageException extends RoutingExceptio
   /**
    * Serial version
    */
-  private static final long serialVersionUID = 4609966704030524483L;
+  private static final long serialVersionUID = 4609966704030524485L;
 
   public CouldNotRouteOutboundMessageException(Processor target) {
     super(target);

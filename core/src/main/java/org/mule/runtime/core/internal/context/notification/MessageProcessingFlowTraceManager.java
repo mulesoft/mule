@@ -6,16 +6,14 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
-import static java.util.Collections.singletonMap;
-
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.exception.MuleExceptionInfo;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.api.notification.PipelineMessageNotification;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
@@ -24,6 +22,7 @@ import org.mule.runtime.core.internal.logging.LogConfigChangeSubject;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -38,13 +37,12 @@ import org.apache.logging.log4j.spi.LoggerContext;
 public class MessageProcessingFlowTraceManager extends LocationExecutionContextProvider
     implements FlowTraceManager, Initialisable, Disposable {
 
-  public static final String FLOW_STACK_INFO_KEY = "FlowStack";
+  public static final String FLOW_STACK_INFO_KEY = MuleExceptionInfo.FLOW_STACK_INFO_KEY;
 
   private final FlowNotificationTextDebugger pipelineProcessorDebugger;
   private final MessageProcessorTextDebugger messageProcessorTextDebugger;
 
   private ServerNotificationManager notificationManager;
-  private String contextId;
 
   private volatile boolean listenersAdded = false;
   private final PropertyChangeListener logConfigChangeListener = evt -> handleNotificationListeners();
@@ -100,16 +98,9 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
    * @param notification the notification that contains the event and the processor that is about to be invoked.
    */
   public void onMessageProcessorNotificationPreInvoke(MessageProcessorNotification notification) {
-    String resolveProcessorRepresentation =
-        resolveProcessorRepresentation(contextId,
-                                       notification.getComponent().getLocation() != null
-                                           ? notification.getComponent().getLocation().getLocation()
-                                           : null,
-                                       notification.getComponent());
-
     FlowCallStack flowCallStack = ((CoreEvent) notification.getEvent()).getFlowCallStack();
     if (flowCallStack != null) {
-      ((DefaultFlowCallStack) flowCallStack).setCurrentProcessorPath(resolveProcessorRepresentation);
+      ((DefaultFlowCallStack) flowCallStack).setCurrentProcessorPath(notification.getComponent().getRepresentation());
     }
   }
 
@@ -143,16 +134,20 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
 
   @Override
   public Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
-    return singletonMap(FLOW_STACK_INFO_KEY, ((CoreEvent) notificationInfo.getEvent()).getFlowCallStack().toString());
+    final Map<String, Object> info = new HashMap<>();
+    info.putIfAbsent(FLOW_STACK_INFO_KEY, ((CoreEvent) notificationInfo.getEvent()).getFlowCallStack().clone());
+    return info;
+  }
+
+  @Override
+  public void putContextInfo(MuleExceptionInfo info, EnrichedNotificationInfo notificationInfo, Component lastProcessed) {
+    if (info.getFlowStack() == null) {
+      info.setFlowStack(((CoreEvent) notificationInfo.getEvent()).getFlowCallStack().clone());
+    }
   }
 
   @Inject
   public void setNotificationManager(ServerNotificationManager notificationManager) {
     this.notificationManager = notificationManager;
-  }
-
-  @Inject
-  public void setMuleContext(MuleContext muleContext) {
-    this.contextId = muleContext.getConfiguration().getId();
   }
 }

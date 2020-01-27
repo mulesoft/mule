@@ -16,7 +16,7 @@ import org.mule.runtime.api.exception.MuleException;
  */
 public class ServerCreationException extends MuleException {
 
-  private static final long serialVersionUID = -7954287390178516553L;
+  private static final long serialVersionUID = -7954287390178516550L;
 
   public ServerCreationException(String message, Throwable cause) {
     super(createStaticMessage("Could not create server: " + message), cause);

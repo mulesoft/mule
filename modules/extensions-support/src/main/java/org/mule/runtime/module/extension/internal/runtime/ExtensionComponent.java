@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
@@ -18,6 +19,7 @@ import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
@@ -60,6 +62,8 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.internal.exception.ErrorMapping;
+import org.mule.runtime.core.internal.exception.ErrorMappingsAware;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
@@ -86,12 +90,14 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import javax.inject.Inject;
+import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 
@@ -104,7 +110,7 @@ import org.slf4j.Logger;
  * @since 4.0
  */
 public abstract class ExtensionComponent<T extends ComponentModel> extends AbstractComponent
-    implements MuleContextAware, MetadataKeyProvider, MetadataProvider<T>, ComponentValueProvider,
+    implements MuleContextAware, ErrorMappingsAware, MetadataKeyProvider, MetadataProvider<T>, ComponentValueProvider,
     Lifecycle {
 
   private final static Logger LOGGER = getLogger(ExtensionComponent.class);
@@ -153,6 +159,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   protected MetadataCacheIdGenerator<ComponentAst> cacheIdGenerator;
 
   private Function<CoreEvent, Optional<ConfigurationInstance>> configurationResolver;
+
+  private List<ErrorMapping> errorMappings = emptyList();
 
   protected ExtensionComponent(ExtensionModel extensionModel,
                                T componentModel,
@@ -593,5 +601,18 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Inject
   public void setComponentLocator(ConfigurationComponentLocator componentLocator) {
     this.componentLocator = componentLocator;
+  }
+
+  @Override
+  public List<ErrorMapping> getErrorMappings() {
+    return errorMappings;
+  }
+
+  @Override
+  public void setAnnotations(Map<QName, Object> newAnnotations) {
+    super.setAnnotations(newAnnotations);
+
+    List<ErrorMapping> list = (List<ErrorMapping>) getAnnotation(ANNOTATION_ERROR_MAPPINGS);
+    this.errorMappings = list != null ? list : emptyList();
   }
 }

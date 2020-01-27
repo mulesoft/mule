@@ -24,7 +24,7 @@ import java.util.List;
 @NoInstantiate
 public final class CompositeClassNotFoundException extends ClassNotFoundException {
 
-  private static final long serialVersionUID = -6941980241656380059L;
+  private static final long serialVersionUID = -6941980241656380056L;
 
   private final String className;
   private final LookupStrategy lookupStrategy;

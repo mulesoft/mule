@@ -7,6 +7,8 @@
 package org.mule.runtime.core.internal.component;
 
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
+
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 
 import java.util.HashMap;
@@ -19,13 +21,13 @@ import javax.xml.namespace.QName;
  */
 public interface ComponentAnnotations {
 
-  QName ANNOTATION_NAME = new QName("config", "componentIdentifier");
+  QName ANNOTATION_NAME = AbstractComponent.ANNOTATION_NAME;
   QName ANNOTATION_PARAMETERS = new QName("config", "componentParameters");
   QName ANNOTATION_COMPONENT_CONFIG = new QName("config", "componentConfiguration");
 
   /**
    * Updates the {@link Component} root container name.
-   * 
+   *
    * @param rootContainerName the root container name of the object.
    * @param component the {@link Component} to update.
    */

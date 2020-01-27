@@ -9,13 +9,14 @@ package org.mule.runtime.core.internal.util;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getComponentIdentifier;
 import static org.mule.runtime.core.api.util.ExceptionUtils.isUnknownMuleError;
-import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
+import org.mule.runtime.core.internal.exception.ErrorMappingsAware;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -45,10 +46,15 @@ public final class InternalExceptionUtils {
   public static CoreEvent createErrorEvent(CoreEvent currentEvent, Component obj,
                                            MessagingException me, ErrorTypeLocator locator) {
     Throwable cause = me.getCause() != null ? me.getCause() : me;
-    List<ErrorMapping> errorMappings = getErrorMappings(obj);
+
+    List<ErrorMapping> errorMappings = emptyList();
+    if (obj instanceof ErrorMappingsAware) {
+      errorMappings = ((ErrorMappingsAware) obj).getErrorMappings();
+    }
+
     if (!errorMappings.isEmpty() || isMessagingExceptionCause(me, cause)) {
       Error newError = getErrorFromFailingProcessor(currentEvent, obj, cause, locator);
-      CoreEvent newEvent = CoreEvent.builder(me.getEvent()).error(newError).build();
+      CoreEvent newEvent = quickCopy(newError, me.getEvent());
       me.setProcessedEvent(newEvent);
       return newEvent;
     } else {
@@ -61,11 +67,6 @@ public final class InternalExceptionUtils {
         .filter(error -> cause.equals(error.getCause()))
         .filter(error -> me.causedExactlyBy(error.getCause().getClass()))
         .isPresent();
-  }
-
-  public static List<ErrorMapping> getErrorMappings(Component object) {
-    List<ErrorMapping> list = (List<ErrorMapping>) object.getAnnotation(ANNOTATION_ERROR_MAPPINGS);
-    return list != null ? list : emptyList();
   }
 
   /**
@@ -88,13 +89,19 @@ public final class InternalExceptionUtils {
         .map(ci -> locator.lookupComponentErrorType(ci, cause))
         .orElse(locator.lookupErrorType(cause));
 
-    return ErrorBuilder.builder(cause)
-        .errorType(getErrorMappings(processor)
-            .stream()
-            .filter(m -> m.match(resultError == null || isUnknownMuleError(resultError) ? errorType : currentError))
-            .findFirst()
-            .map(ErrorMapping::getTarget)
-            .orElse(errorType))
-        .build();
+    if (processor instanceof ErrorMappingsAware) {
+      return ErrorBuilder.builder(cause)
+          .errorType(((ErrorMappingsAware) processor).getErrorMappings()
+              .stream()
+              .filter(m -> m.match(resultError == null || isUnknownMuleError(resultError) ? errorType : currentError))
+              .findFirst()
+              .map(ErrorMapping::getTarget)
+              .orElse(errorType))
+          .build();
+    } else {
+      return ErrorBuilder.builder(cause)
+          .errorType(errorType)
+          .build();
+    }
   }
 }

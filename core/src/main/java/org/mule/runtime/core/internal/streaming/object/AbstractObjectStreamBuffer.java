@@ -10,6 +10,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_OBJECT_STREAMING_BUFFER_SIZE;
+
 import org.mule.runtime.api.streaming.HasSize;
 import org.mule.runtime.core.internal.streaming.AbstractStreamingBuffer;
 
@@ -143,7 +144,7 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
         doClose();
       } finally {
         if (stream instanceof Closeable) {
-          closeSafely(() -> ((Closeable) stream).close());
+          closeSafely((Closeable) stream, Closeable::close);
         }
         setCurrentBucket(null);
         writeLock.unlock();

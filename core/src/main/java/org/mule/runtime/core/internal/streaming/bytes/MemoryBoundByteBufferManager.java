@@ -57,6 +57,7 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager,
   private final long memoryExhaustedWaitTimeoutMillis;
   private final Lock lock = new ReentrantLock();
   private final Condition poolNotFull = lock.newCondition();
+  private final CheckedRunnable poolNotFullSignalTask = poolNotFull::signal;
 
   /**
    * Creates a new instance
@@ -181,7 +182,7 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager,
    * Signals to one waiting threads that streaming memory is available
    */
   protected void signalMemoryAvailable() {
-    signal(poolNotFull::signal);
+    signal(poolNotFullSignalTask);
   }
 
   /**

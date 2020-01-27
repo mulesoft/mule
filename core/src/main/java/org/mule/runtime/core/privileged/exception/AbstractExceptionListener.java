@@ -11,7 +11,6 @@ import static java.text.MessageFormat.format;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.exception.ExceptionHelper.sanitize;
-import static org.mule.runtime.api.exception.MuleException.INFO_ALREADY_LOGGED_KEY;
 import static org.mule.runtime.api.exception.MuleException.isVerboseExceptions;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
@@ -72,6 +71,8 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   protected FlowConstructStatistics statistics;
 
+  private String representation;
+
   public List<Processor> getMessageProcessors() {
     return messageProcessors;
   }
@@ -97,6 +98,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     if (!initialised.get()) {
       doInitialise();
       super.initialise();
+      representation = this.getClass().getSimpleName() + (getLocation() != null ? " @ " + getLocation().getLocation() : "");
       initialised.set(true);
     }
   }
@@ -158,12 +160,12 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
       return;
     }
     //First check if exception was not logged already
-    if ((boolean) resolvedException.getFirst().getInfo().getOrDefault(INFO_ALREADY_LOGGED_KEY, false)) {
+    if (resolvedException.getFirst().getExceptionInfo().isAlreadyLogged()) {
       //Don't log anything, error while getting root or exception already logged.
       return;
     }
     doLogException(resolvedException.getSecond(), null);
-    resolvedException.getFirst().addInfo(INFO_ALREADY_LOGGED_KEY, true);
+    resolvedException.getFirst().getExceptionInfo().setAlreadyLogged(true);
   }
 
   protected void doLogException(String message, Throwable t) {
@@ -248,6 +250,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName() + (getLocation() != null ? " @ " + getLocation().getLocation() : "");
+    return representation;
   }
 }

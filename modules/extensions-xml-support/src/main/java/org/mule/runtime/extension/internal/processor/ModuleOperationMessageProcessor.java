@@ -7,6 +7,7 @@
 package org.mule.runtime.extension.internal.processor;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -17,10 +18,9 @@ import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContex
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONFIG_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
-import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
+import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.core.internal.message.InternalMessage.builder;
-import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErrorMappings;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
@@ -59,6 +59,7 @@ import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
+import org.mule.runtime.core.internal.exception.ErrorMappingsAware;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -73,6 +74,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.xml.namespace.QName;
 
 import org.reactivestreams.Publisher;
 
@@ -98,7 +100,7 @@ import org.reactivestreams.Publisher;
  * </module-operation-chain>
  * </pre>
  */
-public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwner implements Processor {
+public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwner implements Processor, ErrorMappingsAware {
 
   private static final String ORIGINAL_EVENT_KEY = "mule.xmlSdk.originalEvent";
 
@@ -117,6 +119,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   private final Optional<String> target;
   private final String targetValue;
   private CompiledExpression targetValueExpression;
+  private List<ErrorMapping> errorMappings = emptyList();
 
   public ModuleOperationMessageProcessor(Map<String, String> properties,
                                          Map<String, String> parameters,
@@ -208,7 +211,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   }
 
   private FlowStackElement createFlowStackEntry(FlowStackElement top) {
-    final ComponentIdentifier identifier = (ComponentIdentifier) getAnnotation(ANNOTATION_NAME);
+    final ComponentIdentifier identifier = getIdentifier();
     if (identifier.getNamespace() == null || "tns".equals(identifier.getNamespace())) {
       final String[] peekedWithNamespace = top.getFlowName().split("\\:");
       String peekedNamespace = peekedWithNamespace[0];
@@ -234,9 +237,9 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
         // cause of the exception, which means the Mule application will <b>only see</b> the logs of the application's call to the
         // smart connector's <operation/>, rather than the internals of the smart connector's internals.
         EnrichedNotificationInfo notificationInfo = createInfo(event, me, null);
-        exceptionContextProviders
-            .forEach(cp -> cp.getContextInfo(notificationInfo, ModuleOperationMessageProcessor.this)
-                .forEach(me::addInfo));
+        for (ExceptionContextProvider exceptionContextProvider : exceptionContextProviders) {
+          exceptionContextProvider.putContextInfo(me.getExceptionInfo(), notificationInfo, ModuleOperationMessageProcessor.this);
+        }
 
         ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
         handleSubChainException(me,
@@ -251,7 +254,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
       private void handleSubChainException(MessagingException messagingException, CoreEvent originalRequest) {
         final CoreEvent.Builder builder = CoreEvent.builder(messagingException.getEvent().getContext(), originalRequest)
             .error(messagingException.getEvent().getError().get());
-        List<ErrorMapping> errorMappings = getErrorMappings(ModuleOperationMessageProcessor.this);
+        List<ErrorMapping> errorMappings = getErrorMappings();
         if (!errorMappings.isEmpty()) {
           Error error = messagingException.getEvent().getError().get();
           ErrorType errorType = error.getErrorType();
@@ -392,5 +395,18 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   @Override
   protected List<Processor> getOwnedMessageProcessors() {
     return singletonList(nestedChain);
+  }
+
+  @Override
+  public List<ErrorMapping> getErrorMappings() {
+    return errorMappings;
+  }
+
+  @Override
+  public void setAnnotations(Map<QName, Object> newAnnotations) {
+    super.setAnnotations(newAnnotations);
+
+    List<ErrorMapping> list = (List<ErrorMapping>) getAnnotation(ANNOTATION_ERROR_MAPPINGS);
+    this.errorMappings = list != null ? list : emptyList();
   }
 }

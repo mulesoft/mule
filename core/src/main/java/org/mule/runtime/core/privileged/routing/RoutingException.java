@@ -22,7 +22,7 @@ public class RoutingException extends MuleException {
   /**
    * Serial version
    */
-  private static final long serialVersionUID = 2478458847072048645L;
+  private static final long serialVersionUID = 2478458847072048647L;
 
   protected final transient Processor route;
 

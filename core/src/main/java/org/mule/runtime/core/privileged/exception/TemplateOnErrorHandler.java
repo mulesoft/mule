@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.exception;
 
 import static com.google.common.collect.ImmutableMap.of;
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Runtime.getRuntime;
 import static java.util.Arrays.stream;
@@ -138,7 +139,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
           .map(afterRouting())
           .doOnNext(result -> {
             final ErrorHandlerContext ctx = ErrorHandlerContext.from(result);
-            fireEndNotification(ctx.getOriginalEvent(getParameterId(result)), result, ctx.getException(getParameterId(result)));
+            final String parameterId = getParameterId(result);
+            fireEndNotification(ctx.getOriginalEvent(parameterId), result, ctx.getException(parameterId));
           })
           .doOnNext(TemplateOnErrorHandler.this::resolveHandling);
 
@@ -164,10 +166,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   public void routeError(Exception error, Consumer<CoreEvent> continueCallback,
                          Consumer<Throwable> propagateCallback) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Routing error in '" + this.toString() + "'...");
-    }
-
     // All calling methods will end up transforming any error class other than MessagingException into that one
     MessagingException messagingError = (MessagingException) error;
     CoreEvent failureEvent = messagingError.getEvent();
@@ -196,9 +194,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private void resolveHandling(CoreEvent result) {
     final ErrorHandlerContext ctx = ErrorHandlerContext.from(result);
 
-    Exception exception = ctx.getException(getParameterId(result));
-    Consumer<CoreEvent> successfullyHandledConsumer = ctx.getSuccessCallback(getParameterId(result));
-    Consumer<Throwable> errorConsumer = ctx.getRethrowCallback(getParameterId(result));
+    final String parameterId = getParameterId(result);
+    Exception exception = ctx.getException(parameterId);
+    Consumer<CoreEvent> successfullyHandledConsumer = ctx.getSuccessCallback(parameterId);
+    Consumer<Throwable> errorConsumer = ctx.getRethrowCallback(parameterId);
 
     if (exception instanceof MessagingException) {
       final MessagingException messagingEx = (MessagingException) exception;
@@ -235,8 +234,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
       final ErrorHandlerContext ctx = ErrorHandlerContext.from(result);
 
-      fireEndNotification(ctx.getOriginalEvent(getParameterId(result)), result, me);
-      ctx.getRethrowCallback(getParameterId(result)).accept(me);
+      final String parameterId = getParameterId(result);
+      fireEndNotification(ctx.getOriginalEvent(parameterId), result, me);
+      ctx.getRethrowCallback(parameterId).accept(me);
     };
   }
 
@@ -451,7 +451,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
    */
   protected void logException(Throwable t, CoreEvent event) {
     if (TRUE.toString().equals(logException)
-        || expressionManager.evaluateBoolean(logException, event, location, true, true)) {
+        || (!FALSE.toString().equals(logException)
+            && expressionManager.evaluateBoolean(logException, event, location, true, true))) {
       resolveAndLogException(t);
     }
   }

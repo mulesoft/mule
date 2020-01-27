@@ -22,7 +22,7 @@ public class MessageRedeliveredException extends MuleException implements Compos
   /**
    * Serial version
    */
-  private static final long serialVersionUID = 9013890402770563931L;
+  private static final long serialVersionUID = 9013890402770563933L;
 
   private final String messageId;
   private final List<Error> errors;

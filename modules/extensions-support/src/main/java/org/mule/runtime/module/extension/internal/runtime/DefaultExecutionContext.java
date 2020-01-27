@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 
 import org.mule.runtime.api.component.Component;
@@ -173,9 +172,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
    */
   @Override
   public Object setVariable(String key, Object value) {
-    checkArgument(key != null, "null keys are not allowed");
-    checkArgument(value != null, "null values are not allowed");
-    return variables.put(key, value);
+    return variables.put(requireNonNull(key, "null keys are not allowed"), requireNonNull(value, "null values are not allowed"));
   }
 
 
@@ -184,8 +181,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
    */
   @Override
   public <T> T removeVariable(String key) {
-    checkArgument(key != null, "null keys are not allowed");
-    return (T) variables.remove(key);
+    return (T) variables.remove(requireNonNull(key, "null keys are not allowed"));
   }
 
   /**

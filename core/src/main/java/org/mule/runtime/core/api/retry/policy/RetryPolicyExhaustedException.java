@@ -15,7 +15,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
 public final class RetryPolicyExhaustedException extends FatalException {
 
   /** Serial version */
-  private static final long serialVersionUID = 3300563235465630595L;
+  private static final long serialVersionUID = 3300563235465630597L;
 
   public RetryPolicyExhaustedException(I18nMessage message, Object component) {
     super(message, component);

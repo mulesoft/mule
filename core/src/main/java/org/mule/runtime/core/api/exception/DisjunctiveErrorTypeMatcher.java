@@ -20,6 +20,12 @@ public final class DisjunctiveErrorTypeMatcher implements ErrorTypeMatcher {
 
   @Override
   public boolean match(ErrorType errorType) {
-    return errorTypeMatchers.stream().anyMatch(errorTypeMatcher -> errorTypeMatcher.match(errorType));
+    for (ErrorTypeMatcher errorTypeMatcher : errorTypeMatchers) {
+      if (errorTypeMatcher.match(errorType)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
