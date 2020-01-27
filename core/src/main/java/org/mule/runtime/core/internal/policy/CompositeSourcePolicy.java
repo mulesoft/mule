@@ -47,7 +47,7 @@ import reactor.core.publisher.FluxSink;
  * @since 4.0
  */
 public class CompositeSourcePolicy
-    extends AbstractCompositePolicy<SourcePolicyParametersTransformer> implements SourcePolicy, Disposable {
+    extends AbstractCompositePolicy<SourcePolicyParametersTransformer> implements SourcePolicy, Disposable, DeferredDisposable {
 
   private static final Logger LOGGER = getLogger(CompositeSourcePolicy.class);
 
@@ -89,7 +89,7 @@ public class CompositeSourcePolicy
     super(parameterizedPolicies, sourcePolicyParametersTransformer);
     this.flowExecutionProcessor = flowExecutionProcessor;
     this.sourcePolicyProcessorFactory = sourcePolicyProcessorFactory;
-    this.commonPolicy = new CommonSourcePolicy(new SourceWithPoliciesFluxObjectFactory(), sourcePolicyParametersTransformer);
+    this.commonPolicy = new CommonSourcePolicy(new SourceWithPoliciesFluxObjectFactory());
     this.policyEventMapper = new PolicyEventMapper();
     this.resolver = ofNullable(resolver);
   }
@@ -134,7 +134,11 @@ public class CompositeSourcePolicy
                 commonPolicy.finishFlowProcessing(me.getEvent(), result, me, ctx);
               });
 
-      policyFlux.subscribe();
+      policyFlux.subscribe(null, e -> {
+        LOGGER.error("Exception reached PS subscriber for " + toString(), e);
+        // completionLatch.release();
+        // stopSchedulersIfNeeded();
+      });
       return sinkRef.getFluxSink();
     }
 
@@ -218,7 +222,6 @@ public class CompositeSourcePolicy
                       MessageSourceResponseParametersProcessor respParamProcessor,
                       CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> callback) {
     commonPolicy.process(sourceEvent, respParamProcessor, callback);
-
   }
 
   private Map<String, Object> concatMaps(Map<String, Object> originalResponseParameters,
@@ -273,5 +276,10 @@ public class CompositeSourcePolicy
   @Override
   public void dispose() {
     commonPolicy.dispose();
+  }
+
+  @Override
+  public Runnable deferredDispose() {
+    return () -> commonPolicy.dispose();
   }
 }
