@@ -8,6 +8,7 @@ package org.mule.module.launcher.application;
 
 import org.mule.module.launcher.GoodCitizenClassLoader;
 import org.mule.module.launcher.MuleApplicationClassLoader;
+import org.mule.module.launcher.artifact.ShutdownListener;
 import org.mule.module.launcher.nativelib.NativeLibraryFinderFactory;
 import org.mule.module.launcher.artifact.ArtifactClassLoader;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
@@ -48,19 +49,27 @@ public class MuleApplicationClassLoaderFactory implements ApplicationClassLoader
             parent = domainClassLoaderRepository.getDomainClassLoader(domain).getClassLoader();
         }
         final Set<PluginDescriptor> plugins = descriptor.getPlugins();
-        if (!plugins.isEmpty())
+        if (plugins.isEmpty())
         {
-            // Re-assigns parent if there are shared plugin libraries
-            URL[] pluginLibs = descriptor.getSharedPluginLibs();
-            if (pluginLibs != null && pluginLibs.length != 0)
-            {
-                parent = new GoodCitizenClassLoader(pluginLibs, parent);
-            }
-
-            // re-assign parent ref if any plugins deployed, will be used by the MuleAppCL
-            parent = new MulePluginsClassLoader(parent, plugins);
+            return new MuleApplicationClassLoader(descriptor.getName(), parent,
+                    descriptor.getLoaderOverride(), nativeLibraryFinderFactory.create(descriptor.getName()));
         }
-
-        return new MuleApplicationClassLoader(descriptor.getName(), parent, descriptor.getLoaderOverride(), nativeLibraryFinderFactory.create(descriptor.getName()));
+        // Re-assigns parent if there are shared plugin libraries
+        URL[] pluginLibs = descriptor.getSharedPluginLibs();
+        if (pluginLibs != null && pluginLibs.length != 0)
+        {
+            parent = new GoodCitizenClassLoader(pluginLibs, parent);
+        }
+        // re-assign parent ref if any plugins deployed, will be used by the MuleAppCL
+        final MulePluginsClassLoader parentPluginsClassLoader = new MulePluginsClassLoader(parent, plugins);
+        MuleApplicationClassLoader appClassLoader =  new MuleApplicationClassLoader(descriptor.getName(), parentPluginsClassLoader,
+                descriptor.getLoaderOverride(), nativeLibraryFinderFactory.create(descriptor.getName()));
+        appClassLoader.addShutdownListener(new ShutdownListener() {
+            @Override
+            public void execute() {
+                parentPluginsClassLoader.dispose();
+            }
+        });
+        return appClassLoader;
     }
 }
