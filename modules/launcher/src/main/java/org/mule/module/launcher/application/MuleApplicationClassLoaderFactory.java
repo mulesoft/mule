@@ -64,6 +64,9 @@ public class MuleApplicationClassLoaderFactory implements ApplicationClassLoader
         final MulePluginsClassLoader parentPluginsClassLoader = new MulePluginsClassLoader(parent, plugins);
         MuleApplicationClassLoader appClassLoader =  new MuleApplicationClassLoader(descriptor.getName(), parentPluginsClassLoader,
                 descriptor.getLoaderOverride(), nativeLibraryFinderFactory.create(descriptor.getName()));
+
+        // Adding shutdown listener to dispose the parent class loader created above.
+        // Without this, the plugins class loader would leak (see MULE-18006)
         appClassLoader.addShutdownListener(new ShutdownListener() {
             @Override
             public void execute() {
