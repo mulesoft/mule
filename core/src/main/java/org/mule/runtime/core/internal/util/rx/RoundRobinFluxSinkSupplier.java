@@ -27,7 +27,6 @@ public class RoundRobinFluxSinkSupplier<T> implements FluxSinkSupplier<T> {
   private final AtomicInteger index = new AtomicInteger(0);
   // Saving update function to avoid creating the lambda every time
   private final IntUnaryOperator update;
-  private volatile boolean disposed = false;
 
   public RoundRobinFluxSinkSupplier(int size, Supplier<FluxSink<T>> sinkFactory) {
     final List<FluxSink<T>> sinks = new ArrayList<>(size);
@@ -44,16 +43,11 @@ public class RoundRobinFluxSinkSupplier<T> implements FluxSinkSupplier<T> {
 
   @Override
   public void dispose() {
-    disposed = true;
     fluxSinks.forEach(FluxSink::complete);
   }
 
   @Override
   public FluxSink<T> get() {
-    // if (disposed) {
-    // throw new MuleRuntimeException(createStaticMessage("FluxSinkSupplier already disposed."));
-    // }
-
     return fluxSinks.get(nextIndex());
   }
 

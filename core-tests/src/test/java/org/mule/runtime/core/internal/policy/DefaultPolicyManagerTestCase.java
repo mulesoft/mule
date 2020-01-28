@@ -355,7 +355,6 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     final InternalEvent event = mock(InternalEvent.class);
 
     OperationPolicyContext ctx = mock(OperationPolicyContext.class);
-    // when(ctx.getPointcutParameters()).thenReturn(mock(PolicyPointcutParameters.class));
     when(event.getOperationPolicyContext()).thenReturn((EventInternalContext) ctx);
 
     OperationPolicy policyInstance =
