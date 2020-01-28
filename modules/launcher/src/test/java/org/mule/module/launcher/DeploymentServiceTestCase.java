@@ -1428,6 +1428,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertDeploymentSuccess(applicationDeploymentListener, echoPluginAppFileBuilder.getId());
         final Application app = findApp(echoPluginAppFileBuilder.getId(), 1);
+        assertThat(MuleFoldersUtil.getAppTempFolder(app.getArtifactName()).exists(), is(true));
 
         // As this app has a plugin, the tmp directory must exist
         assertApplicationTmpFileExists(app.getArtifactName());
@@ -1440,6 +1441,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         // Check the tmp directory was effectively removed
         assertApplicationTmpFileDoesNotExists(app.getArtifactName());
+        assertThat(MuleFoldersUtil.getAppTempFolder(app.getArtifactName()).exists(), is(false));
     }
 
     @Test
