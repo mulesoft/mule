@@ -124,11 +124,7 @@ public class CompositeOperationPolicy
             from(me.getEvent()).getOperationCallerCallback().error(me);
           });
 
-      policyFlux.subscribe(null, e -> {
-        LOGGER.error("Exception reached PS subscriber for " + toString(), e);
-        // completionLatch.release();
-        // stopSchedulersIfNeeded();
-      });
+      policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + toString(), e));
       return sinkRef.getFluxSink();
     }
   }
@@ -245,7 +241,7 @@ public class CompositeOperationPolicy
   }
 
   @Override
-  public Runnable deferredDispose() {
+  public Disposable deferredDispose() {
     return () -> {
       policySinks.invalidateAll();
       completionCallbackScheduler.stop();

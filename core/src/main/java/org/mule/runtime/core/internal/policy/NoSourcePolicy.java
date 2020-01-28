@@ -88,11 +88,8 @@ public class NoSourcePolicy implements SourcePolicy, Disposable, DeferredDisposa
                                                   from(event));
               });
 
-      policyFlux.subscribe(null, e -> {
-        LOGGER.error("Exception reached PS subscriber for " + toString(), e);
-        // completionLatch.release();
-        // stopSchedulersIfNeeded();
-      });
+      policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + toString(), e));
+
       return sinkRef.getFluxSink();
     }
 
@@ -111,7 +108,7 @@ public class NoSourcePolicy implements SourcePolicy, Disposable, DeferredDisposa
   }
 
   @Override
-  public Runnable deferredDispose() {
+  public Disposable deferredDispose() {
     return () -> commonPolicy.dispose();
   }
 }

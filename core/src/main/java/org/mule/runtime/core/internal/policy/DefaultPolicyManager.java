@@ -388,7 +388,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
 
   private static final class DeferredDisposableWeakReference extends WeakReference<DeferredDisposable> implements Disposable {
 
-    private final Runnable deferredDispose;
+    private final Disposable deferredDispose;
 
     public DeferredDisposableWeakReference(DeferredDisposable referent, ReferenceQueue<? super DeferredDisposable> q) {
       super(referent, q);
@@ -397,7 +397,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
 
     @Override
     public void dispose() {
-      deferredDispose.run();
+      deferredDispose.dispose();
     }
   }
 }

@@ -134,11 +134,8 @@ public class CompositeSourcePolicy
                 commonPolicy.finishFlowProcessing(me.getEvent(), result, me, ctx);
               });
 
-      policyFlux.subscribe(null, e -> {
-        LOGGER.error("Exception reached PS subscriber for " + toString(), e);
-        // completionLatch.release();
-        // stopSchedulersIfNeeded();
-      });
+      policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + toString(), e));
+
       return sinkRef.getFluxSink();
     }
 
@@ -279,7 +276,7 @@ public class CompositeSourcePolicy
   }
 
   @Override
-  public Runnable deferredDispose() {
+  public Disposable deferredDispose() {
     return () -> commonPolicy.dispose();
   }
 }
