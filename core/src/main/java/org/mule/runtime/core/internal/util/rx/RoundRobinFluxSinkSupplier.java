@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-
-import org.mule.runtime.api.exception.MuleRuntimeException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -54,9 +50,9 @@ public class RoundRobinFluxSinkSupplier<T> implements FluxSinkSupplier<T> {
 
   @Override
   public FluxSink<T> get() {
-    if (disposed) {
-      throw new MuleRuntimeException(createStaticMessage("FluxSinkSupplier already disposed."));
-    }
+    // if (disposed) {
+    // throw new MuleRuntimeException(createStaticMessage("FluxSinkSupplier already disposed."));
+    // }
 
     return fluxSinks.get(nextIndex());
   }

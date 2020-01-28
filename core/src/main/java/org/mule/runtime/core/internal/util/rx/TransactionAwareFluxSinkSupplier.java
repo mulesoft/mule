@@ -7,10 +7,7 @@
 package org.mule.runtime.core.internal.util.rx;
 
 import static java.lang.Thread.currentThread;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
-
-import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.util.function.Supplier;
 
@@ -45,9 +42,9 @@ public class TransactionAwareFluxSinkSupplier<T> implements FluxSinkSupplier<T> 
 
   @Override
   public FluxSink<T> get() {
-    if (disposed) {
-      throw new MuleRuntimeException(createStaticMessage("FluxSinkSupplier already disposed."));
-    }
+    // if (disposed) {
+    // throw new MuleRuntimeException(createStaticMessage("FluxSinkSupplier already disposed."));
+    // }
 
     // In case of tx we need to ensure that in use of the delegate supplier there are no 2 threads trying to use the
     // same sink. This could cause a race condition in which the second thread simply queues the event in the busy sink.
