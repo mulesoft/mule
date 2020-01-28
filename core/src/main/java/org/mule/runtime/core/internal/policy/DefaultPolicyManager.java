@@ -230,12 +230,12 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
                  innerKey -> innerKey.isEmpty()
                      ? NO_POLICY_OPERATION
                      : compositePolicyFactory.createOperationPolicy(operation, innerKey,
-                                                    lookupOperationParametersTransformer(outerKey.getFirst()),
-                                                    operationPolicyProcessorFactory,
-                                                    muleContext.getConfiguration().getShutdownTimeout(),
-                                                    muleContext.getSchedulerService()
-                                                        .ioScheduler(muleContext.getSchedulerBaseConfig()
-                                                            .withMaxConcurrentTasks(1)
+                                                                    lookupOperationParametersTransformer(outerKey.getFirst()),
+                                                                    operationPolicyProcessorFactory,
+                                                                    muleContext.getConfiguration().getShutdownTimeout(),
+                                                                    muleContext.getSchedulerService()
+                                                                        .ioScheduler(muleContext.getSchedulerBaseConfig()
+                                                                            .withMaxConcurrentTasks(1)
                                                                             .withName(operation.getLocation().getLocation()
                                                                                 + ".policy.flux.")))));
 
@@ -341,9 +341,9 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   }
 
   private void disposePolicies() {
-      noPolicySourceInstances.asMap().values().forEach(policy -> disposeIfNeeded(policy, LOGGER));
-      sourcePolicyInnerCache.asMap().values().forEach(policy -> disposeIfNeeded(policy, LOGGER));
-      operationPolicyInnerCache.asMap().values().forEach(policy -> disposeIfNeeded(policy, LOGGER));
+    noPolicySourceInstances.asMap().values().forEach(policy -> disposeIfNeeded(policy, LOGGER));
+    sourcePolicyInnerCache.asMap().values().forEach(policy -> disposeIfNeeded(policy, LOGGER));
+    operationPolicyInnerCache.asMap().values().forEach(policy -> disposeIfNeeded(policy, LOGGER));
   }
 
   private void evictCaches() {

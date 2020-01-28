@@ -276,9 +276,9 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
 
       @Override
       public SourcePolicy createSourcePolicy(List<Policy> innerKey, ReactiveProcessor flowExecutionProcessor,
-                                                      Optional<SourcePolicyParametersTransformer> lookupSourceParametersTransformer,
-                                                      SourcePolicyProcessorFactory sourcePolicyProcessorFactory,
-                                                      Function<MessagingException, MessagingException> resolver) {
+                                             Optional<SourcePolicyParametersTransformer> lookupSourceParametersTransformer,
+                                             SourcePolicyProcessorFactory sourcePolicyProcessorFactory,
+                                             Function<MessagingException, MessagingException> resolver) {
         return new DisposeListenerSourcePolicy(() -> sourcePolicydisposed.set(true));
       }
     });
