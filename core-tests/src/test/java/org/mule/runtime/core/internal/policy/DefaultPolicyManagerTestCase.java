@@ -19,6 +19,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
@@ -86,8 +87,10 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
 
     flow1Component = mock(Component.class);
     when(flow1Component.getLocation()).thenReturn(fromSingleComponent("flow1"));
+    when(flow1Component.getRootContainerLocation()).thenReturn(builderFromStringRepresentation("flow1").build());
     flow2Component = mock(Component.class);
     when(flow2Component.getLocation()).thenReturn(fromSingleComponent("flow2"));
+    when(flow2Component.getRootContainerLocation()).thenReturn(builderFromStringRepresentation("flow2").build());
 
     operation1Component = mock(Component.class);
     when(operation1Component.getLocation()).thenReturn(fromSingleComponent("flow/processors/1"));

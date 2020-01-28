@@ -157,7 +157,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
     final ComponentIdentifier sourceIdentifier = source.getLocation().getComponentIdentifier().getIdentifier();
 
     if (!isPoliciesAvailable.get()) {
-      final SourcePolicy policy = noPolicySourceInstances.getIfPresent(source.getLocation().getRootContainerName());
+      final SourcePolicy policy = noPolicySourceInstances.getIfPresent(source.getRootContainerLocation().getGlobalName());
 
       if (policy != null) {
         return policy;
@@ -176,6 +176,10 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
     final SourcePolicy policy = sourcePolicyOuterCache.getIfPresent(policyKey);
     if (policy != null) {
       return policy;
+    }
+
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Source policy - populating outer cache for {}", policyKey);
     }
 
     SourcePolicy sourcePolicy = sourcePolicyOuterCache.get(policyKey, outerKey -> sourcePolicyInnerCache
@@ -222,6 +226,10 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
     final OperationPolicy policy = operationPolicyOuterCache.getIfPresent(policyKey);
     if (policy != null) {
       return policy;
+    }
+
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Operation policy - populating outer cache for {}", policyKey);
     }
 
     OperationPolicy operationPolicy =
