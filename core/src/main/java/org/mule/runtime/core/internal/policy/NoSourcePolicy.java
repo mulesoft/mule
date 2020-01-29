@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.policy;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.functional.Either;
@@ -21,6 +22,8 @@ import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -29,7 +32,9 @@ import reactor.core.publisher.FluxSink;
  *
  * @since 4.0
  */
-public class NoSourcePolicy implements SourcePolicy, Disposable {
+public class NoSourcePolicy implements SourcePolicy, Disposable, DeferredDisposable {
+
+  private static final Logger LOGGER = getLogger(NoSourcePolicy.class);
 
   private final CommonSourcePolicy commonPolicy;
 
@@ -83,7 +88,8 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
                                                   from(event));
               });
 
-      policyFlux.subscribe();
+      policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + toString(), e));
+
       return sinkRef.getFluxSink();
     }
 
@@ -99,5 +105,10 @@ public class NoSourcePolicy implements SourcePolicy, Disposable {
   @Override
   public void dispose() {
     commonPolicy.dispose();
+  }
+
+  @Override
+  public Disposable deferredDispose() {
+    return () -> commonPolicy.dispose();
   }
 }

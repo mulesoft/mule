@@ -6,15 +6,12 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static java.util.Optional.empty;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.block;
@@ -103,27 +100,6 @@ public class NoSourcePolicyTestCase extends AbstractMuleTestCase {
     assertThat(result.getRight(), nullValue());
     assertThat(result.getLeft().getErrorResponseParameters().get(), is(errorParameters));
     assertThat(result.getLeft().getMessagingException().getEvent(), is(updatedEvent));
-  }
-
-  @Test
-  public void processAfterPolicyDispose() throws Throwable {
-    Map<String, Object> errorParameters = responseParameters();
-    when(respParametersProcessor.getFailedExecutionResponseParametersFunction().apply(initialEvent))
-        .thenReturn(errorParameters);
-    noSourcePolicy.dispose();
-
-    Either<SourcePolicyFailureResult, SourcePolicySuccessResult> result =
-        block(callback -> noSourcePolicy.process(initialEvent, respParametersProcessor, callback));
-
-    verify(initialEvent.getContext()).error(result.getLeft().getMessagingException());
-
-    assertThat(result.getRight(), nullValue());
-    assertThat(result.getLeft().getMessagingException().getEvent().getMessage(), is(initialEvent.getMessage()));
-    assertThat(result.getLeft().getMessagingException().getEvent().getContext(), is(initialEvent.getContext()));
-    assertThat(result.getLeft().getMessagingException().getEvent().getSecurityContext(),
-               is(initialEvent.getSecurityContext()));
-    assertThat(result.getLeft().getMessagingException().getEvent().getError(), not(is(empty())));
-    assertThat(result.getLeft().getErrorResponseParameters().get(), is(errorParameters));
   }
 
   private Map<String, Object> responseParameters() {

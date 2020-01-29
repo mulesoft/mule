@@ -271,26 +271,6 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
     assertThat(operationPolicy.getPolicyCount(), is(getRuntime().availableProcessors()));
   }
 
-  @Test
-  public void processAfterPolicyDispose() throws Throwable {
-    expectedException.expect(MessagingException.class);
-
-    compositeOperationPolicy = new CompositeOperationPolicy(operation, asList(firstPolicy, secondPolicy),
-                                                            operationPolicyParametersTransformer,
-                                                            operationPolicyProcessorFactory,
-                                                            muleContext.getConfiguration().getShutdownTimeout(),
-                                                            fluxCompleteScheduler);
-
-    compositeOperationPolicy.dispose();
-
-    try {
-      block(callback -> compositeOperationPolicy.process(initialEvent, operationExecutionFunction, operationParametersProcessor,
-                                                         operationLocation, callback));
-    } catch (Exception throwable) {
-      throw rxExceptionToMuleException(throwable);
-    }
-  }
-
   public static final class InvocationsRecordingCompositeOperationPolicy extends CompositeOperationPolicy {
 
     private static final AtomicInteger nextOperation = new AtomicInteger();

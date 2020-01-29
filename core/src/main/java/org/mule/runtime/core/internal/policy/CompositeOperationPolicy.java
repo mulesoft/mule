@@ -10,11 +10,10 @@ import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.Runtime.getRuntime;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
-import static org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock.readWriteLock;
 import static org.mule.runtime.core.internal.policy.OperationPolicyContext.from;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.create;
 import static reactor.core.publisher.Flux.from;
@@ -29,7 +28,6 @@ import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.rx.Exceptions;
-import org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
@@ -41,10 +39,10 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
@@ -61,7 +59,9 @@ import reactor.core.publisher.FluxSink;
  */
 public class CompositeOperationPolicy
     extends AbstractCompositePolicy<OperationPolicyParametersTransformer>
-    implements OperationPolicy, Disposable {
+    implements OperationPolicy, Disposable, DeferredDisposable {
+
+  private static final Logger LOGGER = getLogger(CompositeOperationPolicy.class);
 
   private final Component operation;
   private final OperationPolicyProcessorFactory operationPolicyProcessorFactory;
@@ -70,8 +70,6 @@ public class CompositeOperationPolicy
 
   private final long shutdownTimeout;
   private final Scheduler completionCallbackScheduler;
-  private final AtomicBoolean disposed;
-  private final FunctionalReadWriteLock readWriteLock;
 
   /**
    * Creates a new composite policy.
@@ -97,8 +95,6 @@ public class CompositeOperationPolicy
     super(parameterizedPolicies, operationPolicyParametersTransformer);
     this.operation = operation;
     this.operationPolicyProcessorFactory = operationPolicyProcessorFactory;
-    this.disposed = new AtomicBoolean(false);
-    this.readWriteLock = readWriteLock();
     this.policySinks = newBuilder()
         .removalListener((String key, FluxSinkSupplier<CoreEvent> value, RemovalCause cause) -> {
           value.dispose();
@@ -128,7 +124,7 @@ public class CompositeOperationPolicy
             from(me.getEvent()).getOperationCallerCallback().error(me);
           });
 
-      policyFlux.subscribe();
+      policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + toString(), e));
       return sinkRef.getFluxSink();
     }
   }
@@ -217,17 +213,11 @@ public class CompositeOperationPolicy
                       ComponentLocation operationLocation,
                       ExecutorCallback callback) {
 
-    readWriteLock.withReadLock(() -> {
-      if (!disposed.get()) {
-        FluxSink<CoreEvent> policySink = policySinks.get(operationLocation.getLocation()).get();
+    FluxSink<CoreEvent> policySink = policySinks.get(operationLocation.getLocation()).get();
 
-        policySink.next(operationEventForPolicy(operationEvent,
-                                                operationExecutionFunction,
-                                                parametersProcessor, callback));
-      } else {
-        callback.error(new MessagingException(createStaticMessage("Operation policy already disposed"), operationEvent));
-      }
-    });
+    policySink.next(operationEventForPolicy(operationEvent,
+                                            operationExecutionFunction,
+                                            parametersProcessor, callback));
   }
 
   private CoreEvent operationEventForPolicy(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
@@ -246,10 +236,15 @@ public class CompositeOperationPolicy
 
   @Override
   public void dispose() {
-    readWriteLock.withWriteLock(() -> {
+    policySinks.invalidateAll();
+    completionCallbackScheduler.stop();
+  }
+
+  @Override
+  public Disposable deferredDispose() {
+    return () -> {
       policySinks.invalidateAll();
       completionCallbackScheduler.stop();
-      disposed.set(true);
-    });
+    };
   }
 }

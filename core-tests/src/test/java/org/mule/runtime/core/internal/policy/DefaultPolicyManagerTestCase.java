@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -18,21 +19,40 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.tck.probe.PollingProber.probe;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.execution.CompletableCallback;
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.functional.Either;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.core.api.policy.PolicyProvider;
+import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 import org.junit.After;
 import org.junit.Before;
@@ -67,8 +87,10 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
 
     flow1Component = mock(Component.class);
     when(flow1Component.getLocation()).thenReturn(fromSingleComponent("flow1"));
+    when(flow1Component.getRootContainerLocation()).thenReturn(builderFromStringRepresentation("flow1").build());
     flow2Component = mock(Component.class);
     when(flow2Component.getLocation()).thenReturn(fromSingleComponent("flow2"));
+    when(flow2Component.getRootContainerLocation()).thenReturn(builderFromStringRepresentation("flow2").build());
 
     operation1Component = mock(Component.class);
     when(operation1Component.getLocation()).thenReturn(fromSingleComponent("flow/processors/1"));
@@ -251,6 +273,111 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     assertThat(policy1, sameInstance(policy2));
   }
 
+  @Test
+  public void sourcePolicyAcceptsWhileAvailable() throws MuleException {
+    startIfNeeded(policyManager);
+
+    AtomicBoolean sourcePolicydisposed = new AtomicBoolean(false);
+
+    policyManager.setCompositePolicyFactory(new CompositePolicyFactory() {
+
+      @Override
+      public SourcePolicy createSourcePolicy(List<Policy> innerKey, ReactiveProcessor flowExecutionProcessor,
+                                             Optional<SourcePolicyParametersTransformer> lookupSourceParametersTransformer,
+                                             SourcePolicyProcessorFactory sourcePolicyProcessorFactory,
+                                             Function<MessagingException, MessagingException> resolver) {
+        return new DisposeListenerSourcePolicy(() -> sourcePolicydisposed.set(true));
+      }
+    });
+
+    final Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
+
+    when(policyProvider.findSourceParameterizedPolicies(any())).thenReturn(asList(policy));
+
+    when(policyProvider.isPoliciesAvailable()).thenReturn(true);
+    policiesChangeCallbackCaptor.getValue().run();
+
+    final InternalEvent event = mock(InternalEvent.class);
+
+    SourcePolicyContext ctx = mock(SourcePolicyContext.class);
+    when(ctx.getPointcutParameters()).thenReturn(mock(PolicyPointcutParameters.class));
+    when(event.getSourcePolicyContext()).thenReturn((EventInternalContext) ctx);
+
+    SourcePolicy policyInstance =
+        policyManager.createSourcePolicyInstance(flow1Component, event, ePub -> ePub,
+                                                 mock(MessageSourceResponseParametersProcessor.class));
+
+    // Clear the caches of the policyManager...
+    policiesChangeCallbackCaptor.getValue().run();
+
+    System.gc();
+    // Verify that the previously obtained policyInstance is still good
+    assertThat(sourcePolicydisposed.get(), is(false));
+
+    policyInstance = null;
+
+    // Verify that dispose is called when the policy is no longer being used
+    probe(() -> {
+      System.gc();
+      return sourcePolicydisposed.get();
+    });
+
+    stopIfNeeded(policyManager);
+  }
+
+  @Test
+  public void operationPolicyAcceptsWhileAvailable() throws MuleException {
+    startIfNeeded(policyManager);
+
+    AtomicBoolean operationPolicydisposed = new AtomicBoolean(false);
+
+    policyManager.setCompositePolicyFactory(new CompositePolicyFactory() {
+
+      @Override
+      public OperationPolicy createOperationPolicy(Component operation, List<Policy> innerKey,
+                                                   Optional<OperationPolicyParametersTransformer> paramsTransformer,
+                                                   OperationPolicyProcessorFactory operationPolicyProcessorFactory,
+                                                   long shutdownTimeout, Scheduler scheduler) {
+        return new DisposeListenerSourcePolicy(() -> {
+          scheduler.stop();
+          operationPolicydisposed.set(true);
+        });
+      }
+    });
+
+    final Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
+
+    when(policyProvider.findOperationParameterizedPolicies(any())).thenReturn(asList(policy));
+
+    when(policyProvider.isPoliciesAvailable()).thenReturn(true);
+    policiesChangeCallbackCaptor.getValue().run();
+
+    final InternalEvent event = mock(InternalEvent.class);
+
+    OperationPolicyContext ctx = mock(OperationPolicyContext.class);
+    when(event.getOperationPolicyContext()).thenReturn((EventInternalContext) ctx);
+
+    OperationPolicy policyInstance =
+        policyManager.createOperationPolicy(flow1Component, event, mock(OperationParametersProcessor.class));
+
+    // Clear the caches of the policyManager...
+    policiesChangeCallbackCaptor.getValue().run();
+
+    System.gc();
+    // Verify that the previously obtained policyInstance is still good
+    assertThat(operationPolicydisposed.get(), is(false));
+
+    policyInstance = null;
+
+    // Verify that dispose is called when the policy is no longer being used
+    probe(() -> {
+      System.gc();
+      return operationPolicydisposed.get();
+    });
+
+    stopIfNeeded(policyManager);
+  }
+
   private Policy mockPolicy() {
     Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
     when(policy.getPolicyChain().getProcessingStrategy().onPipeline(ArgumentMatchers.any()))
@@ -259,4 +386,35 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     return policy;
   }
 
+  private static class DisposeListenerSourcePolicy implements SourcePolicy, OperationPolicy, Disposable, DeferredDisposable {
+
+    private final Disposable onDispose;
+
+    public DisposeListenerSourcePolicy(Disposable onDispose) {
+      this.onDispose = onDispose;
+    }
+
+    @Override
+    public void dispose() {
+      onDispose.dispose();
+    }
+
+    @Override
+    public Disposable deferredDispose() {
+      return onDispose;
+    }
+
+    @Override
+    public void process(CoreEvent sourceEvent, MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor,
+                        CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> callback) {
+      // nothing to do
+    }
+
+    @Override
+    public void process(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
+                        OperationParametersProcessor parametersProcessor, ComponentLocation componentLocation,
+                        ExecutorCallback callback) {
+      // nothing to do
+    }
+  }
 }
