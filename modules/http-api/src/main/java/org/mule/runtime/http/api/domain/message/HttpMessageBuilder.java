@@ -125,7 +125,7 @@ public abstract class HttpMessageBuilder<B extends HttpMessageBuilder, M extends
    * @return the value of the header or {@code null} if there isn't one
    */
   public Optional<String> getHeaderValue(String name) {
-    if (this.headers == null || this.headers.isEmpty()) {
+    if (this.headers == null) {
       return empty();
     }
     return ofNullable(headers.get(name));

@@ -73,16 +73,23 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
   }
 
   public CaseInsensitiveMultiMap(MultiMap<String, String> multiMap, boolean optimized) {
+
+    this.optimized = optimized;
+    this.paramsMap = optimized
+        ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>())
+        : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
+    putAll(multiMap);
+    /*
     this.optimized = optimized;
     if (multiMap instanceof CaseInsensitiveMultiMap) {
-      //this.paramsMap = ((CaseInsensitiveMapWrapper)((CaseInsensitiveMultiMap)multiMap).paramsMap).copy();
-      this.createParamsMap((CaseInsensitiveMultiMap) multiMap);
+    //this.paramsMap = ((CaseInsensitiveMapWrapper)((CaseInsensitiveMultiMap)multiMap).paramsMap).copy();
+    this.createParamsMap((CaseInsensitiveMultiMap) multiMap);
     } else {
-      this.paramsMap = optimized
-          ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>())
-          : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
-      putAll(multiMap);
-    }
+    this.paramsMap = optimized
+        ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>())
+        : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
+    putAll(multiMap);
+    }*/
   }
 
   private void createParamsMap(CaseInsensitiveMultiMap multiMap) {
