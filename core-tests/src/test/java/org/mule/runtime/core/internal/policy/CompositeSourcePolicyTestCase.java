@@ -9,12 +9,8 @@ package org.mule.runtime.core.internal.policy;
 import static java.lang.Runtime.getRuntime;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
@@ -38,16 +34,10 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.internal.event.DefaultEventBuilder;
-import org.mule.runtime.core.internal.exception.DefaultErrorTypeRepository;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -56,6 +46,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
@@ -251,36 +242,6 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
 
     assertThat(sourcePolicy.getNextOperationCount(), is(getRuntime().availableProcessors()));
     assertThat(sourcePolicy.getPolicyCount(), is(getRuntime().availableProcessors()));
-  }
-
-  @Test
-  public void processAfterPolicyDispose() {
-    Map<String, Object> errorParameters = ImmutableMap.of("param", "value");
-    when(sourcePolicyParametersTransformer.fromMessageToErrorResponseParameters(initialEvent.getMessage()))
-        .thenReturn(errorParameters);
-
-    compositeSourcePolicy =
-        new CompositeSourcePolicy(asList(firstPolicy, secondPolicy), flowExecutionProcessor,
-                                  of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory);
-
-    compositeSourcePolicy.dispose();
-
-    final Publisher<CoreEvent> responsePublisher = ((BaseEventContext) initialEvent.getContext()).getResponsePublisher();
-
-    Either<SourcePolicyFailureResult, SourcePolicySuccessResult> sourcePolicyResult =
-        from(compositeSourcePolicy.process(initialEvent, sourceParametersProcessor)).block();
-
-    assertThat(sourcePolicyResult.getRight(), nullValue());
-    assertThat(sourcePolicyResult.getLeft().getMessagingException().getEvent().getMessage(), is(initialEvent.getMessage()));
-    assertThat(sourcePolicyResult.getLeft().getMessagingException().getEvent().getContext(), is(initialEvent.getContext()));
-    assertThat(sourcePolicyResult.getLeft().getMessagingException().getEvent().getVariables(), is(initialEvent.getVariables()));
-    assertThat(sourcePolicyResult.getLeft().getMessagingException().getEvent().getSecurityContext(),
-               is(initialEvent.getSecurityContext()));
-    assertThat(sourcePolicyResult.getLeft().getMessagingException().getEvent().getError(), not(is(empty())));
-    assertThat(sourcePolicyResult.getLeft().getErrorResponseParameters().get(), is(errorParameters));
-
-    expectedException.expectCause(is(sourcePolicyResult.getLeft().getMessagingException()));
-    from(responsePublisher).block();
   }
 
   public static final class InvocationsRecordingCompositeSourcePolicy extends CompositeSourcePolicy {

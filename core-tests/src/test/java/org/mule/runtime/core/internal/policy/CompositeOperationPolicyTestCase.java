@@ -27,6 +27,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -47,6 +48,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -222,24 +224,6 @@ public class CompositeOperationPolicyTestCase extends AbstractCompositePolicyTes
 
     assertThat(operationPolicy.getNextOperationCount(), is(getRuntime().availableProcessors()));
     assertThat(operationPolicy.getPolicyCount(), is(getRuntime().availableProcessors()));
-  }
-
-  @Test
-  public void processAfterPolicyDispose() throws MuleException {
-    expectedException.expect(MessagingException.class);
-
-    compositeOperationPolicy = new CompositeOperationPolicy(operation, asList(firstPolicy, secondPolicy),
-                                                            operationPolicyParametersTransformer,
-                                                            operationPolicyProcessorFactory);
-
-    compositeOperationPolicy.dispose();
-
-    try {
-      from(compositeOperationPolicy.process(initialEvent, operationExecutionFunction, operationParametersProcessor,
-                                            operationLocation)).block();
-    } catch (Exception throwable) {
-      throw rxExceptionToMuleException(throwable);
-    }
   }
 
   public static final class InvocationsRecordingCompositeOperationPolicy extends CompositeOperationPolicy {

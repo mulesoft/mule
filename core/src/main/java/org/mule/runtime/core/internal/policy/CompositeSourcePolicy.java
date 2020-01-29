@@ -34,6 +34,7 @@ import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -45,7 +46,7 @@ import reactor.core.publisher.FluxSink;
  * @since 4.0
  */
 public class CompositeSourcePolicy
-    extends AbstractCompositePolicy<SourcePolicyParametersTransformer> implements SourcePolicy, Disposable {
+    extends AbstractCompositePolicy<SourcePolicyParametersTransformer> implements SourcePolicy, Disposable, DeferredDisposable {
 
   private static final Logger LOGGER = getLogger(CompositeSourcePolicy.class);
 
@@ -59,7 +60,7 @@ public class CompositeSourcePolicy
   private final ReactiveProcessor flowExecutionProcessor;
 
   private final PolicyEventMapper policyEventMapper;
-  private Optional<Function<MessagingException, MessagingException>> resolver;
+  private final Optional<Function<MessagingException, MessagingException>> resolver;
 
   /**
    * Creates a new source policy composed by several {@link Policy} that will be chain together.
@@ -93,7 +94,7 @@ public class CompositeSourcePolicy
     super(parameterizedPolicies, sourcePolicyParametersTransformer);
     this.flowExecutionProcessor = flowExecutionProcessor;
     this.sourcePolicyProcessorFactory = sourcePolicyProcessorFactory;
-    this.commonPolicy = new CommonSourcePolicy(new SourceWithPoliciesFluxObjectFactory(), sourcePolicyParametersTransformer);
+    this.commonPolicy = new CommonSourcePolicy(new SourceWithPoliciesFluxObjectFactory());
     this.policyEventMapper = new PolicyEventMapper();
     this.resolver = ofNullable(resolver);
   }
@@ -129,7 +130,7 @@ public class CompositeSourcePolicy
                 commonPolicy.finishFlowProcessing(me.getEvent(), result, me);
               });
 
-      policyFlux.subscribe();
+      policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + toString(), e));
       return sinkRef.getFluxSink();
     }
 
@@ -281,5 +282,10 @@ public class CompositeSourcePolicy
   @Override
   public void dispose() {
     commonPolicy.dispose();
+  }
+
+  @Override
+  public Disposable deferredDispose() {
+    return () -> commonPolicy.dispose();
   }
 }

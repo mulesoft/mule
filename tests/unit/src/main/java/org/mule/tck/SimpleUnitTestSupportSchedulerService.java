@@ -185,7 +185,10 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
 
   private boolean skip(StackTraceElement ste) {
     return ste.getClassName().startsWith(SimpleUnitTestSupportSchedulerService.class.getName())
+        || ste.getClassName().startsWith("org.mule.runtime.core.api.util.ClassUtils")
+        || ste.getClassName().startsWith("org.mule.runtime.core.api.util.ExceptionUtils")
         || ste.getClassName().startsWith("org.mockito")
+        || ste.getClassName().startsWith("sun.reflect.")
         || ste.getClassName().contains("$Proxy")
         || ste.getClassName().contains("$$Enhancer");
   }
