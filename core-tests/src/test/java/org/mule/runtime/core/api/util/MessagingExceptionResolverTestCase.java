@@ -191,8 +191,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   }
 
   private void assertExceptionMessage(String result, String expected) {
-    String expectedMessage = String.format("%s.", expected);
-    assertThat(result, containsString(expectedMessage));
+    assertThat(result, containsString(expected));
   }
 
   private void assertExceptionErrorType(MessagingException me, ErrorType expected) {

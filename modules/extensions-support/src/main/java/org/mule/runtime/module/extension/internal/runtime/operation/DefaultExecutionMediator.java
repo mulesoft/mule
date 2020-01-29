@@ -92,7 +92,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
    * Executes the operation per the specification in this classes' javadoc
    *
    * @param executor an {@link CompletableComponentExecutor}
-   * @param context  the {@link ExecutionContextAdapter} for the {@code executor} to use
+   * @param context the {@link ExecutionContextAdapter} for the {@code executor} to use
    * @return the operation's result
    * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invokation fails
    */
@@ -183,20 +183,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
                                        MutableConfigurationStats stats,
                                        ExecutorCallback executorCallback) {
 
-    Consumer<ExecutorCallback> executeCommand = callback -> {
-      Throwable t = interceptorChain.before(context, callback);
-      if (t == null) {
-        final Thread currentThread = Thread.currentThread();
-        final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-        currentThread.setContextClassLoader(extensionClassLoader);
-        try {
-          executor.execute(context, callback);
-        } finally {
-          currentThread.setContextClassLoader(currentClassLoader);
-        }
-      }
-    };
-
     ExecutorCallback callbackDelegate = new ExecutorCallback() {
 
       @Override
@@ -240,9 +226,24 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
     RetryPolicyTemplate retryPolicy = context.getRetryPolicyTemplate().orElse(null);
     if (retryPolicy != null && retryPolicy.isEnabled()) {
-      executeWithRetry(context, retryPolicy, executeCommand, callbackDelegate);
+      executeWithRetry(context, retryPolicy, callback -> executeCommand(executor, context, callback), callbackDelegate);
     } else {
-      executeCommand.accept(callbackDelegate);
+      executeCommand(executor, context, callbackDelegate);
+    }
+  }
+
+  private void executeCommand(CompletableComponentExecutor<M> executor, ExecutionContextAdapter<M> context,
+                              ExecutorCallback callback) {
+    Throwable t = interceptorChain.before(context, callback);
+    if (t == null) {
+      final Thread currentThread = Thread.currentThread();
+      final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+      currentThread.setContextClassLoader(extensionClassLoader);
+      try {
+        executor.execute(context, callback);
+      } finally {
+        currentThread.setContextClassLoader(currentClassLoader);
+      }
     }
   }
 
@@ -263,14 +264,19 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   }
 
   private <T> ExecutionTemplate<T> getExecutionTemplate(ExecutionContextAdapter<ComponentModel> context) {
-    return context.getTransactionConfig()
-        .map(txConfig -> ((ExecutionTemplate<T>) createTransactionalExecutionTemplate(context.getMuleContext(), txConfig)))
-        .orElse((ExecutionTemplate<T>) defaultExecutionTemplate);
+    if (context.getTransactionConfig().isPresent()) {
+      return ((ExecutionTemplate<T>) createTransactionalExecutionTemplate(context.getMuleContext(),
+                                                                          context.getTransactionConfig().get()));
+    } else {
+      return (ExecutionTemplate<T>) defaultExecutionTemplate;
+    }
   }
 
   private MutableConfigurationStats getMutableConfigurationStats(ExecutionContext<M> context) {
-    return context.getConfiguration()
-        .map(c -> (MutableConfigurationStats) c.getStatistics())
-        .orElse(null);
+    if (context.getConfiguration().isPresent()) {
+      return (MutableConfigurationStats) (context.getConfiguration().get()).getStatistics();
+    } else {
+      return null;
+    }
   }
 }
