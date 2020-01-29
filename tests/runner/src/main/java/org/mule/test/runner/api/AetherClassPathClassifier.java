@@ -32,6 +32,7 @@ import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
+import static org.mule.test.runner.api.ArtifactClassificationType.SERVICE;
 
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -202,7 +203,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     }
 
     List<ArtifactUrlClassification> serviceUrlClassifications =
-        buildServicesUrlClassification(context, directDependencies, remoteRepositories);
+        buildServicesUrlClassification(context, directDependencies, rootArtifactType, remoteRepositories);
     if (logger.isDebugEnabled()) {
       logger.debug("Resolved services: {}", serviceUrlClassifications.stream()
           .map(serviceUrlClassification -> serviceUrlClassification.getArtifactId()).collect(toList()));
@@ -238,6 +239,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    */
   private List<ArtifactUrlClassification> buildServicesUrlClassification(final ClassPathClassifierContext context,
                                                                          final List<Dependency> directDependencies,
+                                                                         ArtifactClassificationType rootArtifactType,
                                                                          final List<RemoteRepository> rootArtifactRemoteRepositories) {
     List<ArtifactClassificationNode> servicesClassified = newArrayList();
 
@@ -246,6 +248,12 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     List<Artifact> serviceArtifactsDeclared = filterArtifacts(directDependencies,
                                                               muleServiceClassifiedDependencyFilter);
     logger.debug("{} services defined to be classified", serviceArtifactsDeclared.size());
+
+    if (SERVICE.equals(rootArtifactType)) {
+      logger.debug("rootArtifact '{}' identified as Mule service", rootArtifactType);
+      buildPluginUrlClassification(context.getRootArtifact(), context, muleServiceClassifiedDependencyFilter, servicesClassified,
+                                   rootArtifactRemoteRepositories);
+    }
 
     serviceArtifactsDeclared.stream()
         .forEach(serviceArtifact -> buildPluginUrlClassification(serviceArtifact, context,
