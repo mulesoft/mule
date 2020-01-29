@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -21,15 +22,17 @@ class ForeachContext {
   private Object previousCounter;
   private Object previousRootMessage;
   private Message originalMessage;
+  private Optional<ItemSequenceInfo> itemSequenceInfo;
   private Iterator<TypedValue<?>> iterator;
   private AtomicInteger elementNumber = new AtomicInteger();
   private Optional<DataType> batchDataType = empty();
   private Optional<Runnable> onComplete = empty();
 
-  ForeachContext(Object previousCounter, Object previousRootMessage, Message message) {
+  ForeachContext(Object previousCounter, Object previousRootMessage, Message message, Optional<ItemSequenceInfo> itemSequenceInfo) {
     this.previousCounter = previousCounter;
     this.previousRootMessage = previousRootMessage;
     this.originalMessage = message;
+    this.itemSequenceInfo = itemSequenceInfo;
   }
 
   Object getPreviousCounter() {
@@ -70,5 +73,9 @@ class ForeachContext {
 
   public void setOnComplete(Runnable onCompleteConsumer) {
     this.onComplete = Optional.of(onCompleteConsumer);
+  }
+
+  public Optional<ItemSequenceInfo> getItemSequenceInfo() {
+    return itemSequenceInfo;
   }
 }
