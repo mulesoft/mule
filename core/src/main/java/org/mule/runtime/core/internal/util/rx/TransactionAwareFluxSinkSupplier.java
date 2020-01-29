@@ -33,7 +33,6 @@ public class TransactionAwareFluxSinkSupplier<T> implements FluxSinkSupplier<T> 
       .weakKeys()
       .removalListener((Thread key, FluxSink<T> value, RemovalCause cause) -> value.complete())
       .build();
-  private volatile boolean disposed = false;
 
   public TransactionAwareFluxSinkSupplier(Supplier<FluxSink<T>> sinkFactory, FluxSinkSupplier<T> delegate) {
     this.newSinkFactory = sinkFactory;
@@ -42,10 +41,6 @@ public class TransactionAwareFluxSinkSupplier<T> implements FluxSinkSupplier<T> 
 
   @Override
   public FluxSink<T> get() {
-    // if (disposed) {
-    // throw new MuleRuntimeException(createStaticMessage("FluxSinkSupplier already disposed."));
-    // }
-
     // In case of tx we need to ensure that in use of the delegate supplier there are no 2 threads trying to use the
     // same sink. This could cause a race condition in which the second thread simply queues the event in the busy sink.
     // So, this thread will not unbind the tx (causing an error next time it tries to bind one), and the first one will
@@ -60,7 +55,6 @@ public class TransactionAwareFluxSinkSupplier<T> implements FluxSinkSupplier<T> 
 
   @Override
   public void dispose() {
-    disposed = true;
     delegate.dispose();
     sinks.invalidateAll();
   }

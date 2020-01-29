@@ -64,6 +64,8 @@ public class PolicyChain extends AbstractComponent
   private List<Processor> processors;
   private MessageProcessorChain processorChain;
 
+  private String flowStackEntryName;
+
   private PolicyNotificationHelper notificationHelper;
 
   private boolean propagateMessageTransformations;
@@ -80,6 +82,8 @@ public class PolicyChain extends AbstractComponent
     initialiseIfNeeded(processorChain, muleContext);
 
     notificationHelper = new PolicyNotificationHelper(notificationManager, muleContext.getConfiguration().getId(), this);
+
+    flowStackEntryName = getLocation().getLocation() + "[before next]";
   }
 
   public ProcessingStrategy getProcessingStrategy() {
@@ -151,7 +155,7 @@ public class PolicyChain extends AbstractComponent
 
   private Consumer<CoreEvent> pushBeforeNextFlowStackElement() {
     return event -> ((DefaultFlowCallStack) event.getFlowCallStack())
-        .push(new FlowStackElement(getLocation().getLocation() + "[before next]", null));
+        .push(new FlowStackElement(flowStackEntryName, null));
   }
 
   private Consumer<CoreEvent> popFlowFlowStackElement() {

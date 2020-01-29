@@ -109,9 +109,10 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
 
   private final AtomicBoolean isPoliciesAvailable = new AtomicBoolean(false);
 
+  // This set holds the references that are needed to do the dispose after the referenced policy is no longer used.
   private final ReferenceQueue<DeferredDisposable> stalePoliciesQueue = new ReferenceQueue<>();
 
-  private final Set<WeakReference<DeferredDisposable>> activePolicies = new HashSet<>();
+  private final Set<DeferredDisposableWeakReference> activePolicies = new HashSet<>();
 
   private volatile boolean stopped = true;
   private Future taskHandle;
@@ -384,6 +385,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
         DeferredDisposableWeakReference stalePolicy = (DeferredDisposableWeakReference) stalePoliciesQueue.remove(POLL_INTERVAL);
         if (stalePolicy != null) {
           disposeIfNeeded(stalePolicy, LOGGER);
+          activePolicies.remove(stalePolicy);
         }
       } catch (InterruptedException e) {
         currentThread().interrupt();
