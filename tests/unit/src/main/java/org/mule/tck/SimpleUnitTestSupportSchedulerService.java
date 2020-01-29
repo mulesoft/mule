@@ -188,6 +188,7 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
         || ste.getClassName().startsWith("org.mule.runtime.core.api.util.ClassUtils")
         || ste.getClassName().startsWith("org.mule.runtime.core.api.util.ExceptionUtils")
         || ste.getClassName().startsWith("org.mockito")
+        || ste.getClassName().startsWith("sun.reflect.")
         || ste.getClassName().contains("$Proxy")
         || ste.getClassName().contains("$$Enhancer");
   }
