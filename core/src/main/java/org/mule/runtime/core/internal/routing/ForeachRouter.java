@@ -87,7 +87,7 @@ class ForeachRouter {
           currentContextFromEvent.put(event.getContext().getId(), foreachContext);
 
           final CoreEvent innerEvent =
-              builder(event).addVariable(owner.getRootMessageVariableName(), event.getMessage()).itemSequenceInfo(event.getItemSequenceInfo()).build();
+              builder(event).addVariable(owner.getRootMessageVariableName(), event.getMessage()).build();
 
           CoreEvent responseEvent = foreachContextResolver.eventWithContext(innerEvent, currentContextFromEvent);
 
@@ -244,7 +244,7 @@ class ForeachRouter {
             ? event.getVariables().get(owner.getRootMessageVariableName()).getValue()
             : null;
 
-    return new ForeachContext(previousCounterVar, previousRootMessageVar, event.getMessage());
+    return new ForeachContext(previousCounterVar, previousRootMessageVar, event.getMessage(), event.getItemSequenceInfo());
   }
 
   private CoreEvent eventWithCurrentContextDeleted(CoreEvent event) {
@@ -297,7 +297,8 @@ class ForeachRouter {
 
   private CoreEvent createResponseEvent(CoreEvent event) {
     ForeachContext foreachContext = foreachContextResolver.getCurrentContextFromEvent(event).get(event.getContext().getId());
-    final CoreEvent.Builder responseBuilder = builder(event).message(foreachContext.getOriginalMessage());
+
+    final CoreEvent.Builder responseBuilder = builder(event).message(foreachContext.getOriginalMessage()).itemSequenceInfo(foreachContext.getItemSequenceInfo());
     restoreVariables(foreachContext.getPreviousCounter(), foreachContext.getPreviousRootMessage(), responseBuilder);
     return eventWithCurrentContextDeleted(responseBuilder.build());
   }
