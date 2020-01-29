@@ -36,7 +36,7 @@ public enum ArtifactClassificationType {
 
   /**
    * {@link org.eclipse.aether.artifact.Artifact} should be classified as service. The main code of the
-   * {@link org.eclipse.aether.artifact.Artifact} is added to the PLUGIN {@link ClassLoader}.
+   * {@link org.eclipse.aether.artifact.Artifact} is added to the SERVICE {@link ClassLoader}.
    */
   SERVICE
 }
