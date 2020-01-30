@@ -27,6 +27,8 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Na
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Schema;
 
 import java.io.StringWriter;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -57,6 +59,8 @@ public class DefaultExtensionSchemaGenerator implements ExtensionSchemaGenerator
 
     new IdempotentExtensionWalker() {
 
+      private Set<Object> registeredModels = new HashSet<>();
+
       @Override
       public void onConfiguration(ConfigurationModel model) {
         schemaBuilder.registerConfigElement(model);
@@ -81,6 +85,9 @@ public class DefaultExtensionSchemaGenerator implements ExtensionSchemaGenerator
       public void onSource(SourceModel model) {
         schemaBuilder.registerMessageSource(model);
       }
+
+      private void registerOnce()
+
     }.walk(extensionModel);
 
     schemaBuilder.registerEnums();
