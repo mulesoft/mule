@@ -8,12 +8,11 @@
 package org.mule.test.infrastructure.process;
 
 import static java.lang.Integer.parseInt;
+import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -84,8 +83,8 @@ public class WindowsController extends AbstractOSController {
   }
 
   private List<String> getServiceList() {
-    return isNotEmpty(muleAppName) ? Collections.singletonList(muleAppName)
-        : Arrays.asList(MULE_SERVICE_NAME, MULE_EE_SERVICE_NAME);
+    return isNotEmpty(muleAppName) ? asList(muleAppName, MULE_SERVICE_NAME, MULE_EE_SERVICE_NAME)
+        : asList(MULE_SERVICE_NAME, MULE_EE_SERVICE_NAME);
   }
 
   private boolean isServiceRunning(String serviceName) {
