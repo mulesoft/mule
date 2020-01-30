@@ -6,7 +6,7 @@
  */
 /*
  * Decompiled with CFR 0_132.
- * 
+ *
  * Could not load the following classes:
  *  org.mule.runtime.extension.api.runtime.operation.ExecutionContext
  *  org.mule.runtime.module.extension.internal.runtime.execution.ByteBuddyWrappedMethodComponentExecutor
@@ -18,7 +18,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import java.util.function.Supplier;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ByteBuddyWrappedMethodComponentExecutor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
@@ -31,8 +30,9 @@ public class SayMyName
   private final HeisenbergOperations componentInstance;
   private final ArgumentResolver<HeisenbergExtension> configResolver;
 
+  @Override
   public Object execute(ExecutionContext executionContext) {
-    return this.componentInstance.sayMyName(this.configResolver.resolve(executionContext).get());
+    return this.componentInstance.sayMyName(this.configResolver.resolve(executionContext));
   }
 
   public SayMyName(HeisenbergOperations heisenbergOperations, ArgumentResolver<HeisenbergExtension> argumentResolver) {

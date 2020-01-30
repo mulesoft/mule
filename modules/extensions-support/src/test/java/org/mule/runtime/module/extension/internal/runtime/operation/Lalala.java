@@ -6,7 +6,7 @@
  */
 /*
  * Decompiled with CFR 0_132.
- * 
+ *
  * Could not load the following classes:
  *  org.mule.runtime.extension.api.runtime.operation.ExecutionContext
  *  org.mule.runtime.module.extension.internal.runtime.execution.ByteBuddyWrappedMethodComponentExecutor
@@ -20,13 +20,12 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ByteBuddyWrappedMethodComponentExecutor;
-import org.mule.runtime.module.extension.internal.runtime.operation.ReflectiveMethodOperationExecutorTestCase;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 
 public class Lalala
     implements ByteBuddyWrappedMethodComponentExecutor.MethodComponentExecutorWrapper {
 
-  private final ReflectiveMethodOperationExecutorTestCase.PrimitiveTypesTestOperations componentInstance;
+  private final NonCompletableReflectiveMethodOperationExecutorTestCase.PrimitiveTypesTestOperations componentInstance;
   private final ArgumentResolver<Character> charValueResolver;
   private final ArgumentResolver<Byte> byteValueResolver;
   private final ArgumentResolver<Short> shortValueResolver;
@@ -39,16 +38,20 @@ public class Lalala
   /*
    * Exception decompiling
    */
+  @Override
   public Object execute(ExecutionContext var1) {
-    componentInstance.allCombined(charValueResolver.resolve(var1).get(), byteValueResolver.resolve(var1).get(),
-                                  shortValueResolver.resolve(var1).get(),
-                                  intValueResolver.resolve(var1).get(), longValueResolver.resolve(var1).get(),
-                                  floatValueResolver.resolve(var1).get(),
-                                  doubleValueResolver.resolve(var1).get(), booleanValueResolver.resolve(var1).get());
+    componentInstance.allCombined(charValueResolver.resolve(var1),
+                                  byteValueResolver.resolve(var1),
+                                  shortValueResolver.resolve(var1),
+                                  intValueResolver.resolve(var1),
+                                  longValueResolver.resolve(var1),
+                                  floatValueResolver.resolve(var1),
+                                  doubleValueResolver.resolve(var1),
+                                  booleanValueResolver.resolve(var1));
     return null;
   }
 
-  public Lalala(ReflectiveMethodOperationExecutorTestCase.PrimitiveTypesTestOperations primitiveTypesTestOperations,
+  public Lalala(NonCompletableReflectiveMethodOperationExecutorTestCase.PrimitiveTypesTestOperations primitiveTypesTestOperations,
                 ArgumentResolver<Character> argumentResolver, ArgumentResolver<Byte> argumentResolver2,
                 ArgumentResolver<Short> argumentResolver3, ArgumentResolver<Integer> argumentResolver4,
                 ArgumentResolver<Long> argumentResolver5, ArgumentResolver<Float> argumentResolver6,
