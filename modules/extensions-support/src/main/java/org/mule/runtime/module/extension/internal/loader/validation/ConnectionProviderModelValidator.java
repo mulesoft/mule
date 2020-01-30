@@ -25,6 +25,7 @@ import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.extension.api.property.SyntheticModelModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
@@ -104,6 +105,9 @@ public final class ConnectionProviderModelValidator implements ExtensionModelVal
                                                   ProblemsReporter problemsReporter) {
     configLevelConnectionProviders.asMap().forEach((configModel, providerModels) -> {
       for (ConnectionProviderModel providerModel : providerModels) {
+        if (providerModel.getModelProperty(SyntheticModelModelProperty.class).isPresent()) {
+          continue;
+        }
         Type connectionType = MuleExtensionUtils.getConnectionType(providerModel);
         configModel.getOperationModels()
             .forEach(operationModel -> validateConnectionTypes(providerModel, operationModel, connectionType, problemsReporter));
