@@ -30,6 +30,12 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
 
   private static final CaseInsensitiveMultiMap EMPTY_MAP = new CaseInsensitiveMultiMap().toImmutableMultiMap();
 
+  private static final DataType dataType = DataType.builder()
+      .mapType(CaseInsensitiveMultiMap.class)
+      .keyType(String.class)
+      .valueType(String.class)
+      .build();
+
   /**
    * Returns an empty case-insensitive-multi-map (immutable). This map is serializable.
    *
@@ -99,6 +105,6 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
 
   @Override
   public DataType getDataType() {
-    return MULTI_MAP_STRING_STRING;
+    return dataType;
   }
 }
