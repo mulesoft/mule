@@ -1652,4 +1652,10 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     {
         return true;
     }
+
+    public boolean isStopping()
+    {
+        return stopping;
+    }
+
 }
