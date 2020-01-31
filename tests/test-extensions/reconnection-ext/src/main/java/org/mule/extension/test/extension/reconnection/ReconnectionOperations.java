@@ -16,6 +16,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 
@@ -44,14 +45,18 @@ public class ReconnectionOperations {
     return template;
   }
 
-  public PagingProvider<ReconnectableConnection, ReconnectableConnection> pagedOperation(Integer failOn) {
+  public PagingProvider<ReconnectableConnection, ReconnectableConnection> pagedOperation(Integer failOn,
+                                                                                         MuleErrors withErrorType) {
     return new PagingProvider<ReconnectableConnection, ReconnectableConnection>() {
 
       @Override
       public List<ReconnectableConnection> getPage(ReconnectableConnection connection) {
         getPageCalls++;
         if (getPageCalls == failOn) {
-          throw new ModuleException(CONNECTIVITY, new ConnectionException("Failed to retrieve Page"));
+          if (withErrorType.equals(CONNECTIVITY)) {
+            throw new ModuleException(withErrorType, new ConnectionException("Failed to retrieve Page"));
+          }
+          throw new ModuleException(withErrorType, new IllegalArgumentException("An illegal argument was received."));
         }
         return singletonList(connection);
       }
@@ -68,14 +73,15 @@ public class ReconnectionOperations {
     };
   }
 
-  public PagingProvider<ReconnectableConnection, ReconnectableConnection> stickyPagedOperation(Integer failOn) {
+  public PagingProvider<ReconnectableConnection, ReconnectableConnection> stickyPagedOperation(Integer failOn,
+                                                                                               MuleErrors withErrorType) {
     return new PagingProvider<ReconnectableConnection, ReconnectableConnection>() {
 
       @Override
       public List<ReconnectableConnection> getPage(ReconnectableConnection connection) {
         getPageCalls++;
         if (getPageCalls == failOn) {
-          throw new ModuleException(CONNECTIVITY, new ConnectionException("Failed to retrieve Page"));
+          throw new ModuleException(withErrorType, new ConnectionException("Failed to retrieve Page"));
         }
         return singletonList(connection);
       }
@@ -95,10 +101,5 @@ public class ReconnectionOperations {
         return true;
       }
     };
-  }
-
-  public static void resetCounters() {
-    closePagingProviderCalls = 0;
-    getPageCalls = 0;
   }
 }

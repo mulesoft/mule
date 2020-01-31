@@ -28,11 +28,11 @@
     </flow>
 
     <flow name="pagedOperation">
-        <reconnection:paged-operation failOn="#[payload]" config-ref="reconnection_Config"/>
+        <reconnection:paged-operation failOn="#[payload]" withErrorType="#[vars.errorType]" config-ref="reconnection_Config"/>
     </flow>
 
     <flow name="stickyPagedOperation">
-        <reconnection:sticky-paged-operation failOn="#[payload]" config-ref="reconnection_Config"/>
+        <reconnection:sticky-paged-operation failOn="#[payload]" withErrorType="#[vars.errorType]" config-ref="reconnection_Config"/>
     </flow>
 
     <flow name="getReconnectionFromConfig">

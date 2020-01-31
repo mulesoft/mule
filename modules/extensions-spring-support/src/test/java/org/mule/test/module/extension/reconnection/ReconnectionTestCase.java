@@ -7,15 +7,20 @@
 package org.mule.test.module.extension.reconnection;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.closePagingProviderCalls;
-import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.resetCounters;
+import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.getPageCalls;
+import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.disconnectCalls;
 import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
+import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
+import static org.mule.runtime.extension.api.error.MuleErrors.VALIDATION;
 import static org.mule.tck.probe.PollingProber.check;
 
 import org.mule.extension.test.extension.reconnection.ReconnectableConnection;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
@@ -23,6 +28,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.time.Duration;
@@ -100,16 +106,31 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   @Test
   public void connectionIsClosedDuringConnectionExceptionOnFirstPage() throws Exception {
     resetCounters();
-    Iterator<ReconnectableConnection> iterator = getCursor("pagedOperation", 1);
+    Iterator<ReconnectableConnection> iterator = getCursor("pagedOperation", 1, CONNECTIVITY);
     ReconnectableConnection firstPage = iterator.next();
     assertThat("Connection was not disconnected.", firstPage.getDisconnectCalls(), is(1));
     assertThat("Paging provider was not closed.", closePagingProviderCalls, is(1));
   }
 
   @Test
+  public void connectionIsNotClosedDuringOtherExceptionOnFirstPage() throws Exception {
+    resetCounters();
+    Iterator<ReconnectableConnection> iterator;
+    try {
+      iterator = getCursor("pagedOperation", 1, VALIDATION);
+      iterator.next();
+    } catch (Exception e) {
+      assertThat(e.getCause(), instanceOf(MuleRuntimeException.class));
+      assertThat(e.getMessage(), is("Could not execute operation with connection."));
+      assertThat("Paging provider was not closed.", closePagingProviderCalls, is(1));
+      assertThat("Connection was disconnected.", disconnectCalls, is(0));
+    }
+  }
+
+  @Test
   public void stickyConnectionIsClosedAndReconnectedDuringConnectionExceptionOnFirstPage() throws Exception {
     resetCounters();
-    Iterator<ReconnectableConnection> iterator = getCursor("stickyPagedOperation", 1);
+    Iterator<ReconnectableConnection> iterator = getCursor("stickyPagedOperation", 1, CONNECTIVITY);
     ReconnectableConnection firstPage = iterator.next();
     assertThat("Connection was not disconnected.", firstPage.getDisconnectCalls(), is(1));
     assertThat("Paging provider was not closed.", closePagingProviderCalls, is(1));
@@ -129,11 +150,18 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     flowRunner("switchConnection").run();
   }
 
-  private <T> CursorIterator<T> getCursor(String flowName, Integer failOn) throws Exception {
+  private <T> CursorIterator<T> getCursor(String flowName, Integer failOn, MuleErrors errorType) throws Exception {
     CursorIteratorProvider provider =
-        (CursorIteratorProvider) flowRunner(flowName).withPayload(failOn).keepStreamsOpen().run().getMessage().getPayload()
+        (CursorIteratorProvider) flowRunner(flowName).withPayload(failOn).withVariable("errorType", errorType).keepStreamsOpen()
+            .run().getMessage().getPayload()
             .getValue();
 
     return provider.openCursor();
+  }
+
+  public static void resetCounters() {
+    closePagingProviderCalls = 0;
+    getPageCalls = 0;
+    disconnectCalls = 0;
   }
 }

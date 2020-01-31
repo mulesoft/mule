@@ -29,7 +29,7 @@ public class ReconnectableConnectionProvider implements CachedConnectionProvider
 
   public static volatile boolean fail;
   private int reconnectionAttempts = 0;
-  private int disconnectCalls = 0;
+  public static volatile int disconnectCalls = 0;
 
   @Override
   public ReconnectableConnection connect() throws ConnectionException {

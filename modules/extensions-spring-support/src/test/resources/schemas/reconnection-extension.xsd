@@ -91,6 +91,7 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionInt" use="required" name="failOn"></xs:attribute>
+        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/reconnection" type="org.mule.runtime.extension.api.error.MuleErrorsEnumType" use="required" name="withErrorType"></xs:attribute>
         <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
@@ -118,6 +119,7 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionInt" use="required" name="failOn"></xs:attribute>
+        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/reconnection" type="org.mule.runtime.extension.api.error.MuleErrorsEnumType" use="required" name="withErrorType"></xs:attribute>
         <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
@@ -136,14 +138,6 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/reconnection" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ResetCountersType" substitutionGroup="mule:abstract-operator" name="reset-counters"></xs:element>
-  <xs:complexType name="ResetCountersType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/reconnection" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SwitchConnectionType" substitutionGroup="mule:abstract-operator" name="switch-connection"></xs:element>
   <xs:complexType name="SwitchConnectionType">
     <xs:complexContent>
@@ -152,4 +146,33 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:simpleType name="org.mule.runtime.extension.api.error.MuleErrorsEnumType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="ANY"></xs:enumeration>
+          <xs:enumeration value="CONNECTIVITY"></xs:enumeration>
+          <xs:enumeration value="TRANSFORMATION"></xs:enumeration>
+          <xs:enumeration value="EXPRESSION"></xs:enumeration>
+          <xs:enumeration value="REDELIVERY_EXHAUSTED"></xs:enumeration>
+          <xs:enumeration value="RETRY_EXHAUSTED"></xs:enumeration>
+          <xs:enumeration value="ROUTING"></xs:enumeration>
+          <xs:enumeration value="SECURITY"></xs:enumeration>
+          <xs:enumeration value="CLIENT_SECURITY"></xs:enumeration>
+          <xs:enumeration value="SERVER_SECURITY"></xs:enumeration>
+          <xs:enumeration value="SOURCE"></xs:enumeration>
+          <xs:enumeration value="SOURCE_RESPONSE"></xs:enumeration>
+          <xs:enumeration value="SOURCE_RESPONSE_GENERATE"></xs:enumeration>
+          <xs:enumeration value="SOURCE_RESPONSE_SEND"></xs:enumeration>
+          <xs:enumeration value="SOURCE_ERROR_RESPONSE_GENERATE"></xs:enumeration>
+          <xs:enumeration value="SOURCE_ERROR_RESPONSE_SEND"></xs:enumeration>
+          <xs:enumeration value="VALIDATION"></xs:enumeration>
+          <xs:enumeration value="CRITICAL"></xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
 </xs:schema>

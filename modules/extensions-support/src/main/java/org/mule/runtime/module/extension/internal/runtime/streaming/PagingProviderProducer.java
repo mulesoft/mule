@@ -98,7 +98,6 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
         closeDelegate(connection);
       }
       extractConnectionException(e).ifPresent(ex -> connectionSupplier.invalidateConnection());
-      connectionSupplier.invalidateConnection();
       throw new MuleRuntimeException(createStaticMessage(COULD_NOT_EXECUTE), e);
     }
   }
