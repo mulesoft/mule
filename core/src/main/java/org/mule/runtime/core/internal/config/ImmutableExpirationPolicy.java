@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.config;
 
 import static org.mule.runtime.extension.api.ExtensionConstants.DYNAMIC_CONFIG_EXPIRATION_FREQUENCY;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.time.TimeSupplier;
 import org.mule.runtime.core.internal.time.LocalTimeSupplier;
@@ -54,7 +55,7 @@ public final class ImmutableExpirationPolicy extends AbstractComponent implement
    */
   @Override
   public boolean isExpired(long lastUsed, TimeUnit timeUnit) {
-    long idleTimeMillis = timeSupplier.get() - timeUnit.toMillis(lastUsed);
+    long idleTimeMillis = timeSupplier.getAsLong() - timeUnit.toMillis(lastUsed);
     return idleTimeMillis > this.timeUnit.toMillis(maxIdleTime);
   }
 
