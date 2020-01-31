@@ -27,6 +27,14 @@
         <reconnection:switch-connection />
     </flow>
 
+    <flow name="pagedOperation">
+        <reconnection:paged-operation failOn="#[payload]" withErrorType="#[vars.errorType]" config-ref="reconnection_Config"/>
+    </flow>
+
+    <flow name="stickyPagedOperation">
+        <reconnection:sticky-paged-operation failOn="#[payload]" withErrorType="#[vars.errorType]" config-ref="reconnection_Config"/>
+    </flow>
+
     <flow name="getReconnectionFromConfig">
         <reconnection:get-retry-policy-template config-ref="reconnection_Config"/>
     </flow>

@@ -8,6 +8,9 @@
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -35,11 +38,16 @@ import java.util.function.Function;
 public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
   public static final String COULD_NOT_OBTAIN_A_CONNECTION = "Could not obtain a connection for the configuration";
+  public static final String COULD_NOT_CREATE_A_CONNECTION_SUPPLIER =
+      "Could not obtain a connection supplier for the configuration";
+  public static final String COULD_NOT_CLOSE_PAGING_PROVIDER = "Could not close the Paging Provider";
+  public static final String COULD_NOT_EXECUTE = "Could not execute operation with connection";
   private PagingProvider<Object, T> delegate;
   private final ConfigurationInstance config;
   private final ExtensionConnectionSupplier connectionSupplier;
   private final ExecutionContextAdapter executionContext;
   private final ConnectionSupplierFactory connectionSupplierFactory;
+  private Boolean isFirstPage = true;
 
   public PagingProviderProducer(PagingProvider<Object, T> delegate,
                                 ConfigurationInstance config,
@@ -58,7 +66,9 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    */
   @Override
   public List<T> produce() {
-    return performWithConnection(connection -> delegate.getPage(connection));
+    List<T> page = performWithConnection(connection -> delegate.getPage(connection));
+    isFirstPage = false;
+    return page;
   }
 
   /**
@@ -77,16 +87,18 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    * @return
    */
   private <R> R performWithConnection(Function<Object, R> function) {
-    ConnectionSupplier connectionSupplier = null;
+    ConnectionSupplier connectionSupplier = getConnectionSupplier();
+    Object connection = getConnection(connectionSupplier);
     try {
-      connectionSupplier = connectionSupplierFactory.getConnectionSupplier();
-      return function.apply(connectionSupplier.getConnection());
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
-    } finally {
-      if (connectionSupplier != null) {
-        connectionSupplier.close();
+      R result = function.apply(connection);
+      connectionSupplier.close();
+      return result;
+    } catch (Exception e) {
+      if (isFirstPage) {
+        closeDelegate(connection);
       }
+      extractConnectionException(e).ifPresent(ex -> connectionSupplier.invalidateConnection());
+      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_EXECUTE), e);
     }
   }
 
@@ -95,18 +107,10 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    */
   @Override
   public void close() throws IOException {
-    ConnectionSupplier connectionSupplier = null;
-    try {
-      connectionSupplier = connectionSupplierFactory.getConnectionSupplier();
-      delegate.close(connectionSupplier.getConnection());
-    } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
-    } finally {
-      if (connectionSupplier != null) {
-        connectionSupplier.close();
-      }
-      connectionSupplierFactory.dispose();
-    }
+    ConnectionSupplier connectionSupplier = getConnectionSupplier();
+    closeDelegate(getConnection(connectionSupplier));
+    connectionSupplier.close();
+    connectionSupplierFactory.dispose();
   }
 
   private ConnectionSupplierFactory createConnectionSupplierFactory() {
@@ -115,6 +119,30 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     }
 
     return new DefaultConnectionSupplierFactory();
+  }
+
+  private ConnectionSupplier getConnectionSupplier() {
+    try {
+      return connectionSupplierFactory.getConnectionSupplier();
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_CREATE_A_CONNECTION_SUPPLIER), e);
+    }
+  }
+
+  private Object getConnection(ConnectionSupplier connectionSupplier) {
+    try {
+      return connectionSupplier.getConnection();
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
+    }
+  }
+
+  private void closeDelegate(Object connection) {
+    try {
+      delegate.close(connection);
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_CLOSE_PAGING_PROVIDER), e);
+    }
   }
 
   private boolean isTransactional() {
@@ -146,16 +174,16 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
   private class StickyConnectionSupplierFactory implements ConnectionSupplierFactory {
 
+    private ConnectionHandler connectionHandler;
+
     private final LazyValue<ConnectionSupplier> stickyConnection = new LazyValue<>(new CheckedSupplier<ConnectionSupplier>() {
 
       @Override
       public ConnectionSupplier getChecked() throws Throwable {
         StickyConnectionSupplierFactory.this.connectionHandler = connectionSupplier.getConnection(executionContext);
-        return new StickyConnectionSupplier(StickyConnectionSupplierFactory.this.connectionHandler.getConnection());
+        return new StickyConnectionSupplier(StickyConnectionSupplierFactory.this.connectionHandler);
       }
     });
-
-    private ConnectionHandler connectionHandler;
 
     @Override
     public ConnectionSupplier getConnectionSupplier() throws MuleException {
@@ -176,6 +204,8 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     Object getConnection() throws MuleException;
 
     void close();
+
+    void invalidateConnection();
   }
 
 
@@ -194,15 +224,21 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     public void close() {
       connectionHandler.release();
     }
+
+    public void invalidateConnection() {
+      connectionHandler.invalidate();
+    }
   }
 
 
   private class StickyConnectionSupplier implements ConnectionSupplier {
 
     private final Object connection;
+    private final ConnectionHandler connectionHandler;
 
-    public StickyConnectionSupplier(Object connection) {
-      this.connection = connection;
+    public StickyConnectionSupplier(ConnectionHandler connectionHandler) throws ConnectionException {
+      this.connectionHandler = connectionHandler;
+      this.connection = connectionHandler.getConnection();
     }
 
     @Override
@@ -213,6 +249,10 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     @Override
     public void close() {
 
+    }
+
+    public void invalidateConnection() {
+      connectionHandler.invalidate();
     }
   }
 }
