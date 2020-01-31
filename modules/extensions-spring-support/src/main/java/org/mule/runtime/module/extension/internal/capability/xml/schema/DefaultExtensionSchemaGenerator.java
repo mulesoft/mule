@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -63,30 +64,34 @@ public class DefaultExtensionSchemaGenerator implements ExtensionSchemaGenerator
 
       @Override
       public void onConfiguration(ConfigurationModel model) {
-        schemaBuilder.registerConfigElement(model);
+        registerModelOnce(() -> schemaBuilder.registerConfigElement(model), model);
       }
 
       @Override
       protected void onConstruct(ConstructModel model) {
-        schemaBuilder.registerOperation(model);
+        registerModelOnce(() -> schemaBuilder.registerOperation(model), model);
       }
 
       @Override
       public void onOperation(OperationModel model) {
-        schemaBuilder.registerOperation(model);
+        registerModelOnce(() -> schemaBuilder.registerOperation(model), model);
       }
 
       @Override
       public void onConnectionProvider(ConnectionProviderModel model) {
-        schemaBuilder.registerConnectionProviderElement(model);
+        registerModelOnce(() -> schemaBuilder.registerConnectionProviderElement(model), model);
       }
 
       @Override
       public void onSource(SourceModel model) {
-        schemaBuilder.registerMessageSource(model);
+        registerModelOnce(() -> schemaBuilder.registerMessageSource(model), model);
       }
 
-      private void registerOnce()
+      private void registerModelOnce(Runnable registerAction, Object model) {
+        if (registeredModels.add(model)) {
+          registerAction.run();
+        }
+      }
 
     }.walk(extensionModel);
 
