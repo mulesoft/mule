@@ -12,6 +12,7 @@ import static java.util.Collections.unmodifiableList;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+
 import org.mule.runtime.api.exception.ComposedErrorException;
 import org.mule.runtime.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.api.exception.MuleException;
@@ -186,12 +187,14 @@ public final class ErrorBuilder {
    */
   private final static class ErrorImplementation implements Error {
 
-    private Throwable exception;
-    private String description;
-    private String detailedDescription;
-    private ErrorType errorType;
-    private Message muleMessage;
-    private List<Error> errors;
+    private static final long serialVersionUID = -6904692174522094021L;
+
+    private final Throwable exception;
+    private final String description;
+    private final String detailedDescription;
+    private final ErrorType errorType;
+    private final Message muleMessage;
+    private final List<Error> errors;
 
     private ErrorImplementation(Throwable exception, String description, String detailedDescription, ErrorType errorType,
                                 Message errorMessage, List<Error> errors) {

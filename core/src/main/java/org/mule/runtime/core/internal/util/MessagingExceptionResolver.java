@@ -80,7 +80,7 @@ public class MessagingExceptionResolver {
     }
 
     Throwable root = rootCause.get().getFirst();
-    Component failingComponent = getFailingProcessor(me, root).orElse(component);
+    Component failingComponent = getFailingProcessor(me, root);
 
     CoreEvent event = resolveEvent(me, root, resolveErrorType(rootCause.get().getSecond()));
     MessagingException result = resolveResultException(me, root, failingComponent, event);
@@ -176,40 +176,53 @@ public class MessagingExceptionResolver {
                                            Collection<ExceptionContextProvider> exceptionContextProviders) {
     CoreEvent errorEvent = createErrorEvent(me.getEvent(), processor, me, locator);
     Component failingProcessor = me.getFailingComponent() != null ? me.getFailingComponent() : processor;
-    MessagingException updated =
-        me instanceof FlowExecutionException ? new FlowExecutionException(errorEvent, me.getCause(), failingProcessor)
-            : new MessagingException(me.getI18nMessage(), errorEvent, me.getCause(), failingProcessor);
+
+    MessagingException updated;
+    if (errorEvent == me.getEvent() && failingProcessor == me.getFailingComponent()) {
+      updated = me;
+    } else {
+      updated = me instanceof FlowExecutionException
+          ? new FlowExecutionException(errorEvent, me.getCause(), failingProcessor)
+          : new MessagingException(me.getI18nMessage(), errorEvent, me.getCause(), failingProcessor);
+    }
 
     return enrich(updated, failingProcessor, processor, errorEvent, exceptionContextProviders);
   }
 
-  private Optional<Component> getFailingProcessor(MessagingException me, Throwable root) {
+  private Component getFailingProcessor(MessagingException me, Throwable root) {
     Component failing = me.getFailingComponent();
     if (failing == null && root instanceof MessagingException) {
       failing = ((MessagingException) root).getFailingComponent();
     }
-    return Optional.ofNullable(failing);
+
+    return failing != null ? failing : component;
   }
 
   private ErrorType errorTypeFromException(Component failing, ErrorTypeLocator locator, Throwable e) {
     final ErrorType mapped;
-    if (isMessagingExceptionWithError(e)) {
-      mapped = ((MessagingException) e).getEvent().getError().map(Error::getErrorType).orElse(null);
-    } else {
-      final ComponentIdentifier identifier = getComponentIdentifierOf(failing);
 
-      if (identifier != null) {
-        mapped = locator.lookupComponentErrorType(identifier, e);
+    if (e instanceof MessagingException) {
+      final Optional<Error> eventError = ((MessagingException) e).getEvent().getError();
+      if (eventError.isPresent()) {
+        mapped = eventError.get().getErrorType();
       } else {
-        mapped = null;
+        mapped = ((MessagingException) e).getExceptionInfo().getErrorType();
       }
+    } else {
+      mapped = errorTypeFromNotMessagingException(failing, locator, e);
     }
 
     return mapped != null ? mapped : locator.lookupErrorType(e);
   }
 
-  private boolean isMessagingExceptionWithError(Throwable cause) {
-    return cause instanceof MessagingException && ((MessagingException) cause).getEvent().getError().isPresent();
+  private ErrorType errorTypeFromNotMessagingException(Component failing, ErrorTypeLocator locator, Throwable e) {
+    final ComponentIdentifier identifier = getComponentIdentifierOf(failing);
+
+    if (identifier != null) {
+      return locator.lookupComponentErrorType(identifier, e);
+    } else {
+      return null;
+    }
   }
 
   private <T extends MuleException> T enrich(T me, Component failing, Component handling, CoreEvent event,

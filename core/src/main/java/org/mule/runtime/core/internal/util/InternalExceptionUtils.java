@@ -53,7 +53,7 @@ public final class InternalExceptionUtils {
     }
 
     if (!errorMappings.isEmpty() || isMessagingExceptionCause(me, cause)) {
-      Error newError = getErrorFromFailingProcessor(currentEvent, obj, cause, locator);
+      Error newError = getErrorFromFailingProcessor(me.getExceptionInfo().getErrorType(), obj, cause, locator);
       CoreEvent newEvent = quickCopy(newError, me.getEvent());
       me.setProcessedEvent(newEvent);
       return newEvent;
@@ -72,32 +72,45 @@ public final class InternalExceptionUtils {
   /**
    * Determine the {@link ErrorType} of a given exception thrown by a given message processor.
    *
-   * @param processor the component that threw the exception (processor or source).
+   * @param currentError the currently resolved error type.
    * @param cause the exception thrown.
    * @param locator the {@link ErrorTypeLocator}.
    * @return the resolved {@link ErrorType}
    */
-  public static Error getErrorFromFailingProcessor(CoreEvent currentEvent,
+  public static Error getErrorFromFailingProcessor(ErrorType currentError,
                                                    Component processor,
                                                    Throwable cause,
                                                    ErrorTypeLocator locator) {
-    ErrorType currentError = currentEvent != null ? currentEvent.getError().map(Error::getErrorType).orElse(null) : null;
     ErrorType foundErrorType = locator.lookupErrorType(cause);
-    ErrorType resultError = isUnknownMuleError(foundErrorType) ? currentError : foundErrorType;
+    ErrorType resultError = isUnknownMuleError(foundErrorType)
+        ? currentError
+        : foundErrorType;
 
-    ErrorType errorType = getComponentIdentifier(processor)
+    ErrorType errorTypeLookedUp = getComponentIdentifier(processor)
         .map(ci -> locator.lookupComponentErrorType(ci, cause))
-        .orElse(locator.lookupErrorType(cause));
+        .orElse(foundErrorType);
+
+    ErrorType errorType = isUnknownMuleError(errorTypeLookedUp) && resultError != null
+        ? resultError
+        : errorTypeLookedUp;
 
     if (processor instanceof ErrorMappingsAware) {
-      return ErrorBuilder.builder(cause)
-          .errorType(((ErrorMappingsAware) processor).getErrorMappings()
-              .stream()
-              .filter(m -> m.match(resultError == null || isUnknownMuleError(resultError) ? errorType : currentError))
-              .findFirst()
-              .map(ErrorMapping::getTarget)
-              .orElse(errorType))
-          .build();
+      final List<ErrorMapping> errorMappings = ((ErrorMappingsAware) processor).getErrorMappings();
+
+      if (errorMappings.isEmpty()) {
+        return ErrorBuilder.builder(cause)
+            .errorType(errorType)
+            .build();
+      } else {
+        return ErrorBuilder.builder(cause)
+            .errorType(errorMappings
+                .stream()
+                .filter(m -> m.match(resultError == null || isUnknownMuleError(resultError) ? errorType : currentError))
+                .findFirst()
+                .map(ErrorMapping::getTarget)
+                .orElse(errorType))
+            .build();
+      }
     } else {
       return ErrorBuilder.builder(cause)
           .errorType(errorType)

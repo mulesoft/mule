@@ -12,7 +12,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.api.exception.MuleException.INFO_ERROR_TYPE_KEY;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.CONNECTIVITY;
@@ -24,9 +23,10 @@ import static org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition.CUSTOM
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.test.marvel.drstrange.CustomErrorException;
 
+import org.junit.Test;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Test;
 
 @Feature(ERROR_HANDLING)
 @Story(RAISE_ERROR)
@@ -81,7 +81,7 @@ public class ModuleUsingRaiseErrorTestCase extends AbstractCeXmlExtensionMuleArt
     stopFlowConstruct(flowName);
 
     assertThat(me.getMessage(), is("A module error occurred."));
-    assertThat(me.getInfo().get(INFO_ERROR_TYPE_KEY), is(CONNECTIVITY.toString()));
+    assertThat(me.getExceptionInfo().getErrorType().toString(), is(CONNECTIVITY.toString()));
     assertThat(me.getInfo().get(INFO_SOURCE_XML_KEY),
                is("<module-using-raise-error:fail-raise-error></module-using-raise-error:fail-raise-error>"));
     assertThat(me.getInfo().get(INFO_LOCATION_KEY),
@@ -98,16 +98,17 @@ public class ModuleUsingRaiseErrorTestCase extends AbstractCeXmlExtensionMuleArt
     // decorate the MuleException info map.
     stopFlowConstruct(flowName);
 
-    assertThat(me.getMessage(), is("java.lang.NullPointerException."));
-    assertThat(me.getInfo().get(INFO_ERROR_TYPE_KEY), is(
-                                                         builder().namespace(MARVEL_EXTENSION.toUpperCase())
-                                                             .name(CUSTOM_ERROR.toString()).build().toString()));
+    assertThat(me.getMessage(), is("java.lang.NullPointerException"));
+    assertThat(me.getExceptionInfo().getErrorType().toString(), is(builder()
+        .namespace(MARVEL_EXTENSION.toUpperCase())
+        .name(CUSTOM_ERROR.toString())
+        .build().toString()));
     assertThat(me.getInfo().get(INFO_SOURCE_XML_KEY),
                is("<module-using-raise-error:fail-custom-exception content=\"#[vars.food]\"></module-using-raise-error:fail-custom-exception>"));
     assertThat(me.getInfo().get(INFO_LOCATION_KEY),
                is("simpleWithCustomJavaExceptionFlow/processors/0 @ ModuleUsingRaiseErrorTestCase#simpleWithCustomJavaException:flows/flows-with-module-using-raise-error.xml:89"));
 
-    //we ensure the real cause of error is the one thrown by the marvel:read-data operation
+    // we ensure the real cause of error is the one thrown by the marvel:read-data operation
     assertThat(me.getCause(), instanceOf(CustomErrorException.class));
   }
 

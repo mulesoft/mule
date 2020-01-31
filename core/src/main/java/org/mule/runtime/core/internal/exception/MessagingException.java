@@ -27,8 +27,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * <code>MessagingException</code> is a general message exception thrown when errors specific to Message processing occur..
  */
@@ -56,7 +54,6 @@ public class MessagingException extends EventProcessingException {
   public MessagingException(I18nMessage message, CoreEvent event) {
     super(message, event);
     extractMuleMessage(event);
-    storeErrorTypeInfo();
     setMessage(generateMessage(message, null));
   }
 
@@ -64,14 +61,12 @@ public class MessagingException extends EventProcessingException {
     super(message, event);
     extractMuleMessage(event);
     this.failingComponent = failingComponent;
-    storeErrorTypeInfo();
     setMessage(generateMessage(message, null));
   }
 
   public MessagingException(I18nMessage message, CoreEvent event, Throwable cause) {
     super(message, event, cause);
     extractMuleMessage(event);
-    storeErrorTypeInfo();
     setMessage(generateMessage(message, null));
   }
 
@@ -79,14 +74,12 @@ public class MessagingException extends EventProcessingException {
     super(message, event, cause);
     extractMuleMessage(event);
     this.failingComponent = failingComponent;
-    storeErrorTypeInfo();
     setMessage(generateMessage(message, null));
   }
 
   public MessagingException(CoreEvent event, Throwable cause) {
     super(event, cause);
     extractMuleMessage(event);
-    storeErrorTypeInfo();
     setMessage(generateMessage(getI18nMessage(), null));
   }
 
@@ -96,7 +89,6 @@ public class MessagingException extends EventProcessingException {
     this.handled = original.handled();
     original.getInfo().forEach(this::addInfo);
     extractMuleMessage(event);
-    storeErrorTypeInfo();
     setMessage(original.getMessage());
   }
 
@@ -104,28 +96,10 @@ public class MessagingException extends EventProcessingException {
     super(event, cause);
     extractMuleMessage(event);
     this.failingComponent = failingComponent;
-    storeErrorTypeInfo();
     setMessage(generateMessage(getI18nMessage(), null));
   }
 
-  private void storeErrorTypeInfo() {
-    if (event != null) {
-      addInfo(INFO_ERROR_TYPE_KEY, getEvent().getError().map(e -> e.getErrorType().toString()).orElse(MISSING_DEFAULT_VALUE));
-    }
-  }
-
   protected String generateMessage(I18nMessage message, MuleContext muleContext) {
-    StringBuilder buf = new StringBuilder(80);
-
-    if (message != null) {
-      final String msg = message.getMessage();
-      buf.append(msg);
-      String trimmedMessage = msg.trim();
-      if (StringUtils.isNotBlank(trimmedMessage) && trimmedMessage.charAt(trimmedMessage.length() - 1) != '.') {
-        buf.append(".");
-      }
-    }
-
     if (muleMessage != null) {
       if (MuleException.isVerboseExceptions()) {
         Object payload = muleMessage.getPayload().getValue();
@@ -153,11 +127,10 @@ public class MessagingException extends EventProcessingException {
         }
       }
     } else {
-      buf.append("The current Message is null!");
       addInfo(PAYLOAD_INFO_KEY, Objects.toString(null));
     }
 
-    return buf.toString();
+    return message.getMessage();
   }
 
   /**
@@ -176,7 +149,7 @@ public class MessagingException extends EventProcessingException {
    */
   @Override
   public CoreEvent getEvent() {
-    return processedEvent != null ? processedEvent : event;
+    return processedEvent != null ? processedEvent : super.getEvent();
   }
 
   /**
@@ -188,6 +161,7 @@ public class MessagingException extends EventProcessingException {
     if (processedEvent != null) {
       this.processedEvent = processedEvent;
       extractMuleMessage(processedEvent);
+      processedEvent.getError().ifPresent(e -> getExceptionInfo().setErrorType(e.getErrorType()));
     } else {
       this.processedEvent = null;
       this.muleMessage = null;
