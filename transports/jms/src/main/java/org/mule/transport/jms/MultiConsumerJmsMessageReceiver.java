@@ -325,7 +325,10 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             try
             {
                 //If it's processing a message then don't lose it
-                session.recover();
+                if (!jmsConnector.isStopping())
+                {
+                    session.recover();
+                }
             }
             catch (Exception jmsEx)
             {
