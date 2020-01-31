@@ -8,6 +8,7 @@
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -96,6 +97,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       if (isFirstPage) {
         closeDelegate(connection);
       }
+      extractConnectionException(e).ifPresent(ex -> connectionSupplier.invalidateConnection());
       connectionSupplier.invalidateConnection();
       throw new MuleRuntimeException(createStaticMessage(COULD_NOT_EXECUTE), e);
     }
