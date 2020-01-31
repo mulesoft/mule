@@ -28,4 +28,9 @@ public class LocalTimeSupplier implements TimeSupplier {
   public Long get() {
     return currentTimeMillis();
   }
+
+  @Override
+  public long getAsLong() {
+    return currentTimeMillis();
+  }
 }

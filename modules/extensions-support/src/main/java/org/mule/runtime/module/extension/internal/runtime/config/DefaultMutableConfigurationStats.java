@@ -38,7 +38,7 @@ final class DefaultMutableConfigurationStats implements MutableConfigurationStat
    */
   @Override
   public long updateLastUsed() {
-    return lastUsedMillis = timeSupplier.get();
+    return lastUsedMillis = timeSupplier.getAsLong();
   }
 
   /**
