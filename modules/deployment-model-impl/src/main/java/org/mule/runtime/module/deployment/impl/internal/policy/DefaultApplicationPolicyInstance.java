@@ -15,9 +15,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVID
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
-import static org.mule.runtime.module.deployment.impl.internal.policy.proxy.LifecycleFilterProxy.createLifecycleFilterProxy;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.NotificationListener;
@@ -40,6 +40,7 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.CompositeArtifactExtensionManagerFactory;
+import org.mule.runtime.module.deployment.impl.internal.policy.proxy.LifecycleFilterProxy;
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 
@@ -117,21 +118,12 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
     artifactBuilder.withServiceConfigurator(customizationService -> {
       Registry applicationRegistry = application.getRegistry();
-      customizationService.overrideDefaultServiceImpl(OBJECT_LOCK_PROVIDER,
-                                                      createLifecycleFilterProxy(applicationRegistry
-                                                          .lookupByName(OBJECT_LOCK_PROVIDER).get()));
-      customizationService.overrideDefaultServiceImpl(BASE_PERSISTENT_OBJECT_STORE_KEY,
-                                                      createLifecycleFilterProxy(applicationRegistry
-                                                          .lookupByName(BASE_PERSISTENT_OBJECT_STORE_KEY).get()));
-      customizationService.overrideDefaultServiceImpl(BASE_IN_MEMORY_OBJECT_STORE_KEY,
-                                                      createLifecycleFilterProxy(applicationRegistry
-                                                          .lookupByName(BASE_IN_MEMORY_OBJECT_STORE_KEY).get()));
-      customizationService.overrideDefaultServiceImpl(OBJECT_TIME_SUPPLIER,
-                                                      createLifecycleFilterProxy(applicationRegistry
-                                                          .lookupByName(OBJECT_TIME_SUPPLIER).get()));
 
-      applicationRegistry.lookupByName(CLUSTER_MANAGER_ID).ifPresent(muleClusterManager -> customizationService
-          .registerCustomServiceImpl(CLUSTER_MANAGER_ID, createLifecycleFilterProxy(muleClusterManager)));
+      addPolicyCustomizationOverride(OBJECT_LOCK_PROVIDER, customizationService, applicationRegistry);
+      addPolicyCustomizationOverride(BASE_PERSISTENT_OBJECT_STORE_KEY, customizationService, applicationRegistry);
+      addPolicyCustomizationOverride(BASE_IN_MEMORY_OBJECT_STORE_KEY, customizationService, applicationRegistry);
+      addPolicyCustomizationOverride(OBJECT_TIME_SUPPLIER, customizationService, applicationRegistry);
+      addPolicyCustomizationOverride(CLUSTER_MANAGER_ID, customizationService, applicationRegistry);
     });
     try {
       policyContext = artifactBuilder.build();
@@ -140,6 +132,14 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     } catch (MuleException e) {
       throw new InitialisationException(createStaticMessage("Cannot create artifact context for the policy instance"), e, this);
     }
+  }
+
+  private void addPolicyCustomizationOverride(String objectKey, CustomizationService customizationService,
+                                              Registry applicationRegistry) {
+    applicationRegistry
+        .lookupByName(objectKey)
+        .map(LifecycleFilterProxy::createLifecycleFilterProxy)
+        .ifPresent(s -> customizationService.overrideDefaultServiceImpl(objectKey, s));
   }
 
   private void enableNotificationListeners(List<NotificationListener> notificationListeners) {
