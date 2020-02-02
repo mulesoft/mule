@@ -2752,32 +2752,6 @@
       "fields": [
         {
           "key": {
-            "name": "disconnectCalls"
-          },
-          "model": {
-            "type": "Number",
-            "annotations": {
-              "classInformation": {
-                "classname": "int",
-                "hasDefaultConstructor": false,
-                "isInterface": false,
-                "isInstantiable": false,
-                "isAbstract": true,
-                "isFinal": true,
-                "implementedInterfaces": [],
-                "parent": "",
-                "genericTypes": [],
-                "isMap": false
-              },
-              "int": {}
-            }
-          },
-          "annotations": {
-            "visibility": "READ_ONLY"
-          }
-        },
-        {
-          "key": {
             "name": "reconnectionAttempts"
           },
           "model": {
