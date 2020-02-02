@@ -7,15 +7,21 @@
 
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static java.util.function.Function.identity;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
+import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.iterator.Producer;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -23,10 +29,13 @@ import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -45,6 +54,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   public static final String COULD_NOT_OBTAIN_A_CONNECTION = "Could not obtain a connection for the configuration";
   public static final String COULD_NOT_CREATE_A_CONNECTION_SUPPLIER =
       "Could not obtain a connection supplier for the configuration";
+  public static final String COULD_NOT_EXECUTE = "Could not execute operation with connection";
   private PagingProvider<Object, T> delegate;
   private final ConfigurationInstance config;
   private final ExtensionConnectionSupplier extensionConnectionSupplier;
@@ -90,13 +100,32 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    * @return
    */
   private <R> R performWithConnection(Function<Object, R> function) {
+    Optional<MutableConfigurationStats> stats = getMutableConfigurationStats(executionContext);
+    RetryPolicyTemplate retryPolicy =
+        (RetryPolicyTemplate) executionContext.getRetryPolicyTemplate().orElseGet(NoRetryPolicyTemplate::new);
+    CompletableFuture<R> future = retryPolicy.applyPolicy(() -> completedFuture(withConnection(function)),
+                                                          e -> !isFirstPage && !delegate.useStickyConnections()
+                                                              && shouldRetry(e, executionContext),
+                                                          e -> {
+                                                          },
+                                                          e -> stats.ifPresent(s -> s.discountInflightOperation()),
+                                                          identity(),
+                                                          executionContext.getCurrentScheduler());
+    try {
+      return future.get();
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_EXECUTE), e);
+    }
+  }
+
+  private <R> R withConnection(Function<Object, R> function) {
     ConnectionSupplier connectionSupplier = getConnectionSupplier();
     Object connection = getConnection(connectionSupplier);
     try {
       R result = function.apply(connection);
       return result;
     } catch (Exception exception) {
-      if (isFirstPage) {
+      if (isFirstPage || delegate.useStickyConnections()) {
         safely(() -> delegate.close(connection), e -> LOGGER.debug("Found exception closing paging provider", e));
       }
       extractConnectionException(exception).ifPresent(ex -> connectionSupplier.invalidateConnection());
