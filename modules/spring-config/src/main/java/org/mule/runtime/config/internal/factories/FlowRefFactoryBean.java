@@ -435,7 +435,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       Optional<ComponentLocation> componentLocation = ofNullable(DynamicFlowRefMessageProcessor.this.getLocation());
       if (targetAsFlow.isPresent()) {
         return processWithChildContextDontComplete(event, p -> Mono.from(p)
-            .transform(resolvedTarget)
+            .transform(targetAsFlow.get().referenced())
             .onErrorMap(MessagingException.class, getMessagingExceptionMapper()), componentLocation);
       } else {
         // If the resolved target is not a flow, it should be a subflow
