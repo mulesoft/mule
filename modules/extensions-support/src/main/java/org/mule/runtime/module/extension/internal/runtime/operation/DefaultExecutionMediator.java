@@ -17,6 +17,8 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
+import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 
@@ -194,20 +196,6 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
     return value;
   }
 
-  private boolean shouldRetry(Throwable t, ExecutionContextAdapter<T> context) {
-    if (Boolean.valueOf(context.getVariable(DO_NOT_RETRY)) || !extractConnectionException(t).isPresent()) {
-      return false;
-    }
-
-    if (isTransactionActive()) {
-      Transaction tx = TransactionCoordination.getInstance().getTransaction();
-
-      return !tx.hasResource(new ExtensionTransactionKey(context.getConfiguration().get()));
-    }
-
-    return true;
-  }
-
   InterceptorsExecutionResult before(ExecutionContext executionContext, List<Interceptor> interceptors) {
 
     List<Interceptor> interceptorList = new ArrayList<>();
@@ -277,13 +265,6 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
     return context.getTransactionConfig()
         .map(txConfig -> ((ExecutionTemplate<T>) createTransactionalExecutionTemplate(context.getMuleContext(), txConfig)))
         .orElse((ExecutionTemplate<T>) defaultExecutionTemplate);
-  }
-
-  private Optional<MutableConfigurationStats> getMutableConfigurationStats(ExecutionContext<T> context) {
-    return context.getConfiguration()
-        .map(ConfigurationInstance::getStatistics)
-        .filter(s -> s instanceof MutableConfigurationStats)
-        .map(s -> (MutableConfigurationStats) s);
   }
 
   private List<Interceptor> collectInterceptors(ExecutionContextAdapter<T> context, ComponentExecutor<T> executor) {

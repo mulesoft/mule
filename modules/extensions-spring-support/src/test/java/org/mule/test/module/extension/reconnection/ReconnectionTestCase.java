@@ -20,6 +20,7 @@ import static org.mule.tck.probe.PollingProber.check;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnection;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
@@ -127,12 +128,41 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   @Test
+  public void reconnectionDuringConnectionExceptionOnSecondPage() throws Exception {
+    resetCounters();
+    Iterator<ReconnectableConnection> iterator = getCursor("pagedOperation", 2, CONNECTIVITY);
+
+    ReconnectableConnection firstPage = iterator.next();
+    assertThat("Connection was disconnected.", firstPage.getDisconnectCalls(), is(0));
+    assertThat("Paging provider was closed.", closePagingProviderCalls, is(0));
+
+    ReconnectableConnection secondPage = iterator.next();
+    assertThat("Connection was not disconnected.", secondPage.getDisconnectCalls(), is(1));
+    assertThat("Paging provider was closed.", closePagingProviderCalls, is(0));
+  }
+
+  @Test
   public void stickyConnectionIsClosedAndReconnectedDuringConnectionExceptionOnFirstPage() throws Exception {
     resetCounters();
     Iterator<ReconnectableConnection> iterator = getCursor("stickyPagedOperation", 1, CONNECTIVITY);
     ReconnectableConnection firstPage = iterator.next();
     assertThat("Connection was not disconnected.", firstPage.getDisconnectCalls(), is(1));
     assertThat("Paging provider was not closed.", closePagingProviderCalls, is(1));
+  }
+
+  @Test
+  public void stickyConnectionIsNotReconnectedDuringConnectionExceptionOnSecondPage() throws Exception {
+    resetCounters();
+    try {
+      Iterator<ReconnectableConnection> iterator = getCursor("stickyPagedOperation", 2, CONNECTIVITY);
+      iterator.next();
+      iterator.next();
+    } catch (Exception e) {
+      assertThat(e, instanceOf(MuleRuntimeException.class));
+      assertThat(e.getMessage(), is("Could not execute operation with connection"));
+      assertThat("Paging provider was not closed.", closePagingProviderCalls, is(1));
+      assertThat("Connection was not disconnected.", disconnectCalls, is(1));
+    }
   }
 
   private void assertRetryTemplate(RetryPolicyTemplate template, boolean async, int count, long freq) throws Exception {
