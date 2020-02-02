@@ -13,18 +13,12 @@ package org.mule.extension.test.extension.reconnection;
 public final class ReconnectableConnection {
 
   private final int reconnectionAttempts;
-  private final int disconnectCalls;
 
-  public ReconnectableConnection(int reconnectionAttempts, int disconnectCalls) {
+  public ReconnectableConnection(int reconnectionAttempts) {
     this.reconnectionAttempts = reconnectionAttempts;
-    this.disconnectCalls = disconnectCalls;
   }
 
   public int getReconnectionAttempts() {
     return reconnectionAttempts;
-  }
-
-  public int getDisconnectCalls() {
-    return disconnectCalls;
   }
 }
