@@ -6,12 +6,12 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <version>4.1.5-HF-SNAPSHOT</version>
+        <version>4.3.0-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-module-test-policy</artifactId>
+    <artifactId>mule-module-core-functional-tests</artifactId>
     <packaging>jar</packaging>
-    <name>Test Policies for Mule</name>
-    <description>Provides policies to use on tests</description>
+    <name>Mule Core Functional Tests</name>
+    <description>Module for testing mule core features in a functional way</description>
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
@@ -60,6 +60,14 @@
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-unit</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Required test extensions -->
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-some-extension</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
     </dependencies>
