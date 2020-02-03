@@ -88,6 +88,11 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
     }
   }
 
+  @Override
+  public String toString() {
+    return "MetadataTypeModelAdapter{" + type.toString() + "}";
+  }
+
   private static class MetadataTypeModelAdapterWithStereotype extends MetadataTypeModelAdapter implements HasStereotypeModel {
 
     private final StereotypeModel stereotype;

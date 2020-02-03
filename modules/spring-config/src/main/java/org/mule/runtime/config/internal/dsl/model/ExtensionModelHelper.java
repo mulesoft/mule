@@ -409,18 +409,11 @@ public class ExtensionModelHelper {
         .findFirst();
   }
 
-  public Optional<DslElementSyntax> resolveDslElementModel(MetadataType type, ComponentIdentifier componentIdentifier) {
-    return lookupExtensionModelFor(componentIdentifier)
-        .flatMap(currentExtension -> {
-          final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(currentExtension);
-
-          return dslSyntaxResolver.resolve(type);
-        });
-  }
-
   public DslElementSyntax resolveDslElementModel(ParameterModel parameterModel, ComponentIdentifier componentIdentifier) {
     Optional<ExtensionModel> optionalExtensionModel = lookupExtensionModelFor(componentIdentifier);
-    ExtensionModel extensionModel = optionalExtensionModel.orElseThrow(() -> new IllegalStateException("Extension Model in context not present for componentIdentifier: " + componentIdentifier));
+    ExtensionModel extensionModel = optionalExtensionModel
+        .orElseThrow(() -> new IllegalStateException("Extension Model in context not present for componentIdentifier: "
+            + componentIdentifier));
 
     final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(extensionModel);
 

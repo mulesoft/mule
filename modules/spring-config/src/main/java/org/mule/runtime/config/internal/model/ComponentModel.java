@@ -12,6 +12,7 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -19,6 +20,7 @@ import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
@@ -29,9 +31,13 @@ import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.SimpleType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
@@ -70,6 +76,9 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import javax.xml.namespace.QName;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * An {@code ComponentModel} represents the user configuration of a component (flow, config, message processor, etc) defined in an
@@ -325,9 +334,8 @@ public abstract class ComponentModel {
   private void handleNestedParameters(ExtensionModelHelper extensionModelHelper, ParameterizedModel model) {
     Set<ComponentAst> paramChildren = new HashSet<>();
 
-    ((ComponentAst) ComponentModel.this).recursiveStream()
+    ((ComponentAst) ComponentModel.this).directChildrenStream()
         .filter(childComp -> childComp != ComponentModel.this)
-            .filter(childComp -> !childComp.getModel(ParameterizedModel.class).isPresent())
         .forEach(childComp -> {
           extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
               // do not handle the callback parameters from the sources
@@ -347,19 +355,11 @@ public abstract class ComponentModel {
               .ifPresent(paramModel -> {
                 paramChildren.add(childComp);
 
-                if (paramModel.getExpressionSupport() == NOT_SUPPORTED || childComp.directChildrenStream().findFirst().isPresent()) {
-                  // TODO MULE-17710 do a recursive navigation to set the field metadata on the inner ComponentAsts of
-                  // childComp
-                  setParameter(paramModel, new DefaultComponentParameterAst(childComp,
-                                                                            () -> paramModel, childComp.getMetadata()));
-
-                  final MetadataTypeModelAdapter parameterizedTypeModelAdapter =
-                      createParameterizedTypeModelAdapter(paramModel.getType(),
-                                                          extensionModelHelper);
-                  ((ComponentModel) childComp).setMetadataTypeModelAdapter(parameterizedTypeModelAdapter);
-
-                  setMetadataTypeModelAdapter(childComp, paramModel, extensionModelHelper);
-
+                if (paramModel.getExpressionSupport() == NOT_SUPPORTED
+                    || childComp.directChildrenStream().findFirst().isPresent()) {
+                  enrichComponentModels(this, getNestedComponents(this),
+                                        of(extensionModelHelper.resolveDslElementModel(paramModel, this.getIdentifier())),
+                                        paramModel, extensionModelHelper);
                 } else {
                   setParameter(paramModel, new DefaultComponentParameterAst(((ComponentModel) childComp).getTextContent(),
                                                                             () -> paramModel, childComp.getMetadata()));
@@ -371,180 +371,241 @@ public abstract class ComponentModel {
     // ComponentModel.this.innerComponents.removeAll(paramChildren);
   }
 
-  private void setMetadataTypeModelAdapter(ComponentAst componentModel, ParameterModel parameterModel,
-                                           ExtensionModelHelper extensionModelHelper) {
-    DslElementSyntax dslElementSyntax =
-            extensionModelHelper.resolveDslElementModel(parameterModel, ComponentModel.this.getIdentifier());
-    if (!dslElementSyntax.getChilds().isEmpty()) {
-      setModelOnChildComponents(componentModel, extensionModelHelper, dslElementSyntax);
-    }
-    else {
-      parameterModel.getType().accept(new MetadataTypeVisitor() {
-        @Override
-        public void visitObject(ObjectType objectType) {
-          if (isMap(objectType)) {
-            populateMapFields(objectType, componentModel, dslElementSyntax, extensionModelHelper);
-          }
+  private Multimap<ComponentIdentifier, ComponentModel> getNestedComponents(ComponentModel componentModel) {
+    Multimap<ComponentIdentifier, ComponentModel> result = ArrayListMultimap.create();
+    componentModel.getInnerComponents().forEach(nestedComponent -> {
+      result.put(nestedComponent.getIdentifier(), nestedComponent);
+    });
+    return result;
+  }
+
+  private ComponentModel getSingleComponentModel(Multimap<ComponentIdentifier, ComponentModel> innerComponents,
+                                                 Optional<ComponentIdentifier> identifier) {
+    return identifier.filter(innerComponents::containsKey)
+        .map(innerComponents::get)
+        .map(collection -> collection.iterator().next())
+        .orElse(null);
+  }
+
+
+  private void enrichComponentModels(ComponentModel componentModel, Multimap<ComponentIdentifier, ComponentModel> innerComponents,
+                                     Optional<DslElementSyntax> dslContainedElement, ParameterModel paramModel,
+                                     ExtensionModelHelper extensionModelHelper) {
+    dslContainedElement.ifPresent(paramDsl -> {
+      if (paramDsl.isWrapped()) {
+        if (!(paramModel.getType() instanceof ObjectType)) {
+          return;
         }
-      });
-    }
+        ComponentModel wrappedComponent = getSingleComponentModel(innerComponents, getIdentifier(dslContainedElement.get()));
+        Multimap<ComponentIdentifier, ComponentModel> nestedWrappedComponents = getNestedComponents(wrappedComponent);
+
+        Map<ObjectType, Optional<DslElementSyntax>> objectTypeOptionalMap =
+            extensionModelHelper.resolveSubTypes((ObjectType) paramModel.getType());
+
+        objectTypeOptionalMap.entrySet().stream().filter(entry -> {
+          if (entry.getValue().isPresent()) {
+            return getSingleComponentModel(nestedWrappedComponents, getIdentifier(entry.getValue().get())) != null;
+          }
+          return false;
+        }).findFirst().ifPresent(wrappedEntryType -> {
+          DslElementSyntax wrappedDsl = wrappedEntryType.getValue().get();
+          wrappedEntryType.getKey()
+              .accept(getComponentChildVisitor(componentModel,
+                                               paramModel,
+                                               wrappedDsl,
+                                               getSingleComponentModel(nestedWrappedComponents, getIdentifier(wrappedDsl)),
+                                               extensionModelHelper));
+        });
+      }
+
+      ComponentModel paramComponent = getSingleComponentModel(innerComponents, getIdentifier(paramDsl));
+
+      if (paramComponent != null) {
+        paramModel.getType()
+            .accept(getComponentChildVisitor(componentModel, paramModel, paramDsl, paramComponent, extensionModelHelper));
+      }
+    });
   }
 
-  private void populateObjectFieldsType(ComponentAst component, MetadataType metadataType,
-                                        ExtensionModelHelper extensionModelHelper) {
-    Optional<DslElementSyntax> optionalDslElementSyntax =
-            extensionModelHelper.resolveDslElementModel(metadataType, ComponentModel.this.getIdentifier());
-    if (optionalDslElementSyntax.isPresent()) {
-      setModelOnChildComponents(component, extensionModelHelper, optionalDslElementSyntax.get());
-    }
-  }
-
-  private void setModelOnChildComponents(ComponentAst component, ExtensionModelHelper extensionModelHelper, DslElementSyntax dslElementSyntax) {
-    component
-            .directChildrenStream()
-            .forEach(nestedComp -> dslElementSyntax
-                    .getChilds()
-                    .stream()
-                    .filter(childDsl -> nestedComp.getIdentifier().equals(getIdentifier(childDsl).orElse(null)))
-                    .findFirst()
-                    .ifPresent(nestedDslModel -> {
-                      Optional<ParameterModel> optionalParameterModel =
-                              setParameterModel((ComponentModel) component, nestedComp, nestedDslModel, extensionModelHelper);
-                      if (optionalParameterModel.isPresent()) {
-                        ParameterModel parameterModel = optionalParameterModel.get();
-                        parameterModel.getType()
-                                .accept(getMetadataTypeChildVisitor(extensionModelHelper, nestedComp, nestedDslModel, parameterModel));
-                      }
-                    }));
-  }
-
-  // TODO stackControl for recursive types...
-  private MetadataTypeVisitor getMetadataTypeChildVisitor(ExtensionModelHelper extensionModelHelper, ComponentAst componentAst,
-                                                          DslElementSyntax dslModel, ParameterModel parameterModel) {
+  private MetadataTypeVisitor getComponentChildVisitor(ComponentModel componentModel, ParameterModel paramModel,
+                                                       DslElementSyntax paramDsl, ComponentModel paramComponent,
+                                                       ExtensionModelHelper extensionModelHelper) {
     return new MetadataTypeVisitor() {
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        Optional<DslElementSyntax> dslModelGenericOptional = dslModel.getGeneric(arrayType.getType());
-        if (dslModelGenericOptional.isPresent()) {
-          arrayType.getType().accept(new MetadataTypeVisitor() {
-
-            @Override
-            public void visitObject(ObjectType objectType) {
-              Map<ObjectType, Optional<DslElementSyntax>> subTypes = extensionModelHelper.resolveSubTypes(objectType);
-              if (subTypes.isEmpty()) {
-                componentAst
-                        .directChildrenStream()
-                        .forEach(unwrappedComponent -> {
-                          MetadataTypeModelAdapter parameterizedTypeModelAdapter =
-                                  createParameterizedTypeModelAdapter(objectType, extensionModelHelper);
-
-                          ((ComponentModel) unwrappedComponent).setMetadataTypeModelAdapter(parameterizedTypeModelAdapter);
-
-                          populateObjectFieldsType(unwrappedComponent, objectType, extensionModelHelper);
-                        });
-              } else {
-                subTypes.entrySet()
-                        .stream()
-                        .forEach(entry -> entry
-                                .getValue()
-                                .ifPresent(subTypeDsl -> getIdentifier(subTypeDsl)
-                                        .ifPresent(subTypeCompId -> {
-                                          componentAst
-                                                  .directChildrenStream()
-                                                  .filter(comp -> comp
-                                                          .getIdentifier()
-                                                          .equals(subTypeCompId))
-                                                  .forEach(subTypeComp -> {
-                                                    MetadataTypeModelAdapter parameterizedTypeModelAdapter =
-                                                            createParameterizedTypeModelAdapter(entry.getKey(), extensionModelHelper);
-
-                                                    ((ComponentModel) subTypeComp).setMetadataTypeModelAdapter(parameterizedTypeModelAdapter);
-
-                                                    populateObjectFieldsType(subTypeComp, entry.getKey(), extensionModelHelper);
-                                                  });
-
-                                        })));
-              }
-            }
-          });
-        } else {
-          componentAst
-                  .directChildrenStream()
-                  .forEach(unwrappedComponent -> {
-                    MetadataTypeModelAdapter parameterizedTypeModelAdapter =
-                            createParameterizedTypeModelAdapter(arrayType.getType(), extensionModelHelper);
-
-                    ((ComponentModel) unwrappedComponent).setMetadataTypeModelAdapter(parameterizedTypeModelAdapter);
-
-                    populateObjectFieldsType(unwrappedComponent, arrayType.getType(), extensionModelHelper);
-                  });
-        }
+        MetadataType itemType = arrayType.getType();
+        itemType.accept(getArrayItemTypeVisitor(componentModel, paramModel, paramDsl, paramComponent, extensionModelHelper));
       }
 
       @Override
       public void visitObject(ObjectType objectType) {
         if (isMap(objectType)) {
-          populateMapFields(objectType, componentAst, dslModel, extensionModelHelper);
+          List<ComponentModel> componentModels = paramComponent.getInnerComponents().stream().filter(entryComponent -> {
+            MetadataType entryType = objectType.getOpenRestriction().get();
+            Optional<DslElementSyntax> entryValueDslOptional = paramDsl.getGeneric(entryType);
+            if (entryValueDslOptional.isPresent()) {
+              DslElementSyntax entryValueDsl = entryValueDslOptional.get();
+              ParameterModel keyParamModel =
+                  new ImmutableParameterModel(KEY_ATTRIBUTE_NAME, "", typeLoader.load(String.class), false, true, false, false,
+                                              SUPPORTED, null, BEHAVIOUR, null, null, null, null, emptyList(), emptySet());
+              String key = entryComponent.getRawParameters().get(KEY_ATTRIBUTE_NAME);
+              entryComponent.setParameter(keyParamModel, new DefaultComponentParameterAst(key,
+                                                                                          () -> keyParamModel,
+                                                                                          entryComponent.getMetadata()));
+
+              String value = entryComponent.getRawParameters().get(VALUE_ATTRIBUTE_NAME);
+              ParameterModel valueParamModel =
+                  new ImmutableParameterModel(VALUE_ATTRIBUTE_NAME, "", entryType, false, true, false, false, SUPPORTED, null,
+                                              BEHAVIOUR, null, null, null, null, emptyList(), emptySet());
+
+              if (isBlank(value)) {
+                Optional<DslElementSyntax> genericValueDslOptional = entryValueDsl.getGeneric(keyParamModel.getType());
+
+                Multimap<ComponentIdentifier, ComponentModel> nestedComponents = getNestedComponents(entryComponent);
+
+                if (genericValueDslOptional.isPresent()) {
+                  DslElementSyntax genericValueDsl = genericValueDslOptional.get();
+                  enrichComponentModels(entryComponent, nestedComponents, of(genericValueDsl), valueParamModel,
+                                        extensionModelHelper);
+
+                  List<ComponentModel> itemsComponentModels = entryComponent.getInnerComponents().stream()
+                      .filter(valueComponent -> valueComponent.getIdentifier()
+                          .equals(getIdentifier(genericValueDsl).orElse(null)))
+                      .collect(toList());
+
+                  entryComponent.setParameter(valueParamModel, new DefaultComponentParameterAst(itemsComponentModels,
+                                                                                                () -> valueParamModel,
+                                                                                                entryComponent.getMetadata()));
+                } else {
+                  Optional<DslElementSyntax> valueDslElementOptional = entryValueDsl.getContainedElement(VALUE_ATTRIBUTE_NAME);
+                  if (valueDslElementOptional.isPresent() && !valueDslElementOptional.get().isWrapped()) {
+                    // Either a simple value or an objectType
+                    enrichComponentModels(entryComponent, nestedComponents, valueDslElementOptional, valueParamModel,
+                                          extensionModelHelper);
+                  } else if (entryType instanceof ObjectType) {
+                    // This case the value is a baseType therefore we need to go with subTypes
+                    extensionModelHelper.resolveSubTypes((ObjectType) entryType)
+                        .entrySet()
+                        .stream()
+                        .filter(entrySubTypeDslOptional -> entrySubTypeDslOptional.getValue().isPresent())
+                        .forEach(entrySubTypeDslOptional -> {
+                          DslElementSyntax subTypeDsl = entrySubTypeDslOptional.getValue().get();
+
+                          ParameterModel subTypeValueParamModel =
+                              new ImmutableParameterModel(VALUE_ATTRIBUTE_NAME, "", entrySubTypeDslOptional.getKey(), false, true,
+                                                          false, false, SUPPORTED, null,
+                                                          BEHAVIOUR, null, null, null, null, emptyList(), emptySet());
+
+                          enrichComponentModels(entryComponent, nestedComponents, of(subTypeDsl), subTypeValueParamModel,
+                                                extensionModelHelper);
+                        });
+                  }
+                }
+              } else {
+                entryComponent.setParameter(valueParamModel, new DefaultComponentParameterAst(value,
+                                                                                              () -> keyParamModel,
+                                                                                              entryComponent.getMetadata()));
+              }
+
+              ObjectTypeBuilder entryObjectTypeBuilder = new BaseTypeBuilder(MetadataFormat.JAVA).objectType();
+              entryObjectTypeBuilder.addField().key(keyParamModel.getName()).value(keyParamModel.getType());
+              entryObjectTypeBuilder.addField().key(valueParamModel.getName()).value(valueParamModel.getType());
+
+              entryComponent.setMetadataTypeModelAdapter(createParameterizedTypeModelAdapter(entryObjectTypeBuilder.build(),
+                                                                                             extensionModelHelper));
+
+              return true;
+            }
+            return false;
+          }).collect(toList());
+
+          componentModel.setParameter(paramModel, new DefaultComponentParameterAst(componentModels,
+                                                                                   () -> paramModel,
+                                                                                   paramComponent.getMetadata()));
           return;
         }
-        populateObjectFieldsType(componentAst, parameterModel.getType(), extensionModelHelper);
+
+        componentModel.setParameter(paramModel, new DefaultComponentParameterAst(paramComponent,
+                                                                                 () -> paramModel, paramComponent.getMetadata()));
+
+        MetadataTypeModelAdapter parameterizedModel = createParameterizedTypeModelAdapter(objectType, extensionModelHelper);
+        paramComponent.setMetadataTypeModelAdapter(parameterizedModel);
+
+        parameterizedModel.getAllParameterModels().stream().forEach(nestedParameter -> enrichComponentModels(paramComponent,
+                                                                                                             getNestedComponents(paramComponent),
+                                                                                                             paramDsl
+                                                                                                                 .getContainedElement(nestedParameter
+                                                                                                                     .getName()),
+                                                                                                             nestedParameter,
+                                                                                                             extensionModelHelper));
       }
     };
   }
 
-  private void populateMapFields(ObjectType objectType, ComponentAst componentAst, DslElementSyntax dslModel, ExtensionModelHelper extensionModelHelper) {
-    componentAst.directChildrenStream().forEach(entryComponentAst -> {
-      MetadataType valueType = objectType.getOpenRestriction().get();
-      dslModel.getGeneric(valueType).map(entryDsl -> (ComponentModel) entryComponentAst).ifPresent(entryComponentModel -> {
-        ParameterModel keyParamModel = new ImmutableParameterModel(KEY_ATTRIBUTE_NAME, "", typeLoader.load(String.class), false, true, false, false, NOT_SUPPORTED, null, BEHAVIOUR, null, null, null, null, emptyList(), emptySet());
-        String key = entryComponentModel.getRawParameters().get(KEY_ATTRIBUTE_NAME);
-        // KEY parameter
-        entryComponentModel.setParameter(keyParamModel, new DefaultComponentParameterAst(key,
-                                                                                         () -> keyParamModel, entryComponentAst.getMetadata()));
+  private MetadataTypeVisitor getArrayItemTypeVisitor(ComponentModel componentModel, ParameterModel paramModel,
+                                                      DslElementSyntax paramDsl, ComponentModel paramComponent,
+                                                      ExtensionModelHelper extensionModelHelper) {
+    return new MetadataTypeVisitor() {
 
-        // VALUE parameter
-        String value = entryComponentModel.getRawParameters().get(VALUE_ATTRIBUTE_NAME);
-        if (isBlank(value)) {
-          //TODO complex maps...
-          //entryComponentModel.setParameter(childParamModel, new DefaultComponentParameterAst(childComp,
-          //                                                                                   () -> childParamModel,
-          //                                                                                   childComp.getMetadata()));
-          //MetadataTypeModelAdapter childParameterizedTypeModelAdapter =
-          //        createParameterizedTypeModelAdapter(childParamModel.getType(),
-          //                                            extensionModelHelper);
-          //((ComponentModel) childComp).setMetadataTypeModelAdapter(childParameterizedTypeModelAdapter);
-          //
-          //
-          populateObjectFieldsType(entryComponentAst, valueType, extensionModelHelper);
+      @Override
+      public void visitSimpleType(SimpleType simpleType) {
+        if (paramComponent.getRawParameters().containsKey(VALUE_ATTRIBUTE_NAME)) {
+          ObjectTypeBuilder entryObjectTypeBuilder = new BaseTypeBuilder(MetadataFormat.JAVA).objectType();
+          entryObjectTypeBuilder.addField().key(VALUE_ATTRIBUTE_NAME).value(simpleType);
+
+          paramComponent.setMetadataTypeModelAdapter(createParameterizedTypeModelAdapter(entryObjectTypeBuilder.build(),
+                                                                                         extensionModelHelper));
         }
-        else {
-          ParameterModel valueParamModel = new ImmutableParameterModel(VALUE_ATTRIBUTE_NAME, "", valueType, false, true, false, false, NOT_SUPPORTED, null, BEHAVIOUR, null, null, null, null, emptyList(), emptySet());
-          entryComponentModel.setParameter(valueParamModel, new DefaultComponentParameterAst(value,
-                                                                                             () -> keyParamModel, entryComponentAst.getMetadata()));
+      }
 
-        }
+      @Override
+      public void visitObject(ObjectType itemType) {
+        paramDsl.getGeneric(itemType)
+            .ifPresent(itemDsl -> {
+              ComponentIdentifier itemIdentifier = getIdentifier(itemDsl).get();
+              Map<MetadataType, Optional<DslElementSyntax>> typesDslMap = new HashMap<>();
+              typesDslMap.putAll(extensionModelHelper.resolveSubTypes(itemType));
 
-      });
-    });
-  }
+              if (!itemDsl.isWrapped()) {
+                typesDslMap.put(itemType, of(itemDsl));
+              }
 
-  private Optional<ParameterModel> setParameterModel(ComponentModel component, ComponentAst childComp,
-                                                     DslElementSyntax childDslModel, ExtensionModelHelper extensionModelHelper) {
-    return component.getModel(ParameterizedModel.class)
-        .flatMap(parameterizedModel -> parameterizedModel.getAllParameterModels().stream()
-            .filter(childParam -> childParam.getName().equals(childDslModel.getAttributeName())).findFirst()
-            .map(childParamModel -> {
-              component.setParameter(childParamModel, new DefaultComponentParameterAst(childComp,
-                                                                                       () -> childParamModel,
-                                                                                       childComp.getMetadata()));
-              MetadataTypeModelAdapter childParameterizedTypeModelAdapter =
-                  createParameterizedTypeModelAdapter(childParamModel.getType(),
-                                                      extensionModelHelper);
-              ((ComponentModel) childComp).setMetadataTypeModelAdapter(childParameterizedTypeModelAdapter);
+              Map<ComponentIdentifier, MetadataType> itemIdentifiers = new HashMap<>();
+              itemIdentifiers.put(itemIdentifier, itemType);
+              typesDslMap.entrySet().stream()
+                  .filter(entry -> entry.getValue().isPresent())
+                  .forEach(entry -> {
+                    getIdentifier(entry.getValue().get()).ifPresent(subTypeIdentifier -> {
+                      itemIdentifiers.put(subTypeIdentifier, entry.getKey());
+                    });
+                  });
 
-              return childParamModel;
-            }));
+              List<ComponentAst> componentModels = paramComponent.getInnerComponents().stream()
+                  .filter(c -> itemIdentifiers.keySet().contains(c.getIdentifier()))
+                  .map(componentModel -> (ComponentAst) componentModel)
+                  .collect(toList());
+
+              componentModel.setParameter(paramModel, new DefaultComponentParameterAst(componentModels,
+                                                                                       () -> paramModel,
+                                                                                       paramComponent.getMetadata()));
+              paramComponent.getInnerComponents().stream().forEach(itemComponent -> {
+                MetadataType type = itemIdentifiers.get(itemComponent.getIdentifier());
+                typesDslMap.get(type).ifPresent(subTypeDsl -> {
+                  MetadataTypeModelAdapter parameterizedModel = createParameterizedTypeModelAdapter(type, extensionModelHelper);
+                  itemComponent.setMetadataTypeModelAdapter(parameterizedModel);
+
+                  parameterizedModel.getAllParameterModels().stream().forEach(nestedParameter -> {
+                    enrichComponentModels(itemComponent, getNestedComponents(itemComponent),
+                                          subTypeDsl.getContainedElement(nestedParameter.getName()),
+                                          nestedParameter, extensionModelHelper);
+                  });
+
+                });
+              });
+            });
+      }
+    };
   }
 
   private Optional<ComponentIdentifier> getIdentifier(DslElementSyntax dsl) {
