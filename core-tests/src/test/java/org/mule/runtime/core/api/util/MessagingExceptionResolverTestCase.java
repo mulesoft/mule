@@ -34,7 +34,8 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory;
 import org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.ErrorTypeBuilder;import org.mule.runtime.core.internal.util.MessagingExceptionResolver;;
+import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
+import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.connector.DispatchException;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
@@ -42,7 +43,8 @@ import org.mule.tck.integration.transformer.ValidateResponse;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
@@ -201,24 +203,6 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     MessagingException resolved = anotherResolver.resolve(me, locator, emptyList());
     assertExceptionErrorType(resolved, expected);
     assertExceptionMessage(resolved.getMessage(), "DISPATCH PROBLEM");
-  }
-
-  private class ComposedErrorExceptionStub extends MuleException implements ComposedErrorException {
-
-    private List<Error> composedErrors;
-    private String message;
-
-    public ComposedErrorExceptionStub(List<Error> composedErrors, String message) {
-      super(createStaticMessage(message));
-      this.composedErrors = composedErrors;
-      this.message = message;
-    }
-
-    @Override
-    public List<Error> getErrors() {
-      return composedErrors;
-    }
-
   }
 
   private void assertExceptionMessage(String result, String expected) {
