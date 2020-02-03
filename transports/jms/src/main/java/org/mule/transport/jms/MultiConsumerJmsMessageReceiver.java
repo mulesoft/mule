@@ -316,7 +316,10 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
         protected void closeConsumer()
         {
-            jmsConnector.closeQuietly(consumer);
+            if (!jmsConnector.isStopping())
+            {
+                jmsConnector.closeQuietly(consumer);
+            }
             consumer = null;
             consumerClosed = true;
             if (isProcessingMessage)
@@ -383,7 +386,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 {
                     // TODO: Check this. It used to be used when the setMessageListener was used. Think is not needed anymore.
                     // That would mean org.mule.transport.jms.MultiConsumerJmsMessageReceiverTest#messageListenerIsNotRecycledAccordingToConnector is not needed anymore.
-                    if (jmsConnector.mustRecycleReceivers())
+                    if (jmsConnector.mustRecycleReceivers() && !jmsConnector.isStopping())
                     {
                         consumer.close();
                     }
