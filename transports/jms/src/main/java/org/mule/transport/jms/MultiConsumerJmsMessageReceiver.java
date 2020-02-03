@@ -310,7 +310,10 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
         protected void closeConsumer()
         {
-            jmsConnector.closeQuietly(consumer);
+            if (!jmsConnector.isStopping())
+            {
+                jmsConnector.closeQuietly(consumer);
+            }
             consumer = null;
             if (isProcessingMessage)
             {
@@ -374,7 +377,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                 {
                     // This is done to recycle the consumer
                     // by default
-                    if (jmsConnector.mustRecycleReceivers())
+                    if (jmsConnector.mustRecycleReceivers() && !jmsConnector.isStopping())
                     {
                         consumer.setMessageListener(null);
                     }
