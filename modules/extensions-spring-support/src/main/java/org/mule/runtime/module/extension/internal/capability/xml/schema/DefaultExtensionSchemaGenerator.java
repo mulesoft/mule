@@ -13,7 +13,6 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -60,39 +59,30 @@ public class DefaultExtensionSchemaGenerator implements ExtensionSchemaGenerator
 
     new IdempotentExtensionWalker() {
 
-      private Set<Object> registeredModels = new HashSet<>();
-
       @Override
       public void onConfiguration(ConfigurationModel model) {
-        registerModelOnce(() -> schemaBuilder.registerConfigElement(model), model);
+        schemaBuilder.registerConfigElement(model);
       }
 
       @Override
       protected void onConstruct(ConstructModel model) {
-        registerModelOnce(() -> schemaBuilder.registerOperation(model), model);
+        schemaBuilder.registerOperation(model);
       }
 
       @Override
       public void onOperation(OperationModel model) {
-        registerModelOnce(() -> schemaBuilder.registerOperation(model), model);
+        schemaBuilder.registerOperation(model);
       }
 
       @Override
       public void onConnectionProvider(ConnectionProviderModel model) {
-        registerModelOnce(() -> schemaBuilder.registerConnectionProviderElement(model), model);
+        schemaBuilder.registerConnectionProviderElement(model);
       }
 
       @Override
       public void onSource(SourceModel model) {
-        registerModelOnce(() -> schemaBuilder.registerMessageSource(model), model);
+        schemaBuilder.registerMessageSource(model);
       }
-
-      private void registerModelOnce(Runnable registerAction, Object model) {
-        if (registeredModels.add(model)) {
-          registerAction.run();
-        }
-      }
-
     }.walk(extensionModel);
 
     schemaBuilder.registerEnums();

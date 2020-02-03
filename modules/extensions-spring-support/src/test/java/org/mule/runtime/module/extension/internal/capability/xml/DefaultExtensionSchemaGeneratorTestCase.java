@@ -110,7 +110,29 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
         .thenReturn(asList(new JavaXmlDeclarationEnricher()));
 
     final List<SchemaGeneratorTestUnit> extensions;
-    extensions = asList(newTestUnit(javaLoader, TestOAuthExtension.class, "test-oauth.xsd"));
+    extensions = asList(newTestUnit(javaLoader, MapConnector.class, "map.xsd"),
+                        newTestUnit(javaLoader, ListConnector.class, "list.xsd"),
+                        newTestUnit(javaLoader, TestConnector.class, "basic.xsd"),
+                        newTestUnit(javaLoader, StringListConnector.class, "string-list.xsd"),
+                        newTestUnit(javaLoader, GlobalPojoConnector.class, "global-pojo.xsd"),
+                        newTestUnit(javaLoader, GlobalInnerPojoConnector.class, "global-inner-pojo.xsd"),
+                        newTestUnit(javaLoader, VeganExtension.class, "vegan.xsd"),
+                        newTestUnit(javaLoader, PetStoreConnector.class, "petstore.xsd"),
+                        newTestUnit(javaLoader, MetadataExtension.class, "metadata.xsd"),
+                        newTestUnit(javaLoader, HeisenbergExtension.class, "heisenberg.xsd"),
+                        newTestUnit(javaLoader, SubstitutionGroupExtension.class, "substitutiongroup.xsd"),
+                        newTestUnit(javaLoader, TransactionalExtension.class, "tx-ext.xsd"),
+                        newTestUnit(javaLoader, SubTypesMappingConnector.class, "subtypes.xsd"),
+                        newTestUnit(javaLoader, MarvelExtension.class, "marvel.xsd"),
+                        newTestUnit(soapLoader, FootballSoapExtension.class, "soap.xsd"),
+                        newTestUnit(soapLoader, RickAndMortyExtension.class, "ram.xsd"),
+                        newTestUnit(javaLoader, TypedValueExtension.class, "typed-value.xsd"),
+                        newTestUnit(javaLoader, TestOAuthExtension.class, "test-oauth.xsd"),
+                        newTestUnit(javaLoader, WeaveFunctionExtension.class, "test-fn.xsd"),
+                        newTestUnit(javaLoader, ValuesExtension.class, "values.xsd"),
+                        newTestUnit(javaLoader, ImplicitConfigExtension.class, "implicit-config.xsd"),
+                        newTestUnit(javaLoader, NonImplicitConfigExtension.class, "non-implicit-config.xsd"),
+                        newTestUnit(javaLoader, ReconnectionExtension.class, "reconnection-extension.xsd"));
 
     BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel = (extension, loader) -> {
       ExtensionModel model = loadExtension(extension, loader);
@@ -137,7 +159,7 @@ public class DefaultExtensionSchemaGeneratorTestCase extends AbstractMuleTestCas
    * @return whether or not the "expected" test files should be updated when comparison fails
    */
   private boolean shouldUpdateExpectedFilesOnError() {
-    return true;
+    return UPDATE_EXPECTED_FILES_ON_ERROR;
   }
 
   @Before
