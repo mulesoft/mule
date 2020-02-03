@@ -23,6 +23,7 @@ import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.util.context.Context.empty;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.exception.SuppressedMuleException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -275,16 +276,16 @@ class UntilSuccessfulRouter {
 
   private Function<Throwable, Throwable> getThrowableFunction(CoreEvent event) {
     return throwable -> {
-      CoreEvent exhaustionCauseEvent = event;
+      Throwable cause = getMessagingExceptionCause(throwable);
+      CoreEvent exceptionEvent = event;
       if (throwable instanceof MessagingException) {
-        exhaustionCauseEvent = ((MessagingException) throwable).getEvent();
+        exceptionEvent = ((MessagingException) throwable).getEvent();
       }
-      Throwable exhaustionCause = getMessagingExceptionCause(throwable);
-      Throwable retryExhaustedException =
-          new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, exhaustionCause.getMessage()),
-                                            exhaustionCause, owner);
-      CoreEvent retryExhaustedEvent = getRetryExhaustedEvent(exhaustionCauseEvent, retryExhaustedException);
-      return new MessagingException(retryExhaustedEvent, retryExhaustedException, owner);
+      return new MessagingException(exceptionEvent,
+                                    new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX,
+                                                                                          cause.getMessage()),
+                                                                      new SuppressedMuleException(cause), owner),
+                                    owner);
     };
   }
 
