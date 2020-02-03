@@ -374,12 +374,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-service-http-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mule.tests.plugin</groupId>
             <artifactId>mule-tests-component-plugin</artifactId>
             <version>${project.version}</version>
