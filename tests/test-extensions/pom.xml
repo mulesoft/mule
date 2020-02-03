@@ -9,9 +9,7 @@
         <version>4.3.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.mule.tests</groupId>
     <artifactId>mule-test-extensions-parent</artifactId>
-    <version>4.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Parent Pom for Mule Test Extension</name>
 
@@ -94,18 +92,11 @@
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-unit</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-unit</artifactId>
-            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>${guavaVersion}</version>
         </dependency>
     </dependencies>
 </project>
