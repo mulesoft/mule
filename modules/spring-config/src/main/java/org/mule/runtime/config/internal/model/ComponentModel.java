@@ -126,7 +126,7 @@ public abstract class ComponentModel {
 
   /**
    * @return the line number in which the component was defined in the configuration file. It may be empty if the component was
-   *         created pragmatically.
+   * created pragmatically.
    */
   @Deprecated
   public Optional<Integer> getLineNumber() {
@@ -135,7 +135,7 @@ public abstract class ComponentModel {
 
   /**
    * @return the start column in which the component was defined in the configuration file. It may be empty if the component was
-   *         created pragmatically.
+   * created pragmatically.
    */
   @Deprecated
   public Optional<Integer> getStartColumn() {
@@ -201,7 +201,7 @@ public abstract class ComponentModel {
 
   /**
    * @param parameterName name of the configuration parameter.
-   * @param value value contained by the configuration parameter.
+   * @param value         value contained by the configuration parameter.
    */
   public void setParameter(ParameterModel parameterModel, ComponentParameterAst value) {
     this.parameters.put(parameterModel.getName(), value.getRawValue());
@@ -223,7 +223,7 @@ public abstract class ComponentModel {
 
   /**
    * @param componentType the {@link org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType} of the object to be
-   *        created when processing this {@code ComponentModel}.
+   *                      created when processing this {@code ComponentModel}.
    */
   public void setComponentType(TypedComponentIdentifier.ComponentType componentType) {
     this.componentType = componentType;
@@ -397,25 +397,27 @@ public abstract class ComponentModel {
           return;
         }
         ComponentModel wrappedComponent = getSingleComponentModel(innerComponents, getIdentifier(dslContainedElement.get()));
-        Multimap<ComponentIdentifier, ComponentModel> nestedWrappedComponents = getNestedComponents(wrappedComponent);
+        if (wrappedComponent != null) {
+          Multimap<ComponentIdentifier, ComponentModel> nestedWrappedComponents = getNestedComponents(wrappedComponent);
 
-        Map<ObjectType, Optional<DslElementSyntax>> objectTypeOptionalMap =
-            extensionModelHelper.resolveSubTypes((ObjectType) paramModel.getType());
+          Map<ObjectType, Optional<DslElementSyntax>> objectTypeOptionalMap =
+              extensionModelHelper.resolveSubTypes((ObjectType) paramModel.getType());
 
-        objectTypeOptionalMap.entrySet().stream().filter(entry -> {
-          if (entry.getValue().isPresent()) {
-            return getSingleComponentModel(nestedWrappedComponents, getIdentifier(entry.getValue().get())) != null;
-          }
-          return false;
-        }).findFirst().ifPresent(wrappedEntryType -> {
-          DslElementSyntax wrappedDsl = wrappedEntryType.getValue().get();
-          wrappedEntryType.getKey()
-              .accept(getComponentChildVisitor(componentModel,
-                                               paramModel,
-                                               wrappedDsl,
-                                               getSingleComponentModel(nestedWrappedComponents, getIdentifier(wrappedDsl)),
-                                               extensionModelHelper));
-        });
+          objectTypeOptionalMap.entrySet().stream().filter(entry -> {
+            if (entry.getValue().isPresent()) {
+              return getSingleComponentModel(nestedWrappedComponents, getIdentifier(entry.getValue().get())) != null;
+            }
+            return false;
+          }).findFirst().ifPresent(wrappedEntryType -> {
+            DslElementSyntax wrappedDsl = wrappedEntryType.getValue().get();
+            wrappedEntryType.getKey()
+                .accept(getComponentChildVisitor(componentModel,
+                                                 paramModel,
+                                                 wrappedDsl,
+                                                 getSingleComponentModel(nestedWrappedComponents, getIdentifier(wrappedDsl)),
+                                                 extensionModelHelper));
+          });
+        }
       }
 
       ComponentModel paramComponent = getSingleComponentModel(innerComponents, getIdentifier(paramDsl));
@@ -722,7 +724,7 @@ public abstract class ComponentModel {
   /**
    * @param parameterName configuration parameter name
    * @return true if the value provided for the configuration parameter was get from the DSL schema, false if it was explicitly
-   *         defined in the config
+   * defined in the config
    */
   public boolean isParameterValueProvidedBySchema(String parameterName) {
     return this.schemaValueParameter.contains(parameterName);
@@ -804,8 +806,8 @@ public abstract class ComponentModel {
     }
 
     /**
-     * @param parameterName name of the configuration parameter.
-     * @param value value contained by the configuration parameter.
+     * @param parameterName   name of the configuration parameter.
+     * @param value           value contained by the configuration parameter.
      * @param valueFromSchema
      * @return the builder.
      */
@@ -858,7 +860,7 @@ public abstract class ComponentModel {
      * Adds a custom attribute to the {@code ComponentModel}. This custom attribute is meant to hold metadata of the configuration
      * and not to be used to instantiate the runtime object that corresponds to this configuration.
      *
-     * @param name custom attribute name.
+     * @param name  custom attribute name.
      * @param value custom attribute value.
      * @return the builder.
      */
@@ -871,7 +873,7 @@ public abstract class ComponentModel {
      * Adds a custom attribute to the {@code ComponentModel}. This custom attribute is meant to hold metadata of the configuration
      * and not to be used to instantiate the runtime object that corresponds to this configuration.
      *
-     * @param name custom attribute name.
+     * @param name  custom attribute name.
      * @param value custom attribute value.
      * @return the builder.
      */
