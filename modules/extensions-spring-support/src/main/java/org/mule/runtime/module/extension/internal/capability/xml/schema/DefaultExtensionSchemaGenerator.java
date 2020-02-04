@@ -27,8 +27,6 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Na
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Schema;
 
 import java.io.StringWriter;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
