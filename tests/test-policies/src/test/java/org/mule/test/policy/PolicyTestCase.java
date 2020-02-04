@@ -136,6 +136,11 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
     }
 
     @Override
+    public boolean isAnySourcePolicyPathAware() {
+      return false;
+    }
+
+    @Override
     public List<Policy> findOperationParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters) {
       return policyReference.get().map(policy -> policy.getOperationPolicyChain()
           .map(operationChain -> asList(new Policy(operationChain, "policyId")))

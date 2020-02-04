@@ -38,6 +38,14 @@ public interface PolicyProvider {
   boolean isAnySourcePolicyHeadersAware();
 
   /**
+   * @return {@code true} if there is at least one source policy applied that relies on the request path to check for the pointcut
+   *         match.
+   *
+   * @since 4.3
+   */
+  boolean isAnySourcePolicyPathAware();
+
+  /**
    * Creates a collection of {@link Policy} with the policy chain be applied to an operation.
    * <p>
    * The provided collection must be in the correct order in which the policies must be applied.

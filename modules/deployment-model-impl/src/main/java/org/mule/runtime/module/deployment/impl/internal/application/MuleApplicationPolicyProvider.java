@@ -21,6 +21,7 @@ import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.http.policy.api.HeadersAwarePointcut;
+import org.mule.runtime.http.policy.api.PathAwarePointcut;
 import org.mule.runtime.module.deployment.impl.internal.policy.ApplicationPolicyInstance;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyInstanceProviderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateFactory;
@@ -41,6 +42,7 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   private final List<RegisteredPolicyTemplate> registeredPolicyTemplates = new LinkedList<>();
   private final List<RegisteredPolicyInstanceProvider> registeredPolicyInstanceProviders = new LinkedList<>();
   private volatile boolean anySourcePolicyHeadersAware = false;
+  private volatile boolean anySourcePolicyPathAware = false;
   private Application application;
 
   private Runnable policiesChangedCallback = () -> {
@@ -149,6 +151,11 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
         .map(pip -> pip.getApplicationPolicyInstance().getPointcut())
         .anyMatch(pointcut -> pointcut instanceof HeadersAwarePointcut
             && ((HeadersAwarePointcut) pointcut).considersHeaders());
+
+    this.anySourcePolicyPathAware = registeredPolicyInstanceProviders.stream()
+        .map(pip -> pip.getApplicationPolicyInstance().getPointcut())
+        .anyMatch(pointcut -> pointcut instanceof PathAwarePointcut
+            && ((PathAwarePointcut) pointcut).considersPath());
   }
 
   @Override
@@ -171,6 +178,11 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   @Override
   public boolean isAnySourcePolicyHeadersAware() {
     return anySourcePolicyHeadersAware;
+  }
+
+  @Override
+  public boolean isAnySourcePolicyPathAware() {
+    return anySourcePolicyPathAware;
   }
 
   @Override
