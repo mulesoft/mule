@@ -49,6 +49,21 @@ public abstract class ConnectionProviderObjectBuilder<C>
     this(providerModel, resolverSet, null, null, extensionModel, expressionManager, muleContext);
   }
 
+  public ConnectionProviderObjectBuilder(Class<?> prototypeClass,
+                                         ConnectionProviderModel providerModel,
+                                         ResolverSet resolverSet,
+                                         PoolingProfile poolingProfile,
+                                         ReconnectionConfig reconnectionConfig,
+                                         ExtensionModel extensionModel,
+                                         ExpressionManager expressionManager,
+                                         MuleContext muleContext) {
+    super(prototypeClass, providerModel, resolverSet, expressionManager, muleContext);
+    this.providerModel = providerModel;
+    this.poolingProfile = poolingProfile;
+    this.extensionModel = extensionModel;
+    this.muleContext = muleContext;
+    this.reconnectionConfig = computeReconnectionConfig(reconnectionConfig);
+  }
   public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
                                          ResolverSet resolverSet,
                                          PoolingProfile poolingProfile,
@@ -56,13 +71,7 @@ public abstract class ConnectionProviderObjectBuilder<C>
                                          ExtensionModel extensionModel,
                                          ExpressionManager expressionManager,
                                          MuleContext muleContext) {
-    super(getConnectionProviderFactory(providerModel).getObjectType(), providerModel, resolverSet, expressionManager,
-          muleContext);
-    this.providerModel = providerModel;
-    this.poolingProfile = poolingProfile;
-    this.extensionModel = extensionModel;
-    this.muleContext = muleContext;
-    this.reconnectionConfig = computeReconnectionConfig(reconnectionConfig);
+    this(getConnectionProviderFactory(providerModel).getObjectType(), providerModel, resolverSet, poolingProfile, reconnectionConfig, extensionModel, expressionManager, muleContext);
   }
 
   private ReconnectionConfig computeReconnectionConfig(ReconnectionConfig reconnectionConfig) {
