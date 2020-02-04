@@ -201,6 +201,11 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   }
 
   @Override
+  public boolean isAnySourcePolicyHeadersAware() {
+    return policyProvider.isAnySourcePolicyHeadersAware();
+  }
+
+  @Override
   public PolicyPointcutParameters addSourcePointcutParametersIntoEvent(Component source, TypedValue<?> attributes,
                                                                        InternalEvent event) {
     final PolicyPointcutParameters sourcePolicyParams =

@@ -24,7 +24,6 @@ import static org.mule.runtime.module.deployment.impl.internal.application.MuleA
 
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
-import org.mule.runtime.core.api.policy.PolicyPointcut;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
@@ -35,6 +34,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.policy.ApplicationPolicyInstance;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyInstanceProviderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateFactory;
+import org.mule.runtime.policy.api.PolicyPointcut;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -88,15 +88,15 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   @Rule
   public ExpectedException expectedException = none();
 
-  private PolicyTemplate policyTemplate1 = mock(PolicyTemplate.class);
-  private PolicyTemplate policyTemplate2 = mock(PolicyTemplate.class);
-  private PolicyTemplate policyTemplate100 = mock(PolicyTemplate.class);
-  private PolicyTemplate policyTemplate101 = mock(PolicyTemplate.class);
-  private RegionClassLoader regionClassLoader = mock(RegionClassLoader.class);
+  private final PolicyTemplate policyTemplate1 = mock(PolicyTemplate.class);
+  private final PolicyTemplate policyTemplate2 = mock(PolicyTemplate.class);
+  private final PolicyTemplate policyTemplate100 = mock(PolicyTemplate.class);
+  private final PolicyTemplate policyTemplate101 = mock(PolicyTemplate.class);
+  private final RegionClassLoader regionClassLoader = mock(RegionClassLoader.class);
   private ArtifactClassLoader policyClassLoader1 = mock(ArtifactClassLoader.class);
-  private ArtifactClassLoader policyClassLoader2 = mock(ArtifactClassLoader.class);
-  private ArtifactClassLoader policyClassLoader100 = mock(ArtifactClassLoader.class);
-  private ArtifactClassLoader policyClassLoader101 = mock(ArtifactClassLoader.class);
+  private final ArtifactClassLoader policyClassLoader2 = mock(ArtifactClassLoader.class);
+  private final ArtifactClassLoader policyClassLoader100 = mock(ArtifactClassLoader.class);
+  private final ArtifactClassLoader policyClassLoader101 = mock(ArtifactClassLoader.class);
 
   @Before
   public void setUp() throws Exception {

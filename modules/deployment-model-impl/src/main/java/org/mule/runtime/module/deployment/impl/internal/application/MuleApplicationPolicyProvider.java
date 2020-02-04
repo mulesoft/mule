@@ -20,6 +20,7 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
+import org.mule.runtime.http.policy.api.HeadersAwarePointcut;
 import org.mule.runtime.module.deployment.impl.internal.policy.ApplicationPolicyInstance;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyInstanceProviderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateFactory;
@@ -39,6 +40,7 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   private final PolicyInstanceProviderFactory policyInstanceProviderFactory;
   private final List<RegisteredPolicyTemplate> registeredPolicyTemplates = new LinkedList<>();
   private final List<RegisteredPolicyInstanceProvider> registeredPolicyInstanceProviders = new LinkedList<>();
+  private volatile boolean anySourcePolicyHeadersAware = false;
   private Application application;
 
   private Runnable policiesChangedCallback = () -> {
@@ -143,6 +145,10 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   public void onPoliciesChanged(Runnable policiesChangedCallback) {
     this.policiesChangedCallback = policiesChangedCallback;
 
+    this.anySourcePolicyHeadersAware = registeredPolicyInstanceProviders.stream()
+        .map(pip -> pip.getApplicationPolicyInstance().getPointcut())
+        .anyMatch(pointcut -> pointcut instanceof HeadersAwarePointcut
+            && ((HeadersAwarePointcut) pointcut).considersHeaders());
   }
 
   @Override
@@ -160,6 +166,11 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
     }
 
     return policies;
+  }
+
+  @Override
+  public boolean isAnySourcePolicyHeadersAware() {
+    return anySourcePolicyHeadersAware;
   }
 
   @Override

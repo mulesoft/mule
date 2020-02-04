@@ -16,6 +16,8 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.exception.MuleException;
@@ -71,7 +73,7 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
       @Override
       public void configure(MuleContext muleContext) {
         final AtomicReference<Optional<PolicyInstance>> policyReference = new AtomicReference<>();
-        muleContext.getCustomizationService().registerCustomServiceImpl("customPolicyProvider",
+        muleContext.getCustomizationService().registerCustomServiceImpl(OBJECT_POLICY_PROVIDER,
                                                                         new TestPolicyProvider(policyReference));
       }
 
@@ -126,6 +128,11 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
       return policyReference.get().map(policy -> policy.getSourcePolicyChain()
           .map(sourceChain -> asList(new Policy(sourceChain, POLICY_ID)))
           .orElse(emptyList())).orElse(emptyList());
+    }
+
+    @Override
+    public boolean isAnySourcePolicyHeadersAware() {
+      return false;
     }
 
     @Override

@@ -7,20 +7,14 @@
 
 package org.mule.runtime.core.api.policy;
 
-import org.mule.runtime.policy.api.PolicyPointcutParameters;
-
 /**
  * Provides a way to select which policies must be applied based on a given request.
  *
  * @since 4.0
+ *
+ * @deprecated Use {@link org.mule.runtime.policy.api.PolicyPointcut} directly.
  */
-public interface PolicyPointcut {
+@Deprecated
+public interface PolicyPointcut extends org.mule.runtime.policy.api.PolicyPointcut {
 
-  /**
-   * Determines whether or not a policy must be applied on a given request
-   *
-   * @param parameters parameters used to evaluate the pointcut created using the current request. Non null.
-   * @return true if the policy must be applied, false otherwise.
-   */
-  boolean matches(PolicyPointcutParameters parameters);
 }

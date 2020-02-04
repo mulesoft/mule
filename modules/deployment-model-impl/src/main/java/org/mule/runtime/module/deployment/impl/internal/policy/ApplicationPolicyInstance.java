@@ -10,8 +10,8 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.policy.Policy;
-import org.mule.runtime.core.api.policy.PolicyPointcut;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
+import org.mule.runtime.policy.api.PolicyPointcut;
 
 import java.util.Optional;
 

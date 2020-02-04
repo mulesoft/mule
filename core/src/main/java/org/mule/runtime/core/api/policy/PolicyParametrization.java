@@ -13,6 +13,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.notification.NotificationListener;
+import org.mule.runtime.policy.api.PolicyPointcut;
 
 import java.io.File;
 import java.util.List;
@@ -36,7 +37,7 @@ public final class PolicyParametrization {
 
   /**
    * Creates a new parametrization
-   * 
+   *
    * @param id parametrization identifier. Non empty.
    * @param pointcut used to determine if the policy must be applied on a given request. Non null.
    * @param order indicates how this policy must be ordered related to other applied policies. A policy with a given order has to

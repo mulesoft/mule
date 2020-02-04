@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_M
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_PLATFORM_MANAGED_HANDLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 
@@ -21,6 +22,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.time.TimeSupplier;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.policy.PolicyProvider;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials.ClientCredentialsOAuthHandler;
@@ -45,6 +47,7 @@ class ObjectReferencePopulator {
           .put(TimeSupplier.class, OBJECT_TIME_SUPPLIER)
           .put(ExtensionManager.class, OBJECT_EXTENSION_MANAGER)
           .put(PolicyManager.class, OBJECT_POLICY_MANAGER)
+          .put(PolicyProvider.class, OBJECT_POLICY_PROVIDER)
           .put(AuthorizationCodeOAuthHandler.class, OBJECT_EXTENSION_AUTH_CODE_HANDLER)
           .put(ClientCredentialsOAuthHandler.class, OBJECT_EXTENSION_CLIENT_CREDENTIALS_HANDLER)
           .put(PlatformManagedOAuthHandler.class, OBJECT_EXTENSION_PLATFORM_MANAGED_HANDLER)
