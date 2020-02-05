@@ -153,7 +153,7 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
     sourcePolicyAwareAtributes = registeredPolicyInstanceProviders.stream()
         .map(pip -> pip.getApplicationPolicyInstance().getPointcut())
         .flatMap(pointcut -> (pointcut instanceof AttributeAwarePointcut)
-            ? ((AttributeAwarePointcut) pointcut).sourcePolicyAwareAtributes().stream()
+            ? ((AttributeAwarePointcut) pointcut).sourcePolicyAwareAttributes().stream()
             : Collections.<PolicyAwareAttribute>emptySet().stream())
         .collect(toSet());
   }
