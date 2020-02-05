@@ -23,9 +23,7 @@ import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.util.context.Context.empty;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.exception.SuppressedMuleException;
 import org.mule.runtime.api.functional.Either;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -33,10 +31,8 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
-import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.HashMap;
@@ -49,6 +45,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.mule.runtime.internal.exception.SuppressedMuleException;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
@@ -90,8 +87,6 @@ class UntilSuccessfulRouter {
   private Function<ExpressionManagerSession, Integer> delaySupplier;
   private Function<CoreEvent, ExpressionManagerSession> sessionSupplier;
 
-  private final ErrorType retryExhaustedErrorType;
-
   // When using an until successful scope in a blocking flow (for example, calling the owner flow with a Processor#process call),
   // this leads to a reactor completion signal being emitted while the event is being re-injected for retrials. This is solved by
   // deferring the downstream publisher completion until all events have evacuated the scope.
@@ -100,8 +95,7 @@ class UntilSuccessfulRouter {
 
   UntilSuccessfulRouter(Component owner, Publisher<CoreEvent> publisher, MessageProcessorChain nestedChain,
                         ExtendedExpressionManager expressionManager, Predicate<CoreEvent> shouldRetry, Scheduler delayScheduler,
-                        String maxRetries, String millisBetweenRetries, ErrorTypeLocator errorTypeLocator) {
-    this.retryExhaustedErrorType = errorTypeLocator.lookupErrorType(RetryPolicyExhaustedException.class);
+                        String maxRetries, String millisBetweenRetries) {
     this.owner = owner;
     this.shouldRetry = shouldRetry;
     this.delayScheduler = new ConditionalExecutorServiceDecorator(delayScheduler, s -> isTransactionActive());
@@ -287,12 +281,6 @@ class UntilSuccessfulRouter {
                                                                       new SuppressedMuleException(cause), owner),
                                     owner);
     };
-  }
-
-  private CoreEvent getRetryExhaustedEvent(CoreEvent exhaustionCauseEvent, Throwable retryExhaustedException) {
-    ErrorBuilder errorBuilder = ErrorBuilder.builder(retryExhaustedException)
-        .errorType(retryExhaustedErrorType);
-    return CoreEvent.builder(exhaustionCauseEvent).error(errorBuilder.build()).build();
   }
 
   /**

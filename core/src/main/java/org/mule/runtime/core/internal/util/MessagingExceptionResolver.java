@@ -23,7 +23,6 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.SuppressedMuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
@@ -154,13 +153,9 @@ public class MessagingExceptionResolver {
     List<Pair<Throwable, ErrorType>> errors = new ArrayList<>(4);
     final List<Throwable> exceptionsAsList = getExceptionsAsList(me);
     for (Throwable e : exceptionsAsList) {
-      if (e instanceof SuppressedMuleException) {
-        break;
-      } else {
-        ErrorType type = errorTypeFromException(obj, locator, e);
-        if (!isUnknownMuleError(type) && !isCriticalMuleError(type)) {
-          errors.add(new Pair<>(e, type));
-        }
+      ErrorType type = errorTypeFromException(obj, locator, e);
+      if (!isUnknownMuleError(type) && !isCriticalMuleError(type)) {
+        errors.add(new Pair<>(e, type));
       }
     }
     return errors;
