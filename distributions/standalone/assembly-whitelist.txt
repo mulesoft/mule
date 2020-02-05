@@ -386,7 +386,7 @@
 /mule-standalone-${productVersion}/lib/opt/parser-interface-impl-v2-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/opt/quartz-2.3.2.jar
 /mule-standalone-${productVersion}/lib/opt/raml-parser-0.8.39-+
-/mule-standalone-${productVersion}/lib/opt/raml-parser-2-1.0.44.jar
+/mule-standalone-${productVersion}/lib/opt/raml-parser-2-1.0.49-+
 /mule-standalone-${productVersion}/lib/opt/reflections-0.9.9.jar
 /mule-standalone-${productVersion}/lib/opt/relaxngDatatype-20020414.jar
 /mule-standalone-${productVersion}/lib/opt/rhino-1.7.11.jar
@@ -441,7 +441,7 @@
 /mule-standalone-${productVersion}/lib/opt/xmltooling-1.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/xpp3_min-1.1.4c.jar
 /mule-standalone-${productVersion}/lib/opt/xqj-api-1.0.jar
-/mule-standalone-${productVersion}/lib/opt/yagi-1.0.44.jar
+/mule-standalone-${productVersion}/lib/opt/yagi-1.0.49-+
 /mule-standalone-${productVersion}/lib/opt/validation-api-1.1.0.Final.jar
 /mule-standalone-${productVersion}/lib/shared
 /mule-standalone-${productVersion}/lib/shared/README.txt
