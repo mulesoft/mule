@@ -64,6 +64,26 @@ public final class PolicyParametrization {
   }
 
   /**
+   * Creates a new parametrization
+   *
+   * @param id parametrization identifier. Non empty.
+   * @param pointcut used to determine if the policy must be applied on a given request. Non null.
+   * @param order indicates how this policy must be ordered related to other applied policies. A policy with a given order has to
+   *        be applied before polices with smaller order and after policies with bigger order. Must be positive
+   * @param parameters parameters for the policy template on which the parametrization is based on. Non null.
+   * @param config Mule XML configuration file for creating the policy. Non null.
+   * @param notificationListeners notifications listener to be added to policy's context. Non null.
+   *
+   * @deprecated Use {@link #PolicyParametrization(String, PolicyPointcut, int, Map, File, List)} instead.
+   */
+  @Deprecated
+  public PolicyParametrization(String id, org.mule.runtime.core.api.policy.PolicyPointcut pointcut, int order,
+                               Map<String, String> parameters, File config,
+                               List<NotificationListener> notificationListeners) {
+    this(id, (PolicyPointcut) pointcut, order, parameters, config, notificationListeners);
+  }
+
+  /**
    * @return parametrization identifier
    */
   public String getId() {
@@ -72,8 +92,18 @@ public final class PolicyParametrization {
 
   /**
    * @return pointcut to evaluate whether the policy must be applied or not.
+   *
+   * @deprecated Use {@link #getPolicyPointcut()} instead.
    */
-  public PolicyPointcut getPointcut() {
+  @Deprecated
+  public org.mule.runtime.core.api.policy.PolicyPointcut getPointcut() {
+    return (org.mule.runtime.core.api.policy.PolicyPointcut) pointcut;
+  }
+
+  /**
+   * @return pointcut to evaluate whether the policy must be applied or not.
+   */
+  public PolicyPointcut getPolicyPointcut() {
     return pointcut;
   }
 

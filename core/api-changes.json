@@ -3,31 +3,6 @@
     "revapi": {
       "ignore": [
         {
-          "code": "java.method.parameterTypeChanged",
-          "old": "parameter void org.mule.runtime.core.api.policy.PolicyParametrization::<init>(java.lang.String, ===org.mule.runtime.core.api.policy.PolicyPointcut===, int, java.util.Map<java.lang.String, java.lang.String>, java.io.File, java.util.List<org.mule.runtime.api.notification.NotificationListener>)",
-          "new": "parameter void org.mule.runtime.core.api.policy.PolicyParametrization::<init>(java.lang.String, ===org.mule.runtime.policy.api.PolicyPointcut===, int, java.util.Map<java.lang.String, java.lang.String>, java.io.File, java.util.List<org.mule.runtime.api.notification.NotificationListener>)",
-          "oldType": "org.mule.runtime.core.api.policy.PolicyPointcut",
-          "newType": "org.mule.runtime.policy.api.PolicyPointcut",
-          "package": "org.mule.runtime.core.api.policy",
-          "classSimpleName": "PolicyParametrization",
-          "methodName": "<init>",
-          "parameterIndex": "1",
-          "elementKind": "parameter",
-          "justification": "Generalize the PolicyPointcutParameter"
-        },
-        {
-          "code": "java.method.returnTypeChanged",
-          "old": "method org.mule.runtime.core.api.policy.PolicyPointcut org.mule.runtime.core.api.policy.PolicyParametrization::getPointcut()",
-          "new": "method org.mule.runtime.policy.api.PolicyPointcut org.mule.runtime.core.api.policy.PolicyParametrization::getPointcut()",
-          "oldType": "org.mule.runtime.core.api.policy.PolicyPointcut",
-          "newType": "org.mule.runtime.policy.api.PolicyPointcut",
-          "package": "org.mule.runtime.core.api.policy",
-          "classSimpleName": "PolicyParametrization",
-          "methodName": "getPointcut",
-          "elementKind": "method",
-          "justification": "Generalize the PolicyPointcutParameter"
-        },
-        {
           "code": "java.field.nowFinal",
           "old": "field org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY @ org.mule.runtime.core.api.config.QueueProfile",
           "new": "field org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY @ org.mule.runtime.core.api.config.QueueProfile",

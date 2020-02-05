@@ -157,7 +157,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
   @Override
   public PolicyPointcut getPointcut() {
-    return parametrization.getPointcut();
+    return parametrization.getPolicyPointcut();
   }
 
   @Override
