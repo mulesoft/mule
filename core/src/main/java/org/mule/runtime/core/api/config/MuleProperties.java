@@ -191,6 +191,7 @@ public class MuleProperties {
   public static final String OBJECT_CONFIGURATION_PROPERTIES = "_muleConfigurationAttributesResolver";
   public static final String OBJECT_POLICY_MANAGER = "_mulePolicyManager";
   public static final String OBJECT_POLICY_PROVIDER = "_mulePolicyProvider";
+  public static final String OBJECT_POLICY_POINTCUT_FACTORY = "_mulePolicyPointcutFactory";
   public static final String OBJECT_STREAMING_MANAGER = "_muleStreamingManager";
   public static final String OBJECT_STREAMING_GHOST_BUSTER = "_muleStreamingGhostBuster";
   public static final String OBJECT_REGISTRY = "_muleRegistry";

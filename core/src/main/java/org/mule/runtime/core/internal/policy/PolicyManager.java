@@ -60,4 +60,5 @@ public interface PolicyManager {
   OperationPolicy createOperationPolicy(Component operation, CoreEvent operationEvent,
                                         OperationParametersProcessor operationParameters);
 
+
 }

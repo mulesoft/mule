@@ -9,6 +9,7 @@ package org.mule.test.policy;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -16,6 +17,8 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.exception.MuleException;
@@ -29,10 +32,12 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyInstance;
 import org.mule.runtime.core.api.policy.PolicyProvider;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.policy.api.PolicyAwareAttribute;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -71,7 +76,7 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
       @Override
       public void configure(MuleContext muleContext) {
         final AtomicReference<Optional<PolicyInstance>> policyReference = new AtomicReference<>();
-        muleContext.getCustomizationService().registerCustomServiceImpl("customPolicyProvider",
+        muleContext.getCustomizationService().registerCustomServiceImpl(OBJECT_POLICY_PROVIDER,
                                                                         new TestPolicyProvider(policyReference));
       }
 
@@ -126,6 +131,11 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
       return policyReference.get().map(policy -> policy.getSourcePolicyChain()
           .map(sourceChain -> asList(new Policy(sourceChain, POLICY_ID)))
           .orElse(emptyList())).orElse(emptyList());
+    }
+
+    @Override
+    public Set<PolicyAwareAttribute> sourcePolicyAwareAtributes() {
+      return emptySet();
     }
 
     @Override

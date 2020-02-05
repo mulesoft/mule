@@ -88,15 +88,15 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   @Rule
   public ExpectedException expectedException = none();
 
-  private PolicyTemplate policyTemplate1 = mock(PolicyTemplate.class);
-  private PolicyTemplate policyTemplate2 = mock(PolicyTemplate.class);
-  private PolicyTemplate policyTemplate100 = mock(PolicyTemplate.class);
-  private PolicyTemplate policyTemplate101 = mock(PolicyTemplate.class);
-  private RegionClassLoader regionClassLoader = mock(RegionClassLoader.class);
+  private final PolicyTemplate policyTemplate1 = mock(PolicyTemplate.class);
+  private final PolicyTemplate policyTemplate2 = mock(PolicyTemplate.class);
+  private final PolicyTemplate policyTemplate100 = mock(PolicyTemplate.class);
+  private final PolicyTemplate policyTemplate101 = mock(PolicyTemplate.class);
+  private final RegionClassLoader regionClassLoader = mock(RegionClassLoader.class);
   private ArtifactClassLoader policyClassLoader1 = mock(ArtifactClassLoader.class);
-  private ArtifactClassLoader policyClassLoader2 = mock(ArtifactClassLoader.class);
-  private ArtifactClassLoader policyClassLoader100 = mock(ArtifactClassLoader.class);
-  private ArtifactClassLoader policyClassLoader101 = mock(ArtifactClassLoader.class);
+  private final ArtifactClassLoader policyClassLoader2 = mock(ArtifactClassLoader.class);
+  private final ArtifactClassLoader policyClassLoader100 = mock(ArtifactClassLoader.class);
+  private final ArtifactClassLoader policyClassLoader101 = mock(ArtifactClassLoader.class);
 
   @Before
   public void setUp() throws Exception {

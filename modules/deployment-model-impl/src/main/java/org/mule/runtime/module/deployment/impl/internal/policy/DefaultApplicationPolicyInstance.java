@@ -31,7 +31,6 @@ import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyInstance;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
-import org.mule.runtime.core.api.policy.PolicyPointcut;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
@@ -43,6 +42,7 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.CompositeArtifa
 import org.mule.runtime.module.deployment.impl.internal.policy.proxy.LifecycleFilterProxy;
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
+import org.mule.runtime.policy.api.PolicyPointcut;
 
 import java.util.List;
 import java.util.Optional;
@@ -157,7 +157,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
   @Override
   public PolicyPointcut getPointcut() {
-    return parametrization.getPointcut();
+    return parametrization.getPolicyPointcut();
   }
 
   @Override
