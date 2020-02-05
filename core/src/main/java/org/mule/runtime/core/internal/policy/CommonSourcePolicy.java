@@ -11,6 +11,7 @@ import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
 
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.functional.Either;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
@@ -67,6 +68,10 @@ class CommonSourcePolicy {
 
   public void dispose() {
     policySink.dispose();
+  }
+
+  public Disposable deferredDispose() {
+    return () -> policySink.dispose();
   }
 
 }

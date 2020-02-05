@@ -20,6 +20,8 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
@@ -39,14 +41,18 @@ public class NoSourcePolicy implements SourcePolicy, Disposable, DeferredDisposa
   private final CommonSourcePolicy commonPolicy;
 
   public NoSourcePolicy(ReactiveProcessor flowExecutionProcessor) {
-    commonPolicy = new CommonSourcePolicy(new SourceFluxObjectFactory(flowExecutionProcessor));
+    commonPolicy = new CommonSourcePolicy(new SourceFluxObjectFactory(this, flowExecutionProcessor));
   }
 
-  private final class SourceFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
+  private static final class SourceFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
 
+    private final Reference<NoSourcePolicy> noSourcePolicy;
     private final ReactiveProcessor flowExecutionProcessor;
 
-    public SourceFluxObjectFactory(ReactiveProcessor flowExecutionProcessor) {
+    public SourceFluxObjectFactory(NoSourcePolicy noSourcePolicy, ReactiveProcessor flowExecutionProcessor) {
+      // Avoid instances of this class from preventing the policy from being gc'd
+      // Break the circular reference between policy-sinkFactory-flux that may cause memory leaks in the policies caches
+      this.noSourcePolicy = new WeakReference<>(noSourcePolicy);
       this.flowExecutionProcessor = flowExecutionProcessor;
     }
 
@@ -71,21 +77,23 @@ public class NoSourcePolicy implements SourcePolicy, Disposable, DeferredDisposa
               .doOnNext(result -> result.apply(spfr -> {
                 CoreEvent event = spfr.getMessagingException().getEvent();
                 SourcePolicyContext ctx = from(event);
-                commonPolicy.finishFlowProcessing(event,
-                                                  result,
-                                                  spfr.getMessagingException(), ctx);
+                noSourcePolicy.get().commonPolicy.finishFlowProcessing(event,
+                                                                       result,
+                                                                       spfr.getMessagingException(), ctx);
               },
-                                               spsr -> commonPolicy.finishFlowProcessing(spsr.getResult(), result)))
+                                               spsr -> noSourcePolicy.get().commonPolicy.finishFlowProcessing(spsr.getResult(),
+                                                                                                              result)))
               .onErrorContinue(MessagingException.class, (t, e) -> {
                 final MessagingException me = (MessagingException) t;
                 final InternalEvent event = (InternalEvent) me.getEvent();
 
-                commonPolicy.finishFlowProcessing(event,
-                                                  left(new SourcePolicyFailureResult(me, () -> from(event)
-                                                      .getResponseParametersProcessor()
-                                                      .getFailedExecutionResponseParametersFunction().apply(me.getEvent()))),
-                                                  me,
-                                                  from(event));
+                noSourcePolicy.get().commonPolicy.finishFlowProcessing(event,
+                                                                       left(new SourcePolicyFailureResult(me, () -> from(event)
+                                                                           .getResponseParametersProcessor()
+                                                                           .getFailedExecutionResponseParametersFunction()
+                                                                           .apply(me.getEvent()))),
+                                                                       me,
+                                                                       from(event));
               });
 
       policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + toString(), e));

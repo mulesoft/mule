@@ -27,6 +27,8 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -89,7 +91,7 @@ public class CompositeSourcePolicy
     super(parameterizedPolicies, sourcePolicyParametersTransformer);
     this.flowExecutionProcessor = flowExecutionProcessor;
     this.sourcePolicyProcessorFactory = sourcePolicyProcessorFactory;
-    this.commonPolicy = new CommonSourcePolicy(new SourceWithPoliciesFluxObjectFactory());
+    this.commonPolicy = new CommonSourcePolicy(new SourceWithPoliciesFluxObjectFactory(this));
     this.policyEventMapper = new PolicyEventMapper();
     this.resolver = ofNullable(resolver);
   }
@@ -99,7 +101,15 @@ public class CompositeSourcePolicy
     return getLastPolicy().getPolicyChain().getProcessingStrategy().onPipeline(super.getPolicyProcessor());
   }
 
-  private final class SourceWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
+  private static final class SourceWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
+
+    private final Reference<CompositeSourcePolicy> compositeSourcePolicy;
+
+    public SourceWithPoliciesFluxObjectFactory(CompositeSourcePolicy compositeSourcePolicy) {
+      // Avoid instances of this class from preventing the policy from being gc'd
+      // Break the circular reference between policy-sinkFactory-flux that may cause memory leaks in the policies caches
+      this.compositeSourcePolicy = new WeakReference<>(compositeSourcePolicy);
+    }
 
     @Override
     public FluxSink<CoreEvent> get() {
@@ -107,7 +117,7 @@ public class CompositeSourcePolicy
 
       Flux<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> policyFlux =
           Flux.create(sinkRef)
-              .transform(getExecutionProcessor())
+              .transform(compositeSourcePolicy.get().getExecutionProcessor())
               .map(policiesResultEvent -> {
                 SourcePolicyContext ctx = from(policiesResultEvent);
                 return right(SourcePolicyFailureResult.class,
@@ -118,7 +128,7 @@ public class CompositeSourcePolicy
               .doOnNext(result -> {
                 logSourcePolicySuccessfullResult(result.getRight());
 
-                commonPolicy.finishFlowProcessing(result.getRight().getResult(), result);
+                compositeSourcePolicy.get().commonPolicy.finishFlowProcessing(result.getRight().getResult(), result);
               })
               .doOnError(e -> !(e instanceof MessagingException), e -> LOGGER.error(e.getMessage(), e))
               .onErrorContinue(MessagingException.class, (t, e) -> {
@@ -131,7 +141,7 @@ public class CompositeSourcePolicy
 
                 logSourcePolicyFailureResult(result.getLeft());
 
-                commonPolicy.finishFlowProcessing(me.getEvent(), result, me, ctx);
+                compositeSourcePolicy.get().commonPolicy.finishFlowProcessing(me.getEvent(), result, me, ctx);
               });
 
       policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + toString(), e));
@@ -143,7 +153,7 @@ public class CompositeSourcePolicy
                                                                            SourcePolicyContext ctx) {
       final Map<String, Object> originalResponseParameters = ctx.getOriginalResponseParameters();
 
-      return () -> getParametersTransformer()
+      return () -> compositeSourcePolicy.get().getParametersTransformer()
           .map(parametersTransformer -> concatMaps(originalResponseParameters,
                                                    parametersTransformer
                                                        .fromMessageToSuccessResponseParameters(policiesResultEvent
@@ -154,7 +164,7 @@ public class CompositeSourcePolicy
     private Supplier<Map<String, Object>> resolveErrorResponseParameters(MessagingException e, SourcePolicyContext ctx) {
       final Map<String, Object> originalFailureResponseParameters = ctx.getOriginalFailureResponseParameters();
 
-      return () -> getParametersTransformer()
+      return () -> compositeSourcePolicy.get().getParametersTransformer()
           .map(parametersTransformer -> concatMaps(originalFailureResponseParameters,
                                                    parametersTransformer
                                                        .fromMessageToErrorResponseParameters(e.getEvent().getMessage())))
@@ -221,8 +231,8 @@ public class CompositeSourcePolicy
     commonPolicy.process(sourceEvent, respParamProcessor, callback);
   }
 
-  private Map<String, Object> concatMaps(Map<String, Object> originalResponseParameters,
-                                         Map<String, Object> policyResponseParameters) {
+  private static Map<String, Object> concatMaps(Map<String, Object> originalResponseParameters,
+                                                Map<String, Object> policyResponseParameters) {
     if (originalResponseParameters == null) {
       return policyResponseParameters;
     } else {
@@ -239,11 +249,11 @@ public class CompositeSourcePolicy
     }
   }
 
-  private String getCoreEventId(CoreEvent event) {
+  private static String getCoreEventId(CoreEvent event) {
     return event.getContext().getId();
   }
 
-  private String getCoreEventAttributesAsString(CoreEvent event) {
+  private static String getCoreEventAttributesAsString(CoreEvent event) {
     if (event.getMessage() == null || event.getMessage().getAttributes() == null
         || event.getMessage().getAttributes().getValue() == null) {
       return "";
@@ -255,14 +265,14 @@ public class CompositeSourcePolicy
     return policy.getPolicyId();
   }
 
-  private void logSourcePolicySuccessfullResult(SourcePolicySuccessResult result) {
+  private static void logSourcePolicySuccessfullResult(SourcePolicySuccessResult result) {
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace("Event id: " + result.getResult().getContext().getId() + "\nFinished processing. \n" +
           getCoreEventAttributesAsString(result.getResult()));
     }
   }
 
-  private void logSourcePolicyFailureResult(SourcePolicyFailureResult result) {
+  private static void logSourcePolicyFailureResult(SourcePolicyFailureResult result) {
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace("Event id: " + result.getMessagingException().getEvent().getContext().getId()
           + "\nFinished processing with failure. \n" +
@@ -277,6 +287,6 @@ public class CompositeSourcePolicy
 
   @Override
   public Disposable deferredDispose() {
-    return () -> commonPolicy.dispose();
+    return commonPolicy.deferredDispose();
   }
 }
