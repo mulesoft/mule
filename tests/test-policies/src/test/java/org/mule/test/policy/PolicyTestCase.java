@@ -9,6 +9,7 @@ package org.mule.test.policy;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -31,10 +32,12 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyInstance;
 import org.mule.runtime.core.api.policy.PolicyProvider;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.policy.api.PolicyAwareAttribute;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -131,13 +134,8 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
     }
 
     @Override
-    public boolean isAnySourcePolicyHeadersAware() {
-      return false;
-    }
-
-    @Override
-    public boolean isAnySourcePolicyPathAware() {
-      return false;
+    public Set<PolicyAwareAttribute> sourcePolicyAwareAtributes() {
+      return emptySet();
     }
 
     @Override

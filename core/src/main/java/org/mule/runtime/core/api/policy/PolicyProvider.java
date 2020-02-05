@@ -7,9 +7,11 @@
 package org.mule.runtime.core.api.policy;
 
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.policy.api.PolicyAwareAttribute;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Implementation of this interface must provide access to the policies to be applied to message sources or operations.
@@ -30,20 +32,11 @@ public interface PolicyProvider {
   List<Policy> findSourceParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters);
 
   /**
-   * @return {@code true} if there is at least one source policy applied that relies on the headers to check for the pointcut
-   *         match.
+   * @return The attributes that are required by the pointcuts of the currently deployed policies.
    *
    * @since 4.3
    */
-  boolean isAnySourcePolicyHeadersAware();
-
-  /**
-   * @return {@code true} if there is at least one source policy applied that relies on the request path to check for the pointcut
-   *         match.
-   *
-   * @since 4.3
-   */
-  boolean isAnySourcePolicyPathAware();
+  Set<PolicyAwareAttribute> sourcePolicyAwareAtributes();
 
   /**
    * Creates a collection of {@link Policy} with the policy chain be applied to an operation.

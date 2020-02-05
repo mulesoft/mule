@@ -38,11 +38,6 @@ public class NoOpPolicyManager implements PolicyManager {
   }
 
   @Override
-  public boolean isAnySourcePolicyHeadersAware() {
-    return false;
-  }
-
-  @Override
   public PolicyPointcutParameters addSourcePointcutParametersIntoEvent(Component source, TypedValue<?> attributes,
                                                                        InternalEvent event) {
     return new PolicyPointcutParameters(source);

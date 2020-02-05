@@ -39,14 +39,6 @@ public interface PolicyManager {
                                           MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor);
 
   /**
-   * @return {@code true} if there is at least one source policy applied that relies on the headers to check for the pointcut
-   *         match.
-   *
-   * @since 4.3
-   */
-  boolean isAnySourcePolicyHeadersAware();
-
-  /**
    * Creates and generates the {@link PolicyPointcutParameters} for the given {@code source} and {@code attributes}, and adds it
    * as an internal parameter of the event to be built with {@code eventBuilder}.
    *
