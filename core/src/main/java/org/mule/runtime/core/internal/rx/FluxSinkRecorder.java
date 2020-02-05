@@ -73,7 +73,7 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
     }
 
     @Override
-    public FluxSink<T> getFluxSink() {
+    public synchronized FluxSink<T> getFluxSink() {
       return fluxSink;
     }
 
