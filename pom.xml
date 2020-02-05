@@ -2098,6 +2098,9 @@
                                                 <exclude>org.mule.weave:*</exclude>
                                                 <exclude>org.mule.services:*</exclude>
                                                 <exclude>org.mule.tools.maven:mule-classloader-model</exclude>
+
+                                                <exclude>org.raml:raml-parser-2</exclude>
+                                                <exclude>org.raml:yagi</exclude>
                                             </excludes>
                                         </requireReleaseDeps>
                                     </rules>
