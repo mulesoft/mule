@@ -63,6 +63,11 @@ public final class ChainErrorHandlingUtils {
                                              ErrorTypeLocator locator,
                                              Collection<ExceptionContextProvider> exceptionContextProviders,
                                              MessagingExceptionResolver exceptionResolver) {
+    if (event.getError().isPresent()) {
+      // Clear any current error from the event, so it doesn't contaminate the upcoming mapping
+      event = CoreEvent.builder(event).error(null).build();
+    }
+
     if (processor instanceof Component) {
       return exceptionResolver.resolve(new MessagingException(event, throwable, (Component) processor), locator,
                                        exceptionContextProviders);
