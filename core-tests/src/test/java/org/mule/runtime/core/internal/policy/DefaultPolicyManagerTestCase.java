@@ -279,11 +279,19 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
                                              Optional<SourcePolicyParametersTransformer> lookupSourceParametersTransformer,
                                              SourcePolicyProcessorFactory sourcePolicyProcessorFactory,
                                              Function<MessagingException, MessagingException> resolver) {
-        return new DisposeListenerSourcePolicy(() -> sourcePolicydisposed.set(true));
+        final SourcePolicy sourcePolicy =
+            super.createSourcePolicy(innerKey, flowExecutionProcessor, lookupSourceParametersTransformer,
+                                     sourcePolicyProcessorFactory, resolver);
+        final Disposable deferredDispose = ((DeferredDisposable) sourcePolicy).deferredDispose();
+
+        return new DisposeListenerSourcePolicy(() -> {
+          deferredDispose.dispose();
+          sourcePolicydisposed.set(true);
+        });
       }
     });
 
-    final Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
+    final Policy policy = mockPolicy();
 
     when(policyProvider.findSourceParameterizedPolicies(any())).thenReturn(asList(policy));
 
@@ -326,13 +334,19 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
       public OperationPolicy createOperationPolicy(Component operation, List<Policy> innerKey,
                                                    Optional<OperationPolicyParametersTransformer> paramsTransformer,
                                                    OperationPolicyProcessorFactory operationPolicyProcessorFactory) {
+        final OperationPolicy operationPolicy =
+            super.createOperationPolicy(operation, innerKey, paramsTransformer, operationPolicyProcessorFactory);
+
+        final Disposable deferredDispose = ((DeferredDisposable) operationPolicy).deferredDispose();
+
         return new DisposeListenerSourcePolicy(() -> {
+          deferredDispose.dispose();
           operationPolicydisposed.set(true);
         });
       }
     });
 
-    final Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
+    final Policy policy = mockPolicy();
 
     when(policyProvider.findOperationParameterizedPolicies(any())).thenReturn(asList(policy));
 
@@ -360,6 +374,19 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
     }));
 
     stopIfNeeded(policyManager);
+  }
+
+  private Policy mockPolicy() {
+    PolicyChain policyChain = mock(PolicyChain.class, RETURNS_DEEP_STUBS);
+    when(policyChain.apply(any()))
+        .thenAnswer(inv -> inv.getArgument(0));
+    // when(policyChain.getProcessingStrategy().onPipeline(any()))
+    // .thenAnswer(inv -> inv.getArgument(0));
+
+    Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
+    when(policy.getPolicyChain()).thenReturn(policyChain);
+
+    return policy;
   }
 
   private static class DisposeListenerSourcePolicy implements SourcePolicy, OperationPolicy, Disposable, DeferredDisposable {
