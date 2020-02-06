@@ -36,7 +36,7 @@ public interface PlatformManagedConnectionDescriptor {
   /**
    * @return The name that the user has given this connection in the Anypoint Platform
    */
-  String getName();
+  String getDisplayName();
 
   /**
    * Returns parameters additional to the standard OAuth ones that the user has configured for this connection. These usually

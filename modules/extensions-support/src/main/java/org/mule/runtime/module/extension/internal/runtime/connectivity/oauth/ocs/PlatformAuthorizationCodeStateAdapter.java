@@ -39,7 +39,7 @@ public class PlatformAuthorizationCodeStateAdapter extends AbstractPlatformOAuth
 
   @Override
   public String getResourceOwnerId() {
-    return descriptor.getName();
+    return descriptor.getDisplayName();
   }
 
   @Override

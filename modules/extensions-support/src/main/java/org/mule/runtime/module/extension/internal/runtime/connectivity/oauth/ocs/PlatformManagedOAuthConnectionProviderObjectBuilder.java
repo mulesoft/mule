@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs;
 
-import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.PLATFORM_MANAGED_CONNECTION_URI_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.PLATFORM_MANAGED_CONNECTION_ID_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthConfig.from;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -68,7 +68,7 @@ public class PlatformManagedOAuthConnectionProviderObjectBuilder<C> extends Base
     final String connectionUri = (String) context.getConfig().get()
         .getState()
         .getConnectionParameters()
-        .get(PLATFORM_MANAGED_CONNECTION_URI_PARAMETER_NAME);
+        .get(PLATFORM_MANAGED_CONNECTION_ID_PARAMETER_NAME);
 
     final PlatformManagedOAuthConfig config = from(ownerConfigName,
                                                    connectionUri,
