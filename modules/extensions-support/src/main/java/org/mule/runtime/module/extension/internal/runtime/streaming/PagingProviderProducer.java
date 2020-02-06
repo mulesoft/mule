@@ -100,7 +100,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       return result;
     } catch (Exception e) {
       if (isFirstPage) {
-        closeDelegate(connection);
+        silentlyCloseDelegate(connection);
       }
       extractConnectionException(e).ifPresent(ex -> connectionSupplier.invalidateConnection());
       throw e;
@@ -113,7 +113,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   @Override
   public void close() {
     try {
-      closeDelegate(connectionSupplier.getConnection());
+      delegate.close(connectionSupplier.getConnection());
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
     } finally {
@@ -146,7 +146,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     }
   }
 
-  private void closeDelegate(Object connection) {
+  private void silentlyCloseDelegate(Object connection) {
     try {
       delegate.close(connection);
     } catch (Exception e) {

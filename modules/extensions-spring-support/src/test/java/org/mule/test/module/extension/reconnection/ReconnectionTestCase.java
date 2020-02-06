@@ -20,7 +20,6 @@ import static org.mule.tck.probe.PollingProber.check;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnection;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
@@ -128,7 +127,7 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   @Test
-  public void pagingProviderIsClosedQuietly() throws Exception {
+  public void pagingProviderIsClosedQuietlyDuringExceptionOnFirstPage() throws Exception {
     resetCounters();
     Iterator<ReconnectableConnection> iterator = getCursor("notClosableFailingPagedOperation", 1, TRANSFORMATION);
     ReconnectableConnection firstPage = iterator.next();
