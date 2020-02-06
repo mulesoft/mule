@@ -39,6 +39,7 @@ import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.declaration.type.annotation.ExpressionSupportAnnotation;
+import org.mule.runtime.extension.api.declaration.type.annotation.LayoutTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
 
@@ -199,9 +200,26 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
   private static class ObjectFieldTypeAsParameterModelAdapter implements ParameterModel {
 
     private final ObjectFieldType wrappedFieldType;
+    private final LayoutModel layoutModel;
 
     public ObjectFieldTypeAsParameterModelAdapter(ObjectFieldType wrappedFieldType) {
       this.wrappedFieldType = wrappedFieldType;
+      if (this.wrappedFieldType.getAnnotation(LayoutTypeAnnotation.class).isPresent()) {
+        LayoutTypeAnnotation layoutTypeAnnotation = this.wrappedFieldType.getAnnotation(LayoutTypeAnnotation.class).get();
+        LayoutModel.LayoutModelBuilder layoutModelBuilder = LayoutModel.builder();
+        if (layoutTypeAnnotation.isText()) {
+          layoutModelBuilder.asText();
+        }
+        if (layoutTypeAnnotation.isPassword()) {
+          layoutModelBuilder.asPassword();
+        }
+        if (layoutTypeAnnotation.isQuery()) {
+          layoutModelBuilder.asQuery();
+        }
+        layoutModel = layoutModelBuilder.build();
+      } else {
+        layoutModel = null;
+      }
     }
 
     @Override
@@ -277,7 +295,7 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
 
     @Override
     public Optional<LayoutModel> getLayoutModel() {
-      return empty();
+      return ofNullable(layoutModel);
     }
 
     @Override

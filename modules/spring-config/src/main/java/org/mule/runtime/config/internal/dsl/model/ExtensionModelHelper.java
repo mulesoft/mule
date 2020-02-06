@@ -27,6 +27,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.meta.model.ComposableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -96,7 +97,7 @@ public class ExtensionModelHelper {
 
   /**
    * @param extensionModels the set of {@link ExtensionModel}s to work with. Usually this is the set of models configured within a
-   *        mule artifact.
+   *                        mule artifact.
    */
   public ExtensionModelHelper(Set<ExtensionModel> extensionModels) {
     this(extensionModels, DslResolvingContext.getDefault(extensionModels));
@@ -250,7 +251,7 @@ public class ExtensionModelHelper {
    *
    * @param componentIdentifier the identifier to use for the search.
    * @return the found {@link org.mule.runtime.api.meta.model.ConnectionProviderModel} or {@link Optional#empty()} if it couldn't
-   *         be found.
+   * be found.
    */
   public Optional<? extends ConnectionProviderModel> findConnectionProviderModel(ComponentIdentifier componentId) {
 
@@ -285,7 +286,7 @@ public class ExtensionModelHelper {
    *
    * @param componentIdentifier the identifier to use for the search.
    * @return the found {@link org.mule.runtime.api.meta.model.ConfigurationModel} or {@link Optional#empty()} if it couldn't be
-   *         found.
+   * found.
    */
   public Optional<? extends ConfigurationModel> findConfigurationModel(ComponentIdentifier componentId) {
     return extensionConfigurationModelByComponentIdentifier.get(componentId, componentIdentifier -> {
@@ -329,7 +330,7 @@ public class ExtensionModelHelper {
    * {@code delegate} when found.
    *
    * @param componentIdentifier the identifier to use for the search.
-   * @param delegate the callback to execute on the found model.
+   * @param delegate            the callback to execute on the found model.
    */
   public void walkToComponent(ComponentIdentifier componentIdentifier, ExtensionWalkerModelDelegate delegate) {
     lookupExtensionModelFor(componentIdentifier)
@@ -407,6 +408,17 @@ public class ExtensionModelHelper {
     return extensionsModels.stream()
         .filter(e -> e.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace()))
         .findFirst();
+  }
+
+  public DslElementSyntax resolveDslElementModel(NamedObject component, ComponentIdentifier componentIdentifier) {
+    Optional<ExtensionModel> optionalExtensionModel = lookupExtensionModelFor(componentIdentifier);
+    ExtensionModel extensionModel = optionalExtensionModel
+        .orElseThrow(() -> new IllegalStateException("Extension Model in context not present for componentIdentifier: "
+            + componentIdentifier));
+
+    final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(extensionModel);
+
+    return dslSyntaxResolver.resolve(component);
   }
 
   public DslElementSyntax resolveDslElementModel(ParameterModel parameterModel, ComponentIdentifier componentIdentifier) {
