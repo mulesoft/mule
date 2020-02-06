@@ -26,7 +26,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ArgumentResolverDelegate;
-import org.mule.runtime.module.extension.internal.runtime.execution.ByteBuddyWrappedMethodComponentExecutor;
+import org.mule.runtime.module.extension.internal.runtime.execution.GeneratedMethodComponentExecutor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 
 import java.io.File;
@@ -302,7 +302,7 @@ public class MethodExecutorGenerator {
     try (FileOutputStream os = new FileOutputStream(file)) {
       os.write(byteBuddyMadeWrapper.getBytes());
       CompositeClassLoader executorClassLoader = new CompositeClassLoader(method.getDeclaringClass().getClassLoader(),
-                                                                          ByteBuddyWrappedMethodComponentExecutor.class
+                                                                          GeneratedMethodComponentExecutor.class
                                                                               .getClassLoader());
 
       return (Class<MethodExecutor>) byteBuddyMadeWrapper.load(executorClassLoader, INJECTION).getLoaded();

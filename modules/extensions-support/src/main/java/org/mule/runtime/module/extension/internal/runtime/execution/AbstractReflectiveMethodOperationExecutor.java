@@ -43,12 +43,12 @@ abstract class AbstractReflectiveMethodOperationExecutor<M extends ComponentMode
 
   private static final Logger LOGGER = getLogger(ReflectiveMethodOperationExecutor.class);
 
-  protected final ByteBuddyWrappedMethodComponentExecutor<M> executor;
+  protected final GeneratedMethodComponentExecutor<M> executor;
   private MuleContext muleContext;
 
   public AbstractReflectiveMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
-    executor = new ByteBuddyWrappedMethodComponentExecutor<>(operationModel.getParameterGroupModels(),
-                                                             operationMethod, operationInstance);
+    executor = new GeneratedMethodComponentExecutor<>(operationModel.getParameterGroupModels(),
+                                                      operationMethod, operationInstance);
   }
 
   @Override
