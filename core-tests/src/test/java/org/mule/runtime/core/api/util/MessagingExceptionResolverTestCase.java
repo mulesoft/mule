@@ -38,8 +38,11 @@ import org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
+import org.mule.runtime.core.privileged.connector.DispatchException;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
+import org.mule.runtime.internal.exception.SuppressedMuleException;
+import org.mule.tck.integration.transformer.ValidateResponse;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -64,6 +67,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   private final ComponentIdentifier ci = mock(ComponentIdentifier.class);
 
   private final TransformerException TRANSFORMER_EXCEPTION = new TransformerException(createStaticMessage("TRANSFORMER"));
+
   private final ConnectionException CONNECTION_EXCEPTION = new ConnectionException("CONNECTION PROBLEM");
   private final MuleFatalException FATAL_EXCEPTION = new MuleFatalException(createStaticMessage("CRITICAL!!!!!!"));
   private final java.lang.Error ERROR = new java.lang.Error("AN ERROR");
@@ -76,6 +80,8 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   private final ErrorType CRITICAL = locator.lookupErrorType(ERROR.getClass());
   private final ErrorType CONNECTION = locator.lookupErrorType(CONNECTION_EXCEPTION.getClass());
   private final ErrorType TRANSFORMER = locator.lookupErrorType(TRANSFORMER_EXCEPTION.getClass());
+  private final ErrorType DISPATCH = locator.lookupErrorType(DispatchException.class);
+
 
   private final MessagingExceptionResolver resolver = new MessagingExceptionResolver(processor);
 
@@ -188,6 +194,18 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     MessagingException resolved = anotherResolver.resolve(me, locator, emptyList());
     assertExceptionErrorType(resolved, expected);
     assertExceptionMessage(resolved.getMessage(), "CONNECTION PROBLEM");
+  }
+
+  @Test
+  public void resolveSuppressedMuleException() {
+    ErrorType expected = DISPATCH;
+    Throwable exception = new DispatchException(createStaticMessage("DISPATCH PROBLEM"), new ValidateResponse(),
+                                                new SuppressedMuleException(CONNECTION_EXCEPTION));
+    MessagingException me = newMessagingException(exception, event, processor);
+    MessagingExceptionResolver anotherResolver = new MessagingExceptionResolver(new TestProcessor());
+    MessagingException resolved = anotherResolver.resolve(me, locator, emptyList());
+    assertExceptionErrorType(resolved, expected);
+    assertExceptionMessage(resolved.getMessage(), "DISPATCH PROBLEM");
   }
 
   private void assertExceptionMessage(String result, String expected) {

@@ -130,7 +130,7 @@ public class MessagingExceptionResolver {
   }
 
   private Optional<Pair<Throwable, ErrorType>> findRoot(Component obj, MessagingException me, ErrorTypeLocator locator) {
-    List<Pair<Throwable, ErrorType>> errors = collectErrors(obj, me, locator);
+    List<Pair<Throwable, ErrorType>> errors = collectUnsuppressedErrors(obj, me, locator);
 
     if (errors.isEmpty()) {
       return collectCritical(obj, me, locator).stream().findFirst();
@@ -148,7 +148,8 @@ public class MessagingExceptionResolver {
         .findFirst();
   }
 
-  private List<Pair<Throwable, ErrorType>> collectErrors(Component obj, MessagingException me, ErrorTypeLocator locator) {
+  private List<Pair<Throwable, ErrorType>> collectUnsuppressedErrors(Component obj, MessagingException me,
+                                                                     ErrorTypeLocator locator) {
     List<Pair<Throwable, ErrorType>> errors = new ArrayList<>(4);
     final List<Throwable> exceptionsAsList = getExceptionsAsList(me);
     for (Throwable e : exceptionsAsList) {
