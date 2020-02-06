@@ -12,16 +12,17 @@ import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.Credentials;
 import org.mule.runtime.api.security.CredentialsBuilder;
+import org.mule.runtime.api.security.DefaultMuleAuthentication;
+import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
-import org.mule.runtime.api.security.DefaultMuleAuthentication;
-import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -68,18 +69,18 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler {
   public void setAuthentication(List<String> securityProviders, Authentication authentication)
       throws SecurityProviderNotFoundException, SecurityException, UnknownAuthenticationTypeException {
     if (!securityProviders.isEmpty()) {
-      // This filter may only allow authentication on a subset of registered
-      // security providers
-      SecurityManager localManager = new DefaultMuleSecurityManager();
+      final List<SecurityProvider> providers = new ArrayList<>();
+
+      // This filter may only allow authentication on a subset of registered security providers
       for (String sp : securityProviders) {
         SecurityProvider provider = manager.getProvider(sp);
         if (provider != null) {
-          localManager.addProvider(provider);
+          providers.add(provider);
         } else {
           throw new SecurityProviderNotFoundException(sp);
         }
       }
-      this.manager = localManager;
+      this.manager = new DefaultMuleSecurityManager(providers);
     }
 
     setAuthentication(authentication);
