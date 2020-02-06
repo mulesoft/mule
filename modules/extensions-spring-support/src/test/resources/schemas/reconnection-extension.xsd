@@ -82,6 +82,33 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/reconnection" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="NotClosableFailingPagedOperationType" substitutionGroup="mule:abstract-operator" name="not-closable-failing-paged-operation"></xs:element>
+  <xs:complexType name="NotClosableFailingPagedOperationType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionInt" use="required" name="failOn"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/reconnection" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PagedOperationType" substitutionGroup="mule:abstract-operator" name="paged-operation"></xs:element>
   <xs:complexType name="PagedOperationType">
     <xs:complexContent>
@@ -119,7 +146,6 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionInt" use="required" name="failOn"></xs:attribute>
-        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/reconnection" type="org.mule.runtime.extension.api.error.MuleErrorsEnumType" use="required" name="withErrorType"></xs:attribute>
         <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>

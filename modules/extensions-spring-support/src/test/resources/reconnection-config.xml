@@ -32,7 +32,11 @@
     </flow>
 
     <flow name="stickyPagedOperation">
-        <reconnection:sticky-paged-operation failOn="#[payload]" withErrorType="#[vars.errorType]" config-ref="reconnection_Config"/>
+        <reconnection:sticky-paged-operation failOn="#[payload]" config-ref="reconnection_Config"/>
+    </flow>
+
+    <flow name="notClosableFailingPagedOperation">
+        <reconnection:not-closable-failing-paged-operation failOn="#[payload]" config-ref="reconnection_Config"/>
     </flow>
 
     <flow name="getReconnectionFromConfig">

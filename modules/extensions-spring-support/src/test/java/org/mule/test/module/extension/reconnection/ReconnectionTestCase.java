@@ -9,12 +9,12 @@ package org.mule.test.module.extension.reconnection;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.disconnectCalls;
 import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.closePagingProviderCalls;
 import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.getPageCalls;
-import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.disconnectCalls;
 import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
-import static org.mule.runtime.extension.api.error.MuleErrors.VALIDATION;
+import static org.mule.runtime.extension.api.error.MuleErrors.TRANSFORMATION;
 import static org.mule.tck.probe.PollingProber.check;
 
 import org.mule.extension.test.extension.reconnection.ReconnectableConnection;
@@ -104,7 +104,7 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   @Test
-  public void connectionIsClosedDuringConnectionExceptionOnFirstPage() throws Exception {
+  public void reconnectAfterConnectionExceptionOnFirstPage() throws Exception {
     resetCounters();
     Iterator<ReconnectableConnection> iterator = getCursor("pagedOperation", 1, CONNECTIVITY);
     ReconnectableConnection firstPage = iterator.next();
@@ -113,18 +113,27 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   @Test
-  public void connectionIsNotClosedDuringOtherExceptionOnFirstPage() throws Exception {
+  public void doNotReconnectAfterOtherExceptionOnFirstPage() {
     resetCounters();
     Iterator<ReconnectableConnection> iterator;
     try {
-      iterator = getCursor("pagedOperation", 1, VALIDATION);
+      iterator = getCursor("pagedOperation", 1, TRANSFORMATION);
       iterator.next();
     } catch (Exception e) {
-      assertThat(e.getCause(), instanceOf(MuleRuntimeException.class));
-      assertThat(e.getMessage(), is("Could not execute operation with connection."));
+      assertThat(e.getCause(), instanceOf(IllegalArgumentException.class));
+      assertThat(e.getMessage(), is("An illegal argument was received."));
       assertThat("Paging provider was not closed.", closePagingProviderCalls, is(1));
       assertThat("Connection was disconnected.", disconnectCalls, is(0));
     }
+  }
+
+  @Test
+  public void pagingProviderIsClosedQuietly() throws Exception {
+    resetCounters();
+    Iterator<ReconnectableConnection> iterator = getCursor("notClosableFailingPagedOperation", 1, TRANSFORMATION);
+    ReconnectableConnection firstPage = iterator.next();
+    assertThat("Connection was not disconnected.", firstPage.getDisconnectCalls(), is(1));
+    assertThat("Paging provider was not closed.", closePagingProviderCalls, is(1));
   }
 
   @Test
