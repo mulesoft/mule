@@ -6,33 +6,34 @@
  */
 package org.mule.runtime.core.internal.security;
 
+import static java.util.Collections.unmodifiableCollection;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authorizationAttemptFailed;
 
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.security.Authentication;
+import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
+import org.mule.runtime.api.security.UnauthorisedException;
 import org.mule.runtime.api.security.UnknownAuthenticationTypeException;
-import org.mule.runtime.core.internal.lifecycle.LifecycleTransitionResult;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
-import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.SecurityProvider;
-import org.mule.runtime.api.security.UnauthorisedException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mule.runtime.core.internal.lifecycle.LifecycleTransitionResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@code DefaultMuleSecurityManager} is a default implementation of a {@link SecurityManager} for a Mule instance.
@@ -46,11 +47,16 @@ public class DefaultMuleSecurityManager extends AbstractComponent implements Sec
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMuleSecurityManager.class);
 
-  private Map<String, SecurityProvider> providers = new ConcurrentHashMap<>();
-  private Map<String, EncryptionStrategy> cryptoStrategies = new ConcurrentHashMap<>();
+  private final Map<String, SecurityProvider> providers;
+  private final Map<String, EncryptionStrategy> cryptoStrategies = new ConcurrentHashMap<>();
 
   public DefaultMuleSecurityManager() {
-    super();
+    this.providers = new ConcurrentHashMap<>();
+  }
+
+  public DefaultMuleSecurityManager(Collection<SecurityProvider> providers) {
+    this.providers = new SmallMap<>();
+    providers.forEach(this::addProvider);
   }
 
   @Override
@@ -67,14 +73,13 @@ public class DefaultMuleSecurityManager extends AbstractComponent implements Sec
   @Override
   public Authentication authenticate(Authentication authentication) throws SecurityException, SecurityProviderNotFoundException {
     Iterator<SecurityProvider> iter = providers.values().iterator();
-    Class<? extends Authentication> toTest = authentication.getClass();
 
     while (iter.hasNext()) {
       SecurityProvider provider = iter.next();
 
-      if (provider.supports(toTest)) {
+      if (provider.supports(authentication.getClass())) {
         if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Authentication attempt using " + provider.getClass().getName());
+          LOGGER.debug("Authentication attempt using {}", provider.getClass().getName());
         }
 
         Authentication result = null;
@@ -100,7 +105,7 @@ public class DefaultMuleSecurityManager extends AbstractComponent implements Sec
       }
     }
 
-    throw new SecurityProviderNotFoundException(toTest.getName());
+    throw new SecurityProviderNotFoundException(authentication.getClass().getName());
   }
 
   /**
@@ -138,8 +143,7 @@ public class DefaultMuleSecurityManager extends AbstractComponent implements Sec
    */
   @Override
   public Collection<SecurityProvider> getProviders() {
-    ArrayList<SecurityProvider> providersList = new ArrayList<>(providers.values());
-    return Collections.unmodifiableCollection(providersList);
+    return unmodifiableCollection(new ArrayList<>(providers.values()));
   }
 
   /**
@@ -158,11 +162,10 @@ public class DefaultMuleSecurityManager extends AbstractComponent implements Sec
   @Override
   public SecurityContext createSecurityContext(Authentication authentication) throws UnknownAuthenticationTypeException {
     Iterator<SecurityProvider> iter = providers.values().iterator();
-    Class<? extends Authentication> toTest = authentication.getClass();
 
     while (iter.hasNext()) {
       SecurityProvider provider = iter.next();
-      if (provider.supports(toTest)) {
+      if (provider.supports(authentication.getClass())) {
         return provider.createSecurityContext(authentication);
       }
     }
@@ -198,8 +201,7 @@ public class DefaultMuleSecurityManager extends AbstractComponent implements Sec
    */
   @Override
   public Collection<EncryptionStrategy> getEncryptionStrategies() {
-    List<EncryptionStrategy> allStrategies = new ArrayList<>(cryptoStrategies.values());
-    return Collections.unmodifiableCollection(allStrategies);
+    return unmodifiableCollection(new ArrayList<>(cryptoStrategies.values()));
   }
 
   /**
