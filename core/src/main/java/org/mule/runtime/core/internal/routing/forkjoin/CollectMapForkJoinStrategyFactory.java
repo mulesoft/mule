@@ -11,12 +11,13 @@ import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_MAP;
 
-import java.util.List;
-import java.util.function.Function;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.function.Function;
 
 /**
  * {@link ForkJoinStrategy} that:
@@ -37,7 +38,9 @@ public class CollectMapForkJoinStrategyFactory extends AbstractForkJoinStrategyF
                                                                    CoreEvent.Builder resultBuilder) {
     return list -> resultBuilder
         .message(of(list.stream().collect(toMap(event -> Integer.toString(event.getGroupCorrelation().get().getSequence()),
-                                                event -> event.getMessage()))))
+                                                event -> event.getMessage(),
+                                                (a, b) -> b,
+                                                LinkedHashMap::new))))
         .build();
   }
 
