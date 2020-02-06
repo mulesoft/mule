@@ -134,7 +134,7 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
     }
 
     @Override
-    public Set<PolicyAwareAttribute> sourcePolicyAwareAtributes() {
+    public Set<PolicyAwareAttribute> sourcePolicyAwareAttributes() {
       return emptySet();
     }
 

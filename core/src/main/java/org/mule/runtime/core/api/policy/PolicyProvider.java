@@ -36,7 +36,7 @@ public interface PolicyProvider {
    *
    * @since 4.3
    */
-  Set<PolicyAwareAttribute> sourcePolicyAwareAtributes();
+  Set<PolicyAwareAttribute> sourcePolicyAwareAttributes();
 
   /**
    * Creates a collection of {@link Policy} with the policy chain be applied to an operation.

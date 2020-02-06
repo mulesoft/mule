@@ -30,7 +30,7 @@ public class NullPolicyProvider implements PolicyProvider {
   }
 
   @Override
-  public Set<PolicyAwareAttribute> sourcePolicyAwareAtributes() {
+  public Set<PolicyAwareAttribute> sourcePolicyAwareAttributes() {
     return emptySet();
   }
 
