@@ -17,31 +17,31 @@ import org.hamcrest.TypeSafeMatcher;
  */
 public class ClassNameMatcher<T> extends TypeSafeMatcher<T> {
 
-        private final Matcher<String> matcher;
+  private final Matcher<String> matcher;
 
-        private ClassNameMatcher(Matcher<String> matcher) {
-            this.matcher = matcher;
-        }
+  private ClassNameMatcher(Matcher<String> matcher) {
+    this.matcher = matcher;
+  }
 
-        public void describeTo(Description description) {
-            description.appendText("object with class name ");
-            description.appendDescriptionOf(matcher);
-        }
+  public void describeTo(Description description) {
+    description.appendText("object with class name ");
+    description.appendDescriptionOf(matcher);
+  }
 
-        @Override
-        protected boolean matchesSafely(T item) {
-            return matcher.matches(item.getClass().getName());
-        }
+  @Override
+  protected boolean matchesSafely(T item) {
+    return matcher.matches(item.getClass().getName());
+  }
 
-        @Override
-        protected void describeMismatchSafely(T item, Description description) {
-            description.appendText("class name ");
-            matcher.describeMismatch(item.getClass().getName(), description);
-        }
+  @Override
+  protected void describeMismatchSafely(T item, Description description) {
+    description.appendText("class name ");
+    matcher.describeMismatch(item.getClass().getName(), description);
+  }
 
-        @Factory
-        public static <T> Matcher<T> hasClassName(final Matcher<String> matcher) {
-            return new ClassNameMatcher<T>(matcher);
-        }
+  @Factory
+  public static <T> Matcher<T> hasClassName(final Matcher<String> matcher) {
+    return new ClassNameMatcher<T>(matcher);
+  }
 
 }
