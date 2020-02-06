@@ -14,7 +14,7 @@ import static org.mule.extension.test.extension.reconnection.ReconnectionOperati
 import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.getPageCalls;
 import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
-import static org.mule.runtime.extension.api.error.MuleErrors.TRANSFORMATION;
+import static org.mule.runtime.extension.api.error.MuleErrors.VALIDATION;
 import static org.mule.tck.probe.PollingProber.check;
 
 import org.mule.extension.test.extension.reconnection.ReconnectableConnection;
@@ -116,7 +116,7 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     resetCounters();
     Iterator<ReconnectableConnection> iterator;
     try {
-      iterator = getCursor("pagedOperation", 1, TRANSFORMATION);
+      iterator = getCursor("pagedOperation", 1, VALIDATION);
       iterator.next();
     } catch (Exception e) {
       assertThat(e.getCause(), instanceOf(IllegalArgumentException.class));
@@ -129,7 +129,7 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   @Test
   public void pagingProviderIsClosedQuietlyDuringExceptionOnFirstPage() throws Exception {
     resetCounters();
-    Iterator<ReconnectableConnection> iterator = getCursor("notClosableFailingPagedOperation", 1, TRANSFORMATION);
+    Iterator<ReconnectableConnection> iterator = getCursor("notClosableFailingPagedOperation", 1, VALIDATION);
     ReconnectableConnection firstPage = iterator.next();
     assertThat("Connection was not disconnected.", firstPage.getDisconnectCalls(), is(1));
     assertThat("Paging provider was not closed.", closePagingProviderCalls, is(1));
