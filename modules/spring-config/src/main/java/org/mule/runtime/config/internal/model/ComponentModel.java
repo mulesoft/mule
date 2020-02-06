@@ -314,7 +314,12 @@ public abstract class ComponentModel {
 
         DslElementSyntax elementDsl = extensionModelHelper.resolveDslElementModel(model, getIdentifier());
 
-        onParameterizedModel(elementDsl, model);
+        onParameterizedModel(elementDsl, model, paramModel -> !(model.getSuccessCallback()
+            .map(sc -> sc.getAllParameterModels().contains(paramModel))
+            .orElse(false) ||
+            model.getErrorCallback()
+                .map(ec -> ec.getAllParameterModels().contains(paramModel))
+                .orElse(false)));
       }
 
       @Override
@@ -337,6 +342,11 @@ public abstract class ComponentModel {
       }
 
       private void onParameterizedModel(DslElementSyntax elementDsl, ParameterizedModel model) {
+        onParameterizedModel(elementDsl, model, paramModel -> true);
+      }
+
+      private void onParameterizedModel(DslElementSyntax elementDsl, ParameterizedModel model,
+                                        Predicate<ParameterModel> parameterModelFilter) {
         Multimap<ComponentIdentifier, ComponentModel> innerComponents = getNestedComponents(ComponentModel.this);
 
         List<ParameterModel> inlineGroupedParameters = model.getParameterGroupModels().stream()
@@ -348,7 +358,8 @@ public abstract class ComponentModel {
         handleNestedParameters(ComponentModel.this, ((ComponentAst) ComponentModel.this).directChildrenStream()
             .filter(childComp -> childComp != ComponentModel.this),
                                innerComponents, extensionModelHelper, model,
-                               parameterModel -> !inlineGroupedParameters.contains(parameterModel));
+                               parameterModel -> parameterModelFilter.test(parameterModel)
+                                   && !inlineGroupedParameters.contains(parameterModel));
       }
 
     });
@@ -401,33 +412,12 @@ public abstract class ComponentModel {
                                       Multimap<ComponentIdentifier, ComponentModel> nestedComponents,
                                       ExtensionModelHelper extensionModelHelper,
                                       ParameterizedModel model, Predicate<ParameterModel> parameterModelFilter) {
-    //Set<ComponentAst> paramChildren = new HashSet<>();
-
-    //((ComponentAst) componentModel).directChildrenStream()
-    //        .filter(childComp -> childComp != componentModel)
     childrenComponentModels
         .forEach(childComp -> {
           extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
-
-              // TODO: move this to parameterModelFilter
-              // do not handle the callback parameters from the sources
-              .filter(paramModel -> {
-                if (model instanceof SourceModel) {
-                  return !(((SourceModel) model).getSuccessCallback()
-                      .map(sc -> sc.getAllParameterModels().contains(paramModel))
-                      .orElse(false) ||
-                      ((SourceModel) model).getErrorCallback()
-                          .map(ec -> ec.getAllParameterModels().contains(paramModel))
-                          .orElse(false));
-                } else {
-                  return true;
-                }
-              })
               .filter(paramModel -> parameterModelFilter.test(paramModel))
               .filter(paramModel -> paramModel.getDslConfiguration().allowsInlineDefinition())
               .ifPresent(paramModel -> {
-                //paramChildren.add(childComp);
-
                 if (paramModel.getExpressionSupport() == NOT_SUPPORTED
                     || childComp.directChildrenStream().findFirst().isPresent()) {
                   componentModel.enrichComponentModels(componentModel, nestedComponents,
@@ -443,9 +433,6 @@ public abstract class ComponentModel {
                 }
               });
         });
-
-    // TODO MULE-17711 When these are removed, the ast parameters may need to be traversed with recursive/direct spliterators
-    // ComponentModel.this.innerComponents.removeAll(paramChildren);
   }
 
   private Multimap<ComponentIdentifier, ComponentModel> getNestedComponents(ComponentModel componentModel) {
@@ -466,14 +453,14 @@ public abstract class ComponentModel {
 
 
   private void enrichComponentModels(ComponentModel componentModel, Multimap<ComponentIdentifier, ComponentModel> innerComponents,
-                                     Optional<DslElementSyntax> dslContainedElement, ParameterModel paramModel,
+                                     Optional<DslElementSyntax> optionalParamDsl, ParameterModel paramModel,
                                      ExtensionModelHelper extensionModelHelper) {
-    dslContainedElement.ifPresent(paramDsl -> {
+    optionalParamDsl.ifPresent(paramDsl -> {
       if (paramDsl.isWrapped()) {
         if (!(paramModel.getType() instanceof ObjectType)) {
           return;
         }
-        ComponentModel wrappedComponent = getSingleComponentModel(innerComponents, getIdentifier(dslContainedElement.get()));
+        ComponentModel wrappedComponent = getSingleComponentModel(innerComponents, getIdentifier(paramDsl));
         if (wrappedComponent != null) {
           Multimap<ComponentIdentifier, ComponentModel> nestedWrappedComponents = getNestedComponents(wrappedComponent);
 
