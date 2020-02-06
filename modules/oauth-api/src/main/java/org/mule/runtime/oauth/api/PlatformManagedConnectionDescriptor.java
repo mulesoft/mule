@@ -34,7 +34,7 @@ public interface PlatformManagedConnectionDescriptor {
   String getUri();
 
   /**
-   * @return The name that the user has given this connection in the Anypoint Platform
+   * @return The friendly name that the user has given this connection in the Anypoint Platform
    */
   String getDisplayName();
 
