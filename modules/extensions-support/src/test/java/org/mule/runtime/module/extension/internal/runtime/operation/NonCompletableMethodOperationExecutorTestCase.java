@@ -44,7 +44,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Parameter
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.config.LifecycleAwareConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.exception.SdkMethodInvocationException;
-import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ReactiveReflectiveMethodOperationExecutor;
+import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ReactiveMethodOperationExecutor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
@@ -66,7 +66,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class NonCompletableReflectiveMethodOperationExecutorTestCase extends AbstractMuleContextTestCase {
+public class NonCompletableMethodOperationExecutorTestCase extends AbstractMuleContextTestCase {
 
   private static final String CONFIG_NAME = "config";
   private static final DataType DATA_TYPE = STRING;
@@ -107,7 +107,7 @@ public class NonCompletableReflectiveMethodOperationExecutorTestCase extends Abs
   @Mock
   private RetryPolicyTemplate retryPolicyTemplate;
 
-  private ReactiveReflectiveMethodOperationExecutor executor;
+  private ReactiveMethodOperationExecutor executor;
   private ConfigurationInstance configurationInstance;
   private ExecutionContextAdapter operationContext;
   private HeisenbergExtension config;
@@ -136,7 +136,7 @@ public class NonCompletableReflectiveMethodOperationExecutorTestCase extends Abs
   @Test
   public void operationWithReturnValueAndWithoutParameters() throws Exception {
     Method method = ClassUtils.getMethod(HeisenbergOperations.class, "sayMyName", new Class<?>[] {HeisenbergExtension.class});
-    executor = new ReactiveReflectiveMethodOperationExecutor(operationModel, method, operations);
+    executor = new ReactiveMethodOperationExecutor(operationModel, method, operations);
     initialiseIfNeeded(executor, true, muleContext);
     assertResult(execute(), HEISENBERG);
   }
@@ -155,7 +155,7 @@ public class NonCompletableReflectiveMethodOperationExecutorTestCase extends Abs
   @Test
   public void voidOperationWithoutParameters() throws Exception {
     Method method = ClassUtils.getMethod(HeisenbergOperations.class, "die", new Class<?>[] {HeisenbergExtension.class});
-    executor = new ReactiveReflectiveMethodOperationExecutor(operationModel, method, operations);
+    executor = new ReactiveMethodOperationExecutor(operationModel, method, operations);
     initialiseIfNeeded(executor, true, muleContext);
     assertThat(execute(), is(nullValue()));
     assertThat(config.getEndingHealth(), is(DEAD));
@@ -170,7 +170,7 @@ public class NonCompletableReflectiveMethodOperationExecutorTestCase extends Abs
 
     Method method =
         ClassUtils.getMethod(HeisenbergOperations.class, "getEnemy", new Class<?>[] {HeisenbergExtension.class, int.class});
-    executor = new ReactiveReflectiveMethodOperationExecutor(operationModel, method, operations);
+    executor = new ReactiveMethodOperationExecutor(operationModel, method, operations);
     initialiseIfNeeded(executor, true, muleContext);
 
     assertResult(((Result) execute()).getOutput(), "Hank");
@@ -179,7 +179,7 @@ public class NonCompletableReflectiveMethodOperationExecutorTestCase extends Abs
   @Test
   public void voidWithArguments() throws Exception {
     Method method = ClassUtils.getMethod(HeisenbergOperations.class, "die", new Class<?>[] {HeisenbergExtension.class});
-    executor = new ReactiveReflectiveMethodOperationExecutor(operationModel, method, operations);
+    executor = new ReactiveMethodOperationExecutor(operationModel, method, operations);
     initialiseIfNeeded(executor, true, muleContext);
     assertThat(execute(), is(nullValue()));
   }
@@ -192,7 +192,7 @@ public class NonCompletableReflectiveMethodOperationExecutorTestCase extends Abs
     for (Object[] primitiveOperation : primitiveOperations) {
       Method method = ClassUtils.getMethod(PrimitiveTypesTestOperations.class, (String) primitiveOperation[0],
                                            new Class<?>[] {(Class<?>) primitiveOperation[1]});
-      executor = new ReactiveReflectiveMethodOperationExecutor(operationModel, method, primitiveTypesTestOperations);
+      executor = new ReactiveMethodOperationExecutor(operationModel, method, primitiveTypesTestOperations);
       initialiseIfNeeded(executor, true, muleContext);
       execute();
     }
@@ -203,7 +203,7 @@ public class NonCompletableReflectiveMethodOperationExecutorTestCase extends Abs
     Class<?>[] parameterTypes =
         {char.class, byte.class, short.class, int.class, long.class, float.class, double.class, boolean.class};
     Method method = ClassUtils.getMethod(PrimitiveTypesTestOperations.class, "allCombined", parameterTypes);
-    executor = new ReactiveReflectiveMethodOperationExecutor(operationModel, method, primitiveTypesTestOperations);
+    executor = new ReactiveMethodOperationExecutor(operationModel, method, primitiveTypesTestOperations);
     initialiseIfNeeded(executor, true, muleContext);
     execute();
   }

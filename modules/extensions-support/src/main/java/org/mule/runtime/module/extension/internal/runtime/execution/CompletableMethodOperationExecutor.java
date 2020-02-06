@@ -12,14 +12,14 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import java.lang.reflect.Method;
 
 /**
- * Implementation of {@link ReflectiveMethodOperationExecutor} which works by using reflection to invoke a method from a class.
+ * Implementation of {@link CompletableMethodOperationExecutor} which works by using a {@link GeneratedMethodComponentExecutor}
  *
- * @since 4.3
+ * @since 4.3.0
  */
-public class ReflectiveMethodOperationExecutor<M extends ComponentModel> extends AbstractReflectiveMethodOperationExecutor<M> {
+public class CompletableMethodOperationExecutor<M extends ComponentModel> extends AbstractCompletableMethodOperationExecutor<M> {
 
 
-  public ReflectiveMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
+  public CompletableMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
     super(operationModel, operationMethod, operationInstance);
   }
 

@@ -39,7 +39,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithOperationConta
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
-import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveOperationExecutorFactory;
+import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -127,10 +127,10 @@ final class OperationModelLoaderDelegate extends AbstractModelLoaderDelegate {
       if (method.isPresent() && declaringClass.isPresent()) {
         operationDeclarer
             .withModelProperty(new ImplementingMethodModelProperty(method.get()))
-            .withModelProperty(new CompletableComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory(declaringClass
+            .withModelProperty(new CompletableComponentExecutorModelProperty(new CompletableOperationExecutorFactory(declaringClass
                 .get(),
-                                                                                                                    method
-                                                                                                                        .get())));
+                                                                                                                     method
+                                                                                                                         .get())));
       }
 
       loader.addExceptionEnricher(operationMethod, operationDeclarer);

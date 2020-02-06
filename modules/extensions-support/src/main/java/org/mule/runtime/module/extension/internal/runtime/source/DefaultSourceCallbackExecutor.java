@@ -44,11 +44,12 @@ import java.util.stream.Stream;
 import com.google.common.collect.ImmutableList;
 
 /**
- * Implementation of {@link SourceCallbackExecutor} which uses reflection to execute the callback through a {@link Method}
+ * Implementation of {@link SourceCallbackExecutor} which uses a {@link GeneratedMethodComponentExecutor} to execute the
+ * callback through a {@link Method}
  *
- * @since 4.0
+ * @since 4.3.0
  */
-class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
+class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
 
   private final ExtensionModel extensionModel;
   private final Optional<ConfigurationInstance> configurationInstance;
@@ -74,16 +75,16 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
    * @param muleContext           the current {@link MuleContext}
    * @param sourceCallbackModel   the callback's model
    */
-  public ReflectiveSourceCallbackExecutor(ExtensionModel extensionModel,
-                                          Optional<ConfigurationInstance> configurationInstance,
-                                          SourceModel sourceModel,
-                                          Object source,
-                                          Method method,
-                                          CursorProviderFactory cursorProviderFactory,
-                                          StreamingManager streamingManager,
-                                          Component component,
-                                          MuleContext muleContext,
-                                          SourceCallbackModelProperty sourceCallbackModel) {
+  public DefaultSourceCallbackExecutor(ExtensionModel extensionModel,
+                                       Optional<ConfigurationInstance> configurationInstance,
+                                       SourceModel sourceModel,
+                                       Object source,
+                                       Method method,
+                                       CursorProviderFactory cursorProviderFactory,
+                                       StreamingManager streamingManager,
+                                       Component component,
+                                       MuleContext muleContext,
+                                       SourceCallbackModelProperty sourceCallbackModel) {
 
     this.extensionModel = extensionModel;
     this.configurationInstance = configurationInstance;

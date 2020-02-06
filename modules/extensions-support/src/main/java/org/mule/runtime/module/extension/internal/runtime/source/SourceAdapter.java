@@ -216,14 +216,14 @@ public class SourceAdapter implements Lifecycle {
                                                    SourceCallbackModelProperty sourceCallbackModel,
                                                    SourceCallbackExecutor then) {
     SourceCallbackExecutor executor = method
-        .map(m -> (SourceCallbackExecutor) new ReflectiveSourceCallbackExecutor(extensionModel, configurationInstance,
-                                                                                sourceModel,
-                                                                                sourceInvokationTarget.get(),
-                                                                                m, cursorProviderFactory,
-                                                                                streamingManager,
-                                                                                component,
-                                                                                muleContext,
-                                                                                sourceCallbackModel))
+        .map(m -> (SourceCallbackExecutor) new DefaultSourceCallbackExecutor(extensionModel, configurationInstance,
+                                                                             sourceModel,
+                                                                             sourceInvokationTarget.get(),
+                                                                             m, cursorProviderFactory,
+                                                                             streamingManager,
+                                                                             component,
+                                                                             muleContext,
+                                                                             sourceCallbackModel))
         .orElse(NullSourceCallbackExecutor.INSTANCE);
 
     if (then != null) {

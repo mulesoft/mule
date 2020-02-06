@@ -45,15 +45,15 @@ import org.slf4j.Logger;
  * @deprecated since 4.3
  */
 @Deprecated
-public class ReactiveReflectiveMethodOperationExecutor<M extends ComponentModel>
+public class ReactiveMethodOperationExecutor<M extends ComponentModel>
     implements ComponentExecutor<M>, OperationArgumentResolverFactory<M>, MuleContextAware, Lifecycle {
 
-  private static final Logger LOGGER = getLogger(ReactiveReflectiveMethodOperationExecutor.class);
+  private static final Logger LOGGER = getLogger(ReactiveMethodOperationExecutor.class);
 
   private final GeneratedMethodComponentExecutor<M> executor;
   private MuleContext muleContext;
 
-  public ReactiveReflectiveMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
+  public ReactiveMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
     executor =
         new GeneratedMethodComponentExecutor<>(operationModel.getParameterGroupModels(), operationMethod,
                                                operationInstance);

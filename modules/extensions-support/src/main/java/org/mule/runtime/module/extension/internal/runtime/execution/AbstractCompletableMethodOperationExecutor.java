@@ -26,6 +26,7 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.exception.SdkMethodInvocationException;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -38,15 +39,15 @@ import org.slf4j.Logger;
  *
  * @since 4.3.0
  */
-abstract class AbstractReflectiveMethodOperationExecutor<M extends ComponentModel>
+abstract class AbstractCompletableMethodOperationExecutor<M extends ComponentModel>
     implements CompletableComponentExecutor<M>, OperationArgumentResolverFactory<M>, MuleContextAware, Lifecycle {
 
-  private static final Logger LOGGER = getLogger(ReflectiveMethodOperationExecutor.class);
+  private static final Logger LOGGER = getLogger(CompletableMethodOperationExecutor.class);
 
   protected final GeneratedMethodComponentExecutor<M> executor;
   private MuleContext muleContext;
 
-  public AbstractReflectiveMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
+  public AbstractCompletableMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
     executor = new GeneratedMethodComponentExecutor<>(operationModel.getParameterGroupModels(),
                                                       operationMethod, operationInstance);
   }
@@ -55,6 +56,8 @@ abstract class AbstractReflectiveMethodOperationExecutor<M extends ComponentMode
   public final void execute(ExecutionContext<M> executionContext, ExecutorCallback callback) {
     try {
       doExecute(executionContext, callback);
+    } catch (SdkMethodInvocationException e) {
+      callback.error(handleError(wrapFatal(e.getCause()), (ExecutionContextAdapter<M>) executionContext));
     } catch (Exception e) {
       callback.error(handleError(e, (ExecutionContextAdapter<M>) executionContext));
     } catch (Throwable t) {
