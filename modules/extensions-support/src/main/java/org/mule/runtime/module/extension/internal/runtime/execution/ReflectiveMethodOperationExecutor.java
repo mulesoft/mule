@@ -26,5 +26,4 @@ public class ReflectiveMethodOperationExecutor<M extends ComponentModel> extends
   protected void doExecute(ExecutionContext<M> executionContext, ExecutorCallback callback) {
     callback.complete(executor.execute(executionContext));
   }
-
 }

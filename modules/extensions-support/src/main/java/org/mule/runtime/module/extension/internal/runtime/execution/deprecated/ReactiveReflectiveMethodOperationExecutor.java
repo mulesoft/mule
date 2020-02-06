@@ -16,6 +16,7 @@ import static org.mule.runtime.module.extension.api.runtime.privileged.Execution
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.justOrEmpty;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -23,12 +24,12 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.execution.ByteBuddyWrappedMethodComponentExecutor;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
-import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveMethodComponentExecutor;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -49,12 +50,13 @@ public class ReactiveReflectiveMethodOperationExecutor<M extends ComponentModel>
 
   private static final Logger LOGGER = getLogger(ReactiveReflectiveMethodOperationExecutor.class);
 
-  private final ReflectiveMethodComponentExecutor<M> executor;
+  private final ByteBuddyWrappedMethodComponentExecutor<M> executor;
   private MuleContext muleContext;
 
   public ReactiveReflectiveMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
     executor =
-        new ReflectiveMethodComponentExecutor<>(operationModel.getParameterGroupModels(), operationMethod, operationInstance);
+        new ByteBuddyWrappedMethodComponentExecutor<>(operationModel.getParameterGroupModels(), operationMethod,
+                                                      operationInstance);
   }
 
   /**

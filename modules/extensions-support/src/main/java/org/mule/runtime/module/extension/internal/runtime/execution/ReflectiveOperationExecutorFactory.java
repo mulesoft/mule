@@ -8,8 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNonBlocking;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -52,7 +53,7 @@ public final class ReflectiveOperationExecutorFactory<T, M extends ComponentMode
     Object delegate;
     CoreEvent initialiserEvent = null;
     try {
-      initialiserEvent = getInitialiserEvent();
+      initialiserEvent = getNullEvent();
       delegate = objectBuilder.build(ValueResolvingContext.builder(initialiserEvent).build());
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create instance of operation class "

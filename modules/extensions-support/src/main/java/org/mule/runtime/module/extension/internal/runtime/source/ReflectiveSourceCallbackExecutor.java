@@ -34,7 +34,6 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ByteBuddyWrappedMethodComponentExecutor;
-import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveMethodComponentExecutor;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -96,7 +95,7 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
     executor =
         new ByteBuddyWrappedMethodComponentExecutor<>(getAllGroups(sourceModel, method, sourceCallbackModel), method, source);
     try {
-      initialiseIfNeeded(executor, muleContext);
+      initialiseIfNeeded(executor, true, muleContext);
     } catch (InitialisationException e) {
       throw new MuleRuntimeException(e);
     }

@@ -17,7 +17,7 @@ import java.util.function.Supplier;
  *
  * @since 3.7.0
  */
-interface ArgumentResolverDelegate {
+public interface ArgumentResolverDelegate {
 
   ArgumentResolver<?>[] getArgumentResolvers();
 
