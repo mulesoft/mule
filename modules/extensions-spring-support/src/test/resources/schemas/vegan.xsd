@@ -1,1114 +1,1328 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mulesoft.org/schema/mule/vegan" attributeFormDefault="unqualified" elementFormDefault="qualified">
-  <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
-  <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"></xs:import>
-  <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
-  <xs:import namespace="http://www.mulesoft.org/schema/mule/metadata" schemaLocation="http://www.mulesoft.org/schema/mule/metadata/current/mule-metadata.xsd"></xs:import>
-  <xs:complexType name="org.mule.test.vegan.extension.FarmedFood">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" type="vegan:org.mule.test.vegan.extension.FarmedFood" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-farmed-food"></xs:element>
-  <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" type="vegan:org.mule.test.vegan.extension.FarmedFood" abstract="true" name="abstract-farmed-food"></xs:element>
-  <xs:complexType name="org.mule.test.vegan.extension.RottenFood">
-    <xs:complexContent>
-      <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.FarmedFood"></xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" type="vegan:org.mule.test.vegan.extension.RottenFood" substitutionGroup="vegan:abstract-farmed-food" abstract="true" name="abstract-rotten-food"></xs:element>
-  <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" substitutionGroup="vegan:abstract-rotten-food" name="rotten-food">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="vegan:org.mule.test.vegan.extension.RottenFood"></xs:extension>
-      </xs:complexContent>
+<xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://www.mulesoft.org/schema/mule/vegan" attributeFormDefault="unqualified"
+           elementFormDefault="qualified">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
+    <xs:import namespace="http://www.springframework.org/schema/beans"
+               schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"></xs:import>
+    <xs:import namespace="http://www.mulesoft.org/schema/mule/core"
+               schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
+    <xs:complexType name="org.mule.test.vegan.extension.FarmedFood">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                          base="mule:abstractExtensionType"></xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:complexType name="org.mule.test.vegan.extension.HealthyFood.TasteProfile">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="tasty"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="org.mule.test.vegan.extension.HealthyFood">
-    <xs:complexContent>
-      <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.FarmedFood">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="taste-profile">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension base="vegan:org.mule.test.vegan.extension.HealthyFood.TasteProfile"></xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="tasteProfile"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" substitutionGroup="vegan:global-abstract-farmed-food" abstract="true" name="abstract-healthy-food"></xs:element>
-  <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" substitutionGroup="vegan:abstract-healthy-food" name="healthy-food">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="vegan:org.mule.test.vegan.extension.HealthyFood">
-          <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                type="vegan:org.mule.test.vegan.extension.FarmedFood" substitutionGroup="mule:abstract-shared-extension"
+                abstract="true" name="global-abstract-farmed-food"></xs:element>
+    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                type="vegan:org.mule.test.vegan.extension.FarmedFood" abstract="true"
+                name="abstract-farmed-food"></xs:element>
+    <xs:complexType name="org.mule.test.vegan.extension.RottenFood">
+        <xs:complexContent>
+            <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                          base="vegan:org.mule.test.vegan.extension.FarmedFood"></xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:complexType name="org.mule.test.vegan.extension.GroupedFood">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="food">
-            <xs:complexType>
-              <xs:choice minOccurs="1" maxOccurs="1">
-                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
-                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
-              </xs:choice>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="abstract-grouped-food"></xs:element>
-  <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" substitutionGroup="vegan:abstract-grouped-food" name="grouped-food">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="vegan:org.mule.test.vegan.extension.GroupedFood">
-          <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
+    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                type="vegan:org.mule.test.vegan.extension.RottenFood" substitutionGroup="vegan:abstract-farmed-food"
+                abstract="true" name="abstract-rotten-food"></xs:element>
+    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" substitutionGroup="vegan:abstract-rotten-food"
+                name="rotten-food">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="vegan:org.mule.test.vegan.extension.RottenFood"></xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.vegan.extension.HealthyFood.TasteProfile">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="tasty"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="pear-config">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="mule:abstractExtensionType">
-          <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-          <xs:attribute type="xs:string" use="required" name="name">
-            <xs:annotation>
-              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="apple-config">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="mule:abstractExtensionType">
-          <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="main-producers">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="main-producer">
-                    <xs:complexType>
-                      <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="sample">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.HealthyFood"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="cook-book">
-              <xs:complexType>
-                <xs:choice minOccurs="1" maxOccurs="1">
-                  <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-vegan-cook-book"></xs:element>
-                  <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-vegan-cook-book"></xs:element>
-                </xs:choice>
-              </xs:complexType>
-            </xs:element>
-          </xs:sequence>
-          <xs:attribute type="mule:expressionInt" use="optional" default="10" name="timeToPeel"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="mainProducers"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="sample"></xs:attribute>
-          <xs:attribute type="mule:expressionString" use="optional" name="shouldNotOverride"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="cookBook"></xs:attribute>
-          <xs:attribute type="xs:string" use="required" name="name">
-            <xs:annotation>
-              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
-  <xs:complexType name="org.mule.test.vegan.extension.VeganCookBook">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="recipes">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="unbounded" name="recipe">
-                  <xs:complexType>
-                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                  </xs:complexType>
-                </xs:element>
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="mule:expressionList" use="optional" name="recipes"></xs:attribute>
-        <xs:attribute type="mule:expressionInt" use="optional" name="numberOfPages"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" default="Enemies of Bondiola" name="editorial"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" type="vegan:org.mule.test.vegan.extension.VeganCookBook" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-vegan-cook-book"></xs:element>
-  <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" type="vegan:org.mule.test.vegan.extension.VeganCookBook" abstract="true" name="abstract-vegan-cook-book"></xs:element>
-  <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" substitutionGroup="vegan:abstract-vegan-cook-book" name="vegan-cook-book">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="vegan:org.mule.test.vegan.extension.VeganCookBook"></xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="apple-connection">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="mule:abstractConnectionProviderType">
-          <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
-          </xs:sequence>
-        </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PaulMcCartneySourceType" substitutionGroup="mule:abstract-message-source" name="paul-mc-cartney-source"></xs:element>
-  <xs:complexType name="PaulMcCartneySourceType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
-          <xs:annotation>
-            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="Harvest-applesType" substitutionGroup="mule:abstract-message-source" name="harvest-apples"></xs:element>
-  <xs:complexType name="Harvest-applesType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="main-producers">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="unbounded" name="main-producer">
-                  <xs:complexType>
-                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                  </xs:complexType>
-                </xs:element>
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="pojo-grouped-food">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.GroupedFood"></xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="sample">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.HealthyFood"></xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="as-group-inline">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension base="mule:abstractExtensionType">
-                  <xs:sequence>
-                    <xs:element minOccurs="0" maxOccurs="1" name="food">
-                      <xs:complexType>
-                        <xs:choice minOccurs="1" maxOccurs="1">
-                          <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
-                          <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
-                        </xs:choice>
-                      </xs:complexType>
+    <xs:complexType name="org.mule.test.vegan.extension.HealthyFood">
+        <xs:complexContent>
+            <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                          base="vegan:org.mule.test.vegan.extension.FarmedFood">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="taste-profile">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension
+                                        base="vegan:org.mule.test.vegan.extension.HealthyFood.TasteProfile"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
                     </xs:element>
-                  </xs:sequence>
-                  <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
-                </xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="response">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension base="mule:abstractExtensionType">
-                  <xs:sequence></xs:sequence>
-                  <xs:attribute type="mule:expressionInt" use="optional" name="timeToPeel"></xs:attribute>
-                </xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="key"></xs:attribute>
-        <xs:attribute type="mule:substitutableName" use="optional" name="mainProducers"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="shouldNotOverride"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="flowName"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="pojoGroupedFood"></xs:attribute>
-        <xs:attribute type="xs:string" use="required" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
-          <xs:annotation>
-            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="sample"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="EatAppleType" substitutionGroup="mule:abstract-operator" name="eat-apple"></xs:element>
-  <xs:complexType name="EatAppleType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-        </xs:sequence>
-        <xs:attribute type="mule:expressionString" use="optional" name="key"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-          <xs:annotation>
-            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
-          <xs:annotation>
-            <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="required" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetFruitSampleType" substitutionGroup="mule:abstract-operator" name="get-fruit-sample"></xs:element>
-  <xs:complexType name="GetFruitSampleType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="sample">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.HealthyFood"></xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="sample"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetNotOverridenParameterType" substitutionGroup="mule:abstract-operator" name="get-not-overriden-parameter"></xs:element>
-  <xs:complexType name="GetNotOverridenParameterType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:expressionString" use="optional" name="shouldNotOverride"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetProducersType" substitutionGroup="mule:abstract-operator" name="get-producers"></xs:element>
-  <xs:complexType name="GetProducersType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="main-producers">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="unbounded" name="main-producer">
-                  <xs:complexType>
-                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                  </xs:complexType>
-                </xs:element>
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="mule:expressionList" use="optional" name="mainProducers"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-          <xs:annotation>
-            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetTimeToPeelType" substitutionGroup="mule:abstract-operator" name="get-time-to-peel"></xs:element>
-  <xs:complexType name="GetTimeToPeelType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:expressionInt" use="optional" name="timeToPeel"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SpreadTheWordType" substitutionGroup="mule:abstract-operator" name="spread-the-word"></xs:element>
-  <xs:complexType name="SpreadTheWordType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:expressionString" use="required" name="theWord"></xs:attribute>
-        <xs:attribute type="mule:substitutableInt" use="optional" default="2" name="eloquenceLevel"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="banana-config">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="mule:abstractExtensionType">
-          <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="main-producers">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="main-producer">
-                    <xs:complexType>
-                      <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
                 </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="sample">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.HealthyFood"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="healthy-food">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.HealthyFood"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-          </xs:sequence>
-          <xs:attribute type="mule:expressionInt" use="optional" default="10" name="timeToPeel"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="mainProducers"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="sample"></xs:attribute>
-          <xs:attribute type="mule:expressionString" use="optional" name="shouldNotOverride"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="healthyFood"></xs:attribute>
-          <xs:attribute type="xs:string" use="required" name="name">
-            <xs:annotation>
-              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
+                <xs:attribute type="xs:string" use="optional" name="tasteProfile"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="banana-plantain-connection">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="mule:abstractConnectionProviderType">
-          <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
-          </xs:sequence>
-          <xs:attribute type="mule:expressionString" use="optional" default="Ecuador" name="originCountry"></xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
+    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                substitutionGroup="vegan:global-abstract-farmed-food" abstract="true"
+                name="abstract-healthy-food"></xs:element>
+    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" substitutionGroup="vegan:abstract-healthy-food"
+                name="healthy-food">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="vegan:org.mule.test.vegan.extension.HealthyFood">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.vegan.extension.GroupedFood">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="food">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1"
+                                            maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
+                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1"
+                                            maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="EatBananaType" substitutionGroup="mule:abstract-operator" name="eat-banana"></xs:element>
-  <xs:complexType name="EatBananaType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="EatPealedType" substitutionGroup="mule:abstract-operator" name="eat-pealed"></xs:element>
-  <xs:complexType name="EatPealedType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="xs:string" use="required" name="attributeOnlyBanana"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetConfigType" substitutionGroup="mule:abstract-operator" name="get-config"></xs:element>
-  <xs:complexType name="GetConfigType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetLunchType" substitutionGroup="mule:abstract-operator" name="get-lunch"></xs:element>
-  <xs:complexType name="GetLunchType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="grape-config">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="mule:abstractExtensionType">
-          <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
-          </xs:sequence>
-          <xs:attribute type="xs:string" use="required" name="name">
-            <xs:annotation>
-              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension"
+                abstract="true" name="abstract-grouped-food"></xs:element>
+    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" substitutionGroup="vegan:abstract-grouped-food"
+                name="grouped-food">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="vegan:org.mule.test.vegan.extension.GroupedFood">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension"
+                name="pear-config">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                    <xs:attribute type="xs:string" use="required" name="name">
+                        <xs:annotation>
+                            <xs:documentation>The identifier of this element used to reference it in other components
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension"
+                name="apple-config">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="main-producers">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="main-producer">
+                                        <xs:complexType>
+                                            <xs:attribute type="mule:expressionString" use="required"
+                                                          name="value"></xs:attribute>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="sample">
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                                                  base="vegan:org.mule.test.vegan.extension.HealthyFood"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="cook-book">
+                            <xs:complexType>
+                                <xs:choice minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1"
+                                                maxOccurs="1" ref="vegan:abstract-vegan-cook-book"></xs:element>
+                                    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1"
+                                                maxOccurs="1" ref="vegan:global-abstract-vegan-cook-book"></xs:element>
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="mule:expressionInt" use="optional" default="10"
+                                  name="timeToPeel"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="mainProducers"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="sample"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="shouldNotOverride"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="cookBook"></xs:attribute>
+                    <xs:attribute type="xs:string" use="required" name="name">
+                        <xs:annotation>
+                            <xs:documentation>The identifier of this element used to reference it in other components
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.vegan.extension.VeganCookBook">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="recipes">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="recipe">
+                                    <xs:complexType>
+                                        <xs:attribute type="mule:expressionString" use="required"
+                                                      name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionList" use="optional" name="recipes"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" name="numberOfPages"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" default="Enemies of Bondiola"
+                              name="editorial"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="grape-connection">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="mule:abstractConnectionProviderType">
-          <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="vegan-policy">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.VeganPolicy"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-          </xs:sequence>
-          <xs:attribute type="xs:string" use="optional" name="veganPolicy"></xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                type="vegan:org.mule.test.vegan.extension.VeganCookBook"
+                substitutionGroup="mule:abstract-shared-extension" abstract="true"
+                name="global-abstract-vegan-cook-book"></xs:element>
+    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                type="vegan:org.mule.test.vegan.extension.VeganCookBook" abstract="true"
+                name="abstract-vegan-cook-book"></xs:element>
+    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                substitutionGroup="vegan:abstract-vegan-cook-book" name="vegan-cook-book">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="vegan:org.mule.test.vegan.extension.VeganCookBook"></xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                substitutionGroup="mule:abstractConnectionProvider" name="apple-connection">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mule:abstractConnectionProviderType">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="PaulMcCartneySourceType" substitutionGroup="mule:abstract-message-source"
+                name="paul-mc-cartney-source"></xs:element>
+    <xs:complexType name="PaulMcCartneySourceType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>The name of the configuration to be used to execute this component
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+                    <xs:annotation>
+                        <xs:documentation>Whether this source should only be executed on the primary node when runnning
+                            in Cluster
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:complexType name="org.mule.test.vegan.extension.VeganPolicy">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="meetAllowed"></xs:attribute>
-        <xs:attribute type="mule:expressionInt" use="optional" name="saltMiligrams"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="saltReplacementName"></xs:attribute>
-        <xs:attribute type="mule:expressionInt" use="optional" default="500" name="maxCalories"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GrapeOperationType" substitutionGroup="mule:abstract-operator" name="grape-operation"></xs:element>
-  <xs:complexType name="GrapeOperationType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="kiwi-config">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="mule:abstractExtensionType">
-          <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
-          </xs:sequence>
-          <xs:attribute type="xs:string" use="required" name="name">
-            <xs:annotation>
-              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="Harvest-applesType" substitutionGroup="mule:abstract-message-source"
+                name="harvest-apples"></xs:element>
+    <xs:complexType name="Harvest-applesType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="main-producers">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="main-producer">
+                                    <xs:complexType>
+                                        <xs:attribute type="mule:expressionString" use="required"
+                                                      name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="pojo-grouped-food">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                                              base="vegan:org.mule.test.vegan.extension.GroupedFood"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="sample">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                                              base="vegan:org.mule.test.vegan.extension.HealthyFood"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="as-group-inline">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension base="mule:abstractExtensionType">
+                                    <xs:sequence>
+                                        <xs:element minOccurs="0" maxOccurs="1" name="food">
+                                            <xs:complexType>
+                                                <xs:choice minOccurs="1" maxOccurs="1">
+                                                    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                                                                minOccurs="1" maxOccurs="1"
+                                                                ref="vegan:abstract-farmed-food"></xs:element>
+                                                    <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                                                                minOccurs="1" maxOccurs="1"
+                                                                ref="vegan:global-abstract-farmed-food"></xs:element>
+                                                </xs:choice>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
+                                </xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="response">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension base="mule:abstractExtensionType">
+                                    <xs:sequence></xs:sequence>
+                                    <xs:attribute type="mule:expressionInt" use="optional"
+                                                  name="timeToPeel"></xs:attribute>
+                                </xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="key"></xs:attribute>
+                <xs:attribute type="mule:substitutableName" use="optional" name="mainProducers"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="shouldNotOverride"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="flowName"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="pojoGroupedFood"></xs:attribute>
+                <xs:attribute type="xs:string" use="required" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>The name of the configuration to be used to execute this component
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+                    <xs:annotation>
+                        <xs:documentation>Whether this source should only be executed on the primary node when runnning
+                            in Cluster
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="sample"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="kiwi-connection">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="mule:abstractConnectionProviderType">
-          <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
-          </xs:sequence>
-        </xs:extension>
-      </xs:complexContent>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="EatAppleType" substitutionGroup="mule:abstract-operator" name="eat-apple"></xs:element>
+    <xs:complexType name="EatAppleType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionString" use="optional" name="key"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+                    <xs:annotation>
+                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
+                    <xs:annotation>
+                        <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="required" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>The name of the configuration to be used to execute this component
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="EatKiwiType" substitutionGroup="mule:abstract-operator" name="eat-kiwi"></xs:element>
-  <xs:complexType name="EatKiwiType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="peach-config">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="mule:abstractExtensionType">
-          <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
-          </xs:sequence>
-          <xs:attribute type="xs:string" use="required" name="name">
-            <xs:annotation>
-              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="GetFruitSampleType" substitutionGroup="mule:abstract-operator"
+                name="get-fruit-sample"></xs:element>
+    <xs:complexType name="GetFruitSampleType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="sample">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                                              base="vegan:org.mule.test.vegan.extension.HealthyFood"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="sample"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>The name of the configuration to be used to execute this component
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="connection">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="mule:abstractConnectionProviderType">
-          <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
-          </xs:sequence>
-        </xs:extension>
-      </xs:complexContent>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="GetNotOverridenParameterType" substitutionGroup="mule:abstract-operator"
+                name="get-not-overriden-parameter"></xs:element>
+    <xs:complexType name="GetNotOverridenParameterType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:attribute type="mule:expressionString" use="optional" name="shouldNotOverride"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>The name of the configuration to be used to execute this component
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="Harvest-peachesType" substitutionGroup="mule:abstract-message-source" name="harvest-peaches"></xs:element>
-  <xs:complexType name="Harvest-peachesType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
-          <xs:annotation>
-            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="AddVeganProductsDescriptionsType" substitutionGroup="mule:abstract-operator" name="add-vegan-products-descriptions"></xs:element>
-  <xs:complexType name="AddVeganProductsDescriptionsType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="product-descriptions">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="unbounded" name="product-description">
-                  <xs:complexType>
-                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                  </xs:complexType>
-                </xs:element>
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="mule:expressionMap" use="optional" name="productDescription"></xs:attribute>
-        <xs:attribute type="mule:substitutableInt" use="optional" default="2" name="eloquenceLevel"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ApplyPolicyType" substitutionGroup="mule:abstract-operator" name="apply-policy"></xs:element>
-  <xs:complexType name="ApplyPolicyType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="policy">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.VeganPolicy"></xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="policy"></xs:attribute>
-        <xs:attribute type="mule:substitutableInt" use="optional" default="2" name="eloquenceLevel"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ConsumingGroupedFoodType" substitutionGroup="mule:abstract-operator" name="consuming-grouped-food"></xs:element>
-  <xs:complexType name="ConsumingGroupedFoodType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="pojo-grouped-food">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.GroupedFood"></xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="food">
-            <xs:complexType>
-              <xs:choice minOccurs="1" maxOccurs="1">
-                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
-                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
-              </xs:choice>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="pojoGroupedFood"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="argument1"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="argument2"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="argument3"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ConvinceAnimalKillerType" substitutionGroup="mule:abstract-operator" name="convince-animal-killer"></xs:element>
-  <xs:complexType name="ConvinceAnimalKillerType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="mule:substitutableInt" use="optional" default="2" name="eloquenceLevel"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="argument1"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="argument2"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="argument3"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="EatWatermelonType" substitutionGroup="mule:abstract-operator" name="eat-watermelon"></xs:element>
-  <xs:complexType name="EatWatermelonType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="fruit">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.tck.testmodels.fruit.WaterMelon"></xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="fruit"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="org.mule.tck.testmodels.fruit.WaterMelon">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="mule:expressionBoolean" use="optional" name="bitten"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="brand"></xs:attribute>
-        <xs:attribute type="mule:expressionDouble" use="optional" name="radius"></xs:attribute>
-        <xs:attribute type="mule:expressionInt" use="optional" name="seeds"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="state"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetAllApplesType" substitutionGroup="mule:abstract-operator" name="get-all-apples"></xs:element>
-  <xs:complexType name="GetAllApplesType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="apples"></xs:element>
-        </xs:sequence>
-        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-          <xs:annotation>
-            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetHealthyFoodType" substitutionGroup="mule:abstract-operator" name="get-healthy-food"></xs:element>
-  <xs:complexType name="GetHealthyFoodType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="healthy-food">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" base="vegan:org.mule.test.vegan.extension.HealthyFood"></xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="healthyFood"></xs:attribute>
-        <xs:attribute type="mule:substitutableInt" use="optional" default="2" name="eloquenceLevel"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetProductionType" substitutionGroup="mule:abstract-operator" name="get-production"></xs:element>
-  <xs:complexType name="GetProductionType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="food">
-            <xs:complexType>
-              <xs:choice minOccurs="1" maxOccurs="1">
-                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
-                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
-              </xs:choice>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
-        <xs:attribute type="mule:substitutableInt" use="optional" default="2" name="eloquenceLevel"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="RegisterVeganProductsType" substitutionGroup="mule:abstract-operator" name="register-vegan-products"></xs:element>
-  <xs:complexType name="RegisterVeganProductsType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="products">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="unbounded" name="product">
-                  <xs:complexType>
-                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                  </xs:complexType>
-                </xs:element>
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="mule:expressionList" use="optional" name="products"></xs:attribute>
-        <xs:attribute type="mule:substitutableInt" use="optional" default="2" name="eloquenceLevel"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-          <xs:annotation>
-            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TryEatType" substitutionGroup="mule:abstract-operator" name="try-eat"></xs:element>
-  <xs:complexType name="TryEatType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="xs:string" use="required" name="food"></xs:attribute>
-        <xs:attribute type="mule:expressionMap" use="optional" name="menu"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="argument1"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="argument2"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="argument3"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="TryToEatThisListOfMapsType" substitutionGroup="mule:abstract-operator" name="try-to-eat-this-list-of-maps"></xs:element>
-  <xs:complexType name="TryToEatThisListOfMapsType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="foods"></xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="argument1"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="argument2"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="argument3"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="GetProducersType" substitutionGroup="mule:abstract-operator" name="get-producers"></xs:element>
+    <xs:complexType name="GetProducersType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="main-producers">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="main-producer">
+                                    <xs:complexType>
+                                        <xs:attribute type="mule:expressionString" use="required"
+                                                      name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionList" use="optional" name="mainProducers"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+                    <xs:annotation>
+                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>The name of the configuration to be used to execute this component
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="GetTimeToPeelType" substitutionGroup="mule:abstract-operator"
+                name="get-time-to-peel"></xs:element>
+    <xs:complexType name="GetTimeToPeelType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:attribute type="mule:expressionInt" use="optional" name="timeToPeel"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>The name of the configuration to be used to execute this component
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="SpreadTheWordType" substitutionGroup="mule:abstract-operator" name="spread-the-word"></xs:element>
+    <xs:complexType name="SpreadTheWordType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:attribute type="mule:expressionString" use="required" name="theWord"></xs:attribute>
+                <xs:attribute type="mule:substitutableInt" use="optional" default="2"
+                              name="eloquenceLevel"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>The name of the configuration to be used to execute this component
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension"
+                name="banana-config">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="main-producers">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="main-producer">
+                                        <xs:complexType>
+                                            <xs:attribute type="mule:expressionString" use="required"
+                                                          name="value"></xs:attribute>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="sample">
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                                                  base="vegan:org.mule.test.vegan.extension.HealthyFood"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="healthy-food">
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                                                  base="vegan:org.mule.test.vegan.extension.HealthyFood"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="mule:expressionInt" use="optional" default="10"
+                                  name="timeToPeel"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="mainProducers"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="sample"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="shouldNotOverride"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="healthyFood"></xs:attribute>
+                    <xs:attribute type="xs:string" use="required" name="name">
+                        <xs:annotation>
+                            <xs:documentation>The identifier of this element used to reference it in other components
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                substitutionGroup="mule:abstractConnectionProvider" name="banana-plantain-connection">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mule:abstractConnectionProviderType">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="mule:expressionString" use="optional" default="Ecuador"
+                                  name="originCountry"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="EatBananaType" substitutionGroup="mule:abstract-operator" name="eat-banana"></xs:element>
+    <xs:complexType name="EatBananaType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>The name of the configuration to be used to execute this component
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="EatPealedType" substitutionGroup="mule:abstract-operator" name="eat-pealed"></xs:element>
+    <xs:complexType name="EatPealedType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:attribute type="xs:string" use="required" name="attributeOnlyBanana"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>The name of the configuration to be used to execute this component
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="GetConfigType" substitutionGroup="mule:abstract-operator" name="get-config"></xs:element>
+    <xs:complexType name="GetConfigType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>The name of the configuration to be used to execute this component
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="GetLunchType" substitutionGroup="mule:abstract-operator" name="get-lunch"></xs:element>
+    <xs:complexType name="GetLunchType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>The name of the configuration to be used to execute this component
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension"
+                name="grape-config">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="xs:string" use="required" name="name">
+                        <xs:annotation>
+                            <xs:documentation>The identifier of this element used to reference it in other components
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                substitutionGroup="mule:abstractConnectionProvider" name="grape-connection">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mule:abstractConnectionProviderType">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="vegan-policy">
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                                                  base="vegan:org.mule.test.vegan.extension.VeganPolicy"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="xs:string" use="optional" name="veganPolicy"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.vegan.extension.VeganPolicy">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionBoolean" use="optional" default="false"
+                              name="meetAllowed"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" name="saltMiligrams"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="saltReplacementName"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" default="500" name="maxCalories"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="GrapeOperationType" substitutionGroup="mule:abstract-operator"
+                name="grape-operation"></xs:element>
+    <xs:complexType name="GrapeOperationType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>The name of the configuration to be used to execute this component
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension"
+                name="kiwi-config">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="xs:string" use="required" name="name">
+                        <xs:annotation>
+                            <xs:documentation>The identifier of this element used to reference it in other components
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                substitutionGroup="mule:abstractConnectionProvider" name="kiwi-connection">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mule:abstractConnectionProviderType">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="EatKiwiType" substitutionGroup="mule:abstract-operator" name="eat-kiwi"></xs:element>
+    <xs:complexType name="EatKiwiType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>The name of the configuration to be used to execute this component
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension"
+                name="peach-config">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="xs:string" use="required" name="name">
+                        <xs:annotation>
+                            <xs:documentation>The identifier of this element used to reference it in other components
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                substitutionGroup="mule:abstractConnectionProvider" name="connection">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mule:abstractConnectionProviderType">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="Harvest-peachesType" substitutionGroup="mule:abstract-message-source"
+                name="harvest-peaches"></xs:element>
+    <xs:complexType name="Harvest-peachesType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>The name of the configuration to be used to execute this component
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+                    <xs:annotation>
+                        <xs:documentation>Whether this source should only be executed on the primary node when runnning
+                            in Cluster
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="AddVeganProductsDescriptionsType" substitutionGroup="mule:abstract-operator"
+                name="add-vegan-products-descriptions"></xs:element>
+    <xs:complexType name="AddVeganProductsDescriptionsType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="product-descriptions">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="product-description">
+                                    <xs:complexType>
+                                        <xs:attribute type="mule:expressionString" use="required"
+                                                      name="key"></xs:attribute>
+                                        <xs:attribute type="mule:expressionString" use="required"
+                                                      name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionMap" use="optional" name="productDescription"></xs:attribute>
+                <xs:attribute type="mule:substitutableInt" use="optional" default="2"
+                              name="eloquenceLevel"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="ApplyPolicyType" substitutionGroup="mule:abstract-operator" name="apply-policy"></xs:element>
+    <xs:complexType name="ApplyPolicyType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="policy">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                                              base="vegan:org.mule.test.vegan.extension.VeganPolicy"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="policy"></xs:attribute>
+                <xs:attribute type="mule:substitutableInt" use="optional" default="2"
+                              name="eloquenceLevel"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="ConsumingGroupedFoodType" substitutionGroup="mule:abstract-operator"
+                name="consuming-grouped-food"></xs:element>
+    <xs:complexType name="ConsumingGroupedFoodType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="pojo-grouped-food">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                                              base="vegan:org.mule.test.vegan.extension.GroupedFood"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="food">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1"
+                                            maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
+                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1"
+                                            maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="pojoGroupedFood"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="argument1"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="argument2"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="argument3"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="ConvinceAnimalKillerType" substitutionGroup="mule:abstract-operator"
+                name="convince-animal-killer"></xs:element>
+    <xs:complexType name="ConvinceAnimalKillerType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:attribute type="mule:substitutableInt" use="optional" default="2"
+                              name="eloquenceLevel"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="argument1"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="argument2"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="argument3"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="EatWatermelonType" substitutionGroup="mule:abstract-operator" name="eat-watermelon"></xs:element>
+    <xs:complexType name="EatWatermelonType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="fruit">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                                              base="vegan:org.mule.tck.testmodels.fruit.WaterMelon"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="fruit"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="org.mule.tck.testmodels.fruit.WaterMelon">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionBoolean" use="optional" name="bitten"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="brand"></xs:attribute>
+                <xs:attribute type="mule:expressionDouble" use="optional" name="radius"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" name="seeds"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="state"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="GetAllApplesType" substitutionGroup="mule:abstract-operator" name="get-all-apples"></xs:element>
+    <xs:complexType name="GetAllApplesType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="apples"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+                    <xs:annotation>
+                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="GetHealthyFoodType" substitutionGroup="mule:abstract-operator"
+                name="get-healthy-food"></xs:element>
+    <xs:complexType name="GetHealthyFoodType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="healthy-food">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+                                              base="vegan:org.mule.test.vegan.extension.HealthyFood"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="healthyFood"></xs:attribute>
+                <xs:attribute type="mule:substitutableInt" use="optional" default="2"
+                              name="eloquenceLevel"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="GetProductionType" substitutionGroup="mule:abstract-operator" name="get-production"></xs:element>
+    <xs:complexType name="GetProductionType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="food">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1"
+                                            maxOccurs="1" ref="vegan:abstract-farmed-food"></xs:element>
+                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1"
+                                            maxOccurs="1" ref="vegan:global-abstract-farmed-food"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="food"></xs:attribute>
+                <xs:attribute type="mule:substitutableInt" use="optional" default="2"
+                              name="eloquenceLevel"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="RegisterVeganProductsType" substitutionGroup="mule:abstract-operator"
+                name="register-vegan-products"></xs:element>
+    <xs:complexType name="RegisterVeganProductsType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="products">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="product">
+                                    <xs:complexType>
+                                        <xs:attribute type="mule:expressionString" use="required"
+                                                      name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionList" use="optional" name="products"></xs:attribute>
+                <xs:attribute type="mule:substitutableInt" use="optional" default="2"
+                              name="eloquenceLevel"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+                    <xs:annotation>
+                        <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="TryEatType" substitutionGroup="mule:abstract-operator" name="try-eat"></xs:element>
+    <xs:complexType name="TryEatType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:attribute type="xs:string" use="required" name="food"></xs:attribute>
+                <xs:attribute type="mule:expressionMap" use="optional" name="menu"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="argument1"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="argument2"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="argument3"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/vegan" xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                type="TryToEatThisListOfMapsType" substitutionGroup="mule:abstract-operator"
+                name="try-to-eat-this-list-of-maps"></xs:element>
+    <xs:complexType name="TryToEatThisListOfMapsType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="foods"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="argument1"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="argument2"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="argument3"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 </xs:schema>

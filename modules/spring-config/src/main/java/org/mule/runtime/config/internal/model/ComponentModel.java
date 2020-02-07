@@ -675,10 +675,7 @@ public abstract class ComponentModel {
               ComponentIdentifier itemIdentifier = getIdentifier(itemDsl).get();
               Map<MetadataType, Optional<DslElementSyntax>> typesDslMap = new HashMap<>();
               typesDslMap.putAll(extensionModelHelper.resolveSubTypes(itemType));
-
-              if (!itemDsl.isWrapped()) {
-                typesDslMap.put(itemType, of(itemDsl));
-              }
+              typesDslMap.put(itemType, of(itemDsl));
 
               Map<ComponentIdentifier, MetadataType> itemIdentifiers = new HashMap<>();
               itemIdentifiers.put(itemIdentifier, itemType);
