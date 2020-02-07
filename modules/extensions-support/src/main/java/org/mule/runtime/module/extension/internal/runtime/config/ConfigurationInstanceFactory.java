@@ -124,8 +124,7 @@ public final class ConfigurationInstanceFactory<T> {
 
     if (requiresConnection && connectionProviderResolver.isPresent()) {
       ConnectionProviderValueResolver<C> resolver = connectionProviderResolver.get();
-      try (ValueResolvingContext cxt = ValueResolvingContext.builder(event, expressionManager)
-          .withProperty(CONFIGURATION_MODEL_PROPERTY_NAME, configurationModel).build()) {
+      try (ValueResolvingContext cxt = ValueResolvingContext.builder(event, expressionManager).build()) {
         connectionProvider = ofNullable(resolver.resolve(cxt));
       }
     } else {

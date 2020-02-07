@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.connection;
 import org.mule.runtime.api.config.HasPoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.retry.HasReconnectionConfig;
 
@@ -23,4 +24,5 @@ public interface ConnectionProviderWrapper<C>
 
   RetryPolicyTemplate getRetryPolicyTemplate();
 
+  ConnectionManagementType getConnectionManagementType();
 }

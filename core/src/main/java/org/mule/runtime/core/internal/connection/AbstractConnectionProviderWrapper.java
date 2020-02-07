@@ -7,6 +7,9 @@
 package org.mule.runtime.core.internal.connection;
 
 import static java.util.Optional.empty;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -14,13 +17,17 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.config.PoolingProfile;
+import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 
 import java.util.Optional;
 
@@ -87,6 +94,21 @@ public abstract class AbstractConnectionProviderWrapper<C> implements Connection
   }
 
   @Override
+  public ConnectionManagementType getConnectionManagementType() {
+    if (delegate instanceof ConnectionProviderWrapper) {
+      return ((ConnectionProviderWrapper<C>) delegate).getConnectionManagementType();
+    }
+    ConnectionManagementType type = NONE;
+    if (delegate instanceof PoolingConnectionProvider) {
+      type = POOLING;
+    } else if (delegate instanceof CachedConnectionProvider) {
+      type = CACHED;
+    }
+
+    return type;
+  }
+
+  @Override
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(delegate, true, muleContext);
     initialiseIfNeeded(getRetryPolicyTemplate(), true, muleContext);
@@ -112,6 +134,11 @@ public abstract class AbstractConnectionProviderWrapper<C> implements Connection
 
   @Override
   public Optional<PoolingProfile> getPoolingProfile() {
+    return empty();
+  }
+
+  @Override
+  public Optional<ReconnectionConfig> getReconnectionConfig() {
     return empty();
   }
 }
