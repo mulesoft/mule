@@ -35,10 +35,6 @@
         <reconnection:sticky-paged-operation failOn="#[payload]" config-ref="reconnection_Config"/>
     </flow>
 
-    <flow name="notClosableFailingPagedOperation">
-        <reconnection:not-closable-failing-paged-operation failOn="#[payload]" config-ref="reconnection_Config"/>
-    </flow>
-
     <flow name="getReconnectionFromConfig">
         <reconnection:get-retry-policy-template config-ref="reconnection_Config"/>
     </flow>

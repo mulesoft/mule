@@ -127,15 +127,6 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   @Test
-  public void pagingProviderIsClosedQuietlyDuringExceptionOnFirstPage() throws Exception {
-    resetCounters();
-    Iterator<ReconnectableConnection> iterator = getCursor("notClosableFailingPagedOperation", 1, VALIDATION);
-    ReconnectableConnection firstPage = iterator.next();
-    assertThat("Connection was not disconnected.", firstPage.getDisconnectCalls(), is(1));
-    assertThat("Paging provider was not closed.", closePagingProviderCalls, is(1));
-  }
-
-  @Test
   public void stickyConnectionIsClosedAndReconnectedDuringConnectionExceptionOnFirstPage() throws Exception {
     resetCounters();
     Iterator<ReconnectableConnection> iterator = getCursor("stickyPagedOperation", 1, CONNECTIVITY);

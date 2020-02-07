@@ -101,31 +101,4 @@ public class ReconnectionOperations {
       }
     };
   }
-
-  public PagingProvider<ReconnectableConnection, ReconnectableConnection> notClosableFailingPagedOperation(Integer failOn) {
-    return new PagingProvider<ReconnectableConnection, ReconnectableConnection>() {
-
-      @Override
-      public List<ReconnectableConnection> getPage(ReconnectableConnection connection) {
-        getPageCalls++;
-        if (getPageCalls == failOn) {
-          throw new ModuleException(CONNECTIVITY, new ConnectionException("An illegal argument was received."));
-        }
-        return singletonList(connection);
-      }
-
-      @Override
-      public Optional<Integer> getTotalResults(ReconnectableConnection connection) {
-        return empty();
-      }
-
-      @Override
-      public void close(ReconnectableConnection connection) {
-        closePagingProviderCalls++;
-        if (closePagingProviderCalls == failOn) {
-          throw new IllegalArgumentException("Failed to close Paging Provider.");
-        }
-      }
-    };
-  }
 }

@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -44,14 +45,12 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   public static final String COULD_NOT_OBTAIN_A_CONNECTION = "Could not obtain a connection for the configuration";
   public static final String COULD_NOT_CREATE_A_CONNECTION_SUPPLIER =
       "Could not obtain a connection supplier for the configuration";
-  public static final String COULD_NOT_CLOSE_PAGING_PROVIDER = "Could not close the Paging Provider";
-  public static final String COULD_NOT_EXECUTE = "Could not execute operation with connection";
   private PagingProvider<Object, T> delegate;
   private final ConfigurationInstance config;
   private final ExtensionConnectionSupplier extensionConnectionSupplier;
   private final ExecutionContextAdapter executionContext;
   private final ConnectionSupplierFactory connectionSupplierFactory;
-  private ConnectionSupplier connectionSupplier;
+  private ConnectionSupplier actualConnectionSupplier;
   private Boolean isFirstPage = true;
 
   public PagingProviderProducer(PagingProvider<Object, T> delegate,
@@ -92,18 +91,18 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    * @return
    */
   private <R> R performWithConnection(Function<Object, R> function) {
-    connectionSupplier = getConnectionSupplier();
-    Object connection = getConnection(connectionSupplier);
+    actualConnectionSupplier = getActualConnectionSupplier();
+    Object connection = getConnection(actualConnectionSupplier);
     try {
       R result = function.apply(connection);
-      connectionSupplier.close();
+      actualConnectionSupplier.close();
       return result;
-    } catch (Exception e) {
+    } catch (Exception exception) {
       if (isFirstPage) {
-        silentlyCloseDelegate(connection);
+        safely(() -> delegate.close(connection), e -> LOGGER.debug("Found exception closing buffer", e));
       }
-      extractConnectionException(e).ifPresent(ex -> connectionSupplier.invalidateConnection());
-      throw e;
+      extractConnectionException(exception).ifPresent(ex -> actualConnectionSupplier.invalidateConnection());
+      throw exception;
     }
   }
 
@@ -113,11 +112,11 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   @Override
   public void close() {
     try {
-      delegate.close(connectionSupplier.getConnection());
+      delegate.close(actualConnectionSupplier.getConnection());
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
     } finally {
-      connectionSupplier.close();
+      actualConnectionSupplier.close();
       connectionSupplierFactory.dispose();
     }
   }
@@ -130,7 +129,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     return new DefaultConnectionSupplierFactory();
   }
 
-  private ConnectionSupplier getConnectionSupplier() {
+  private ConnectionSupplier getActualConnectionSupplier() {
     try {
       return connectionSupplierFactory.getConnectionSupplier();
     } catch (MuleException e) {
@@ -143,14 +142,6 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       return connectionSupplier.getConnection();
     } catch (MuleException e) {
       throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
-    }
-  }
-
-  private void silentlyCloseDelegate(Object connection) {
-    try {
-      delegate.close(connection);
-    } catch (Exception e) {
-      LOGGER.error(COULD_NOT_CLOSE_PAGING_PROVIDER, e);
     }
   }
 
