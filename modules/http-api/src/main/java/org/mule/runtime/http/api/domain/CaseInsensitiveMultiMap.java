@@ -8,11 +8,10 @@
 package org.mule.runtime.http.api.domain;
 
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 
 import org.mule.api.annotation.NoExtend;
-import org.mule.runtime.api.el.DataTypeAware;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.api.util.MultiMap;
 
@@ -25,17 +24,11 @@ import java.util.LinkedList;
  * @since 4.0
  */
 @NoExtend
-public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements DataTypeAware {
+public class CaseInsensitiveMultiMap extends AbstractCaseInsensitiveMultiMap {
 
   private static final long serialVersionUID = -3754163327838153655L;
 
   private static final CaseInsensitiveMultiMap EMPTY_MAP = new CaseInsensitiveMultiMap().toImmutableMultiMap();
-
-  private static final DataType dataType = DataType.builder()
-      .mapType(CaseInsensitiveMultiMap.class)
-      .keyType(String.class)
-      .valueType(String.class)
-      .build();
 
   /**
    * Returns an empty case-insensitive-multi-map (immutable). This map is serializable.
@@ -73,23 +66,21 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
   }
 
   public CaseInsensitiveMultiMap(MultiMap<String, String> multiMap, boolean optimized) {
-
-    this.optimized = optimized;
+    /* this.optimized = optimized;
     this.paramsMap = optimized
         ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>())
         : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
-    putAll(multiMap);
-    /*
+    putAll(multiMap);*/
     this.optimized = optimized;
     if (multiMap instanceof CaseInsensitiveMultiMap) {
-    //this.paramsMap = ((CaseInsensitiveMapWrapper)((CaseInsensitiveMultiMap)multiMap).paramsMap).copy();
-    this.createParamsMap((CaseInsensitiveMultiMap) multiMap);
+      //this.paramsMap = ((CaseInsensitiveMapWrapper)((CaseInsensitiveMultiMap)multiMap).paramsMap).copy();
+      this.createParamsMap((CaseInsensitiveMultiMap) multiMap);
     } else {
-    this.paramsMap = optimized
-        ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>())
-        : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
-    putAll(multiMap);
-    }*/
+      this.paramsMap = optimized
+          ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>())
+          : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
+      putAll(multiMap);
+    }
   }
 
   private void createParamsMap(CaseInsensitiveMultiMap multiMap) {
@@ -118,10 +109,10 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
     }
   }
 
-  public static CaseInsensitiveMultiMap fromMultiMap(MultiMap<String, String> multiMap) {
+  public static AbstractCaseInsensitiveMultiMap fromMultiMap(MultiMap<String, String> multiMap) {
     if (multiMap != null) {
-      if (multiMap instanceof CaseInsensitiveMultiMap) {
-        return (CaseInsensitiveMultiMap) multiMap;
+      if (multiMap instanceof AbstractCaseInsensitiveMultiMap) {
+        return (AbstractCaseInsensitiveMultiMap) multiMap;
       } else {
         return new CaseInsensitiveMultiMap(multiMap);
       }
@@ -145,7 +136,7 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
 
   private static class ImmutableCaseInsensitiveMultiMap extends CaseInsensitiveMultiMap {
 
-    private static final long serialVersionUID = -1048913048598100657L;
+    private static final long serialVersionUID = 3979199753090570561L;
 
     public ImmutableCaseInsensitiveMultiMap(CaseInsensitiveMultiMap caseInsensitiveMultiMap) {
       super(caseInsensitiveMultiMap, caseInsensitiveMultiMap.optimized);
@@ -158,8 +149,13 @@ public class CaseInsensitiveMultiMap extends MultiMap<String, String> implements
     }
   }
 
-  @Override
-  public DataType getDataType() {
-    return dataType;
+  public static AbstractCaseInsensitiveMultiMap unmodifiableCaseInsensitiveMultiMap(AbstractCaseInsensitiveMultiMap m) {
+    requireNonNull(m);
+    if (m instanceof UnmodifiableCaseInsensitiveMultiMap || m instanceof ImmutableCaseInsensitiveMultiMap) {
+      return m;
+    } else if (m instanceof CaseInsensitiveMultiMap) {
+      return new UnmodifiableCaseInsensitiveMultiMap((CaseInsensitiveMultiMap) m);
+    }
+    return null;
   }
 }

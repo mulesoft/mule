@@ -7,7 +7,7 @@
 package org.mule.runtime.http.api.domain.message;
 
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap;
+import org.mule.runtime.http.api.domain.AbstractCaseInsensitiveMultiMap;
 
 import java.util.Collection;
 
@@ -20,7 +20,7 @@ import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.fromMulti
  */
 public abstract class BaseMessageWithHeaders implements MessageWithHeaders {
 
-  protected CaseInsensitiveMultiMap headers;
+  protected AbstractCaseInsensitiveMultiMap headers;
 
   public BaseMessageWithHeaders(MultiMap<String, String> headers) {
     if (headers != null) {

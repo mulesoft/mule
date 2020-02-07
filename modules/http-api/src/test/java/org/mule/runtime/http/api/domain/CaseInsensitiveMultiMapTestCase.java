@@ -11,8 +11,10 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.util.MultiMap.unmodifiableMultiMap;
+import static org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap.unmodifiableCaseInsensitiveMultiMap;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.MULTI_MAP;
 
@@ -20,6 +22,9 @@ import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.api.util.MultiMapTestCase;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -116,6 +121,40 @@ public class CaseInsensitiveMultiMapTestCase extends MultiMapTestCase {
 
     assertThat(otherMultiMap, is(equalTo(multiMap)));
     assertThat(multiMap, is(equalTo(otherMultiMap)));
+  }
+
+  @Test(expected = UnsupportedOperationException.class)
+  public void unmodifiableMultiMapFailsOnPut() {
+    CaseInsensitiveMultiMap map = new CaseInsensitiveMultiMap();
+    unmodifiableCaseInsensitiveMultiMap(map).put(KEY_1, VALUE_1);
+  }
+
+  @Test(expected = UnsupportedOperationException.class)
+  public void unmodifiableMultiMapFailsOnPutAll() {
+    CaseInsensitiveMultiMap map = new CaseInsensitiveMultiMap();
+    map.put(KEY_1, VALUE_1);
+    unmodifiableMultiMap(multiMap).putAll(map);
+  }
+
+  @Test(expected = UnsupportedOperationException.class)
+  public void unmodifiableMultiMapFailsOnRemove() {
+    unmodifiableCaseInsensitiveMultiMap((CaseInsensitiveMultiMap) multiMap).remove(KEY_1);
+  }
+
+  @Test(expected = UnsupportedOperationException.class)
+  public void unmodifiableMultiMapFailsOnClear() {
+    unmodifiableCaseInsensitiveMultiMap((CaseInsensitiveMultiMap) multiMap).clear();
+  }
+
+  @Test
+  public void toUnmodifiableMapKeepsOrder() {
+    multiMap.put(KEY_3, VALUE_1);
+    multiMap.put(KEY_2, VALUE_1);
+    multiMap.put(KEY_1, VALUE_1);
+    List<Map.Entry<String, String>> entryList = multiMap.entryList();
+    List<Map.Entry<String, String>> immutableEntryList =
+        unmodifiableCaseInsensitiveMultiMap((CaseInsensitiveMultiMap) multiMap).entryList();
+    assertEquals(entryList, immutableEntryList);
   }
 
 }

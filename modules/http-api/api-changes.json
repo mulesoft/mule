@@ -3,11 +3,21 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap",
+          "new": "class org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap",
+          "superClass": "org.mule.runtime.http.api.domain.AbstractCaseInsensitiveMultiMap",
+          "package": "org.mule.runtime.http.api.domain",
+          "classSimpleName": "CaseInsensitiveMultiMap",
+          "elementKind": "class",
+          "justification": "Change HTTP MultiMap parameters to CaseInsensitiveMultiMap"
+        },
+        {
           "code": "java.field.typeChanged",
           "old": "field org.mule.runtime.http.api.domain.message.BaseMessageWithHeaders.headers",
           "new": "field org.mule.runtime.http.api.domain.message.BaseMessageWithHeaders.headers",
           "oldType": "org.mule.runtime.api.util.MultiMap<java.lang.String, java.lang.String>",
-          "newType": "org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap",
+          "newType": "org.mule.runtime.http.api.domain.AbstractCaseInsensitiveMultiMap",
           "package": "org.mule.runtime.http.api.domain.message",
           "classSimpleName": "BaseMessageWithHeaders",
           "fieldName": "headers",
