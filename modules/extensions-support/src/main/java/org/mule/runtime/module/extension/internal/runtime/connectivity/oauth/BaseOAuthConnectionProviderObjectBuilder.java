@@ -63,6 +63,17 @@ public abstract class BaseOAuthConnectionProviderObjectBuilder<C> extends Defaul
     super(providerModel, resolverSet, poolingProfile, reconnectionConfig, extensionModel, expressionManager, muleContext);
   }
 
+  public BaseOAuthConnectionProviderObjectBuilder(Class<?> prototypeClass, ConnectionProviderModel providerModel,
+                                                  ResolverSet resolverSet,
+                                                  PoolingProfile poolingProfile,
+                                                  ReconnectionConfig reconnectionConfig,
+                                                  ExtensionModel extensionModel,
+                                                  ExpressionManager expressionManager,
+                                                  MuleContext muleContext) {
+    super(prototypeClass, providerModel, resolverSet, poolingProfile, reconnectionConfig, extensionModel, expressionManager,
+          muleContext);
+  }
+
   protected Optional<OAuthObjectStoreConfig> buildOAuthObjectStoreConfig(CoreEvent event) throws MuleException {
     final ValueResolver resolver = resolverSet.getResolvers().get(OAUTH_STORE_CONFIG_GROUP_NAME);
     if (resolver == null) {

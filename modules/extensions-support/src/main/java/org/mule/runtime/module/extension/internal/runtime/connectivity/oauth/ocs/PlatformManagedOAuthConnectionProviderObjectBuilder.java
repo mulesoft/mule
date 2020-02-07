@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs;
 
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.PLATFORM_MANAGED_CONNECTION_ID_PARAMETER_NAME;
+import static org.mule.runtime.module.extension.internal.runtime.config.ConfigurationInstanceFactory.CONFIGURATION_MODEL_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthConfig.from;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -14,6 +15,7 @@ import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
@@ -54,7 +56,8 @@ public class PlatformManagedOAuthConnectionProviderObjectBuilder<C> extends Base
                                                              ExtensionModel extensionModel,
                                                              ExpressionManager expressionManager,
                                                              MuleContext muleContext) {
-    super(providerModel, resolverSet, poolingProfile, reconnectionConfig, extensionModel, expressionManager, muleContext);
+    super(PlatformManagedOAuthConnectionProvider.class, providerModel, resolverSet, poolingProfile, reconnectionConfig,
+          extensionModel, expressionManager, muleContext);
     this.platformHandler = platformHandler;
     this.grantType = grantType;
     this.configurationProperties = configurationProperties;
@@ -62,18 +65,15 @@ public class PlatformManagedOAuthConnectionProviderObjectBuilder<C> extends Base
 
   @Override
   public Pair<ConnectionProvider<C>, ResolverSetResult> build(ValueResolvingContext context) throws MuleException {
+    final ConfigurationModel configurationModel = (ConfigurationModel) context.getProperty(CONFIGURATION_MODEL_PROPERTY_NAME);
     final ResolverSetResult resolverSetResult = resolverSet.resolve(context);
-    final Pair<ConnectionProviderModel, OAuthGrantType> delegateModel = getDelegateOAuthConnectionProviderModel(context);
-    final String ownerConfigName = context.getConfig().get().getName();
-    final String connectionUri = (String) context.getConfig().get()
-        .getState()
-        .getConnectionParameters()
-        .get(PLATFORM_MANAGED_CONNECTION_ID_PARAMETER_NAME);
-
+    final Pair<ConnectionProviderModel, OAuthGrantType> delegateModel =
+        getDelegateOAuthConnectionProviderModel(configurationModel);
+    final String ownerConfigName = configurationModel.getName();
+    final String connectionUri = (String) resolverSetResult.get(PLATFORM_MANAGED_CONNECTION_ID_PARAMETER_NAME);
     final PlatformManagedOAuthConfig config = from(ownerConfigName,
                                                    connectionUri,
                                                    grantType,
-                                                   context.getConfig().get(),
                                                    extensionModel,
                                                    delegateModel.getFirst(),
                                                    delegateModel.getSecond(),
@@ -87,11 +87,11 @@ public class PlatformManagedOAuthConnectionProviderObjectBuilder<C> extends Base
     return new Pair<>(provider, resolverSetResult);
   }
 
-  private Pair<ConnectionProviderModel, OAuthGrantType> getDelegateOAuthConnectionProviderModel(ValueResolvingContext context) {
+  private Pair<ConnectionProviderModel, OAuthGrantType> getDelegateOAuthConnectionProviderModel(ConfigurationModel configurationModel) {
     Reference<Pair<ConnectionProviderModel, OAuthGrantType>> authCodePair = new Reference<>();
     Reference<Pair<ConnectionProviderModel, OAuthGrantType>> clientCredentialsPair = new Reference<>();
 
-    for (ConnectionProviderModel cpModel : context.getConfig().get().getModel().getConnectionProviders()) {
+    for (ConnectionProviderModel cpModel : configurationModel.getConnectionProviders()) {
       if (authCodePair.get() != null) {
         break;
       }

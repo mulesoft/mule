@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
  */
 public final class ConfigurationInstanceFactory<T> {
 
+  public static final String CONFIGURATION_MODEL_PROPERTY_NAME = "Configuration model";
   private final ConfigurationModel configurationModel;
   private final ConfigurationObjectBuilder<T> configurationObjectBuilder;
   private final boolean requiresConnection;
@@ -86,7 +87,8 @@ public final class ConfigurationInstanceFactory<T> {
 
     Pair<T, ResolverSetResult> configValue = createConfigurationInstance(name, event);
     if (requiresConnection) {
-      try (ValueResolvingContext ctx = ValueResolvingContext.builder(event, expressionManager).build()) {
+      try (ValueResolvingContext ctx = ValueResolvingContext.builder(event, expressionManager)
+          .withProperty(CONFIGURATION_MODEL_PROPERTY_NAME, configurationModel).build()) {
         connectionProvider = ofNullable(resolver.resolve(ctx));
       }
     } else {
@@ -122,7 +124,8 @@ public final class ConfigurationInstanceFactory<T> {
 
     if (requiresConnection && connectionProviderResolver.isPresent()) {
       ConnectionProviderValueResolver<C> resolver = connectionProviderResolver.get();
-      try (ValueResolvingContext cxt = ValueResolvingContext.builder(event, expressionManager).build()) {
+      try (ValueResolvingContext cxt = ValueResolvingContext.builder(event, expressionManager)
+          .withProperty(CONFIGURATION_MODEL_PROPERTY_NAME, configurationModel).build()) {
         connectionProvider = ofNullable(resolver.resolve(cxt));
       }
     } else {

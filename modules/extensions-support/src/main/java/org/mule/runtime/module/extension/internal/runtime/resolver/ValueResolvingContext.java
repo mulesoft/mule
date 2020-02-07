@@ -15,6 +15,8 @@ import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -28,16 +30,19 @@ public class ValueResolvingContext implements AutoCloseable {
   private CoreEvent event;
   private final ConfigurationInstance config;
   private final ExpressionManagerSession session;
+  private final Map<String, Object> properties;
   private final boolean resolveCursors;
 
   private ValueResolvingContext(CoreEvent event,
                                 ExpressionManagerSession session,
                                 ConfigurationInstance config,
-                                boolean resolveCursors) {
+                                boolean resolveCursors,
+                                Map<String, Object> properties) {
     this.event = event;
     this.session = session;
     this.config = config;
     this.resolveCursors = resolveCursors;
+    this.properties = properties;
   }
 
   /**
@@ -85,6 +90,10 @@ public class ValueResolvingContext implements AutoCloseable {
     return ofNullable(config);
   }
 
+  public Object getProperty(String propertyName) {
+    return properties.get(propertyName);
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -122,6 +131,7 @@ public class ValueResolvingContext implements AutoCloseable {
 
     private CoreEvent event;
     private Optional<ConfigurationInstance> config = empty();
+    private Map<String, Object> properties = new HashMap<>();
     private ExpressionManager manager;
     private boolean resolveCursors = true;
 
@@ -145,6 +155,11 @@ public class ValueResolvingContext implements AutoCloseable {
       return this;
     }
 
+    public Builder withProperty(String propertyName, Object propertyValue) {
+      this.properties.put(propertyName, propertyValue);
+      return this;
+    }
+
     public Builder resolveCursors(boolean resolveCursors) {
       this.resolveCursors = resolveCursors;
       return this;
@@ -152,12 +167,12 @@ public class ValueResolvingContext implements AutoCloseable {
 
     public ValueResolvingContext build() {
       if (event == null) {
-        return new ValueResolvingContext(null, null, null, true);
+        return new ValueResolvingContext(null, null, null, true, properties);
       } else if (manager == null) {
-        return new ValueResolvingContext(event, null, config.orElse(null), resolveCursors);
+        return new ValueResolvingContext(event, null, config.orElse(null), resolveCursors, properties);
       } else {
         return new ValueResolvingContext(event, manager.openSession(event.asBindingContext()), config.orElse(null),
-                                         resolveCursors);
+                                         resolveCursors, properties);
       }
     }
   }
