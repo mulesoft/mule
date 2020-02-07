@@ -218,7 +218,7 @@
         <rhinoJsr223Version>1.1</rhinoJsr223Version>
         <saxonVersion>9.9.1-1</saxonVersion>
         <slf4jVersion>1.7.25</slf4jVersion>
-        <snakeYamlVersion>1.18</snakeYamlVersion>
+        <snakeYamlVersion>1.23</snakeYamlVersion>
         <springVersion>4.3.19.RELEASE</springVersion>
         <sshCoreVersion>1.4.0</sshCoreVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
@@ -2023,7 +2023,7 @@
                 <module>sources-community</module>
             </modules>
         </profile>
-		<profile>
+        <profile>
             <id>release</id>
             <properties>
                 <skipVerifications>false</skipVerifications>
