@@ -17,7 +17,6 @@ import static net.bytebuddy.implementation.bytecode.member.FieldAccess.forField;
 import static net.bytebuddy.implementation.bytecode.member.MethodReturn.VOID;
 import static net.bytebuddy.matcher.ElementMatchers.isConstructor;
 import static net.bytebuddy.matcher.ElementMatchers.named;
-import static net.bytebuddy.matcher.ElementMatchers.takesArgument;
 import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.FileUtils.TEMP_DIR;
@@ -32,24 +31,29 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResol
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.description.field.FieldDescription;
+import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription.ForLoadedType;
 import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.dynamic.DynamicType.Builder.MethodDefinition.ParameterDefinition.Annotatable;
 import net.bytebuddy.dynamic.DynamicType.Unloaded;
 import net.bytebuddy.dynamic.scaffold.InstrumentedType;
 import net.bytebuddy.implementation.Implementation;
+import net.bytebuddy.implementation.MethodCall;
+import net.bytebuddy.implementation.MethodCall.ArgumentLoader;
 import net.bytebuddy.implementation.bytecode.ByteCodeAppender;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
-import net.bytebuddy.implementation.bytecode.assign.TypeCasting;
-import net.bytebuddy.implementation.bytecode.constant.NullConstant;
+import net.bytebuddy.implementation.bytecode.assign.Assigner;
+import net.bytebuddy.implementation.bytecode.member.FieldAccess;
 import net.bytebuddy.implementation.bytecode.member.MethodInvocation;
-import net.bytebuddy.implementation.bytecode.member.MethodReturn;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 
 public class MethodExecutorGenerator {
@@ -60,10 +64,9 @@ public class MethodExecutorGenerator {
 
   public MethodExecutor generate(Object targetInstance,
                                  Method method,
-                                 ArgumentResolverDelegate argumentResolverDelegate)
-      throws Exception {
+                                 ArgumentResolverDelegate argumentResolverDelegate) throws Exception {
 
-    Class<MethodExecutor> executorClass = getExecutorClass(method);
+    Class<MethodExecutor> executorClass = getExecutorClass(method, targetInstance);
     List<Object> args = new ArrayList<>();
     args.add(targetInstance);
     args.addAll(asList(argumentResolverDelegate.getArgumentResolvers()));
@@ -71,13 +74,13 @@ public class MethodExecutorGenerator {
     return (MethodExecutor) executorClass.getConstructors()[0].newInstance(args.toArray(new Object[args.size()]));
   }
 
-  private Class<MethodExecutor> getExecutorClass(Method method) {
+  private Class<MethodExecutor> getExecutorClass(Method method, Object targetInstance) {
     String generatorName = getGeneratorName(method);
-    return executorClasses.computeIfAbsent(generatorName, key -> generateExecutorClass(key, method));
+    return executorClasses.computeIfAbsent(generatorName, key -> generateExecutorClass(key, method, targetInstance));
 
   }
 
-  private Class<MethodExecutor> generateExecutorClass(String generatorName, Method method) {
+  private Class<MethodExecutor> generateExecutorClass(String generatorName, Method method, Object targetInstance) {
     DynamicType.Builder<Object> operationWrapperClassBuilder = new ByteBuddy()
         .subclass(Object.class, NO_CONSTRUCTORS)
         .implement(MethodExecutor.class)
@@ -86,7 +89,7 @@ public class MethodExecutorGenerator {
 
     for (int i = 0; i < method.getParameterTypes().length; ++i) {
       operationWrapperClassBuilder = operationWrapperClassBuilder
-          .defineField(method.getParameters()[i].getName() + "Resolver",
+          .defineField(getParameterFieldName(method.getParameters()[i]),
                        parameterizedType(ArgumentResolver.class, method.getParameterTypes()[i]).build(),
                        PRIVATE, FINAL);
     }
@@ -98,7 +101,7 @@ public class MethodExecutorGenerator {
     for (int i = 0; i < method.getParameterTypes().length; ++i) {
       constructorDefinition = constructorDefinition
           .withParameter(parameterizedType(ArgumentResolver.class, method.getParameterTypes()[i]).build(),
-                         method.getParameters()[i].getName() + "Resolver");
+                         getParameterFieldName(method.getParameters()[i]));
     }
 
     final Unloaded<Object> byteBuddyMadeWrapper = constructorDefinition.intercept(new Implementation() {
@@ -114,27 +117,27 @@ public class MethodExecutorGenerator {
           List<StackManipulation> stackManipulationItems = new ArrayList<>();
 
           stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
-          stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Object.class)
-              .getDeclaredMethods()
-              .filter(isConstructor().and(takesArguments(0)))
-              .getOnly()));
+          stackManipulationItems.add(MethodInvocation.invoke(new ForLoadedType(Object.class)
+                                                                 .getDeclaredMethods()
+                                                                 .filter(isConstructor().and(takesArguments(0)))
+                                                                 .getOnly()));
           stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
           stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(1));
           stackManipulationItems.add(forField(implementationTarget
-              .getInstrumentedType()
-              .getDeclaredFields()
-              .filter(named(TARGET_INSTANCE_FIELD_NAME)).getOnly())
-                  .write());
+                                                  .getInstrumentedType()
+                                                  .getDeclaredFields()
+                                                  .filter(named(TARGET_INSTANCE_FIELD_NAME)).getOnly())
+                                         .write());
 
           for (int i = 0; i < method.getParameterTypes().length; ++i) {
             stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
             stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(i + 2));
             stackManipulationItems.add(forField(implementationTarget
-                .getInstrumentedType()
-                .getDeclaredFields()
-                .filter(named(method.getParameters()[i].getName() + "Resolver"))
-                .getOnly())
-                    .write());
+                                                    .getInstrumentedType()
+                                                    .getDeclaredFields()
+                                                    .filter(named(getParameterFieldName(method.getParameters()[i])))
+                                                    .getOnly())
+                                           .write());
           }
 
           stackManipulationItems.add(VOID);
@@ -148,151 +151,12 @@ public class MethodExecutorGenerator {
         .defineMethod("execute", Object.class, PUBLIC)
         .withParameter(ExecutionContext.class, "executionContext")
         .throwing(Exception.class)
-        .intercept(new Implementation() {
+        .intercept(MethodCall.invoke(method)
+                       .onField(TARGET_INSTANCE_FIELD_NAME)
+                       .with(getArgumentLoaders(method))
+                       .withAssigner(Assigner.DEFAULT, Assigner.Typing.DYNAMIC)
 
-          @Override
-          public InstrumentedType prepare(InstrumentedType instrumentedType) {
-            return instrumentedType;
-          }
-
-          @Override
-          public ByteCodeAppender appender(Target implementationTarget) {
-            return (methodVisitor, instrumentationContext, instrumentedMethod) -> {
-              List<StackManipulation> stackManipulationItems = new ArrayList<>();
-
-              stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
-              stackManipulationItems.add(forField(implementationTarget
-                  .getInstrumentedType()
-                  .getDeclaredFields()
-                  .filter(named(TARGET_INSTANCE_FIELD_NAME)).getOnly())
-                      .read());
-
-              for (int i = 0; i < method.getParameterTypes().length; ++i) {
-                stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
-                stackManipulationItems.add(forField(implementationTarget
-                    .getInstrumentedType()
-                    .getDeclaredFields()
-                    .filter(
-                            named(method.getParameters()[i].getName() + "Resolver"))
-                    .getOnly())
-                        .read());
-                stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(1));
-                stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(ArgumentResolver.class)
-                    .getDeclaredMethods()
-                    .filter(named("resolve"))
-                    .getOnly()));
-                final TypeDescription.ForLoadedType paramType =
-                    new TypeDescription.ForLoadedType(method.getParameterTypes()[i]);
-
-                if (paramType.isPrimitive()) {
-                  stackManipulationItems.add(TypeCasting.to(paramType.asBoxed()));
-
-                  if (int.class.equals(method.getParameterTypes()[i])) {
-                    stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Integer.class)
-                        .getDeclaredMethods()
-                        .filter(named("intValue"))
-                        .getOnly()));
-                  } else if (long.class.equals(method.getParameterTypes()[i])) {
-                    stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Long.class)
-                        .getDeclaredMethods()
-                        .filter(named("longValue"))
-                        .getOnly()));
-                  } else if (short.class.equals(method.getParameterTypes()[i])) {
-                    stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Short.class)
-                        .getDeclaredMethods()
-                        .filter(named("shortValue"))
-                        .getOnly()));
-                  } else if (double.class.equals(method.getParameterTypes()[i])) {
-                    stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Double.class)
-                        .getDeclaredMethods()
-                        .filter(named("doubleValue"))
-                        .getOnly()));
-                  } else if (float.class.equals(method.getParameterTypes()[i])) {
-                    stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Float.class)
-                        .getDeclaredMethods()
-                        .filter(named("floatValue"))
-                        .getOnly()));
-                  } else if (boolean.class.equals(method.getParameterTypes()[i])) {
-                    stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Boolean.class)
-                        .getDeclaredMethods()
-                        .filter(named("booleanValue"))
-                        .getOnly()));
-                  } else if (char.class.equals(method.getParameterTypes()[i])) {
-                    stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Character.class)
-                        .getDeclaredMethods()
-                        .filter(named("charValue"))
-                        .getOnly()));
-                  } else if (byte.class.equals(method.getParameterTypes()[i])) {
-                    stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Byte.class)
-                        .getDeclaredMethods()
-                        .filter(named("byteValue"))
-                        .getOnly()));
-                  }
-                } else {
-                  stackManipulationItems.add(TypeCasting.to(paramType));
-                }
-              }
-
-              stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(method.getDeclaringClass())
-                  .getDeclaredMethods()
-                  .filter(named(method.getName()))
-                  .getOnly()));
-
-              if (Void.TYPE.equals(method.getReturnType())) {
-                stackManipulationItems.add(NullConstant.INSTANCE);
-              } else if (int.class.equals(method.getReturnType())) {
-                stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Integer.class)
-                    .getDeclaredMethods()
-                    .filter(named("valueOf").and(takesArgument(0, int.class)))
-                    .getOnly()));
-              } else if (long.class.equals(method.getReturnType())) {
-                stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Long.class)
-                    .getDeclaredMethods()
-                    .filter(named("valueOf").and(takesArgument(0, long.class)))
-                    .getOnly()));
-              } else if (short.class.equals(method.getReturnType())) {
-                stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Short.class)
-                    .getDeclaredMethods()
-                    .filter(
-                            named("valueOf").and(takesArgument(0, short.class)))
-                    .getOnly()));
-              } else if (double.class.equals(method.getReturnType())) {
-                stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Double.class)
-                    .getDeclaredMethods()
-                    .filter(
-                            named("valueOf").and(takesArgument(0, double.class)))
-                    .getOnly()));
-              } else if (float.class.equals(method.getReturnType())) {
-                stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Float.class)
-                    .getDeclaredMethods()
-                    .filter(
-                            named("valueOf").and(takesArgument(0, float.class)))
-                    .getOnly()));
-              } else if (boolean.class.equals(method.getReturnType())) {
-                stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Boolean.class)
-                    .getDeclaredMethods()
-                    .filter(
-                            named("valueOf").and(takesArgument(0, boolean.class)))
-                    .getOnly()));
-              } else if (char.class.equals(method.getReturnType())) {
-                stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Character.class)
-                    .getDeclaredMethods()
-                    .filter(named("valueOf").and(takesArgument(0, char.class)))
-                    .getOnly()));
-              } else if (byte.class.equals(method.getReturnType())) {
-                stackManipulationItems.add(MethodInvocation.invoke(new TypeDescription.ForLoadedType(Byte.class)
-                    .getDeclaredMethods()
-                    .filter(named("valueOf").and(takesArgument(0, byte.class)))
-                    .getOnly()));
-              }
-              stackManipulationItems.add(MethodReturn.of(new TypeDescription.ForLoadedType(Object.class)));
-
-              StackManipulation.Size size = new StackManipulation.Compound(stackManipulationItems)
-                  .apply(methodVisitor, instrumentationContext);
-              return new ByteCodeAppender.Size(size.getMaximalSize(), instrumentedMethod.getStackSize());
-            };
-          }
-        }).make();
+        ).make();
 
     final File file = new File(TEMP_DIR, generatorName + ".class");
     if (file.exists()) {
@@ -313,5 +177,55 @@ public class MethodExecutorGenerator {
 
   private String getGeneratorName(Method method) {
     return method.getDeclaringClass().getName() + "$" + method.getName() + "$" + hashCode() + "$MethodComponentExecutorWrapper";
+  }
+
+  private ArgumentLoader.Factory getArgumentLoaders(Method method) {
+    return new ArgumentLoader.Factory() {
+
+      @Override
+      public InstrumentedType prepare(InstrumentedType instrumentedType) {
+        return instrumentedType;
+      }
+
+      @Override
+      public ArgumentLoader.ArgumentProvider make(Implementation.Target implementationTarget) {
+        MethodDescription.InDefinedShape resolveInvocation = new ForLoadedType(ArgumentResolver.class)
+            .getDeclaredMethods()
+            .filter(named("resolve"))
+            .getOnly();
+
+        return (instrumentedMethod, invokedMethod) -> {
+          final int parameterCount = method.getParameterCount();
+          List<ArgumentLoader> loaders = new ArrayList<>(parameterCount);
+          for (int i = 0; i < parameterCount; i++) {
+            Parameter parameter = method.getParameters()[i];
+            Class<?> parameterType = parameter.getType();
+            String parameterFieldName = getParameterFieldName(parameter);
+            loaders.add((target, assigner, typing) -> {
+              FieldDescription fieldDescription = instrumentedMethod.getDeclaringType()
+                  .getDeclaredFields()
+                  .filter(named(parameterFieldName))
+                  .getOnly();
+
+              List<StackManipulation> stack = new LinkedList<>();
+              stack.add(MethodVariableAccess.loadThis());
+              stack.add(FieldAccess.forField(fieldDescription).read());
+              stack.add(MethodVariableAccess.REFERENCE.loadFrom(1));
+              stack.add(MethodInvocation.invoke(resolveInvocation));
+              stack.add(assigner.assign(new ForLoadedType(Object.class).asGenericType(),
+                                        new ForLoadedType(parameterType).asGenericType(), typing));
+
+              return new StackManipulation.Compound(stack);
+            });
+          }
+
+          return loaders;
+        };
+      }
+    };
+  }
+
+  private String getParameterFieldName(Parameter parameter) {
+    return parameter.getName() + "Resolver";
   }
 }
