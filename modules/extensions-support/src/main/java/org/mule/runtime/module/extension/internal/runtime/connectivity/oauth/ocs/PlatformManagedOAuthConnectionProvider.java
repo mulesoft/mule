@@ -201,7 +201,7 @@ public class PlatformManagedOAuthConnectionProvider<C> implements OAuthConnectio
                                              expressionManager);
     Class<? extends ConnectionProvider> connectionProviderDelegateClass =
         getDelegateProviderType(oauthConfig.getDelegateConnectionProviderModel())
-            .orElse(PlatformManagedOAuthConnectionProvider.class);
+            .orElseThrow(() -> new IllegalStateException("Delegate connection provider must have an implementing type."));
 
     return (ConnectionProvider<C>) withContextClassLoader(getClassLoader(oauthConfig.getExtensionModel()), () -> {
       ResolverSet delegateResolverSet =
