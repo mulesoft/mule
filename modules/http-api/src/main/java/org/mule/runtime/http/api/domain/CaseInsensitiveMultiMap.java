@@ -57,8 +57,8 @@ public class CaseInsensitiveMultiMap extends AbstractCaseInsensitiveMultiMap {
   public CaseInsensitiveMultiMap(boolean optimized) {
     this.optimized = optimized;
     this.paramsMap = optimized
-        ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>())
-        : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
+        ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>(), false)
+        : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>(), false);
   }
 
   public CaseInsensitiveMultiMap(MultiMap<String, String> paramsMap) {
@@ -68,8 +68,8 @@ public class CaseInsensitiveMultiMap extends AbstractCaseInsensitiveMultiMap {
   public CaseInsensitiveMultiMap(MultiMap<String, String> multiMap, boolean optimized) {
     /* this.optimized = optimized;
     this.paramsMap = optimized
-        ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>())
-        : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
+        ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>(), false)
+        : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>(), false);
     putAll(multiMap);*/
     this.optimized = optimized;
     if (multiMap instanceof CaseInsensitiveMultiMap) {
@@ -77,8 +77,8 @@ public class CaseInsensitiveMultiMap extends AbstractCaseInsensitiveMultiMap {
       this.createParamsMap((CaseInsensitiveMultiMap) multiMap);
     } else {
       this.paramsMap = optimized
-          ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>())
-          : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
+          ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>(), false)
+          : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>(), false);
       putAll(multiMap);
     }
   }
@@ -89,7 +89,7 @@ public class CaseInsensitiveMultiMap extends AbstractCaseInsensitiveMultiMap {
       if (multiMap.paramsMap instanceof OptimizedCaseInsensitiveMapWrapper) {
         this.paramsMap = ((OptimizedCaseInsensitiveMapWrapper<LinkedList<String>>) multiMap.paramsMap).copy();
       } else {
-        new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
+        this.paramsMap = new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>(), false);
         if (!multiMap.isEmpty()) {
           putAll(multiMap);
         }
@@ -100,7 +100,7 @@ public class CaseInsensitiveMultiMap extends AbstractCaseInsensitiveMultiMap {
       if (multiMap.paramsMap instanceof CaseInsensitiveMapWrapper) {
         this.paramsMap = ((CaseInsensitiveMapWrapper<LinkedList<String>>) multiMap.paramsMap).copy();
       } else {
-        new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>());
+        this.paramsMap = new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>(), false);
         if (!multiMap.isEmpty()) {
           putAll(multiMap);
         }

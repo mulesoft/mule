@@ -13,6 +13,7 @@ import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,6 +35,13 @@ public class OptimizedCaseInsensitiveMapWrapper<T> extends CaseInsensitiveMapWra
    */
   public OptimizedCaseInsensitiveMapWrapper(Map map) {
     super(map);
+  }
+
+  /**
+   * Use this constructor ONLY if the calling method is the only one who has the reference to the map parameter.
+   */
+  public OptimizedCaseInsensitiveMapWrapper(Map map, boolean requireEmpty) {
+    super(map, requireEmpty);
   }
 
   /**
