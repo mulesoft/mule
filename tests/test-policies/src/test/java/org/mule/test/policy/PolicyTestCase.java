@@ -139,6 +139,16 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
     }
 
     @Override
+    public boolean isSourcePoliciesAvailable() {
+      return true;
+    }
+
+    @Override
+    public boolean isOperationPoliciesAvailable() {
+      return true;
+    }
+
+    @Override
     public List<Policy> findOperationParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters) {
       return policyReference.get().map(policy -> policy.getOperationPolicyChain()
           .map(operationChain -> asList(new Policy(operationChain, "policyId")))

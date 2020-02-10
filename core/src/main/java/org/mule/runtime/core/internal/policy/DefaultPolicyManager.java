@@ -107,7 +107,8 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
 
   private CompositePolicyFactory compositePolicyFactory = new CompositePolicyFactory();
 
-  private final AtomicBoolean isPoliciesAvailable = new AtomicBoolean(false);
+  private final AtomicBoolean isSourcePoliciesAvailable = new AtomicBoolean(false);
+  private final AtomicBoolean isOperationPoliciesAvailable = new AtomicBoolean(false);
 
   // This set holds the references that are needed to do the dispose after the referenced policy is no longer used.
   private final ReferenceQueue<DeferredDisposable> stalePoliciesQueue = new ReferenceQueue<>();
@@ -157,7 +158,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
                                                  MessageSourceResponseParametersProcessor messageSourceResponseParametersProcessor) {
     final ComponentIdentifier sourceIdentifier = source.getLocation().getComponentIdentifier().getIdentifier();
 
-    if (!isPoliciesAvailable.get()) {
+    if (!isSourcePoliciesAvailable.get()) {
       final SourcePolicy policy = noPolicySourceInstances.getIfPresent(source.getRootContainerLocation().getGlobalName());
 
       if (policy != null) {
@@ -212,7 +213,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   @Override
   public OperationPolicy createOperationPolicy(Component operation, CoreEvent event,
                                                OperationParametersProcessor operationParameters) {
-    if (!isPoliciesAvailable.get()) {
+    if (!isOperationPoliciesAvailable.get()) {
       return NO_POLICY_OPERATION;
     }
 
@@ -281,11 +282,13 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
     if (muleContext.getArtifactType().equals(APP)) {
       policyProvider.onPoliciesChanged(() -> {
         evictCaches();
-        isPoliciesAvailable.set(policyProvider.isPoliciesAvailable());
+        isSourcePoliciesAvailable.set(policyProvider.isSourcePoliciesAvailable());
+        isOperationPoliciesAvailable.set(policyProvider.isOperationPoliciesAvailable());
       });
-    }
 
-    isPoliciesAvailable.set(policyProvider.isPoliciesAvailable());
+      isSourcePoliciesAvailable.set(policyProvider.isSourcePoliciesAvailable());
+      isOperationPoliciesAvailable.set(policyProvider.isOperationPoliciesAvailable());
+    }
 
     policyPointcutParametersManager =
         new PolicyPointcutParametersManager(registry.lookupAllByType(SourcePolicyPointcutParametersFactory.class),

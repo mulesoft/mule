@@ -148,6 +148,20 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   }
 
   @Override
+  public boolean isSourcePoliciesAvailable() {
+    return registeredPolicyInstanceProviders
+        .stream()
+        .anyMatch(pip -> pip.getApplicationPolicyInstance().getSourcePolicy().isPresent());
+  }
+
+  @Override
+  public boolean isOperationPoliciesAvailable() {
+    return registeredPolicyInstanceProviders
+        .stream()
+        .anyMatch(pip -> pip.getApplicationPolicyInstance().getOperationPolicy().isPresent());
+  }
+
+  @Override
   public void onPoliciesChanged(Runnable policiesChangedCallback) {
     this.policiesChangedCallback = () -> {
       policiesChangedCallback.run();
