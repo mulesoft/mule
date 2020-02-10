@@ -17,7 +17,6 @@ import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.closeE
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.closePagingProviderCalls;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.getPageCalls;
 
-import org.mule.extension.test.extension.reconnection.ReconnectableConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
@@ -26,7 +25,6 @@ import org.mule.test.heisenberg.extension.model.PersonalInfo;
 
 import java.util.Iterator;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -98,14 +96,14 @@ public class PagedOperationExecutionTestCase extends AbstractExtensionFunctional
     resetCounters();
     Iterator iterator = getCursorWithPayload("failAtClosePagedOperation", 1);
     iterator.next();
-    Assert.assertThat("Paging provider was not closed.", closePagingProviderCalls, CoreMatchers.is(1));
+    Assert.assertThat("Paging provider was not closed.", closePagingProviderCalls, is(1));
   }
 
   @Test
   public void pagingProviderIsClosedSafelyAfterDataSourceIsFullyConsumed() throws Exception {
     resetCounters();
     flowRunner("consumeFailAtClosePagedOperation").withPayload(4).run();
-    Assert.assertThat("Paging provider was not closed.", closePagingProviderCalls, CoreMatchers.is(1));
+    Assert.assertThat("Paging provider was not closed.", closePagingProviderCalls, is(1));
   }
 
   private <T> CursorIterator<T> getCursorWithPayload(String flowName, Object payload) throws Exception {
