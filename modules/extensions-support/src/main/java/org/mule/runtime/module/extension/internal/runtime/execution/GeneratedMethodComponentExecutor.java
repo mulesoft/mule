@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
-import static java.lang.Thread.currentThread;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -89,18 +88,12 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
   }
 
   public Object execute(ExecutionContext<M> executionContext) {
-    final Thread currentThread = currentThread();
-    final ClassLoader originalClassLoader = currentThread.getContextClassLoader();
-    currentThread.setContextClassLoader(extensionClassLoader);
-
     try {
       return methodExecutor.execute(executionContext);
     } catch (MuleRuntimeException e) {
       throw e;
     } catch (Throwable t) {
       throw new SdkMethodInvocationException(t);
-    } finally {
-      currentThread.setContextClassLoader(originalClassLoader);
     }
   }
 
@@ -116,7 +109,7 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
         isEmpty(method.getParameterTypes()) ? NO_ARGS_DELEGATE : getMethodArgumentResolver(groups, method);
 
     try {
-      methodExecutor = methodExecutorGenerator.generate(componentInstance, method, argumentResolverDelegate);
+      methodExecutor = methodExecutorGenerator.generate(componentInstance, method, argumentResolverDelegate).getInstance();
     } catch (Exception e) {
       throw new InitialisationException(e, this);
     }

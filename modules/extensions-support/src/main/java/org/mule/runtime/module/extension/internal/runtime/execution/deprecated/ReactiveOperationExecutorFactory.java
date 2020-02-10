@@ -25,7 +25,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
- * An implementation of {@link ComponentExecutorFactory} which produces instances of {@link ReactiveMethodOperationExecutor}.
+ * An implementation of {@link ComponentExecutorFactory} which produces instances of {@link ComponentExecutorFactory}.
  *
  * @param <T> the type of the class in which the implementing method is declared
  * @since 3.7.0

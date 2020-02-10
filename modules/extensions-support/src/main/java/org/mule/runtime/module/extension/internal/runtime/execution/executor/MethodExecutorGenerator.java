@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution.executor;
 
+import static java.lang.System.identityHashCode;
 import static java.util.Arrays.asList;
 import static net.bytebuddy.description.modifier.FieldManifestation.FINAL;
 import static net.bytebuddy.description.modifier.Visibility.PRIVATE;
@@ -25,7 +26,8 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ArgumentResolverDelegate;
-import org.mule.runtime.module.extension.internal.runtime.execution.GeneratedMethodComponentExecutor;
+import org.mule.runtime.module.extension.internal.runtime.execution.GeneratedClass;
+import org.mule.runtime.module.extension.internal.runtime.execution.GeneratedInstance;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 
 import java.io.File;
@@ -59,29 +61,31 @@ import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 public class MethodExecutorGenerator {
 
   private static final String TARGET_INSTANCE_FIELD_NAME = "__targetInstance";
-  private final Map<String, Class<MethodExecutor>> executorClasses = new HashMap<>();
+  private final Map<String, GeneratedClass<MethodExecutor>> executorClasses = new HashMap<>();
+  private final int instanceId = identityHashCode(this);
 
+  public GeneratedInstance<MethodExecutor> generate(Object targetInstance,
+                                                    Method method,
+                                                    ArgumentResolverDelegate argumentResolverDelegate) throws Exception {
 
-  public MethodExecutor generate(Object targetInstance,
-                                 Method method,
-                                 ArgumentResolverDelegate argumentResolverDelegate)
-      throws Exception {
-
-    Class<MethodExecutor> executorClass = getExecutorClass(method, targetInstance);
+    GeneratedClass<MethodExecutor> generatedClass = getExecutorClass(method, targetInstance);
     List<Object> args = new ArrayList<>();
     args.add(targetInstance);
     args.addAll(asList(argumentResolverDelegate.getArgumentResolvers()));
 
-    return (MethodExecutor) executorClass.getConstructors()[0].newInstance(args.toArray(new Object[args.size()]));
+    MethodExecutor instance = (MethodExecutor) generatedClass.getGeneratedClass().getConstructors()[0]
+        .newInstance(args.toArray(new Object[args.size()]));
+
+    return new GeneratedInstance<>(instance, generatedClass);
   }
 
-  private Class<MethodExecutor> getExecutorClass(Method method, Object targetInstance) {
+  private GeneratedClass<MethodExecutor> getExecutorClass(Method method, Object targetInstance) {
     String generatorName = getGeneratorName(method);
     return executorClasses.computeIfAbsent(generatorName, key -> generateExecutorClass(key, method, targetInstance));
 
   }
 
-  private Class<MethodExecutor> generateExecutorClass(String generatorName, Method method, Object targetInstance) {
+  private GeneratedClass<MethodExecutor> generateExecutorClass(String generatorName, Method method, Object targetInstance) {
     DynamicType.Builder<Object> operationWrapperClassBuilder = new ByteBuddy()
         .subclass(Object.class, NO_CONSTRUCTORS)
         .implement(MethodExecutor.class)
@@ -119,26 +123,26 @@ public class MethodExecutorGenerator {
 
           stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
           stackManipulationItems.add(MethodInvocation.invoke(new ForLoadedType(Object.class)
-              .getDeclaredMethods()
-              .filter(isConstructor().and(takesArguments(0)))
-              .getOnly()));
+                                                                 .getDeclaredMethods()
+                                                                 .filter(isConstructor().and(takesArguments(0)))
+                                                                 .getOnly()));
           stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
           stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(1));
           stackManipulationItems.add(forField(implementationTarget
-              .getInstrumentedType()
-              .getDeclaredFields()
-              .filter(named(TARGET_INSTANCE_FIELD_NAME)).getOnly())
-                  .write());
+                                                  .getInstrumentedType()
+                                                  .getDeclaredFields()
+                                                  .filter(named(TARGET_INSTANCE_FIELD_NAME)).getOnly())
+                                         .write());
 
           for (int i = 0; i < method.getParameterTypes().length; ++i) {
             stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
             stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(i + 2));
             stackManipulationItems.add(forField(implementationTarget
-                .getInstrumentedType()
-                .getDeclaredFields()
-                .filter(named(getParameterFieldName(method.getParameters()[i])))
-                .getOnly())
-                    .write());
+                                                    .getInstrumentedType()
+                                                    .getDeclaredFields()
+                                                    .filter(named(getParameterFieldName(method.getParameters()[i])))
+                                                    .getOnly())
+                                           .write());
           }
 
           stackManipulationItems.add(VOID);
@@ -153,9 +157,9 @@ public class MethodExecutorGenerator {
         .withParameter(ExecutionContext.class, "executionContext")
         .throwing(Exception.class)
         .intercept(MethodCall.invoke(method)
-            .onField(TARGET_INSTANCE_FIELD_NAME)
-            .with(getArgumentLoaders(method))
-            .withAssigner(Assigner.DEFAULT, Assigner.Typing.DYNAMIC)
+                       .onField(TARGET_INSTANCE_FIELD_NAME)
+                       .with(getArgumentLoaders(method))
+                       .withAssigner(Assigner.DEFAULT, Assigner.Typing.DYNAMIC)
 
         ).make();
 
@@ -167,22 +171,17 @@ public class MethodExecutorGenerator {
     try (FileOutputStream os = new FileOutputStream(file)) {
       os.write(byteBuddyMadeWrapper.getBytes());
       CompositeClassLoader executorClassLoader = new CompositeClassLoader(method.getDeclaringClass().getClassLoader(),
-                                                                          GeneratedMethodComponentExecutor.class
-                                                                              .getClassLoader());
+                                                                          getClass().getClassLoader());
 
-      return (Class<MethodExecutor>) byteBuddyMadeWrapper.load(executorClassLoader, INJECTION).getLoaded();
+      return new GeneratedClass<>((Class<MethodExecutor>) byteBuddyMadeWrapper.load(executorClassLoader, INJECTION).getLoaded(),
+                                  file);
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not generate MethodExecutor class"), e);
     }
   }
 
   private String getGeneratorName(Method method) {
-    return method.getDeclaringClass().getName() + "$" + method.getName() + "$" + hashCode() + "$MethodComponentExecutorWrapper";
-  }
-
-  @Override
-  public int hashCode() {
-    return 1;
+    return method.getDeclaringClass().getName() + "$" + method.getName() + "$" + instanceId + "$MethodComponentExecutorWrapper";
   }
 
   private ArgumentLoader.Factory getArgumentLoaders(Method method) {

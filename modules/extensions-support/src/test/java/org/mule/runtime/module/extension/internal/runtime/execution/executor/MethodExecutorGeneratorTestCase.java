@@ -7,15 +7,19 @@
 package org.mule.runtime.module.extension.internal.runtime.execution.executor;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.util.FileUtils.TEMP_DIR;
 import static org.mule.runtime.core.api.util.FileUtils.copyFile;
+import static org.mule.runtime.module.extension.internal.runtime.execution.executor.MethodExecutorGeneratorTestCase.Utils.mockArgumentResolverDelegate;
 
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.runtime.module.extension.internal.runtime.execution.ArgumentResolverDelegate;
+import org.mule.runtime.module.extension.internal.runtime.execution.GeneratedInstance;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 
 import java.io.ByteArrayInputStream;
@@ -31,45 +35,91 @@ public class MethodExecutorGeneratorTestCase {
 
   private MethodExecutorGenerator generator = new MethodExecutorGenerator();
 
-  @Test
-  public void generateNonPrimitives() throws Exception {
-    Method method = getMethod("noPrimitivesOperation");
-    generator.generate(this, method, mockArgumentResolverDelegate(method));
 
-    getByteCodeFile(method);
+  /**
+   * Utilities for debugging purposes. Not meant to use during test run
+   */
+  public static class Utils {
+
+    public static File copyGeneratedClass(MethodExecutorGenerator generator,
+                                          Object target,
+                                          Method method,
+                                          File targetDirectory) throws Exception {
+      GeneratedInstance<MethodExecutor> generatedInstance =
+          generator.generate(target, method, mockArgumentResolverDelegate(method));
+      File byteCodeFile = generatedInstance.getGeneratedClass().getByteCodeFile();
+      File targetFile = new File(targetDirectory, byteCodeFile.getName());
+      copyFile(byteCodeFile, targetFile, true);
+
+      return targetFile;
+    }
+
+    public static ArgumentResolverDelegate mockArgumentResolverDelegate(Method method) {
+      ArgumentResolverDelegate delegate = mock(ArgumentResolverDelegate.class);
+      ArgumentResolver[] resolvers = new ArgumentResolver[method.getParameterCount()];
+      for (int i = 0; i < method.getParameterCount(); i++) {
+        resolvers[i] = mock(ArgumentResolver.class);
+      }
+
+      when(delegate.getArgumentResolvers()).thenReturn(resolvers);
+      return delegate;
+    }
   }
 
+  @Test
+  public void sameMethodGeneratesUniqueClass() throws Exception {
+    Method method = getMethod("sampleOperation");
+    GeneratedInstance<MethodExecutor> generatedInstance1 = generator.generate(this, method, mockArgumentResolverDelegate(method));
+    GeneratedInstance<MethodExecutor> generatedInstance2 = generator.generate(this, method, mockArgumentResolverDelegate(method));
 
-  private File getByteCodeFile(Method method) throws Exception {
-    String generatorName = method.getDeclaringClass().getName() + "$" + method.getName() + "$1$MethodComponentExecutorWrapper";
-    final File source = new File(TEMP_DIR, generatorName + ".class");
-    assertThat(source.exists(), is(true));
+    assertThat(generatedInstance1.getInstance(), is(notNullValue()));
+    assertThat(generatedInstance2.getInstance(), is(notNullValue()));
+    assertThat(generatedInstance1.getInstance(), is(not(sameInstance(generatedInstance2.getInstance()))));
 
-    File target = new File("/Users/mariano.gonzalez/Desktop", source.getName());
-    copyFile(source, target, true);
+    assertThat(generatedInstance1.getGeneratedClass().getGeneratedClass(),
+               is(sameInstance(generatedInstance2.getGeneratedClass().getGeneratedClass())));
 
-    return target;
+    assertThat(generatedInstance1.getInstance().getClass(),
+               is(sameInstance(generatedInstance1.getGeneratedClass().getGeneratedClass())));
+    assertThat(generatedInstance2.getInstance().getClass(),
+               is(sameInstance(generatedInstance2.getGeneratedClass().getGeneratedClass())));
+  }
+
+  @Test
+  public void differentMethodsGenerateDifferentClasses() throws Exception {
+    Method method1 = getMethod("sampleOperation");
+    Method method2 = getMethod("anotherOperation");
+
+    GeneratedInstance<MethodExecutor> generatedInstance1 =
+        generator.generate(this, method1, mockArgumentResolverDelegate(method1));
+    GeneratedInstance<MethodExecutor> generatedInstance2 =
+        generator.generate(this, method2, mockArgumentResolverDelegate(method2));
+
+    assertThat(generatedInstance1.getInstance(), is(notNullValue()));
+    assertThat(generatedInstance2.getInstance(), is(notNullValue()));
+    assertThat(generatedInstance1.getInstance(), is(not(sameInstance(generatedInstance2.getInstance()))));
+
+    assertThat(generatedInstance1.getGeneratedClass().getGeneratedClass(),
+               is(not(sameInstance(generatedInstance2.getGeneratedClass().getGeneratedClass()))));
+
+    assertThat(generatedInstance1.getInstance().getClass(),
+               is(sameInstance(generatedInstance1.getGeneratedClass().getGeneratedClass())));
+    assertThat(generatedInstance2.getInstance().getClass(),
+               is(sameInstance(generatedInstance2.getGeneratedClass().getGeneratedClass())));
   }
 
   private Method getMethod(String methodName) {
     return Stream.of(getClass().getMethods()).filter(m -> m.getName().equals(methodName)).findFirst().get();
   }
 
-  private ArgumentResolverDelegate mockArgumentResolverDelegate(Method method) {
-    ArgumentResolverDelegate delegate = mock(ArgumentResolverDelegate.class);
-    ArgumentResolver[] resolvers = new ArgumentResolver[method.getParameterCount()];
-    for (int i = 0; i < method.getParameterCount(); i++) {
-      resolvers[i] = mock(ArgumentResolver.class);
-    }
-
-    when(delegate.getArgumentResolvers()).thenReturn(resolvers);
-    return delegate;
+  public InputStream sampleOperation(@Config MethodExecutorGeneratorTestCase config,
+                                     String param1,
+                                     Map<String, Object> map,
+                                     StreamingHelper streamingHelper) {
+    return new ByteArrayInputStream(param1.getBytes());
   }
 
-  public InputStream noPrimitivesOperation(@Config MethodExecutorGeneratorTestCase config,
-                                           String param1,
-                                           Map<String, Object> map,
-                                           StreamingHelper streamingHelper) {
-    return new ByteArrayInputStream(param1.getBytes());
+  public String anotherOperation(@Config MethodExecutorGeneratorTestCase config, int param1) {
+    return "" + param1;
   }
 }
