@@ -66,7 +66,8 @@ public class MethodExecutorGenerator {
 
   public GeneratedInstance<MethodExecutor> generate(Object targetInstance,
                                                     Method method,
-                                                    ArgumentResolverDelegate argumentResolverDelegate) throws Exception {
+                                                    ArgumentResolverDelegate argumentResolverDelegate)
+      throws Exception {
 
     GeneratedClass<MethodExecutor> generatedClass = getExecutorClass(method, targetInstance);
     List<Object> args = new ArrayList<>();
@@ -123,26 +124,26 @@ public class MethodExecutorGenerator {
 
           stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
           stackManipulationItems.add(MethodInvocation.invoke(new ForLoadedType(Object.class)
-                                                                 .getDeclaredMethods()
-                                                                 .filter(isConstructor().and(takesArguments(0)))
-                                                                 .getOnly()));
+              .getDeclaredMethods()
+              .filter(isConstructor().and(takesArguments(0)))
+              .getOnly()));
           stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
           stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(1));
           stackManipulationItems.add(forField(implementationTarget
-                                                  .getInstrumentedType()
-                                                  .getDeclaredFields()
-                                                  .filter(named(TARGET_INSTANCE_FIELD_NAME)).getOnly())
-                                         .write());
+              .getInstrumentedType()
+              .getDeclaredFields()
+              .filter(named(TARGET_INSTANCE_FIELD_NAME)).getOnly())
+                  .write());
 
           for (int i = 0; i < method.getParameterTypes().length; ++i) {
             stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
             stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(i + 2));
             stackManipulationItems.add(forField(implementationTarget
-                                                    .getInstrumentedType()
-                                                    .getDeclaredFields()
-                                                    .filter(named(getParameterFieldName(method.getParameters()[i])))
-                                                    .getOnly())
-                                           .write());
+                .getInstrumentedType()
+                .getDeclaredFields()
+                .filter(named(getParameterFieldName(method.getParameters()[i])))
+                .getOnly())
+                    .write());
           }
 
           stackManipulationItems.add(VOID);
@@ -157,9 +158,9 @@ public class MethodExecutorGenerator {
         .withParameter(ExecutionContext.class, "executionContext")
         .throwing(Exception.class)
         .intercept(MethodCall.invoke(method)
-                       .onField(TARGET_INSTANCE_FIELD_NAME)
-                       .with(getArgumentLoaders(method))
-                       .withAssigner(Assigner.DEFAULT, Assigner.Typing.DYNAMIC)
+            .onField(TARGET_INSTANCE_FIELD_NAME)
+            .with(getArgumentLoaders(method))
+            .withAssigner(Assigner.DEFAULT, Assigner.Typing.DYNAMIC)
 
         ).make();
 

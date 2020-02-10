@@ -44,7 +44,8 @@ public class MethodExecutorGeneratorTestCase {
     public static File copyGeneratedClass(MethodExecutorGenerator generator,
                                           Object target,
                                           Method method,
-                                          File targetDirectory) throws Exception {
+                                          File targetDirectory)
+        throws Exception {
       GeneratedInstance<MethodExecutor> generatedInstance =
           generator.generate(target, method, mockArgumentResolverDelegate(method));
       File byteCodeFile = generatedInstance.getGeneratedClass().getByteCodeFile();
