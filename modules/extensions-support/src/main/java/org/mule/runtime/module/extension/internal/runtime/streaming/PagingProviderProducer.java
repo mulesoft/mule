@@ -50,7 +50,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   private final ExtensionConnectionSupplier extensionConnectionSupplier;
   private final ExecutionContextAdapter executionContext;
   private final ConnectionSupplierFactory connectionSupplierFactory;
-  private ConnectionSupplier actualConnectionSupplier;
+  private LazyValue<ConnectionSupplier> actualConnectionSupplier;
   private Boolean isFirstPage = true;
 
   public PagingProviderProducer(PagingProvider<Object, T> delegate,
@@ -61,6 +61,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     this.config = config;
     this.executionContext = executionContext;
     this.extensionConnectionSupplier = extensionConnectionSupplier;
+    this.actualConnectionSupplier = new LazyValue<>(this::getActualConnectionSupplier);
 
     this.connectionSupplierFactory = createConnectionSupplierFactory();
   }
@@ -91,17 +92,16 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    * @return
    */
   private <R> R performWithConnection(Function<Object, R> function) {
-    actualConnectionSupplier = getActualConnectionSupplier();
-    Object connection = getConnection(actualConnectionSupplier);
+    Object connection = getConnection(actualConnectionSupplier.get());
     try {
       R result = function.apply(connection);
-      actualConnectionSupplier.close();
+      actualConnectionSupplier.get().close();
       return result;
     } catch (Exception exception) {
       if (isFirstPage) {
         safely(() -> delegate.close(connection), e -> LOGGER.debug("Found exception closing buffer", e));
       }
-      extractConnectionException(exception).ifPresent(ex -> actualConnectionSupplier.invalidateConnection());
+      extractConnectionException(exception).ifPresent(ex -> actualConnectionSupplier.get().invalidateConnection());
       throw exception;
     }
   }
@@ -112,11 +112,11 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   @Override
   public void close() {
     try {
-      delegate.close(actualConnectionSupplier.getConnection());
+      delegate.close(actualConnectionSupplier.get().getConnection());
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
     } finally {
-      actualConnectionSupplier.close();
+      actualConnectionSupplier.get().close();
       connectionSupplierFactory.dispose();
     }
   }
