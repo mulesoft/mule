@@ -8,20 +8,38 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import java.io.File;
 
+/**
+ * Represents a class that was dynamically generated at runtime
+ *
+ * @param <T> the generic type of the generated class
+ * @since 4.3.0
+ */
 public final class GeneratedClass<T> {
 
   private final Class<T> generatedClass;
   private final File byteCodeFile;
 
+  /**
+   * Creates a new instance
+   *
+   * @param generatedClass the {@link Class} that was generated
+   * @param byteCodeFile   A file pointing to the generated class bytecode
+   */
   public GeneratedClass(Class<T> generatedClass, File byteCodeFile) {
     this.generatedClass = generatedClass;
     this.byteCodeFile = byteCodeFile;
   }
 
+  /**
+   * @return the {@link Class} that was generated
+   */
   public Class<T> getGeneratedClass() {
     return generatedClass;
   }
 
+  /**
+   * @return A file pointing to the generated class bytecode
+   */
   public File getByteCodeFile() {
     return byteCodeFile;
   }

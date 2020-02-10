@@ -58,12 +58,29 @@ import net.bytebuddy.implementation.bytecode.member.FieldAccess;
 import net.bytebuddy.implementation.bytecode.member.MethodInvocation;
 import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 
+/**
+ * Uses bytecode manipulation to dynamically generate {@link MethodExecutor} classes that invoke a given method.
+ *
+ * @since 4.3.0
+ */
 public class MethodExecutorGenerator {
 
   private static final String TARGET_INSTANCE_FIELD_NAME = "__targetInstance";
   private final Map<String, GeneratedClass<MethodExecutor>> executorClasses = new HashMap<>();
   private final int instanceId = identityHashCode(this);
 
+  /**
+   * Creates a {@link GeneratedInstance} pointing to a dynamic {@link MethodExecutor} that executes the given {@code method}.
+   * <p>
+   * Each invocation to this method will return a new {@link GeneratedInstance} pointing to unique instances. However, all
+   * invocations pointing to the same {@code method} will share the same underlying {@link GeneratedClass}
+   *
+   * @param targetInstance           the instance on which the method is to be executed
+   * @param method                   the method to be invoked
+   * @param argumentResolverDelegate the {@link ArgumentResolverDelegate} that provides the {@link ArgumentResolver resolvers}
+   * @return a {@link GeneratedInstance}
+   * @throws Exception if the instance cannot be generated
+   */
   public GeneratedInstance<MethodExecutor> generate(Object targetInstance,
                                                     Method method,
                                                     ArgumentResolverDelegate argumentResolverDelegate)
@@ -214,11 +231,22 @@ public class MethodExecutorGenerator {
                   .getOnly();
 
               List<StackManipulation> stack = new LinkedList<>();
+
+              // bring the 'this' variable into the current frame
               stack.add(MethodVariableAccess.loadThis());
+
+              // load the value of the field that holds the ArgumentResolver
               stack.add(FieldAccess.forField(fieldDescription).read());
+
+              // load the ExecutionContext that was passed as a parameter
               stack.add(MethodVariableAccess.REFERENCE.loadFrom(1));
+
+              // invoke the resolve() method on the ArgumentResolver field
               stack.add(MethodInvocation.invoke(resolveInvocation));
+
+              // handle casting, autoboxing and similar herbs
               stack.add(assigner.assign(new ForLoadedType(Object.class).asGenericType(),
+
                                         new ForLoadedType(parameterType).asGenericType(), typing));
 
               return new StackManipulation.Compound(stack);

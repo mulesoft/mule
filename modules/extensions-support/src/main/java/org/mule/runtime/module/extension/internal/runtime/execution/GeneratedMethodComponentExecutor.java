@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.collection.SmallMap.forSize;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -30,7 +31,6 @@ import org.mule.runtime.module.extension.internal.runtime.execution.executor.Met
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -150,16 +150,15 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
 
   @Override
   public Function<ExecutionContext<M>, Map<String, Object>> createArgumentResolver(M operationModel) {
-    return ec -> withContextClassLoader(extensionClassLoader,
-                                        () -> {
-                                          final Object[] resolved =
-                                              getParameterValues(ec, method.getParameterTypes());
+    return ec -> withContextClassLoader(extensionClassLoader, () -> {
+      final Object[] resolved = getParameterValues(ec, method.getParameterTypes());
 
-                                          final Map<String, Object> resolvedParams = new HashMap<>();
-                                          for (int i = 0; i < method.getParameterCount(); ++i) {
-                                            resolvedParams.put(method.getParameters()[i].getName(), resolved[i]);
-                                          }
-                                          return resolvedParams;
-                                        });
+      int parameterCount = method.getParameterCount();
+      final Map<String, Object> resolvedParams = forSize(parameterCount);
+      for (int i = 0; i < parameterCount; ++i) {
+        resolvedParams.put(method.getParameters()[i].getName(), resolved[i]);
+      }
+      return resolvedParams;
+    });
   }
 }
