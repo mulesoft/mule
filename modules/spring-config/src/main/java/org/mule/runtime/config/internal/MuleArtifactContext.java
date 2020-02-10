@@ -186,16 +186,16 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
    * registry implementation to wraps the spring ApplicationContext
    *
-   * @param muleContext the {@link MuleContext} that own this context
-   * @param artifactDeclaration the mule configuration defined programmatically
-   * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
-   *        org.mule.runtime.config.internal.SpringRegistry
-   * @param pluginsClassLoaders the classloades of the plugins included in the artifact, on hwich contexts the parsers will
-   *        process.
+   * @param muleContext                                the {@link MuleContext} that own this context
+   * @param artifactDeclaration                        the mule configuration defined programmatically
+   * @param optionalObjectsController                  the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
+   *                                                   org.mule.runtime.config.internal.SpringRegistry
+   * @param pluginsClassLoaders                        the classloades of the plugins included in the artifact, on hwich contexts the parsers will
+   *                                                   process.
    * @param parentConfigurationProperties
-   * @param disableXmlValidations {@code true} when loading XML configs it will not apply validations.
+   * @param disableXmlValidations                      {@code true} when loading XML configs it will not apply validations.
    * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
-   *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
+   *                                                   {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
    * @since 3.7.0
    */
   public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
@@ -314,12 +314,16 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       return new ApplicationModel(artifactConfig, artifactDeclaration, getExtensions(),
                                   artifactProperties, parentConfigurationProperties,
                                   of(componentBuildingDefinitionRegistry),
-                                  externalResourceProvider);
+                                  externalResourceProvider, isRuntimeMode());
     } catch (MuleRuntimeException e) {
       throw e;
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
+  }
+
+  protected boolean isRuntimeMode() {
+    return true;
   }
 
   public void initialize() {
@@ -532,9 +536,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   /**
    * Creates the definition for all the objects to be created form the enabled components in the {@code applicationModel}.
    *
-   * @param beanFactory the bean factory in which definition must be created.
+   * @param beanFactory      the bean factory in which definition must be created.
    * @param applicationModel the artifact application model.
-   * @param mustBeRoot if the component must be root to be created.
+   * @param mustBeRoot       if the component must be root to be created.
    * @return an order list of the created bean names. The order must be respected for the creation of the objects.
    */
   protected List<Pair<String, ComponentAst>> createApplicationComponents(DefaultListableBeanFactory beanFactory,
@@ -738,7 +742,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
    * Returns a prototype chain of processors mutating the root container name of the set of beans created from that prototype
    * object.
    *
-   * @param name the bean name
+   * @param name              the bean name
    * @param rootContainerName the new root container name.
    */
   public synchronized void getPrototypeBeanWithRootContainer(String name, String rootContainerName) {

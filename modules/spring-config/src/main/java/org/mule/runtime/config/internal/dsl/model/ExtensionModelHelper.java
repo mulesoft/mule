@@ -58,6 +58,7 @@ import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -421,6 +422,10 @@ public class ExtensionModelHelper {
     return dslSyntaxResolver.resolve(component);
   }
 
+  public Optional<DslElementSyntax> resolveDslElementModel(MetadataType metadataType, ExtensionModel extensionModel) {
+    return dslSyntaxResolversByExtension.get(extensionModel).resolve(metadataType);
+  }
+
   public DslElementSyntax resolveDslElementModel(ParameterModel parameterModel, ComponentIdentifier componentIdentifier) {
     Optional<ExtensionModel> optionalExtensionModel = lookupExtensionModelFor(componentIdentifier);
     ExtensionModel extensionModel = optionalExtensionModel
@@ -448,6 +453,14 @@ public class ExtensionModelHelper {
                                                                                                                    .resolve(subType)))));
     }
     return mapBuilder.build();
+  }
+
+  public Collection<ObjectType> getAllSubTypes() {
+    return dslResolvingContext.getTypeCatalog().getAllSubTypes();
+  }
+
+  public Collection<ObjectType> getSubTypes(ObjectType objectType) {
+    return dslResolvingContext.getTypeCatalog().getSubTypes(objectType);
   }
 
   /**

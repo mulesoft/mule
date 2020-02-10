@@ -16,6 +16,7 @@ import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.extension.internal.loader.XmlExtensionLoaderDelegate.MODULE_CONNECTION_MARKER_ATTRIBUTE;
 import static org.mule.runtime.extension.internal.loader.validator.TestConnectionValidator.TEST_CONNECTION_SELECTED_ELEMENT_INVALID;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -48,14 +49,14 @@ import org.junit.rules.ExpectedException;
  * @since 4.0
  */
 @SmallTest
-public class TestConnectionFailuresTestCase extends AbstractMuleTestCase {
+public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
 
   @Rule
   public ExpectedException exception = ExpectedException.none();
 
   @Test
   public void multipleGlobalElementsWithXmlnsConnectionAttribute() {
-    setExpectedMessage("Can't resolve http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd");
+    setExpectedMessage("first-config", "second-config");
     getExtensionModelFrom("validation/testconnection/module-multiple-global-element-xmlns-connection-true.xml");
   }
 

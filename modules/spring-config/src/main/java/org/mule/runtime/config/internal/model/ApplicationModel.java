@@ -40,13 +40,18 @@ import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.api.model.UnionType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -84,7 +89,6 @@ import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfi
 import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
-import org.mule.runtime.config.internal.dsl.spring.DefaultValueVisitor;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.util.ClassUtils;
@@ -93,7 +97,9 @@ import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
+import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -113,10 +119,9 @@ import java.util.stream.Stream;
 
 import javax.xml.namespace.QName;
 
-import org.slf4j.Logger;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.slf4j.Logger;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -271,13 +276,14 @@ public class ApplicationModel implements ArtifactAst {
   private final ExtensionModelHelper extensionModelHelper;
   private final Map<String, ComponentModel> namedComponentModels = new HashMap<>();
   private final Map<String, ComponentModel> namedTopLevelComponentModels = new HashMap<>();
+  private boolean runtimeMode = true;
 
   /**
    * Creates an {code ApplicationModel} from a {@link ArtifactConfig}.
    * <p/>
    * A set of validations are applied that may make creation fail.
    *
-   * @param artifactConfig the mule artifact configuration content.
+   * @param artifactConfig      the mule artifact configuration content.
    * @param artifactDeclaration an {@link ArtifactDeclaration}
    * @throws Exception when the application configuration has semantic errors.
    */
@@ -285,7 +291,7 @@ public class ApplicationModel implements ArtifactAst {
                           ResourceProvider externalResourceProvider)
       throws Exception {
     this(artifactConfig, artifactDeclaration, emptySet(), emptyMap(), empty(), of(new ComponentBuildingDefinitionRegistry()),
-         externalResourceProvider);
+         externalResourceProvider, true);
   }
 
   /**
@@ -293,14 +299,14 @@ public class ApplicationModel implements ArtifactAst {
    * <p/>
    * A set of validations are applied that may make creation fail.
    *
-   * @param artifactConfig the mule artifact configuration content.
-   * @param artifactDeclaration an {@link ArtifactDeclaration}
-   * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to type componentModels
-   * @param parentConfigurationProperties the {@link ConfigurationProperties} of the parent artifact. For instance, application
-   *        will receive the domain resolver.
+   * @param artifactConfig                      the mule artifact configuration content.
+   * @param artifactDeclaration                 an {@link ArtifactDeclaration}
+   * @param extensionModels                     Set of {@link ExtensionModel extensionModels} that will be used to type componentModels
+   * @param parentConfigurationProperties       the {@link ConfigurationProperties} of the parent artifact. For instance, application
+   *                                            will receive the domain resolver.
    * @param componentBuildingDefinitionRegistry an optional {@link ComponentBuildingDefinitionRegistry} used to correlate items in
-   *        this model to their definitions expanded) false implies the mule is being created from a tooling perspective.
-   * @param externalResourceProvider the provider for configuration properties files and ${file::name.txt} placeholders
+   *                                            this model to their definitions expanded) false implies the mule is being created from a tooling perspective.
+   * @param externalResourceProvider            the provider for configuration properties files and ${file::name.txt} placeholders
    * @throws Exception when the application configuration has semantic errors.
    */
   // TODO: MULE-9638 remove this optional
@@ -311,7 +317,22 @@ public class ApplicationModel implements ArtifactAst {
                           Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry,
                           ResourceProvider externalResourceProvider)
       throws Exception {
+    this(artifactConfig, artifactDeclaration, extensionModels, deploymentProperties, parentConfigurationProperties,
+         componentBuildingDefinitionRegistry,
+         externalResourceProvider, true);
+  }
 
+  // TODO: MULE-9638 remove this optional
+  public ApplicationModel(ArtifactConfig artifactConfig, ArtifactDeclaration artifactDeclaration,
+                          Set<ExtensionModel> extensionModels,
+                          Map<String, String> deploymentProperties,
+                          Optional<ConfigurationProperties> parentConfigurationProperties,
+                          Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry,
+                          ResourceProvider externalResourceProvider,
+                          boolean runtimeMode)
+      throws Exception {
+
+    this.runtimeMode = runtimeMode;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.externalResourceProvider = externalResourceProvider;
     createConfigurationAttributeResolver(artifactConfig, parentConfigurationProperties, deploymentProperties);
@@ -324,7 +345,8 @@ public class ApplicationModel implements ArtifactAst {
     // TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart connectors
     // and crafted declared extension models)
     resolveComponentTypes();
-    muleComponentModels.forEach(componentModel -> componentModel.resolveTypedComponentIdentifier(extensionModelHelper));
+    muleComponentModels
+        .forEach(componentModel -> componentModel.resolveTypedComponentIdentifier(extensionModelHelper, runtimeMode));
     final ComponentLocationVisitor clv = new ComponentLocationVisitor();
     recursiveStreamWithHierarchy().forEach(clv);
   }
@@ -334,7 +356,8 @@ public class ApplicationModel implements ArtifactAst {
       // TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart
       // connectors and crafted declared extension models)
       resolveComponentTypes();
-      muleComponentModels.forEach(componentModel -> componentModel.resolveTypedComponentIdentifier(extensionModelHelper));
+      muleComponentModels
+          .forEach(componentModel -> componentModel.resolveTypedComponentIdentifier(extensionModelHelper, runtimeMode));
     });
     // Have to index again the component models with macro expanded ones
     indexComponentModels();
@@ -575,25 +598,8 @@ public class ApplicationModel implements ArtifactAst {
         buildingDefinition.map(definition -> {
           ObjectTypeVisitor typeDefinitionVisitor = new ObjectTypeVisitor(componentModel);
           definition.getTypeDefinition().visit(typeDefinitionVisitor);
-
-          final Class<?> type = typeDefinitionVisitor.getType();
-          componentModel.setType(type);
-
-          if (ValueResolver.class.isAssignableFrom(type)) {
-            definition.getConstructorAttributeDefinition().get(0).accept(new DefaultValueVisitor() {
-
-              @Override
-              public void onFixedValue(Object value) {
-                if (value instanceof MetadataType) {
-                  final MetadataTypeModelAdapter adapter =
-                      createMetadataTypeModelAdapterWithSterotype((MetadataType) value, extensionModelHelper)
-                          .orElse(createParameterizedTypeModelAdapter((MetadataType) value, extensionModelHelper));
-                  componentModel.setMetadataTypeModelAdapter(adapter);
-                }
-              }
-            });
-          }
-
+          // We still have components without extension models
+          componentModel.setType(typeDefinitionVisitor.getType());
           return definition;
         }).orElseGet(() -> {
           String classParameter = componentModel.getRawParameters().get(CLASS_ATTRIBUTE);
@@ -608,7 +614,86 @@ public class ApplicationModel implements ArtifactAst {
         });
       });
     });
+
+    // Use ExtensionModel to register top level and subTypes elements
+    if (!runtimeMode) {
+      ReflectionCache reflectionCache = new ReflectionCache();
+      List<ComponentIdentifier> context = new ArrayList<>();
+      extensionModelHelper.getExtensionsModels().stream().forEach(extensionModel -> extensionModel.getTypes().stream()
+          .filter(p -> IntrospectionUtils.isInstantiable(p, reflectionCache))
+          .forEach(parameterType -> {
+            registerTopLevelParameter(parameterType, reflectionCache, context, extensionModel);
+          }));
+    }
+
   }
+
+  private void registerTopLevelParameter(MetadataType parameterType, ReflectionCache reflectionCache,
+                                         List<ComponentIdentifier> context, ExtensionModel extensionModel) {
+    Optional<DslElementSyntax> dslElement = extensionModelHelper.resolveDslElementModel(parameterType, extensionModel);
+    if (!dslElement.isPresent() ||
+        context.contains(builder().name(dslElement.get().getElementName()).namespace(dslElement.get().getPrefix()).build())) {
+      return;
+    }
+
+    parameterType.accept(new MetadataTypeVisitor() {
+
+      @Override
+      public void visitObject(ObjectType objectType) {
+        DslElementSyntax pojoDsl = dslElement.get();
+        if (pojoDsl.supportsTopLevelDeclaration() || (pojoDsl.supportsChildDeclaration() && pojoDsl.isWrapped())
+            || getSubstitutionGroup(objectType).isPresent() ||
+            extensionModelHelper.getAllSubTypes().contains(objectType)) {
+
+          findComponentDefinitionModel(builder().name(dslElement.get().getElementName()).namespace(dslElement.get().getPrefix())
+              .build())
+                  .ifPresent(componentModel -> componentModel
+                      .setMetadataTypeModelAdapter(createMetadataTypeModelAdapterWithSterotype(objectType, extensionModelHelper)
+                          .orElse(createParameterizedTypeModelAdapter(objectType, extensionModelHelper))));
+        }
+
+        registerSubTypes(objectType, reflectionCache, context, extensionModel);
+      }
+
+      @Override
+      public void visitArrayType(ArrayType arrayType) {
+        registerTopLevelParameter(arrayType.getType(), reflectionCache, context, extensionModel);
+      }
+
+      @Override
+      public void visitUnion(UnionType unionType) {
+        unionType.getTypes().forEach(type -> type.accept(this));
+      }
+
+    });
+  }
+
+  private void registerSubTypes(MetadataType type, ReflectionCache reflectionCache, List<ComponentIdentifier> context,
+                                ExtensionModel extensionModel) {
+    type.accept(new MetadataTypeVisitor() {
+
+      @Override
+      public void visitUnion(UnionType unionType) {
+        unionType.getTypes().forEach(type -> type.accept(this));
+      }
+
+      @Override
+      public void visitArrayType(ArrayType arrayType) {
+        arrayType.getType().accept(this);
+      }
+
+      @Override
+      public void visitObject(ObjectType objectType) {
+        if (objectType.isOpen()) {
+          objectType.getOpenRestriction().get().accept(this);
+        } else {
+          extensionModelHelper.getSubTypes(objectType)
+              .forEach(subtype -> registerTopLevelParameter(subtype, reflectionCache, context, extensionModel));
+        }
+      }
+    });
+  }
+
 
   /**
    * Creates the effective application model to be used to generate the runtime objects of the mule configuration.
@@ -1101,8 +1186,8 @@ public class ApplicationModel implements ArtifactAst {
    * message processors
    *
    * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to check if the element has to be
-   *        expanded.
-   * @param postProcess a closure to be executed after the macroexpansion of an extension.
+   *                        expanded.
+   * @param postProcess     a closure to be executed after the macroexpansion of an extension.
    */
   private void expandModules(Set<ExtensionModel> extensionModels, Runnable postProcess) {
     new MacroExpansionModulesModel(this, extensionModels).expand(postProcess);
