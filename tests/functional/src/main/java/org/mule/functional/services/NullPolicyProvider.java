@@ -35,6 +35,16 @@ public class NullPolicyProvider implements PolicyProvider {
   }
 
   @Override
+  public boolean isSourcePoliciesAvailable() {
+    return false;
+  }
+
+  @Override
+  public boolean isOperationPoliciesAvailable() {
+    return false;
+  }
+
+  @Override
   public List<Policy> findOperationParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters) {
     return emptyList();
   }

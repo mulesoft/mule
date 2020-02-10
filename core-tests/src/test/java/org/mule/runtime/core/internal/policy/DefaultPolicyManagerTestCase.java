@@ -84,6 +84,9 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     policiesChangeCallbackCaptor = ArgumentCaptor.forClass(Runnable.class);
     verify(policyProvider).onPoliciesChanged(policiesChangeCallbackCaptor.capture());
 
+    when(policyProvider.isSourcePoliciesAvailable()).thenReturn(true);
+    when(policyProvider.isOperationPoliciesAvailable()).thenReturn(true);
+
     flow1Component = mock(Component.class);
     when(flow1Component.getLocation()).thenReturn(fromSingleComponent("flow1"));
     when(flow1Component.getRootContainerLocation()).thenReturn(builderFromStringRepresentation("flow1").build());
@@ -104,6 +107,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void sourceNoPoliciesPresent() {
+    when(policyProvider.isSourcePoliciesAvailable()).thenReturn(false);
     when(policyProvider.findSourceParameterizedPolicies(any())).thenReturn(emptyList());
     policiesChangeCallbackCaptor.getValue().run();
 
@@ -129,7 +133,6 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
 
     when(policyProvider.findSourceParameterizedPolicies(policyParams1)).thenReturn(asList(policy));
     when(policyProvider.findSourceParameterizedPolicies(policyParams2)).thenReturn(asList(policy));
-    when(policyProvider.isPoliciesAvailable()).thenReturn(true);
     policiesChangeCallbackCaptor.getValue().run();
 
     final InternalEvent event1 = mock(InternalEvent.class);
@@ -163,7 +166,6 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     when(policyChain.onChainError(any())).thenReturn(policyChain);
 
     when(policyProvider.findSourceParameterizedPolicies(policyParams)).thenReturn(asList(policy));
-    when(policyProvider.isPoliciesAvailable()).thenReturn(true);
     policiesChangeCallbackCaptor.getValue().run();
 
     final InternalEvent event = mock(InternalEvent.class);
@@ -184,6 +186,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void operationNoPoliciesPresent() {
+    when(policyProvider.isOperationPoliciesAvailable()).thenReturn(false);
     when(policyProvider.findOperationParameterizedPolicies(any())).thenReturn(emptyList());
     policiesChangeCallbackCaptor.getValue().run();
 
@@ -204,7 +207,6 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
 
     when(policyProvider.findOperationParameterizedPolicies(any(PolicyPointcutParameters.class)))
         .thenReturn(asList(policy));
-    when(policyProvider.isPoliciesAvailable()).thenReturn(true);
     policiesChangeCallbackCaptor.getValue().run();
 
     final OperationPolicy operationPolicy1 = policyManager.createOperationPolicy(operation1Component, mock(InternalEvent.class),
@@ -226,7 +228,6 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     when(policyProvider.findOperationParameterizedPolicies(any(PolicyPointcutParameters.class)))
         .thenReturn(asList(policy1))
         .thenReturn(asList(policy2));
-    when(policyProvider.isPoliciesAvailable()).thenReturn(true);
     policiesChangeCallbackCaptor.getValue().run();
 
     final PolicyPointcutParameters sourcePolicyParams1 = mock(PolicyPointcutParameters.class);
@@ -258,7 +259,6 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     Policy policy = mockPolicy();
     when(policyProvider.findOperationParameterizedPolicies(any(PolicyPointcutParameters.class)))
         .thenReturn(asList(policy));
-    when(policyProvider.isPoliciesAvailable()).thenReturn(true);
     policiesChangeCallbackCaptor.getValue().run();
 
     final OperationPolicy policy1 = policyManager.createOperationPolicy(operation1Component, mock(InternalEvent.class),
@@ -301,7 +301,6 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
 
     when(policyProvider.findSourceParameterizedPolicies(any())).thenReturn(asList(policy));
 
-    when(policyProvider.isPoliciesAvailable()).thenReturn(true);
     policiesChangeCallbackCaptor.getValue().run();
 
     final InternalEvent event = mock(InternalEvent.class);
@@ -363,7 +362,6 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
 
     when(policyProvider.findOperationParameterizedPolicies(any())).thenReturn(asList(policy));
 
-    when(policyProvider.isPoliciesAvailable()).thenReturn(true);
     policiesChangeCallbackCaptor.getValue().run();
 
     final InternalEvent event = mock(InternalEvent.class);

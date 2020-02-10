@@ -56,7 +56,23 @@ public interface PolicyProvider {
    */
   default boolean isPoliciesAvailable() {
     return true;
-  };
+  }
+
+  /**
+   * Returns whether there are policies applicable to sources registered or not. In case this returns {@code false}, the caller
+   * may do certain optimization by skipping altogether the source policies code.
+   *
+   * @since 4.3
+   */
+  boolean isSourcePoliciesAvailable();
+
+  /**
+   * Returns whether there are policies applicable to operations registered or not. In case this returns {@code false}, the caller
+   * may do certain optimization by skipping altogether the operations policies code.
+   *
+   * @since 4.3
+   */
+  boolean isOperationPoliciesAvailable();
 
   /**
    * Register a callback to be executed any time a policy is added or removed.
@@ -67,6 +83,6 @@ public interface PolicyProvider {
    */
   default void onPoliciesChanged(Runnable policiesChangedCallback) {
     // Nothing to do
-  };
+  }
 
 }
