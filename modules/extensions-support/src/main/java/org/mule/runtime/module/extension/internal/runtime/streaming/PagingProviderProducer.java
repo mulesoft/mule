@@ -91,6 +91,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    * @return
    */
   private <R> R performWithConnection(Function<Object, R> function) {
+    actualConnectionSupplier = getActualConnectionSupplier();
     Object connection = getConnection(actualConnectionSupplier);
     try {
       R result = function.apply(connection);
@@ -111,6 +112,9 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   @Override
   public void close() {
     try {
+      if (actualConnectionSupplier == null) {
+        actualConnectionSupplier = getActualConnectionSupplier();
+      }
       delegate.close(actualConnectionSupplier.getConnection());
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
