@@ -1,0 +1,24 @@
+aload0 // reference to self
+getfield org/mule/runtime/module/extension/internal/runtime/execution/executor/sample/NonPrimitiveOperationReferenceExecutor.__targetInstance:org.mule.runtime.module.extension.internal.runtime.execution.executor.MethodExecutorGeneratorTestCase
+aload0 // reference to self
+getfield org/mule/runtime/module/extension/internal/runtime/execution/executor/sample/NonPrimitiveOperationReferenceExecutor.configResolver:org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver
+aload1
+invokeinterface org/mule/runtime/module/extension/internal/runtime/resolver/ArgumentResolver.resolve(Lorg/mule/runtime/extension/api/runtime/operation/ExecutionContext;)Ljava/lang/Object;
+checkcast org/mule/runtime/module/extension/internal/runtime/execution/executor/MethodExecutorGeneratorTestCase
+aload0 // reference to self
+getfield org/mule/runtime/module/extension/internal/runtime/execution/executor/sample/NonPrimitiveOperationReferenceExecutor.param1Resolver:org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver
+aload1
+invokeinterface org/mule/runtime/module/extension/internal/runtime/resolver/ArgumentResolver.resolve(Lorg/mule/runtime/extension/api/runtime/operation/ExecutionContext;)Ljava/lang/Object;
+checkcast java/lang/String
+aload0 // reference to self
+getfield org/mule/runtime/module/extension/internal/runtime/execution/executor/sample/NonPrimitiveOperationReferenceExecutor.mapResolver:org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver
+aload1
+invokeinterface org/mule/runtime/module/extension/internal/runtime/resolver/ArgumentResolver.resolve(Lorg/mule/runtime/extension/api/runtime/operation/ExecutionContext;)Ljava/lang/Object;
+checkcast java/util/Map
+aload0 // reference to self
+getfield org/mule/runtime/module/extension/internal/runtime/execution/executor/sample/NonPrimitiveOperationReferenceExecutor.streamingHelperResolver:org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver
+aload1
+invokeinterface org/mule/runtime/module/extension/internal/runtime/resolver/ArgumentResolver.resolve(Lorg/mule/runtime/extension/api/runtime/operation/ExecutionContext;)Ljava/lang/Object;
+checkcast org/mule/runtime/extension/api/runtime/streaming/StreamingHelper
+invokevirtual org/mule/runtime/module/extension/internal/runtime/execution/executor/MethodExecutorGeneratorTestCase.noPrimitivesOperation(Lorg/mule/runtime/module/extension/internal/runtime/execution/executor/MethodExecutorGeneratorTestCase;Ljava/lang/String;Ljava/util/Map;Lorg/mule/runtime/extension/api/runtime/streaming/StreamingHelper;)Ljava/io/InputStream;
+areturn

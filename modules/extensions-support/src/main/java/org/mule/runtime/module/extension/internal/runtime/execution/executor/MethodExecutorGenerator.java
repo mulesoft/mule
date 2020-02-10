@@ -180,6 +180,11 @@ public class MethodExecutorGenerator {
     return method.getDeclaringClass().getName() + "$" + method.getName() + "$" + hashCode() + "$MethodComponentExecutorWrapper";
   }
 
+  @Override
+  public int hashCode() {
+    return 1;
+  }
+
   private ArgumentLoader.Factory getArgumentLoaders(Method method) {
     return new ArgumentLoader.Factory() {
 
