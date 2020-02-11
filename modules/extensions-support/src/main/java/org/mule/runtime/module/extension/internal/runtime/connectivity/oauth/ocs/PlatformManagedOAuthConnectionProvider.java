@@ -170,7 +170,7 @@ public class PlatformManagedOAuthConnectionProvider<C> implements OAuthConnectio
       safely(() -> stopIfNeeded(getRetryPolicyTemplate()),
              e -> LOGGER.error(format("Error stopping %s for Platform Connection %s",
                                       RetryPolicyTemplate.class.getName(),
-                                      descriptor.getName()),
+                                      descriptor.getDisplayName()),
                                e));
     }
   }
