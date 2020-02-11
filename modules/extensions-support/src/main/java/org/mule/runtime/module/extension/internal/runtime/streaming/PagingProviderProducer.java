@@ -50,7 +50,6 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   private final ExtensionConnectionSupplier extensionConnectionSupplier;
   private final ExecutionContextAdapter executionContext;
   private final ConnectionSupplierFactory connectionSupplierFactory;
-  private ConnectionSupplier actualConnectionSupplier;
   private Boolean isFirstPage = true;
 
   public PagingProviderProducer(PagingProvider<Object, T> delegate,
@@ -91,17 +90,17 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    * @return
    */
   private <R> R performWithConnection(Function<Object, R> function) {
-    actualConnectionSupplier = getActualConnectionSupplier();
-    Object connection = getConnection(actualConnectionSupplier);
+    ConnectionSupplier connectionSupplier = getConnectionSupplier();
+    Object connection = getConnection(connectionSupplier);
     try {
       R result = function.apply(connection);
-      actualConnectionSupplier.close();
+      connectionSupplier.close();
       return result;
     } catch (Exception exception) {
       if (isFirstPage) {
         safely(() -> delegate.close(connection), e -> LOGGER.debug("Found exception closing paging provider", e));
       }
-      extractConnectionException(exception).ifPresent(ex -> actualConnectionSupplier.invalidateConnection());
+      extractConnectionException(exception).ifPresent(ex -> connectionSupplier.invalidateConnection());
       throw exception;
     }
   }
@@ -133,7 +132,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     return new DefaultConnectionSupplierFactory();
   }
 
-  private ConnectionSupplier getActualConnectionSupplier() {
+  private ConnectionSupplier getConnectionSupplier() {
     try {
       return connectionSupplierFactory.getConnectionSupplier();
     } catch (MuleException e) {
