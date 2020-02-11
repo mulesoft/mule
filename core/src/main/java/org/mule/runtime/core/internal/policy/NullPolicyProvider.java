@@ -7,15 +7,14 @@
 package org.mule.runtime.core.internal.policy;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
+import static org.mule.runtime.http.policy.api.SourcePolicyAwareAttributes.noAttributes;
 
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyProvider;
-import org.mule.runtime.policy.api.PolicyAwareAttribute;
+import org.mule.runtime.policy.api.PolicyAwareAttributes;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * A policy provider that returns no policy.
@@ -30,8 +29,8 @@ public class NullPolicyProvider implements PolicyProvider {
   }
 
   @Override
-  public Set<PolicyAwareAttribute> sourcePolicyAwareAttributes() {
-    return emptySet();
+  public PolicyAwareAttributes sourcePolicyAwareAttributes() {
+    return noAttributes();
   }
 
   @Override

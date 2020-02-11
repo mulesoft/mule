@@ -9,11 +9,9 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.lang.Integer.compare;
 import static java.lang.String.format;
-import static java.util.Collections.emptySet;
 import static java.util.Optional.of;
-import static java.util.stream.Collectors.toSet;
-import static java.util.stream.Stream.empty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.http.policy.api.SourcePolicyAwareAttributes.noAttributes;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.policy.Policy;
@@ -27,14 +25,13 @@ import org.mule.runtime.module.deployment.impl.internal.policy.ApplicationPolicy
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyInstanceProviderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateFactory;
 import org.mule.runtime.policy.api.AttributeAwarePointcut;
-import org.mule.runtime.policy.api.PolicyAwareAttribute;
+import org.mule.runtime.policy.api.PolicyAwareAttributes;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Provides policy management and provision for Mule applications
@@ -45,7 +42,7 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   private final PolicyInstanceProviderFactory policyInstanceProviderFactory;
   private final List<RegisteredPolicyTemplate> registeredPolicyTemplates = new LinkedList<>();
   private final List<RegisteredPolicyInstanceProvider> registeredPolicyInstanceProviders = new LinkedList<>();
-  private Set<PolicyAwareAttribute> sourcePolicyAwareAttributes = emptySet();
+  private PolicyAwareAttributes sourcePolicyAwareAttributes;
   private Application application;
 
   private Runnable policiesChangedCallback = () -> {
@@ -171,11 +168,9 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
 
   private synchronized void updatePolicyAwareAttributes() {
     sourcePolicyAwareAttributes = registeredPolicyInstanceProviders.stream()
-        .map(pip -> pip.getApplicationPolicyInstance().getPointcut())
-        .flatMap(pointcut -> (pointcut instanceof AttributeAwarePointcut)
-            ? ((AttributeAwarePointcut) pointcut).sourcePolicyAwareAttributes().stream()
-            : empty())
-        .collect(toSet());
+        .filter(pip -> pip.getApplicationPolicyInstance().getPointcut() instanceof AttributeAwarePointcut)
+        .map(pip -> ((AttributeAwarePointcut) pip.getApplicationPolicyInstance().getPointcut()).sourcePolicyAwareAttributes())
+        .reduce(noAttributes(), PolicyAwareAttributes::merge);
   }
 
   @Override
@@ -196,7 +191,7 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   }
 
   @Override
-  public synchronized Set<PolicyAwareAttribute> sourcePolicyAwareAttributes() {
+  public synchronized PolicyAwareAttributes sourcePolicyAwareAttributes() {
     return sourcePolicyAwareAttributes;
   }
 
