@@ -57,9 +57,9 @@ public class FileUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
   private static final String TEMP_DIR_SYSTEM_PROPERTY = "java.io.tmpdir";
+  private static final File TEMP_DIR = new File(getProperty(TEMP_DIR_SYSTEM_PROPERTY));
   private static final Random random = new Random();
 
-  public static final File TEMP_DIR = new File(getProperty(TEMP_DIR_SYSTEM_PROPERTY));
   public static String DEFAULT_ENCODING = "UTF-8";
 
   static {

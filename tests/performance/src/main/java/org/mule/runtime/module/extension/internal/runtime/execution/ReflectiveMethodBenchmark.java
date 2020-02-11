@@ -95,7 +95,7 @@ public class ReflectiveMethodBenchmark extends AbstractBenchmark {
       }
     };
 
-    MethodExecutor executor = new MethodExecutorGenerator().generate(target, method, resolverDelegate).getInstance();
+    MethodExecutor executor = new MethodExecutorGenerator().generate(target, method, resolverDelegate);
     return executor.execute(new ExecutionContext() {
 
       @Override
