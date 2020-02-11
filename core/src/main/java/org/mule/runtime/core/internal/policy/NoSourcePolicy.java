@@ -18,6 +18,8 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
@@ -38,14 +40,18 @@ public class NoSourcePolicy implements SourcePolicy, Disposable, DeferredDisposa
   private final CommonSourcePolicy commonPolicy;
 
   public NoSourcePolicy(ReactiveProcessor flowExecutionProcessor) {
-    commonPolicy = new CommonSourcePolicy(new SourceFluxObjectFactory(flowExecutionProcessor));
+    commonPolicy = new CommonSourcePolicy(new SourceFluxObjectFactory(this, flowExecutionProcessor));
   }
 
-  private final class SourceFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
+  private static final class SourceFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
 
+    private final Reference<NoSourcePolicy> noSourcePolicy;
     private final ReactiveProcessor flowExecutionProcessor;
 
-    public SourceFluxObjectFactory(ReactiveProcessor flowExecutionProcessor) {
+    public SourceFluxObjectFactory(NoSourcePolicy noSourcePolicy, ReactiveProcessor flowExecutionProcessor) {
+      // Avoid instances of this class from preventing the policy from being gc'd
+      // Break the circular reference between policy-sinkFactory-flux that may cause memory leaks in the policies caches
+      this.noSourcePolicy = new WeakReference<>(noSourcePolicy);
       this.flowExecutionProcessor = flowExecutionProcessor;
     }
 
@@ -58,7 +64,7 @@ public class NoSourcePolicy implements SourcePolicy, Disposable, DeferredDisposa
               .transform(flowExecutionProcessor)
               .map(flowExecutionResult -> {
                 MessageSourceResponseParametersProcessor parametersProcessor =
-                    commonPolicy.getResponseParamsProcessor(flowExecutionResult);
+                    noSourcePolicy.get().commonPolicy.getResponseParamsProcessor(flowExecutionResult);
 
                 return right(SourcePolicyFailureResult.class,
                              new SourcePolicySuccessResult(flowExecutionResult,
@@ -67,18 +73,21 @@ public class NoSourcePolicy implements SourcePolicy, Disposable, DeferredDisposa
                                                                .apply(flowExecutionResult),
                                                            parametersProcessor));
               })
-              .doOnNext(result -> result.apply(spfr -> commonPolicy.finishFlowProcessing(spfr.getMessagingException().getEvent(),
-                                                                                         result, spfr.getMessagingException()),
-                                               spsr -> commonPolicy.finishFlowProcessing(spsr.getResult(), result)))
+              .doOnNext(result -> result
+                  .apply(spfr -> noSourcePolicy.get().commonPolicy.finishFlowProcessing(spfr.getMessagingException().getEvent(),
+                                                                                        result, spfr.getMessagingException()),
+                         spsr -> noSourcePolicy.get().commonPolicy.finishFlowProcessing(spsr.getResult(), result)))
               .onErrorContinue(MessagingException.class, (t, e) -> {
                 final MessagingException me = (MessagingException) t;
                 final InternalEvent event = (InternalEvent) me.getEvent();
 
-                commonPolicy.finishFlowProcessing(event,
-                                                  left(new SourcePolicyFailureResult(me, () -> commonPolicy
-                                                      .getResponseParamsProcessor(event)
-                                                      .getFailedExecutionResponseParametersFunction().apply(me.getEvent()))),
-                                                  me);
+                noSourcePolicy.get().commonPolicy.finishFlowProcessing(event,
+                                                                       left(new SourcePolicyFailureResult(me, () -> noSourcePolicy
+                                                                           .get().commonPolicy
+                                                                               .getResponseParamsProcessor(event)
+                                                                               .getFailedExecutionResponseParametersFunction()
+                                                                               .apply(me.getEvent()))),
+                                                                       me);
               });
 
       policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + toString(), e));
