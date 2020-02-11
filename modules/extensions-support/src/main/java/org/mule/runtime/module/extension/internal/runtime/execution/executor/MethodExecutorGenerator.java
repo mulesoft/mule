@@ -274,7 +274,6 @@ public class MethodExecutorGenerator {
 
               // handle casting, autoboxing and similar herbs
               stack.add(assigner.assign(new ForLoadedType(Object.class).asGenericType(),
-
                                         new ForLoadedType(parameterType).asGenericType(), typing));
 
               return new StackManipulation.Compound(stack);
