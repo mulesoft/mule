@@ -19,6 +19,8 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
  */
 public class SdkMethodInvocationException extends MuleRuntimeException {
 
+  private static final long serialVersionUID = 8708990792854682118L;
+
   public SdkMethodInvocationException(Throwable cause) {
     super(cause);
   }
