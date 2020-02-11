@@ -15,8 +15,6 @@ import org.mule.runtime.module.extension.internal.runtime.execution.executor.Met
 import org.mule.runtime.module.extension.internal.runtime.execution.executor.MethodExecutorGenerator;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -42,7 +40,7 @@ public class ReflectiveMethodBenchmark extends AbstractBenchmark {
   private Method method;
 
   @Setup
-  public void setUp() throws NoSuchMethodException, SecurityException, FileNotFoundException, IOException {
+  public void setUp() throws NoSuchMethodException, SecurityException {
     target = new Target();
     method =
         target.getClass().getDeclaredMethod("doIt", new Class[] {int.class, int.class, int.class, int.class, int.class, int.class,
@@ -62,12 +60,12 @@ public class ReflectiveMethodBenchmark extends AbstractBenchmark {
   public Object generated() throws Exception {
     ArgumentResolverDelegate resolverDelegate = new ArgumentResolverDelegate() {
 
-      private final int count = 10;
+      private static final int COUNT = 10;
 
       @Override
       public ArgumentResolver<?>[] getArgumentResolvers() {
-        ArgumentResolver<?>[] resolvers = new ArgumentResolver[count];
-        for (int i = 0; i < count; i++) {
+        ArgumentResolver<?>[] resolvers = new ArgumentResolver[COUNT];
+        for (int i = 0; i < COUNT; i++) {
           int retVal = i;
           resolvers[i] = (ArgumentResolver<Object>) executionContext -> retVal;
         }
@@ -77,8 +75,8 @@ public class ReflectiveMethodBenchmark extends AbstractBenchmark {
 
       @Override
       public Object[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
-        Object[] values = new Object[count];
-        for (int i = 0; i < count; i++) {
+        Object[] values = new Object[COUNT];
+        for (int i = 0; i < COUNT; i++) {
           values[i] = i;
         }
 
@@ -87,8 +85,8 @@ public class ReflectiveMethodBenchmark extends AbstractBenchmark {
 
       @Override
       public Supplier<Object>[] resolveDeferred(ExecutionContext executionContext, Class<?>[] parameterTypes) {
-        Supplier<Object>[] suppliers = new Supplier[count];
-        for (int i = 0; i < count; i++) {
+        Supplier<Object>[] suppliers = new Supplier[COUNT];
+        for (int i = 0; i < COUNT; i++) {
           int retVal = i;
           suppliers[i] = () -> retVal;
         }

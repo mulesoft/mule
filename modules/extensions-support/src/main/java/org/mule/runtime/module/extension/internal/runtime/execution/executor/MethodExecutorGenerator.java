@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution.executor;
 
+import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
+import static java.nio.file.Files.delete;
 import static java.util.Arrays.asList;
 import static net.bytebuddy.description.modifier.FieldManifestation.FINAL;
 import static net.bytebuddy.description.modifier.Visibility.PRIVATE;
@@ -32,6 +34,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResol
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -86,7 +89,7 @@ public class MethodExecutorGenerator {
                                                     ArgumentResolverDelegate argumentResolverDelegate)
       throws Exception {
 
-    GeneratedClass<MethodExecutor> generatedClass = getExecutorClass(method, targetInstance);
+    GeneratedClass<MethodExecutor> generatedClass = getExecutorClass(method);
     List<Object> args = new ArrayList<>();
     args.add(targetInstance);
     args.addAll(asList(argumentResolverDelegate.getArgumentResolvers()));
@@ -97,13 +100,13 @@ public class MethodExecutorGenerator {
     return new GeneratedInstance<>(instance, generatedClass);
   }
 
-  private GeneratedClass<MethodExecutor> getExecutorClass(Method method, Object targetInstance) {
+  private GeneratedClass<MethodExecutor> getExecutorClass(Method method) {
     String generatorName = getGeneratorName(method);
-    return executorClasses.computeIfAbsent(generatorName, key -> generateExecutorClass(key, method, targetInstance));
+    return executorClasses.computeIfAbsent(generatorName, key -> generateExecutorClass(key, method));
 
   }
 
-  private GeneratedClass<MethodExecutor> generateExecutorClass(String generatorName, Method method, Object targetInstance) {
+  private GeneratedClass<MethodExecutor> generateExecutorClass(String generatorName, Method method) {
     DynamicType.Builder<Object> operationWrapperClassBuilder = new ByteBuddy()
         .subclass(Object.class, NO_CONSTRUCTORS)
         .implement(MethodExecutor.class)
@@ -183,7 +186,14 @@ public class MethodExecutorGenerator {
 
     final File file = new File(TEMP_DIR, generatorName + ".class");
     if (file.exists()) {
-      file.delete();
+      try {
+        delete(file.toPath());
+      } catch (IOException e) {
+        throw new MuleRuntimeException(createStaticMessage(format(
+                                                                  "Temporal bytecode class for executing method %s already exists but couldn't be deleted",
+                                                                  method.toString())),
+                                       e);
+      }
     }
 
     try (FileOutputStream os = new FileOutputStream(file)) {

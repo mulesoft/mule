@@ -42,7 +42,7 @@ import org.slf4j.Logger;
 abstract class AbstractCompletableMethodOperationExecutor<M extends ComponentModel>
     implements CompletableComponentExecutor<M>, OperationArgumentResolverFactory<M>, MuleContextAware, Lifecycle {
 
-  private static final Logger LOGGER = getLogger(CompletableMethodOperationExecutor.class);
+  private static final Logger LOGGER = getLogger(AbstractCompletableMethodOperationExecutor.class);
 
   protected final GeneratedMethodComponentExecutor<M> executor;
   private MuleContext muleContext;
