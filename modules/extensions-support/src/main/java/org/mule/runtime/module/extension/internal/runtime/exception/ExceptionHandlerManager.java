@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
-import static org.mule.runtime.core.api.util.ExceptionUtils.extractCauseOfType;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -84,8 +83,7 @@ public final class ExceptionHandlerManager {
     if (connectionException.isPresent()) {
       return resolveConnectionException(connectionException.get());
     } else {
-      // unwraps the exception thrown by the reflective operation if exist any.
-      return extractCauseOfType(e, UndeclaredThrowableException.class).orElse(e);
+      return e instanceof SdkMethodInvocationException ? e.getCause() : e;
     }
   }
 

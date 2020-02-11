@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
+import static java.lang.System.arraycopy;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnotationParser.getParamNames;
@@ -241,6 +242,14 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   }
 
   @Override
+  public ArgumentResolver<?>[] getArgumentResolvers() {
+    ArgumentResolver<?>[] copy = new ArgumentResolver<?>[argumentResolvers.length];
+    arraycopy(argumentResolvers, 0, copy, 0, argumentResolvers.length);
+
+    return copy;
+  }
+
+  @Override
   public Object[] resolve(ExecutionContext executionContext, Class<?>[] parameterTypes) {
     Object[] parameterValues = new Object[argumentResolvers.length];
     for (int i = 0; i < argumentResolvers.length; i++) {
@@ -304,7 +313,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       return new DefaultValueArgumentResolverDecorator(resolver, (short) 0);
     }
     if (type.equals(double.class)) {
-      return new DefaultValueArgumentResolverDecorator(resolver, (double) 0.0d);
+      return new DefaultValueArgumentResolverDecorator(resolver, 0.0d);
     }
     if (type.equals(char.class)) {
       return new DefaultValueArgumentResolverDecorator(resolver, '\u0000');

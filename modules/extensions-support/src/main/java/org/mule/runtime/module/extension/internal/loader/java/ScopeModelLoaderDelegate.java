@@ -26,7 +26,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterDeclarationContext;
-import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveOperationExecutorFactory;
+import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -87,9 +87,10 @@ final class ScopeModelLoaderDelegate extends AbstractModelLoaderDelegate {
 
     if (method.isPresent() && declaringClass.isPresent()) {
       scope.withModelProperty(new ImplementingMethodModelProperty(method.get()))
-          .withModelProperty(new CompletableComponentExecutorModelProperty(new ReflectiveOperationExecutorFactory(declaringClass
+          .withModelProperty(new CompletableComponentExecutorModelProperty(new CompletableOperationExecutorFactory(declaringClass
               .get(),
-                                                                                                                  method.get())));
+                                                                                                                   method
+                                                                                                                       .get())));
     }
 
     processMimeType(scope, scopeMethod);

@@ -14,6 +14,7 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -24,7 +25,6 @@ import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 
 import java.io.IOException;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Before;
@@ -92,10 +92,10 @@ public class ExceptionHandlerManagerTestCase {
   }
 
   @Test
-  public void handleInvocationTargetExceptionCause() {
+  public void handleSdkMethodInvocationExceptionCause() {
     IOException rootCause = new IOException(ERROR_MESSAGE, new Exception());
     // The root cause is contained in a reflective UndeclaredThrowableException exception
-    Throwable throwable = manager.handleThrowable(new Throwable(new Exception(new UndeclaredThrowableException(rootCause))));
+    Throwable throwable = manager.handleThrowable(new SdkMethodInvocationException(rootCause));
     assertThat(throwable, is(instanceOf(IOException.class)));
     assertThat(throwable.getMessage(), is(ERROR_MESSAGE));
     assertThat(throwable, is(sameInstance(rootCause)));

@@ -33,7 +33,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
-import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveMethodComponentExecutor;
+import org.mule.runtime.module.extension.internal.runtime.execution.GeneratedMethodComponentExecutor;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -44,11 +44,12 @@ import java.util.stream.Stream;
 import com.google.common.collect.ImmutableList;
 
 /**
- * Implementation of {@link SourceCallbackExecutor} which uses reflection to execute the callback through a {@link Method}
+ * Implementation of {@link SourceCallbackExecutor} which uses a {@link GeneratedMethodComponentExecutor} to execute the
+ * callback through a {@link Method}
  *
- * @since 4.0
+ * @since 4.3.0
  */
-class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
+class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
 
   private final ExtensionModel extensionModel;
   private final Optional<ConfigurationInstance> configurationInstance;
@@ -57,7 +58,7 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
   private final StreamingManager streamingManager;
   private final MuleContext muleContext;
   private final boolean async;
-  private final ReflectiveMethodComponentExecutor<SourceModel> executor;
+  private final GeneratedMethodComponentExecutor<SourceModel> executor;
   private final Component component;
 
   /**
@@ -74,16 +75,16 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
    * @param muleContext           the current {@link MuleContext}
    * @param sourceCallbackModel   the callback's model
    */
-  public ReflectiveSourceCallbackExecutor(ExtensionModel extensionModel,
-                                          Optional<ConfigurationInstance> configurationInstance,
-                                          SourceModel sourceModel,
-                                          Object source,
-                                          Method method,
-                                          CursorProviderFactory cursorProviderFactory,
-                                          StreamingManager streamingManager,
-                                          Component component,
-                                          MuleContext muleContext,
-                                          SourceCallbackModelProperty sourceCallbackModel) {
+  public DefaultSourceCallbackExecutor(ExtensionModel extensionModel,
+                                       Optional<ConfigurationInstance> configurationInstance,
+                                       SourceModel sourceModel,
+                                       Object source,
+                                       Method method,
+                                       CursorProviderFactory cursorProviderFactory,
+                                       StreamingManager streamingManager,
+                                       Component component,
+                                       MuleContext muleContext,
+                                       SourceCallbackModelProperty sourceCallbackModel) {
 
     this.extensionModel = extensionModel;
     this.configurationInstance = configurationInstance;
@@ -92,9 +93,10 @@ class ReflectiveSourceCallbackExecutor implements SourceCallbackExecutor {
     this.streamingManager = streamingManager;
     this.component = component;
     this.muleContext = muleContext;
-    executor = new ReflectiveMethodComponentExecutor<>(getAllGroups(sourceModel, method, sourceCallbackModel), method, source);
+    executor =
+        new GeneratedMethodComponentExecutor<>(getAllGroups(sourceModel, method, sourceCallbackModel), method, source);
     try {
-      initialiseIfNeeded(executor, muleContext);
+      initialiseIfNeeded(executor, true, muleContext);
     } catch (InitialisationException e) {
       throw new MuleRuntimeException(e);
     }

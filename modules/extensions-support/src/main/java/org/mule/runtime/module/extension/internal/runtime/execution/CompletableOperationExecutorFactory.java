@@ -8,8 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNonBlocking;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -26,18 +27,18 @@ import java.util.Map;
 
 /**
  * An implementation of {@link CompletableComponentExecutorFactory} which produces instances of
- * {@link ReflectiveMethodOperationExecutor}.
+ * {@link CompletableMethodOperationExecutor}.
  *
  * @param <T> the type of the class in which the implementing method is declared
  * @since 3.7
  */
-public final class ReflectiveOperationExecutorFactory<T, M extends ComponentModel> implements
+public final class CompletableOperationExecutorFactory<T, M extends ComponentModel> implements
     CompletableComponentExecutorFactory<M> {
 
   private final Class<T> implementationClass;
   private final Method operationMethod;
 
-  public ReflectiveOperationExecutorFactory(Class<T> implementationClass, Method operationMethod) {
+  public CompletableOperationExecutorFactory(Class<T> implementationClass, Method operationMethod) {
     checkArgument(implementationClass != null, "implementationClass cannot be null");
     checkArgument(operationMethod != null, "operationMethod cannot be null");
 
@@ -52,7 +53,7 @@ public final class ReflectiveOperationExecutorFactory<T, M extends ComponentMode
     Object delegate;
     CoreEvent initialiserEvent = null;
     try {
-      initialiserEvent = getInitialiserEvent();
+      initialiserEvent = getNullEvent();
       delegate = objectBuilder.build(ValueResolvingContext.builder(initialiserEvent).build());
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create instance of operation class "
@@ -64,9 +65,9 @@ public final class ReflectiveOperationExecutorFactory<T, M extends ComponentMode
     }
 
     if (isNonBlocking(operationModel)) {
-      return new NonBlockingReflectiveMethodOperationExecutor<>(operationModel, operationMethod, delegate);
+      return new NonBlockingCompletableMethodOperationExecutor<>(operationModel, operationMethod, delegate);
     }
 
-    return new ReflectiveMethodOperationExecutor<>(operationModel, operationMethod, delegate);
+    return new CompletableMethodOperationExecutor<>(operationModel, operationMethod, delegate);
   }
 }

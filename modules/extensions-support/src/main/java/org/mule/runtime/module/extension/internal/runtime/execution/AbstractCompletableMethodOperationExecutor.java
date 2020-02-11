@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.execution.deprecated;
+package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -14,8 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextProperties.COMPLETION_CALLBACK_CONTEXT_PARAM;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Mono.error;
-import static reactor.core.publisher.Mono.justOrEmpty;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -23,55 +22,52 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.runtime.execution.OperationArgumentResolverFactory;
-import org.mule.runtime.module.extension.internal.runtime.execution.ReflectiveMethodComponentExecutor;
+import org.mule.runtime.module.extension.internal.runtime.exception.SdkMethodInvocationException;
 
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 /**
- * Implementation of {@link ComponentExecutor} which works by using reflection to invoke a method from a class.
+ * Base class for {@link CompletableComponentExecutor} that use reflection to invoke the actual application logic
  *
- * @since 3.7.0
- * @deprecated since 4.3
+ * @since 4.3.0
  */
-@Deprecated
-public class ReactiveReflectiveMethodOperationExecutor<M extends ComponentModel>
-    implements ComponentExecutor<M>, OperationArgumentResolverFactory<M>, MuleContextAware, Lifecycle {
+abstract class AbstractCompletableMethodOperationExecutor<M extends ComponentModel>
+    implements CompletableComponentExecutor<M>, OperationArgumentResolverFactory<M>, MuleContextAware, Lifecycle {
 
-  private static final Logger LOGGER = getLogger(ReactiveReflectiveMethodOperationExecutor.class);
+  private static final Logger LOGGER = getLogger(AbstractCompletableMethodOperationExecutor.class);
 
-  private final ReflectiveMethodComponentExecutor<M> executor;
+  protected final GeneratedMethodComponentExecutor<M> executor;
   private MuleContext muleContext;
 
-  public ReactiveReflectiveMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
-    executor =
-        new ReflectiveMethodComponentExecutor<>(operationModel.getParameterGroupModels(), operationMethod, operationInstance);
+  public AbstractCompletableMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
+    executor = new GeneratedMethodComponentExecutor<>(operationModel.getParameterGroupModels(),
+                                                      operationMethod, operationInstance);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public Publisher<Object> execute(ExecutionContext<M> executionContext) {
+  public final void execute(ExecutionContext<M> executionContext, ExecutorCallback callback) {
     try {
-      return justOrEmpty(executor.execute(executionContext));
+      doExecute(executionContext, callback);
+    } catch (SdkMethodInvocationException e) {
+      callback.error(handleError(wrapFatal(e.getCause()), (ExecutionContextAdapter<M>) executionContext));
     } catch (Exception e) {
-      return handleError(e, (ExecutionContextAdapter<M>) executionContext);
+      callback.error(handleError(e, (ExecutionContextAdapter<M>) executionContext));
     } catch (Throwable t) {
-      return handleError(wrapFatal(t), (ExecutionContextAdapter<M>) executionContext);
+      callback.error(handleError(wrapFatal(t), (ExecutionContextAdapter<M>) executionContext));
     }
   }
 
-  private Publisher<Object> handleError(Throwable t, ExecutionContextAdapter<M> executionContext) {
+  protected abstract void doExecute(ExecutionContext<M> executionContext, ExecutorCallback callback);
+
+  protected Throwable handleError(Throwable t, ExecutionContextAdapter<M> executionContext) {
     CompletionCallback completionCallback = executionContext.getVariable(COMPLETION_CALLBACK_CONTEXT_PARAM);
     if (completionCallback != null) {
       if (t instanceof Exception) {
@@ -81,7 +77,7 @@ public class ReactiveReflectiveMethodOperationExecutor<M extends ComponentModel>
       }
     }
 
-    return error(t);
+    return t;
   }
 
   @Override
@@ -116,4 +112,5 @@ public class ReactiveReflectiveMethodOperationExecutor<M extends ComponentModel>
         ? executor.createArgumentResolver(operationModel)
         : ec -> emptyMap();
   }
+
 }

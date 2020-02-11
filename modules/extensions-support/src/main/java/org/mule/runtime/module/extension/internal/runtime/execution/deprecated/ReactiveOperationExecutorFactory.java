@@ -25,20 +25,20 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
- * An implementation of {@link ComponentExecutorFactory} which produces instances of {@link ReactiveReflectiveMethodOperationExecutor}.
+ * An implementation of {@link ComponentExecutorFactory} which produces instances of {@link ComponentExecutorFactory}.
  *
  * @param <T> the type of the class in which the implementing method is declared
  * @since 3.7.0
  * @deprecated since 4.3
  */
 @Deprecated
-public final class ReactiveReflectiveOperationExecutorFactory<T, M extends ComponentModel>
+public final class ReactiveOperationExecutorFactory<T, M extends ComponentModel>
     implements ComponentExecutorFactory<M> {
 
   private final Class<T> implementationClass;
   private final Method operationMethod;
 
-  public ReactiveReflectiveOperationExecutorFactory(Class<T> implementationClass, Method operationMethod) {
+  public ReactiveOperationExecutorFactory(Class<T> implementationClass, Method operationMethod) {
     checkArgument(implementationClass != null, "implementationClass cannot be null");
     checkArgument(operationMethod != null, "operationMethod cannot be null");
 
@@ -64,6 +64,6 @@ public final class ReactiveReflectiveOperationExecutorFactory<T, M extends Compo
       }
     }
 
-    return new ReactiveReflectiveMethodOperationExecutor(operationModel, operationMethod, delegate);
+    return new ReactiveMethodOperationExecutor(operationModel, operationMethod, delegate);
   }
 }

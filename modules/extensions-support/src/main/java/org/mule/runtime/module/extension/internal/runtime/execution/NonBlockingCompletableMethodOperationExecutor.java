@@ -14,15 +14,16 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import java.lang.reflect.Method;
 
 /**
- * Implementation of {@link NonBlockingReflectiveMethodOperationExecutor} which works by using reflection to invoke a method from a class.
+ * Implementation of {@link NonBlockingCompletableMethodOperationExecutor} which works by using a
+ * {@link GeneratedMethodComponentExecutor}
  *
- * @since 4.3
+ * @since 4.3.0
  */
-public class NonBlockingReflectiveMethodOperationExecutor<M extends ComponentModel>
-    extends AbstractReflectiveMethodOperationExecutor<M> {
+public class NonBlockingCompletableMethodOperationExecutor<M extends ComponentModel>
+    extends AbstractCompletableMethodOperationExecutor<M> {
 
 
-  public NonBlockingReflectiveMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
+  public NonBlockingCompletableMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
     super(operationModel, operationMethod, operationInstance);
   }
 

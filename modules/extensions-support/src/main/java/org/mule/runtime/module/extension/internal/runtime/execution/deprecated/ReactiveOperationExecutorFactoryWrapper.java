@@ -57,7 +57,7 @@ public final class ReactiveOperationExecutorFactoryWrapper<T extends ComponentMo
 
   private boolean isJavaNonBlocking(T componentModel, ComponentExecutor<T> executor) {
     if (componentModel instanceof OperationModel && !((OperationModel) componentModel).isBlocking()) {
-      return executor instanceof ReactiveReflectiveMethodOperationExecutor;
+      return executor instanceof ReactiveMethodOperationExecutor;
     } else {
       return componentModel instanceof ConstructModel;
     }
