@@ -109,7 +109,7 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
         isEmpty(method.getParameterTypes()) ? NO_ARGS_DELEGATE : getMethodArgumentResolver(groups, method);
 
     try {
-      methodExecutor = methodExecutorGenerator.generate(componentInstance, method, argumentResolverDelegate).getInstance();
+      methodExecutor = methodExecutorGenerator.generate(componentInstance, method, argumentResolverDelegate);
     } catch (Exception e) {
       throw new InitialisationException(e, this);
     }

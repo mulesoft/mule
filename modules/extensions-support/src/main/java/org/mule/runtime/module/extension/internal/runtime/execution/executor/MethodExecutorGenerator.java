@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.execution.executor;
 
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
-import static java.nio.file.Files.delete;
 import static java.util.Arrays.asList;
 import static net.bytebuddy.description.modifier.FieldManifestation.FINAL;
 import static net.bytebuddy.description.modifier.Visibility.PRIVATE;
@@ -22,14 +21,11 @@ import static net.bytebuddy.matcher.ElementMatchers.isConstructor;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.util.FileUtils.TEMP_DIR;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.execution.ArgumentResolverDelegate;
-import org.mule.runtime.module.extension.internal.runtime.execution.GeneratedClass;
-import org.mule.runtime.module.extension.internal.runtime.execution.GeneratedInstance;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 
 import java.io.File;
@@ -38,10 +34,10 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.field.FieldDescription;
@@ -69,44 +65,53 @@ import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess;
 public class MethodExecutorGenerator {
 
   private static final String TARGET_INSTANCE_FIELD_NAME = "__targetInstance";
-  private final Map<String, GeneratedClass<MethodExecutor>> executorClasses = new HashMap<>();
+  private final Map<String, Class<MethodExecutor>> executorClasses = new ConcurrentHashMap<>();
   private final int instanceId = identityHashCode(this);
 
   /**
-   * Creates a {@link GeneratedInstance} pointing to a dynamic {@link MethodExecutor} that executes the given {@code method}.
+   * Instantiates a dynamic {@link MethodExecutor} that executes the given {@code method}.
    * <p>
-   * Each invocation to this method will return a new {@link GeneratedInstance} pointing to unique instances. However, all
-   * invocations pointing to the same {@code method} will share the same underlying {@link GeneratedClass}
+   * Each invocation to this method will return a new and unique {@link MethodExecutor} instances. However, all
+   * invocations pointing to the same {@code method} will return instances of the same dynamically generated class.
    *
    * @param targetInstance           the instance on which the method is to be executed
    * @param method                   the method to be invoked
    * @param argumentResolverDelegate the {@link ArgumentResolverDelegate} that provides the {@link ArgumentResolver resolvers}
-   * @return a {@link GeneratedInstance}
+   * @return a {@link MethodExecutor}
    * @throws Exception if the instance cannot be generated
    */
-  public GeneratedInstance<MethodExecutor> generate(Object targetInstance,
-                                                    Method method,
-                                                    ArgumentResolverDelegate argumentResolverDelegate)
-      throws Exception {
+  public MethodExecutor generate(Object targetInstance,
+                                 Method method,
+                                 ArgumentResolverDelegate argumentResolverDelegate) {
+    return generate(targetInstance, method, argumentResolverDelegate, null);
+  }
 
-    GeneratedClass<MethodExecutor> generatedClass = getExecutorClass(method);
+  public MethodExecutor generate(Object targetInstance,
+                                 Method method,
+                                 ArgumentResolverDelegate argumentResolverDelegate,
+                                 File generatedByteCodeFile) {
+
+    Class<MethodExecutor> generatedClass = getExecutorClass(method, generatedByteCodeFile);
     List<Object> args = new ArrayList<>();
     args.add(targetInstance);
     args.addAll(asList(argumentResolverDelegate.getArgumentResolvers()));
 
-    MethodExecutor instance = (MethodExecutor) generatedClass.getGeneratedClass().getConstructors()[0]
-        .newInstance(args.toArray(new Object[args.size()]));
-
-    return new GeneratedInstance<>(instance, generatedClass);
+    try {
+      return (MethodExecutor) generatedClass.getConstructors()[0].newInstance(args.toArray(new Object[args.size()]));
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage(format("Could not instantiate dynamic %s for method %s",
+                                                                MethodExecutor.class.getName(), method.toString())),
+                                     e);
+    }
   }
 
-  private GeneratedClass<MethodExecutor> getExecutorClass(Method method) {
+  private Class<MethodExecutor> getExecutorClass(Method method, File generatedByteCodeFile) {
     String generatorName = getGeneratorName(method);
-    return executorClasses.computeIfAbsent(generatorName, key -> generateExecutorClass(key, method));
+    return executorClasses.computeIfAbsent(generatorName, key -> generateExecutorClass(key, method, generatedByteCodeFile));
 
   }
 
-  private GeneratedClass<MethodExecutor> generateExecutorClass(String generatorName, Method method) {
+  private Class<MethodExecutor> generateExecutorClass(String generatorName, Method method, File generatedByteCodeFile) {
     DynamicType.Builder<Object> operationWrapperClassBuilder = new ByteBuddy()
         .subclass(Object.class, NO_CONSTRUCTORS)
         .implement(MethodExecutor.class)
@@ -184,27 +189,27 @@ public class MethodExecutorGenerator {
 
         ).make();
 
-    final File file = new File(TEMP_DIR, generatorName + ".class");
-    if (file.exists()) {
-      try {
-        delete(file.toPath());
+    if (generatedByteCodeFile != null) {
+      try (FileOutputStream os = new FileOutputStream(generatedByteCodeFile)) {
+        os.write(byteBuddyMadeWrapper.getBytes());
       } catch (IOException e) {
         throw new MuleRuntimeException(createStaticMessage(format(
-                                                                  "Temporal bytecode class for executing method %s already exists but couldn't be deleted",
-                                                                  method.toString())),
+                                                                  "Could not store bytecode while generating a dynamic %s for method %s",
+                                                                  MethodExecutor.class, method.toString())),
                                        e);
       }
     }
 
-    try (FileOutputStream os = new FileOutputStream(file)) {
-      os.write(byteBuddyMadeWrapper.getBytes());
-      CompositeClassLoader executorClassLoader = new CompositeClassLoader(method.getDeclaringClass().getClassLoader(),
-                                                                          getClass().getClassLoader());
+    CompositeClassLoader executorClassLoader = new CompositeClassLoader(method.getDeclaringClass().getClassLoader(),
+                                                                        getClass().getClassLoader());
 
-      return new GeneratedClass<>((Class<MethodExecutor>) byteBuddyMadeWrapper.load(executorClassLoader, INJECTION).getLoaded(),
-                                  file);
+    try {
+      return (Class<MethodExecutor>) byteBuddyMadeWrapper.load(executorClassLoader, INJECTION).getLoaded();
     } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not generate MethodExecutor class"), e);
+      throw new MuleRuntimeException(createStaticMessage(
+                                                         "Could not generate MethodExecutor class for method "
+                                                             + method.toString()),
+                                     e);
     }
   }
 
