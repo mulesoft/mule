@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static java.lang.System.getProperty;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.notification.FlowConstructNotification.FLOW_CONSTRUCT_STOPPED;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 
@@ -116,7 +118,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   private final Set<DeferredDisposableWeakReference> activePolicies = new HashSet<>();
 
   private volatile boolean stopped = true;
-  private Future taskHandle;
+  private Future<?> taskHandle;
   @Inject
   private SchedulerService schedulerService;
   private Scheduler scheduler;
@@ -350,6 +352,20 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
     disposePolicies();
     evictCaches();
     scheduler.stop();
+
+    activePolicies.forEach(stalePolicy -> disposeIfNeeded(stalePolicy, LOGGER));
+    activePolicies.clear();
+    try {
+      while (stalePoliciesQueue.remove(1) != null) {
+        // nothing to do, just the removal
+      }
+    } catch (IllegalArgumentException | InterruptedException e) {
+      if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
+        throw new MuleRuntimeException(e);
+      } else {
+        LOGGER.warn("Exception when disposing DefaultPolicyManager", e);
+      }
+    }
   }
 
   private void disposePolicies() {
