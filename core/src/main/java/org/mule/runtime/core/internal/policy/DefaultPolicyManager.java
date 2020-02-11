@@ -350,11 +350,10 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   @Override
   public void dispose() {
     disposePolicies();
-    evictCaches();
-    scheduler.stop();
 
     activePolicies.forEach(stalePolicy -> disposeIfNeeded(stalePolicy, LOGGER));
     activePolicies.clear();
+
     try {
       while (stalePoliciesQueue.remove(1) != null) {
         // nothing to do, just the removal
@@ -366,6 +365,9 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
         LOGGER.warn("Exception when disposing DefaultPolicyManager", e);
       }
     }
+
+    evictCaches();
+    scheduler.stop();
   }
 
   private void disposePolicies() {
