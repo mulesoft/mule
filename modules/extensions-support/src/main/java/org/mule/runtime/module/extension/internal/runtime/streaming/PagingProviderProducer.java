@@ -99,7 +99,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       return result;
     } catch (Exception exception) {
       if (isFirstPage) {
-        safely(() -> delegate.close(connection), e -> LOGGER.debug("Found exception closing buffer", e));
+        safely(() -> delegate.close(connection), e -> LOGGER.debug("Found exception closing paging provider", e));
       }
       extractConnectionException(exception).ifPresent(ex -> actualConnectionSupplier.invalidateConnection());
       throw exception;
@@ -111,15 +111,16 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    */
   @Override
   public void close() {
+    ConnectionSupplier connectionSupplier = null;
     try {
-      if (actualConnectionSupplier == null) {
-        actualConnectionSupplier = getActualConnectionSupplier();
-      }
-      delegate.close(actualConnectionSupplier.getConnection());
+      connectionSupplier = connectionSupplierFactory.getConnectionSupplier();
+      delegate.close(connectionSupplier.getConnection());
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
     } finally {
-      actualConnectionSupplier.close();
+      if (connectionSupplier != null) {
+        connectionSupplier.close();
+      }
       connectionSupplierFactory.dispose();
     }
   }
