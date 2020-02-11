@@ -10,6 +10,7 @@ import static com.google.common.base.Joiner.on;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
@@ -645,9 +646,9 @@ public class ApplicationModel implements ArtifactAst {
             || getSubstitutionGroup(objectType).isPresent() ||
             extensionModelHelper.getAllSubTypes().contains(objectType)) {
 
-          findComponentDefinitionModel(builder().name(dslElement.get().getElementName()).namespace(dslElement.get().getPrefix())
+          findComponentDefinitionModels(builder().name(dslElement.get().getElementName()).namespace(dslElement.get().getPrefix())
               .build())
-                  .ifPresent(componentModel -> componentModel
+                  .forEach(componentModel -> componentModel
                       .setMetadataTypeModelAdapter(createMetadataTypeModelAdapterWithSterotype(objectType, extensionModelHelper)
                           .orElse(createParameterizedTypeModelAdapter(objectType, extensionModelHelper))));
         }
@@ -806,6 +807,14 @@ public class ApplicationModel implements ArtifactAst {
     }
     return muleComponentModels.get(0).getInnerComponents().stream().filter(ComponentModel::isRoot)
         .filter(componentModel -> componentModel.getIdentifier().equals(componentIdentifier)).findFirst();
+  }
+
+  public List<ComponentModel> findComponentDefinitionModels(ComponentIdentifier componentIdentifier) {
+    if (muleComponentModels.isEmpty()) {
+      return emptyList();
+    }
+    return muleComponentModels.get(0).getInnerComponents().stream().filter(ComponentModel::isRoot)
+        .filter(componentModel -> componentModel.getIdentifier().equals(componentIdentifier)).collect(toList());
   }
 
   private void convertConfigFileToComponentModel(ArtifactConfig artifactConfig) {
