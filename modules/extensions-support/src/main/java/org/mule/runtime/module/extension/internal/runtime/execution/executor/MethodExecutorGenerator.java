@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution.executor;
 
+import static java.lang.Class.forName;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
 import static java.util.Arrays.asList;
@@ -119,16 +120,24 @@ public class MethodExecutorGenerator {
   }
 
   private Class<MethodExecutor> getExecutorClass(Method method, File generatedByteCodeFile) {
-    String generatorName = getGeneratorName(method);
-    return executorClasses.computeIfAbsent(generatorName, key -> generateExecutorClass(key, method, generatedByteCodeFile));
+    String executorName = getExecutorName(method);
+    return executorClasses.computeIfAbsent(executorName, key -> generateExecutorClass(key, method, generatedByteCodeFile));
 
   }
 
-  private Class<MethodExecutor> generateExecutorClass(String generatorName, Method method, File generatedByteCodeFile) {
+  private Class<MethodExecutor> generateExecutorClass(String executorName, Method method, File generatedByteCodeFile) {
+    final CompositeClassLoader executorClassLoader = new CompositeClassLoader(method.getDeclaringClass().getClassLoader(),
+                                                                              getClass().getClassLoader());
+    try {
+      return (Class<MethodExecutor>) forName(executorName, true, executorClassLoader);
+    } catch (ClassNotFoundException e) {
+      // class doesn't exist, generate
+    }
+
     DynamicType.Builder<Object> operationWrapperClassBuilder = new ByteBuddy()
         .subclass(Object.class, NO_CONSTRUCTORS)
         .implement(MethodExecutor.class)
-        .name(generatorName)
+        .name(executorName)
         .defineField(TARGET_INSTANCE_FIELD_NAME, method.getDeclaringClass(), PRIVATE, FINAL);
 
     for (int i = 0; i < method.getParameterTypes().length; ++i) {
@@ -213,9 +222,6 @@ public class MethodExecutorGenerator {
       }
     }
 
-    CompositeClassLoader executorClassLoader = new CompositeClassLoader(method.getDeclaringClass().getClassLoader(),
-                                                                        getClass().getClassLoader());
-
     try {
       return (Class<MethodExecutor>) byteBuddyMadeWrapper.load(executorClassLoader, INJECTION).getLoaded();
     } catch (Exception e) {
@@ -226,8 +232,8 @@ public class MethodExecutorGenerator {
     }
   }
 
-  private String getGeneratorName(Method method) {
-    return method.getDeclaringClass().getName() + "$" + method.getName() + "$" + instanceId + "$MethodComponentExecutorWrapper";
+  private String getExecutorName(Method method) {
+    return method.getDeclaringClass().getName() + "$" + method.getName() + "$" + instanceId + "$MethodComponentExecutor";
   }
 
   private ArgumentLoader.Factory getArgumentLoaders(Method method) {
