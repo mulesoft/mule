@@ -94,7 +94,6 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     Object connection = getConnection(connectionSupplier);
     try {
       R result = function.apply(connection);
-      connectionSupplier.close();
       return result;
     } catch (Exception exception) {
       if (isFirstPage) {
@@ -102,6 +101,8 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       }
       extractConnectionException(exception).ifPresent(ex -> connectionSupplier.invalidateConnection());
       throw exception;
+    } finally {
+      safely(connectionSupplier::close, e -> LOGGER.debug("Found exception closing the connection supplier", e));
     }
   }
 
@@ -118,7 +119,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
     } finally {
       if (connectionSupplier != null) {
-        connectionSupplier.close();
+        safely(connectionSupplier::close, e -> LOGGER.debug("Found exception closing the connection supplier", e));
       }
       connectionSupplierFactory.dispose();
     }

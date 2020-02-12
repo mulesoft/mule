@@ -8,7 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyObject;
@@ -34,7 +36,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -123,5 +127,66 @@ public class PagingProviderProducerTestCase {
   public void closeNoisely() throws Exception {
     doThrow(new DefaultMuleException(new Exception())).when(delegate).close(any());
     producer.close();
+  }
+
+  @Test
+  public void connectionIsInvalidatedOnConnectionExceptionInProduce() throws Exception {
+    producer = createProducer();
+    ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
+    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+    doThrow(new RuntimeException(new ConnectionException("Invalid Connection"))).when(delegate).getPage(any());
+
+    try {
+      producer.produce();
+    } catch (Exception e) {
+      assertThat(e.getCause(), instanceOf(ConnectionException.class));
+      verify(delegate, times(1)).close(any());
+      verify(connectionHandler, times(1)).invalidate();
+    }
+  }
+
+  @Test
+  public void connectionIsReleasedOnExceptionInProduce() throws Exception {
+    producer = createProducer();
+    ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
+    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+    doThrow(new IllegalArgumentException("Invalid arguments")).when(delegate).getPage(any());
+
+    try {
+      producer.produce();
+    } catch (Exception e) {
+      assertThat(e, instanceOf(IllegalArgumentException.class));
+      verify(delegate, times(1)).close(any());
+      verify(connectionHandler, times(1)).release();
+    }
+  }
+
+  @Test
+  public void pagingProviderDelegateIsClosedQuietlyOnExceptionInProduceFirstPage() throws Exception {
+    producer = createProducer();
+    ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
+    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+    doThrow(new IllegalArgumentException("Invalid arguments")).when(delegate).getPage(any());
+    doThrow(new DefaultMuleException("Error while closing delegate")).when(delegate).close(any());
+
+    try {
+      producer.produce();
+    } catch (Exception e) {
+      assertThat(e, instanceOf(IllegalArgumentException.class));
+      verify(delegate, times(1)).close(any());
+      verify(connectionHandler, times(1)).release();
+    }
+  }
+
+  @Test
+  public void connectionIsClosedQuietlyExceptionInClose() throws Exception {
+    producer = createProducer();
+    ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
+    doThrow(new IllegalArgumentException("There was a problem releasing the connection")).when(connectionHandler).release();
+    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+
+    producer.close();
+    verify(delegate, times(1)).close(any());
+    verify(connectionHandler, times(1)).release();
   }
 }
