@@ -248,8 +248,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     initialiseIfNeeded(pipeline, muleContext);
 
     completionCallbackScheduler = schedulerService.ioScheduler(muleContext.getSchedulerBaseConfig()
-        // TODO (rodro) MULE-18053
-        // .withMaxConcurrentTasks(1)
+        .withMaxConcurrentTasks(1)
         .withName(getName() + ".flux.completionCallback"));
   }
 
