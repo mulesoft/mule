@@ -9,7 +9,6 @@ package org.mule.test.policy;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -18,6 +17,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
+import static org.mule.runtime.http.policy.api.SourcePolicyAwareAttributes.noAttributes;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
@@ -32,12 +32,11 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyInstance;
 import org.mule.runtime.core.api.policy.PolicyProvider;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.policy.api.PolicyAwareAttribute;
+import org.mule.runtime.policy.api.PolicyAwareAttributes;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -134,8 +133,8 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
     }
 
     @Override
-    public Set<PolicyAwareAttribute> sourcePolicyAwareAttributes() {
-      return emptySet();
+    public PolicyAwareAttributes sourcePolicyAwareAttributes() {
+      return noAttributes();
     }
 
     @Override

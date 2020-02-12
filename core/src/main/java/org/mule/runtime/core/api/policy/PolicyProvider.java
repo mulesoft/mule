@@ -7,11 +7,10 @@
 package org.mule.runtime.core.api.policy;
 
 import org.mule.api.annotation.NoImplement;
-import org.mule.runtime.policy.api.PolicyAwareAttribute;
+import org.mule.runtime.policy.api.PolicyAwareAttributes;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Implementation of this interface must provide access to the policies to be applied to message sources or operations.
@@ -36,7 +35,7 @@ public interface PolicyProvider {
    *
    * @since 4.3
    */
-  Set<PolicyAwareAttribute> sourcePolicyAwareAttributes();
+  PolicyAwareAttributes sourcePolicyAwareAttributes();
 
   /**
    * Creates a collection of {@link Policy} with the policy chain be applied to an operation.

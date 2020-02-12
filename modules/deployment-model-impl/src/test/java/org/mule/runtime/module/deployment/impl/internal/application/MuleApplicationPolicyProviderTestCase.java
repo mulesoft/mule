@@ -7,10 +7,13 @@
 
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.regex.Pattern.compile;
+import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.CoreMatchers.isA;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -20,27 +23,34 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.http.policy.api.SourcePolicyAwareAttributes.SourceAttribute.HEADERS;
+import static org.mule.runtime.http.policy.api.SourcePolicyAwareAttributes.SourceAttribute.REQUEST_PATH;
 import static org.mule.runtime.module.deployment.impl.internal.application.MuleApplicationPolicyProvider.createPolicyRegistrationError;
 
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
-import org.mule.runtime.core.api.policy.PolicyPointcut;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
+import org.mule.runtime.http.policy.api.SourcePolicyAwareAttributes;
+import org.mule.runtime.http.policy.api.SourcePolicyAwareAttributes.Builder;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.policy.ApplicationPolicyInstance;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyInstanceProviderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateFactory;
+import org.mule.runtime.policy.api.AttributeAwarePointcut;
+import org.mule.runtime.policy.api.PolicyPointcut;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,6 +65,7 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   private static final String POLICY_ID1 = "policyId1";
   private static final String POLICY_ID2 = "policyId2";
   private static final String POLICY_ID3 = "policyId3";
+  private static final String POLICY_ID4 = "policyId4";
   private static final int ORDER_POLICY1 = 1;
   private static final int ORDER_POLICY2 = 2;
   private static final int ORDER_POLICY3 = 3;
@@ -65,12 +76,21 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
       new MuleApplicationPolicyProvider(policyTemplateFactory, policyInstanceProviderFactory);
   private final Application application = mock(Application.class);
   private final PolicyPointcut pointcut = mock(PolicyPointcut.class);
+  private final AttributeAwarePointcut pointcutHeader1 = mock(AttributeAwarePointcut.class);
+  private final AttributeAwarePointcut pointcutHeader2 = mock(AttributeAwarePointcut.class);
+  private final AttributeAwarePointcut pointcutResource1 = mock(AttributeAwarePointcut.class);
   private final PolicyParametrization parametrization1 =
       new PolicyParametrization(POLICY_ID1, pointcut, ORDER_POLICY1, emptyMap(), mock(File.class), emptyList());
   private final PolicyParametrization parametrization2 =
       new PolicyParametrization(POLICY_ID2, pointcut, ORDER_POLICY2, emptyMap(), mock(File.class), emptyList());
   private final PolicyParametrization parametrization3 =
       new PolicyParametrization(POLICY_ID3, pointcut, ORDER_POLICY3, emptyMap(), mock(File.class), emptyList());
+  private final PolicyParametrization parametrizationH1 =
+      new PolicyParametrization(POLICY_ID1, pointcutHeader1, ORDER_POLICY1, emptyMap(), mock(File.class), emptyList());
+  private final PolicyParametrization parametrizationH2 =
+      new PolicyParametrization(POLICY_ID2, pointcutHeader2, ORDER_POLICY2, emptyMap(), mock(File.class), emptyList());
+  private final PolicyParametrization parametrizationR4 =
+      new PolicyParametrization(POLICY_ID4, pointcutResource1, ORDER_POLICY3, emptyMap(), mock(File.class), emptyList());
   private final PolicyTemplateDescriptor policyTemplateDescriptor1 = new PolicyTemplateDescriptor(POLICY_NAME1);
   private final PolicyTemplateDescriptor policyTemplateDescriptor2 = new PolicyTemplateDescriptor(POLICY_NAME2);
   private final PolicyTemplateDescriptor policyTemplateDescriptorV100 = new PolicyTemplateDescriptor(POLICY_NAME1);
@@ -81,6 +101,9 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
   private final ApplicationPolicyInstance applicationPolicyInstance3 = mock(ApplicationPolicyInstance.class);
   private final ApplicationPolicyInstance applicationPolicyInstance100 = mock(ApplicationPolicyInstance.class);
   private final ApplicationPolicyInstance applicationPolicyInstance101 = mock(ApplicationPolicyInstance.class);
+  private final ApplicationPolicyInstance applicationPolicyInstanceH1 = mock(ApplicationPolicyInstance.class);
+  private final ApplicationPolicyInstance applicationPolicyInstanceH2 = mock(ApplicationPolicyInstance.class);
+  private final ApplicationPolicyInstance applicationPolicyInstanceR1 = mock(ApplicationPolicyInstance.class);
 
   private final Policy policy1 = mock(Policy.class, POLICY_ID1);
   private final Policy policy2 = mock(Policy.class, POLICY_ID2);
@@ -145,6 +168,10 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
     when(applicationPolicyInstance101.getSourcePolicy()).thenReturn(of(policy2));
     when(applicationPolicyInstance101.getPolicyTemplate()).thenReturn(policyTemplate100);
 
+    when(applicationPolicyInstanceH1.getPointcut()).thenReturn(pointcutHeader1);
+    when(applicationPolicyInstanceH2.getPointcut()).thenReturn(pointcutHeader2);
+    when(applicationPolicyInstanceR1.getPointcut()).thenReturn(pointcutResource1);
+
     when(policyInstanceProviderFactory.create(application, policyTemplate1, parametrization1))
         .thenReturn(applicationPolicyInstance1);
     when(policyInstanceProviderFactory.create(application, policyTemplate1, parametrization2))
@@ -157,6 +184,12 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
         .thenReturn(applicationPolicyInstance3);
     when(policyInstanceProviderFactory.create(application, policyTemplate101, parametrization2))
         .thenReturn(applicationPolicyInstance101);
+    when(policyInstanceProviderFactory.create(application, policyTemplate1, parametrizationH1))
+        .thenReturn(applicationPolicyInstanceH1);
+    when(policyInstanceProviderFactory.create(application, policyTemplate1, parametrizationH2))
+        .thenReturn(applicationPolicyInstanceH2);
+    when(policyInstanceProviderFactory.create(application, policyTemplate1, parametrizationR4))
+        .thenReturn(applicationPolicyInstanceR1);
 
     policyTemplateDescriptor1.setBundleDescriptor(new BundleDescriptor.Builder().setArtifactId(POLICY_NAME1).setGroupId("test")
         .setVersion("1.0").build());
@@ -439,6 +472,47 @@ public class MuleApplicationPolicyProviderTestCase extends AbstractMuleTestCase 
     assertThat(parameterizedPolicies.size(), equalTo(2));
     assertThat(parameterizedPolicies.get(0), is(policy1));
     assertThat(parameterizedPolicies.get(1), is(policy2));
+  }
+
+  @Test
+  public void sourcePolicyAwareAttributesMixedPointcuts() throws Exception {
+    when(pointcutHeader1.sourcePolicyAwareAttributes()).thenReturn(new Builder().headers("h1", "h4").build());
+    when(pointcutHeader2.sourcePolicyAwareAttributes()).thenReturn(new Builder().headers("h2", "h3", "h4").build());
+    when(pointcutResource1.sourcePolicyAwareAttributes()).thenReturn(new Builder().requestPathPatterns(compile(".*")).build());
+
+    policyProvider.onPoliciesChanged(() -> {
+    });
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrizationH1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrizationH2);
+    policyProvider.addPolicy(policyTemplateDescriptor2, parametrization3);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrizationR4);
+
+    SourcePolicyAwareAttributes sourcePolicyAwareAttributes =
+        (SourcePolicyAwareAttributes) policyProvider.sourcePolicyAwareAttributes();
+
+    assertThat(sourcePolicyAwareAttributes.requires(HEADERS), is(true));
+    assertThat(sourcePolicyAwareAttributes.requires(REQUEST_PATH), is(true));
+    assertThat(sourcePolicyAwareAttributes.getHeaders(), is(newHashSet("h1", "h2", "h3", "h4")));
+
+    Set<String> stringPatterns =
+        sourcePolicyAwareAttributes.getRequestPathPatterns().stream().map(Pattern::toString).collect(toSet());
+    assertThat(stringPatterns, is(newHashSet(".*")));
+  }
+
+  @Test
+  public void sourcePolicyAwareAttributesNoAttributeAwarePointcut() throws Exception {
+
+    policyProvider.onPoliciesChanged(() -> {
+    });
+
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization1);
+    policyProvider.addPolicy(policyTemplateDescriptor1, parametrization2);
+
+    SourcePolicyAwareAttributes sourcePolicyAwareAttributes =
+        (SourcePolicyAwareAttributes) policyProvider.sourcePolicyAwareAttributes();
+
+    assertThat(sourcePolicyAwareAttributes.requires(HEADERS), is(false));
+    assertThat(sourcePolicyAwareAttributes.requires(REQUEST_PATH), is(false));
   }
 
 }
