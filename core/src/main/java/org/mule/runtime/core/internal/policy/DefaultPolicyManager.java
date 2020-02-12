@@ -355,7 +355,10 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       while (stalePoliciesQueue.remove(1) != null) {
         // nothing to do, just the removal
       }
-    } catch (IllegalArgumentException | InterruptedException e) {
+    } catch (InterruptedException e) {
+      currentThread().interrupt();
+      throw new MuleRuntimeException(e);
+    } catch (IllegalArgumentException e) {
       if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
         throw new MuleRuntimeException(e);
       } else {
