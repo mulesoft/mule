@@ -13,6 +13,8 @@ import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
 
 public class TestOAuthOperations {
 
+  private static int executedCounter = 0;
+
   public TestOAuthConnection getConnection(@Connection TestOAuthConnection connection) {
     return connection;
   }
@@ -26,5 +28,12 @@ public class TestOAuthOperations {
         throw new AccessTokenExpiredException();
       }
     }
+  }
+
+  public TestOAuthConnection getFlackyConnection(@Connection TestOAuthConnection connection) {
+    if(executedCounter++%2==0){
+      throw new AccessTokenExpiredException();
+    }
+    return connection;
   }
 }
