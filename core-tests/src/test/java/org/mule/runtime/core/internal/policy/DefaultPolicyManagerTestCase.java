@@ -284,7 +284,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
                                      sourcePolicyProcessorFactory, resolver);
         final Disposable deferredDispose = ((DeferredDisposable) sourcePolicy).deferredDispose();
 
-        return new DisposeListenerSourcePolicy(() -> {
+        return new DisposeListenerSourcePolicy(sourcePolicy, () -> {
           deferredDispose.dispose();
           sourcePolicydisposed.set(true);
         });
@@ -339,7 +339,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
 
         final Disposable deferredDispose = ((DeferredDisposable) operationPolicy).deferredDispose();
 
-        return new DisposeListenerSourcePolicy(() -> {
+        return new DisposeListenerSourcePolicy(operationPolicy, () -> {
           deferredDispose.dispose();
           operationPolicydisposed.set(true);
         });
@@ -391,9 +391,11 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleTestCase {
 
   private static class DisposeListenerSourcePolicy implements SourcePolicy, OperationPolicy, Disposable, DeferredDisposable {
 
+    private final Object reference;
     private final Disposable onDispose;
 
-    public DisposeListenerSourcePolicy(Disposable onDispose) {
+    public DisposeListenerSourcePolicy(Object reference, Disposable onDispose) {
+      this.reference = reference;
       this.onDispose = onDispose;
     }
 

@@ -88,7 +88,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   private final Set<DeferredDisposableWeakReference> activePolicies = new HashSet<>();
 
   private volatile boolean stopped = true;
-  private Future taskHandle;
+  private Future<?> taskHandle;
   private SchedulerService schedulerService;
   private Scheduler scheduler;
 
@@ -309,8 +309,22 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   @Override
   public void dispose() {
     disposePolicies();
+
+    try {
+      while (stalePoliciesQueue.remove(1) != null) {
+        // nothing to do, just the removal
+      }
+    } catch (InterruptedException e) {
+      currentThread().interrupt();
+      throw new MuleRuntimeException(e);
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Exception when disposing DefaultPolicyManager", e);
+    }
+
     evictCaches();
     scheduler.stop();
+
+    activePolicies.clear();
   }
 
   private void disposePolicies() {
