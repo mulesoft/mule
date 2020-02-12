@@ -119,7 +119,6 @@
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
         <xs:attribute type="mule:expressionInt" use="required" name="failOn"></xs:attribute>
-        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/reconnection" type="org.mule.runtime.extension.api.error.MuleErrorsEnumType" use="required" name="withErrorType"></xs:attribute>
         <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
