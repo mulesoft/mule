@@ -10,6 +10,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_OBJECT_STREAMING_BUFFER_SIZE;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.streaming.HasSize;
 import org.mule.runtime.core.internal.streaming.AbstractStreamingBuffer;
@@ -20,6 +21,8 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+
 /**
  * Base class for implementations of {@link ObjectStreamBuffer}
  *
@@ -27,6 +30,8 @@ import java.util.function.Supplier;
  * @since 4.0
  */
 public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuffer implements ObjectStreamBuffer<T> {
+
+  private static final Logger LOGGER = getLogger(AbstractObjectStreamBuffer.class);
 
   private final Iterator<T> stream;
   private final Supplier<Integer> sizeResolver;
@@ -144,7 +149,11 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
         doClose();
       } finally {
         if (stream instanceof Closeable) {
-          closeSafely((Closeable) stream, Closeable::close);
+          try {
+            ((Closeable) stream).close();
+          } catch (Exception e) {
+            LOGGER.debug("Found exception trying to close Object stream", e);
+          }
         }
         setCurrentBucket(null);
         writeLock.unlock();

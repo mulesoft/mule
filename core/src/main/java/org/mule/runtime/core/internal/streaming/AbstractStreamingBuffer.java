@@ -8,11 +8,9 @@ package org.mule.runtime.core.internal.streaming;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
-import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.streaming.Cursor;
-import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 
@@ -54,10 +52,6 @@ public abstract class AbstractStreamingBuffer {
 
   protected void checkNotClosed() {
     checkState(!closed.get(), "Buffer is closed");
-  }
-
-  protected <T> void closeSafely(T item, CheckedConsumer<T> task) {
-    safely(item, task, e -> LOGGER.debug("Found exception closing buffer", e));
   }
 
   public final class LockReleaser {

@@ -67,7 +67,11 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
           return null;
         } finally {
           if (stream != null) {
-            closeSafely(stream, InputStream::close);
+            try {
+              stream.close();
+            } catch (IOException e) {
+              LOGGER.debug("Found exception trying to close InputStream", e);
+            }
           }
         }
       });
@@ -147,13 +151,8 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     return totalRead;
   }
 
-  protected boolean deallocate(ByteBuffer byteBuffer) {
-    if (byteBuffer != null) {
-      closeSafely(byteBuffer, bufferManager::deallocate);
-      return true;
-    }
-
-    return false;
+  protected void deallocate(ByteBuffer byteBuffer) {
+    bufferManager.deallocate(byteBuffer);
   }
 
   protected abstract ByteBuffer copy(long position, int length);

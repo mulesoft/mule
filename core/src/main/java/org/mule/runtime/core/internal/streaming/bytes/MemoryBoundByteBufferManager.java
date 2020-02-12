@@ -10,10 +10,8 @@ import static java.lang.Math.round;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_MAX_MEMORY;
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.MAX_STREAMING_MEMORY_PERCENTAGE;
-import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -86,14 +84,14 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager,
    * @throws MaxStreamingMemoryExceededException if the memory cap is exceeded by this operation
    */
   protected final ByteBuffer allocateIfFits(int capacity) {
-    if (streamingMemory.addAndGet(capacity) <= maxStreamingMemory) {
+    //if (streamingMemory.addAndGet(capacity) <= maxStreamingMemory) {
       return ByteBuffer.allocate(capacity);
-    }
-
-    streamingMemory.addAndGet(-capacity);
-    throw new MaxStreamingMemoryExceededException(createStaticMessage(format(
-                                                                             "Max streaming memory limit of %d bytes was exceeded",
-                                                                             maxStreamingMemory)));
+    //}
+    //
+    //streamingMemory.addAndGet(-capacity);
+    //throw new MaxStreamingMemoryExceededException(createStaticMessage(format(
+    //                                                                         "Max streaming memory limit of %d bytes was exceeded",
+    //                                                                         maxStreamingMemory)));
   }
 
   /**
@@ -110,24 +108,25 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager,
    */
   @Override
   public final ByteBuffer allocate(int capacity) {
-    ByteBuffer buffer = null;
-    boolean isRetry = false;
-    do {
-      try {
-        buffer = doAllocate(capacity);
-      } catch (MaxStreamingMemoryExceededException e) {
-        if (isRetry) {
-          throw e;
-        }
-
-        LOGGER.debug("Max streaming memory threshold of {} achieved. Will wait {} ms for reclaimed memory to retry",
-                     maxStreamingMemory, memoryExhaustedWaitTimeoutMillis);
-        signal(() -> awaitNotFull(memoryExhaustedWaitTimeoutMillis, e));
-        isRetry = true;
-      }
-    } while (buffer == null);
-
-    return buffer;
+    return allocateIfFits(capacity);
+    //ByteBuffer buffer = null;
+    //boolean isRetry = false;
+    //do {
+    //  try {
+    //    buffer = doAllocate(capacity);
+    //  } catch (MaxStreamingMemoryExceededException e) {
+    //    if (isRetry) {
+    //      throw e;
+    //    }
+    //
+    //    LOGGER.debug("Max streaming memory threshold of {} achieved. Will wait {} ms for reclaimed memory to retry",
+    //                 maxStreamingMemory, memoryExhaustedWaitTimeoutMillis);
+    //    signal(() -> awaitNotFull(memoryExhaustedWaitTimeoutMillis, e));
+    //    isRetry = true;
+    //  }
+    //} while (buffer == null);
+    //
+    //return buffer;
   }
 
   protected ByteBuffer doAllocate(int capacity) {
@@ -136,9 +135,9 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager,
 
   @Override
   public void deallocate(ByteBuffer byteBuffer) {
-    if (streamingMemory.addAndGet(-byteBuffer.capacity()) < maxStreamingMemory) {
-      signalMemoryAvailable();
-    }
+    //if (streamingMemory.addAndGet(-byteBuffer.capacity()) < maxStreamingMemory) {
+    //  signalMemoryAvailable();
+    //}
   }
 
   @Override
@@ -182,7 +181,7 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager,
    * Signals to one waiting threads that streaming memory is available
    */
   protected void signalMemoryAvailable() {
-    signal(poolNotFullSignalTask);
+    //signal(poolNotFullSignalTask);
   }
 
   /**
@@ -191,6 +190,6 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager,
    * @param task a task
    */
   protected void signal(CheckedRunnable task) {
-    withLock(lock, task);
+    //withLock(lock, task);
   }
 }

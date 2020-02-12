@@ -6,12 +6,10 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import static java.util.Collections.newSetFromMap;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Base class for a {@link CursorProvider} decorator which makes sure that {@link Cursor cursors}
@@ -24,15 +22,17 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class ManagedCursorProvider<T extends Cursor> implements CursorProvider<T> {
 
   private final CursorProvider<T> delegate;
-  private final Set<Cursor> cursors = newSetFromMap(new ConcurrentHashMap<>());
+  private final AtomicInteger openCursorsCount = new AtomicInteger(0);
   private final MutableStreamingStatistics statistics;
   private final CursorProviderJanitor janitor;
 
   protected ManagedCursorProvider(CursorProvider<T> delegate, MutableStreamingStatistics statistics) {
     this.delegate = delegate;
-    this.janitor = new CursorProviderJanitor(delegate, cursors, statistics);
+    this.janitor = new CursorProviderJanitor(delegate, openCursorsCount, statistics);
     this.statistics = statistics;
-    statistics.incrementOpenProviders();
+    if (statistics != null) {
+      statistics.incrementOpenProviders();
+    }
   }
 
   /**
@@ -45,11 +45,13 @@ public abstract class ManagedCursorProvider<T extends Cursor> implements CursorP
   @Override
   public final T openCursor() {
     T cursor = delegate.openCursor();
-    T managedCursor = managedCursor(cursor);
-    cursors.add(managedCursor);
+    openCursorsCount.incrementAndGet();
 
-    statistics.incrementOpenCursors();
-    return managedCursor;
+    if (statistics != null) {
+      statistics.incrementOpenCursors();
+    }
+
+    return managedCursor(cursor);
   }
 
   public CursorProvider<T> getDelegate() {
