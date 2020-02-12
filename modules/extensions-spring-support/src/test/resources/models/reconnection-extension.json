@@ -1391,59 +1391,6 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "String",
-                    "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.error.MuleErrors",
-                      "enum": {
-                        "type": "[Ljava.lang.String;",
-                        "values": [
-                          "ANY",
-                          "CONNECTIVITY",
-                          "TRANSFORMATION",
-                          "EXPRESSION",
-                          "REDELIVERY_EXHAUSTED",
-                          "RETRY_EXHAUSTED",
-                          "ROUTING",
-                          "SECURITY",
-                          "CLIENT_SECURITY",
-                          "SERVER_SECURITY",
-                          "SOURCE",
-                          "SOURCE_RESPONSE",
-                          "SOURCE_RESPONSE_GENERATE",
-                          "SOURCE_RESPONSE_SEND",
-                          "SOURCE_ERROR_RESPONSE_GENERATE",
-                          "SOURCE_ERROR_RESPONSE_SEND",
-                          "VALIDATION",
-                          "CRITICAL"
-                        ]
-                      }
-                    }
-                  },
-                  "hasDynamicType": false,
-                  "required": true,
-                  "isConfigOverride": false,
-                  "isComponentId": false,
-                  "expressionSupport": "SUPPORTED",
-                  "role": "BEHAVIOUR",
-                  "dslConfiguration": {
-                    "allowsInlineDefinition": false,
-                    "allowsReferences": false,
-                    "allowTopLevelDefinition": false
-                  },
-                  "layoutModel": {
-                    "password": false,
-                    "text": false,
-                    "query": false,
-                    "order": 2
-                  },
-                  "allowedStereotypeModels": [],
-                  "name": "withErrorType",
-                  "description": "",
-                  "modelProperties": {}
-                },
-                {
-                  "type": {
-                    "format": "java",
                     "type": "Object",
                     "annotations": {
                       "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
@@ -1465,7 +1412,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 4
+                    "order": 3
                   },
                   "allowedStereotypeModels": [
                     {
@@ -1625,7 +1572,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 3,
+                    "order": 2,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1679,7 +1626,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 5,
+                    "order": 4,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1711,7 +1658,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 6,
+                    "order": 5,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -1889,7 +1836,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 7,
+                    "order": 6,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],

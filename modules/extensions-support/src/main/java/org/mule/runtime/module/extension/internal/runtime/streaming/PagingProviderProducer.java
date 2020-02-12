@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -25,9 +26,11 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.function.Function;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link Producer} that uses an instance of {@link PagingProvider} to get its results.
@@ -37,14 +40,14 @@ import java.util.function.Function;
  */
 public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(PagingProviderProducer.class);
+
   public static final String COULD_NOT_OBTAIN_A_CONNECTION = "Could not obtain a connection for the configuration";
   public static final String COULD_NOT_CREATE_A_CONNECTION_SUPPLIER =
       "Could not obtain a connection supplier for the configuration";
-  public static final String COULD_NOT_CLOSE_PAGING_PROVIDER = "Could not close the Paging Provider";
-  public static final String COULD_NOT_EXECUTE = "Could not execute operation with connection";
   private PagingProvider<Object, T> delegate;
   private final ConfigurationInstance config;
-  private final ExtensionConnectionSupplier connectionSupplier;
+  private final ExtensionConnectionSupplier extensionConnectionSupplier;
   private final ExecutionContextAdapter executionContext;
   private final ConnectionSupplierFactory connectionSupplierFactory;
   private Boolean isFirstPage = true;
@@ -52,11 +55,11 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   public PagingProviderProducer(PagingProvider<Object, T> delegate,
                                 ConfigurationInstance config,
                                 ExecutionContextAdapter executionContext,
-                                ExtensionConnectionSupplier connectionSupplier) {
+                                ExtensionConnectionSupplier extensionConnectionSupplier) {
     this.delegate = new PagingProviderWrapper(delegate, executionContext.getExtensionModel());
     this.config = config;
     this.executionContext = executionContext;
-    this.connectionSupplier = connectionSupplier;
+    this.extensionConnectionSupplier = extensionConnectionSupplier;
 
     this.connectionSupplierFactory = createConnectionSupplierFactory();
   }
@@ -91,14 +94,15 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     Object connection = getConnection(connectionSupplier);
     try {
       R result = function.apply(connection);
-      connectionSupplier.close();
       return result;
-    } catch (Exception e) {
+    } catch (Exception exception) {
       if (isFirstPage) {
-        closeDelegate(connection);
+        safely(() -> delegate.close(connection), e -> LOGGER.debug("Found exception closing paging provider", e));
       }
-      extractConnectionException(e).ifPresent(ex -> connectionSupplier.invalidateConnection());
-      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_EXECUTE), e);
+      extractConnectionException(exception).ifPresent(ex -> connectionSupplier.invalidateConnection());
+      throw exception;
+    } finally {
+      safely(connectionSupplier::close, e -> LOGGER.debug("Found exception closing the connection supplier", e));
     }
   }
 
@@ -106,11 +110,19 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    * Closes the delegate
    */
   @Override
-  public void close() throws IOException {
-    ConnectionSupplier connectionSupplier = getConnectionSupplier();
-    closeDelegate(getConnection(connectionSupplier));
-    connectionSupplier.close();
-    connectionSupplierFactory.dispose();
+  public void close() {
+    ConnectionSupplier connectionSupplier = null;
+    try {
+      connectionSupplier = connectionSupplierFactory.getConnectionSupplier();
+      delegate.close(connectionSupplier.getConnection());
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
+    } finally {
+      if (connectionSupplier != null) {
+        safely(connectionSupplier::close, e -> LOGGER.debug("Found exception closing the connection supplier", e));
+      }
+      connectionSupplierFactory.dispose();
+    }
   }
 
   private ConnectionSupplierFactory createConnectionSupplierFactory() {
@@ -137,14 +149,6 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     }
   }
 
-  private void closeDelegate(Object connection) {
-    try {
-      delegate.close(connection);
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_CLOSE_PAGING_PROVIDER), e);
-    }
-  }
-
   private boolean isTransactional() {
     Transaction tx = TransactionCoordination.getInstance().getTransaction();
     return tx != null && tx.hasResource(new ExtensionTransactionKey(config));
@@ -162,7 +166,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
     @Override
     public ConnectionSupplier getConnectionSupplier() throws MuleException {
-      return new DefaultConnectionSupplier(connectionSupplier.getConnection(executionContext));
+      return new DefaultConnectionSupplier(extensionConnectionSupplier.getConnection(executionContext));
     }
 
     @Override
@@ -180,7 +184,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
       @Override
       public ConnectionSupplier getChecked() throws Throwable {
-        StickyConnectionSupplierFactory.this.connectionHandler = connectionSupplier.getConnection(executionContext);
+        StickyConnectionSupplierFactory.this.connectionHandler = extensionConnectionSupplier.getConnection(executionContext);
         return new StickyConnectionSupplier(StickyConnectionSupplierFactory.this.connectionHandler);
       }
     });
