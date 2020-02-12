@@ -71,10 +71,7 @@ class CommonSourcePolicy {
   }
 
   public Disposable deferredDispose() {
-    final FluxSinkSupplier<CoreEvent> sink = policySink;
-    return () -> {
-      sink.dispose();
-    };
+    return () -> policySink.dispose();
   }
 
 }
