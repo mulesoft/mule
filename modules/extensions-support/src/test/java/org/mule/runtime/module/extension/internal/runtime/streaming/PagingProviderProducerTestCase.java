@@ -179,7 +179,7 @@ public class PagingProviderProducerTestCase {
   }
 
   @Test
-  public void connectionIsClosedQuietlyExceptionInClose() throws Exception {
+  public void connectionIsClosedQuietlyInClose() throws Exception {
     producer = createProducer();
     ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
     doThrow(new IllegalArgumentException("There was a problem releasing the connection")).when(connectionHandler).release();
