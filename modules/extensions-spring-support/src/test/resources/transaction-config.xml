@@ -79,6 +79,24 @@
         <flow-ref name="accumulatePages" />
     </flow>
 
+    <flow name="failingPagedOperationWithoutTx">
+        <set-variable variableName="accumulator" value="#[[]]" />
+        <tx:failing-paged-transactional-operation failOn="#[vars.failOn]" config-ref="nonPoolingTx">
+            <reconnect count="5" frequency="10" />
+        </tx:failing-paged-transactional-operation>
+        <flow-ref name="accumulatePages" />
+    </flow>
+
+    <flow name="failingPagedOperationInTx">
+        <set-variable variableName="accumulator" value="#[[]]" />
+        <try transactionalAction="ALWAYS_BEGIN">
+            <tx:failing-paged-transactional-operation failOn="#[vars.failOn]" config-ref="nonPoolingTx">
+                <!--<reconnect count="5" frequency="10" />-->
+            </tx:failing-paged-transactional-operation>
+            <flow-ref name="accumulatePages" />
+        </try>
+    </flow>
+
     <sub-flow name="accumulatePages">
         <foreach>
             <set-variable variableName="accumulator" value="#[vars.accumulator + payload]" />
