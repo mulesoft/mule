@@ -354,7 +354,7 @@ public class ApplicationModel implements ArtifactAst {
 
   public void macroExpandXmlSdkComponents(Set<ExtensionModel> extensionModels) {
     expandModules(extensionModels, () -> {
-      // TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart
+      // TODO MULE-13894 do this onorg.springframework.beans.ConversionNotSupportedExceptionly on runtimeMode=true once unified extensionModel names to use camelCase (see smart
       // connectors and crafted declared extension models)
       resolveComponentTypes();
       muleComponentModels
