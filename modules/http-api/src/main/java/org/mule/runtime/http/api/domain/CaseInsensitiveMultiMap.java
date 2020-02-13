@@ -8,6 +8,7 @@
 package org.mule.runtime.http.api.domain;
 
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.metadata.DataType;
@@ -44,6 +45,26 @@ public class CaseInsensitiveMultiMap extends AbstractCaseInsensitiveMultiMap {
    */
   public static CaseInsensitiveMultiMap emptyCaseInsensitiveMultiMap() {
     return EMPTY_MAP;
+  }
+
+  /**
+   * Returns an unmodifiable view of the specified case-insensitive-multi-map. This method allows modules to provide users with
+   * "read-only" access to internal case-insensitive-multi-maps. Query operations on the returned case-insensitive-multi-map "read
+   * through" to the specified case-insensitive-multi-map, and attempts to modify the returned case-insensitive-multi-map, whether
+   * direct or via its collection views, result in an <tt>UnsupportedOperationException</tt>.
+   * <p>
+   * The returned map will be serializable if the specified map is serializable.
+   *
+   * @param m the case-insensitive-multi-map for which an unmodifiable view is to be returned.
+   * @return an unmodifiable view of the specified case-insensitive-multi-map.
+   */
+  public static AbstractCaseInsensitiveMultiMap unmodifiableCaseInsensitiveMultiMap(AbstractCaseInsensitiveMultiMap m) {
+    requireNonNull(m);
+    if (m instanceof UnmodifiableCaseInsensitiveMultiMap || m instanceof ImmutableCaseInsensitiveMultiMap) {
+      return m;
+    } else {
+      return new UnmodifiableCaseInsensitiveMultiMap(m);
+    }
   }
 
   protected final boolean optimized;

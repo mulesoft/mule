@@ -7,6 +7,11 @@
 
 package org.mule.runtime.http.api.domain;
 
+import static java.util.Collections.unmodifiableCollection;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableSet;
+
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.el.DataTypeAware;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.util.MultiMap;
@@ -19,10 +24,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import static java.util.Collections.unmodifiableCollection;
-import static java.util.Collections.unmodifiableList;
-import static java.util.Collections.unmodifiableSet;
-
+@NoExtend
 public abstract class AbstractCaseInsensitiveMultiMap extends MultiMap<String, String> implements DataTypeAware {
 
   protected static final DataType dataType = DataType.builder()
@@ -43,9 +45,9 @@ public abstract class AbstractCaseInsensitiveMultiMap extends MultiMap<String, S
 
     private static final long serialVersionUID = 6798199484376351419L;
 
-    private final CaseInsensitiveMultiMap m;
+    private final AbstractCaseInsensitiveMultiMap m;
 
-    public UnmodifiableCaseInsensitiveMultiMap(CaseInsensitiveMultiMap m) {
+    public UnmodifiableCaseInsensitiveMultiMap(AbstractCaseInsensitiveMultiMap m) {
       this.m = m;
     }
 
