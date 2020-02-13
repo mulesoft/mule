@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -74,6 +76,8 @@ import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.exception.NullExceptionEnricher;
 
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -179,7 +183,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     stubComponentExecutor(operationExecutor, result);
     stubFailingComponentExecutor(operationExceptionExecutor, exception);
 
-    when(operationContext.getConfiguration()).thenReturn(Optional.of(configurationInstance));
+    when(operationContext.getConfiguration()).thenReturn(of(configurationInstance));
     when(operationContext.getExtensionModel()).thenReturn(extensionModel);
     when(operationContext.getTransactionConfig()).thenReturn(empty());
     when(operationContext.getRetryPolicyTemplate()).thenReturn(ofNullable(retryPolicy));
@@ -204,7 +208,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
         new ReconnectableConnectionProviderWrapper<>(null,
                                                      new ReconnectionConfig(true, retryPolicy));
     initialiseIfNeeded(connectionProviderWrapper, true, muleContext);
-    Optional<ConnectionProvider> connectionProvider = Optional.of(connectionProviderWrapper);
+    Optional<ConnectionProvider> connectionProvider = of(connectionProviderWrapper);
 
     when(configurationInstance.getConnectionProvider()).thenReturn(connectionProvider);
     when(exceptionEnricher.enrichException(any())).thenAnswer(inv -> {
@@ -333,6 +337,30 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   }
 
   @Test
+  public void shouldNotExecuteWithExtensionClassLoaderSetInContextClassLoader() throws Throwable {
+    ClassLoader currentClassLoader = currentThread().getContextClassLoader();
+
+    ClassLoader extensionClassLoader = new URLClassLoader(new URL[0]);
+    when(extensionModel.getModelProperty(ClassLoaderModelProperty.class))
+        .thenReturn(of(new ClassLoaderModelProperty(extensionClassLoader)));
+
+    ClassLoader classLoader = new URLClassLoader(new URL[0]);
+    try {
+      currentThread().setContextClassLoader(classLoader);
+      doAnswer(invocation -> {
+        CompletableComponentExecutor.ExecutorCallback callback = invocation.getArgument(1);
+        assertThat(currentThread().getContextClassLoader(), sameInstance(classLoader));
+        callback.complete(null);
+        return null;
+      }).when(operationExceptionExecutor).execute(any(), any());
+
+      execute();
+    } finally {
+      currentThread().setContextClassLoader(currentClassLoader);
+    }
+  }
+
+  @Test
   public void enrichThrownModuleExceptionInValueTransformer() throws Throwable {
     final ModuleException moduleExceptionToThrow = new ModuleException(ERROR, HEALTH, exception);
     expectedException.expectCause(sameInstance(moduleExceptionToThrow));
@@ -387,7 +415,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   private ErrorTypeRepository mockErrorModel() {
     final ErrorType parentErrorType = mock(ErrorType.class);
     ErrorTypeRepository errorTypeRepository = mock(ErrorTypeRepository.class);
-    when(errorTypeRepository.lookupErrorType(any())).thenReturn(Optional.of(ErrorTypeBuilder.builder()
+    when(errorTypeRepository.lookupErrorType(any())).thenReturn(of(ErrorTypeBuilder.builder()
         .namespace("testNs")
         .identifier("test")
         .parentErrorType(parentErrorType)

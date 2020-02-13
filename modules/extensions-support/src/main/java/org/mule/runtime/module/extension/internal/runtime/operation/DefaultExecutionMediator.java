@@ -11,7 +11,6 @@ import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -61,8 +60,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private final ExecutionTemplate<?> defaultExecutionTemplate = callback -> callback.process();
   private final ModuleExceptionHandler moduleExceptionHandler;
   private final ResultTransformer resultTransformer;
-  private final ClassLoader extensionClassLoader;
-
 
   @FunctionalInterface
   public interface ResultTransformer extends CheckedBiFunction<ExecutionContextAdapter, Object, Object> {
@@ -85,7 +82,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel, typeRepository);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     this.resultTransformer = resultTransformer;
-    extensionClassLoader = getClassLoader(extensionModel);
   }
 
   /**
@@ -236,14 +232,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
                               ExecutorCallback callback) {
     Throwable t = interceptorChain.before(context, callback);
     if (t == null) {
-      final Thread currentThread = Thread.currentThread();
-      final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-      currentThread.setContextClassLoader(extensionClassLoader);
-      try {
-        executor.execute(context, callback);
-      } finally {
-        currentThread.setContextClassLoader(currentClassLoader);
-      }
+      executor.execute(context, callback);
     }
   }
 

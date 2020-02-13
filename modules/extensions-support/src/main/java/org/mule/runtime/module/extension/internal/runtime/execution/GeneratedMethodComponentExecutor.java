@@ -13,7 +13,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -71,7 +70,6 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
   private final List<ParameterGroupModel> groups;
   private final Method method;
   private final Object componentInstance;
-  private final ClassLoader extensionClassLoader;
 
   @Inject
   private MethodExecutorGenerator methodExecutorGenerator;
@@ -84,7 +82,6 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
     this.groups = groups;
     this.method = method;
     this.componentInstance = componentInstance;
-    extensionClassLoader = method.getDeclaringClass().getClassLoader();
   }
 
   public Object execute(ExecutionContext<M> executionContext) {
@@ -150,7 +147,7 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
 
   @Override
   public Function<ExecutionContext<M>, Map<String, Object>> createArgumentResolver(M operationModel) {
-    return ec -> withContextClassLoader(extensionClassLoader, () -> {
+    return ec -> {
       final Object[] resolved = getParameterValues(ec, method.getParameterTypes());
 
       int parameterCount = method.getParameterCount();
@@ -159,6 +156,6 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
         resolvedParams.put(method.getParameters()[i].getName(), resolved[i]);
       }
       return resolvedParams;
-    });
+    };
   }
 }
