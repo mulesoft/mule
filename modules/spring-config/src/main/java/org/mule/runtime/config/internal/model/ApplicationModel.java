@@ -10,7 +10,6 @@ import static com.google.common.base.Joiner.on;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
@@ -601,6 +600,7 @@ public class ApplicationModel implements ArtifactAst {
           definition.getTypeDefinition().visit(typeDefinitionVisitor);
           // We still have components without extension models
           componentModel.setType(typeDefinitionVisitor.getType());
+
           return definition;
         }).orElseGet(() -> {
           String classParameter = componentModel.getRawParameters().get(CLASS_ATTRIBUTE);
@@ -617,23 +617,27 @@ public class ApplicationModel implements ArtifactAst {
     });
 
     // Use ExtensionModel to register top level and subTypes elements
-    if (!runtimeMode) {
-      ReflectionCache reflectionCache = new ReflectionCache();
-      List<ComponentIdentifier> context = new ArrayList<>();
-      extensionModelHelper.getExtensionsModels().stream().forEach(extensionModel -> extensionModel.getTypes().stream()
-          .filter(p -> IntrospectionUtils.isInstantiable(p, reflectionCache))
-          .forEach(parameterType -> {
-            registerTopLevelParameter(parameterType, reflectionCache, context, extensionModel);
-          }));
-    }
+    ReflectionCache reflectionCache = new ReflectionCache();
+    Map<ComponentIdentifier, MetadataTypeModelAdapter> registry = new HashMap();
+    extensionModelHelper.getExtensionsModels().stream().forEach(extensionModel -> extensionModel.getTypes().stream()
+        .filter(p -> IntrospectionUtils.isInstantiable(p, reflectionCache))
+        .forEach(parameterType -> {
+          registerTopLevelParameter(parameterType, reflectionCache, registry, extensionModel);
+        }));
 
+    executeOnEveryComponentTree(componentModel -> {
+      if (registry.containsKey(componentModel.getIdentifier())) {
+        componentModel.setMetadataTypeModelAdapter(registry.get(componentModel.getIdentifier()));
+      }
+    });
   }
 
   private void registerTopLevelParameter(MetadataType parameterType, ReflectionCache reflectionCache,
-                                         List<ComponentIdentifier> context, ExtensionModel extensionModel) {
+                                         Map<ComponentIdentifier, MetadataTypeModelAdapter> registry,
+                                         ExtensionModel extensionModel) {
     Optional<DslElementSyntax> dslElement = extensionModelHelper.resolveDslElementModel(parameterType, extensionModel);
     if (!dslElement.isPresent() ||
-        context.contains(builder().name(dslElement.get().getElementName()).namespace(dslElement.get().getPrefix()).build())) {
+        registry.containsKey(builder().name(dslElement.get().getElementName()).namespace(dslElement.get().getPrefix()).build())) {
       return;
     }
 
@@ -646,19 +650,17 @@ public class ApplicationModel implements ArtifactAst {
             || getSubstitutionGroup(objectType).isPresent() ||
             extensionModelHelper.getAllSubTypes().contains(objectType)) {
 
-          findComponentDefinitionModels(builder().name(dslElement.get().getElementName()).namespace(dslElement.get().getPrefix())
-              .build())
-                  .forEach(componentModel -> componentModel
-                      .setMetadataTypeModelAdapter(createMetadataTypeModelAdapterWithSterotype(objectType, extensionModelHelper)
-                          .orElse(createParameterizedTypeModelAdapter(objectType, extensionModelHelper))));
+          registry.put(builder().name(dslElement.get().getElementName()).namespace(dslElement.get().getPrefix())
+              .build(), createMetadataTypeModelAdapterWithSterotype(objectType, extensionModelHelper)
+                  .orElse(createParameterizedTypeModelAdapter(objectType, extensionModelHelper)));
         }
 
-        registerSubTypes(objectType, reflectionCache, context, extensionModel);
+        registerSubTypes(objectType, reflectionCache, registry, extensionModel);
       }
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        registerTopLevelParameter(arrayType.getType(), reflectionCache, context, extensionModel);
+        registerTopLevelParameter(arrayType.getType(), reflectionCache, registry, extensionModel);
       }
 
       @Override
@@ -669,7 +671,8 @@ public class ApplicationModel implements ArtifactAst {
     });
   }
 
-  private void registerSubTypes(MetadataType type, ReflectionCache reflectionCache, List<ComponentIdentifier> context,
+  private void registerSubTypes(MetadataType type, ReflectionCache reflectionCache,
+                                Map<ComponentIdentifier, MetadataTypeModelAdapter> registry,
                                 ExtensionModel extensionModel) {
     type.accept(new MetadataTypeVisitor() {
 
@@ -689,7 +692,7 @@ public class ApplicationModel implements ArtifactAst {
           objectType.getOpenRestriction().get().accept(this);
         } else {
           extensionModelHelper.getSubTypes(objectType)
-              .forEach(subtype -> registerTopLevelParameter(subtype, reflectionCache, context, extensionModel));
+              .forEach(subtype -> registerTopLevelParameter(subtype, reflectionCache, registry, extensionModel));
         }
       }
     });
@@ -807,14 +810,6 @@ public class ApplicationModel implements ArtifactAst {
     }
     return muleComponentModels.get(0).getInnerComponents().stream().filter(ComponentModel::isRoot)
         .filter(componentModel -> componentModel.getIdentifier().equals(componentIdentifier)).findFirst();
-  }
-
-  public List<ComponentModel> findComponentDefinitionModels(ComponentIdentifier componentIdentifier) {
-    if (muleComponentModels.isEmpty()) {
-      return emptyList();
-    }
-    return muleComponentModels.get(0).getInnerComponents().stream().filter(ComponentModel::isRoot)
-        .filter(componentModel -> componentModel.getIdentifier().equals(componentIdentifier)).collect(toList());
   }
 
   private void convertConfigFileToComponentModel(ArtifactConfig artifactConfig) {
