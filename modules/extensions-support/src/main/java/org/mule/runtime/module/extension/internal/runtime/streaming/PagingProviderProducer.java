@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionExc
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -128,7 +129,12 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       if (isFirstPage || delegate.useStickyConnections()) {
         safely(() -> delegate.close(connection), e -> LOGGER.debug("Found exception closing paging provider", e));
       }
-      extractConnectionException(exception).ifPresent(ex -> connectionSupplier.invalidateConnection());
+      extractConnectionException(exception).ifPresent(ex -> {
+        if (isTransactional()) {
+          executionContext.setVariable(DO_NOT_RETRY, "true");
+        }
+        connectionSupplier.invalidateConnection();
+      });
       throw exception;
     } finally {
       safely(connectionSupplier::close, e -> LOGGER.debug("Found exception closing the connection supplier", e));

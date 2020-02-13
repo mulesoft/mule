@@ -91,7 +91,7 @@
         <set-variable variableName="accumulator" value="#[[]]" />
         <try transactionalAction="ALWAYS_BEGIN">
             <tx:failing-paged-transactional-operation failOn="#[vars.failOn]" config-ref="nonPoolingTx">
-                <!--<reconnect count="5" frequency="10" />-->
+                <reconnect count="5" frequency="10" />
             </tx:failing-paged-transactional-operation>
             <flow-ref name="accumulatePages" />
         </try>
