@@ -31,7 +31,7 @@ public class TestOAuthOperations {
   }
 
   public TestOAuthConnection getFlackyConnection(@Connection TestOAuthConnection connection) {
-    if(executedCounter++%2==0){
+    if (executedCounter++ % 2 == 0) {
       throw new AccessTokenExpiredException();
     }
     return connection;

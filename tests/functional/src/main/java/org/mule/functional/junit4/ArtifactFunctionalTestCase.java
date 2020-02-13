@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
+import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
@@ -108,6 +109,8 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   private static IsolatedClassLoaderExtensionsManagerConfigurationBuilder extensionsManagerConfigurationBuilder;
 
   private static TestServicesMuleContextConfigurator serviceConfigurator;
+  private Once.RunOnce loadExtensions = Once.of(() -> extensionsManagerConfigurationBuilder.loadExtensionModels());
+
 
   @BeforeClass
   public static void configureClassLoaderRepository() {
@@ -146,7 +149,6 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     if (!pluginClassLoaders.isEmpty()) {
       extensionsManagerConfigurationBuilder =
           new IsolatedClassLoaderExtensionsManagerConfigurationBuilder(pluginClassLoaders);
-      extensionsManagerConfigurationBuilder.loadExtensionModels();
     }
   }
 
@@ -242,6 +244,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     }
 
     if (extensionsManagerConfigurationBuilder != null) {
+      loadExtensions.runOnce();
       builders.add(0, extensionsManagerConfigurationBuilder);
     }
 
