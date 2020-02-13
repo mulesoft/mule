@@ -66,14 +66,8 @@ public class CaseInsensitiveMultiMap extends AbstractCaseInsensitiveMultiMap {
   }
 
   public CaseInsensitiveMultiMap(MultiMap<String, String> multiMap, boolean optimized) {
-    /* this.optimized = optimized;
-    this.paramsMap = optimized
-        ? new OptimizedCaseInsensitiveMapWrapper<>(new LinkedHashMap<>(), false)
-        : new CaseInsensitiveMapWrapper<>(new LinkedHashMap<>(), false);
-    putAll(multiMap);*/
     this.optimized = optimized;
     if (multiMap instanceof CaseInsensitiveMultiMap) {
-      //this.paramsMap = ((CaseInsensitiveMapWrapper)((CaseInsensitiveMultiMap)multiMap).paramsMap).copy();
       this.createParamsMap((CaseInsensitiveMultiMap) multiMap);
     } else {
       this.paramsMap = optimized
