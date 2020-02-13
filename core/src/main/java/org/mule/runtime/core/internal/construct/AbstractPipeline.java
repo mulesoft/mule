@@ -89,7 +89,6 @@ import java.util.function.Function;
 import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link Processor}s that will be used to process
@@ -247,6 +246,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     initialiseIfNeeded(source, muleContext);
     initialiseIfNeeded(pipeline, muleContext);
+
+    completionCallbackScheduler = schedulerService.ioScheduler(muleContext.getSchedulerBaseConfig()
+        .withMaxConcurrentTasks(1)
+        .withName(getName() + ".flux.completionCallback"));
   }
 
   /**
@@ -255,7 +258,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
    *
    * @return the into-flow dispatching {@link ReactiveProcessor}
    */
-  private ReactiveProcessor dispatchToFlow() {
+  protected final ReactiveProcessor dispatchToFlow() {
     return publisher -> from(publisher)
         .doOnNext(assertStarted())
         .transform(routeThroughProcessingStrategyTransformer())
@@ -317,30 +320,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                                                  });
                                                  return result.getRight();
                                                });
-  }
-
-  /**
-   * @deprecated since 4.3.0. Kept for backwards compatibility of some cases until those are migrated.
-   */
-  @Deprecated
-  protected Function<CoreEvent, Publisher<? extends CoreEvent>> routeThroughProcessingStrategyMapper() {
-    // This accept/emit choice is made because there's a backpressure check done in the #emit sink message, which can be done
-    // preemptively as the maxConcurrency one, before policies execution. As previous implementation, use WAIT strategy as
-    // default. This check may not be needed anymore for ProactorStreamProcessingStrategy. See MULE-16988.
-    return getSource() == null || getSource().getBackPressureStrategy() == WAIT
-        ? routeToSink(event -> sink.accept(event))
-        : routeToSink(event -> sinkEmit(event));
-  }
-
-  private Function<CoreEvent, Publisher<? extends CoreEvent>> routeToSink(Consumer<CoreEvent> sinkRouter) {
-    return event -> {
-      Publisher<CoreEvent> responsePublisher = ((BaseEventContext) event.getContext()).getResponsePublisher();
-
-      sinkRouter.accept(event);
-
-      // Subscribe the rest of reactor chain to response publisher, through which errors and responses will be emitted
-      return Mono.from(responsePublisher);
-    };
   }
 
   private void sinkEmit(CoreEvent event) {
@@ -450,6 +429,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   @Override
   protected void doStart() throws MuleException {
     super.doStart();
+
     try {
       // Each component in the chain must be started before `apply` is called on them, ...
       startIfStartable(pipeline);
@@ -459,9 +439,6 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       stopOnFailure(e);
       return;
     }
-
-    completionCallbackScheduler = schedulerService.ioScheduler(muleContext.getSchedulerBaseConfig().withMaxConcurrentTasks(1)
-        .withName(getName() + ".flux.completionCallback"));
 
     canProcessMessage = true;
     if (getMuleContext().isStarted()) {
@@ -510,8 +487,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   public Consumer<CoreEvent> assertStarted() {
     return event -> {
       if (!canProcessMessage) {
-        throw propagate(new MessagingException(event,
-                                               new LifecycleException(CoreMessages.isStopped(getName()), event.getMessage())));
+        final Exception exception =
+            new MessagingException(event, new LifecycleException(CoreMessages.isStopped(getName()), this));
+        ((BaseEventContext) event.getContext()).error(exception);
+        throw propagate(exception);
       }
     };
   }
@@ -531,15 +510,15 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected void doStopProcessingStrategy() throws MuleException {
     stopIfStoppable(processingStrategy);
 
-    if (completionCallbackScheduler != null) {
-      completionCallbackScheduler.stop();
-    }
-
     super.doStopProcessingStrategy();
   }
 
   @Override
   protected void doDispose() {
+    if (completionCallbackScheduler != null) {
+      completionCallbackScheduler.stop();
+    }
+
     disposeIfDisposable(pipeline);
     disposeIfDisposable(source);
     disposeIfDisposable(processingStrategy);
