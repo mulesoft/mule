@@ -17,6 +17,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyVararg;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doThrow;
@@ -345,6 +346,22 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   public void notEnrichThrownExceptionInValueTransformer() throws Throwable {
     final Exception exceptionToThrow = new RuntimeException(ERROR, exception);
     expectedException.expectCause(sameInstance(exception));
+    expectedException.expectMessage(ERROR);
+    mockExceptionEnricher(operationModel, () -> new NullExceptionEnricher());
+    final ValueTransformer failingTransformer = mock(ValueTransformer.class);
+    when(failingTransformer.apply(any(), any())).thenThrow(exceptionToThrow);
+
+    Mono.from(new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext),
+                                           muleContext.getErrorTypeRepository(), failingTransformer)
+                                               .execute(operationExecutor, operationContext))
+        .block();
+  }
+
+  @Test
+  public void notReconnectInValueTransformerWhenVariableIsSet() throws Throwable {
+    when(operationContext.getVariable(anyString())).thenReturn("true");
+    final Exception exceptionToThrow = new RuntimeException(new ConnectionException(ERROR));
+    expectedException.expectCause(instanceOf(ConnectionException.class));
     expectedException.expectMessage(ERROR);
     mockExceptionEnricher(operationModel, () -> new NullExceptionEnricher());
     final ValueTransformer failingTransformer = mock(ValueTransformer.class);
