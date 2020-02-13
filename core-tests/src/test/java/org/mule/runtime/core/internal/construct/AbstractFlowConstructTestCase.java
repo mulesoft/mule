@@ -10,6 +10,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
@@ -49,6 +51,7 @@ public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextT
   protected void doSetUp() throws Exception {
     super.doSetUp();
 
+    muleContext = spy(muleContext);
     directInboundMessageSource = new DirectInboundMessageSource();
   }
 
@@ -148,11 +151,13 @@ public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextT
     assertFalse(flow.isStarted());
     assertFalse(flow.isStopped());
 
+    when(muleContext.isStarting()).thenReturn(true);
     // This should not actually start the flow
     flow.start();
     assertFalse(flow.isStarted());
     assertTrue(flow.isStopped());
 
+    when(muleContext.isStarting()).thenReturn(false);
     // Finally the flow is actually started
     flow.start();
     assertTrue(flow.isStarted());
