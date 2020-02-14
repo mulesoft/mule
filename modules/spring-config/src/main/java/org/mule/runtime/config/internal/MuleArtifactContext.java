@@ -322,6 +322,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
   }
 
+  /**
+   * Defines if the context should be created for Runtime (execution) o not. This has impact on how the AST
+   * will be populated and created.
+   */
   protected boolean isRuntimeMode() {
     return true;
   }

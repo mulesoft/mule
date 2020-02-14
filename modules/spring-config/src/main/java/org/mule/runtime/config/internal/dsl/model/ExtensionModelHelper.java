@@ -271,9 +271,6 @@ public class ExtensionModelHelper {
                   modelRef.set(model);
                 }
               }
-
-          ;
-
             }.walk(currentExtension);
 
             return ofNullable(modelRef.get());
@@ -357,8 +354,6 @@ public class ExtensionModelHelper {
               }
             }
 
-        ;
-
             @Override
             protected void onOperation(HasOperationModels owner, OperationModel model) {
               if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
@@ -412,14 +407,18 @@ public class ExtensionModelHelper {
   }
 
   public DslElementSyntax resolveDslElementModel(NamedObject component, ComponentIdentifier componentIdentifier) {
+    final DslSyntaxResolver dslSyntaxResolver = getDslSyntaxResolver(componentIdentifier);
+
+    return dslSyntaxResolver.resolve(component);
+  }
+
+  private DslSyntaxResolver getDslSyntaxResolver(ComponentIdentifier componentIdentifier) {
     Optional<ExtensionModel> optionalExtensionModel = lookupExtensionModelFor(componentIdentifier);
     ExtensionModel extensionModel = optionalExtensionModel
         .orElseThrow(() -> new IllegalStateException("Extension Model in context not present for componentIdentifier: "
             + componentIdentifier));
 
-    final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(extensionModel);
-
-    return dslSyntaxResolver.resolve(component);
+    return dslSyntaxResolversByExtension.get(extensionModel);
   }
 
   public Optional<DslElementSyntax> resolveDslElementModel(MetadataType metadataType, ExtensionModel extensionModel) {
@@ -427,30 +426,22 @@ public class ExtensionModelHelper {
   }
 
   public DslElementSyntax resolveDslElementModel(ParameterModel parameterModel, ComponentIdentifier componentIdentifier) {
-    Optional<ExtensionModel> optionalExtensionModel = lookupExtensionModelFor(componentIdentifier);
-    ExtensionModel extensionModel = optionalExtensionModel
-        .orElseThrow(() -> new IllegalStateException("Extension Model in context not present for componentIdentifier: "
-            + componentIdentifier));
-
-    final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(extensionModel);
-
+    final DslSyntaxResolver dslSyntaxResolver = getDslSyntaxResolver(componentIdentifier);
     return dslSyntaxResolver.resolve(parameterModel);
   }
 
   public Map<ObjectType, Optional<DslElementSyntax>> resolveSubTypes(ObjectType type) {
     ImmutableMap.Builder<ObjectType, Optional<DslElementSyntax>> mapBuilder = ImmutableMap.builder();
     for (ObjectType subType : dslResolvingContext.getTypeCatalog().getSubTypes(type)) {
-      subType.getAnnotation(TypeIdAnnotation.class).map(TypeIdAnnotation::getValue).ifPresent(
-                                                                                              typeId -> dslResolvingContext
-                                                                                                  .getTypeCatalog()
-                                                                                                  .getDeclaringExtension(typeId)
-                                                                                                  .ifPresent(extensionName -> dslResolvingContext
-                                                                                                      .getExtension(extensionName)
-                                                                                                      .ifPresent(extensionModel -> mapBuilder
-                                                                                                          .put(subType,
-                                                                                                               dslSyntaxResolversByExtension
-                                                                                                                   .get(extensionModel)
-                                                                                                                   .resolve(subType)))));
+      Optional<String> typeId = subType.getAnnotation(TypeIdAnnotation.class).map(TypeIdAnnotation::getValue);
+      if (typeId.isPresent()) {
+        Optional<String> declaringExtension = dslResolvingContext.getTypeCatalog().getDeclaringExtension(typeId.get());
+        if (declaringExtension.isPresent()) {
+          dslResolvingContext.getExtension(declaringExtension.get())
+              .ifPresent(extensionModel -> mapBuilder.put(subType,
+                                                          dslSyntaxResolversByExtension.get(extensionModel).resolve(subType)));
+        }
+      }
     }
     return mapBuilder.build();
   }

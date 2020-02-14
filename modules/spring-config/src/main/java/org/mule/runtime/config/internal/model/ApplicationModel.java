@@ -45,6 +45,7 @@ import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.model.ArrayType;
@@ -98,7 +99,6 @@ import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.ArrayList;
@@ -353,7 +353,7 @@ public class ApplicationModel implements ArtifactAst {
 
   public void macroExpandXmlSdkComponents(Set<ExtensionModel> extensionModels) {
     expandModules(extensionModels, () -> {
-      // TODO MULE-13894 do this onorg.springframework.beans.ConversionNotSupportedExceptionly on runtimeMode=true once unified extensionModel names to use camelCase (see smart
+      // TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart connectors
       // connectors and crafted declared extension models)
       resolveComponentTypes();
       muleComponentModels
@@ -620,10 +620,8 @@ public class ApplicationModel implements ArtifactAst {
     ReflectionCache reflectionCache = new ReflectionCache();
     Map<ComponentIdentifier, MetadataTypeModelAdapter> registry = new HashMap();
     extensionModelHelper.getExtensionsModels().stream().forEach(extensionModel -> extensionModel.getTypes().stream()
-        .filter(p -> IntrospectionUtils.isInstantiable(p, reflectionCache))
-        .forEach(parameterType -> {
-          registerTopLevelParameter(parameterType, reflectionCache, registry, extensionModel);
-        }));
+        .filter(p -> isInstantiable(p, reflectionCache))
+        .forEach(parameterType -> registerTopLevelParameter(parameterType, reflectionCache, registry, extensionModel)));
 
     executeOnEveryComponentTree(componentModel -> {
       if (registry.containsKey(componentModel.getIdentifier())) {
