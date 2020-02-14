@@ -78,18 +78,17 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
    * seconds. The definition of max memory is that of {@link MemoryManager#getMaxMemory()}
    */
   public PoolingByteBufferManager() {
-    this(new DefaultMemoryManager(), DEFAULT_BUFFER_POOL_SIZE, DEFAULT_BUFFER_BUCKET_SIZE, DEFAULT_MEMORY_EXHAUSTED_WAIT_TIME);
+    this(new DefaultMemoryManager(), DEFAULT_BUFFER_POOL_SIZE, DEFAULT_BUFFER_BUCKET_SIZE);
   }
 
   /**
    * Creates a new instance which allows the pool to grow up to 50% of calling {@link MemoryManager#getMaxMemory()} on the given
    * {@code memoryManager}, and has {@code waitTimeoutMillis} as wait timeout.
    *
-   * @param memoryManager                    a {@link MemoryManager} used to determine the runtime's max memory
-   * @param memoryExhaustedWaitTimeoutMillis how long to wait when the pool is exhausted
+   * @param memoryManager a {@link MemoryManager} used to determine the runtime's max memory
    */
-  public PoolingByteBufferManager(MemoryManager memoryManager, int size, int bufferSize, long memoryExhaustedWaitTimeoutMillis) {
-    super(memoryManager, memoryExhaustedWaitTimeoutMillis);
+  public PoolingByteBufferManager(MemoryManager memoryManager, int size, int bufferSize) {
+    super(memoryManager);
     this.size = size;
     defaultSizePool = newBufferPool(bufferSize);
   }
@@ -143,8 +142,6 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
         LOGGER.warn("Error disposing mixed capacity byte buffers pool", e);
       }
     }
-
-    super.dispose();
   }
 
   private class BufferPool {
@@ -195,14 +192,10 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
     }
 
     private void returnBuffer(ByteBuffer buffer) {
-      try {
-        if (ephemeralBufferIds.remove(identityHashCode(buffer))) {
-          factory.destroy(buffer);
-        } else {
-          pool.restore(buffer);
-        }
-      } finally {
-        signalMemoryAvailable();
+      if (ephemeralBufferIds.remove(identityHashCode(buffer))) {
+        factory.destroy(buffer);
+      } else {
+        pool.restore(buffer);
       }
     }
 

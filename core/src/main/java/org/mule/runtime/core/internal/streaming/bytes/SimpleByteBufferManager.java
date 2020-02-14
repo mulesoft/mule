@@ -17,8 +17,7 @@ public class SimpleByteBufferManager extends MemoryBoundByteBufferManager {
 
   public SimpleByteBufferManager() {}
 
-  public SimpleByteBufferManager(MemoryManager memoryManager, long memoryExhaustedWaitTimeoutMillis) {
-    super(memoryManager, memoryExhaustedWaitTimeoutMillis);
+  public SimpleByteBufferManager(MemoryManager memoryManager) {
+    super(memoryManager);
   }
-
 }
