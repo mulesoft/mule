@@ -67,7 +67,8 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
   }
 
   private static String getProperty(ConfigurationProperties configurationProperties, String key) {
-    return configurationProperties.resolveStringProperty(key).orElseThrow(() -> new IllegalArgumentException(format("OCS property '%s' has not been set", key)));
+    return configurationProperties.resolveStringProperty(key)
+        .orElseThrow(() -> new IllegalArgumentException(format("OCS property '%s' has not been set", key)));
   }
 
   public PlatformManagedOAuthConfig(String ownerConfigName,
