@@ -74,16 +74,13 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager 
 
     streamingMemory.addAndGet(-capacity);
     throw new MaxStreamingMemoryExceededException(createStaticMessage(
-                                                                      format("Max streaming memory limit of %d bytes was exceeded",
-                                                                             maxStreamingMemory)));
+        format("Max streaming memory limit of %d bytes was exceeded",
+               maxStreamingMemory)));
   }
 
   /**
-   * Tries to allocate the {@link ByteBuffer} by delegating to {@link #doAllocate(int)}. If the memory cap is exceeded
+   * Tries to allocate the {@link ByteBuffer} by delegating to {@link #allocateIfFits(int)}. If the memory cap is exceeded
    * a {@link MaxStreamingMemoryExceededException} is thrown.
-   * <p>
-   * This method is final, actual allocation logic <b>MUST</b> happen on the {@link #doAllocate(int)} method, which in turn
-   * <b>MUST</b> also delegate into {@link #allocateIfFits(int)}
    *
    * @param capacity the capacity of the returned buffer
    * @return a {@link ByteBuffer}
@@ -95,12 +92,22 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager 
     return allocateIfFits(capacity);
   }
 
+  /**
+   * Delegates into {@link #doDeallocate(ByteBuffer)} so that the {@link #streamingMemory} counted gets properly decreased
+   *
+   * @param byteBuffer the buffer to be deallocated.
+   */
   @Override
   @Deprecated
   public void deallocate(ByteBuffer byteBuffer) {
     doDeallocate(byteBuffer);
   }
 
+  /**
+   * Decreases the {@link #streamingMemory} counter by the capacity of the given {@code byteBuffer}
+   *
+   * @param byteBuffer a {@link ByteBuffer}
+   */
   protected void doDeallocate(ByteBuffer byteBuffer) {
     streamingMemory.addAndGet(-byteBuffer.capacity());
   }
@@ -114,7 +121,7 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager 
         return Long.valueOf(maxMemoryProperty);
       } catch (Exception e) {
         throw new IllegalArgumentException(format("Invalid value for system property '%s'. A memory size (in bytes) was "
-            + "expected, got '%s' instead", MULE_STREAMING_MAX_MEMORY,
+                                                      + "expected, got '%s' instead", MULE_STREAMING_MAX_MEMORY,
                                                   maxMemoryProperty));
       }
     }

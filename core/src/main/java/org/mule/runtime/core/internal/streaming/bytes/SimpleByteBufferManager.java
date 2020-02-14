@@ -22,6 +22,9 @@ public class SimpleByteBufferManager extends MemoryBoundByteBufferManager {
     super(memoryManager);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public ManagedByteBufferWrapper allocateManaged(int capacity) {
     return new ManagedByteBufferWrapper(allocateIfFits(capacity), buffer -> doDeallocate(buffer.getDelegate()));
