@@ -11,6 +11,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.util.MultiMap.unmodifiableMultiMap;
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
@@ -20,6 +21,8 @@ import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.api.util.MultiMapTestCase;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -42,7 +45,7 @@ public class CaseInsensitiveMultiMapTestCase extends MultiMapTestCase {
   public static Collection<Object[]> data() {
     return asList(new Object[][] {
         {(Supplier<MultiMap<String, String>>) (() -> new CaseInsensitiveMultiMap(new MultiMap<>())),
-            (Function<MultiMap<String, String>, MultiMap<String, String>>) (m -> new CaseInsensitiveMultiMap(m))}
+            (Function<MultiMap<String, String>, MultiMap<String, String>>) (CaseInsensitiveMultiMap::new)}
     });
   }
 
@@ -98,7 +101,7 @@ public class CaseInsensitiveMultiMapTestCase extends MultiMapTestCase {
 
   @Test
   public void emptyEquality() {
-    MultiMap<Object, Object> otherMultiMap = new MultiMap<>();
+    CaseInsensitiveMultiMap otherMultiMap = new CaseInsensitiveMultiMap();
 
     assertThat(multiMap, is(equalTo(otherMultiMap)));
     assertThat(otherMultiMap, is(equalTo(multiMap)));
@@ -106,7 +109,7 @@ public class CaseInsensitiveMultiMapTestCase extends MultiMapTestCase {
 
   @Test
   public void complexEquality() {
-    MultiMap<Object, Object> otherMultiMap = new MultiMap<>();
+    CaseInsensitiveMultiMap otherMultiMap = new CaseInsensitiveMultiMap();
     otherMultiMap.put("hello", "there");
     multiMap.put("hello", "there");
     otherMultiMap.put("hello", "stranger");
@@ -116,6 +119,38 @@ public class CaseInsensitiveMultiMapTestCase extends MultiMapTestCase {
 
     assertThat(otherMultiMap, is(equalTo(multiMap)));
     assertThat(multiMap, is(equalTo(otherMultiMap)));
+  }
+
+  @Test(expected = UnsupportedOperationException.class)
+  public void immutableCaseInsensitiveMultiMapFailsOnPut() {
+    multiMap.toImmutableMultiMap().put(KEY_1, VALUE_1);
+  }
+
+  @Test(expected = UnsupportedOperationException.class)
+  public void immutableCaseInsensitiveMultiMapFailsOnPutAll() {
+   CaseInsensitiveMultiMap map = new CaseInsensitiveMultiMap();
+    map.put(KEY_1, VALUE_1);
+    multiMap.toImmutableMultiMap().putAll(map);
+  }
+
+  @Test(expected = UnsupportedOperationException.class)
+  public void immutableCaseInsensitiveMultiMapFailsOnRemove() {
+    multiMap.toImmutableMultiMap().remove(KEY_1);
+  }
+
+  @Test(expected = UnsupportedOperationException.class)
+  public void immutableCaseInsensitiveMultiMapFailsOnClear() {
+    multiMap.toImmutableMultiMap().clear();
+  }
+
+  @Test
+  public void toImmutableCaseInsensitiveMapKeepsOrder() {
+    multiMap.put(KEY_3, VALUE_1);
+    multiMap.put(KEY_2, VALUE_1);
+    multiMap.put(KEY_1, VALUE_1);
+    List<Entry<String, String>> entryList = multiMap.entryList();
+    List<Entry<String, String>> immutableEntryList = multiMap.toImmutableMultiMap().entryList();
+    assertEquals(entryList, immutableEntryList);
   }
 
 }

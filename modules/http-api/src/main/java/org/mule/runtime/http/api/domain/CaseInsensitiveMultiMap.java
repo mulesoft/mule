@@ -16,6 +16,7 @@ import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.api.util.MultiMap;
 
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * {@link MultiMap} where the key's case is not taken into account when looking for it, adding or aggregating it.
@@ -119,5 +120,19 @@ public class CaseInsensitiveMultiMap extends AbstractCaseInsensitiveMultiMap {
   @Override
   public DataType getDataType() {
     return dataType;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof CaseInsensitiveMultiMap)) return false;
+    if (!super.equals(o)) return false;
+    CaseInsensitiveMultiMap that = (CaseInsensitiveMultiMap) o;
+    return optimized == that.optimized;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), optimized);
   }
 }
