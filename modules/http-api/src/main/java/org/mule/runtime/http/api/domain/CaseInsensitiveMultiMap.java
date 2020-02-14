@@ -124,9 +124,13 @@ public class CaseInsensitiveMultiMap extends AbstractCaseInsensitiveMultiMap {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof CaseInsensitiveMultiMap)) return false;
-    if (!super.equals(o)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof CaseInsensitiveMultiMap))
+      return false;
+    if (!super.equals(o))
+      return false;
     CaseInsensitiveMultiMap that = (CaseInsensitiveMultiMap) o;
     return optimized == that.optimized;
   }

@@ -128,7 +128,7 @@ public class CaseInsensitiveMultiMapTestCase extends MultiMapTestCase {
 
   @Test(expected = UnsupportedOperationException.class)
   public void immutableCaseInsensitiveMultiMapFailsOnPutAll() {
-   CaseInsensitiveMultiMap map = new CaseInsensitiveMultiMap();
+    CaseInsensitiveMultiMap map = new CaseInsensitiveMultiMap();
     map.put(KEY_1, VALUE_1);
     multiMap.toImmutableMultiMap().putAll(map);
   }
