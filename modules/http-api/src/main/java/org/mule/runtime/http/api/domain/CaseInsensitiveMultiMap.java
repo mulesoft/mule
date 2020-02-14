@@ -127,10 +127,12 @@ public class CaseInsensitiveMultiMap extends AbstractCaseInsensitiveMultiMap {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof CaseInsensitiveMultiMap))
+    if (!(o instanceof CaseInsensitiveMultiMap)) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!super.equals(o)) {
       return false;
+    }
     CaseInsensitiveMultiMap that = (CaseInsensitiveMultiMap) o;
     return optimized == that.optimized;
   }
