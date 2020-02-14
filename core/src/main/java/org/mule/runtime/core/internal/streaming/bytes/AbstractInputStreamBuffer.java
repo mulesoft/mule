@@ -151,9 +151,5 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     return totalRead;
   }
 
-  protected void deallocate(ByteBuffer byteBuffer) {
-    bufferManager.deallocate(byteBuffer);
-  }
-
   protected abstract ByteBuffer copy(long position, int length);
 }

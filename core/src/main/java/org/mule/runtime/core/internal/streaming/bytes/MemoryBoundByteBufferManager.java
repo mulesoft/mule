@@ -15,6 +15,7 @@ import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConsta
 
 import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
+import org.mule.runtime.core.api.streaming.bytes.ManagedByteBufferWrapper;
 import org.mule.runtime.core.internal.streaming.DefaultMemoryManager;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
 
@@ -58,11 +59,12 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager 
   }
 
   /**
-   * Tries to allocate a {@link ByteBuffer} of the given {@code capacity}. If said operation exceeds the memory cap, then a
-   * {@link MaxStreamingMemoryExceededException} is thrown
+   * Tries to allocate a {@link ManagedByteBufferWrapper} of the given {@code capacity}.
+   * <p>
+   * If said operation exceeds the memory cap, then a {@link MaxStreamingMemoryExceededException} is thrown.
    *
    * @param capacity the required buffer's capacity
-   * @return a {@link ByteBuffer}
+   * @return a {@link ManagedByteBufferWrapper}
    * @throws MaxStreamingMemoryExceededException if the memory cap is exceeded by this operation
    */
   protected final ByteBuffer allocateIfFits(int capacity) {
@@ -71,8 +73,8 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager 
     }
 
     streamingMemory.addAndGet(-capacity);
-    throw new MaxStreamingMemoryExceededException(createStaticMessage(format(
-                                                                             "Max streaming memory limit of %d bytes was exceeded",
+    throw new MaxStreamingMemoryExceededException(createStaticMessage(
+                                                                      format("Max streaming memory limit of %d bytes was exceeded",
                                                                              maxStreamingMemory)));
   }
 
@@ -88,16 +90,18 @@ public abstract class MemoryBoundByteBufferManager implements ByteBufferManager 
    * @throws MaxStreamingMemoryExceededException if the memory cap is exceeded.
    */
   @Override
-  public final ByteBuffer allocate(int capacity) {
-    return doAllocate(capacity);
-  }
-
-  protected ByteBuffer doAllocate(int capacity) {
+  @Deprecated
+  public ByteBuffer allocate(int capacity) {
     return allocateIfFits(capacity);
   }
 
   @Override
+  @Deprecated
   public void deallocate(ByteBuffer byteBuffer) {
+    doDeallocate(byteBuffer);
+  }
+
+  protected void doDeallocate(ByteBuffer byteBuffer) {
     streamingMemory.addAndGet(-byteBuffer.capacity());
   }
 

@@ -8,8 +8,6 @@ package org.mule.runtime.core.internal.streaming.bytes;
 
 import static java.lang.Math.min;
 import static java.lang.Runtime.getRuntime;
-import static java.lang.System.identityHashCode;
-import static java.util.Collections.newSetFromMap;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.DEFAULT_BUFFER_BUCKET_SIZE;
@@ -18,12 +16,11 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.streaming.bytes.ManagedByteBufferWrapper;
 import org.mule.runtime.core.internal.streaming.DefaultMemoryManager;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
 
 import java.nio.ByteBuffer;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
@@ -71,7 +68,7 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
             LOGGER.debug("Found exception trying to dispose buffer pool for capacity " + key, e);
           }
         }
-      }).build(capacity -> newBufferPool(capacity));
+      }).build(this::newBufferPool);
 
   /**
    * Creates a new instance which allows the pool to grow up to 70% of the runtime's max memory and has a wait timeout of 10
@@ -102,27 +99,13 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
   }
 
   @Override
-  protected ByteBuffer doAllocate(int capacity) {
+  public ManagedByteBufferWrapper allocateManaged(int capacity) {
     try {
       return getBufferPool(capacity).take();
+    } catch (RuntimeException e) {
+      throw e;
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not allocate byte buffer. " + e.getMessage()), e);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void deallocate(ByteBuffer byteBuffer) {
-    int capacity = byteBuffer.capacity();
-    BufferPool pool = getBufferPool(capacity);
-    if (pool != null) {
-      try {
-        pool.returnBuffer(byteBuffer);
-      } catch (Exception e) {
-        throw new MuleRuntimeException(createStaticMessage("Could not deallocate buffer of capacity " + capacity), e);
-      }
     }
   }
 
@@ -146,34 +129,33 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
 
   private class BufferPool {
 
-    private final PoolService<ByteBuffer> pool;
-    private final PoolObjectFactory<ByteBuffer> factory;
+    private final PoolService<ManagedByteBufferWrapper> pool;
+    private final PoolObjectFactory<ManagedByteBufferWrapper> factory;
     private final int bufferCapacity;
-    private final Set<Integer> ephemeralBufferIds = newSetFromMap(new ConcurrentHashMap<>());
 
     private BufferPool(int size, int bufferCapacity) {
       this.bufferCapacity = bufferCapacity;
-      factory = new PoolObjectFactory<ByteBuffer>() {
+      factory = new PoolObjectFactory<ManagedByteBufferWrapper>() {
 
         @Override
-        public ByteBuffer create() {
-          return allocateIfFits(bufferCapacity);
+        public ManagedByteBufferWrapper create() {
+          return new ManagedByteBufferWrapper(allocateIfFits(bufferCapacity), buffer -> returnBuffer(buffer));
         }
 
         @Override
-        public boolean readyToTake(ByteBuffer buffer) {
+        public boolean readyToTake(ManagedByteBufferWrapper buffer) {
           return true;
         }
 
         @Override
-        public boolean readyToRestore(ByteBuffer buffer) {
-          buffer.clear();
+        public boolean readyToRestore(ManagedByteBufferWrapper buffer) {
+          buffer.getDelegate().clear();
           return true;
         }
 
         @Override
-        public void destroy(ByteBuffer buffer) {
-          PoolingByteBufferManager.super.deallocate(buffer);
+        public void destroy(ManagedByteBufferWrapper buffer) {
+          doDeallocate(buffer.getDelegate());
         }
       };
 
@@ -181,22 +163,17 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
                                   factory, min(getRuntime().availableProcessors(), size), size, false);
     }
 
-    private ByteBuffer take() {
-      ByteBuffer buffer = pool.tryTake();
+    private ManagedByteBufferWrapper take() {
+      ManagedByteBufferWrapper buffer = pool.tryTake();
       if (buffer == null) {
-        buffer = allocateIfFits(bufferCapacity);
-        ephemeralBufferIds.add(identityHashCode(buffer));
+        buffer = new ManagedByteBufferWrapper(allocateIfFits(bufferCapacity), b -> doDeallocate(b.getDelegate()));
       }
 
       return buffer;
     }
 
-    private void returnBuffer(ByteBuffer buffer) {
-      if (ephemeralBufferIds.remove(identityHashCode(buffer))) {
-        factory.destroy(buffer);
-      } else {
-        pool.restore(buffer);
-      }
+    private void returnBuffer(ManagedByteBufferWrapper buffer) {
+      pool.restore(buffer);
     }
 
     private void close() {

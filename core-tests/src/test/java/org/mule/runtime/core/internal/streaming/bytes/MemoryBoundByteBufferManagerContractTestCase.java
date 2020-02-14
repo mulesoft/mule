@@ -9,10 +9,9 @@ package org.mule.runtime.core.internal.streaming.bytes;
 import static java.lang.Math.round;
 import static java.lang.System.clearProperty;
 import static java.lang.System.setProperty;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -21,13 +20,10 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_MAX_
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.DEFAULT_BUFFER_BUCKET_SIZE;
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.MAX_STREAMING_MEMORY_PERCENTAGE;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.streaming.bytes.ManagedByteBufferWrapper;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.nio.ByteBuffer;
 
 import org.junit.After;
 import org.junit.Rule;
@@ -36,16 +32,19 @@ import org.junit.rules.ExpectedException;
 
 public abstract class MemoryBoundByteBufferManagerContractTestCase extends AbstractMuleTestCase {
 
-  private MemoryBoundByteBufferManager bufferManager = createDefaultBoundBuffer();
   private static final int CAPACITY = 100;
   private static final int OTHER_CAPACITY = CAPACITY + 1;
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
+  private MemoryBoundByteBufferManager bufferManager = createDefaultBoundBuffer();
+
   @After
-  public void after() {
-    bufferManager.dispose();
+  public void dispose() {
+    if (bufferManager instanceof Disposable) {
+      ((Disposable) bufferManager).dispose();
+    }
   }
 
   @Test
@@ -56,31 +55,28 @@ public abstract class MemoryBoundByteBufferManagerContractTestCase extends Abstr
 
   protected abstract MemoryBoundByteBufferManager createDefaultBoundBuffer();
 
-  protected abstract MemoryBoundByteBufferManager createBuffer(MemoryManager memoryManager, int capacity, long waitTimeoutMillis);
+  protected abstract MemoryBoundByteBufferManager createBuffer(MemoryManager memoryManager, int capacity);
 
   @Test
-  public void limitTotalMemory() throws Exception {
+  public void limitTotalMemory() {
     long maxMemory = round((DEFAULT_BUFFER_BUCKET_SIZE * 2) / MAX_STREAMING_MEMORY_PERCENTAGE);
-    final long waitTimeoutMillis = SECONDS.toMillis(2);
 
-    bufferManager.dispose();
-    bufferManager = createBuffer(getMemoryManager(maxMemory), DEFAULT_BUFFER_BUCKET_SIZE, waitTimeoutMillis);
+    dispose();
+    bufferManager = createBuffer(getMemoryManager(maxMemory), DEFAULT_BUFFER_BUCKET_SIZE);
 
-    assertMemoryLimit(DEFAULT_BUFFER_BUCKET_SIZE, waitTimeoutMillis);
+    assertMemoryLimit(DEFAULT_BUFFER_BUCKET_SIZE);
   }
 
   @Test
-  public void limitTotalMemoryThroughSystemProperty() throws Exception {
+  public void limitTotalMemoryThroughSystemProperty() {
     long maxMemory = round((DEFAULT_BUFFER_BUCKET_SIZE * 2) / MAX_STREAMING_MEMORY_PERCENTAGE);
-    final long waitTimeoutMillis = SECONDS.toMillis(2);
-
     MemoryManager memoryManager = getMemoryManager(maxMemory);
 
-    bufferManager.dispose();
+    dispose();
     setProperty(MULE_STREAMING_MAX_MEMORY, String.valueOf(maxMemory));
     try {
-      bufferManager = createBuffer(memoryManager, DEFAULT_BUFFER_BUCKET_SIZE, waitTimeoutMillis);
-      assertMemoryLimit(DEFAULT_BUFFER_BUCKET_SIZE, waitTimeoutMillis);
+      bufferManager = createBuffer(memoryManager, DEFAULT_BUFFER_BUCKET_SIZE);
+      assertMemoryLimit(DEFAULT_BUFFER_BUCKET_SIZE);
       verify(memoryManager, never()).getMaxMemory();
     } finally {
       clearProperty(MULE_STREAMING_MAX_MEMORY);
@@ -88,62 +84,41 @@ public abstract class MemoryBoundByteBufferManagerContractTestCase extends Abstr
   }
 
   @Test
-  public void invalidMemoryCapThroughSystemProperty() throws Exception {
+  public void invalidMemoryCapThroughSystemProperty() {
     setProperty(MULE_STREAMING_MAX_MEMORY, "don't spend that much memory please");
-    bufferManager.dispose();
+    dispose();
     try {
       expectedException.expect(IllegalArgumentException.class);
-      bufferManager = createBuffer(mock(MemoryManager.class), DEFAULT_BUFFER_BUCKET_SIZE, 10);
+      bufferManager = createBuffer(mock(MemoryManager.class), DEFAULT_BUFFER_BUCKET_SIZE);
     } finally {
       clearProperty(MULE_STREAMING_MAX_MEMORY);
     }
   }
 
-  private void assertMemoryLimit(int bufferCapacity, long waitTimeoutMillis) throws InterruptedException {
-    ByteBuffer buffer1 = bufferManager.allocate(bufferCapacity);
-    ByteBuffer buffer2 = bufferManager.allocate(bufferCapacity);
-    assertThat(buffer1.capacity(), is(bufferCapacity));
-    assertThat(buffer2.capacity(), is(bufferCapacity));
+  private void assertMemoryLimit(int bufferCapacity) {
+    ManagedByteBufferWrapper buffer1 = bufferManager.allocateManaged(bufferCapacity);
+    ManagedByteBufferWrapper buffer2 = bufferManager.allocateManaged(bufferCapacity);
+    assertThat(buffer1.getDelegate().capacity(), is(bufferCapacity));
+    assertThat(buffer2.getDelegate().capacity(), is(bufferCapacity));
 
-    Latch latch = new Latch();
-    Reference<Boolean> maxMemoryExhausted = new Reference<>(false);
+    try {
+      bufferManager.allocateManaged(bufferCapacity);
+      fail("MaxStreamingMemoryExceededException was expected");
+    } catch (MaxStreamingMemoryExceededException e) {
+      // awesome... continue
+    }
 
-    new Thread(() -> {
-      try {
-        bufferManager.allocate(bufferCapacity);
-        latch.release();
-      } catch (MaxStreamingMemoryExceededException e) {
-        maxMemoryExhausted.set(true);
-      } catch (MuleRuntimeException e) {
-        maxMemoryExhausted.set(e.getCause() instanceof MaxStreamingMemoryExceededException);
-      }
-    }).start();
-
-    assertThat(latch.await(waitTimeoutMillis * 2, MILLISECONDS), is(false));
-    assertThat(maxMemoryExhausted.get(), is(true));
-
-    bufferManager.deallocate(buffer1);
-
-    Latch secondLatch = new Latch();
-    new Thread(() -> {
-      try {
-        bufferManager.allocate(bufferCapacity);
-        maxMemoryExhausted.set(false);
-      } finally {
-        secondLatch.release();
-      }
-    }).start();
-
-    assertThat(secondLatch.await(waitTimeoutMillis, MILLISECONDS), is(true));
-    assertThat(maxMemoryExhausted.get(), is(false));
+    buffer1.deallocate();
+    buffer1 = bufferManager.allocateManaged(bufferCapacity);
+    assertThat(buffer1.getDelegate().capacity(), is(bufferCapacity));
   }
 
   private void assertCapacity(int capacity) {
-    ByteBuffer buffer = bufferManager.allocate(capacity);
+    ManagedByteBufferWrapper buffer = bufferManager.allocateManaged(capacity);
     try {
-      assertThat(buffer.capacity(), is(capacity));
+      assertThat(buffer.getDelegate().capacity(), is(capacity));
     } finally {
-      bufferManager.deallocate(buffer);
+      buffer.deallocate();
     }
   }
 

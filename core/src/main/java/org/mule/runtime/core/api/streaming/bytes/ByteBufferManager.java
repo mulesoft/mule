@@ -34,7 +34,10 @@ public interface ByteBufferManager {
    * @return a {@link ByteBuffer} of the given {@code capacity}
    * @throws MaxStreamingMemoryExceededException if no more streaming memory is available
    */
+  @Deprecated
   ByteBuffer allocate(int capacity);
+
+  ManagedByteBufferWrapper allocateManaged(int capacity);
 
   /**
    * Indicates that the given {@code byteBuffer} is no longer needed and the runtime
@@ -42,5 +45,7 @@ public interface ByteBufferManager {
    *
    * @param byteBuffer the buffer to be deallocated.
    */
+  @Deprecated
   void deallocate(ByteBuffer byteBuffer);
+
 }
