@@ -215,7 +215,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private String getParameterId(CoreEvent event) {
-    return event.getContext().getId() + "_" + toString();
+    final String id = event.getContext().getId();
+    return (id != null ? id : "(null)").concat("_").concat(toString());
   }
 
   private BiConsumer<Throwable, Object> onRoutingError() {
@@ -414,7 +415,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private boolean acceptsExpression(CoreEvent event) {
-    return when.map(expr -> expressionManager.evaluateBoolean(expr, event, getLocation())).orElse(true);
+    return !when.isPresent() || when.map(expr -> expressionManager.evaluateBoolean(expr, event, getLocation())).orElse(true);
   }
 
   protected Function<CoreEvent, CoreEvent> afterRouting() {

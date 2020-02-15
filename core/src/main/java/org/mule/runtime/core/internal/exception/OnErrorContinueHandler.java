@@ -14,6 +14,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
@@ -102,6 +103,7 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
   }
 
   private boolean sourceError(CoreEvent event) {
-    return event.getError().filter(error -> sourceErrorMatcher.match(error.getErrorType())).isPresent();
+    final Optional<Error> error = event.getError();
+    return error.isPresent() && sourceErrorMatcher.match(error.get().getErrorType());
   }
 }

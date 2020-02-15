@@ -36,6 +36,7 @@ import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
@@ -201,7 +202,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   public void setExceptionListeners(List<MessagingExceptionHandlerAcceptor> exceptionListeners) {
-    this.exceptionListeners = exceptionListeners;
+    this.exceptionListeners = new CopyOnWriteArrayList<>(exceptionListeners);
   }
 
   public List<MessagingExceptionHandlerAcceptor> getExceptionListeners() {
