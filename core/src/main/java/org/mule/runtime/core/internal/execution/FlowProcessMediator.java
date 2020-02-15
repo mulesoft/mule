@@ -201,7 +201,7 @@ public class FlowProcessMediator implements Initialisable {
     try {
       onMessageReceived(ctx);
       ctx.flowConstruct.checkBackpressure(ctx.event);
-      ctx.template.getNotificationFunctions().forEach(notificationFunction -> muleContext.getNotificationManager()
+      ctx.template.getNotificationFunctions().forEach(notificationFunction -> notificationManager
           .fireNotification(notificationFunction.apply(ctx.event, ctx.messageProcessContext.getMessageSource())));
       ctx.sourcePolicy.process(ctx.event, ctx.template,
                                new CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>>() {
@@ -359,15 +359,15 @@ public class FlowProcessMediator implements Initialisable {
    */
   private void policySuccessError(SourceErrorException see, SourcePolicySuccessResult successResult, PhaseContext ctx) {
     MessagingException messagingException =
-        see.toMessagingException(ctx.flowConstruct.getMuleContext().getExceptionContextProviders(), ctx.messageSource);
+        see.toMessagingException(exceptionContextProviders, ctx.messageSource);
 
-    Runnable terminationCallback =
-        () -> sendErrorResponse(messagingException, successResult.createErrorResponseParameters(), ctx,
+    Consumer<MessagingException> terminationCallback =
+        me -> sendErrorResponse(me, successResult.createErrorResponseParameters(), ctx,
                                 new CompletableCallback<Void>() {
 
                                   @Override
                                   public void complete(Void value) {
-                                    onTerminate(ctx, left(messagingException));
+                                    onTerminate(ctx, left(me));
                                     finish(ctx);
                                   }
 
@@ -378,8 +378,10 @@ public class FlowProcessMediator implements Initialisable {
                                   }
                                 });
 
-    ctx.flowConstruct.getExceptionListener().routeError(messagingException, event -> terminationCallback.run(),
-                                                        error -> terminationCallback.run());
+    ctx.flowConstruct.getExceptionListener()
+        .router(event -> terminationCallback.accept(messagingException),
+                error -> terminationCallback.accept(messagingException))
+        .accept(messagingException);
   }
 
   /**
@@ -458,7 +460,7 @@ public class FlowProcessMediator implements Initialisable {
 
       Message eventMessage;
       if (resultValue instanceof Collection && adapter.isCollection()) {
-        eventMessage = toMessage(Result.<Collection<Message>, TypedValue>builder()
+        eventMessage = toMessage(Result.<Collection<Message>, TypedValue<?>>builder()
             .output(toMessageCollection(
                                         new MediaTypeDecoratedResultCollection((Collection<Result>) resultValue,
                                                                                adapter.getPayloadMediaTypeResolver()),

@@ -115,6 +115,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private ComponentLocation location;
 
   private Supplier<FluxSink<CoreEvent>> fluxFactory;
+  @Deprecated
   private Supplier<FluxSink<CoreEvent>> routingSink;
 
   private final class OnErrorHandlerFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
@@ -161,6 +162,28 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     } catch (Throwable throwable) {
       throw new RuntimeException(unwrap(throwable));
     }
+  }
+
+  @Override
+  public Consumer<Exception> router(Consumer<CoreEvent> continueCallback,
+                                    Consumer<Throwable> propagateCallback) {
+    final FluxSink<CoreEvent> fluxSink = fluxFactory.get();
+
+    return error -> {
+      // All calling methods will end up transforming any error class other than MessagingException into that one
+      MessagingException messagingError = (MessagingException) error;
+      CoreEvent failureEvent = messagingError.getEvent();
+
+      ErrorHandlerContext ctx = ErrorHandlerContext.from(failureEvent);
+
+      if (ctx == null) {
+        ctx = new ErrorHandlerContext();
+        failureEvent = quickCopy(failureEvent, of(ERROR_HANDLER_CONTEXT, ctx));
+      }
+
+      ctx.addContextItem(getParameterId(failureEvent), error, failureEvent, continueCallback, propagateCallback);
+      fluxSink.next(failureEvent);
+    };
   }
 
   @Override
