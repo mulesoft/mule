@@ -8,8 +8,6 @@ package org.mule.runtime.core.internal.streaming.object;
 
 import org.mule.runtime.api.streaming.HasSize;
 
-import java.util.Optional;
-
 /**
  * A buffer which provides concurrent random access to the entirety
  * of a stream of objects.
@@ -37,7 +35,7 @@ public interface ObjectStreamBuffer<T> extends HasSize {
    * @param position the bucket's position
    * @return an optional the bucket. Will be empty if no bucket for that position,
    */
-  Optional<Bucket<T>> getBucketFor(Position position);
+  Bucket<T> getBucketFor(Position position);
 
   /**
    * Transforms the given index based {@code position} to a {@link Position}

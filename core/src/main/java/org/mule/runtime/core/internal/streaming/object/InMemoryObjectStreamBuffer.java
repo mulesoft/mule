@@ -7,8 +7,7 @@
 package org.mule.runtime.core.internal.streaming.object;
 
 import static java.lang.Math.floor;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
 import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
 
@@ -71,12 +70,12 @@ public class InMemoryObjectStreamBuffer<T> extends AbstractObjectStreamBuffer<T>
   }
 
   @Override
-  protected Optional<Bucket<T>> getPresentBucket(Position position) {
+  protected Bucket<T> getPresentBucket(Position position) {
     if (position.getBucketIndex() < buckets.size()) {
-      return ofNullable(buckets.get(position.getBucketIndex()));
+      return buckets.get(position.getBucketIndex());
     }
 
-    return empty();
+    return null;
   }
 
   @Override
@@ -93,5 +92,4 @@ public class InMemoryObjectStreamBuffer<T> extends AbstractObjectStreamBuffer<T>
       throw new StreamingBufferSizeExceededException(config.getMaxBufferSize());
     }
   }
-
 }

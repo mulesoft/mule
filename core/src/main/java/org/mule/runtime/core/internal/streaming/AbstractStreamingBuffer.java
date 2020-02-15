@@ -7,19 +7,13 @@
 package org.mule.runtime.core.internal.streaming;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.streaming.Cursor;
-import org.mule.runtime.core.api.util.func.CheckedFunction;
-import org.mule.runtime.core.api.util.func.CheckedSupplier;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import org.slf4j.Logger;
 
 /**
  * Base class for streaming buffers with basic functionality to allow {@link Cursor cursors}
@@ -29,48 +23,12 @@ import org.slf4j.Logger;
  */
 public abstract class AbstractStreamingBuffer {
 
-  private static final Logger LOGGER = getLogger(AbstractStreamingBuffer.class);
-
   protected final AtomicBoolean closed = new AtomicBoolean(false);
   private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
   protected final Lock readLock = readWriteLock.readLock();
   protected final Lock writeLock = readWriteLock.writeLock();
 
-  protected <T> T withReadLock(CheckedFunction<LockReleaser, T> function) {
-    final LockReleaser releaser = new LockReleaser(readLock);
-    readLock.lock();
-    try {
-      return function.apply(releaser);
-    } finally {
-      releaser.release();
-    }
-  }
-
-  protected <T> T withWriteLock(CheckedSupplier<T> supplier) {
-    return withLock(writeLock, supplier);
-  }
-
   protected void checkNotClosed() {
     checkState(!closed.get(), "Buffer is closed");
-  }
-
-  public final class LockReleaser {
-
-    private final Lock lock;
-    private boolean acquired = true;
-
-    private LockReleaser(Lock lock) {
-      this.lock = lock;
-    }
-
-    public void release() {
-      if (acquired) {
-        try {
-          lock.unlock();
-        } finally {
-          acquired = false;
-        }
-      }
-    }
   }
 }

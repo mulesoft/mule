@@ -11,6 +11,7 @@ import static java.lang.Math.toIntExact;
 import static java.lang.System.arraycopy;
 import static java.nio.ByteBuffer.wrap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
@@ -65,17 +66,18 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
   }
 
   private ByteBuffer doGet(long position, int length, boolean consumeStreamIfNecessary) {
-    return withReadLock(releaser -> {
-
+    readLock.lock();
+    try {
       ByteBuffer presentRead = getFromCurrentData(position, length);
       if (presentRead != null) {
         return presentRead;
       }
 
       if (consumeStreamIfNecessary) {
-        releaser.release();
-        return withWriteLock(() -> {
+        readLock.unlock();
+        writeLock.lock();
 
+        try {
           ByteBuffer refetch;
           refetch = getFromCurrentData(position, length);
           if (refetch != null) {
@@ -84,27 +86,30 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
 
           final long requiredUpperBound = position + length;
           while (!streamFullyConsumed && bufferTip < requiredUpperBound) {
-            try {
-              final int read = consumeForwardData();
-              if (read > 0) {
-                refetch = getFromCurrentData(position, min(length, read));
-                if (refetch != null) {
-                  return refetch;
-                }
-              } else {
-                actingBuffer.limit(actingBuffer.position());
+            final int read = consumeForwardData();
+            if (read > 0) {
+              refetch = getFromCurrentData(position, min(length, read));
+              if (refetch != null) {
+                return refetch;
               }
-            } catch (IOException e) {
-              throw new MuleRuntimeException(createStaticMessage("Could not read stream"), e);
+            } else {
+              actingBuffer.limit(actingBuffer.position());
             }
           }
-
           return doGet(position, length, false);
-        });
+        } catch (IOException e) {
+          throw new MuleRuntimeException(createStaticMessage("Could not read stream"), e);
+        } finally {
+          // lock downgrade
+          readLock.lock();
+          writeLock.unlock();
+        }
       } else {
         return getFromCurrentData(position, length);
       }
-    });
+    } finally {
+      readLock.unlock();
+    }
   }
 
   private ByteBuffer getFromCurrentData(long position, int length) {

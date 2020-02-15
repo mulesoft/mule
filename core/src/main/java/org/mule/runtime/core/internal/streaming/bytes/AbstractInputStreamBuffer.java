@@ -61,20 +61,19 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
   @Override
   public final void close() {
     if (closed.compareAndSet(false, true)) {
-      withWriteLock(() -> {
-        try {
-          doClose();
-          return null;
-        } finally {
-          if (stream != null) {
-            try {
-              stream.close();
-            } catch (IOException e) {
-              LOGGER.debug("Found exception trying to close InputStream", e);
-            }
+      writeLock.lock();
+      try {
+        doClose();
+      } finally {
+        if (stream != null) {
+          try {
+            stream.close();
+          } catch (IOException e) {
+            LOGGER.debug("Found exception trying to close InputStream", e);
           }
         }
-      });
+        writeLock.unlock();
+      }
     }
   }
 
