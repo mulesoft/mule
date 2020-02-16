@@ -13,10 +13,10 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -28,6 +28,7 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.getI
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.Flow;
@@ -42,6 +43,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.processor.ContextPropagationChecker;
 
 import java.io.ByteArrayInputStream;
 import java.util.Collection;
@@ -344,6 +346,29 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.start();
 
     assertNoRetryContextAfterScopeExecutions(4);
+  }
+
+  @Test
+  public void subscriberContextPropagation() throws MuleException {
+    final ContextPropagationChecker contextPropagationChecker = new ContextPropagationChecker();
+
+    untilSuccessful = new UntilSuccessful();
+    // untilSuccessful.setMaxRetries("1");
+    untilSuccessful.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    //
+    // targetMessageProcessor = new ConfigurableMessageProcessor();
+    untilSuccessful.setMessageProcessors(singletonList(contextPropagationChecker));
+    muleContext.getInjector().inject(untilSuccessful);
+
+    untilSuccessful.initialise();
+    untilSuccessful.start();
+
+    final CoreEvent result = just(eventBuilder(muleContext).message(of("1")).build())
+        .transform(untilSuccessful)
+        .subscriberContext(contextPropagationChecker.contextPropagationFlag())
+        .blockFirst();
+
+    assertThat(result, not(nullValue()));
   }
 
   protected void assertNoRetryContextAfterScopeExecutions(int expectedExecutions) throws MuleException {

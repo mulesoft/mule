@@ -16,6 +16,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,6 +34,7 @@ import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ScatterGatherStory.SCATTER_GATHER;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
@@ -49,20 +52,21 @@ import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectMapForkJoinStrategyFactory;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.processor.ContextPropagationChecker;
 
 import java.io.StringBufferInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(ROUTERS)
 @Story(SCATTER_GATHER)
@@ -71,14 +75,14 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
   @Rule
   public ExpectedException expectedException = none();
 
-  private ScatterGatherRouter router = new ScatterGatherRouter();
-  private ForkJoinStrategyFactory mockForkJoinStrategyFactory = mock(ForkJoinStrategyFactory.class);
-  private ConfigurationProperties configurationProperties = mock(ConfigurationProperties.class);
+  private final ScatterGatherRouter router = new ScatterGatherRouter();
+  private final ForkJoinStrategyFactory mockForkJoinStrategyFactory = mock(ForkJoinStrategyFactory.class);
+  private final ConfigurationProperties configurationProperties = mock(ConfigurationProperties.class);
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
     when(componentLocator.find(Location.builder().globalName(APPLE_FLOW).build())).thenReturn(of(mock(Flow.class)));
-    when(configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY)).thenReturn(Optional.of(false));
+    when(configurationProperties.resolveBooleanProperty(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY)).thenReturn(of(false));
 
     Map<String, Object> registryObjects = new HashMap<>();
     registryObjects.put(REGISTRY_KEY, componentLocator);
@@ -235,4 +239,22 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
     assertThat(router.isDelayErrors(), equalTo(true));
   }
 
+  @Test
+  public void subscriberContextPropagation() throws MuleException {
+    final ContextPropagationChecker contextPropagationCheckerA = new ContextPropagationChecker();
+    final ContextPropagationChecker contextPropagationCheckerB = new ContextPropagationChecker();
+
+    muleContext.getInjector().inject(router);
+    router.setRoutes(asList(newChain(empty(), contextPropagationCheckerA),
+                            newChain(empty(), contextPropagationCheckerB)));
+    router.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    router.initialise();
+
+    final CoreEvent result = just(testEvent())
+        .transform(router)
+        .subscriberContext(contextPropagationCheckerA.contextPropagationFlag())
+        .blockFirst();
+
+    assertThat(result, not(nullValue()));
+  }
 }

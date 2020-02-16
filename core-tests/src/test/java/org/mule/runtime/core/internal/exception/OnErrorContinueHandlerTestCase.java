@@ -7,9 +7,12 @@
 package org.mule.runtime.core.internal.exception;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -27,6 +30,8 @@ import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HA
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_CONTINUE;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
@@ -36,7 +41,11 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.rule.VerboseExceptions;
+import org.mule.tck.processor.ContextPropagationChecker;
 import org.mule.tck.testmodels.mule.TestTransaction;
+
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,6 +54,7 @@ import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import reactor.core.publisher.Flux;
 
 @Feature(ERROR_HANDLING)
 @Story(ON_ERROR_CONTINUE)
@@ -158,6 +168,30 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
 
     expectedException.expect(Exception.class);
     onErrorContinueHandler.handleException(mockException, muleEvent);
+  }
+
+  @Test
+  public void subscriberContextPropagation() throws MuleException {
+    final ContextPropagationChecker contextPropagationChecker = new ContextPropagationChecker();
+
+    onErrorContinueHandler
+        .setMessageProcessors(singletonList(contextPropagationChecker));
+
+    initialiseIfNeeded(onErrorContinueHandler, muleContext);
+
+    AtomicReference<CoreEvent> resultRef = new AtomicReference<>();
+    final Consumer<Exception> router = onErrorContinueHandler
+        .router(pub -> Flux.from(pub).subscriberContext(contextPropagationChecker.contextPropagationFlag()),
+                e -> resultRef.set(e),
+                t -> {
+                  throw new MuleRuntimeException(t);
+                });
+
+    when(mockException.getEvent()).thenReturn(muleEvent);
+    when(mockException.handled()).thenReturn(true);
+    router.accept(mockException);
+
+    assertThat(resultRef.get(), not(nullValue()));
   }
 
   private Processor createChagingEventMessageProcessor(final CoreEvent lastEventCreated) {

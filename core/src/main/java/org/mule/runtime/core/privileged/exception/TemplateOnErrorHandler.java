@@ -14,6 +14,7 @@ import static java.util.Collections.newSetFromMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static java.util.function.Function.identity;
 import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
@@ -69,7 +70,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -114,9 +114,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private boolean isLocalErrorHandlerLocation;
   private ComponentLocation location;
 
-  private Supplier<FluxSink<CoreEvent>> fluxFactory;
+  private Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>> fluxFactory;
 
-  private final class OnErrorHandlerFluxObjectFactory implements Supplier<FluxSink<CoreEvent>>, Disposable {
+  private final class OnErrorHandlerFluxObjectFactory
+      implements Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>>, Disposable {
 
     private final Optional<ProcessingStrategy> processingStrategy;
     private final Set<FluxSink<CoreEvent>> fluxSinks = newSetFromMap(new ConcurrentHashMap<>());
@@ -126,7 +127,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     }
 
     @Override
-    public FluxSink<CoreEvent> get() {
+    public FluxSink<CoreEvent> apply(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> publisherPostProcessor) {
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
       Flux<CoreEvent> onErrorFlux = Flux.create(sinkRef).map(beforeRouting());
 
@@ -134,7 +135,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         onErrorFlux = onErrorFlux.compose(TemplateOnErrorHandler.this::route);
       }
 
-      onErrorFlux = onErrorFlux
+      onErrorFlux = Flux.from(publisherPostProcessor.apply(onErrorFlux
           .onErrorContinue(MessagingException.class, onRoutingError())
           .map(afterRouting())
           .doOnNext(result -> {
@@ -142,7 +143,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
             final String parameterId = getParameterId(result);
             fireEndNotification(ctx.getOriginalEvent(parameterId), result, ctx.getException(parameterId));
           })
-          .doOnNext(TemplateOnErrorHandler.this::resolveHandling);
+          .doOnNext(TemplateOnErrorHandler.this::resolveHandling)));
 
       if (processingStrategy.isPresent()) {
         processingStrategy.get().registerInternalSink(onErrorFlux, "error handler '" + getLocation().getLocation() + "'");
@@ -171,9 +172,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   @Override
-  public Consumer<Exception> router(Consumer<CoreEvent> continueCallback,
+  public Consumer<Exception> router(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> publisherPostProcessor,
+                                    Consumer<CoreEvent> continueCallback,
                                     Consumer<Throwable> propagateCallback) {
-    FluxSink<CoreEvent> fluxSink = fluxFactory.get();
+    FluxSink<CoreEvent> fluxSink = fluxFactory.apply(publisherPostProcessor);
 
     return error -> {
       // All calling methods will end up transforming any error class other than MessagingException into that one
@@ -198,7 +200,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private Mono<CoreEvent> applyInternal(final Exception exception) {
-    return Mono.create(sink -> router(handledEvent -> sink.success(handledEvent),
+    return Mono.create(sink -> router(identity(), handledEvent -> sink.success(handledEvent),
                                       rethrownError -> sink.error(rethrownError))
                                           .accept(exception));
   }

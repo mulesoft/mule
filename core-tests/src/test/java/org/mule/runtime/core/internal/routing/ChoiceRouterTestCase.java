@@ -12,6 +12,8 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
@@ -22,6 +24,8 @@ import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_O
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.just;
+
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -30,6 +34,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
+import org.mule.tck.processor.ContextPropagationChecker;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
 import java.util.Map;
@@ -142,6 +147,39 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
     thrown.expectCause(instanceOf(ExpressionRuntimeException.class));
     thrown.expectCause(hasMessage(containsString("evaluating expression: \"wat\"")));
     process(choiceRouter, zapEvent());
+  }
+
+  @Test
+  public void subscriberContextPropagation() throws MuleException {
+    final ContextPropagationChecker contextPropagationChecker = new ContextPropagationChecker();
+
+    MessageProcessorChain mp = newChain(empty(), contextPropagationChecker);
+    choiceRouter.addRoute(payloadZapExpression(), mp);
+    initialise();
+
+    final CoreEvent result = just(zapEvent())
+        .transform(choiceRouter)
+        .subscriberContext(contextPropagationChecker.contextPropagationFlag())
+        .blockFirst();
+
+    assertThat(result, not(nullValue()));
+  }
+
+  @Test
+  public void subscriberContextPropagationDefaultRoute() throws MuleException {
+    final ContextPropagationChecker contextPropagationChecker = new ContextPropagationChecker();
+
+    MessageProcessorChain mp = newChain(empty(), contextPropagationChecker);
+    choiceRouter.addRoute(payloadZapExpression(), event -> event);
+    choiceRouter.setDefaultRoute(mp);
+    initialise();
+
+    final CoreEvent result = just(fooEvent())
+        .transform(choiceRouter)
+        .subscriberContext(contextPropagationChecker.contextPropagationFlag())
+        .blockFirst();
+
+    assertThat(result, not(nullValue()));
   }
 
   private void initialise() throws InitialisationException {

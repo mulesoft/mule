@@ -11,6 +11,8 @@ import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -25,6 +27,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -39,6 +42,7 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.processor.ContextPropagationChecker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -128,6 +132,26 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
     assertThat(route2.getCount(), is(0));
     assertThat(route1.getCount(), is(1));
+  }
+
+  @Test
+  public void subscriberContextPropagation() throws MuleException {
+    final ContextPropagationChecker contextPropagationChecker = new ContextPropagationChecker();
+
+    roundRobin.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    List<Processor> routes = new ArrayList<>(1);
+    routes.add(contextPropagationChecker);
+    routes.forEach(r -> roundRobin.addRoute(r));
+
+    initialiseIfNeeded(roundRobin, muleContext);
+    startIfNeeded(roundRobin);
+
+    final CoreEvent result = just(testEvent())
+        .transform(roundRobin)
+        .subscriberContext(contextPropagationChecker.contextPropagationFlag())
+        .blockFirst();
+
+    assertThat(result, not(nullValue()));
   }
 
   class TestDriver implements Runnable {

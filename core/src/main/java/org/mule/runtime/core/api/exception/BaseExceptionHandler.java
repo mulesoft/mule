@@ -11,6 +11,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -41,8 +42,10 @@ public abstract class BaseExceptionHandler implements FlowExceptionHandler {
   protected abstract void onError(Exception exception);
 
   @Override
-  public Consumer<Exception> router(Consumer<CoreEvent> continueCallback, Consumer<Throwable> propagateCallback) {
-    final Consumer<Exception> router = FlowExceptionHandler.super.router(continueCallback, propagateCallback);
+  public Consumer<Exception> router(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> publisherPostProcessor,
+                                    Consumer<CoreEvent> continueCallback, Consumer<Throwable> propagateCallback) {
+    final Consumer<Exception> router =
+        FlowExceptionHandler.super.router(publisherPostProcessor, continueCallback, propagateCallback);
     return error -> {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Routing error in '" + this.toString() + "'...");

@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 
@@ -98,11 +99,12 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   @Override
-  public Consumer<Exception> router(Consumer<CoreEvent> continueCallback, Consumer<Throwable> propagateCallback) {
+  public Consumer<Exception> router(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> publisherPostProcessor,
+                                    Consumer<CoreEvent> continueCallback, Consumer<Throwable> propagateCallback) {
     Map<MessagingExceptionHandlerAcceptor, Consumer<Exception>> routers = new HashMap<>();
 
     for (MessagingExceptionHandlerAcceptor errorListener : exceptionListeners) {
-      routers.put(errorListener, errorListener.router(continueCallback, propagateCallback));
+      routers.put(errorListener, errorListener.router(publisherPostProcessor, continueCallback, propagateCallback));
     }
 
     return error -> {

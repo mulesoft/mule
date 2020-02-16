@@ -40,4 +40,9 @@ public class VerboseExceptions extends ExternalResource {
     System.setProperty(MULE_VERBOSE_EXCEPTIONS, Boolean.toString(verbose));
     refreshVerboseExceptions();
   }
+
+  @Override
+  public String toString() {
+    return "VerboseExceptions: " + verboseExceptions.getValue();
+  }
 }

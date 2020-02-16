@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.execution;
 
 import static java.util.Collections.emptyMap;
+import static java.util.function.Function.identity;
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
@@ -379,7 +380,7 @@ public class FlowProcessMediator implements Initialisable {
                                 });
 
     ctx.flowConstruct.getExceptionListener()
-        .router(event -> terminationCallback.accept(messagingException),
+        .router(identity(), event -> terminationCallback.accept(messagingException),
                 error -> terminationCallback.accept(messagingException))
         .accept(messagingException);
   }

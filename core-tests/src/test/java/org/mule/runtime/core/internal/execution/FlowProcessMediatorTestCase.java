@@ -157,7 +157,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
       return null;
     })
         .when(flowErrorHandlerRouter).accept(any(Exception.class));
-    when(exceptionHandler.router(any(Consumer.class), propagateConsumerCaptor.capture()))
+    when(exceptionHandler.router(any(Function.class), any(Consumer.class), propagateConsumerCaptor.capture()))
         .thenReturn(flowErrorHandlerRouter);
 
     when(((AbstractFlowConstruct) flow).getExceptionListener()).thenReturn(exceptionHandler);

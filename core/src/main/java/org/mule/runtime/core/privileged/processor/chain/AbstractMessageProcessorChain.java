@@ -89,6 +89,7 @@ import org.slf4j.Logger;
 
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
 
 /**
@@ -171,23 +172,28 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     if (messagingExceptionHandler != null) {
       final FluxSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
-      final Consumer<Exception> errorRouter = messagingExceptionHandler
-          .router(handled -> errorSwitchSinkSinkRef.next(right(handled)),
-                  rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class)));
+      return Mono.subscriberContext()
+          .flatMapMany(ctx -> {
+            final Consumer<Exception> errorRouter = messagingExceptionHandler
+                .router(pub -> from(pub).subscriberContext(ctx),
+                        handled -> errorSwitchSinkSinkRef.next(right(handled)),
+                        rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class)));
 
-      final Flux<Either<MessagingException, CoreEvent>> upstream =
-          from(doApply(publisher, (context, throwable) -> errorRouter.accept(throwable)))
-              // This Either here is used to propagate errors. If the error is sent directly through the merged Flux,
-              // it will be cancelled, ignoring the onErrorcontinue of the parent Flux.
-              .map(event -> right(MessagingException.class, event))
-              .doOnNext(r -> errorSwitchSinkSinkRef.next(r))
-              .doOnError(t -> errorSwitchSinkSinkRef.error(t))
-              .doOnComplete(() -> errorSwitchSinkSinkRef.complete());
+            final Flux<Either<MessagingException, CoreEvent>> upstream =
+                from(doApply(publisher, (context, throwable) -> errorRouter.accept(throwable)))
+                    // This Either here is used to propagate errors. If the error is sent directly through the merged Flux,
+                    // it will be cancelled, ignoring the onErrorcontinue of the parent Flux.
+                    .map(event -> right(MessagingException.class, event))
+                    .doOnNext(r -> errorSwitchSinkSinkRef.next(r))
+                    .doOnError(t -> errorSwitchSinkSinkRef.error(t))
+                    .doOnComplete(() -> errorSwitchSinkSinkRef.complete());
 
-      return subscribeFluxOnPublisherSubscription(create(errorSwitchSinkSinkRef)
-          .map(result -> result.reduce(me -> {
-            throw propagateWrappingFatal(me);
-          }, response -> response)), upstream);
+            return subscribeFluxOnPublisherSubscription(create(errorSwitchSinkSinkRef)
+                .map(result -> result.reduce(me -> {
+                  throw propagateWrappingFatal(me);
+                }, response -> response)), upstream);
+          });
+
     } else {
       return doApply(publisher, (context, throwable) -> context.error(throwable));
     }

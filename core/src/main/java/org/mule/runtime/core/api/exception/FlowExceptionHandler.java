@@ -65,13 +65,15 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
    * Provides a router for an error towards the destination error handler, calling the corresponding callback in case of failure
    * or success.
    *
+   * @param publisherPostProcessor allows to modify the publisher that will handle the error.
    * @param continueCallback the callback called in case the error is successfully handled
    * @param propagateCallback the callback is called in case the error-handling fails
    * @return the router for an error.
    *
    * @since 4.3
    */
-  default Consumer<Exception> router(Consumer<CoreEvent> continueCallback,
+  default Consumer<Exception> router(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> publisherPostProcessor,
+                                     Consumer<CoreEvent> continueCallback,
                                      Consumer<Throwable> propagateCallback) {
     return error -> propagateCallback.accept(error);
   }

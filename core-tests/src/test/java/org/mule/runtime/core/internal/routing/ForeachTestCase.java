@@ -8,15 +8,18 @@ package org.mule.runtime.core.internal.routing;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
@@ -28,13 +31,11 @@ import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAG
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
-import static org.mule.test.allure.AllureConstants.RoutersFeature.ForeachStory.FOR_EACH;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
+import static org.mule.test.allure.AllureConstants.RoutersFeature.ForeachStory.FOR_EACH;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.just;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
@@ -50,7 +51,15 @@ import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
+import org.mule.tck.processor.ContextPropagationChecker;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
+
+import java.nio.BufferOverflowException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -61,12 +70,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 
-import java.nio.BufferOverflowException;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Iterator;
-import java.util.Optional;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 @Feature(ROUTERS)
 @Story(FOR_EACH)
@@ -470,6 +476,20 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     assertThat(ERR_SEQUENCE_OVERRIDDEN, processedEvent.getItemSequenceInfo(), is(inEventItemSequence));
   }
 
+  @Test
+  public void subscriberContextPropagation() throws MuleException {
+    final ContextPropagationChecker contextPropagationChecker = new ContextPropagationChecker();
+
+    simpleForeach = createForeach(singletonList(contextPropagationChecker));
+
+    final CoreEvent result = just(eventBuilder(muleContext).message(of(asList("1", "2", "3"))).build())
+        .transform(simpleForeach)
+        .subscriberContext(contextPropagationChecker.contextPropagationFlag())
+        .blockFirst();
+
+    assertThat(result, not(nullValue()));
+  }
+
   private CoreEvent processInChain(Processor processor, CoreEvent event) throws Exception {
     final MessageProcessorChain chain = newChain(Optional.empty(), processor);
     initialiseIfNeeded(chain, muleContext);
@@ -537,7 +557,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   private static class FailingProcessorMatcher extends BaseMatcher<MessagingException> {
 
-    private Processor expectedFailingProcessor;
+    private final Processor expectedFailingProcessor;
 
     FailingProcessorMatcher(Processor processor) {
       this.expectedFailingProcessor = processor;
