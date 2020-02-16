@@ -91,6 +91,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
       ErrorTypeBuilder.builder().parentErrorType(mock(ErrorType.class)).namespace("TEST").identifier("FLOW_FAILED").build();
 
   private FlowConstruct flow;
+  private Consumer<Exception> flowErrorHandlerRouter;
   private MessageProcessContext context;
   private SourceResultAdapter resultAdapter;
   private FlowProcessTemplate template;
@@ -149,12 +150,15 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     FlowExceptionHandler exceptionHandler = mock(FlowExceptionHandler.class);
 
     // Call routeError failure callback for success response sending error test cases
-    doAnswer(invocation -> {
-      Exception error = invocation.getArgument(0);
-      Consumer<Throwable> failureConsumer = invocation.getArgument(2);
-      failureConsumer.accept(error);
+    final ArgumentCaptor<Consumer> propagateConsumerCaptor = ArgumentCaptor.forClass(Consumer.class);
+    flowErrorHandlerRouter = mock(Consumer.class);
+    doAnswer(inv -> {
+      propagateConsumerCaptor.getValue().accept(inv.getArgument(0));
       return null;
-    }).when(exceptionHandler).routeError(any(Exception.class), any(Consumer.class), any(Consumer.class));
+    })
+        .when(flowErrorHandlerRouter).accept(any(Exception.class));
+    when(exceptionHandler.router(any(Consumer.class), propagateConsumerCaptor.capture()))
+        .thenReturn(flowErrorHandlerRouter);
 
     when(((AbstractFlowConstruct) flow).getExceptionListener()).thenReturn(exceptionHandler);
     when(exceptionHandler.apply(any()))
@@ -411,9 +415,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
   }
 
   private void verifyFlowErrorHandler(final EventMatcher errorHandlerEventMatcher) {
-    verify(((AbstractFlowConstruct) flow).getExceptionListener()).routeError(argThat(withEventThat(errorHandlerEventMatcher)),
-                                                                             any(Consumer.class),
-                                                                             any(Consumer.class));
+    verify(flowErrorHandlerRouter).accept(argThat(withEventThat(errorHandlerEventMatcher)));
   }
 
   private EventMatcher isErrorTypeSourceResponseGenerate() {

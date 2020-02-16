@@ -174,8 +174,9 @@ abstract class AbstractEventContext implements BaseEventContext {
         LOGGER.debug("{} handling messaging exception.", this);
       }
 
-      exceptionHandler.routeError((MessagingException) throwable, handled -> success(handled),
-                                  rethrown -> responseDone(left(rethrown)));
+      exceptionHandler.router(handled -> success(handled),
+                              rethrown -> responseDone(left(rethrown)))
+          .accept((Exception) throwable);
     } else {
       responseDone(left(throwable));
     }

@@ -124,25 +124,6 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   @Override
-  public void routeError(Exception error, Consumer<CoreEvent> continueCallback,
-                         Consumer<Throwable> propagateCallback) {
-    MessagingException messagingError = (MessagingException) error;
-    CoreEvent event = messagingError.getEvent();
-    try {
-      for (MessagingExceptionHandlerAcceptor errorListener : exceptionListeners) {
-        if (errorListener.accept(event)) {
-          errorListener.routeError(error, continueCallback, propagateCallback);
-          return;
-        }
-      }
-      throw new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE));
-    } catch (Exception e) {
-      propagateCallback.accept(messagingExceptionResolver.resolve(new MessagingException(event, e, this),
-                                                                  errorTypeLocator, exceptionContextProviders));
-    }
-  }
-
-  @Override
   public Publisher<CoreEvent> apply(Exception exception) {
     if (exception instanceof MessagingException) {
       CoreEvent event = ((MessagingException) exception).getEvent();

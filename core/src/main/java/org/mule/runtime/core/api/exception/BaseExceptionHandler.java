@@ -41,12 +41,16 @@ public abstract class BaseExceptionHandler implements FlowExceptionHandler {
   protected abstract void onError(Exception exception);
 
   @Override
-  public void routeError(Exception error, Consumer<CoreEvent> continueCallback, Consumer<Throwable> propagateCallback) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Routing error in '" + this.toString() + "'...");
-    }
+  public Consumer<Exception> router(Consumer<CoreEvent> continueCallback, Consumer<Throwable> propagateCallback) {
+    final Consumer<Exception> router = FlowExceptionHandler.super.router(continueCallback, propagateCallback);
+    return error -> {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Routing error in '" + this.toString() + "'...");
+      }
 
-    onError(error);
-    FlowExceptionHandler.super.routeError(error, continueCallback, propagateCallback);
+      onError(error);
+      router.accept(error);
+    };
   }
+
 }

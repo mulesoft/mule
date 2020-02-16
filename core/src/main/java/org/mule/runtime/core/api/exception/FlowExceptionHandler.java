@@ -31,7 +31,7 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
    * @param exception which occurred
    * @param event which was being processed when the exception occurred
    * @return new event to route on to the rest of the flow, generally with ExceptionPayload set on the message
-   * @deprecated Use {@link FlowExceptionHandler#routeError(Exception, Consumer, Consumer)}
+   * @deprecated Use {@link FlowExceptionHandler#router(Consumer, Consumer)}
    */
   @Deprecated
   CoreEvent handleException(Exception exception, CoreEvent event);
@@ -39,7 +39,7 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
   /**
    * @param exception the exception to handle
    * @return the publisher with the handling result
-   * @deprecated Use {@link FlowExceptionHandler#routeError(Exception, Consumer, Consumer)}
+   * @deprecated Use {@link FlowExceptionHandler#router(Consumer, Consumer)}
    */
   @Override
   @Deprecated
@@ -62,20 +62,6 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
   }
 
   /**
-   * Routes the error towards the destination error handler, calling the corresponding callback in case of failure or success.
-   *
-   * @param error the {@link Exception} to route
-   * @param continueCallback the callback called in case the error is successfully handled
-   * @param propagateCallback the callback is called in case the error-handling fails
-   *
-   * @since 4.3
-   */
-  default void routeError(Exception error, Consumer<CoreEvent> continueCallback,
-                          Consumer<Throwable> propagateCallback) {
-    propagateCallback.accept(error);
-  }
-
-  /**
    * Provides a router for an error towards the destination error handler, calling the corresponding callback in case of failure
    * or success.
    *
@@ -87,7 +73,7 @@ public interface FlowExceptionHandler extends Function<Exception, Publisher<Core
    */
   default Consumer<Exception> router(Consumer<CoreEvent> continueCallback,
                                      Consumer<Throwable> propagateCallback) {
-    return error -> routeError(error, continueCallback, propagateCallback);
+    return error -> propagateCallback.accept(error);
   }
 }
 
