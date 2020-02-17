@@ -204,8 +204,10 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
 
     public ObjectFieldTypeAsParameterModelAdapter(ObjectFieldType wrappedFieldType) {
       this.wrappedFieldType = wrappedFieldType;
-      if (this.wrappedFieldType.getAnnotation(LayoutTypeAnnotation.class).isPresent()) {
-        LayoutTypeAnnotation layoutTypeAnnotation = this.wrappedFieldType.getAnnotation(LayoutTypeAnnotation.class).get();
+      Optional<LayoutTypeAnnotation> optionalLayoutTypeAnnotation =
+          this.wrappedFieldType.getAnnotation(LayoutTypeAnnotation.class);
+      if (optionalLayoutTypeAnnotation.isPresent()) {
+        LayoutTypeAnnotation layoutTypeAnnotation = optionalLayoutTypeAnnotation.get();
         LayoutModel.LayoutModelBuilder layoutModelBuilder = LayoutModel.builder();
         if (layoutTypeAnnotation.isText()) {
           layoutModelBuilder.asText();

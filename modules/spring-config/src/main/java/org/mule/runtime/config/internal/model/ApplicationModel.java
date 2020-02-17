@@ -639,16 +639,17 @@ public class ApplicationModel implements ArtifactAst {
       return;
     }
 
+    DslElementSyntax dsl = dslElement.get();
+
     parameterType.accept(new MetadataTypeVisitor() {
 
       @Override
       public void visitObject(ObjectType objectType) {
-        DslElementSyntax pojoDsl = dslElement.get();
-        if (pojoDsl.supportsTopLevelDeclaration() || (pojoDsl.supportsChildDeclaration() && pojoDsl.isWrapped())
+        if (dsl.supportsTopLevelDeclaration() || (dsl.supportsChildDeclaration() && dsl.isWrapped())
             || getSubstitutionGroup(objectType).isPresent() ||
             extensionModelHelper.getAllSubTypes().contains(objectType)) {
 
-          registry.put(builder().name(dslElement.get().getElementName()).namespace(dslElement.get().getPrefix())
+          registry.put(builder().name(dsl.getElementName()).namespace(dsl.getPrefix())
               .build(), createMetadataTypeModelAdapterWithSterotype(objectType, extensionModelHelper)
                   .orElse(createParameterizedTypeModelAdapter(objectType, extensionModelHelper)));
         }
@@ -686,7 +687,7 @@ public class ApplicationModel implements ArtifactAst {
 
       @Override
       public void visitObject(ObjectType objectType) {
-        if (objectType.isOpen()) {
+        if (objectType.isOpen() && objectType.getOpenRestriction().isPresent()) {
           objectType.getOpenRestriction().get().accept(this);
         } else {
           extensionModelHelper.getSubTypes(objectType)
