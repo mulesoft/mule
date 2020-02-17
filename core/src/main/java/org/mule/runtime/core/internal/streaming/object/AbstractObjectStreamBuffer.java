@@ -6,10 +6,9 @@
  */
 package org.mule.runtime.core.internal.streaming.object;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_OBJECT_STREAMING_BUFFER_SIZE;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.streaming.HasSize;
 import org.mule.runtime.core.internal.streaming.AbstractStreamingBuffer;
@@ -20,6 +19,8 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+
 /**
  * Base class for implementations of {@link ObjectStreamBuffer}
  *
@@ -27,6 +28,8 @@ import java.util.function.Supplier;
  * @since 4.0
  */
 public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuffer implements ObjectStreamBuffer<T> {
+
+  private static final Logger LOGGER = getLogger(AbstractObjectStreamBuffer.class);
 
   private final Iterator<T> stream;
   private final Supplier<Integer> sizeResolver;
@@ -54,21 +57,31 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
   protected abstract void initialize(Optional<Position> maxPosition, Bucket<T> initialBucket);
 
   @Override
-  public Optional<Bucket<T>> getBucketFor(Position position) {
+  public Bucket<T> getBucketFor(Position position) {
     checkNotClosed();
 
     if (maxPosition != null && maxPosition.compareTo(position) < 0) {
       throw new NoSuchElementException();
     }
-    return withReadLock(releaser -> {
-      Optional<Bucket<T>> bucket = getPresentBucket(position);
-      if (bucket.isPresent()) {
+
+    readLock.lock();
+    try {
+      Bucket<T> bucket = getPresentBucket(position);
+      if (bucket != null) {
         return forwarding(bucket);
       }
-
-      releaser.release();
-      return fetch(position);
-    });
+      readLock.unlock();
+      writeLock.lock();
+      try {
+        return fetch(position);
+      } finally {
+        // classic lock downgrade
+        readLock.lock();
+        writeLock.unlock();
+      }
+    } finally {
+      readLock.unlock();
+    }
   }
 
   @Override
@@ -83,8 +96,8 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
     }
 
     Position position = toPosition(i);
-
-    return withReadLock(releaser -> {
+    readLock.lock();
+    try {
       if (maxPosition != null) {
         return position.compareTo(maxPosition) < 1;
       }
@@ -93,43 +106,48 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
         return true;
       }
 
-      releaser.release();
+      readLock.unlock();
+      writeLock.lock();
       try {
-        return fetch(position).isPresent();
+        return fetch(position) != null;
       } catch (NoSuchElementException e) {
         return false;
+      } finally {
+        // classic lock downgrade
+        readLock.lock();
+        writeLock.unlock();
       }
-    });
+    } finally {
+      readLock.unlock();
+    }
   }
 
-  private Optional<Bucket<T>> fetch(Position position) {
-    return withWriteLock(() -> {
-      Optional<Bucket<T>> presentBucket = getPresentBucket(position);
-      if (presentBucket.filter(bucket -> bucket.contains(position)).isPresent()) {
-        return presentBucket;
+  private Bucket<T> fetch(Position position) {
+    Bucket<T> presentBucket = getPresentBucket(position);
+    if (presentBucket != null && presentBucket.contains(position)) {
+      return presentBucket;
+    }
+
+    while (currentPosition.compareTo(position) < 0) {
+      if (!stream.hasNext()) {
+        maxPosition = currentPosition;
+        return null;
       }
 
-      while (currentPosition.compareTo(position) < 0) {
-        if (!stream.hasNext()) {
-          maxPosition = currentPosition;
-          return empty();
-        }
+      T item = stream.next();
+      if (currentBucket.add(item)) {
+        currentPosition = currentPosition.advanceItem();
+      } else {
+        setCurrentBucket(onBucketOverflow(currentBucket));
+        currentBucket.add(item);
 
-        T item = stream.next();
-        if (currentBucket.add(item)) {
-          currentPosition = currentPosition.advanceItem();
-        } else {
-          setCurrentBucket(onBucketOverflow(currentBucket));
-          currentBucket.add(item);
-
-          currentPosition = currentPosition.advanceBucket();
-        }
-        instancesCount++;
-        validateMaxBufferSizeNotExceeded(instancesCount);
+        currentPosition = currentPosition.advanceBucket();
       }
+      instancesCount++;
+      validateMaxBufferSizeNotExceeded(instancesCount);
+    }
 
-      return of(currentBucket);
-    });
+    return currentBucket;
   }
 
   protected abstract void validateMaxBufferSizeNotExceeded(int instancesCount);
@@ -144,7 +162,11 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
         doClose();
       } finally {
         if (stream instanceof Closeable) {
-          closeSafely((Closeable) stream, Closeable::close);
+          try {
+            ((Closeable) stream).close();
+          } catch (Exception e) {
+            LOGGER.debug("Found exception trying to close Object stream", e);
+          }
         }
         setCurrentBucket(null);
         writeLock.unlock();
@@ -154,10 +176,14 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
 
   protected abstract void doClose();
 
-  protected abstract Optional<Bucket<T>> getPresentBucket(Position position);
+  protected abstract Bucket<T> getPresentBucket(Position position);
 
-  private Optional<Bucket<T>> forwarding(Optional<Bucket<T>> presentBucket) {
-    return presentBucket.map(b -> new ForwardingBucket<>(b));
+  private Bucket<T> forwarding(Bucket<T> presentBucket) {
+    if (presentBucket != null) {
+      return new ForwardingBucket<>(presentBucket);
+    }
+
+    return null;
   }
 
   protected Bucket<T> getCurrentBucket() {
@@ -183,17 +209,32 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
 
     @Override
     public Optional<T> get(int index) {
-      return withReadLock(releaser -> {
+      readLock.lock();
+      try {
         Optional<T> item = delegate.get(index);
         if (item.isPresent()) {
           return item;
         }
 
         Position position = new Position(delegate.getIndex(), index);
-        releaser.release();
-        delegate = (Bucket<T>) fetch(position).orElseThrow(NoSuchElementException::new);
-        return withReadLock(r2 -> delegate.get(index));
-      });
+        readLock.unlock();
+        writeLock.lock();
+        try {
+          delegate = (Bucket<T>) fetch(position);
+        } finally {
+          // classic lock downgrade
+          readLock.lock();
+          writeLock.unlock();
+        }
+
+        if (delegate == null) {
+          throw new NoSuchElementException();
+        }
+
+        return delegate.get(index);
+      } finally {
+        readLock.unlock();
+      }
     }
 
     @Override

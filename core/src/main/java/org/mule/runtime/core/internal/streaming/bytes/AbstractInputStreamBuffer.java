@@ -61,16 +61,19 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
   @Override
   public final void close() {
     if (closed.compareAndSet(false, true)) {
-      withWriteLock(() -> {
-        try {
-          doClose();
-          return null;
-        } finally {
-          if (stream != null) {
-            closeSafely(stream, InputStream::close);
+      writeLock.lock();
+      try {
+        doClose();
+      } finally {
+        if (stream != null) {
+          try {
+            stream.close();
+          } catch (IOException e) {
+            LOGGER.debug("Found exception trying to close InputStream", e);
           }
         }
-      });
+        writeLock.unlock();
+      }
     }
   }
 
@@ -145,15 +148,6 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     }
 
     return totalRead;
-  }
-
-  protected boolean deallocate(ByteBuffer byteBuffer) {
-    if (byteBuffer != null) {
-      closeSafely(byteBuffer, bufferManager::deallocate);
-      return true;
-    }
-
-    return false;
   }
 
   protected abstract ByteBuffer copy(long position, int length);

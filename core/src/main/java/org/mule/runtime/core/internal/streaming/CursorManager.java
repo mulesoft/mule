@@ -33,7 +33,7 @@ public class CursorManager {
    * @param statistics statistics which values should be kept updated
    */
   public CursorManager(MutableStreamingStatistics statistics, StreamingGhostBuster ghostBuster) {
-    this.statistics = statistics;
+    this.statistics = statistics instanceof NullStreamingStatistics ? null : statistics;
     this.ghostBuster = ghostBuster;
   }
 

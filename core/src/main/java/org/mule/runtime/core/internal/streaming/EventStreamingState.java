@@ -6,10 +6,8 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import static org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock.readWriteLock;
 import static org.mule.runtime.core.internal.concurrent.CaffeineBuffer.FULL;
 
-import org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock;
 import org.mule.runtime.core.internal.concurrent.CaffeineBoundedBuffer;
 import org.mule.runtime.core.internal.concurrent.CaffeineBuffer;
 
@@ -17,6 +15,9 @@ import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Tracks the active streaming resources owned by a particular event.
@@ -26,7 +27,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class EventStreamingState {
 
   private final AtomicBoolean disposed = new AtomicBoolean(false);
-  private final FunctionalReadWriteLock providersLock = readWriteLock();
+  private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+  private final Lock readLock = readWriteLock.readLock();
+  private final Lock writeLock = readWriteLock.writeLock();
 
   private CaffeineBuffer<WeakReference<ManagedCursorProvider>> providers = new CaffeineBoundedBuffer<>();
   private List<CaffeineBuffer<WeakReference<ManagedCursorProvider>>> providersOverflow = null;
@@ -42,23 +45,30 @@ public class EventStreamingState {
    */
   public ManagedCursorProvider addProvider(ManagedCursorProvider provider, StreamingGhostBuster ghostBuster) {
     WeakReference<ManagedCursorProvider> ref = ghostBuster.track(provider);
-    return providersLock.withReadLock(r -> {
+    readLock.lock();
+    try {
+      if (providers.offer(ref) != FULL) {
+        return ref.get();
+      }
+    } finally {
+      readLock.unlock();
+    }
+
+    writeLock.lock();
+    try {
       if (providers.offer(ref) == FULL) {
-        r.release();
-        providersLock.withWriteLock(() -> {
-          if (providers.offer(ref) == FULL) {
-            if (providersOverflow == null) {
-              providersOverflow = new LinkedList<>();
-            }
-            providersOverflow.add(providers);
-            providers = new CaffeineBoundedBuffer<>();
-            providers.offer(ref);
-          }
-        });
+        if (providersOverflow == null) {
+          providersOverflow = new LinkedList<>();
+        }
+        providersOverflow.add(providers);
+        providers = new CaffeineBoundedBuffer<>();
+        providers.offer(ref);
       }
 
       return ref.get();
-    });
+    } finally {
+      writeLock.unlock();
+    }
   }
 
   /**
@@ -66,12 +76,15 @@ public class EventStreamingState {
    */
   public void dispose() {
     if (disposed.compareAndSet(false, true)) {
-      providersLock.withWriteLock(() -> {
+      writeLock.lock();
+      try {
         dispose(providers);
         if (providersOverflow != null) {
           providersOverflow.forEach(this::dispose);
         }
-      });
+      } finally {
+        writeLock.unlock();
+      }
     }
   }
 

@@ -11,10 +11,12 @@ import static java.lang.Math.toIntExact;
 import static java.lang.System.arraycopy;
 import static java.nio.ByteBuffer.wrap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
+import org.mule.runtime.core.api.streaming.bytes.ManagedByteBufferWrapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +37,8 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
 
   private static final int STREAM_FINISHED_PROBE = 10;
 
-  private ByteBuffer buffer;
+  private ManagedByteBufferWrapper managedBuffer;
+  private ByteBuffer actingBuffer;
   private final int bufferSizeIncrement;
   private final int maxBufferSize;
   private long bufferTip = 0;
@@ -48,7 +51,8 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
    */
   public InMemoryStreamBuffer(InputStream stream, InMemoryCursorStreamConfig config, ByteBufferManager bufferManager) {
     super(stream, bufferManager);
-    buffer = bufferManager.allocate(config.getInitialBufferSize().toBytes());
+    managedBuffer = bufferManager.allocateManaged(config.getInitialBufferSize().toBytes());
+    actingBuffer = managedBuffer.getDelegate();
     this.bufferSizeIncrement = config.getBufferSizeIncrement() != null
         ? config.getBufferSizeIncrement().toBytes()
         : 0;
@@ -62,46 +66,49 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
   }
 
   private ByteBuffer doGet(long position, int length, boolean consumeStreamIfNecessary) {
-    return withReadLock(releaser -> {
-
+    readLock.lock();
+    try {
       ByteBuffer presentRead = getFromCurrentData(position, length);
       if (presentRead != null) {
         return presentRead;
       }
 
       if (consumeStreamIfNecessary) {
-        releaser.release();
-        return withWriteLock(() -> {
+        readLock.unlock();
+        writeLock.lock();
 
-          ByteBuffer refetch;
-          refetch = getFromCurrentData(position, length);
+        try {
+          ByteBuffer refetch = getFromCurrentData(position, length);
           if (refetch != null) {
             return refetch;
           }
 
           final long requiredUpperBound = position + length;
           while (!streamFullyConsumed && bufferTip < requiredUpperBound) {
-            try {
-              final int read = consumeForwardData();
-              if (read > 0) {
-                refetch = getFromCurrentData(position, min(length, read));
-                if (refetch != null) {
-                  return refetch;
-                }
-              } else {
-                buffer.limit(buffer.position());
+            final int read = consumeForwardData();
+            if (read > 0) {
+              refetch = getFromCurrentData(position, min(length, read));
+              if (refetch != null) {
+                return refetch;
               }
-            } catch (IOException e) {
-              throw new MuleRuntimeException(createStaticMessage("Could not read stream"), e);
+            } else {
+              actingBuffer.limit(actingBuffer.position());
             }
           }
-
           return doGet(position, length, false);
-        });
+        } catch (IOException e) {
+          throw new MuleRuntimeException(createStaticMessage("Could not read stream"), e);
+        } finally {
+          // classic lock downgrade
+          readLock.lock();
+          writeLock.unlock();
+        }
       } else {
         return getFromCurrentData(position, length);
       }
-    });
+    } finally {
+      readLock.unlock();
+    }
   }
 
   private ByteBuffer getFromCurrentData(long position, int length) {
@@ -122,8 +129,8 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
    */
   @Override
   public void doClose() {
-    deallocate(buffer);
-    buffer = null;
+    managedBuffer.release();
+    managedBuffer = null;
   }
 
   /**
@@ -135,12 +142,13 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
    */
   @Override
   public int consumeForwardData() throws IOException {
-    ByteBuffer b = buffer;
-    ByteBuffer readBuffer = b.hasRemaining()
+    ManagedByteBufferWrapper b = managedBuffer;
+    ManagedByteBufferWrapper managedReadBuffer = b.getDelegate().hasRemaining()
         ? b
-        : bufferManager.allocate(bufferSizeIncrement > 0 ? bufferSizeIncrement : STREAM_FINISHED_PROBE);
+        : bufferManager.allocateManaged(bufferSizeIncrement > 0 ? bufferSizeIncrement : STREAM_FINISHED_PROBE);
 
-    final boolean auxBuffer = readBuffer != b;
+    ByteBuffer readBuffer = managedReadBuffer.getDelegate();
+    final boolean auxBuffer = managedReadBuffer != b;
     final int read;
 
     try {
@@ -148,20 +156,18 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
 
       if (read > 0) {
         if (auxBuffer) {
-          b = expandBuffer();
+          expandBuffer();
           readBuffer.flip();
-          b.put(readBuffer);
-          buffer = b;
+          actingBuffer.put(readBuffer);
         }
 
         bufferTip += read;
       }
     } finally {
       if (auxBuffer) {
-        bufferManager.deallocate(readBuffer);
+        managedReadBuffer.release();
       }
     }
-
 
     return read;
   }
@@ -171,22 +177,24 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
    *
    * @return a new, expanded {@link ByteBuffer}
    */
-  private ByteBuffer expandBuffer() {
-    ByteBuffer b = buffer;
-    int newSize = b.capacity() + bufferSizeIncrement;
+  private ManagedByteBufferWrapper expandBuffer() {
+    ManagedByteBufferWrapper oldManagedBuffer = managedBuffer;
+    ByteBuffer oldBuffer = oldManagedBuffer.getDelegate();
+    int newSize = oldBuffer.capacity() + bufferSizeIncrement;
     if (!canBeExpandedTo(newSize)) {
       throw new StreamingBufferSizeExceededException(maxBufferSize);
     }
 
-    ByteBuffer newBuffer = bufferManager.allocate(newSize);
-    b.position(0);
-    newBuffer.put(b);
-    ByteBuffer oldBuffer = b;
-    b = newBuffer;
-    buffer = b;
-    deallocate(oldBuffer);
+    ManagedByteBufferWrapper newManagedBuffer = bufferManager.allocateManaged(newSize);
+    ByteBuffer newBuffer = newManagedBuffer.getDelegate();
+    oldBuffer.position(0);
+    newBuffer.put(oldBuffer);
 
-    return b;
+    managedBuffer = newManagedBuffer;
+    actingBuffer = newBuffer;
+    oldManagedBuffer.release();
+
+    return newManagedBuffer;
   }
 
   @Override
@@ -196,22 +204,22 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
 
   private ByteBuffer softCopy(long position, int length) {
     final int offset = toIntExact(position);
-    return wrap(buffer.array(), offset, min(length, buffer.limit() - offset)).slice();
+    return wrap(actingBuffer.array(), offset, min(length, actingBuffer.limit() - offset)).slice();
   }
 
   protected ByteBuffer hardCopy(long position, int length) {
     final int offset = toIntExact(position);
-    length = min(length, buffer.limit() - offset);
+    length = min(length, actingBuffer.limit() - offset);
 
     byte[] b = new byte[length];
-    arraycopy(buffer.array(), offset, b, 0, length);
+    arraycopy(actingBuffer.array(), offset, b, 0, length);
     return wrap(b);
   }
 
   private boolean canDoSoftCopy() {
-    return streamFullyConsumed ||
-        buffer.capacity() >= maxBufferSize ||
-        bufferSizeIncrement == 0;
+    return streamFullyConsumed
+        || actingBuffer.capacity() >= maxBufferSize
+        || bufferSizeIncrement == 0;
   }
 
   private boolean canBeExpandedTo(int newSize) {

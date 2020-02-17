@@ -13,6 +13,7 @@ import org.mule.runtime.core.internal.streaming.CursorProviderJanitor;
 import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A decorator which allows performing management tasks over a {@link CursorStream}
@@ -25,6 +26,7 @@ class ManagedCursorStreamDecorator extends CursorStream {
   private CursorStreamProvider exposedProvider;
   private final CursorStream delegate;
   private final CursorProviderJanitor janitor;
+  private final AtomicBoolean closed = new AtomicBoolean(false);
 
   /**
    * Creates a new instance. Notice that it receives a {@code managedCursorProvider} so that a hard reference is kept
@@ -46,14 +48,16 @@ class ManagedCursorStreamDecorator extends CursorStream {
 
   @Override
   public void close() throws IOException {
-    try {
-      delegate.close();
-    } finally {
-      if (managedCursorProvider != null) {
-        exposedProvider = (CursorStreamProvider) managedCursorProvider.getDelegate();
-        managedCursorProvider = null;
+    if (closed.compareAndSet(false, true)) {
+      try {
+        delegate.close();
+      } finally {
+        if (managedCursorProvider != null) {
+          exposedProvider = (CursorStreamProvider) managedCursorProvider.getDelegate();
+          managedCursorProvider = null;
+        }
+        janitor.releaseCursor(delegate);
       }
-      janitor.releaseCursor(delegate);
     }
   }
 

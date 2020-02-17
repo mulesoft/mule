@@ -23,7 +23,7 @@ public class PoolingByteBufferManagerTestCase extends MemoryBoundByteBufferManag
   }
 
   @Override
-  protected MemoryBoundByteBufferManager createBuffer(MemoryManager memoryManager, int capacity, long waitTimeoutMillis) {
-    return new PoolingByteBufferManager(memoryManager, 2, capacity, waitTimeoutMillis);
+  protected MemoryBoundByteBufferManager createBuffer(MemoryManager memoryManager, int capacity) {
+    return new PoolingByteBufferManager(memoryManager, 2, capacity);
   }
 }

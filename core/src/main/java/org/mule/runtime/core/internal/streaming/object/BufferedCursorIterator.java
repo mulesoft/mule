@@ -44,7 +44,10 @@ public class BufferedCursorIterator<T> extends AbstractCursorIterator<T> {
   protected T doNext(long p) {
     Position position = buffer.toPosition(p);
     if (bucket == null || !bucket.contains(position)) {
-      bucket = buffer.getBucketFor(position).orElse(bucket);
+      Bucket<T> nextBucket = buffer.getBucketFor(position);
+      if (nextBucket != null) {
+        bucket = nextBucket;
+      }
     }
 
     if (bucket != null) {

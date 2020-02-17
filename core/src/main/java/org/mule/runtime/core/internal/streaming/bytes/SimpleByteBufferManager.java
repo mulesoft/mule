@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
+import org.mule.runtime.core.api.streaming.bytes.ManagedByteBufferWrapper;
 import org.mule.runtime.core.internal.streaming.MemoryManager;
 
 /**
@@ -17,8 +18,15 @@ public class SimpleByteBufferManager extends MemoryBoundByteBufferManager {
 
   public SimpleByteBufferManager() {}
 
-  public SimpleByteBufferManager(MemoryManager memoryManager, long memoryExhaustedWaitTimeoutMillis) {
-    super(memoryManager, memoryExhaustedWaitTimeoutMillis);
+  public SimpleByteBufferManager(MemoryManager memoryManager) {
+    super(memoryManager);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ManagedByteBufferWrapper allocateManaged(int capacity) {
+    return new ManagedByteBufferWrapper(allocateIfFits(capacity), buffer -> doDeallocate(buffer.getDelegate()));
+  }
 }
