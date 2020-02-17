@@ -687,8 +687,9 @@ public class ApplicationModel implements ArtifactAst {
 
       @Override
       public void visitObject(ObjectType objectType) {
-        if (objectType.isOpen() && objectType.getOpenRestriction().isPresent()) {
-          objectType.getOpenRestriction().get().accept(this);
+        Optional<MetadataType> openRestriction = objectType.getOpenRestriction();
+        if (objectType.isOpen() && openRestriction.isPresent()) {
+          openRestriction.get().accept(this);
         } else {
           extensionModelHelper.getSubTypes(objectType)
               .forEach(subtype -> registerTopLevelParameter(subtype, reflectionCache, registry, extensionModel));
