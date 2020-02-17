@@ -353,10 +353,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     final ContextPropagationChecker contextPropagationChecker = new ContextPropagationChecker();
 
     untilSuccessful = new UntilSuccessful();
-    // untilSuccessful.setMaxRetries("1");
     untilSuccessful.setAnnotations(getAppleFlowComponentLocationAnnotations());
-    //
-    // targetMessageProcessor = new ConfigurableMessageProcessor();
     untilSuccessful.setMessageProcessors(singletonList(contextPropagationChecker));
     muleContext.getInjector().inject(untilSuccessful);
 

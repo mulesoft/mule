@@ -35,6 +35,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.create;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.publisher.Operators.lift;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -89,7 +90,6 @@ import org.slf4j.Logger;
 
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
 
 /**
@@ -172,7 +172,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     if (messagingExceptionHandler != null) {
       final FluxSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
-      return Mono.subscriberContext()
+      return subscriberContext()
           .flatMapMany(ctx -> {
             final Consumer<Exception> errorRouter = messagingExceptionHandler
                 .router(pub -> from(pub).subscriberContext(ctx),
