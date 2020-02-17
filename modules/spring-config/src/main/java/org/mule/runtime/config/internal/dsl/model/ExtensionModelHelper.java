@@ -255,27 +255,24 @@ public class ExtensionModelHelper {
    * be found.
    */
   public Optional<? extends ConnectionProviderModel> findConnectionProviderModel(ComponentIdentifier componentId) {
+    return extensionConnectionProviderModelByComponentIdentifier
+        .get(componentId, componentIdentifier -> lookupExtensionModelFor(componentIdentifier)
+            .flatMap(currentExtension -> {
+              AtomicReference<ConnectionProviderModel> modelRef = new AtomicReference<>();
+              new ExtensionWalker() {
 
-    return extensionConnectionProviderModelByComponentIdentifier.get(componentId, componentIdentifier -> {
-      return lookupExtensionModelFor(componentIdentifier)
-          .flatMap(currentExtension -> {
-            AtomicReference<ConnectionProviderModel> modelRef = new AtomicReference<>();
+                final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(currentExtension);
 
-            new ExtensionWalker() {
-
-              final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(currentExtension);
-
-              @Override
-              protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
-                if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
-                  modelRef.set(model);
+                @Override
+                protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
+                  if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
+                    modelRef.set(model);
+                  }
                 }
-              }
-            }.walk(currentExtension);
+              }.walk(currentExtension);
 
-            return ofNullable(modelRef.get());
-          });
-    });
+              return ofNullable(modelRef.get());
+            }));
   }
 
   /**
