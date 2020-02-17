@@ -93,21 +93,6 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     return performWithConnection(connection -> delegate.getTotalResults(connection)).orElse(-1);
   }
 
-  private <R> R performWithConnection2(Function<Object, R> function) {
-    ConnectionSupplier connectionSupplier = null;
-    try {
-      connectionSupplier = connectionSupplierFactory.getConnectionSupplier();
-      return function.apply(connectionSupplier.getConnection());
-    } catch (MuleException e) {
-      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
-    } finally {
-      if (connectionSupplier != null) {
-        connectionSupplier.close();
-      }
-    }
-  }
-
-
   /**
    * Finds a connection and applies the {@link Function} passed as parameter.
    *
