@@ -676,6 +676,7 @@ public class GrizzlyHttpClient implements HttpClient
         private CompletionHandler<HttpResponse, Exception> completionHandler;
         private WorkManager workManager;
         private HttpRequest request;
+        private final AtomicBoolean handled;
 
         WorkManagerAsyncCompletionHandler(CompletionHandler<HttpResponse, Exception> completionHandler,
                 WorkManager workManager, HttpRequest request)
@@ -683,45 +684,51 @@ public class GrizzlyHttpClient implements HttpClient
             this.completionHandler = completionHandler;
             this.workManager = workManager;
             this.request = request;
+            this.handled = new AtomicBoolean(false);
         }
 
         @Override
         public Response onCompleted(final Response response) throws Exception
         {
-            workManager.execute(new Runnable()
+            if (!handled.getAndSet(true))
             {
-                @Override
-                public void run()
+                workManager.execute(new Runnable()
                 {
-                    try
+                    @Override
+                    public void run()
                     {
-                        completionHandler.onCompletion(createMuleResponse(response, response.getResponseBodyAsStream()));
+                        try
+                        {
+                            completionHandler.onCompletion(createMuleResponse(response, response.getResponseBodyAsStream()));
+                        }
+                        catch (IOException e)
+                        {
+                            completionHandler.onFailure(e);
+                        }
+                        finally
+                        {
+                            closeResources(request);
+                        }
                     }
-                    catch (IOException e)
-                    {
-                        completionHandler.onFailure(e);
-                    }
-                    finally
-                    {
-                        closeResources(request);
-                    }
-                }
-            });
+                });
+            }
             return null;
         }
 
         @Override
         public void onThrowable(final Throwable t)
         {
-            workManager.execute(new Runnable()
+            if (!handled.getAndSet(true))
             {
-                @Override
-                public void run()
+                workManager.execute(new Runnable()
                 {
-                    completionHandler.onFailure((Exception) t);
-                }
-            });
-
+                    @Override
+                    public void run()
+                    {
+                        completionHandler.onFailure((Exception) t);
+                    }
+                });
+            }
         }
     }
 
