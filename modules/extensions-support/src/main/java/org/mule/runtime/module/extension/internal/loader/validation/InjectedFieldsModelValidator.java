@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
@@ -73,13 +74,14 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
 
           @Override
           protected void onSource(HasSourceModels owner, SourceModel model) {
-            validateFields(model, model.getModelProperty(ImplementingTypeModelProperty.class), DefaultEncoding.class);
+            validateFields(model, getImplementingType(model), DefaultEncoding.class);
           }
 
           @Override
           protected void onConfiguration(ConfigurationModel model) {
-            validateFields(model, model.getModelProperty(ImplementingTypeModelProperty.class), DefaultEncoding.class);
-            validateFields(model, model.getModelProperty(ImplementingTypeModelProperty.class), RefName.class);
+            Optional<Class> implementingType = getImplementingType(model);
+            validateFields(model, implementingType, DefaultEncoding.class);
+            validateFields(model, implementingType, RefName.class);
           }
 
           @Override
@@ -90,8 +92,8 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
 
           @Override
           protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
-            validateFields(model, model.getModelProperty(ImplementingTypeModelProperty.class), DefaultEncoding.class);
-            validateFields(model, model.getModelProperty(ImplementingTypeModelProperty.class), RefName.class);
+            validateFields(model, getImplementingType(model), DefaultEncoding.class);
+            validateFields(model, getImplementingType(model), RefName.class);
           }
 
           @Override
@@ -145,10 +147,10 @@ public final class InjectedFieldsModelValidator implements ExtensionModelValidat
             });
           }
 
-          private void validateFields(NamedObject model, Optional<ImplementingTypeModelProperty> modelProperty,
+          private void validateFields(NamedObject model, Optional<Class> implementingType,
                                       Class<? extends Annotation> annotationClass) {
-            modelProperty.ifPresent(implementingTypeModelProperty -> {
-              validateType(model, implementingTypeModelProperty.getType(), annotationClass);
+            implementingType.ifPresent(type -> {
+              validateType(model, type, annotationClass);
             });
           }
 

@@ -500,14 +500,14 @@ public class MuleExtensionUtils {
   }
 
   /**
-   * Tests the given {@code connectionProviderModel} for a {@link ImplementingTypeModelProperty} and if present it
+   * Tests the given {@code enrichableModel} for a {@link ImplementingTypeModelProperty} and if present it
    * returns the enclosed implementing type.
    *
-   * @param connectionProviderModel the provider to get the implemented type from
+   * @param enrichableModel the provider to get the implemented type from
    * @return an {@link Optional} that either has the provider implementing type, or is empty
    * @since 4.3.0
    */
-  public static Optional<Class> getImplementingType(ConnectionProviderModel connectionProviderModel) {
-    return connectionProviderModel.getModelProperty(ImplementingTypeModelProperty.class).map(mp -> mp.getType());
+  public static Optional<Class> getImplementingType(EnrichableModel enrichableModel) {
+    return enrichableModel.getModelProperty(ImplementingTypeModelProperty.class).map(mp -> mp.getType());
   }
 }

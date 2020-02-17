@@ -32,6 +32,7 @@ import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.springframework.core.ResolvableType.NONE;
 import static org.springframework.util.ConcurrentReferenceHashMap.ReferenceType.WEAK;
@@ -1380,15 +1381,12 @@ public final class IntrospectionUtils {
                                                                              Class<? extends ConnectionProvider> connectionProvider,
                                                                              List<ConnectionProviderModel> allConnectionProviders) {
     for (ConnectionProviderModel providerModel : allConnectionProviders) {
-      Optional<ImplementingTypeModelProperty> modelProperty = providerModel.getModelProperty(ImplementingTypeModelProperty.class);
+      Optional<Class> providerImplementingType = getImplementingType(providerModel);
 
-      if (modelProperty.isPresent()) {
-        ImplementingTypeModelProperty property = modelProperty.get();
-
-        if (property.getType().equals(connectionProvider)) {
-          return of(providerModel);
-        }
+      if (providerImplementingType.map(type -> type.equals(connectionProvider)).orElse(false)) {
+        return of(providerModel);
       }
+
     }
     return empty();
   }

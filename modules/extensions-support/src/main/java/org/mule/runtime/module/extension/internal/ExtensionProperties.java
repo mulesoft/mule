@@ -73,6 +73,7 @@ public class ExtensionProperties {
   /**
    * The name to be used in a property of a {@link ValueResolvingContext} to store the {@link ConfigurationModel} being
    * used in that context.
+   * @since 4.3.0
    */
   public static final String CONFIGURATION_MODEL_PROPERTY_NAME = "Configuration model";
 

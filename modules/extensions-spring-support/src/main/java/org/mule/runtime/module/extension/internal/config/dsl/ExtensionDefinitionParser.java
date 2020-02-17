@@ -45,6 +45,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTargetParameter;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.AnyType;
@@ -869,8 +870,7 @@ public abstract class ExtensionDefinitionParser {
   private void parseRoute(NestedRouteModel routeModel) {
     DslElementSyntax routeDsl = dslResolver.resolve(routeModel);
 
-    Class<?> type = routeModel.getModelProperty(ImplementingTypeModelProperty.class)
-        .map(ImplementingTypeModelProperty::getType)
+    Class<?> type = getImplementingType(routeModel)
         .orElseThrow(() -> new IllegalStateException("Missing route information"));
 
     MetadataType metadataType = typeLoader.load(type);
