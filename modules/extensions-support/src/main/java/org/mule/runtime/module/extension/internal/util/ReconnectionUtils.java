@@ -10,10 +10,14 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTr
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
 
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
+
+import java.util.Optional;
 
 /**
  * Utilities for handling reconnection on operations that use a connection.
@@ -25,11 +29,13 @@ public class ReconnectionUtils {
   /**
    * @param t the {@link Throwable} thrown during the execution of the operation
    * @param context the {@link ExecutionContextAdapter} that contains the context information about the operation's execution
-   *
    * @return whether or not the operation should be retried
    */
   public static boolean shouldRetry(Throwable t, ExecutionContextAdapter<?> context) {
-    if (Boolean.valueOf(context.getVariable(DO_NOT_RETRY)) || !extractConnectionException(t).isPresent()) {
+    Optional<String> contextConfigName = context.getConfiguration().map(ConfigurationInstance::getName);
+    Optional<ConnectionException> connectionException = extractConnectionException(t);
+    if (Boolean.valueOf(context.getVariable(DO_NOT_RETRY)) || !connectionException.isPresent()
+        || !validateConnectionException(connectionException.get(), contextConfigName.orElse(null))) {
       return false;
     }
 
@@ -39,6 +45,14 @@ public class ReconnectionUtils {
       return !tx.hasResource(new ExtensionTransactionKey(context.getConfiguration().get()));
     }
 
+    return true;
+  }
+
+  private static boolean validateConnectionException(ConnectionException connectionException, String contextConfigName) {
+    Object operationConfigName = connectionException.getInfo().get("operationConfigName");
+    if (operationConfigName != null && contextConfigName != null) {
+      return contextConfigName.equals(operationConfigName);
+    }
     return true;
   }
 }

@@ -19,8 +19,8 @@ import static org.mule.tck.probe.PollingProber.check;
 
 import org.mule.extension.test.extension.reconnection.ReconnectableConnection;
 import org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
@@ -29,6 +29,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.error.MuleErrors;
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.time.Duration;
@@ -112,8 +113,8 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     assertThat("Paging provider was not closed.", closePagingProviderCalls, is(1));
   }
 
-  @Test
-  public void doNotReconnectAfterOtherExceptionOnFirstPage() {
+  @Test(expected = IllegalArgumentException.class)
+  public void doNotReconnectAfterOtherExceptionOnFirstPage() throws Throwable {
     resetCounters();
     Iterator<ReconnectableConnection> iterator;
     try {
@@ -124,6 +125,7 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
       assertThat(e.getMessage(), is("An illegal argument was received."));
       assertThat("Paging provider was not closed.", closePagingProviderCalls, is(1));
       assertThat("Connection was disconnected.", disconnectCalls, is(0));
+      throw e.getCause();
     }
   }
 
@@ -132,13 +134,30 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     resetCounters();
     Iterator<ReconnectableConnection> iterator = getCursor("pagedOperation", 2, CONNECTIVITY);
 
-    ReconnectableConnection firstPage = iterator.next();
+    iterator.next();
     assertThat("Connection was disconnected.", disconnectCalls, is(0));
     assertThat("Paging provider was closed.", closePagingProviderCalls, is(0));
 
-    ReconnectableConnection secondPage = iterator.next();
+    iterator.next();
     assertThat("Connection was not disconnected.", disconnectCalls, is(1));
     assertThat("Paging provider was closed.", closePagingProviderCalls, is(0));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void doNotReconnectAfterOtherExceptionOnSecondPage() throws Exception {
+    resetCounters();
+    Iterator<ReconnectableConnection> iterator;
+    try {
+      iterator = getCursor("pagedOperation", 2, VALIDATION);
+      iterator.next();
+      iterator.next();
+    } catch (Exception e) {
+      assertThat(e, instanceOf(IllegalArgumentException.class));
+      assertThat(e.getMessage(), is("An illegal argument was received."));
+      assertThat("Paging provider was not closed.", closePagingProviderCalls, is(0));
+      assertThat("Connection was disconnected.", disconnectCalls, is(0));
+      throw e;
+    }
   }
 
   @Test
@@ -150,7 +169,7 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     assertThat("Paging provider was not closed.", closePagingProviderCalls, is(1));
   }
 
-  @Test
+  @Test(expected = ModuleException.class)
   public void stickyConnectionIsNotReconnectedDuringConnectionExceptionOnSecondPage() throws Exception {
     resetCounters();
     try {
@@ -158,10 +177,28 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
       iterator.next();
       iterator.next();
     } catch (Exception e) {
-      assertThat(e, instanceOf(MuleRuntimeException.class));
-      assertThat(e.getMessage(), is("Could not execute operation with connection"));
-      assertThat("Paging provider was not closed.", closePagingProviderCalls, is(1));
+      assertThat(e, instanceOf(ModuleException.class));
+      assertThat(e.getCause(), instanceOf(ConnectionException.class));
+      assertThat(e.getCause().getMessage(), is("Failed to retrieve Page"));
+      assertThat("Paging provider was not closed.", closePagingProviderCalls, is(0));
       assertThat("Connection was not disconnected.", disconnectCalls, is(1));
+      throw e;
+    }
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void stickyConnectionIsNotReconnectedDuringOtherExceptionOnSecondPage() throws Exception {
+    resetCounters();
+    try {
+      Iterator<ReconnectableConnection> iterator = getCursor("stickyPagedOperation", 2, VALIDATION);
+      iterator.next();
+      iterator.next();
+    } catch (Exception e) {
+      assertThat(e, instanceOf(IllegalArgumentException.class));
+      assertThat(e.getMessage(), is("An illegal argument was received."));
+      assertThat("Paging provider was not closed.", closePagingProviderCalls, is(0));
+      assertThat("Connection was not disconnected.", disconnectCalls, is(0));
+      throw e;
     }
   }
 

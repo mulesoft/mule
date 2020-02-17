@@ -21,6 +21,7 @@ import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -91,8 +92,13 @@ public final class ExceptionHandlerManager {
 
   private Throwable resolveConnectionException(ConnectionException connectionException) {
     if (!connectionException.getErrorType().isPresent() && connectionErrorType != null) {
-      return new ConnectionException(connectionException.getMessage(), connectionException.getCause(),
-                                     connectionErrorType, connectionException.getConnection().orElse(null));
+      ConnectionException newException = new ConnectionException(connectionException.getMessage(), connectionException.getCause(),
+                                                                 connectionErrorType,
+                                                                 connectionException.getConnection().orElse(null));
+      for (Map.Entry<String, Object> entry : connectionException.getInfo().entrySet()) {
+        newException.addInfo(entry.getKey(), entry.getValue());
+      }
+      return newException;
     }
     return connectionException;
   }

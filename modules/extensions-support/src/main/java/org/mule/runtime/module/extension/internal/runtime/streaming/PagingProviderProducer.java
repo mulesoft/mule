@@ -14,7 +14,6 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionExc
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -37,6 +36,7 @@ import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionT
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -93,6 +93,21 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     return performWithConnection(connection -> delegate.getTotalResults(connection)).orElse(-1);
   }
 
+  private <R> R performWithConnection2(Function<Object, R> function) {
+    ConnectionSupplier connectionSupplier = null;
+    try {
+      connectionSupplier = connectionSupplierFactory.getConnectionSupplier();
+      return function.apply(connectionSupplier.getConnection());
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
+    } finally {
+      if (connectionSupplier != null) {
+        connectionSupplier.close();
+      }
+    }
+  }
+
+
   /**
    * Finds a connection and applies the {@link Function} passed as parameter.
    *
@@ -114,7 +129,12 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
                                                           executionContext.getCurrentScheduler());
     try {
       return future.get();
-    } catch (Exception e) {
+    } catch (ExecutionException e) {
+      if (e.getCause() instanceof RuntimeException) {
+        throw (RuntimeException) e.getCause();
+      }
+      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_EXECUTE), e.getCause());
+    } catch (InterruptedException e) {
       throw new MuleRuntimeException(createStaticMessage(COULD_NOT_EXECUTE), e);
     }
   }
@@ -125,17 +145,18 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     try {
       R result = function.apply(connection);
       return result;
-    } catch (Exception exception) {
-      if (isFirstPage || delegate.useStickyConnections()) {
+    } catch (Exception caughtException) {
+      if (isFirstPage) {
         safely(() -> delegate.close(connection), e -> LOGGER.debug("Found exception closing paging provider", e));
       }
-      extractConnectionException(exception).ifPresent(ex -> {
-        if (isTransactional()) {
-          executionContext.setVariable(DO_NOT_RETRY, "true");
-        }
-        connectionSupplier.invalidateConnection();
-      });
-      throw exception;
+      Optional<ConnectionException> connectionException = extractConnectionException(caughtException);
+      Optional<String> exceptionConfigName =
+          executionContext.getConfiguration().map(config -> ((ConfigurationInstance) config).getName());
+      if (isTransactional() && connectionException.isPresent() && exceptionConfigName.isPresent()) {
+        connectionException.get().addInfo("operationConfigName", exceptionConfigName.get());
+      }
+      connectionException.ifPresent(ex -> connectionSupplier.invalidateConnection());
+      throw caughtException;
     } finally {
       safely(connectionSupplier::close, e -> LOGGER.debug("Found exception closing the connection supplier", e));
     }

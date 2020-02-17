@@ -111,11 +111,27 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
   }
 
   @Test
-  public void doNotReconnectPagedOperationInTxWhenExceptionOnSecondPage() throws Exception {
+  public void doNotReconnectStickyPagedOperationInTx() throws Exception {
+    resetCounters();
+    expectedException.expectCause(instanceOf(ConnectionException.class));
+    expectedException.expectMessage("Failed to retrieve Page");
+    flowRunner("stickyFailingPagedOperationInTx").withVariable("failOn", 1).run();
+  }
+
+  @Test
+  public void doNotReconnectPagedOperationInTxWhenConnectionExceptionOnSecondPage() throws Exception {
     resetCounters();
     expectedException.expectCause(instanceOf(ConnectionException.class));
     expectedException.expectMessage("Failed to retrieve Page");
     flowRunner("failingPagedOperationInTx").withVariable("failOn", 2).run();
+  }
+
+  @Test
+  public void doNotReconnectStickyPagedOperationInTxWhenConnectionExceptionOnSecondPage() throws Exception {
+    resetCounters();
+    expectedException.expectCause(instanceOf(ConnectionException.class));
+    expectedException.expectMessage("Failed to retrieve Page");
+    flowRunner("stickyFailingPagedOperationInTx").withVariable("failOn", 2).run();
   }
 
   @Test
@@ -128,12 +144,29 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
   }
 
   @Test
-  public void doReconnectPagedOperationWithoutTxWhenExceptionOnSecondPage() throws Exception {
+  public void doReconnectStickyPagedOperationWithoutTx() throws Exception {
+    resetCounters();
+    CoreEvent event = flowRunner("stickyFailingPagedOperationWithoutTx").withVariable("failOn", 1).run();
+    Collection<Integer> accumulator = (Collection<Integer>) event.getVariables().get("accumulator").getValue();
+    assertThat(accumulator, is(notNullValue()));
+    assertThat(accumulator, hasSize(2));
+  }
+
+  @Test
+  public void doReconnectPagedOperationWithoutTxWhenConnectionExceptionOnSecondPage() throws Exception {
     resetCounters();
     CoreEvent event = flowRunner("failingPagedOperationWithoutTx").withVariable("failOn", 2).run();
     Collection<Integer> accumulator = (Collection<Integer>) event.getVariables().get("accumulator").getValue();
     assertThat(accumulator, is(notNullValue()));
     assertThat(accumulator, hasSize(2));
+  }
+
+  @Test
+  public void doNotReconnectStickyPagedOperationWithoutTxWhenConnectionExceptionOnSecondPage() throws Exception {
+    resetCounters();
+    expectedException.expectCause(instanceOf(ConnectionException.class));
+    expectedException.expectMessage("Failed to retrieve Page");
+    flowRunner("stickyFailingPagedOperationInTx").withVariable("failOn", 2).run();
   }
 
   @Test
