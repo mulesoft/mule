@@ -66,7 +66,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
   private final PeriodicScheduler scheduler;
   private final boolean disallowConcurrentExecution;
-  private final boolean disabled;
+  private static boolean disabled = parseBoolean(getProperty(MULE_DISABLE_SCHEDULERS));
 
   private Scheduler pollingExecutor;
   private ScheduledFuture<?> schedulingJob;
@@ -97,7 +97,6 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     this.muleContext = muleContext;
     this.scheduler = scheduler;
     this.disallowConcurrentExecution = disallowConcurrentExecution;
-    this.disabled = parseBoolean(getProperty(MULE_DISABLE_SCHEDULERS));
   }
 
   @Override
@@ -285,5 +284,15 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     public FlowConstruct getFlowConstruct() {
       return flowConstruct;
     }
+  }
+
+  /**
+   * This method is only for testing proposes.  Don't use.
+   *
+   * @param disabled
+   * @deprecated
+   */
+  static void setDisabled(boolean disabled) {
+    DefaultSchedulerMessageSource.disabled = disabled;
   }
 }
