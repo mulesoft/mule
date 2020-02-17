@@ -3,6 +3,16 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap",
+          "new": "class org.mule.runtime.http.api.domain.CaseInsensitiveMultiMap",
+          "superClass": "org.mule.runtime.http.api.domain.AbstractCaseInsensitiveMultiMap",
+          "package": "org.mule.runtime.http.api.domain",
+          "classSimpleName": "CaseInsensitiveMultiMap",
+          "elementKind": "class",
+          "justification": "EE-7205: General HTTP improvements"
+        },
+        {
           "code": "java.field.constantValueChanged",
           "old": "field org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY @ org.mule.runtime.http.api.server.ServerAlreadyExistsException",
           "new": "field org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY @ org.mule.runtime.http.api.server.ServerAlreadyExistsException",
