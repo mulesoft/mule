@@ -29,13 +29,22 @@ import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.sourceTimesStarted;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.CORE_POOL_SIZE_ERROR_MESSAGE;
+import static org.mule.test.heisenberg.extension.HeisenbergSource.resetHeisenbergSource;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_BODY;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_INVOKE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
-import static org.mule.test.heisenberg.extension.HeisenbergSource.resetHeisenbergSource;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
 
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.Optional;
+
+import org.hamcrest.Matcher;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.Location;
@@ -47,15 +56,6 @@ import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.test.heisenberg.extension.HeisenbergSource;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
-
-import org.hamcrest.Matcher;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import java.math.BigDecimal;
-import java.util.Map;
-import java.util.Optional;
 
 public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -93,6 +93,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   @Test
+  @Ignore("MULE-18067")
   public void source() throws Exception {
     startFlow("source");
 
@@ -163,6 +164,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   @Test
+  @Ignore("MULE-18067")
   public void sourceOnSuccessCallsOnTerminate() throws Exception {
     startFlow("source");
 
@@ -174,6 +176,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   @Test
+  @Ignore("MULE-18067")
   public void sourceFailsOnSuccessParametersCallsOnErrorAndOnTerminate() throws Exception {
     startFlow("sourceWithInvalidSuccessParameter");
 
@@ -202,6 +205,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   @Test
+  @Ignore("MULE-18067")
   public void sourceFailsOnSuccessAndOnErrorParametersCallsOnTerminate() throws Exception {
     startFlow("sourceWithInvalidSuccessAndErrorParameters");
 
@@ -221,6 +225,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   @Test
+  @Ignore("MULE-18067")
   public void sourceFailsInsideOnErrorAndCallsOnTerminate() throws Exception {
     startFlow("sourceFailsInsideOnError");
 
@@ -246,6 +251,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   @Test
+  @Ignore("MULE-18067")
   public void failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt() throws Exception {
     startFlow("failureInFlowCallsOnErrorDirectlyAndFailsHandlingIt");
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> assertState(false, false, true));
