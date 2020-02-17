@@ -90,6 +90,11 @@ public class ValueResolvingContext implements AutoCloseable {
     return ofNullable(config);
   }
 
+  /**
+   * @param propertyName the name of the property to be retrieved
+   * @return the value of the property if found or null if it is not present in the context.
+   * @since 4.3.0
+   */
   public Object getProperty(String propertyName) {
     return properties.get(propertyName);
   }
@@ -155,6 +160,13 @@ public class ValueResolvingContext implements AutoCloseable {
       return this;
     }
 
+    /**
+     * Adds a property to the {@link ValueResolvingContext} to be built.
+     *
+     * @param propertyName the name of the property to be stored in the context
+     * @param propertyValue the value of the property to be stored in the context
+     * @return this builder
+     */
     public Builder withProperty(String propertyName, Object propertyValue) {
       this.properties.put(propertyName, propertyValue);
       return this;

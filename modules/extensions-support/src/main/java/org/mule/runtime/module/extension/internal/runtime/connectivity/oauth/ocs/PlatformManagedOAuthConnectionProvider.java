@@ -22,6 +22,7 @@ import static org.mule.runtime.module.extension.internal.runtime.connectivity.oa
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.validateOAuthConnection;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.config.PoolingProfile;
@@ -200,7 +201,7 @@ public class PlatformManagedOAuthConnectionProvider<C> implements OAuthConnectio
                                              new ReflectionCache(),
                                              expressionManager);
     Class<? extends ConnectionProvider> connectionProviderDelegateClass =
-        getDelegateProviderType(oauthConfig.getDelegateConnectionProviderModel())
+        getImplementingType(oauthConfig.getDelegateConnectionProviderModel())
             .orElseThrow(() -> new IllegalStateException("Delegate connection provider must have an implementing type."));
 
     return (ConnectionProvider<C>) withContextClassLoader(getClassLoader(oauthConfig.getExtensionModel()), () -> {
@@ -230,10 +231,6 @@ public class PlatformManagedOAuthConnectionProvider<C> implements OAuthConnectio
         }
       }
     }, MuleException.class, e -> e);
-  }
-
-  private Optional<Class> getDelegateProviderType(ConnectionProviderModel delegateConnectionProviderModel) {
-    return delegateConnectionProviderModel.getModelProperty(ImplementingTypeModelProperty.class).map(mp -> mp.getType());
   }
 
   private PlatformManagedConnectionDescriptor fetchConnectionDescriptor() throws MuleException {

@@ -24,5 +24,8 @@ public interface ConnectionProviderWrapper<C>
 
   RetryPolicyTemplate getRetryPolicyTemplate();
 
+  /**
+   * @return the {@link ConnectionManagementType} of the delegate {@link ConnectionProvider}.
+   */
   ConnectionManagementType getConnectionManagementType();
 }

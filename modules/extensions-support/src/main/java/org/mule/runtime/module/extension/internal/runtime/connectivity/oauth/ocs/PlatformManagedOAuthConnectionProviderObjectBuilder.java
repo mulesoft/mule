@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs;
 
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.PLATFORM_MANAGED_CONNECTION_ID_PARAMETER_NAME;
-import static org.mule.runtime.module.extension.internal.runtime.config.ConfigurationInstanceFactory.CONFIGURATION_MODEL_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONFIGURATION_MODEL_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthConfig.from;
 
 import org.mule.runtime.api.component.ConfigurationProperties;

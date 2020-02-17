@@ -53,6 +53,7 @@ import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionE
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
+import org.mule.runtime.extension.api.property.SyntheticModelModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
@@ -70,6 +71,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.CompileTi
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
@@ -486,4 +488,26 @@ public class MuleExtensionUtils {
     return extensionModel.getModelProperty(CompileTimeModelProperty.class).isPresent();
   }
 
+  /**
+   * Indicates whether a give {@link EnrichableModel} is synthetic or not.
+   *
+   * @param enrichableModel the enrichable model that may be synthetic
+   * @return if the enrichable model is synthetic or not
+   * @since 4.3.0
+   */
+  public static boolean isSynthetic(EnrichableModel enrichableModel) {
+    return enrichableModel.getModelProperty(SyntheticModelModelProperty.class).isPresent();
+  }
+
+  /**
+   * Tests the given {@code connectionProviderModel} for a {@link ImplementingTypeModelProperty} and if present it
+   * returns the enclosed implementing type.
+   *
+   * @param connectionProviderModel the provider to get the implemented type from
+   * @return an {@link Optional} that either has the provider implementing type, or is empty
+   * @since 4.3.0
+   */
+  public static Optional<Class> getImplementingType(ConnectionProviderModel connectionProviderModel) {
+    return connectionProviderModel.getModelProperty(ImplementingTypeModelProperty.class).map(mp -> mp.getType());
+  }
 }

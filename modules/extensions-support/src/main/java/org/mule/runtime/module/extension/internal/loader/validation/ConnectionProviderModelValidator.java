@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.validateConfigOverrideParametersNotAllowed;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isSynthetic;
 
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -105,7 +106,7 @@ public final class ConnectionProviderModelValidator implements ExtensionModelVal
                                                   ProblemsReporter problemsReporter) {
     configLevelConnectionProviders.asMap().forEach((configModel, providerModels) -> {
       for (ConnectionProviderModel providerModel : providerModels) {
-        if (providerModel.getModelProperty(SyntheticModelModelProperty.class).isPresent()) {
+        if (isSynthetic(providerModel)) {
           continue;
         }
         Type connectionType = MuleExtensionUtils.getConnectionType(providerModel);
