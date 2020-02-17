@@ -34,6 +34,11 @@ public class NullStreamingStatistics implements MutableStreamingStatistics {
   }
 
   @Override
+  public int decrementOpenCursors(int howMany) {
+    return 0;
+  }
+
+  @Override
   public int getOpenCursorProvidersCount() {
     return 0;
   }

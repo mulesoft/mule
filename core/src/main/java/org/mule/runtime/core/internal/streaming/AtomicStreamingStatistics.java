@@ -38,6 +38,11 @@ public class AtomicStreamingStatistics implements MutableStreamingStatistics {
     return openCursors.decrementAndGet();
   }
 
+  @Override
+  public int decrementOpenCursors(int howMany) {
+    return openCursors.addAndGet(-howMany);
+  }
+
   /**
    * {@inheritDoc}
    */

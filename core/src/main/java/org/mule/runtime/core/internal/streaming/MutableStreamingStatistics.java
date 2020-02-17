@@ -38,9 +38,18 @@ public interface MutableStreamingStatistics extends StreamingStatistics {
   int incrementOpenCursors();
 
   /**
-   * Decreases the number of open providers by one and returns the updated value
+   * Decreases the number of open cursors by one and returns the updated value
    *
    * @return the updated value
    */
   int decrementOpenCursors();
+
+  /**
+   * Decreases the number of cursors by {@code howMany} and returns the updated value
+   *
+   * @param howMany how many cursors were closed
+   * @return the updated value
+   * @since 4.3.0
+   */
+  int decrementOpenCursors(int howMany);
 }

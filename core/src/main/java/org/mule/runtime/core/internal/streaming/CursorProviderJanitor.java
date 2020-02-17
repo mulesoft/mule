@@ -78,6 +78,9 @@ public class CursorProviderJanitor {
     try {
       provider.releaseResources();
     } finally {
+      if (statistics != null) {
+        statistics.decrementOpenCursors(openCursorsCount.get());
+      }
       provider = null;
     }
   }
