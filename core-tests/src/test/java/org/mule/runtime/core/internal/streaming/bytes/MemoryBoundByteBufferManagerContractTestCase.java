@@ -108,7 +108,7 @@ public abstract class MemoryBoundByteBufferManagerContractTestCase extends Abstr
       // awesome... continue
     }
 
-    buffer1.deallocate();
+    buffer1.release();
     buffer1 = bufferManager.allocateManaged(bufferCapacity);
     assertThat(buffer1.getDelegate().capacity(), is(bufferCapacity));
   }
@@ -118,7 +118,7 @@ public abstract class MemoryBoundByteBufferManagerContractTestCase extends Abstr
     try {
       assertThat(buffer.getDelegate().capacity(), is(capacity));
     } finally {
-      buffer.deallocate();
+      buffer.release();
     }
   }
 

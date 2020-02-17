@@ -78,8 +78,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
         writeLock.lock();
 
         try {
-          ByteBuffer refetch;
-          refetch = getFromCurrentData(position, length);
+          ByteBuffer refetch = getFromCurrentData(position, length);
           if (refetch != null) {
             return refetch;
           }
@@ -100,7 +99,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
         } catch (IOException e) {
           throw new MuleRuntimeException(createStaticMessage("Could not read stream"), e);
         } finally {
-          // lock downgrade
+          // classic lock downgrade
           readLock.lock();
           writeLock.unlock();
         }
@@ -130,7 +129,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
    */
   @Override
   public void doClose() {
-    managedBuffer.deallocate();
+    managedBuffer.release();
     managedBuffer = null;
   }
 
@@ -166,7 +165,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
       }
     } finally {
       if (auxBuffer) {
-        managedReadBuffer.deallocate();
+        managedReadBuffer.release();
       }
     }
 
@@ -193,7 +192,7 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
 
     managedBuffer = newManagedBuffer;
     actingBuffer = newBuffer;
-    oldManagedBuffer.deallocate();
+    oldManagedBuffer.release();
 
     return newManagedBuffer;
   }

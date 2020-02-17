@@ -41,12 +41,13 @@ public interface ByteBufferManager {
   /**
    * Returns a {@link ManagedByteBufferWrapper} of the given {@code capacity}.
    * <p>
-   * Invokers <b>MUST</b> call the {@link ManagedByteBufferWrapper#deallocate()} method on the returned
+   * Invokers <b>MUST</b> call the {@link ManagedByteBufferWrapper#release()} method on the returned
    * instance once it's no longer needed.
    *
    * @param capacity the capacity of the returned buffer
    * @return a {@link ManagedByteBufferWrapper} of the given {@code capacity}
    * @throws MaxStreamingMemoryExceededException if no more streaming memory is available
+   * @since 4.3.0
    */
   ManagedByteBufferWrapper allocateManaged(int capacity);
 
@@ -55,7 +56,7 @@ public interface ByteBufferManager {
    * may dispose of it however it sees fit.
    *
    * @param byteBuffer the buffer to be deallocated.
-   * @deprecated since 4.3.0. Use {@link ManagedByteBufferWrapper#deallocate()} instead
+   * @deprecated since 4.3.0. Use {@link ManagedByteBufferWrapper#release()} instead
    */
   @Deprecated
   void deallocate(ByteBuffer byteBuffer);

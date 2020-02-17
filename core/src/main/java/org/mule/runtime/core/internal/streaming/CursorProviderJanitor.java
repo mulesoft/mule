@@ -77,7 +77,6 @@ public class CursorProviderJanitor {
 
     try {
       provider.releaseResources();
-
     } finally {
       provider = null;
     }

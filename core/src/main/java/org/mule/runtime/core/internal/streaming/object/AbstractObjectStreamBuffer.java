@@ -70,11 +70,18 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
       if (bucket != null) {
         return forwarding(bucket);
       }
+      readLock.unlock();
+      writeLock.lock();
+      try {
+        return fetch(position);
+      } finally {
+        // classic lock downgrade
+        readLock.lock();
+        writeLock.unlock();
+      }
     } finally {
       readLock.unlock();
     }
-
-    return fetch(position);
   }
 
   @Override
@@ -89,7 +96,6 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
     }
 
     Position position = toPosition(i);
-    boolean readLockAcquired = true;
     readLock.lock();
     try {
       if (maxPosition != null) {
@@ -100,52 +106,48 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
         return true;
       }
 
-      readLockAcquired = false;
       readLock.unlock();
-
+      writeLock.lock();
       try {
         return fetch(position) != null;
       } catch (NoSuchElementException e) {
         return false;
+      } finally {
+        // classic lock downgrade
+        readLock.lock();
+        writeLock.unlock();
       }
     } finally {
-      if (readLockAcquired) {
-        readLock.unlock();
-      }
+      readLock.unlock();
     }
   }
 
   private Bucket<T> fetch(Position position) {
-    writeLock.lock();
-    try {
-      Bucket<T> presentBucket = getPresentBucket(position);
-      if (presentBucket != null && presentBucket.contains(position)) {
-        return presentBucket;
-      }
-
-      while (currentPosition.compareTo(position) < 0) {
-        if (!stream.hasNext()) {
-          maxPosition = currentPosition;
-          return null;
-        }
-
-        T item = stream.next();
-        if (currentBucket.add(item)) {
-          currentPosition = currentPosition.advanceItem();
-        } else {
-          setCurrentBucket(onBucketOverflow(currentBucket));
-          currentBucket.add(item);
-
-          currentPosition = currentPosition.advanceBucket();
-        }
-        instancesCount++;
-        validateMaxBufferSizeNotExceeded(instancesCount);
-      }
-
-      return currentBucket;
-    } finally {
-      writeLock.unlock();
+    Bucket<T> presentBucket = getPresentBucket(position);
+    if (presentBucket != null && presentBucket.contains(position)) {
+      return presentBucket;
     }
+
+    while (currentPosition.compareTo(position) < 0) {
+      if (!stream.hasNext()) {
+        maxPosition = currentPosition;
+        return null;
+      }
+
+      T item = stream.next();
+      if (currentBucket.add(item)) {
+        currentPosition = currentPosition.advanceItem();
+      } else {
+        setCurrentBucket(onBucketOverflow(currentBucket));
+        currentBucket.add(item);
+
+        currentPosition = currentPosition.advanceBucket();
+      }
+      instancesCount++;
+      validateMaxBufferSizeNotExceeded(instancesCount);
+    }
+
+    return currentBucket;
   }
 
   protected abstract void validateMaxBufferSizeNotExceeded(int instancesCount);
@@ -207,7 +209,6 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
 
     @Override
     public Optional<T> get(int index) {
-      boolean readLockAcquired = true;
       readLock.lock();
       try {
         Optional<T> item = delegate.get(index);
@@ -216,21 +217,23 @@ public abstract class AbstractObjectStreamBuffer<T> extends AbstractStreamingBuf
         }
 
         Position position = new Position(delegate.getIndex(), index);
-        readLockAcquired = false;
         readLock.unlock();
-        delegate = (Bucket<T>) fetch(position);
+        writeLock.lock();
+        try {
+          delegate = (Bucket<T>) fetch(position);
+        } finally {
+          // classic lock downgrade
+          readLock.lock();
+          writeLock.unlock();
+        }
 
         if (delegate == null) {
           throw new NoSuchElementException();
         }
 
-        readLock.lock();
-        readLockAcquired = true;
         return delegate.get(index);
       } finally {
-        if (readLockAcquired) {
-          readLock.unlock();
-        }
+        readLock.unlock();
       }
     }
 
