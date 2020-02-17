@@ -252,6 +252,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     router.accept(mockException);
 
     assertThat(thownRef.get().getCause(), not(instanceOf(AssertionError.class)));
+    assertThat(thownRef.get(), sameInstance(mockException));
   }
 
   private Processor createChagingEventMessageProcessor(final CoreEvent lastEventCreated) {

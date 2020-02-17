@@ -16,8 +16,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,10 +29,10 @@ import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZ
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
+import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ScatterGatherStory.SCATTER_GATHER;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
@@ -250,11 +248,7 @@ public class ScatterGatherRouterTestCase extends AbstractMuleContextTestCase {
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
     router.initialise();
 
-    final CoreEvent result = just(testEvent())
-        .transform(router)
-        .subscriberContext(contextPropagationCheckerA.contextPropagationFlag())
-        .blockFirst();
-
-    assertThat(result, not(nullValue()));
+    assertContextPropagation(testEvent(), router, contextPropagationCheckerA);
+    assertContextPropagation(testEvent(), router, contextPropagationCheckerB);
   }
 }

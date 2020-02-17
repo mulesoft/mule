@@ -8,8 +8,6 @@ package org.mule.runtime.core.internal.routing;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
@@ -17,7 +15,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
-import static reactor.core.publisher.Flux.just;
+import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -83,12 +81,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
     FirstSuccessful fs = createFirstSuccessfulRouter(contextPropagationChecker);
 
-    final CoreEvent result = just(testEvent())
-        .transform(fs)
-        .subscriberContext(contextPropagationChecker.contextPropagationFlag())
-        .blockFirst();
-
-    assertThat(result, not(nullValue()));
+    assertContextPropagation(testEvent(), fs, contextPropagationChecker);
   }
 
   private FirstSuccessful createFirstSuccessfulRouter(Processor... processors) throws Exception {

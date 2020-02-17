@@ -15,8 +15,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,11 +26,11 @@ import static org.mule.runtime.api.component.location.ConfigurationComponentLoca
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_LIST;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
+import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ParallelForEachStory.PARALLEL_FOR_EACH;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.Event;
@@ -237,12 +235,8 @@ public class ParallelForEachTestCase extends AbstractMuleContextTestCase {
     router.setAnnotations(getAppleFlowComponentLocationAnnotations());
     router.initialise();
 
-    final CoreEvent result = just(eventBuilder(muleContext).message(Message.of(asList("1", "2", "3"))).build())
-        .transform(router)
-        .subscriberContext(contextPropagationChecker.contextPropagationFlag())
-        .blockFirst();
-
-    assertThat(result, not(nullValue()));
+    assertContextPropagation(eventBuilder(muleContext).message(Message.of(asList("1", "2", "3"))).build(), router,
+                             contextPropagationChecker);
   }
 
   private CoreEvent createListEvent() throws MuleException {

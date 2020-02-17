@@ -16,8 +16,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -30,11 +28,11 @@ import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_COUNTER_VAR
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAGE_VARIABLE;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
+import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ForeachStory.FOR_EACH;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ItemSequenceInfo;
@@ -482,12 +480,8 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
     simpleForeach = createForeach(singletonList(contextPropagationChecker));
 
-    final CoreEvent result = just(eventBuilder(muleContext).message(of(asList("1", "2", "3"))).build())
-        .transform(simpleForeach)
-        .subscriberContext(contextPropagationChecker.contextPropagationFlag())
-        .blockFirst();
-
-    assertThat(result, not(nullValue()));
+    assertContextPropagation(eventBuilder(muleContext).message(of(asList("1", "2", "3"))).build(), simpleForeach,
+                             contextPropagationChecker);
   }
 
   private CoreEvent processInChain(Processor processor, CoreEvent event) throws Exception {

@@ -27,8 +27,8 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
+import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
-import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.Flow;
@@ -360,12 +360,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final CoreEvent result = just(eventBuilder(muleContext).message(of("1")).build())
-        .transform(untilSuccessful)
-        .subscriberContext(contextPropagationChecker.contextPropagationFlag())
-        .blockFirst();
-
-    assertThat(result, not(nullValue()));
+    assertContextPropagation(eventBuilder(muleContext).message(of("1")).build(), untilSuccessful, contextPropagationChecker);
   }
 
   protected void assertNoRetryContextAfterScopeExecutions(int expectedExecutions) throws MuleException {

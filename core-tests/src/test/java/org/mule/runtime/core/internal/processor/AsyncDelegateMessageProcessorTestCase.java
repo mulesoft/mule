@@ -25,8 +25,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
+import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
-import static reactor.core.publisher.Flux.just;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -151,7 +151,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   }
 
   @Test
-  @Ignore("Does this case actually make sense?")
+  @Ignore("Does this case actually make sense? Async has to run in an independent context, so propagation from the parent is not a wanted thing.")
   public void subscriberContextPropagation() throws Exception {
     final ContextPropagationChecker contextPropagationChecker = new ContextPropagationChecker();
 
@@ -160,12 +160,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     initialiseIfNeeded(async, true, muleContext);
     async.start();
 
-    final CoreEvent result = just(testEvent())
-        .transform(async)
-        .subscriberContext(contextPropagationChecker.contextPropagationFlag())
-        .blockFirst();
-
-    assertThat(result, not(nullValue()));
+    assertContextPropagation(testEvent(), async, contextPropagationChecker);
     asyncEntryLatch.countDown();
     assertThat(latch.await(LOCK_TIMEOUT, MILLISECONDS), is(true));
   }
