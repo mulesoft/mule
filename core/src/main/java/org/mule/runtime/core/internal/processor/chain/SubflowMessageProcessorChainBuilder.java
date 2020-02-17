@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.processor.chain;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static reactor.core.publisher.Flux.from;
@@ -83,7 +82,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
   @Override
   protected MessageProcessorChain createSimpleChain(List<Processor> processors,
                                                     Optional<ProcessingStrategy> processingStrategyOptional) {
-    return new SubFlowMessageProcessorChain(name, processors);
+    return new SubFlowMessageProcessorChain(name, processors, processingStrategyOptional);
   }
 
   /**
@@ -93,8 +92,9 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
 
     private final String subFlowName;
 
-    SubFlowMessageProcessorChain(String name, List<Processor> processors) {
-      super(name, empty(), processors,
+    SubFlowMessageProcessorChain(String name, List<Processor> processors,
+                                 Optional<ProcessingStrategy> processingStrategyOptional) {
+      super(name, processingStrategyOptional, processors,
             NullExceptionHandler.getInstance());
       this.subFlowName = name;
     }
