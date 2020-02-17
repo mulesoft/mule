@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.source.polling;
+package org.mule.runtime.core.internal.source.scheduler;
 
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
@@ -30,7 +30,6 @@ import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.execution.MuleMessageProcessingManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SourcePolicy;
-import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.slf4j.Logger;
 
