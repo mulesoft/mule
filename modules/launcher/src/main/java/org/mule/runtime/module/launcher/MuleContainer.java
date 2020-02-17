@@ -8,9 +8,11 @@ package org.mule.runtime.module.launcher;
 
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.String.format;
+import static java.lang.System.setProperty;
 import static org.apache.commons.lang3.reflect.MethodUtils.invokeStaticMethod;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShutdown;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorWhileRunning;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -23,7 +25,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.container.api.MuleFoldersUtil;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
@@ -94,13 +95,13 @@ public class MuleContainer {
   private static MuleLog4jContextFactory log4jContextFactory;
 
   static {
-    if (System.getProperty(MuleProperties.MULE_SIMPLE_LOG) == null) {
+    if (System.getProperty(MULE_SIMPLE_LOG) == null) {
       // We need to force the creation of a logger before we can change the manager factory.
       // This is because if not, any logger that will be acquired by MuleLog4jContextFactory code
       // will fail since it will try to use a null factory.
       LoggerFactory.getLogger("triggerDefaultFactoryCreation");
       // We need to set this property so log4j uses the same context factory everywhere
-      System.setProperty("log4j2.loggerContextFactory", MuleLog4jContextFactory.class.getName());
+      setProperty("log4j2.loggerContextFactory", MuleLog4jContextFactory.class.getName());
       log4jContextFactory = new MuleLog4jContextFactory();
       LogManager.setFactory(log4jContextFactory);
     }
@@ -191,7 +192,7 @@ public class MuleContainer {
       if (System.getProperty(DEPLOYMENT_APPLICATION_PROPERTY) != null) {
         throw new IllegalArgumentException(INVALID_DEPLOY_APP_CONFIGURATION_ERROR);
       }
-      System.setProperty(DEPLOYMENT_APPLICATION_PROPERTY, appOption);
+      setProperty(DEPLOYMENT_APPLICATION_PROPERTY, appOption);
     }
   }
 

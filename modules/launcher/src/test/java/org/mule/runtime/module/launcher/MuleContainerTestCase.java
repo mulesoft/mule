@@ -13,12 +13,13 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.module.launcher.MuleContainer.APP_COMMAND_LINE_OPTION;
 import static org.mule.runtime.module.launcher.MuleContainer.INVALID_DEPLOY_APP_CONFIGURATION_ERROR;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-import org.mule.runtime.core.api.config.MuleProperties;
+
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderManager;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
@@ -46,10 +47,11 @@ import org.mockito.InOrder;
 public class MuleContainerTestCase extends AbstractMuleTestCase {
 
   private static final String APP_NAME = "testApp";
+
   // Required to run the test, otherwise we need to configure a fake mule
   // folder with a conf/log4j2.xml
   @Rule
-  public SystemProperty simpleLog = new SystemProperty(MuleProperties.MULE_SIMPLE_LOG, "true");
+  public SystemProperty simpleLog = new SystemProperty(MULE_SIMPLE_LOG, "true");
 
   @Rule
   public ExpectedException expectedException = none();
