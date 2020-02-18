@@ -15,7 +15,6 @@ import static org.mule.test.heisenberg.extension.AsyncHeisenbergSource.completio
 import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("MULE-18067")
 public class AsyncHeisenbergMessageSourceTestCase extends HeisenbergMessageSourceTestCase {
 
   @Override
