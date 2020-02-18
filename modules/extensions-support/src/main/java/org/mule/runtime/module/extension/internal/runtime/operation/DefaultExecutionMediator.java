@@ -12,10 +12,7 @@ import static java.util.Collections.emptyList;
 import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
-import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
@@ -31,8 +28,6 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.extension.api.runtime.Interceptable;
@@ -45,7 +40,6 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
-import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

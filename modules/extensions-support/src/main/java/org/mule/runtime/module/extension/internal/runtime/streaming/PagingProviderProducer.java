@@ -13,6 +13,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
+import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.isPartOfActiveTransaction;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
 
 import org.mule.runtime.api.connection.ConnectionException;
@@ -23,15 +24,12 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.iterator.Producer;
-import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
-import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
 import java.util.List;
 import java.util.Optional;
@@ -144,7 +142,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   private void handleConnectionException(ConnectionException connectionException, ConnectionSupplier connectionSupplier) {
     Optional<String> exceptionConfigName =
         executionContext.getConfiguration().map(config -> ((ConfigurationInstance) config).getName());
-    if (isTransactional()) {
+    if (isPartOfActiveTransaction(config)) {
       connectionException.addInfo("wasTransactional", true);
     }
     if (isFirstPage) {
@@ -173,7 +171,8 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   }
 
   private ConnectionSupplierFactory createConnectionSupplierFactory() {
-    if (delegate.useStickyConnections() || isTransactional()) {
+    //TODO fix this isPartOfActiveTransaction(config) (currently is always false here because transaction has not been bound yet, it is bound on extensionConnectionSupplier.getConnection(executionContext))
+    if (delegate.useStickyConnections() || isPartOfActiveTransaction(config)) {
       return new StickyConnectionSupplierFactory();
     }
 
@@ -194,11 +193,6 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     } catch (MuleException e) {
       throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
     }
-  }
-
-  private boolean isTransactional() {
-    Transaction tx = TransactionCoordination.getInstance().getTransaction();
-    return tx != null && tx.hasResource(new ExtensionTransactionKey(config));
   }
 
   private interface ConnectionSupplierFactory {

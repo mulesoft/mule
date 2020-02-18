@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
-import static java.lang.Boolean.parseBoolean;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
@@ -39,10 +38,8 @@ public class ReconnectionUtils {
       return false;
     }
 
-    if (isTransactionActive()) {
-      Transaction tx = TransactionCoordination.getInstance().getTransaction();
-
-      return !tx.hasResource(new ExtensionTransactionKey(context.getConfiguration().get()));
+    if (isPartOfActiveTransaction(context.getConfiguration().get())) {
+      return false;
     }
 
     return validateConnectionException(connectionException.get(), contextConfigName.orElse(null));
@@ -58,5 +55,13 @@ public class ReconnectionUtils {
       return contextConfigName.equals(operationConfigName);
     }
     return true;
+  }
+
+  public static boolean isPartOfActiveTransaction(ConfigurationInstance configurationInstance) {
+    if (isTransactionActive()) {
+      Transaction tx = TransactionCoordination.getInstance().getTransaction();
+      return tx != null && tx.hasResource(new ExtensionTransactionKey(configurationInstance));
+    }
+    return false;
   }
 }
