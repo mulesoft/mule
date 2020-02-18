@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.processor;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.locks.LockSupport.parkNanos;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -21,8 +22,10 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
+import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -38,22 +41,24 @@ import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrateg
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
+import org.mule.tck.processor.ContextPropagationChecker;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.beans.ExceptionListener;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProcessorTestCase implements ExceptionListener {
 
-  private AsyncDelegateMessageProcessor messageProcessor;
+  private AsyncDelegateMessageProcessor async;
   protected TestListener target = new TestListener();
   private Exception exceptionThrown;
   protected Latch latch = new Latch();
-  private Latch asyncEntryLatch = new Latch();
+  private final Latch asyncEntryLatch = new Latch();
   private Flow flow;
 
   @Rule
@@ -74,14 +79,14 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     super.doSetUp();
     flow = createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator);
 
-    messageProcessor = createAsyncDelegateMessageProcessor(target, flow);
-    messageProcessor.start();
+    async = createAsyncDelegateMessageProcessor(target, flow);
+    async.start();
   }
 
   @Override
   protected void doTearDown() throws Exception {
-    messageProcessor.stop();
-    messageProcessor.dispose();
+    async.stop();
+    async.dispose();
 
     flow.dispose();
     super.doTearDown();
@@ -91,7 +96,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
   public void process() throws Exception {
     CoreEvent request = testEvent();
 
-    CoreEvent result = process(messageProcessor, request);
+    CoreEvent result = process(async, request);
 
     // Complete parent context so we can assert event context completion based on async completion.
     ((BaseEventContext) request.getContext()).success(result);
@@ -132,7 +137,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
 
     try {
       CoreEvent request = testEvent();
-      CoreEvent result = process(messageProcessor, request);
+      CoreEvent result = process(async, request);
 
       // Wait until processor in async is executed to allow assertions on sensed event
       asyncEntryLatch.countDown();
@@ -143,6 +148,21 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractReactiveProce
     } finally {
       TransactionCoordination.getInstance().unbindTransaction(transaction);
     }
+  }
+
+  @Test
+  @Ignore("Does this case actually make sense? Async has to run in an independent context, so propagation from the parent is not a wanted thing.")
+  public void subscriberContextPropagation() throws Exception {
+    final ContextPropagationChecker contextPropagationChecker = new ContextPropagationChecker();
+
+    async = createAsyncDelegateMessageProcessor(newChain(empty(), contextPropagationChecker, target), flow);
+    async.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    initialiseIfNeeded(async, true, muleContext);
+    async.start();
+
+    assertContextPropagation(testEvent(), async, contextPropagationChecker);
+    asyncEntryLatch.countDown();
+    assertThat(latch.await(LOCK_TIMEOUT, MILLISECONDS), is(true));
   }
 
   @Test

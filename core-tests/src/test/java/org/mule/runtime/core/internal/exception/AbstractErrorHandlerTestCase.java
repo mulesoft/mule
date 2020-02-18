@@ -40,7 +40,7 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
     this.verbose = verbose;
   }
 
-  @Parameters
+  @Parameters(name = "{0}")
   public static Collection<Object> data() {
     return asList(new VerboseExceptions(true),
                   new VerboseExceptions(false));

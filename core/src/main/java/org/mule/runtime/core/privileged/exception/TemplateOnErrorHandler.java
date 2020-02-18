@@ -9,11 +9,12 @@ package org.mule.runtime.core.privileged.exception;
 import static com.google.common.collect.ImmutableMap.of;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static java.lang.Runtime.getRuntime;
 import static java.util.Arrays.stream;
+import static java.util.Collections.newSetFromMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static java.util.function.Function.identity;
 import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
@@ -40,8 +41,8 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.ErrorHandlerNotification;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -57,8 +58,6 @@ import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContext;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
-import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
-import org.mule.runtime.core.internal.util.rx.TransactionAwareFluxSinkSupplier;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 
@@ -66,10 +65,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -114,19 +114,20 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   private boolean isLocalErrorHandlerLocation;
   private ComponentLocation location;
 
-  private Supplier<FluxSink<CoreEvent>> fluxFactory;
-  private Supplier<FluxSink<CoreEvent>> routingSink;
+  private Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>> fluxFactory;
 
-  private final class OnErrorHandlerFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
+  private final class OnErrorHandlerFluxObjectFactory
+      implements Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>>, Disposable {
 
     private final Optional<ProcessingStrategy> processingStrategy;
+    private final Set<FluxSink<CoreEvent>> fluxSinks = newSetFromMap(new ConcurrentHashMap<>());
 
     public OnErrorHandlerFluxObjectFactory(Optional<ProcessingStrategy> processingStrategy) {
       this.processingStrategy = processingStrategy;
     }
 
     @Override
-    public FluxSink<CoreEvent> get() {
+    public FluxSink<CoreEvent> apply(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> publisherPostProcessor) {
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
       Flux<CoreEvent> onErrorFlux = Flux.create(sinkRef).map(beforeRouting());
 
@@ -134,7 +135,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         onErrorFlux = onErrorFlux.compose(TemplateOnErrorHandler.this::route);
       }
 
-      onErrorFlux = onErrorFlux
+      onErrorFlux = Flux.from(publisherPostProcessor.apply(onErrorFlux
           .onErrorContinue(MessagingException.class, onRoutingError())
           .map(afterRouting())
           .doOnNext(result -> {
@@ -142,16 +143,23 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
             final String parameterId = getParameterId(result);
             fireEndNotification(ctx.getOriginalEvent(parameterId), result, ctx.getException(parameterId));
           })
-          .doOnNext(TemplateOnErrorHandler.this::resolveHandling);
+          .doOnNext(TemplateOnErrorHandler.this::resolveHandling)));
 
       if (processingStrategy.isPresent()) {
         processingStrategy.get().registerInternalSink(onErrorFlux, "error handler '" + getLocation().getLocation() + "'");
       } else {
         onErrorFlux.subscribe();
       }
-      return sinkRef.getFluxSink();
+      final FluxSink<CoreEvent> fluxSink = sinkRef.getFluxSink();
+      fluxSinks.add(fluxSink);
+      return fluxSink;
     }
 
+    @Override
+    public void dispose() {
+      fluxSinks.forEach(fs -> fs.complete());
+      fluxSinks.clear();
+    }
   }
 
   @Override
@@ -164,21 +172,26 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   @Override
-  public void routeError(Exception error, Consumer<CoreEvent> continueCallback,
-                         Consumer<Throwable> propagateCallback) {
-    // All calling methods will end up transforming any error class other than MessagingException into that one
-    MessagingException messagingError = (MessagingException) error;
-    CoreEvent failureEvent = messagingError.getEvent();
+  public Consumer<Exception> router(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> publisherPostProcessor,
+                                    Consumer<CoreEvent> continueCallback,
+                                    Consumer<Throwable> propagateCallback) {
+    FluxSink<CoreEvent> fluxSink = fluxFactory.apply(publisherPostProcessor);
 
-    ErrorHandlerContext ctx = ErrorHandlerContext.from(failureEvent);
+    return error -> {
+      // All calling methods will end up transforming any error class other than MessagingException into that one
+      MessagingException messagingError = (MessagingException) error;
+      CoreEvent failureEvent = messagingError.getEvent();
 
-    if (ctx == null) {
-      ctx = new ErrorHandlerContext();
-      failureEvent = quickCopy(failureEvent, of(ERROR_HANDLER_CONTEXT, ctx));
-    }
+      ErrorHandlerContext ctx = ErrorHandlerContext.from(failureEvent);
 
-    ctx.addContextItem(getParameterId(failureEvent), error, failureEvent, continueCallback, propagateCallback);
-    routingSink.get().next(failureEvent);
+      if (ctx == null) {
+        ctx = new ErrorHandlerContext();
+        failureEvent = quickCopy(failureEvent, of(ERROR_HANDLER_CONTEXT, ctx));
+      }
+
+      ctx.addContextItem(getParameterId(failureEvent), error, failureEvent, continueCallback, propagateCallback);
+      fluxSink.next(failureEvent);
+    };
   }
 
   @Override
@@ -187,8 +200,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private Mono<CoreEvent> applyInternal(final Exception exception) {
-    return Mono.create(sink -> routeError(exception, handledEvent -> sink.success(handledEvent),
-                                          rethrownError -> sink.error(rethrownError)));
+    return Mono.create(sink -> router(identity(), handledEvent -> sink.success(handledEvent),
+                                      rethrownError -> sink.error(rethrownError))
+                                          .accept(exception));
   }
 
   private void resolveHandling(CoreEvent result) {
@@ -215,7 +229,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private String getParameterId(CoreEvent event) {
-    return event.getContext().getId() + "_" + toString();
+    final String id = event.getContext().getId();
+    return (id != null ? id : "(null)").concat("_").concat(toString());
   }
 
   private BiConsumer<Throwable, Object> onRoutingError() {
@@ -315,16 +330,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   @Override
-  public void start() throws MuleException {
-    super.start();
-    routingSink =
-        new TransactionAwareFluxSinkSupplier<>(fluxFactory,
-                                               new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(), fluxFactory));
-  }
-
-  @Override
   public void dispose() {
-    disposeIfNeeded(routingSink, logger);
+    disposeIfNeeded(fluxFactory, LOGGER);
     super.dispose();
   }
 
@@ -414,7 +421,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private boolean acceptsExpression(CoreEvent event) {
-    return when.map(expr -> expressionManager.evaluateBoolean(expr, event, getLocation())).orElse(true);
+    return !when.isPresent() || when.map(expr -> expressionManager.evaluateBoolean(expr, event, getLocation())).orElse(true);
   }
 
   protected Function<CoreEvent, CoreEvent> afterRouting() {

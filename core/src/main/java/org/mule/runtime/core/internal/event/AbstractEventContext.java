@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.event;
 
+import static com.google.common.base.Functions.identity;
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Objects.requireNonNull;
@@ -174,8 +175,9 @@ abstract class AbstractEventContext implements BaseEventContext {
         LOGGER.debug("{} handling messaging exception.", this);
       }
 
-      exceptionHandler.routeError((MessagingException) throwable, handled -> success(handled),
-                                  rethrown -> responseDone(left(rethrown)));
+      exceptionHandler.router(identity(), handled -> success(handled),
+                              rethrown -> responseDone(left(rethrown)))
+          .accept((Exception) throwable);
     } else {
       responseDone(left(throwable));
     }

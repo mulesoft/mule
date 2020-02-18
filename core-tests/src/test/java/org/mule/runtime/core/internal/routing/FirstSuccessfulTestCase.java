@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
@@ -16,9 +15,8 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
+import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
 
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -32,10 +30,12 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-import org.mule.runtime.core.privileged.routing.CouldNotRouteOutboundMessageException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.processor.ContextPropagationChecker;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
@@ -73,6 +73,15 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     fs.initialise();
     expectedException.expect(NullPointerException.class);
     fs.process(testEvent());
+  }
+
+  @Test
+  public void subscriberContextPropagation() throws Exception {
+    final ContextPropagationChecker contextPropagationChecker = new ContextPropagationChecker();
+
+    FirstSuccessful fs = createFirstSuccessfulRouter(contextPropagationChecker);
+
+    assertContextPropagation(testEvent(), fs, contextPropagationChecker);
   }
 
   private FirstSuccessful createFirstSuccessfulRouter(Processor... processors) throws Exception {

@@ -35,8 +35,12 @@ import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAccep
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 
@@ -95,22 +99,30 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   @Override
-  public void routeError(Exception error, Consumer<CoreEvent> continueCallback,
-                         Consumer<Throwable> propagateCallback) {
-    MessagingException messagingError = (MessagingException) error;
-    CoreEvent event = messagingError.getEvent();
-    try {
-      for (MessagingExceptionHandlerAcceptor errorListener : exceptionListeners) {
-        if (errorListener.accept(event)) {
-          errorListener.routeError(error, continueCallback, propagateCallback);
-          return;
-        }
-      }
-      throw new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE));
-    } catch (Exception e) {
-      propagateCallback.accept(messagingExceptionResolver.resolve(new MessagingException(event, e, this),
-                                                                  errorTypeLocator, exceptionContextProviders));
+  public Consumer<Exception> router(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> publisherPostProcessor,
+                                    Consumer<CoreEvent> continueCallback, Consumer<Throwable> propagateCallback) {
+    Map<MessagingExceptionHandlerAcceptor, Consumer<Exception>> routers = new HashMap<>();
+
+    for (MessagingExceptionHandlerAcceptor errorListener : exceptionListeners) {
+      routers.put(errorListener, errorListener.router(publisherPostProcessor, continueCallback, propagateCallback));
     }
+
+    return error -> {
+      MessagingException messagingError = (MessagingException) error;
+      CoreEvent event = messagingError.getEvent();
+      try {
+        for (MessagingExceptionHandlerAcceptor errorListener : exceptionListeners) {
+          if (errorListener.accept(event)) {
+            routers.get(errorListener).accept(error);
+            return;
+          }
+        }
+        throw new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE));
+      } catch (Exception e) {
+        propagateCallback.accept(messagingExceptionResolver.resolve(new MessagingException(event, e, this),
+                                                                    errorTypeLocator, exceptionContextProviders));
+      }
+    };
   }
 
   @Override
@@ -201,7 +213,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   public void setExceptionListeners(List<MessagingExceptionHandlerAcceptor> exceptionListeners) {
-    this.exceptionListeners = exceptionListeners;
+    this.exceptionListeners = new CopyOnWriteArrayList<>(exceptionListeners);
   }
 
   public List<MessagingExceptionHandlerAcceptor> getExceptionListeners() {

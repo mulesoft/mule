@@ -20,8 +20,10 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -30,6 +32,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
+import org.mule.tck.processor.ContextPropagationChecker;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
 import java.util.Map;
@@ -142,6 +145,29 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
     thrown.expectCause(instanceOf(ExpressionRuntimeException.class));
     thrown.expectCause(hasMessage(containsString("evaluating expression: \"wat\"")));
     process(choiceRouter, zapEvent());
+  }
+
+  @Test
+  public void subscriberContextPropagation() throws MuleException {
+    final ContextPropagationChecker contextPropagationChecker = new ContextPropagationChecker();
+
+    MessageProcessorChain mp = newChain(empty(), contextPropagationChecker);
+    choiceRouter.addRoute(payloadZapExpression(), mp);
+    initialise();
+
+    assertContextPropagation(zapEvent(), choiceRouter, contextPropagationChecker);
+  }
+
+  @Test
+  public void subscriberContextPropagationDefaultRoute() throws MuleException {
+    final ContextPropagationChecker contextPropagationChecker = new ContextPropagationChecker();
+
+    MessageProcessorChain mp = newChain(empty(), contextPropagationChecker);
+    choiceRouter.addRoute(payloadZapExpression(), event -> event);
+    choiceRouter.setDefaultRoute(mp);
+    initialise();
+
+    assertContextPropagation(fooEvent(), choiceRouter, contextPropagationChecker);
   }
 
   private void initialise() throws InitialisationException {
