@@ -216,7 +216,9 @@ public class ExceptionUtils {
    * @param <E> the generic type of the expected exception
    * @return a value returned by either the {@code callable} or the {@code exceptionHandler}
    * @throws E if the expected exception is actually thrown
+   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually instead
    */
+  @Deprecated
   public static <T, E extends Exception> T tryExpecting(Class<E> expectedExceptionType, Callable<T> callable,
                                                         ExceptionHandler<T, E> exceptionHandler)
       throws E {
@@ -249,7 +251,9 @@ public class ExceptionUtils {
    * @param <T> the generic type of the return value
    * @param <E> the generic type of the expected exception
    * @throws E if the expected exception is actually thrown
+   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually instead
    */
+  @Deprecated
   public static <T, E extends Exception> void tryExpecting(Class<E> expectedExceptionType, Runnable runnable,
                                                            ExceptionHandler<T, E> exceptionHandler)
       throws E {

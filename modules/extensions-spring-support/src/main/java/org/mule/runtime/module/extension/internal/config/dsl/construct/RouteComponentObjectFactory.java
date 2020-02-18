@@ -7,8 +7,9 @@
 package org.mule.runtime.module.extension.internal.config.dsl.construct;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.api.util.func.Once.of;
+
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
@@ -63,7 +64,10 @@ public class RouteComponentObjectFactory extends AbstractExtensionObjectFactory<
 
   @Override
   public Object doGetObject() throws Exception {
-    return withContextClassLoader(classLoader, () -> {
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, classLoader);
+    try {
       initialiser.runOnce();
 
       if (nestedProcessors != null) {
@@ -78,8 +82,8 @@ public class RouteComponentObjectFactory extends AbstractExtensionObjectFactory<
       resolveParameterGroups(objectType, builder);
 
       return new ObjectBuilderValueResolver<>(builder, muleContext);
-    }, Exception.class, exception -> {
-      throw exception;
-    });
+    } finally {
+      setContextClassLoader(thread, classLoader, currentClassLoader);
+    }
   }
 }

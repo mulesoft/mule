@@ -9,9 +9,8 @@ package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 import static java.lang.Thread.currentThread;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.util.LazyValue;
@@ -66,7 +65,10 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
 
   @Override
   public Object doGetObject() throws Exception {
-    return withContextClassLoader(classLoader, () -> {
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, classLoader);
+    try {
       // TODO MULE-10919 - This logic is similar to that of the resolverset object builder and should
       // be generalized
 
@@ -81,7 +83,7 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
         return resolver;
       }
 
-      CoreEvent initialiserEvent = getInitialiserEvent(muleContext);
+      CoreEvent initialiserEvent = getNullEvent(muleContext);
       try (ValueResolvingContext ctx = ValueResolvingContext.builder(initialiserEvent, expressionManager).build()) {
         staticProduct = resolver.resolve(ctx);
         muleContext.getInjector().inject(staticProduct);
@@ -91,9 +93,9 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
           ((BaseEventContext) initialiserEvent.getContext()).success();
         }
       }
-    }, Exception.class, exception -> {
-      throw exception;
-    });
+    } finally {
+      setContextClassLoader(thread, classLoader, currentClassLoader);
+    }
   }
 
   private void injectFields() {

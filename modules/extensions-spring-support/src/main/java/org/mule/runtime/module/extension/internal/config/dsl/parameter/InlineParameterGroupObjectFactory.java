@@ -7,8 +7,9 @@
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.api.util.func.Once.of;
+
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -53,7 +54,10 @@ public class InlineParameterGroupObjectFactory extends AbstractExtensionObjectFa
 
   @Override
   public Object doGetObject() throws Exception {
-    return withContextClassLoader(classLoader, () -> {
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, classLoader);
+    try {
       initialiser.runOnce();
 
       // TODO MULE-10919 - This logic is similar to that of the resolverset object builder and should
@@ -62,8 +66,8 @@ public class InlineParameterGroupObjectFactory extends AbstractExtensionObjectFa
       resolveParameterGroups(objectType, builder);
 
       return new ObjectBuilderValueResolver<>(builder, muleContext);
-    }, Exception.class, exception -> {
-      throw exception;
-    });
+    } finally {
+      setContextClassLoader(thread, classLoader, currentClassLoader);
+    }
   }
 }

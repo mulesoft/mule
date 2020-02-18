@@ -10,6 +10,7 @@ import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
@@ -232,17 +233,18 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     }
   }
 
-  private void executeCommand(CompletableComponentExecutor<M> executor, ExecutionContextAdapter<M> context,
+  private void executeCommand(CompletableComponentExecutor<M> executor,
+                              ExecutionContextAdapter<M> context,
                               ExecutorCallback callback) {
     Throwable t = interceptorChain.before(context, callback);
     if (t == null) {
       final Thread currentThread = Thread.currentThread();
       final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-      currentThread.setContextClassLoader(extensionClassLoader);
+      setContextClassLoader(currentThread, currentClassLoader, extensionClassLoader);
       try {
         executor.execute(context, callback);
       } finally {
-        currentThread.setContextClassLoader(currentClassLoader);
+        setContextClassLoader(currentThread, extensionClassLoader, currentClassLoader);
       }
     }
   }

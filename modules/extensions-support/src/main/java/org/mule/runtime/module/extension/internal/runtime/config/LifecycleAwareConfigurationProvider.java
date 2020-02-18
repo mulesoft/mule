@@ -12,7 +12,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -79,17 +78,23 @@ public abstract class LifecycleAwareConfigurationProvider extends AbstractCompon
    */
   @Override
   public void initialise() throws InitialisationException {
-    withContextClassLoader(extensionClassLoader, () -> {
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, extensionClassLoader);
+    try {
       lifecycleManager.fireInitialisePhase((phaseName, object) -> {
         for (ConfigurationInstance configurationInstance : configurationInstances) {
           initialiseIfNeeded(configurationInstance, true, muleContext);
         }
         doInitialise();
       });
-      return null;
-    }, InitialisationException.class, e -> {
+    } catch (InitialisationException e) {
+      throw e;
+    } catch (MuleException e) {
       throw new InitialisationException(e, this);
-    });
+    } finally {
+      setContextClassLoader(thread, extensionClassLoader, currentClassLoader);
+    }
   }
 
   /**
@@ -104,16 +109,20 @@ public abstract class LifecycleAwareConfigurationProvider extends AbstractCompon
    */
   @Override
   public void start() throws MuleException {
-    withContextClassLoader(extensionClassLoader, () -> {
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, extensionClassLoader);
+    try {
       lifecycleManager.fireStartPhase((phaseName, object) -> {
         for (ConfigurationInstance configurationInstance : configurationInstances) {
           startConfig(configurationInstance);
         }
       });
-      return null;
-    }, MuleException.class, e -> {
+    } catch (MuleException e) {
       throw new DefaultMuleException(e);
-    });
+    } finally {
+      setContextClassLoader(thread, extensionClassLoader, currentClassLoader);
+    }
   }
 
   /**
@@ -123,16 +132,20 @@ public abstract class LifecycleAwareConfigurationProvider extends AbstractCompon
    */
   @Override
   public void stop() throws MuleException {
-    withContextClassLoader(extensionClassLoader, () -> {
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, extensionClassLoader);
+    try {
       lifecycleManager.fireStopPhase((phaseName, object) -> {
         for (ConfigurationInstance configurationInstance : configurationInstances) {
           stopIfNeeded(configurationInstance);
         }
       });
-      return null;
-    }, MuleException.class, e -> {
+    } catch (MuleException e) {
       throw new DefaultMuleException(e);
-    });
+    } finally {
+      setContextClassLoader(thread, extensionClassLoader, currentClassLoader);
+    }
   }
 
   /**

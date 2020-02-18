@@ -7,22 +7,20 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.connection.AbstractConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.retry.HasReconnectionConfig;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 
 import java.util.Optional;
-import java.util.concurrent.Callable;
 
 /**
  * An {@link ConnectionProviderWrapper} which makes sure that all delegate methods are executed with a given {@link #classLoader}
@@ -46,7 +44,7 @@ public class ClassLoaderConnectionProviderWrapper<C> extends AbstractConnectionP
         : new ClassLoaderConnectionProviderWrapper<>(provider, classLoader);
   }
 
-  private final ClassLoader classLoader;
+  protected final ClassLoader classLoader;
 
   private ClassLoaderConnectionProviderWrapper(ConnectionProvider<C> provider, ClassLoader classLoader) {
     super(provider);
@@ -55,37 +53,86 @@ public class ClassLoaderConnectionProviderWrapper<C> extends AbstractConnectionP
 
   @Override
   public C connect() throws ConnectionException {
-    return onClassLoader(() -> getDelegate().connect(), ConnectionException.class);
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, classLoader);
+    try {
+      return getDelegate().connect();
+    } finally {
+      setContextClassLoader(thread, classLoader, currentClassLoader);
+    }
   }
 
   @Override
   public ConnectionValidationResult validate(C connection) {
-    return onClassLoader(() -> getDelegate().validate(connection));
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, classLoader);
+    try {
+      return getDelegate().validate(connection);
+    } finally {
+      setContextClassLoader(thread, classLoader, currentClassLoader);
+    }
   }
 
   @Override
   public void disconnect(C connection) {
-    onClassLoader(() -> getDelegate().disconnect(connection));
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, classLoader);
+    try {
+      getDelegate().disconnect(connection);
+    } finally {
+      setContextClassLoader(thread, classLoader, currentClassLoader);
+    }
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    onClassLoader(super::initialise, InitialisationException.class);
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, classLoader);
+    try {
+      super.initialise();
+    } finally {
+      setContextClassLoader(thread, classLoader, currentClassLoader);
+    }
   }
 
   @Override
   public void start() throws MuleException {
-    onClassLoader(super::start, MuleException.class);
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, classLoader);
+    try {
+      super.start();
+    } finally {
+      setContextClassLoader(thread, classLoader, currentClassLoader);
+    }
   }
 
   @Override
   public void stop() throws MuleException {
-    onClassLoader(super::stop, MuleException.class);
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, classLoader);
+    try {
+      super.stop();
+    } finally {
+      setContextClassLoader(thread, classLoader, currentClassLoader);
+    }
   }
 
   @Override
   public void dispose() {
-    onClassLoader(super::dispose);
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, classLoader);
+    try {
+      super.dispose();
+    } finally {
+      setContextClassLoader(thread, classLoader, currentClassLoader);
+    }
   }
 
   @Override
@@ -95,27 +142,6 @@ public class ClassLoaderConnectionProviderWrapper<C> extends AbstractConnectionP
       return ((HasReconnectionConfig) delegate).getReconnectionConfig();
     }
     return Optional.empty();
-  }
-
-  protected void onClassLoader(CheckedRunnable runnable) {
-    onClassLoader(runnable, RuntimeException.class);
-  }
-
-  private <T> T onClassLoader(Callable<T> callable) {
-    return onClassLoader(callable, RuntimeException.class);
-  }
-
-  private <E extends Exception> void onClassLoader(CheckedRunnable runnable, Class<E> expectedException) throws E {
-    onClassLoader(() -> {
-      runnable.run();
-      return null;
-    }, expectedException);
-  }
-
-  private <T, E extends Exception> T onClassLoader(Callable<T> callable, Class<E> expectedException) throws E {
-    return withContextClassLoader(classLoader, callable, expectedException, e -> {
-      throw new MuleRuntimeException(e);
-    });
   }
 
   private static class PoolingClassLoaderConnectionProviderWrapper<C> extends ClassLoaderConnectionProviderWrapper<C> implements
@@ -128,12 +154,26 @@ public class ClassLoaderConnectionProviderWrapper<C> extends AbstractConnectionP
 
     @Override
     public void onBorrow(C connection) {
-      onClassLoader(() -> getPoolingDelegate().onBorrow(connection));
+      Thread thread = Thread.currentThread();
+      ClassLoader currentClassLoader = thread.getContextClassLoader();
+      setContextClassLoader(thread, currentClassLoader, classLoader);
+      try {
+        getPoolingDelegate().onBorrow(connection);
+      } finally {
+        setContextClassLoader(thread, classLoader, currentClassLoader);
+      }
     }
 
     @Override
     public void onReturn(C connection) {
-      onClassLoader(() -> getPoolingDelegate().onReturn(connection));
+      Thread thread = Thread.currentThread();
+      ClassLoader currentClassLoader = thread.getContextClassLoader();
+      setContextClassLoader(thread, currentClassLoader, classLoader);
+      try {
+        getPoolingDelegate().onReturn(connection);
+      } finally {
+        setContextClassLoader(thread, classLoader, currentClassLoader);
+      }
     }
 
     private PoolingConnectionProvider<C> getPoolingDelegate() {

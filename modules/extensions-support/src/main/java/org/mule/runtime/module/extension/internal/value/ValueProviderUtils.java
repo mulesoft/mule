@@ -8,14 +8,14 @@ package org.mule.runtime.module.extension.internal.value;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.extension.api.values.ValueBuilder;
 import org.mule.runtime.extension.api.values.ValueProvider;
@@ -98,17 +98,18 @@ public class ValueProviderUtils {
    */
   public static Set<Value> valuesWithClassLoader(Callable<Set<Value>> valueResolver, ExtensionModel extensionModel)
       throws ValueResolvingException {
-    Reference<ValueResolvingException> exceptionReference = new Reference<>();
-    Set<Value> values =
-        withContextClassLoader(getClassLoader(extensionModel), valueResolver, ValueResolvingException.class, (e) -> {
-          exceptionReference.set((ValueResolvingException) e);
-          return null;
-        });
-
-    if (exceptionReference.get() != null) {
-      throw exceptionReference.get();
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    ClassLoader extensionClassLoader = getClassLoader(extensionModel);
+    setContextClassLoader(thread, currentClassLoader, extensionClassLoader);
+    try {
+      return valueResolver.call();
+    } catch (ValueResolvingException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new MuleRuntimeException(e);
+    } finally {
+      setContextClassLoader(thread, extensionClassLoader, currentClassLoader);
     }
-
-    return values;
   }
 }

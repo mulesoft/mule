@@ -853,7 +853,7 @@ public class ClassUtils {
    *
    * @param classLoader the context {@link ClassLoader} on which the {@code runnable} should be executed
    * @param runnable a closure
-   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually instead
+   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually using {@link #setContextClassLoader(Thread, ClassLoader, ClassLoader)} instead
    */
   @Deprecated
   public static void withContextClassLoader(ClassLoader classLoader, Runnable runnable) {
@@ -875,7 +875,7 @@ public class ClassUtils {
    * @param classLoader the context {@link ClassLoader} on which the {@code runnable} should be executed
    * @param callable a {@link Callable}
    * @return the value that the {@code callable} produced
-   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually instead
+   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually using {@link #setContextClassLoader(Thread, ClassLoader, ClassLoader)} instead
    */
   @Deprecated
   public static <T> T withContextClassLoader(ClassLoader classLoader, Callable<T> callable) {
@@ -903,7 +903,7 @@ public class ClassUtils {
    * @param <T> the generic type of the return value
    * @param <E> the generic type of the expected exception
    * @throws E if the expected exception is actually thrown
-   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually instead
+   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually using {@link #setContextClassLoader(Thread, ClassLoader, ClassLoader)} instead
    */
   @Deprecated
   public static <T, E extends Exception> void withContextClassLoader(ClassLoader classLoader, Runnable runnable,
@@ -944,7 +944,7 @@ public class ClassUtils {
    * @param <E> the generic type of the expected exception
    * @return a value returned by either the {@code callable} or the {@code exceptionHandler}
    * @throws E if the expected exception is actually thrown
-   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually instead
+   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually using {@link #setContextClassLoader(Thread, ClassLoader, ClassLoader)} instead
    */
   @Deprecated
   public static <T, E extends Exception> T withContextClassLoader(ClassLoader classLoader, Callable<T> callable,

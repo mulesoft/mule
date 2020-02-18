@@ -18,7 +18,6 @@ import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.ne
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
@@ -251,12 +250,16 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    */
   @Override
   public final void start() throws MuleException {
-    withContextClassLoader(classLoader, () -> {
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, classLoader);
+    try {
       doStart();
-      return null;
-    }, MuleException.class, e -> {
+    } catch (MuleException e) {
       throw new DefaultMuleException(e);
-    });
+    } finally {
+      setContextClassLoader(thread, classLoader, currentClassLoader);
+    }
   }
 
   /**
@@ -266,12 +269,16 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    */
   @Override
   public final void stop() throws MuleException {
-    withContextClassLoader(classLoader, () -> {
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, classLoader);
+    try {
       doStop();
-      return null;
-    }, MuleException.class, e -> {
+    } catch (MuleException e) {
       throw new DefaultMuleException(e);
-    });
+    } finally {
+      setContextClassLoader(thread, classLoader, currentClassLoader);
+    }
   }
 
   /**

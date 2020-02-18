@@ -127,9 +127,8 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
         registry.registerObject(MOCK_HTTP_SERVICE, mock(HttpService.class));
       }
 
-      overriddenDefaultServices.forEach((serviceId, serviceImpl) ->
-                                            (muleContext).getCustomizationService()
-                                                .overrideDefaultServiceImpl(serviceId, serviceImpl));
+      overriddenDefaultServices.forEach((serviceId, serviceImpl) -> (muleContext).getCustomizationService()
+          .overrideDefaultServiceImpl(serviceId, serviceImpl));
 
       registry.registerObjects(additionalMockedServices);
     } catch (RegistrationException e) {
