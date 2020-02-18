@@ -16,7 +16,6 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALW
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NONE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
@@ -85,7 +84,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -194,19 +192,6 @@ public class MuleExtensionUtils {
   public static ClassLoader getClassLoader(ExtensionModel extensionModel) {
     return extensionModel.getModelProperty(ClassLoaderModelProperty.class).map(ClassLoaderModelProperty::getClassLoader)
         .orElse(currentThread().getContextClassLoader());
-  }
-
-  /**
-   * Executes the given {@code callable} using the {@link ClassLoader} associated to the {@code extensionModel}
-   *
-   * @param extensionModel a {@link ExtensionModel}
-   * @param callable       a {@link Callable}
-   * @param <T>            the generic type of the {@code callable}'s return type
-   * @return the value returned by the {@code callable}
-   * @throws Exception if the {@code callable} fails to execute
-   */
-  public static <T> T withExtensionClassLoader(ExtensionModel extensionModel, Callable<T> callable) throws Exception {
-    return withContextClassLoader(getClassLoader(extensionModel), callable);
   }
 
   /**

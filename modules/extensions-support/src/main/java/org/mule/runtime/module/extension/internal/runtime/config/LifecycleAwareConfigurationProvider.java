@@ -11,9 +11,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -138,17 +140,19 @@ public abstract class LifecycleAwareConfigurationProvider extends AbstractCompon
    */
   @Override
   public void dispose() {
+    Thread currentThread = Thread.currentThread();
+    ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+    setContextClassLoader(currentThread, currentClassLoader, extensionClassLoader);
     try {
-      withContextClassLoader(extensionClassLoader, () -> {
         lifecycleManager.fireDisposePhase((phaseName, object) -> {
           for (ConfigurationInstance configurationInstance : configurationInstances) {
             disposeIfNeeded(configurationInstance, LOGGER);
           }
         });
-        return null;
-      });
     } catch (Exception e) {
       LOGGER.error("Could not dispose configuration provider of name " + getName(), e);
+    } finally {
+      setContextClassLoader(currentThread, extensionClassLoader, currentClassLoader);
     }
   }
 

@@ -8,22 +8,21 @@
 package org.mule.test.runner.api;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+
 import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
 import org.mule.runtime.api.deployment.meta.MuleServiceModel;
 import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerializer;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.service.api.discoverer.ImmutableServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
-import org.mule.runtime.module.service.api.discoverer.ImmutableServiceAssembly;
 
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -80,16 +79,15 @@ public class IsolatedServiceProviderDiscoverer implements ServiceProviderDiscove
 
   private ServiceProvider instantiateServiceProvider(ClassLoader classLoader, String className) throws ServiceResolutionError {
     Object reflectedObject;
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, classLoader);
     try {
-      reflectedObject = withContextClassLoader(classLoader, () -> {
-        try {
-          return ClassUtils.instantiateClass(className);
-        } catch (Exception e) {
-          throw new MuleRuntimeException(createStaticMessage("Unable to create service from class: " + className), e);
-        }
-      });
-    } catch (RuntimeException e) {
+      reflectedObject = instantiateClass(className);
+    } catch (Exception e) {
       throw new ServiceResolutionError(e.getMessage(), e);
+    } finally {
+      setContextClassLoader(thread, classLoader, currentClassLoader);
     }
 
     if (!(reflectedObject instanceof ServiceProvider)) {
@@ -99,5 +97,4 @@ public class IsolatedServiceProviderDiscoverer implements ServiceProviderDiscove
 
     return (ServiceProvider) reflectedObject;
   }
-
 }

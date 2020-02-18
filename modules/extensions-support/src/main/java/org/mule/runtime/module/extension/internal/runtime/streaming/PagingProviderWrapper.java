@@ -8,12 +8,11 @@ package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static java.util.Optional.empty;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,12 +34,12 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
   private static final Logger LOGGER = getLogger(PagingProviderWrapper.class);
 
   private final PagingProvider<C, T> delegate;
-  private final ExtensionModel extensionModel;
+  private final ClassLoader extensionClassLoader;
   private AtomicBoolean closed = new AtomicBoolean(false);
 
-  public PagingProviderWrapper(PagingProvider<C, T> delegate, ExtensionModel extensionModel) {
+  public PagingProviderWrapper(PagingProvider<C, T> delegate, ClassLoader extensionClassLoader) {
     this.delegate = delegate;
-    this.extensionModel = extensionModel;
+    this.extensionClassLoader = extensionClassLoader;
   }
 
   /**
@@ -72,9 +71,12 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
       return null;
     }
 
-    List<T> page = withContextClassLoader(MuleExtensionUtils.getClassLoader(extensionModel), () -> {
-      List<T> delegatePage = delegate.getPage(connection);
-      if (isEmpty(delegatePage)) {
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, extensionClassLoader);
+    try {
+      List<T> page = delegate.getPage(connection);
+      if (isEmpty(page)) {
         try {
           if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Empty page was obtained. Closing delegate since this means that the data source has been consumed");
@@ -84,10 +86,11 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
           handleCloseException(e);
         }
       }
-      return delegatePage;
-    });
 
-    return page;
+      return page;
+    } finally {
+      setContextClassLoader(thread, extensionClassLoader, currentClassLoader);
+    }
   }
 
   @Override

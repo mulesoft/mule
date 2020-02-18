@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
@@ -53,11 +53,16 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
     ClassLoader classLoader = loadingContext.getExtensionClassLoader();
     try (InputStream resource = classLoader.getResourceAsStream("META-INF/" + serializer.getFileName(name))) {
       if (resource != null) {
-        XmlExtensionDocumentation documenter = withContextClassLoader(
-                                                                      ExtensionDescriptionsEnricher.class
-                                                                          .getClassLoader(),
-                                                                      () -> serializer
-                                                                          .deserialize(IOUtils.toString(resource)));
+        XmlExtensionDocumentation documenter;
+        Thread thread = Thread.currentThread();
+        ClassLoader currentClassLoader = thread.getContextClassLoader();
+        ClassLoader contextClassLoader = ExtensionDescriptionsEnricher.class.getClassLoader();
+        setContextClassLoader(thread, currentClassLoader, contextClassLoader);
+        try {
+          documenter = serializer.deserialize(IOUtils.toString(resource));
+        } finally {
+          setContextClassLoader(thread, contextClassLoader, currentClassLoader);
+        }
         document(loadingContext.getExtensionDeclarer().getDeclaration(), documenter);
       }
     } catch (IOException e) {

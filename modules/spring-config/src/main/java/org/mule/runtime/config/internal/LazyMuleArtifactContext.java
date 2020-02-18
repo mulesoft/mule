@@ -37,7 +37,7 @@ import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZ
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore.SHARED_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
@@ -351,7 +351,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                         boolean applyStartPhase,
                                         Optional<ComponentModelInitializerAdapter> parentComponentModelInitializerAdapter) {
     checkState(predicateOptional.isPresent() != locationOptional.isPresent(), "predicate or location has to be passed");
-    return withContextClassLoader(getMuleContext().getExecutionClassLoader(), () -> {
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    ClassLoader executionClassLoader = getMuleContext().getExecutionClassLoader();
+    setContextClassLoader(thread, currentClassLoader, executionClassLoader);
+
+    try {
       // User input components to be initialized...
       final Predicate<ComponentAst> basePredicate =
           predicateOptional.orElseGet(() -> comp -> comp.getLocation() != null &&
@@ -377,17 +382,17 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           componentModel -> beanDefinitionFactory.isLanguageConstructComponent(componentModel.getIdentifier());
 
       final ArtifactAst minimalApplicationModel = graph.minimalArtifactFor(basePredicate
-          .or(txManagerPredicate)
-          .or(configPredicate)
-          .or(alwaysEnabledPredicate)
-          .or(languageConstructPredicate));
+                                                                               .or(txManagerPredicate)
+                                                                               .or(configPredicate)
+                                                                               .or(alwaysEnabledPredicate)
+                                                                               .or(languageConstructPredicate));
 
       if (locationOptional.map(loc -> minimalApplicationModel.recursiveStream()
           .noneMatch(comp -> comp.getLocation() != null
               && comp.getLocation().getLocation().equals(loc.toString())))
           .orElse(false)) {
         throw new NoSuchComponentModelException(createStaticMessage("No object found at location "
-            + locationOptional.get().toString()));
+                                                                        + locationOptional.get().toString()));
       }
 
       Set<String> requestedLocations = locationOptional.map(location -> (Set<String>) newHashSet(location.toString()))
@@ -437,7 +442,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       super.prepareObjectProviders();
 
       return createBeans(applicationComponents);
-    });
+    } finally {
+      setContextClassLoader(thread, executionClassLoader, currentClassLoader);
+    }
   }
 
   /**

@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -78,19 +78,24 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   }
 
   public P build() {
-    return withContextClassLoader(getClassLoader(extensionModel), () -> {
-      try {
-        final ExtensionManager extensionManager = muleContext.getExtensionManager();
-        final ResolverSet operationArguments = getArgumentsResolverSet();
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    ClassLoader extensionClassLoader = getClassLoader(extensionModel);
+    setContextClassLoader(thread, currentClassLoader, extensionClassLoader);
 
-        P processor = createMessageProcessor(extensionManager, operationArguments);
-        // TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically
-        muleContext.getInjector().inject(processor);
-        return processor;
-      } catch (Exception e) {
-        throw new MuleRuntimeException(e);
-      }
-    });
+    try {
+      final ExtensionManager extensionManager = muleContext.getExtensionManager();
+      final ResolverSet operationArguments = getArgumentsResolverSet();
+
+      P processor = createMessageProcessor(extensionManager, operationArguments);
+      // TODO: MULE-5002 this should not be necessary but lifecycle issues when injecting message processors automatically
+      muleContext.getInjector().inject(processor);
+      return processor;
+    } catch (Exception e) {
+      throw new MuleRuntimeException(e);
+    } finally {
+      setContextClassLoader(thread, extensionClassLoader, currentClassLoader);
+    }
   }
 
   protected abstract P createMessageProcessor(ExtensionManager extensionManager, ResolverSet operationArguments);

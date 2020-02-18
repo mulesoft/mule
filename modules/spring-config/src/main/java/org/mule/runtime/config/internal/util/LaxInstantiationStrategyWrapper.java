@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.internal.util;
 
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 
 import org.mule.runtime.config.internal.OptionalObjectsController;
 import org.mule.runtime.config.internal.processor.DiscardedOptionalBeanPostProcessor;
@@ -26,8 +26,8 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
  * <p/>
  * This object delegates actual instantiation into a {@code delegate} which it wraps
  *
- * @since 3.7.0
  * @see DiscardedOptionalBeanPostProcessor
+ * @since 3.7.0
  */
 public class LaxInstantiationStrategyWrapper implements InstantiationStrategy {
 
@@ -42,13 +42,17 @@ public class LaxInstantiationStrategyWrapper implements InstantiationStrategy {
   @Override
   public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner) throws BeansException {
     // TODO MULE-10002 - review approach to load the internal classes of the extensions when using them in the parsers.
-    return withContextClassLoader(getClassLoader(bd), () -> {
-      try {
-        return delegate.instantiate(bd, beanName, owner);
-      } catch (BeansException e) {
-        return failIfNotOptional(e, beanName);
-      }
-    });
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    ClassLoader beanClassLoader = getClassLoader(bd);
+    setContextClassLoader(thread, currentClassLoader, beanClassLoader);
+    try {
+      return delegate.instantiate(bd, beanName, owner);
+    } catch (BeansException e) {
+      return failIfNotOptional(e, beanName);
+    } finally {
+      setContextClassLoader(thread, beanClassLoader, currentClassLoader);
+    }
   }
 
   private ClassLoader getClassLoader(RootBeanDefinition bd) {
@@ -62,26 +66,34 @@ public class LaxInstantiationStrategyWrapper implements InstantiationStrategy {
   @Override
   public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner, Constructor<?> ctor, Object... args)
       throws BeansException {
-    return withContextClassLoader(getClassLoader(bd), () -> {
-      try {
-        return delegate.instantiate(bd, beanName, owner, ctor, args);
-      } catch (BeansException e) {
-        return failIfNotOptional(e, beanName);
-      }
-    });
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    ClassLoader beanClassLoader = getClassLoader(bd);
+    setContextClassLoader(thread, currentClassLoader, beanClassLoader);
+    try {
+      return delegate.instantiate(bd, beanName, owner, ctor, args);
+    } catch (BeansException e) {
+      return failIfNotOptional(e, beanName);
+    } finally {
+      setContextClassLoader(thread, beanClassLoader, currentClassLoader);
+    }
   }
 
   @Override
   public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner, Object factoryBean, Method factoryMethod,
                             Object... args)
       throws BeansException {
-    return withContextClassLoader(getClassLoader(bd), () -> {
-      try {
-        return delegate.instantiate(bd, beanName, owner, factoryBean, factoryMethod, args);
-      } catch (BeansException e) {
-        return failIfNotOptional(e, beanName);
-      }
-    });
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    ClassLoader beanClassLoader = getClassLoader(bd);
+    setContextClassLoader(thread, currentClassLoader, beanClassLoader);
+    try {
+      return delegate.instantiate(bd, beanName, owner, factoryBean, factoryMethod, args);
+    } catch (BeansException e) {
+      return failIfNotOptional(e, beanName);
+    } finally {
+      setContextClassLoader(thread, beanClassLoader, currentClassLoader);
+    }
   }
 
   private Object failIfNotOptional(BeansException exception, String beanName) throws BeansException {

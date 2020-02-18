@@ -21,6 +21,7 @@ import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -45,7 +46,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
                                 ConfigurationInstance config,
                                 ExecutionContextAdapter executionContext,
                                 ExtensionConnectionSupplier connectionSupplier) {
-    this.delegate = new PagingProviderWrapper(delegate, executionContext.getExtensionModel());
+    this.delegate = new PagingProviderWrapper(delegate, MuleExtensionUtils.getClassLoader(executionContext.getExtensionModel()));
     this.config = config;
     this.executionContext = executionContext;
     this.connectionSupplier = connectionSupplier;

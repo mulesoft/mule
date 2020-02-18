@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -16,6 +17,7 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIG
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
@@ -191,15 +193,19 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
           .map(p -> (CursorProviderFactory) streamingManager.forObjects().getDefaultCursorProviderFactory())
           .orElseGet(() -> streamingManager.forBytes().getDefaultCursorProviderFactory());
     }
-    withContextClassLoader(classLoader, () -> {
+    Thread currentThread = Thread.currentThread();
+    ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+    setContextClassLoader(currentThread, currentClassLoader, classLoader);
+    try {
       validateConfigurationProviderIsNotExpression();
       initConfigurationResolver();
       findConfigurationProvider().ifPresent(this::validateOperationConfiguration);
       doInitialise();
-      return null;
-    }, InitialisationException.class, e -> {
+    } catch (InitialisationException e) {
       throw new InitialisationException(e, this);
-    });
+    } finally {
+      setContextClassLoader(currentThread, classLoader, currentClassLoader);
+    }
 
     setCacheIdGenerator();
   }
@@ -225,9 +231,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
         ConfigurationInstance instance = configurationProvider.get().get(event);
         if (instance == null) {
           throw new IllegalModelDefinitionException(format(
-                                                           "Root component '%s' contains a reference to config '%s' but it doesn't exists",
-                                                           getLocation().getRootContainerName(),
-                                                           configurationProvider));
+              "Root component '%s' contains a reference to config '%s' but it doesn't exists",
+              getLocation().getRootContainerName(),
+              configurationProvider));
         }
 
         return of(instance);
@@ -273,13 +279,15 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    */
   @Override
   public final void dispose() {
+    Thread thread = currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, classLoader);
     try {
-      withContextClassLoader(classLoader, () -> {
-        doDispose();
-        return null;
-      });
+      doDispose();
     } catch (Exception e) {
       LOGGER.warn("Exception found trying to dispose component", e);
+    } finally {
+      setContextClassLoader(thread, classLoader, currentClassLoader);
     }
   }
 
@@ -328,11 +336,18 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Override
   public MetadataResult<MetadataKeysContainer> getMetadataKeys() throws MetadataResolvingException {
     try {
-      return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader,
-                                                                      () -> metadataMediator.getMetadataKeys(context,
-                                                                                                             getParameterValueResolver(),
-                                                                                                             reflectionCache)));
+      return runWithMetadataContext(context -> {
+        Thread thread = currentThread();
+        ClassLoader currentClassLoader = thread.getContextClassLoader();
+        setContextClassLoader(thread, currentClassLoader, classLoader);
+        try {
+          return metadataMediator.getMetadataKeys(context,
+                                                  getParameterValueResolver(),
+                                                  reflectionCache);
+        } finally {
+          setContextClassLoader(thread, classLoader, currentClassLoader);
+        }
+      });
     } catch (ConnectionException e) {
       return failure(newFailure(e).onKeys());
     }
@@ -344,12 +359,18 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Override
   public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata() throws MetadataResolvingException {
     try {
-      return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader, () -> metadataMediator
-                                        .getMetadata(context, getParameterValueResolver(),
-                                                     reflectionCache)));
+      return runWithMetadataContext(context -> {
+        Thread thread = currentThread();
+        ClassLoader currentClassLoader = thread.getContextClassLoader();
+        setContextClassLoader(thread, currentClassLoader, classLoader);
+        try {
+          return metadataMediator.getMetadata(context, getParameterValueResolver(), reflectionCache);
+        } finally {
+          setContextClassLoader(thread, classLoader, currentClassLoader);
+        }
+      });
     } catch (ConnectionException e) {
-      return failure(newFailure(e).onComponent());
+      return failure(newFailure(e).onKeys());
     }
   }
 
@@ -359,11 +380,18 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Override
   public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata(MetadataKey key) throws MetadataResolvingException {
     try {
-      return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader,
-                                                                      () -> metadataMediator.getMetadata(context, key)));
+      return runWithMetadataContext(context -> {
+        Thread thread = currentThread();
+        ClassLoader currentClassLoader = thread.getContextClassLoader();
+        setContextClassLoader(thread, currentClassLoader, classLoader);
+        try {
+          return metadataMediator.getMetadata(context, key);
+        } finally {
+          setContextClassLoader(thread, classLoader, currentClassLoader);
+        }
+      });
     } catch (ConnectionException e) {
-      return failure(newFailure(e).onComponent());
+      return failure(newFailure(e).onKeys());
     }
   }
 
@@ -373,14 +401,21 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   @Override
   public Set<Value> getValues(String parameterName) throws ValueResolvingException {
     try {
-      return runWithValueProvidersContext(context -> withContextClassLoader(classLoader,
-                                                                            () -> valueProviderMediator
-                                                                                .getValues(parameterName,
-                                                                                           getParameterValueResolver(),
-                                                                                           (CheckedSupplier<Object>) () -> context
-                                                                                               .getConnection().orElse(null),
-                                                                                           (CheckedSupplier<Object>) () -> context
-                                                                                               .getConfig().orElse(null))));
+      return runWithValueProvidersContext(context -> {
+        Thread thread = currentThread();
+        ClassLoader currentClassLoader = thread.getContextClassLoader();
+        setContextClassLoader(thread, currentClassLoader, classLoader);
+        try {
+          return valueProviderMediator.getValues(parameterName,
+                                                 getParameterValueResolver(),
+                                                 (CheckedSupplier<Object>) () -> context.getConnection().orElse(null),
+                                                 (CheckedSupplier<Object>) () -> context.getConfig().orElse(null));
+        } catch (ValueResolvingException e) {
+          throw new MuleRuntimeException(e);
+        } finally {
+          setContextClassLoader(thread, classLoader, currentClassLoader);
+        }
+      });
     } catch (MuleRuntimeException e) {
       Throwable rootException = getRootException(e);
       if (rootException instanceof ValueResolvingException) {
@@ -401,7 +436,14 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     try {
       MetadataCacheId cacheId = getMetadataCacheId();
       MetadataCache metadataCache = metadataService.getMetadataCache(cacheId.getValue());
-      context = withContextClassLoader(classLoader, () -> getMetadataContext(metadataCache));
+      Thread currentThread = currentThread();
+      ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+      setContextClassLoader(currentThread, currentClassLoader, classLoader);
+      try {
+        context = getMetadataContext(metadataCache);
+      } finally {
+        setContextClassLoader(currentThread, classLoader, currentClassLoader);
+      }
       MetadataResult<R> result = contextConsumer.apply(context);
       if (result.isSuccess()) {
         metadataService.saveCache(cacheId.getValue(), metadataCache);
@@ -433,10 +475,10 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
           return id;
         })
         .orElseThrow(() -> new IllegalStateException(
-                                                     format("Missing information to obtain the MetadataCache for the component '%s'. "
-                                                         +
-                                                         "Expected to have the ComponentAst information in the '%s' annotation but none was found.",
-                                                            this.getLocation().toString(), ANNOTATION_COMPONENT_CONFIG)));
+            format("Missing information to obtain the MetadataCache for the component '%s'. "
+                       +
+                       "Expected to have the ComponentAst information in the '%s' annotation but none was found.",
+                   this.getLocation().toString(), ANNOTATION_COMPONENT_CONFIG)));
   }
 
   private <R> R runWithValueProvidersContext(Function<ExtensionResolvingContext, R> valueProviderFunction) {
@@ -461,8 +503,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       if (configuration.isPresent()) {
         ConfigurationProvider configurationProvider = findConfigurationProvider()
             .orElseThrow(
-                         () -> new MetadataResolvingException("Failed to create the required configuration for Metadata retrieval",
-                                                              INVALID_CONFIGURATION));
+                () -> new MetadataResolvingException("Failed to create the required configuration for Metadata retrieval",
+                                                     INVALID_CONFIGURATION));
 
         if (configurationProvider instanceof DynamicConfigurationProvider) {
           throw new MetadataResolvingException("Configuration used for Metadata fetch cannot be dynamic", INVALID_CONFIGURATION);
@@ -560,13 +602,13 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   private void validateConfigurationProviderIsNotExpression() throws InitialisationException {
     if (isConfigurationSpecified() && expressionParser.isContainsTemplate(configurationProvider.get().getName())) {
       throw new InitialisationException(
-                                        createStaticMessage(
-                                                            format("Root component '%s' defines component '%s' which specifies the expression '%s' as a config-ref. "
-                                                                + "Expressions are not allowed as config references",
-                                                                   getLocation().getRootContainerName(),
-                                                                   hyphenize(componentModel.getName()),
-                                                                   configurationProvider)),
-                                        this);
+          createStaticMessage(
+              format("Root component '%s' defines component '%s' which specifies the expression '%s' as a config-ref. "
+                         + "Expressions are not allowed as config references",
+                     getLocation().getRootContainerName(),
+                     hyphenize(componentModel.getName()),
+                     configurationProvider)),
+          this);
     }
   }
 

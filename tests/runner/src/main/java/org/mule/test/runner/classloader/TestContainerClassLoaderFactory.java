@@ -8,7 +8,7 @@
 package org.mule.test.runner.classloader;
 
 import static java.util.Collections.emptyMap;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
@@ -50,9 +50,9 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
    * differences when running applications in standalone container vs junit.
    *
    * @param extraBootPackages {@link List} of {@link String}s extra boot packages that need to be appended to the container (junit
-   *        for instance)
-   * @param urls {@link URL}s that were classified to be added to the container {@link ClassLoader}
-   * @param moduleRepository provides access to the modules available on the container. Non null.
+   *                          for instance)
+   * @param urls              {@link URL}s that were classified to be added to the container {@link ClassLoader}
+   * @param moduleRepository  provides access to the modules available on the container. Non null.
    */
   public TestContainerClassLoaderFactory(final List<String> extraBootPackages, final URL[] urls,
                                          ModuleRepository moduleRepository) {
@@ -70,11 +70,19 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
    *
    * @param parentClassLoader parent classLoader. Can be null.
    * @return a non null {@link ArtifactClassLoader} containing container code that can be used as parent classloader for other
-   *         mule artifacts.
+   * mule artifacts.
    */
   @Override
   public ArtifactClassLoader createContainerClassLoader(final ClassLoader parentClassLoader) {
-    final List<MuleModule> muleModules = withContextClassLoader(classLoader, () -> testContainerModuleRepository.getModules());
+    final List<MuleModule> muleModules;
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, classLoader);
+    try {
+      muleModules = testContainerModuleRepository.getModules();
+    } finally {
+      setContextClassLoader(thread, classLoader, currentClassLoader);
+    }
 
     MuleClassLoaderLookupPolicy lookupPolicy = new MuleClassLoaderLookupPolicy(emptyMap(), getBootPackages());
 
@@ -91,11 +99,11 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
    * The {@code muleModules} parameter will be ignored due to it has all the modules in classpath, instead they are discovered
    * once again but using a {@link URLClassLoader} that has the {@link URL}'s classified for the container {@link ClassLoader}.
    *
-   * @param parentClassLoader the parent {@link ClassLoader} to delegate PARENT look ups
-   * @param muleModules {@link MuleModule} discovered from the launcher {@link ClassLoader} but will be not considered here due to
-   *        it has all the class path
+   * @param parentClassLoader     the parent {@link ClassLoader} to delegate PARENT look ups
+   * @param muleModules           {@link MuleModule} discovered from the launcher {@link ClassLoader} but will be not considered here due to
+   *                              it has all the class path
    * @param containerLookupPolicy the default {@link ClassLoaderLookupPolicy} defined for a container but will be ignored due to
-   *        it has to be different when running with a full class path as parent {@link ClassLoader}
+   *                              it has to be different when running with a full class path as parent {@link ClassLoader}
    * @param artifactDescriptor
    * @return the {@link ArtifactClassLoader} to be used for the container
    */
@@ -109,10 +117,15 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
         new MuleArtifactClassLoader(containerDescriptor.getName(), containerDescriptor, urls, parentClassLoader,
                                     containerLookupPolicy);
 
-    return createContainerFilteringClassLoader(parentClassLoader, withContextClassLoader(classLoader,
-                                                                                         () -> testContainerModuleRepository
-                                                                                             .getModules()),
-                                               containerClassLoader);
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, classLoader);
+    try {
+      return createContainerFilteringClassLoader(parentClassLoader, testContainerModuleRepository.getModules(),
+                                                 containerClassLoader);
+    } finally {
+      setContextClassLoader(thread, classLoader, currentClassLoader);
+    }
   }
 
   public ArtifactClassLoader getContainerClassLoader() {
@@ -121,8 +134,8 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
 
   /**
    * @return the original list of boot packages defined in {@link ContainerClassLoaderFactory} plus extra packages needed to be
-   *         added in order to allow tests to run with isolation. For instance, junit is an extra package that has to be handled
-   *         as boot package.
+   * added in order to allow tests to run with isolation. For instance, junit is an extra package that has to be handled
+   * as boot package.
    */
   @Override
   public Set<String> getBootPackages() {

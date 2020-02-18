@@ -13,13 +13,13 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.launcher.coreextension.ClasspathMuleCoreExtensionDiscoverer.CORE_EXTENSION_RESOURCE_NAME;
-import org.mule.runtime.container.api.MuleCoreExtension;
+
 import org.mule.runtime.api.exception.DefaultMuleException;
-import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.container.api.MuleCoreExtension;
+import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -43,13 +43,17 @@ public class ClasspathMuleCoreExtensionDiscovererTestCase extends AbstractMuleTe
     final ClasspathMuleCoreExtensionDiscoverer discoverer = new ClasspathMuleCoreExtensionDiscoverer(artifactClassLoader);
 
     // Uses context classloader to force discovering of the test properties
-    final List<MuleCoreExtension> discover = withContextClassLoader(artifactClassLoader.getClassLoader(), () -> {
-      try {
-        return discoverer.discover();
-      } catch (DefaultMuleException e) {
-        throw new IllegalStateException(e);
-      }
-    });
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    thread.setContextClassLoader(artifactClassLoader.getClassLoader());
+    final List<MuleCoreExtension> discover;
+    try {
+      discover = discoverer.discover();
+    } catch (DefaultMuleException e) {
+      throw new IllegalStateException(e);
+    } finally {
+      thread.setContextClassLoader(currentClassLoader);
+    }
 
     assertThat(discover.size(), equalTo(1));
     assertThat(discover.get(0), instanceOf(TestCoreExtension.class));

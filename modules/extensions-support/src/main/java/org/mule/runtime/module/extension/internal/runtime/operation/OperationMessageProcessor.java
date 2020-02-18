@@ -11,7 +11,7 @@ import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.ne
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.module.extension.internal.runtime.ExecutionTypeMapper.asProcessingType;
 
 import org.mule.runtime.api.connection.ConnectionException;
@@ -64,23 +64,29 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
 
   @Override
   public MetadataResult<MetadataKeysContainer> getEntityKeys() throws MetadataResolvingException {
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, classLoader);
     try {
-      return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader,
-                                                                      () -> entityMetadataMediator.getEntityKeys(context)));
+      return runWithMetadataContext(context -> entityMetadataMediator.getEntityKeys(context));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onKeys());
+    } finally {
+      setContextClassLoader(thread, classLoader, currentClassLoader);
     }
   }
 
   @Override
   public MetadataResult<TypeMetadataDescriptor> getEntityMetadata(MetadataKey key) throws MetadataResolvingException {
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    setContextClassLoader(thread, currentClassLoader, classLoader);
     try {
-      return runWithMetadataContext(
-                                    context -> withContextClassLoader(classLoader, () -> entityMetadataMediator
-                                        .getEntityMetadata(context, key)));
+      return runWithMetadataContext(context -> entityMetadataMediator.getEntityMetadata(context, key));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onKeys());
+    } finally {
+      setContextClassLoader(thread, classLoader, currentClassLoader);
     }
   }
 

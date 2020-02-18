@@ -9,11 +9,13 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.withExtensionClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -67,14 +69,17 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
                                                                  ConnectionProviderValueResolver connectionProviderResolver,
                                                                  ReflectionCache reflectionCache,
                                                                  ExpressionManager expressionManager,
-                                                                 MuleContext muleContext)
-      throws Exception {
-    return withExtensionClassLoader(extensionModel, () -> {
+                                                                 MuleContext muleContext) {
+    Thread thread = Thread.currentThread();
+    ClassLoader currentClassLoader = thread.getContextClassLoader();
+    ClassLoader extensionClassLoader = getClassLoader(extensionModel);
+    setContextClassLoader(thread, currentClassLoader, extensionClassLoader);
+    try {
       configureConnectionProviderResolver(name, connectionProviderResolver);
       ConfigurationInstance configuration;
       CoreEvent initialiserEvent = null;
       try {
-        initialiserEvent = getInitialiserEvent(muleContext);
+        initialiserEvent = getNullEvent(muleContext);
         initialiseIfNeeded(resolverSet, true, muleContext);
         ConfigurationInstanceFactory configurationFactory = new ConfigurationInstanceFactory(extensionModel,
                                                                                              configurationModel,
@@ -83,9 +88,9 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
                                                                                              muleContext);
         configuration = configurationFactory.createConfiguration(name, initialiserEvent, connectionProviderResolver);
       } catch (MuleException e) {
-        throw new ConfigurationException(createStaticMessage(format("Could not create configuration '%s' for the '%s'", name,
-                                                                    extensionModel.getName())),
-                                         e);
+        throw new MuleRuntimeException(new ConfigurationException(createStaticMessage(format("Could not create configuration '%s' for the '%s'", name,
+                                                          extensionModel.getName())),
+                               e));
       } finally {
         if (initialiserEvent != null) {
           ((BaseEventContext) initialiserEvent.getContext()).success();
@@ -94,7 +99,9 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
 
       return new ConfigurationProviderToolingAdapter(name, extensionModel, configurationModel, configuration, reflectionCache,
                                                      muleContext);
-    });
+    } finally {
+      setContextClassLoader(thread, extensionClassLoader, currentClassLoader);
+    }
   }
 
   private void configureConnectionProviderResolver(String configName, ValueResolver<ConnectionProvider> resolver) {
