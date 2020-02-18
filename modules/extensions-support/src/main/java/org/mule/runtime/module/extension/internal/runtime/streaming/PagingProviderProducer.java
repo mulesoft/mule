@@ -134,17 +134,23 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       if (isFirstPage) {
         safely(() -> delegate.close(connection), e -> LOGGER.debug("Found exception closing paging provider", e));
       }
-      Optional<ConnectionException> connectionException = extractConnectionException(caughtException);
-      Optional<String> exceptionConfigName =
-          executionContext.getConfiguration().map(config -> ((ConfigurationInstance) config).getName());
-      if (isTransactional() && connectionException.isPresent() && exceptionConfigName.isPresent()) {
-        connectionException.get().addInfo("operationConfigName", exceptionConfigName.get());
-      }
-      connectionException.ifPresent(ex -> connectionSupplier.invalidateConnection());
+      extractConnectionException(caughtException).ifPresent(e -> handleConnectionException(e, connectionSupplier));
       throw caughtException;
     } finally {
       safely(connectionSupplier::close, e -> LOGGER.debug("Found exception closing the connection supplier", e));
     }
+  }
+
+  private void handleConnectionException(ConnectionException connectionException, ConnectionSupplier connectionSupplier) {
+    Optional<String> exceptionConfigName =
+        executionContext.getConfiguration().map(config -> ((ConfigurationInstance) config).getName());
+    if (isTransactional()) {
+      connectionException.addInfo("wasTransactional", true);
+    }
+    if (isFirstPage) {
+      exceptionConfigName.ifPresent(name -> connectionException.addInfo("operationConfigName", name));
+    }
+    connectionSupplier.invalidateConnection();
   }
 
   /**

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
+import static java.lang.Boolean.parseBoolean;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
@@ -34,8 +35,7 @@ public class ReconnectionUtils {
   public static boolean shouldRetry(Throwable t, ExecutionContextAdapter<?> context) {
     Optional<String> contextConfigName = context.getConfiguration().map(ConfigurationInstance::getName);
     Optional<ConnectionException> connectionException = extractConnectionException(t);
-    if (Boolean.valueOf(context.getVariable(DO_NOT_RETRY)) || !connectionException.isPresent()
-        || !validateConnectionException(connectionException.get(), contextConfigName.orElse(null))) {
+    if (Boolean.valueOf(context.getVariable(DO_NOT_RETRY)) || !connectionException.isPresent()) {
       return false;
     }
 
@@ -45,10 +45,14 @@ public class ReconnectionUtils {
       return !tx.hasResource(new ExtensionTransactionKey(context.getConfiguration().get()));
     }
 
-    return true;
+    return validateConnectionException(connectionException.get(), contextConfigName.orElse(null));
   }
 
   private static boolean validateConnectionException(ConnectionException connectionException, String contextConfigName) {
+    Boolean wasTransactional = (Boolean) connectionException.getInfo().get("wasTransactional");
+    if (wasTransactional != null && wasTransactional) {
+      return false;
+    }
     Object operationConfigName = connectionException.getInfo().get("operationConfigName");
     if (operationConfigName != null && contextConfigName != null) {
       return contextConfigName.equals(operationConfigName);
