@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.metadata;
 
+import static java.lang.Thread.currentThread;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
@@ -19,7 +20,6 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
@@ -55,7 +55,6 @@ import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ParameterTypeWrapper;
 import org.mule.tck.junit4.matcher.MetadataKeyMatcher;
 import org.mule.tck.message.StringAttributes;
-import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.metadata.extension.model.animals.Animal;
 import org.mule.test.metadata.extension.model.animals.AnimalClade;
 import org.mule.test.metadata.extension.model.animals.Bear;
@@ -73,7 +72,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase {
@@ -617,15 +615,19 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
    * asserts that, it sets back the original classloader to TCCL. Done in this way due to it is not possible to change extension
    * model classloader property once it is registered.
    */
-  private void resolveTestWithContextClassLoader(String flowName, Callback<MetadataOperationTestCase> doAction)
-      throws Exception {
+  private void resolveTestWithContextClassLoader(String flowName, Callback<MetadataOperationTestCase> doAction) {
     location = Location.builder().globalName(flowName).addProcessorsPart().addIndexPart(0).build();
     TestThreadContextClassLoaderResolver.reset();
+
+    Thread currentThread = currentThread();
     final ClassLoader originalClassLoader = org.mule.test.metadata.extension.MetadataConnection.class.getClassLoader();
-    withContextClassLoader(mock(ClassLoader.class), () -> {
+    currentThread.setContextClassLoader(mock(ClassLoader.class));
+    try {
       doAction.execute(MetadataOperationTestCase.this);
       assertThat(TestThreadContextClassLoaderResolver.getCurrentState(), is(sameInstance(originalClassLoader)));
-    });
+    } finally {
+      currentThread.setContextClassLoader(originalClassLoader);
+    }
   }
 
   private ParameterModel getParameter(ComponentModel model, String parameterName) {

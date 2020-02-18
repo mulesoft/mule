@@ -7,22 +7,23 @@
 package org.mule.runtime.module.service.internal.manager;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.lang.reflect.Proxy.getInvocationHandler;
 import static java.lang.reflect.Proxy.isProxyClass;
 import static java.lang.reflect.Proxy.newProxyInstance;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.core.internal.util.DefaultMethodInvoker;
 import org.mule.runtime.core.internal.util.MethodInvoker;
@@ -34,7 +35,6 @@ import org.mule.runtime.module.service.internal.discoverer.LazyServiceAssembly;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -128,12 +128,18 @@ public class LazyServiceProxy implements InvocationHandler {
 
   private CheckedSupplier<Service> createService() {
     return () -> {
-      Service service = withServiceClassLoader(() -> instantiateService());
-      if (started.compareAndSet(false, true)) {
-        doStart(service);
-        stopped.set(false);
+      Thread currentThread = currentThread();
+      ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+      currentThread.setContextClassLoader(assembly.getClassLoader());
+      try {
+        return instantiateService();
+      } catch (RuntimeException e) {
+        throw e;
+      } catch (Exception e) {
+        throw new MuleRuntimeException(e);
+      } finally {
+        currentThread.setContextClassLoader(originalClassLoader);
       }
-      return service;
     };
   }
 
@@ -163,17 +169,29 @@ public class LazyServiceProxy implements InvocationHandler {
   }
 
   private synchronized void doStart(Service service) {
-    withServiceClassLoader(() -> {
+    Thread currentThread = currentThread();
+    ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(assembly.getClassLoader());
+    try {
       startIfNeeded(service);
       String splash = service.getSplashMessage();
       if (isNotEmpty(splash)) {
         log(new ServiceSplashScreen(service.toString(), splash).toString());
       }
-    });
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new MuleRuntimeException(e);
+    } finally {
+      currentThread.setContextClassLoader(originalClassLoader);
+    }
   }
 
   private synchronized void doStop() {
-    withServiceClassLoader(() -> {
+    Thread currentThread = currentThread();
+    ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(assembly.getClassLoader());
+    try {
       try {
         stopIfNeeded(service.get());
       } catch (Exception e) {
@@ -184,21 +202,17 @@ public class LazyServiceProxy implements InvocationHandler {
         try {
           ((DisposableClassLoader) assembly.getClassLoader()).dispose();
         } catch (Exception e) {
-          LOGGER
-              .warn(format("Service '%s' class loader was not stopped properly: %s", assembly.getName(), e.getMessage()),
-                    e);
+          LOGGER.warn(format("Service '%s' class loader was not stopped properly: %s",
+                             assembly.getName(), e.getMessage()), e);
         }
-
       }
-    });
-  }
-
-  private void withServiceClassLoader(CheckedRunnable task) {
-    withContextClassLoader(assembly.getClassLoader(), task);
-  }
-
-  private <T> T withServiceClassLoader(Callable<T> callable) {
-    return withContextClassLoader(assembly.getClassLoader(), callable);
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new MuleRuntimeException(e);
+    } finally {
+      currentThread.setContextClassLoader(originalClassLoader);
+    }
   }
 
   @Override

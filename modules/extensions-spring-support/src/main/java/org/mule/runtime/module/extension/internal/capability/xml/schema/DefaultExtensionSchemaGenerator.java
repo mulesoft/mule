@@ -7,11 +7,13 @@
 package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
 
+import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -86,8 +88,15 @@ public class DefaultExtensionSchemaGenerator implements ExtensionSchemaGenerator
     schemaBuilder.registerEnums();
 
     // Make sure the XML libs use the container classloader internally
-    return withContextClassLoader(DefaultExtensionSchemaGenerator.class.getClassLoader(),
-                                  () -> renderSchema(schemaBuilder.build()));
+    Thread currentThread = currentThread();
+    ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+    ClassLoader contextClassLoader = DefaultExtensionSchemaGenerator.class.getClassLoader();
+    setContextClassLoader(currentThread, originalClassLoader, contextClassLoader);
+    try {
+      return renderSchema(schemaBuilder.build());
+    } finally {
+      setContextClassLoader(currentThread, contextClassLoader, originalClassLoader);
+    }
   }
 
   private void validate(ExtensionModel extensionModel, XmlDslModel xmlDslModel) {

@@ -8,12 +8,13 @@ package org.mule.runtime.module.launcher;
 
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static org.apache.commons.lang3.reflect.MethodUtils.invokeStaticMethod;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShutdown;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorWhileRunning;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
@@ -138,9 +139,9 @@ public class MuleContainer {
                                                     artifactResourcesRegistry.getApplicationFactory(),
                                                     artifactResourcesRegistry.getToolingApplicationDescriptorFactory());
     this.coreExtensionManager = new DefaultMuleCoreExtensionManagerServer(
-                                                                          new ClasspathMuleCoreExtensionDiscoverer(artifactResourcesRegistry
-                                                                              .getContainerClassLoader()),
-                                                                          new ReflectionMuleCoreExtensionDependencyResolver());
+        new ClasspathMuleCoreExtensionDiscoverer(artifactResourcesRegistry
+                                                     .getContainerClassLoader()),
+        new ReflectionMuleCoreExtensionDependencyResolver());
     this.muleLockFactory = artifactResourcesRegistry.getRuntimeLockFactory();
 
     artifactResourcesRegistry.getContainerClassLoader().dispose();
@@ -218,8 +219,8 @@ public class MuleContainer {
     if (!executionFolder.exists()) {
       if (!executionFolder.mkdirs()) {
         throw new MuleRuntimeException(CoreMessages.createStaticMessage(format(
-                                                                               "Could not create folder %s, validate that the process has permissions over that directory",
-                                                                               executionFolder.getAbsolutePath())));
+            "Could not create folder %s, validate that the process has permissions over that directory",
+            executionFolder.getAbsolutePath())));
       }
     }
   }
@@ -266,13 +267,17 @@ public class MuleContainer {
   }
 
   private void doResourceInitialization() {
-    withContextClassLoader(getSystemClassLoader(), () -> {
-      try {
-        new DefaultResourceInitializer().initialize();
-      } catch (Exception e) {
-        logger.error("Cannot create resource initializer instance", e);
-      }
-    });
+    Thread currentThread = currentThread();
+    final ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+    ClassLoader systemClassLoader = getSystemClassLoader();
+    setContextClassLoader(currentThread, originalClassLoader, systemClassLoader);
+    try {
+      new DefaultResourceInitializer().initialize();
+    } catch (Exception e) {
+      logger.error("Cannot create resource initializer instance", e);
+    } finally {
+      setContextClassLoader(currentThread, systemClassLoader, originalClassLoader);
+    }
   }
 
   protected void showSplashScreen() {

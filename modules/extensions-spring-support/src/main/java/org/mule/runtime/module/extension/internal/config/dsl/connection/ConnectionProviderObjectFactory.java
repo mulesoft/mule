@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.connection;
 
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import static java.lang.Thread.currentThread;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+
 import org.mule.runtime.api.config.PoolingProfile;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
@@ -33,8 +36,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionPro
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.SoapConnectionProviderObjectBuilder;
-
-import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
@@ -73,8 +74,18 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
 
   @Override
   public ConnectionProviderResolver doGetObject() {
-    Callable<ResolverSet> callable = () -> getParametersResolver().getParametersAsResolverSet(providerModel, muleContext);
-    ResolverSet resolverSet = withContextClassLoader(getClassLoader(extensionModel), callable);
+    ResolverSet resolverSet;
+    Thread currentThread = currentThread();
+    ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+    ClassLoader contextClassLoader = this.getClass().getClassLoader();
+    setContextClassLoader(currentThread, originalClassLoader, contextClassLoader);
+    try {
+      resolverSet = getParametersResolver().getParametersAsResolverSet(providerModel, muleContext);
+    } catch (ConfigurationException e) {
+      throw new MuleRuntimeException(e);
+    } finally {
+      setContextClassLoader(currentThread, contextClassLoader, originalClassLoader);
+    }
 
     ConnectionProviderObjectBuilder builder;
     if (extensionModel.getModelProperty(SoapExtensionModelProperty.class).isPresent()) {

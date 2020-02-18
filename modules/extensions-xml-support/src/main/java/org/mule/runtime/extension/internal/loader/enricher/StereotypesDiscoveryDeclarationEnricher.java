@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.extension.internal.loader.enricher;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
 
 import org.mule.metadata.api.model.StringType;
@@ -62,9 +63,15 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-    withContextClassLoader(extensionLoadingContext.getExtensionClassLoader(),
-                           () -> new EnricherDelegate(extensionLoadingContext.getDslResolvingContext())
-                               .apply(extensionLoadingContext));
+    Thread currentThread = currentThread();
+    final ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+    ClassLoader extensionClassLoader = extensionLoadingContext.getExtensionClassLoader();
+    setContextClassLoader(currentThread, originalClassLoader, extensionClassLoader);
+    try {
+      new EnricherDelegate(extensionLoadingContext.getDslResolvingContext()).apply(extensionLoadingContext);
+    } finally {
+      setContextClassLoader(currentThread, extensionClassLoader, originalClassLoader);
+    }
   }
 
   private static class EnricherDelegate {

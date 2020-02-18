@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static java.lang.Thread.currentThread;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.value.ValueProviderService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
@@ -22,7 +22,6 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -35,7 +34,7 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
 
   private T delegate;
 
-  protected DeployableArtifactWrapper(T artifact) throws IOException {
+  protected DeployableArtifactWrapper(T artifact) {
     this.delegate = artifact;
   }
 
@@ -137,7 +136,14 @@ public class DeployableArtifactWrapper<T extends DeployableArtifact<D>, D extend
     ClassLoader classLoader = getArtifactClassLoader() != null ? getArtifactClassLoader().getClassLoader()
         : Thread.currentThread().getContextClassLoader();
 
-    withContextClassLoader(classLoader, artifactAction::execute);
+    Thread currentThread = currentThread();
+    final ClassLoader originalClassLoader = currentThread().getContextClassLoader();
+    setContextClassLoader(currentThread, originalClassLoader, classLoader);
+    try {
+      artifactAction.execute();
+    } finally {
+      setContextClassLoader(currentThread, classLoader, originalClassLoader);
+    }
   }
 
   public String getAppName() {

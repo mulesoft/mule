@@ -7,13 +7,14 @@
 package org.mule.runtime.module.extension.api.loader;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.privileged.DeclarationEnrichers;
@@ -190,11 +191,16 @@ public class AbstractJavaExtensionModelLoader extends ExtensionModelLoader {
         ClassLoader extensionClassLoader = context.getExtensionClassLoader();
         Class annotation = extensionClassLoader.loadClass(DeclarationEnrichers.class.getName());
         return (Collection<DeclarationEnricher>) extensionType.getAnnotation((Class<DeclarationEnrichers>) annotation)
-            .map(enrichers -> withContextClassLoader(extensionClassLoader,
-                                                     () -> stream(enrichers.value())
-                                                         .map(this::instantiateOrFail)
-                                                         .collect(toList())))
-            .orElse(emptyList());
+            .map(enrichers -> {
+              Thread currentThread = currentThread();
+              ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+              setContextClassLoader(currentThread, originalClassLoader, extensionClassLoader);
+              try {
+                return stream(enrichers.value()).map(this::instantiateOrFail).collect(toList());
+              } finally {
+                setContextClassLoader(currentThread, extensionClassLoader, originalClassLoader);
+              }
+            }).orElse(emptyList());
       } catch (ClassNotFoundException e) {
         // Do nothing
       }

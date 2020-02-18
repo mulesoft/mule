@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.internal.processor.interceptor;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.fromFuture;
@@ -32,7 +33,6 @@ import java.util.concurrent.CompletionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import reactor.util.context.Context;
 
 /**
@@ -94,26 +94,33 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
     }
 
     try {
-      return withContextClassLoader(interceptor.getClass().getClassLoader(), () -> interceptor
-          .around(((Component) component).getLocation(),
-                  getResolvedParams(eventWithResolvedParams), interceptionEvent,
-                  reactiveInterceptionAction))
-                      .exceptionally(t -> {
-                        if (t instanceof MessagingException) {
-                          throw new CompletionException(t);
-                        } else {
-                          throw new CompletionException(createMessagingException(eventWithResolvedParams,
-                                                                                 t instanceof CompletionException ? t.getCause()
-                                                                                     : t,
-                                                                                 (Component) component, empty()));
-                        }
-                      })
-                      .thenApply(interceptedEvent -> interceptedEvent != null
-                          ? ((DefaultInterceptionEvent) interceptedEvent).resolve()
-                          : null);
+      CompletableFuture<InterceptionEvent> future;
+      Thread currentThread = currentThread();
+      ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+      ClassLoader interceptorClassLoader = interceptor.getClass().getClassLoader();
+      setContextClassLoader(currentThread, originalClassLoader, interceptorClassLoader);
+      currentThread.setContextClassLoader(interceptorClassLoader);
+      try {
+        future = interceptor.around(((Component) component).getLocation(),
+                                    getResolvedParams(eventWithResolvedParams), interceptionEvent,
+                                    reactiveInterceptionAction);
+      } finally {
+        setContextClassLoader(currentThread, interceptorClassLoader, originalClassLoader);
+      }
+      return future.exceptionally(t -> {
+        if (t instanceof MessagingException) {
+          throw new CompletionException(t);
+        } else {
+          throw new CompletionException(createMessagingException(eventWithResolvedParams,
+                                                                 t instanceof CompletionException ? t.getCause()
+                                                                     : t,
+                                                                 (Component) component, empty()));
+        }
+      }).thenApply(interceptedEvent -> interceptedEvent != null
+          ? ((DefaultInterceptionEvent) interceptedEvent).resolve()
+          : null);
     } catch (Exception e) {
       throw propagate(createMessagingException(interceptionEvent.resolve(), e, (Component) component, empty()));
     }
   }
-
 }

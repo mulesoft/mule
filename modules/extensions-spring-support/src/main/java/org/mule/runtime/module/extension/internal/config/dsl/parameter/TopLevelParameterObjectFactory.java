@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
+import static java.lang.Thread.currentThread;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
@@ -22,9 +24,6 @@ import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultO
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
-import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-
-import javax.inject.Inject;
 
 /**
  * An {@link AbstractExtensionObjectFactory} to resolve extension objects that can be defined as named top level elements and be
@@ -49,11 +48,19 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
     this.classLoader = classLoader;
     this.objectType = type;
 
-    objectClass = new LazyValue<>(() -> withContextClassLoader(classLoader, () -> {
-      // We must add the annotations support with a proxy to avoid the SDK user to clutter the POJO definitions in an extension
-      // with the annotations stuff.
-      return addAnnotationsToClass(getType(type));
-    }));
+    objectClass = new LazyValue<>(() -> {
+      Thread currentThread = currentThread();
+      ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+      ClassLoader contextClassLoader = this.getClass().getClassLoader();
+      setContextClassLoader(currentThread, originalClassLoader, contextClassLoader);
+      try {
+        // We must add the annotations support with a proxy to avoid the SDK user to clutter the POJO definitions in an extension
+        // with the annotations stuff.
+        return addAnnotationsToClass(getType(type));
+      } finally {
+        setContextClassLoader(currentThread, contextClassLoader, originalClassLoader);
+      }
+    });
     builder = new LazyValue<>(() -> new DefaultObjectBuilder(objectClass.get(), reflectionCache));
   }
 

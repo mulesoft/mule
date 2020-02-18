@@ -52,7 +52,6 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
@@ -98,7 +97,6 @@ import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
@@ -1281,7 +1279,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected void executeApplicationFlow(String flowName, String correlationId) throws Exception {
     ClassLoader appClassLoader = deploymentService.getApplications().get(0).getArtifactClassLoader().getClassLoader();
-    withContextClassLoader(appClassLoader, () -> {
+    Thread currentThread = currentThread();
+    ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(appClassLoader);
+    try {
       final FlowRunner flowRunner = new FlowRunner(deploymentService.getApplications().get(0).getRegistry(), flowName)
           .withPayload(TEST_MESSAGE);
 
@@ -1289,17 +1290,16 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
         flowRunner.withSourceCorrelationId(correlationId);
       }
 
-      CoreEvent result;
       try {
-        result = flowRunner.run();
+        flowRunner.run();
       } finally {
         flowRunner.dispose();
       }
 
       assertThat(currentThread().getContextClassLoader(), sameInstance(appClassLoader));
-
-      return result;
-    });
+    } finally {
+      currentThread.setContextClassLoader(originalClassLoader);
+    }
   }
 
   protected void assertNoZombiePresent(Map<String, Map<URI, Long>> zombieMap) {

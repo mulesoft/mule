@@ -12,7 +12,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -21,7 +21,6 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
@@ -67,56 +66,55 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   }
 
   @Override
-  public ConfigurationProvider doGetObject() throws Exception {
+  public ConfigurationProvider doGetObject() {
     if (instance == null) {
       instance = createInnerInstance();
     }
     return instance;
   }
 
-  private ConfigurationProvider createInnerInstance() throws ConfigurationException {
+  private ConfigurationProvider createInnerInstance() {
     if (expirationPolicy == null) {
       expirationPolicy = muleContext.getConfiguration().getDynamicConfigExpiration().getExpirationPolicy();
     }
 
-    return withContextClassLoader(getExtensionClassLoader(), () -> {
+    Thread currentThread = currentThread();
+    ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+    ClassLoader extensionClassLoader = getExtensionClassLoader();
+    setContextClassLoader(currentThread, originalClassLoader, extensionClassLoader);
+    try {
       ResolverSet resolverSet = getParametersResolver().getParametersAsResolverSet(configurationModel, muleContext);
       final ConnectionProviderValueResolver connectionProviderResolver = getConnectionProviderResolver();
       connectionProviderResolver.getResolverSet()
           .ifPresent((CheckedConsumer) resolver -> initialiseIfNeeded(resolver, true, muleContext));
 
-      ConfigurationProvider configurationProvider;
-      try {
-        if (resolverSet.isDynamic() || connectionProviderResolver.isDynamic()) {
-          configurationProvider =
-              configurationProviderFactory.createDynamicConfigurationProvider(configName.get(), extensionModel,
+      if (resolverSet.isDynamic() || connectionProviderResolver.isDynamic()) {
+        return configurationProviderFactory.createDynamicConfigurationProvider(configName.get(),
+                                                                               extensionModel,
+                                                                               configurationModel,
+                                                                               resolverSet,
+                                                                               connectionProviderResolver,
+                                                                               expirationPolicy,
+                                                                               reflectionCache,
+                                                                               expressionManager,
+                                                                               muleContext);
+      } else {
+        return configurationProviderFactory.createStaticConfigurationProvider(configName.get(),
+                                                                              extensionModel,
                                                                               configurationModel,
                                                                               resolverSet,
                                                                               connectionProviderResolver,
-                                                                              expirationPolicy,
                                                                               reflectionCache,
                                                                               expressionManager,
                                                                               muleContext);
-        } else {
-          configurationProvider = configurationProviderFactory
-              .createStaticConfigurationProvider(configName.get(),
-                                                 extensionModel,
-                                                 configurationModel,
-                                                 resolverSet,
-                                                 connectionProviderResolver,
-                                                 reflectionCache,
-                                                 expressionManager,
-                                                 muleContext);
-        }
-
-      } catch (Exception e) {
-        throw new MuleRuntimeException(
-                                       createStaticMessage(format("Could not create an implicit configuration '%s' for the extension '%s'",
-                                                                  configurationModel.getName(), extensionModel.getName())),
-                                       e);
       }
-      return configurationProvider;
-    });
+    } catch (Exception e) {
+      throw new MuleRuntimeException(
+          createStaticMessage(format("Could not create an implicit configuration '%s' for the extension '%s'",
+                                     configurationModel.getName(), extensionModel.getName())), e);
+    } finally {
+      setContextClassLoader(currentThread, extensionClassLoader, originalClassLoader);
+    }
   }
 
   private ClassLoader getExtensionClassLoader() {

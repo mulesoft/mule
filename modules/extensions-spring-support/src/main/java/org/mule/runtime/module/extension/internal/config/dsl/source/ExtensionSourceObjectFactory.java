@@ -6,19 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.source;
 
-import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
-import static org.mule.runtime.core.api.util.ClassUtils.memoize;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toBackPressureStrategy;
 
-import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -72,7 +70,11 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
 
   @Override
   public ExtensionMessageSource doGetObject() {
-    return withContextClassLoader(getClassLoader(extensionModel), () -> {
+    Thread currentThread = currentThread();
+    ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+    ClassLoader extensionClassLoader = getClassLoader(extensionModel);
+    setContextClassLoader(currentThread, originalClassLoader, extensionClassLoader);
+    try {
       getParametersResolver().checkParameterGroupExclusiveness(Optional.of(sourceModel),
                                                                sourceModel.getParameterGroupModels(),
                                                                parameters.keySet());
@@ -106,7 +108,13 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                         ((MuleContextWithRegistry) muleContext).getRegistry()
                                             .lookupObject(NotificationDispatcher.class),
                                         muleContext.getTransactionFactoryManager(), muleContext.getConfiguration().getId());
-    });
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new MuleRuntimeException(e);
+    } finally {
+      setContextClassLoader(currentThread, extensionClassLoader, originalClassLoader);
+    }
   }
 
   // TODO(MULE-15641): REMOVE THIS METHOD. REPLACE WITH `nonCallbackParameters.isDynamic()`

@@ -7,12 +7,13 @@
 package org.mule.runtime.core.internal.processor.interceptor;
 
 import static java.lang.String.valueOf;
+import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.util.collection.SmallMap.forSize;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
@@ -129,10 +130,17 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
       }
 
       try {
-        withContextClassLoader(interceptor.getClass().getClassLoader(),
-                               () -> interceptor.before(component.getLocation(),
-                                                        getResolvedParams(eventWithResolvedParams),
-                                                        interceptionEvent));
+        Thread currentThread = currentThread();
+        ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+        ClassLoader interceptorClassLoader = interceptor.getClass().getClassLoader();
+        setContextClassLoader(currentThread, originalClassLoader, interceptorClassLoader);
+        try {
+          interceptor.before(component.getLocation(),
+                             getResolvedParams(eventWithResolvedParams),
+                             interceptionEvent);
+        } finally {
+          setContextClassLoader(currentThread, interceptorClassLoader, originalClassLoader);
+        }
         return interceptionEvent.resolve();
       } catch (Exception e) {
         throw propagate(new MessagingException(interceptionEvent.resolve(), e.getCause(), component));
@@ -152,8 +160,14 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
       }
 
       try {
-        withContextClassLoader(interceptor.getClass().getClassLoader(),
-                               () -> interceptor.after(component.getLocation(), interceptionEvent, thrown));
+        Thread currentThread = currentThread();
+        ClassLoader originalTCCL = currentThread.getContextClassLoader();
+        currentThread.setContextClassLoader(interceptor.getClass().getClassLoader());
+        try {
+          interceptor.after(component.getLocation(), interceptionEvent, thrown);
+        } finally {
+          currentThread.setContextClassLoader(originalTCCL);
+        }
         return interceptionEvent.resolve();
       } catch (Exception e) {
         throw propagate(createMessagingException(interceptionEvent.resolve(), e.getCause(), component, empty()));

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
@@ -20,7 +21,6 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPED;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
@@ -137,9 +137,14 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
 
   @Override
   public void install() {
-    withContextClassLoader(null, () -> {
+    Thread currentThread = currentThread();
+    ClassLoader originalTCCL = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(null);
+    try {
       log(miniSplash(format("New %s '%s'", shortArtifactType, descriptor.getName())));
-    });
+    } finally {
+      currentThread.setContextClassLoader(originalTCCL);
+    }
     // set even though it might be redundant, just in case the app is been redeployed
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
 
@@ -173,19 +178,28 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
 
   @Override
   public void start() {
-    withContextClassLoader(null, () -> {
+    final Thread currentThread = currentThread();
+    final ClassLoader originalClassLoader = currentThread().getContextClassLoader();
+    currentThread.setContextClassLoader(null);
+    try {
       log(miniSplash(format("Starting %s '%s'", shortArtifactType, descriptor.getName())));
-    });
+    } finally {
+      currentThread.setContextClassLoader(originalClassLoader);
+    }
+
     try {
       this.artifactContext.getMuleContext().start();
 
       // null CCL ensures we log at 'system' level
       // TODO getDomainClassLoader a more usable wrapper for any logger to be logged at sys level
-      withContextClassLoader(null, () -> {
+      currentThread.setContextClassLoader(null);
+      try {
         ApplicationStartedSplashScreen splashScreen = new ApplicationStartedSplashScreen();
         splashScreen.createMessage(descriptor);
         LogUtil.log(splashScreen.toString());
-      });
+      } finally {
+        currentThread.setContextClassLoader(originalClassLoader);
+      }
     } catch (Exception e) {
       setStatusToFailed();
 
@@ -208,9 +222,14 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   }
 
   private void doInit(boolean lazy, boolean disableXmlValidations) {
-    withContextClassLoader(null, () -> {
+    Thread currentThread = currentThread();
+    final ClassLoader originalClassLoader = currentThread().getContextClassLoader();
+    currentThread.setContextClassLoader(null);
+    try {
       log(miniSplash(format("Initializing %s '%s'", shortArtifactType, descriptor.getName())));
-    });
+    } finally {
+      currentThread.setContextClassLoader(originalClassLoader);
+    }
     try {
       ArtifactContextBuilder artifactBuilder =
           newBuilder().setArtifactProperties(merge(descriptor.getAppProperties(), getProperties())).setArtifactType(APP)

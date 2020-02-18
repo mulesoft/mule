@@ -13,13 +13,13 @@ import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.maven.client.api.model.RepositoryPolicy.CHECKSUM_POLICY_FAIL;
 import static org.mule.maven.client.api.model.RepositoryPolicy.CHECKSUM_POLICY_WARN;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.test.runner.RunnerConfiguration.readConfiguration;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_ARTIFACTS;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_PROPERTIES_FILE;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXTRA_BOOT_PACKAGES;
 import static org.mule.test.runner.utils.RunnerModuleUtils.getExcludedProperties;
+
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.MavenConfiguration;
@@ -38,9 +38,6 @@ import org.mule.test.runner.api.WorkspaceLocationResolver;
 import org.mule.test.runner.classification.DefaultWorkspaceReader;
 import org.mule.test.runner.maven.AutoDiscoverWorkspaceLocationResolver;
 
-import com.google.common.base.Throwables;
-import com.google.common.collect.Sets;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -53,6 +50,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import com.google.common.base.Throwables;
+import com.google.common.collect.Sets;
 import org.junit.internal.builders.AnnotatedBuilder;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
@@ -162,22 +161,25 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     if (staticFieldsInjected && errorWhileSettingClassLoaders != null) {
       throw Throwables.propagate(errorWhileSettingClassLoaders);
     }
-    withContextClassLoader(testRunnerClassLoader, () -> {
-      try {
-        if (!staticFieldsInjected) {
 
-          injectPluginsClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
-          injectServicesClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
-          injectContainerClassLoader(artifactClassLoaderHolder, isolatedTestClass);
-          injectApplicationClassLoader(artifactClassLoaderHolder, isolatedTestClass);
-        }
-      } catch (Throwable t) {
-        errorWhileSettingClassLoaders = t;
-        throw Throwables.propagate(t);
-      } finally {
-        staticFieldsInjected = true;
+    Thread currentThread = currentThread();
+    ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(testRunnerClassLoader);
+    try {
+      if (!staticFieldsInjected) {
+
+        injectPluginsClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
+        injectServicesClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
+        injectContainerClassLoader(artifactClassLoaderHolder, isolatedTestClass);
+        injectApplicationClassLoader(artifactClassLoaderHolder, isolatedTestClass);
       }
-    });
+    } catch (Throwable t) {
+      errorWhileSettingClassLoaders = t;
+      throw Throwables.propagate(t);
+    } finally {
+      staticFieldsInjected = true;
+      currentThread.setContextClassLoader(originalClassLoader);
+    }
   }
 
   private void checkConfiguration(Class<?> klass) {
@@ -448,8 +450,14 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
    */
   @Override
   public void run(RunNotifier notifier) {
-    withContextClassLoader(artifactClassLoaderHolder.getTestRunnerPluginClassLoader().getClassLoader(),
-                           () -> delegate.run(notifier));
+    Thread currentThread = currentThread();
+    ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(artifactClassLoaderHolder.getTestRunnerPluginClassLoader().getClassLoader());
+    try {
+      delegate.run(notifier);
+    } finally {
+      currentThread.setContextClassLoader(originalClassLoader);
+    }
   }
 
   /**

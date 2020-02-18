@@ -8,12 +8,13 @@
 package org.mule.runtime.module.extension.internal.manager;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConfigurationForComponent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -124,20 +125,22 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     final String extensionVersion = extensionModel.getVersion();
     final String extensionVendor = extensionModel.getVendor();
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Registering extension {} (version: {} vendor: {} )", extensionName, extensionVersion, extensionVendor);
-    }
+    LOGGER.debug("Registering extension {} (version: {} vendor: {} )", extensionName, extensionVersion, extensionVendor);
 
     if (extensionRegistry.containsExtension(extensionName)) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("An extension of name '{}' (version: {} vendor {}) is already registered. Skipping...", extensionName,
-                     extensionVersion, extensionVendor);
-      }
+      LOGGER.debug("An extension of name '{}' (version: {} vendor {}) is already registered. Skipping...", extensionName,
+                   extensionVersion, extensionVendor);
     } else {
-      withContextClassLoader(getClassLoader(extensionModel), () -> {
+      Thread currentThread = currentThread();
+      final ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+      ClassLoader extensionClassLoader = getClassLoader(extensionModel);
+      setContextClassLoader(currentThread, originalClassLoader, extensionClassLoader);
+      try {
         extensionRegistry.registerExtension(extensionName, extensionModel);
         extensionActivator.activateExtension(extensionModel);
-      });
+      } finally {
+        setContextClassLoader(currentThread, extensionClassLoader, originalClassLoader);
+      }
     }
   }
 

@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.internal.processor.interceptor;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
@@ -93,10 +94,17 @@ public class CompletableInterceptorSourceCallbackAdapter extends AbstractInterce
       }
 
       try {
-        withContextClassLoader(interceptor.getClass().getClassLoader(),
-                               () -> interceptor.beforeCallback(component.getLocation(),
-                                                                getResolvedParams(eventWithResolvedParams),
-                                                                interceptionEvent));
+        Thread currentThread = currentThread();
+        ClassLoader originalTCCL = currentThread.getContextClassLoader();
+        ClassLoader ctxClassLoader = interceptor.getClass().getClassLoader();
+        setContextClassLoader(currentThread, originalTCCL, ctxClassLoader);
+        try {
+          interceptor.beforeCallback(component.getLocation(),
+                                     getResolvedParams(eventWithResolvedParams),
+                                     interceptionEvent);
+        } finally {
+          setContextClassLoader(currentThread, ctxClassLoader, originalTCCL);
+        }
         return interceptionEvent.resolve();
       } catch (Exception e) {
         throw propagate(new MessagingException(interceptionEvent.resolve(), e.getCause(), component));
@@ -116,8 +124,15 @@ public class CompletableInterceptorSourceCallbackAdapter extends AbstractInterce
       }
 
       try {
-        withContextClassLoader(interceptor.getClass().getClassLoader(),
-                               () -> interceptor.afterCallback(component.getLocation(), interceptionEvent, thrown));
+        Thread currentThread = currentThread();
+        ClassLoader originalTCCL = currentThread.getContextClassLoader();
+        ClassLoader ctxClassLoader = interceptor.getClass().getClassLoader();
+        setContextClassLoader(currentThread, originalTCCL, ctxClassLoader);
+        try {
+          interceptor.afterCallback(component.getLocation(), interceptionEvent, thrown);
+        } finally {
+          setContextClassLoader(currentThread, ctxClassLoader, originalTCCL);
+        }
         return interceptionEvent.resolve();
       } catch (Exception e) {
         throw propagate(createMessagingException(interceptionEvent.resolve(), e.getCause(), component, empty()));

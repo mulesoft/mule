@@ -46,7 +46,7 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   protected String getConfigFile() {
     return "reconnection-config.xml";
   }
-
+  DefaultSchedulerMessageSource
   @Override
   protected void doSetUp() throws Exception {
     capturedEvents = new LinkedList<>();

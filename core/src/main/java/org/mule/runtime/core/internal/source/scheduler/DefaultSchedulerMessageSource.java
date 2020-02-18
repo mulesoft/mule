@@ -6,8 +6,12 @@
  */
 package org.mule.runtime.core.internal.source.scheduler;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_SCHEDULERS;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -63,6 +67,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
   private final PeriodicScheduler scheduler;
   private final boolean disallowConcurrentExecution;
+  private static boolean disabled = parseBoolean(getProperty(MULE_DISABLE_SCHEDULERS));
 
   private Scheduler pollingExecutor;
   private ScheduledFuture<?> schedulingJob;
@@ -86,7 +91,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
   /**
    * @param muleContext application's context
-   * @param scheduler the scheduler
+   * @param scheduler   the scheduler
    */
   public DefaultSchedulerMessageSource(MuleContext muleContext, PeriodicScheduler scheduler,
                                        boolean disallowConcurrentExecution) {
@@ -97,7 +102,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
   @Override
   public synchronized void start() throws MuleException {
-    if (started) {
+    if (started || disabled) {
       return;
     }
     try {
@@ -126,7 +131,18 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
   @Override
   public void trigger() {
-    pollingExecutor.execute(() -> withContextClassLoader(muleContext.getExecutionClassLoader(), () -> poll()));
+    if (!disabled) {
+      pollingExecutor.execute(() -> {
+        Thread currentThread = currentThread();
+        ClassLoader originalTCCL = currentThread.getContextClassLoader();
+        currentThread.setContextClassLoader(muleContext.getExecutionClassLoader());
+        try {
+          poll();
+        } finally {
+          currentThread.setContextClassLoader(originalTCCL);
+        }
+      });
+    }
   }
 
   @Override
@@ -275,5 +291,16 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     public FlowConstruct getFlowConstruct() {
       return flowConstruct;
     }
+
+  }
+
+  /**
+   * This method is only for testing proposes.  Don't use.
+   *
+   * @param disabled
+   * @deprecated
+   */
+  static void setDisabled(boolean disabled) {
+    DefaultSchedulerMessageSource.disabled = disabled;
   }
 }

@@ -6,22 +6,22 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
-import static org.mule.test.allure.AllureConstants.ComponentsFeature.LoggerStory.LOGGER;
+import static java.lang.Thread.currentThread;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.LoggerStory.LOGGER;
 
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import io.qameta.allure.Story;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -74,7 +74,7 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() {
-    currentClassLoader = Thread.currentThread().getContextClassLoader();
+    currentClassLoader = currentThread().getContextClassLoader();
     when(containerLoggerContext.getConfiguration().getLoggerConfig(anyString()).getLevel()).thenReturn(Level.INFO);
     logger =
         new DispatchingLogger(originalLogger, currentClassLoader.hashCode(), containerLoggerContext, contextSelector,
@@ -95,19 +95,29 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void anotherClassLoader() {
-    withContextClassLoader(additionalClassLoader, () -> {
+    Thread currentThread = currentThread();
+    ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(additionalClassLoader);
+    try {
       logger.info(MESSAGE);
       verify(originalLogger).info(MESSAGE);
-    });
+    } finally {
+      currentThread.setContextClassLoader(originalClassLoader);
+    }
   }
 
   @Test
   public void regionClassLoader() {
     RegionClassLoader regionClassLoader = mock(RegionClassLoader.class);
-    withContextClassLoader(regionClassLoader, () -> {
+    Thread currentThread = currentThread();
+    ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(regionClassLoader);
+    try {
       logger.info(MESSAGE);
       verify(contextSelector).getContext(LOGGER_NAME, regionClassLoader, true);
-    });
+    } finally {
+      currentThread.setContextClassLoader(originalClassLoader);
+    }
   }
 
   @Test
@@ -133,11 +143,17 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
         return LOGGER_NAME;
       }
     };
+
     // Test and assertions
-    withContextClassLoader(regionClassLoader, () -> {
+    Thread currentThread = currentThread();
+    ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(regionClassLoader);
+    try {
       dispatchingLogger.info("Fallback Test Message");
       dispatchingLogger.info("Test Message");
-    });
+    } finally {
+      currentThread.setContextClassLoader(originalClassLoader);
+    }
     verify(containerLogger, times(1)).info("Fallback Test Message");
     verify(regionClassLoaderLogger, times(1)).info("Test Message");
   }

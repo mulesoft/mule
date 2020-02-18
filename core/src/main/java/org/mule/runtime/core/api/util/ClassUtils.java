@@ -853,7 +853,9 @@ public class ClassUtils {
    *
    * @param classLoader the context {@link ClassLoader} on which the {@code runnable} should be executed
    * @param runnable a closure
+   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually instead
    */
+  @Deprecated
   public static void withContextClassLoader(ClassLoader classLoader, Runnable runnable) {
     try {
       withContextClassLoader(classLoader, runnable, RuntimeException.class, e -> {
@@ -873,7 +875,9 @@ public class ClassUtils {
    * @param classLoader the context {@link ClassLoader} on which the {@code runnable} should be executed
    * @param callable a {@link Callable}
    * @return the value that the {@code callable} produced
+   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually instead
    */
+  @Deprecated
   public static <T> T withContextClassLoader(ClassLoader classLoader, Callable<T> callable) {
     return withContextClassLoader(classLoader, callable, RuntimeException.class, e -> {
       throw new MuleRuntimeException(e);
@@ -899,7 +903,9 @@ public class ClassUtils {
    * @param <T> the generic type of the return value
    * @param <E> the generic type of the expected exception
    * @throws E if the expected exception is actually thrown
+   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually instead
    */
+  @Deprecated
   public static <T, E extends Exception> void withContextClassLoader(ClassLoader classLoader, Runnable runnable,
                                                                      Class<E> expectedExceptionType,
                                                                      ExceptionHandler<T, E> exceptionHandler)
@@ -938,7 +944,9 @@ public class ClassUtils {
    * @param <E> the generic type of the expected exception
    * @return a value returned by either the {@code callable} or the {@code exceptionHandler}
    * @throws E if the expected exception is actually thrown
+   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually instead
    */
+  @Deprecated
   public static <T, E extends Exception> T withContextClassLoader(ClassLoader classLoader, Callable<T> callable,
                                                                   Class<E> expectedExceptionType,
                                                                   ExceptionHandler<T, E> exceptionHandler)
@@ -957,6 +965,12 @@ public class ClassUtils {
     }
   }
 
+  public static void setContextClassLoader(Thread thread, ClassLoader currentClassLoader, ClassLoader newClassLoader) {
+    if (currentClassLoader != newClassLoader) {
+      thread.setContextClassLoader(newClassLoader);
+    }
+  }
+
   /**
    * Wraps the given function {@code f} so that results for a given input are cached in the given Map.
    *
@@ -965,9 +979,7 @@ public class ClassUtils {
    * @return the memoized function
    */
   public static <I, O> Function<I, O> memoize(Function<I, O> f, Map<I, O> cache) {
-    return input -> {
-      return cache.computeIfAbsent(input, f);
-    };
+    return input -> cache.computeIfAbsent(input, f);
   }
 
   /**

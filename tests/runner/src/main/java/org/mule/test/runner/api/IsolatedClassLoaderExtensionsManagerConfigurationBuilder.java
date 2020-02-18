@@ -7,10 +7,12 @@
 
 package org.mule.test.runner.api;
 
+import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.MULE_AUTO_GENERATED_ARTIFACT_PATH_INSIDE_JAR;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -18,18 +20,16 @@ import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
-import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
-
-import com.google.common.collect.ImmutableSet;
 
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +56,7 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
    * defined for the extension.
    *
    * @param pluginsClassLoaders the list of {@link ArtifactClassLoader} created for each plugin found in the dependencies (either
-   *        plugin or extension plugin).
+   *                            plugin or extension plugin).
    */
   public IsolatedClassLoaderExtensionsManagerConfigurationBuilder(final List<ArtifactClassLoader> pluginsClassLoaders) {
     this.extensionManagerFactory = new DefaultExtensionManagerFactory();
@@ -109,7 +109,10 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
         String artifactName = (String) pluginClassLoader.getClass().getMethod("getArtifactId").invoke(pluginClassLoader);
         ClassLoader classLoader =
             (ClassLoader) pluginClassLoader.getClass().getMethod("getClassLoader").invoke(pluginClassLoader);
-        withContextClassLoader(classLoader, (CheckedRunnable) () -> {
+        Thread currentThread = currentThread();
+        ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+        setContextClassLoader(currentThread, originalClassLoader, classLoader);
+        try {
           Method findResource = classLoader.getClass().getMethod("findResource", String.class);
           URL json = ((URL) findResource.invoke(classLoader, META_INF_MULE_ARTIFACT_MULE_PLUGIN));
           if (json == null) {
@@ -131,8 +134,9 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
           } else {
             LOGGER.debug("Discarding plugin with artifactName '{}' as it doesn't have a mule-artifact.json", artifactName);
           }
-        });
-
+        } finally {
+          setContextClassLoader(currentThread, classLoader, originalClassLoader);
+        }
       }
     } catch (Exception e) {
       throw new RuntimeException("Error while loading extension models", e);

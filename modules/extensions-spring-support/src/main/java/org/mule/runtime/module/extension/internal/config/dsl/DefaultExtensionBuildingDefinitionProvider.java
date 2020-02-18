@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
@@ -29,7 +30,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
@@ -99,7 +99,10 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
 
     if (!extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent()) {
       final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
-      withContextClassLoader(extensionClassLoader, () -> {
+      Thread currentThread = currentThread();
+      final ClassLoader originalClassLoader = currentThread().getContextClassLoader();
+      setContextClassLoader(currentThread, originalClassLoader, extensionClassLoader);
+      try {
         ReflectionCache reflectionCache = new ReflectionCache();
         new IdempotentExtensionWalker() {
 
@@ -145,7 +148,9 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
                                              parsingContext, reflectionCache);
 
         registerSubTypes(definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext, reflectionCache);
-      });
+      } finally {
+        setContextClassLoader(currentThread, extensionClassLoader, originalClassLoader);
+      }
     }
   }
 

@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher.stereotypes;
 
+import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.api.util.FunctionalUtils.ifPresent;
 import static org.mule.runtime.api.util.NameUtils.underscorize;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.WIRING;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTION;
@@ -91,8 +92,16 @@ public class StereotypesDeclarationEnricher implements DeclarationEnricher {
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
-    withContextClassLoader(extensionLoadingContext.getExtensionClassLoader(),
-                           () -> new EnricherDelegate().apply(extensionLoadingContext));
+    Thread currentThread = currentThread();
+    final ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+    ClassLoader extensionClassLoader = extensionLoadingContext.getExtensionClassLoader();
+    setContextClassLoader(currentThread, originalClassLoader, extensionClassLoader);
+    currentThread.setContextClassLoader(extensionClassLoader);
+    try {
+      new EnricherDelegate().apply(extensionLoadingContext);
+    } finally {
+      setContextClassLoader(currentThread, extensionClassLoader, originalClassLoader);
+    }
   }
 
   private static class EnricherDelegate {

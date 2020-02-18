@@ -7,13 +7,13 @@
 package org.mule.runtime.module.extension.internal.resources;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
 import static javax.tools.Diagnostic.Kind.ERROR;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.util.MuleSystemProperties.FORCE_EXTENSION_VALIDATION_PROPERTY_NAME;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
@@ -31,9 +31,6 @@ import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.ExtensionAnnotationProcessor;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +47,9 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Annotation processor that picks up all the extensions annotated with {@link Extension} and use a
@@ -97,10 +97,15 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
         Optional<Class<Object>> annotatedClass = processor.classFor(extensionElement, processingEnv);
         ExtensionElement extension = toExtensionElement(extensionElement, processingEnv);
         ClassLoader classLoader = annotatedClass.map(Class::getClassLoader).orElseGet(ExtensionModel.class::getClassLoader);
-        withContextClassLoader(classLoader, () -> {
+        Thread currentThread = currentThread();
+        final ClassLoader originalClassLoader = currentThread().getContextClassLoader();
+        currentThread.setContextClassLoader(classLoader);
+        try {
           ExtensionModel extensionModel = parseExtension(extensionElement, extension, roundEnv, classLoader);
           generator.generateFor(extensionModel);
-        });
+        } finally {
+          currentThread.setContextClassLoader(originalClassLoader);
+        }
       });
 
       return false;

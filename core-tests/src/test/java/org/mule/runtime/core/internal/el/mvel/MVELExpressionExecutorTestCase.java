@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.el.mvel;
 
+import static java.lang.Thread.currentThread;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
@@ -13,10 +14,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.internal.el.context.AbstractELTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.size.SmallTest;
@@ -42,10 +44,10 @@ public class MVELExpressionExecutorTestCase extends AbstractELTestCase {
   }
 
   @Before
-  public void setupMVEL() throws InitialisationException {
+  public void setupMVEL() {
     mvel = new MVELExpressionExecutor(new ParserConfiguration());
-    context = Mockito.mock(MVELExpressionLanguageContext.class);
-    Mockito.when(context.isResolveable(Mockito.anyString())).thenReturn(false);
+    context = mock(MVELExpressionLanguageContext.class);
+    when(context.isResolveable(Mockito.anyString())).thenReturn(false);
   }
 
   @Test
@@ -74,16 +76,18 @@ public class MVELExpressionExecutorTestCase extends AbstractELTestCase {
   }
 
   @Test
-  public void useContextClassLoader() throws ClassNotFoundException {
-    withContextClassLoader(new MyClassClassLoader(), () -> {
-      try {
-        assertFalse((Boolean) mvel.execute("1 is org.MyClass", null));
-      } catch (Exception e) {
-        e.printStackTrace();
-        fail(e.getMessage());
-      }
-
-    });
+  public void useContextClassLoader() {
+    Thread currentThread = currentThread();
+    ClassLoader originalTCCL = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(new MyClassClassLoader());
+    try {
+      assertFalse((Boolean) mvel.execute("1 is org.MyClass", null));
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail(e.getMessage());
+    } finally {
+      currentThread.setContextClassLoader(originalTCCL);
+    }
   }
 
   @Test

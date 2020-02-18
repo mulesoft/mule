@@ -9,9 +9,11 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
@@ -56,25 +58,43 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
 
     artifactContext.getMuleContext().getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
 
-    withContextClassLoader(null, () -> {
+    Thread currentThread = currentThread();
+    ClassLoader originalTCCL = currentThread.getContextClassLoader();
+    currentThread.setContextClassLoader(null);
+    try {
       if (LOGGER.isInfoEnabled()) {
         log(miniSplash(format("Stopping %s '%s'", artifactType, getArtifactName())));
       }
-    });
+    } finally {
+      currentThread.setContextClassLoader(originalTCCL);
+    }
 
-    withContextClassLoader(deploymentClassLoader.getClassLoader(), () -> {
-      this.artifactContext.getMuleContext().stop();
-      return null;
-    });
+    setContextClassLoader(currentThread, originalTCCL, deploymentClassLoader.getClassLoader());
+    try {
+      artifactContext.getMuleContext().stop();
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new MuleRuntimeException(e);
+    } finally {
+      setContextClassLoader(currentThread, deploymentClassLoader.getClassLoader(), originalTCCL);
+    }
   }
 
   @Override
   public final void dispose() {
-    withContextClassLoader(null, () -> log(miniSplash(format("Disposing %s '%s'", artifactType, getArtifactName()))));
+    Thread currentThread = currentThread();
+    final ClassLoader originalClassLoader = currentThread().getContextClassLoader();
+    currentThread.setContextClassLoader(null);
+    try {
+      log(miniSplash(format("Disposing %s '%s'", artifactType, getArtifactName())));
+    } finally {
+      currentThread.setContextClassLoader(originalClassLoader);
+    }
 
     // moved wrapper logic into the actual implementation, as redeploy() invokes it directly, bypassing
     // classloader cleanup
-    ClassLoader originalClassLoader = currentThread().getContextClassLoader();
+
     try {
       ClassLoader artifactCL = null;
       if (getArtifactClassLoader() != null) {
@@ -82,7 +102,7 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
       }
       // if not initialized yet, it can be null
       if (artifactCL != null) {
-        currentThread().setContextClassLoader(artifactCL);
+        setContextClassLoader(currentThread, originalClassLoader, artifactCL);
       }
 
       doDispose();
@@ -96,7 +116,7 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
       }
     } finally {
       // kill any refs to the old classloader to avoid leaks
-      currentThread().setContextClassLoader(originalClassLoader);
+      currentThread.setContextClassLoader(originalClassLoader);
       deploymentClassLoader = null;
     }
   }

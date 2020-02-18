@@ -8,6 +8,7 @@
 package org.mule.tck.util;
 
 import static java.io.File.pathSeparator;
+import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.toList;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 import static org.apache.commons.io.FileUtils.listFiles;
@@ -15,7 +16,6 @@ import static org.apache.commons.io.filefilter.TrueFileFilter.TRUE;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.tck.ZipUtils.compress;
 
-import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.tck.ZipUtils;
 
@@ -324,7 +324,10 @@ public class CompilerUtils {
     private void processExtensionAnnotations(File targetFolder, String extensionVersion) {
       URLClassLoader urlClassLoader = createExtensionClassLoader(targetFolder);
 
-      ClassUtils.withContextClassLoader(urlClassLoader, () -> {
+      Thread currentThread = currentThread();
+      ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+      currentThread.setContextClassLoader(urlClassLoader);
+      try {
         File metaInfFolder = new File(targetFolder, "META-INF");
         metaInfFolder.mkdir();
         CompilerTask compilerTask =
@@ -334,7 +337,9 @@ public class CompilerUtils {
                 .toTarget(metaInfFolder).build();
 
         compilerTask.compile();
-      });
+      } finally {
+        currentThread.setContextClassLoader(originalClassLoader);
+      }
     }
 
     private URLClassLoader createExtensionClassLoader(File targetFolder) {

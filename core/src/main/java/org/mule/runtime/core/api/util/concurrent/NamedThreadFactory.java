@@ -7,9 +7,10 @@
 package org.mule.runtime.core.api.util.concurrent;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.security.AccessController.doPrivileged;
 import static java.security.AccessController.getContext;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 
 import org.mule.runtime.core.api.util.StringUtils;
 
@@ -60,12 +61,18 @@ public class NamedThreadFactory implements java.util.concurrent.ThreadFactory {
     };
 
     if (contextClassLoader != null) {
-      return withContextClassLoader(this.getClass().getClassLoader(), () -> {
+      Thread currentThread = currentThread();
+      ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+      ClassLoader contextClassLoader = this.getClass().getClassLoader();
+      setContextClassLoader(currentThread, originalClassLoader, contextClassLoader);
+      try {
         // Avoid the created thread to inherit the security context of the caller thread's stack.
         // If the thread creation is triggered by a deployable artifact classloader, a reference to it would be kept by the
         // created thread without this doProvileged call.
         return doPrivileged((PrivilegedAction<Thread>) () -> tf.get(), ACCESS_CONTROL_CTX);
-      });
+      } finally {
+        setContextClassLoader(currentThread, contextClassLoader, originalClassLoader);
+      }
     } else {
       return tf.get();
     }
