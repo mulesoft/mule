@@ -23,7 +23,6 @@ import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 
@@ -48,11 +47,11 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
     this(rawValue, null, model, metadata);
   }
 
-  public DefaultComponentParameterAst(ComponentAst complexValue, Supplier<ParameterModel> model, ComponentMetadataAst metadata) {
+  public DefaultComponentParameterAst(Object complexValue, Supplier<ParameterModel> model, ComponentMetadataAst metadata) {
     this(null, complexValue, model, metadata);
   }
 
-  private DefaultComponentParameterAst(String rawValue, ComponentAst complexValue, Supplier<ParameterModel> model,
+  private DefaultComponentParameterAst(String rawValue, Object complexValue, Supplier<ParameterModel> model,
                                        ComponentMetadataAst metadata) {
     this.rawValue = rawValue;
     this.model = model;
@@ -60,7 +59,7 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
 
     this.value = new LazyValue<>(() -> {
       if (complexValue != null) {
-        return right((Object) complexValue);
+        return right(complexValue);
         // previous implementations were assuming that an empty string was the same as the param not being present...
       } else if (isEmpty(rawValue)) {
         final Object defaultValue = getModel().getDefaultValue();

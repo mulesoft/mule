@@ -19,12 +19,15 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.util.NameUtils.COMPONENT_NAME_SEPARATOR;
 import static org.mule.runtime.api.util.NameUtils.toCamelCase;
 
+import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.meta.model.ComposableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -51,9 +54,12 @@ import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeHandlerManagerFactory;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -61,6 +67,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Helper class to work with a set of {@link ExtensionModel}s
@@ -87,10 +94,11 @@ public class ExtensionModelHelper {
 
   private final JavaTypeLoader javaTypeLoader = new JavaTypeLoader(ExtensionModelHelper.class.getClassLoader(),
                                                                    new ExtensionsTypeHandlerManagerFactory());
+  private final DslResolvingContext dslResolvingContext;
 
   /**
    * @param extensionModels the set of {@link ExtensionModel}s to work with. Usually this is the set of models configured within a
-   *        mule artifact.
+   *                        mule artifact.
    */
   public ExtensionModelHelper(Set<ExtensionModel> extensionModels) {
     this(extensionModels, DslResolvingContext.getDefault(extensionModels));
@@ -100,6 +108,7 @@ public class ExtensionModelHelper {
     this.extensionsModels = extensionModels;
     this.dslSyntaxResolversByExtension =
         Caffeine.newBuilder().build(key -> DslSyntaxResolver.getDefault(key, dslResolvingCtx));
+    this.dslResolvingContext = dslResolvingCtx;
   }
 
   /**
@@ -243,31 +252,27 @@ public class ExtensionModelHelper {
    *
    * @param componentIdentifier the identifier to use for the search.
    * @return the found {@link org.mule.runtime.api.meta.model.ConnectionProviderModel} or {@link Optional#empty()} if it couldn't
-   *         be found.
+   * be found.
    */
   public Optional<? extends ConnectionProviderModel> findConnectionProviderModel(ComponentIdentifier componentId) {
+    return extensionConnectionProviderModelByComponentIdentifier
+        .get(componentId, componentIdentifier -> lookupExtensionModelFor(componentIdentifier)
+            .flatMap(currentExtension -> {
+              AtomicReference<ConnectionProviderModel> modelRef = new AtomicReference<>();
+              new ExtensionWalker() {
 
-    return extensionConnectionProviderModelByComponentIdentifier.get(componentId, componentIdentifier -> {
-      return lookupExtensionModelFor(componentIdentifier)
-          .flatMap(currentExtension -> {
-            AtomicReference<ConnectionProviderModel> modelRef = new AtomicReference<>();
+                final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(currentExtension);
 
-            new ExtensionWalker() {
-
-              final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(currentExtension);
-
-              @Override
-              protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
-                if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
-                  modelRef.set(model);
+                @Override
+                protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
+                  if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
+                    modelRef.set(model);
+                  }
                 }
-              };
+              }.walk(currentExtension);
 
-            }.walk(currentExtension);
-
-            return ofNullable(modelRef.get());
-          });
-    });
+              return ofNullable(modelRef.get());
+            }));
   }
 
   /**
@@ -276,7 +281,7 @@ public class ExtensionModelHelper {
    *
    * @param componentIdentifier the identifier to use for the search.
    * @return the found {@link org.mule.runtime.api.meta.model.ConfigurationModel} or {@link Optional#empty()} if it couldn't be
-   *         found.
+   * found.
    */
   public Optional<? extends ConfigurationModel> findConfigurationModel(ComponentIdentifier componentId) {
     return extensionConfigurationModelByComponentIdentifier.get(componentId, componentIdentifier -> {
@@ -320,7 +325,7 @@ public class ExtensionModelHelper {
    * {@code delegate} when found.
    *
    * @param componentIdentifier the identifier to use for the search.
-   * @param delegate the callback to execute on the found model.
+   * @param delegate            the callback to execute on the found model.
    */
   public void walkToComponent(ComponentIdentifier componentIdentifier, ExtensionWalkerModelDelegate delegate) {
     lookupExtensionModelFor(componentIdentifier)
@@ -344,7 +349,7 @@ public class ExtensionModelHelper {
                 delegate.onConnectionProvider(model);
                 stop();
               }
-            };
+            }
 
             @Override
             protected void onOperation(HasOperationModels owner, OperationModel model) {
@@ -396,6 +401,54 @@ public class ExtensionModelHelper {
     return extensionsModels.stream()
         .filter(e -> e.getXmlDslModel().getPrefix().equals(componentIdentifier.getNamespace()))
         .findFirst();
+  }
+
+  public DslElementSyntax resolveDslElementModel(NamedObject component, ComponentIdentifier componentIdentifier) {
+    final DslSyntaxResolver dslSyntaxResolver = getDslSyntaxResolver(componentIdentifier);
+
+    return dslSyntaxResolver.resolve(component);
+  }
+
+  private DslSyntaxResolver getDslSyntaxResolver(ComponentIdentifier componentIdentifier) {
+    Optional<ExtensionModel> optionalExtensionModel = lookupExtensionModelFor(componentIdentifier);
+    ExtensionModel extensionModel = optionalExtensionModel
+        .orElseThrow(() -> new IllegalStateException("Extension Model in context not present for componentIdentifier: "
+            + componentIdentifier));
+
+    return dslSyntaxResolversByExtension.get(extensionModel);
+  }
+
+  public Optional<DslElementSyntax> resolveDslElementModel(MetadataType metadataType, ExtensionModel extensionModel) {
+    return dslSyntaxResolversByExtension.get(extensionModel).resolve(metadataType);
+  }
+
+  public DslElementSyntax resolveDslElementModel(ParameterModel parameterModel, ComponentIdentifier componentIdentifier) {
+    final DslSyntaxResolver dslSyntaxResolver = getDslSyntaxResolver(componentIdentifier);
+    return dslSyntaxResolver.resolve(parameterModel);
+  }
+
+  public Map<ObjectType, Optional<DslElementSyntax>> resolveSubTypes(ObjectType type) {
+    ImmutableMap.Builder<ObjectType, Optional<DslElementSyntax>> mapBuilder = ImmutableMap.builder();
+    for (ObjectType subType : dslResolvingContext.getTypeCatalog().getSubTypes(type)) {
+      Optional<String> typeId = subType.getAnnotation(TypeIdAnnotation.class).map(TypeIdAnnotation::getValue);
+      if (typeId.isPresent()) {
+        Optional<String> declaringExtension = dslResolvingContext.getTypeCatalog().getDeclaringExtension(typeId.get());
+        if (declaringExtension.isPresent()) {
+          dslResolvingContext.getExtension(declaringExtension.get())
+              .ifPresent(extensionModel -> mapBuilder.put(subType,
+                                                          dslSyntaxResolversByExtension.get(extensionModel).resolve(subType)));
+        }
+      }
+    }
+    return mapBuilder.build();
+  }
+
+  public Collection<ObjectType> getAllSubTypes() {
+    return dslResolvingContext.getTypeCatalog().getAllSubTypes();
+  }
+
+  public Collection<ObjectType> getSubTypes(ObjectType objectType) {
+    return dslResolvingContext.getTypeCatalog().getSubTypes(objectType);
   }
 
   /**

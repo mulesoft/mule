@@ -1,632 +1,811 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mulesoft.org/schema/mule/subtypes" attributeFormDefault="unqualified" elementFormDefault="qualified">
-  <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
-  <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"></xs:import>
-  <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
-  <xs:import namespace="http://www.mulesoft.org/schema/mule/metadata" schemaLocation="http://www.mulesoft.org/schema/mule/metadata/current/mule-metadata.xsd"></xs:import>
-  <xs:import namespace="http://www.mulesoft.org/schema/mule/heisenberg" schemaLocation="http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd"></xs:import>
-  <xs:import namespace="http://www.mulesoft.org/schema/mule/vegan" schemaLocation="http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd"></xs:import>
-  <xs:complexType name="org.mule.test.subtypes.extension.ParentShape">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="mule:expressionInt" use="optional" name="area"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.ParentShape" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-parent-shape"></xs:element>
-  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.ParentShape" abstract="true" name="abstract-parent-shape"></xs:element>
-  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-parent-shape" name="parent-shape">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="subtypes:org.mule.test.subtypes.extension.ParentShape"></xs:extension>
-      </xs:complexContent>
+<xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://www.mulesoft.org/schema/mule/subtypes" attributeFormDefault="unqualified"
+           elementFormDefault="qualified">
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
+    <xs:import namespace="http://www.springframework.org/schema/beans"
+               schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"></xs:import>
+    <xs:import namespace="http://www.mulesoft.org/schema/mule/core"
+               schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
+    <xs:import namespace="http://www.mulesoft.org/schema/mule/vegan"
+               schemaLocation="http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd"></xs:import>
+    <xs:import namespace="http://www.mulesoft.org/schema/mule/heisenberg"
+               schemaLocation="http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd"></xs:import>
+    <xs:complexType name="org.mule.test.subtypes.extension.ParentShape">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionInt" use="optional" name="area"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:complexType name="org.mule.test.subtypes.extension.Square">
-    <xs:complexContent>
-      <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.ParentShape">
-        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt" use="optional" name="side"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:global-abstract-parent-shape" abstract="true" name="abstract-square"></xs:element>
-  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-square" name="square">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="subtypes:org.mule.test.subtypes.extension.Square">
-          <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                type="subtypes:org.mule.test.subtypes.extension.ParentShape"
+                substitutionGroup="mule:abstract-shared-extension" abstract="true"
+                name="global-abstract-parent-shape"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                type="subtypes:org.mule.test.subtypes.extension.ParentShape" abstract="true"
+                name="abstract-parent-shape"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                substitutionGroup="subtypes:abstract-parent-shape" name="parent-shape">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="subtypes:org.mule.test.subtypes.extension.ParentShape"></xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.subtypes.extension.Square">
+        <xs:complexContent>
+            <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                          base="subtypes:org.mule.test.subtypes.extension.ParentShape">
+                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt"
+                              use="optional" name="side"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:complexType name="org.mule.test.subtypes.extension.Triangle">
-    <xs:complexContent>
-      <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.ParentShape">
-        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt" use="optional" name="height"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:global-abstract-parent-shape" abstract="true" name="abstract-triangle-alias"></xs:element>
-  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-triangle-alias" name="triangle-alias">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="subtypes:org.mule.test.subtypes.extension.Triangle">
-          <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                substitutionGroup="subtypes:global-abstract-parent-shape" abstract="true"
+                name="abstract-square"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                substitutionGroup="subtypes:abstract-square" name="square">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="subtypes:org.mule.test.subtypes.extension.Square">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.subtypes.extension.Triangle">
+        <xs:complexContent>
+            <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                          base="subtypes:org.mule.test.subtypes.extension.ParentShape">
+                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt"
+                              use="optional" name="height"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:complexType name="org.mule.test.subtypes.extension.Door">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.Door" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-door"></xs:element>
-  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.Door" abstract="true" name="abstract-door"></xs:element>
-  <xs:complexType name="org.mule.test.subtypes.extension.HouseDoor">
-    <xs:complexContent>
-      <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.Door">
-        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionBoolean" use="optional" default="false" name="locked"></xs:attribute>
-        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="optional" default="pivotal" name="handle"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:global-abstract-door" abstract="true" name="abstract-house-door"></xs:element>
-  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-house-door" name="house-door">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="subtypes:org.mule.test.subtypes.extension.HouseDoor">
-          <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                substitutionGroup="subtypes:global-abstract-parent-shape" abstract="true"
+                name="abstract-triangle-alias"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                substitutionGroup="subtypes:abstract-triangle-alias" name="triangle-alias">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="subtypes:org.mule.test.subtypes.extension.Triangle">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.subtypes.extension.Door">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                          base="mule:abstractExtensionType"></xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:complexType name="org.mule.test.subtypes.extension.CarDoor">
-    <xs:complexContent>
-      <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.Door">
-        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="color"></xs:attribute>
-        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="optional" default="button" name="handle"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:global-abstract-door" abstract="true" name="abstract-car-door"></xs:element>
-  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-car-door" name="car-door">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="subtypes:org.mule.test.subtypes.extension.CarDoor">
-          <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                type="subtypes:org.mule.test.subtypes.extension.Door" substitutionGroup="mule:abstract-shared-extension"
+                abstract="true" name="global-abstract-door"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                type="subtypes:org.mule.test.subtypes.extension.Door" abstract="true" name="abstract-door"></xs:element>
+    <xs:complexType name="org.mule.test.subtypes.extension.HouseDoor">
+        <xs:complexContent>
+            <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                          base="subtypes:org.mule.test.subtypes.extension.Door">
+                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionBoolean"
+                              use="optional" default="false" name="locked"></xs:attribute>
+                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString"
+                              use="optional" default="pivotal" name="handle"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:complexType name="org.mule.test.subtypes.extension.Revolver">
-    <xs:complexContent>
-      <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.Weapon">
-        <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt" use="optional" default="6" name="bullets"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:global-abstract-weapon" abstract="true" name="abstract-revolver"></xs:element>
-  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-revolver" name="revolver">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="subtypes:org.mule.test.subtypes.extension.Revolver">
-          <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                substitutionGroup="subtypes:global-abstract-door" abstract="true"
+                name="abstract-house-door"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                substitutionGroup="subtypes:abstract-house-door" name="house-door">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="subtypes:org.mule.test.subtypes.extension.HouseDoor">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.subtypes.extension.CarDoor">
+        <xs:complexContent>
+            <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                          base="subtypes:org.mule.test.subtypes.extension.Door">
+                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString"
+                              use="required" name="color"></xs:attribute>
+                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString"
+                              use="optional" default="button" name="handle"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="config">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="mule:abstractExtensionType">
-          <xs:annotation>
-            <xs:documentation>Default configuration</xs:documentation>
-          </xs:annotation>
-          <xs:sequence minOccurs="1" maxOccurs="1">
-            <xs:element minOccurs="1" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="abstract-shape">
-              <xs:complexType>
-                <xs:choice minOccurs="1" maxOccurs="1">
-                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
-                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
-                </xs:choice>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="door-interface">
-              <xs:complexType>
-                <xs:choice minOccurs="1" maxOccurs="1">
-                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
-                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
-                </xs:choice>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="explicit-square">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.Square"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="final-pojo">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.FinalPojo"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="ricin">
-              <xs:complexType>
-                <xs:complexContent>
-                  <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.Ricin"></xs:extension>
-                </xs:complexContent>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="extensible-weapon">
-              <xs:complexType>
-                <xs:choice minOccurs="0" maxOccurs="unbounded">
-                  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                  <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
-                </xs:choice>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="triangle">
-              <xs:complexType>
-                <xs:choice minOccurs="1" maxOccurs="1">
-                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
-                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
-                </xs:choice>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="pojo-with-extension">
-              <xs:complexType>
-                <xs:choice minOccurs="1" maxOccurs="1">
-                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-extensible-pojo"></xs:element>
-                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-extensible-pojo"></xs:element>
-                </xs:choice>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="one-pojos">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:choice minOccurs="0" maxOccurs="unbounded">
-                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-pojo-for-list"></xs:element>
-                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-pojo-for-list"></xs:element>
-                  </xs:choice>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                substitutionGroup="subtypes:global-abstract-door" abstract="true" name="abstract-car-door"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                substitutionGroup="subtypes:abstract-car-door" name="car-door">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="subtypes:org.mule.test.subtypes.extension.CarDoor">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.subtypes.extension.Revolver">
+        <xs:complexContent>
+            <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+                          base="heisenberg:org.mule.test.heisenberg.extension.model.Weapon">
+                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt"
+                              use="optional" default="6" name="bullets"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+                substitutionGroup="heisenberg:global-abstract-weapon" abstract="true"
+                name="abstract-revolver"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                substitutionGroup="subtypes:abstract-revolver" name="revolver">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="subtypes:org.mule.test.subtypes.extension.Revolver">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension"
+                name="config">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                    <xs:annotation>
+                        <xs:documentation>Default configuration</xs:documentation>
+                    </xs:annotation>
+                    <xs:sequence minOccurs="1" maxOccurs="1">
+                        <xs:element minOccurs="1" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="abstract-shape">
+                            <xs:complexType>
+                                <xs:choice minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                minOccurs="1" maxOccurs="1"
+                                                ref="subtypes:abstract-parent-shape"></xs:element>
+                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                minOccurs="1" maxOccurs="1"
+                                                ref="subtypes:global-abstract-parent-shape"></xs:element>
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="door-interface">
+                            <xs:complexType>
+                                <xs:choice minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                minOccurs="1" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
+                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                minOccurs="1" maxOccurs="1"
+                                                ref="subtypes:global-abstract-door"></xs:element>
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="explicit-square">
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                  base="subtypes:org.mule.test.subtypes.extension.Square"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="final-pojo">
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                  base="subtypes:org.mule.test.subtypes.extension.FinalPojo"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="ricin">
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+                                                  base="heisenberg:org.mule.test.heisenberg.extension.model.Ricin"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="extensible-weapon">
+                            <xs:complexType>
+                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+                                                minOccurs="1" maxOccurs="1"
+                                                ref="heisenberg:abstract-weapon"></xs:element>
+                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+                                                minOccurs="1" maxOccurs="1"
+                                                ref="heisenberg:global-abstract-weapon"></xs:element>
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="triangle">
+                            <xs:complexType>
+                                <xs:choice minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                minOccurs="1" maxOccurs="1"
+                                                ref="subtypes:abstract-parent-shape"></xs:element>
+                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                minOccurs="1" maxOccurs="1"
+                                                ref="subtypes:global-abstract-parent-shape"></xs:element>
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="pojo-with-extension">
+                            <xs:complexType>
+                                <xs:choice minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                minOccurs="1" maxOccurs="1"
+                                                ref="subtypes:abstract-extensible-pojo"></xs:element>
+                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                minOccurs="1" maxOccurs="1"
+                                                ref="subtypes:global-abstract-extensible-pojo"></xs:element>
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="one-pojos">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                        <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                    minOccurs="1" maxOccurs="1"
+                                                    ref="subtypes:abstract-pojo-for-list"></xs:element>
+                                        <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                    minOccurs="1" maxOccurs="1"
+                                                    ref="subtypes:global-abstract-pojo-for-list"></xs:element>
+                                    </xs:choice>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="two-pojos">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                        <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                    minOccurs="1" maxOccurs="1"
+                                                    ref="subtypes:abstract-pojo-for-list"></xs:element>
+                                        <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                    minOccurs="1" maxOccurs="1"
+                                                    ref="subtypes:global-abstract-pojo-for-list"></xs:element>
+                                    </xs:choice>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="weapons">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                        <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+                                                    minOccurs="1" maxOccurs="1"
+                                                    ref="heisenberg:abstract-weapon"></xs:element>
+                                        <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+                                                    minOccurs="1" maxOccurs="1"
+                                                    ref="heisenberg:global-abstract-weapon"></xs:element>
+                                    </xs:choice>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="weapon-maps">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="weapon-map">
+                                        <xs:complexType>
+                                            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                                <xs:element
+                                                        xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+                                                        minOccurs="1" maxOccurs="1"
+                                                        ref="heisenberg:abstract-weapon"></xs:element>
+                                                <xs:element
+                                                        xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+                                                        minOccurs="1" maxOccurs="1"
+                                                        ref="heisenberg:global-abstract-weapon"></xs:element>
+                                            </xs:choice>
+                                            <xs:attribute type="mule:expressionString" use="required"
+                                                          name="key"></xs:attribute>
+                                            <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="xs:string" use="optional" name="abstractShape"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="doorInterface"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="explicitSquare"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="finalPojo"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="ricin"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="extensibleWeapon"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="triangle"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="pojoWithExtension"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="onePojos"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="twoPojos"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="weapons"></xs:attribute>
+                    <xs:attribute type="mule:expressionMap" use="optional" name="weaponMap"></xs:attribute>
+                    <xs:attribute type="xs:string" use="required" name="name">
+                        <xs:annotation>
+                            <xs:documentation>The identifier of this element used to reference it in other components
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.subtypes.extension.FinalPojo">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionString" use="optional" name="someString"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="org.mule.test.subtypes.extension.ExtensiblePojo">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="numbers">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="number">
+                                    <xs:complexType>
+                                        <xs:attribute type="mule:expressionInt" use="required"
+                                                      name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
                 </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="two-pojos">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:choice minOccurs="0" maxOccurs="unbounded">
-                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-pojo-for-list"></xs:element>
-                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-pojo-for-list"></xs:element>
-                  </xs:choice>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="weapons">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:choice minOccurs="0" maxOccurs="unbounded">
-                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
-                  </xs:choice>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="weapon-maps">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:element minOccurs="0" maxOccurs="unbounded" name="weapon-map">
-                    <xs:complexType>
-                      <xs:choice minOccurs="0" maxOccurs="unbounded">
-                        <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                        <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="1" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
-                      </xs:choice>
-                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                      <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
-                    </xs:complexType>
-                  </xs:element>
-                </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-          </xs:sequence>
-          <xs:attribute type="xs:string" use="optional" name="abstractShape"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="doorInterface"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="explicitSquare"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="finalPojo"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="ricin"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="extensibleWeapon"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="triangle"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="pojoWithExtension"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="onePojos"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="twoPojos"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="weapons"></xs:attribute>
-          <xs:attribute type="mule:expressionMap" use="optional" name="weaponMap"></xs:attribute>
-          <xs:attribute type="xs:string" use="required" name="name">
-            <xs:annotation>
-              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
+                <xs:attribute type="mule:expressionString" use="required" name="myString"></xs:attribute>
+                <xs:attribute type="mule:expressionList" use="optional" name="numbers"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:complexType name="org.mule.test.subtypes.extension.FinalPojo">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="mule:expressionString" use="optional" name="someString"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="org.mule.test.subtypes.extension.ExtensiblePojo">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="numbers">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="unbounded" name="number">
-                  <xs:complexType>
-                    <xs:attribute type="mule:expressionInt" use="required" name="value"></xs:attribute>
-                  </xs:complexType>
-                </xs:element>
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="mule:expressionString" use="required" name="myString"></xs:attribute>
-        <xs:attribute type="mule:expressionList" use="optional" name="numbers"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.ExtensiblePojo" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-extensible-pojo"></xs:element>
-  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.ExtensiblePojo" abstract="true" name="abstract-extensible-pojo"></xs:element>
-  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-extensible-pojo" name="extensible-pojo">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="subtypes:org.mule.test.subtypes.extension.ExtensiblePojo"></xs:extension>
-      </xs:complexContent>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                type="subtypes:org.mule.test.subtypes.extension.ExtensiblePojo"
+                substitutionGroup="mule:abstract-shared-extension" abstract="true"
+                name="global-abstract-extensible-pojo"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                type="subtypes:org.mule.test.subtypes.extension.ExtensiblePojo" abstract="true"
+                name="abstract-extensible-pojo"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                substitutionGroup="subtypes:abstract-extensible-pojo" name="extensible-pojo">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="subtypes:org.mule.test.subtypes.extension.ExtensiblePojo"></xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.subtypes.extension.PojoForList">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionString" use="optional" name="id"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:complexType name="org.mule.test.subtypes.extension.PojoForList">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="mule:expressionString" use="optional" name="id"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.PojoForList" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-pojo-for-list"></xs:element>
-  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.PojoForList" abstract="true" name="abstract-pojo-for-list"></xs:element>
-  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-pojo-for-list" name="pojo-for-list">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="subtypes:org.mule.test.subtypes.extension.PojoForList"></xs:extension>
-      </xs:complexContent>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                type="subtypes:org.mule.test.subtypes.extension.PojoForList"
+                substitutionGroup="mule:abstract-shared-extension" abstract="true"
+                name="global-abstract-pojo-for-list"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                type="subtypes:org.mule.test.subtypes.extension.PojoForList" abstract="true"
+                name="abstract-pojo-for-list"></xs:element>
+    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                substitutionGroup="subtypes:abstract-pojo-for-list" name="pojo-for-list">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="subtypes:org.mule.test.subtypes.extension.PojoForList"></xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+                substitutionGroup="mule:abstractConnectionProvider" name="connection">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mule:abstractConnectionProviderType">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="abstract-shape">
+                            <xs:complexType>
+                                <xs:choice minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                minOccurs="1" maxOccurs="1"
+                                                ref="subtypes:abstract-parent-shape"></xs:element>
+                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                minOccurs="1" maxOccurs="1"
+                                                ref="subtypes:global-abstract-parent-shape"></xs:element>
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="door-interface">
+                            <xs:complexType>
+                                <xs:choice minOccurs="1" maxOccurs="1">
+                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                minOccurs="1" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
+                                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                minOccurs="1" maxOccurs="1"
+                                                ref="subtypes:global-abstract-door"></xs:element>
+                                </xs:choice>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="doors">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                        <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                    minOccurs="1" maxOccurs="1"
+                                                    ref="subtypes:abstract-door"></xs:element>
+                                        <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                    minOccurs="1" maxOccurs="1"
+                                                    ref="subtypes:global-abstract-door"></xs:element>
+                                    </xs:choice>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="xs:string" use="optional" name="abstractShape"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="doorInterface"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="doors"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes"
+                xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ConfigRetrieverType"
+                substitutionGroup="mule:abstract-operator" name="config-retriever"></xs:element>
+    <xs:complexType name="ConfigRetrieverType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:attribute type="xs:string" use="required" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>The name of the configuration to be used to execute this component
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="connection">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="mule:abstractConnectionProviderType">
-          <xs:sequence minOccurs="0" maxOccurs="1">
-            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="abstract-shape">
-              <xs:complexType>
-                <xs:choice minOccurs="1" maxOccurs="1">
-                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
-                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
-                </xs:choice>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="door-interface">
-              <xs:complexType>
-                <xs:choice minOccurs="1" maxOccurs="1">
-                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
-                  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
-                </xs:choice>
-              </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" maxOccurs="1" name="doors">
-              <xs:complexType>
-                <xs:sequence>
-                  <xs:choice minOccurs="0" maxOccurs="unbounded">
-                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
-                    <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
-                  </xs:choice>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes"
+                xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ConnectionRetrieverType"
+                substitutionGroup="mule:abstract-operator" name="connection-retriever"></xs:element>
+    <xs:complexType name="ConnectionRetrieverType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                 </xs:sequence>
-              </xs:complexType>
-            </xs:element>
-          </xs:sequence>
-          <xs:attribute type="xs:string" use="optional" name="abstractShape"></xs:attribute>
-          <xs:attribute type="xs:string" use="optional" name="doorInterface"></xs:attribute>
-          <xs:attribute type="mule:expressionList" use="optional" name="doors"></xs:attribute>
-        </xs:extension>
-      </xs:complexContent>
+                <xs:attribute type="xs:string" use="required" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>The name of the configuration to be used to execute this component
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
-  </xs:element>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ConfigRetrieverType" substitutionGroup="mule:abstract-operator" name="config-retriever"></xs:element>
-  <xs:complexType name="ConfigRetrieverType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="xs:string" use="required" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ConnectionRetrieverType" substitutionGroup="mule:abstract-operator" name="connection-retriever"></xs:element>
-  <xs:complexType name="ConnectionRetrieverType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="required" name="config-ref">
-          <xs:annotation>
-            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SubtypesSourceType" substitutionGroup="mule:abstract-message-source" name="subtypes-source"></xs:element>
-  <xs:complexType name="SubtypesSourceType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="door-param">
-            <xs:complexType>
-              <xs:choice minOccurs="1" maxOccurs="1">
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
-              </xs:choice>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="doorParam"></xs:attribute>
-        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
-          <xs:annotation>
-            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="DoorRetrieverType" substitutionGroup="mule:abstract-operator" name="door-retriever"></xs:element>
-  <xs:complexType name="DoorRetrieverType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="door">
-            <xs:complexType>
-              <xs:choice minOccurs="1" maxOccurs="1">
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
-              </xs:choice>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="door"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="NoGlobalPojoType" substitutionGroup="mule:abstract-operator" name="no-global-pojo"></xs:element>
-  <xs:complexType name="NoGlobalPojoType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
-        <xs:attribute type="xs:string" use="required" name="noGlobalPojo"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ProcessDoorType" substitutionGroup="mule:abstract-operator" name="process-door"></xs:element>
-  <xs:complexType name="ProcessDoorType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="door">
-            <xs:complexType>
-              <xs:choice minOccurs="1" maxOccurs="1">
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
-              </xs:choice>
-            </xs:complexType>
-          </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="door-registries">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="unbounded" name="door-registry">
-                  <xs:complexType>
-                    <xs:choice minOccurs="0" maxOccurs="unbounded">
-                      <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
-                      <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
-                    </xs:choice>
-                    <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
-                  </xs:complexType>
-                </xs:element>
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="door"></xs:attribute>
-        <xs:attribute type="mule:expressionMap" use="optional" name="doorRegistry"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ShapeRetrieverType" substitutionGroup="mule:abstract-operator" name="shape-retriever"></xs:element>
-  <xs:complexType name="ShapeRetrieverType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="shape">
-            <xs:complexType>
-              <xs:choice minOccurs="1" maxOccurs="1">
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
-              </xs:choice>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="shape"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SubtypedAndConcreteParametersType" substitutionGroup="mule:abstract-operator" name="subtyped-and-concrete-parameters"></xs:element>
-  <xs:complexType name="SubtypedAndConcreteParametersType">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
-        <xs:sequence minOccurs="0" maxOccurs="1">
-          <xs:element minOccurs="0" maxOccurs="1" name="base-shape">
-            <xs:complexType>
-              <xs:choice minOccurs="1" maxOccurs="1">
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
-              </xs:choice>
-            </xs:complexType>
-          </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="door">
-            <xs:complexType>
-              <xs:choice minOccurs="1" maxOccurs="1">
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
-              </xs:choice>
-            </xs:complexType>
-          </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="final-pojo">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.FinalPojo"></xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="cook-book">
-            <xs:complexType>
-              <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:abstract-vegan-cook-book"></xs:element>
-                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1" maxOccurs="1" ref="vegan:global-abstract-vegan-cook-book"></xs:element>
-              </xs:choice>
-            </xs:complexType>
-          </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="square-shape">
-            <xs:complexType>
-              <xs:choice minOccurs="1" maxOccurs="1">
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
-              </xs:choice>
-            </xs:complexType>
-          </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="triangle">
-            <xs:complexType>
-              <xs:choice minOccurs="1" maxOccurs="1">
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
-                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1" maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
-              </xs:choice>
-            </xs:complexType>
-          </xs:element>
-          <xs:element minOccurs="0" maxOccurs="1" name="no-ref">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.NoReferencePojo"></xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-        <xs:attribute type="xs:string" use="optional" name="baseShape"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="door"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="finalPojo"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="cookBook"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="squareShape"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="triangle"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="noRef"></xs:attribute>
-        <xs:attribute type="xs:string" use="optional" name="target">
-          <xs:annotation>
-            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
-          <xs:annotation>
-            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="org.mule.test.subtypes.extension.NoReferencePojo">
-    <xs:complexContent>
-      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-        <xs:attribute type="mule:expressionInt" use="required" name="number"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="required" name="string"></xs:attribute>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes"
+                xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SubtypesSourceType"
+                substitutionGroup="mule:abstract-message-source" name="subtypes-source"></xs:element>
+    <xs:complexType name="SubtypesSourceType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="door-param">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1"
+                                            maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1"
+                                            maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="doorParam"></xs:attribute>
+                <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+                    <xs:annotation>
+                        <xs:documentation>Whether this source should only be executed on the primary node when runnning
+                            in Cluster
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes"
+                xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="DoorRetrieverType"
+                substitutionGroup="mule:abstract-operator" name="door-retriever"></xs:element>
+    <xs:complexType name="DoorRetrieverType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="door">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1"
+                                            maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1"
+                                            maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="door"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes"
+                xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="NoGlobalPojoType"
+                substitutionGroup="mule:abstract-operator" name="no-global-pojo"></xs:element>
+    <xs:complexType name="NoGlobalPojoType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+                <xs:attribute type="xs:string" use="required" name="noGlobalPojo"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes"
+                xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ProcessDoorType"
+                substitutionGroup="mule:abstract-operator" name="process-door"></xs:element>
+    <xs:complexType name="ProcessDoorType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="door">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1"
+                                            maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1"
+                                            maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="door-registries">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="door-registry">
+                                    <xs:complexType>
+                                        <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                            <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                        minOccurs="1" maxOccurs="1"
+                                                        ref="subtypes:abstract-door"></xs:element>
+                                            <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                                        minOccurs="1" maxOccurs="1"
+                                                        ref="subtypes:global-abstract-door"></xs:element>
+                                        </xs:choice>
+                                        <xs:attribute type="mule:expressionString" use="required"
+                                                      name="key"></xs:attribute>
+                                        <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="door"></xs:attribute>
+                <xs:attribute type="mule:expressionMap" use="optional" name="doorRegistry"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes"
+                xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ShapeRetrieverType"
+                substitutionGroup="mule:abstract-operator" name="shape-retriever"></xs:element>
+    <xs:complexType name="ShapeRetrieverType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="shape">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1"
+                                            maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1"
+                                            maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="shape"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes"
+                xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SubtypedAndConcreteParametersType"
+                substitutionGroup="mule:abstract-operator" name="subtyped-and-concrete-parameters"></xs:element>
+    <xs:complexType name="SubtypedAndConcreteParametersType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+                <xs:sequence minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" name="base-shape">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1"
+                                            maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1"
+                                            maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="door">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1"
+                                            maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1"
+                                            maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="final-pojo">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                              base="subtypes:org.mule.test.subtypes.extension.FinalPojo"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="cook-book">
+                        <xs:complexType>
+                            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1"
+                                            maxOccurs="1" ref="vegan:abstract-vegan-cook-book"></xs:element>
+                                <xs:element xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan" minOccurs="1"
+                                            maxOccurs="1" ref="vegan:global-abstract-vegan-cook-book"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="square-shape">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1"
+                                            maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1"
+                                            maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="triangle">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1"
+                                            maxOccurs="1" ref="subtypes:abstract-parent-shape"></xs:element>
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="1"
+                                            maxOccurs="1" ref="subtypes:global-abstract-parent-shape"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="no-ref">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes"
+                                              base="subtypes:org.mule.test.subtypes.extension.NoReferencePojo"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="baseShape"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="door"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="finalPojo"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="cookBook"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="squareShape"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="triangle"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="noRef"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+                    <xs:annotation>
+                        <xs:documentation>An expression that will be evaluated against the operation's output and the
+                            outcome of that expression will be stored in the target variable
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="org.mule.test.subtypes.extension.NoReferencePojo">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionInt" use="required" name="number"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="required" name="string"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 </xs:schema>

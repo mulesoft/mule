@@ -57,102 +57,6 @@
         }
       },
       "fields": []
-    },
-    {
-      "format": "java",
-      "type": "Object",
-      "annotations": {
-        "typeId": "org.mule.tck.message.StringAttributes",
-        "classInformation": {
-          "classname": "org.mule.tck.message.StringAttributes",
-          "hasDefaultConstructor": true,
-          "isInterface": false,
-          "isInstantiable": true,
-          "isAbstract": false,
-          "isFinal": false,
-          "implementedInterfaces": [
-            "java.io.Serializable"
-          ],
-          "parent": "",
-          "genericTypes": [],
-          "isMap": false
-        },
-        "typeAlias": {
-          "value": "StringAttributes"
-        }
-      },
-      "fields": [
-        {
-          "key": {
-            "name": "value"
-          },
-          "model": {
-            "type": "String"
-          }
-        }
-      ]
-    },
-    {
-      "format": "java",
-      "type": "Object",
-      "annotations": {
-        "typeId": "org.mule.tck.testmodels.fruit.Banana",
-        "classInformation": {
-          "classname": "org.mule.tck.testmodels.fruit.Banana",
-          "hasDefaultConstructor": true,
-          "isInterface": false,
-          "isInstantiable": true,
-          "isAbstract": false,
-          "isFinal": false,
-          "implementedInterfaces": [
-            "org.mule.tck.testmodels.fruit.Fruit"
-          ],
-          "parent": "",
-          "genericTypes": [],
-          "isMap": false
-        },
-        "typeAlias": {
-          "value": "Banana"
-        }
-      },
-      "fields": [
-        {
-          "key": {
-            "name": "bitten"
-          },
-          "model": {
-            "type": "Boolean",
-            "annotations": {
-              "typeId": "boolean"
-            }
-          },
-          "annotations": {
-            "visibility": "READ_ONLY"
-          }
-        },
-        {
-          "key": {
-            "name": "origin"
-          },
-          "model": {
-            "type": "String"
-          }
-        },
-        {
-          "key": {
-            "name": "peeled"
-          },
-          "model": {
-            "type": "Boolean",
-            "annotations": {
-              "typeId": "boolean"
-            }
-          },
-          "annotations": {
-            "visibility": "READ_ONLY"
-          }
-        }
-      ]
     }
   ],
   "configurations": [
@@ -11948,6 +11852,40 @@
       "format": "java",
       "type": "Object",
       "annotations": {
+        "typeId": "org.mule.tck.message.StringAttributes",
+        "classInformation": {
+          "classname": "org.mule.tck.message.StringAttributes",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "java.io.Serializable"
+          ],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "StringAttributes"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "value"
+          },
+          "model": {
+            "type": "String"
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
         "typeId": "org.mule.tck.testmodels.fruit.Apple",
         "classInformation": {
           "classname": "org.mule.tck.testmodels.fruit.Apple",
@@ -12238,6 +12176,68 @@
             "annotations": {
               "typeId": "boolean"
             }
+          }
+        }
+      ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.tck.testmodels.fruit.Banana",
+        "classInformation": {
+          "classname": "org.mule.tck.testmodels.fruit.Banana",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "org.mule.tck.testmodels.fruit.Fruit"
+          ],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "Banana"
+        }
+      },
+      "fields": [
+        {
+          "key": {
+            "name": "bitten"
+          },
+          "model": {
+            "type": "Boolean",
+            "annotations": {
+              "typeId": "boolean"
+            }
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
+          }
+        },
+        {
+          "key": {
+            "name": "origin"
+          },
+          "model": {
+            "type": "String"
+          }
+        },
+        {
+          "key": {
+            "name": "peeled"
+          },
+          "model": {
+            "type": "Boolean",
+            "annotations": {
+              "typeId": "boolean"
+            }
+          },
+          "annotations": {
+            "visibility": "READ_ONLY"
           }
         }
       ]

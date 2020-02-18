@@ -135,14 +135,14 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
    * registry implementation to wraps the spring ApplicationContext
    *
-   * @param muleContext the {@link MuleContext} that own this context
-   * @param artifactDeclaration the mule configuration defined programmatically
-   * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
-   *        org.mule.runtime.config.internal.SpringRegistry
+   * @param muleContext                                the {@link MuleContext} that own this context
+   * @param artifactDeclaration                        the mule configuration defined programmatically
+   * @param optionalObjectsController                  the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
+   *                                                   org.mule.runtime.config.internal.SpringRegistry
    * @param parentConfigurationProperties
-   * @param disableXmlValidations {@code true} when loading XML configs it will not apply validations.
+   * @param disableXmlValidations                      {@code true} when loading XML configs it will not apply validations.
    * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
-   *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
+   *                                                   {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
    * @since 4.0
    */
   public LazyMuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
@@ -222,6 +222,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     }
 
     initialize();
+  }
+
+  @Override
+  protected boolean isRuntimeMode() {
+    return false;
   }
 
   @Override

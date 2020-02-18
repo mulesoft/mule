@@ -39,6 +39,7 @@ import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.declaration.type.annotation.ExpressionSupportAnnotation;
+import org.mule.runtime.extension.api.declaration.type.annotation.LayoutTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
 
@@ -86,6 +87,11 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
     } else {
       return emptyList();
     }
+  }
+
+  @Override
+  public String toString() {
+    return "MetadataTypeModelAdapter{" + type.toString() + "}";
   }
 
   private static class MetadataTypeModelAdapterWithStereotype extends MetadataTypeModelAdapter implements HasStereotypeModel {
@@ -194,9 +200,28 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
   private static class ObjectFieldTypeAsParameterModelAdapter implements ParameterModel {
 
     private final ObjectFieldType wrappedFieldType;
+    private final LayoutModel layoutModel;
 
     public ObjectFieldTypeAsParameterModelAdapter(ObjectFieldType wrappedFieldType) {
       this.wrappedFieldType = wrappedFieldType;
+      Optional<LayoutTypeAnnotation> optionalLayoutTypeAnnotation =
+          this.wrappedFieldType.getAnnotation(LayoutTypeAnnotation.class);
+      if (optionalLayoutTypeAnnotation.isPresent()) {
+        LayoutTypeAnnotation layoutTypeAnnotation = optionalLayoutTypeAnnotation.get();
+        LayoutModel.LayoutModelBuilder layoutModelBuilder = LayoutModel.builder();
+        if (layoutTypeAnnotation.isText()) {
+          layoutModelBuilder.asText();
+        }
+        if (layoutTypeAnnotation.isPassword()) {
+          layoutModelBuilder.asPassword();
+        }
+        if (layoutTypeAnnotation.isQuery()) {
+          layoutModelBuilder.asQuery();
+        }
+        layoutModel = layoutModelBuilder.build();
+      } else {
+        layoutModel = null;
+      }
     }
 
     @Override
@@ -221,7 +246,7 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
 
     @Override
     public MetadataType getType() {
-      return wrappedFieldType;
+      return wrappedFieldType.getValue();
     }
 
     @Override
@@ -272,7 +297,7 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
 
     @Override
     public Optional<LayoutModel> getLayoutModel() {
-      return empty();
+      return ofNullable(layoutModel);
     }
 
     @Override

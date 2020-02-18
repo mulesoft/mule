@@ -230,6 +230,7 @@ public interface AllureConstants {
     String JMS_EXTENSION = "JMS Extension";
 
     interface JmsStory {
+
     }
 
   }
@@ -239,6 +240,7 @@ public interface AllureConstants {
     String OAUTH_EXTENSION = "OAuth Extension";
 
     interface OauthStory {
+
     }
 
   }
@@ -290,6 +292,7 @@ public interface AllureConstants {
     String SOCKETS_EXTENSION = "Sockets Extension";
 
     interface SocketsStory {
+
     }
 
   }
@@ -299,6 +302,7 @@ public interface AllureConstants {
     String VALIDATION_EXTENSION = "Validation Extension";
 
     interface ValidationStory {
+
     }
 
   }
@@ -308,6 +312,7 @@ public interface AllureConstants {
     String WSC_EXTENSION = "WSC Extension";
 
     interface WscStory {
+
     }
 
   }
@@ -329,6 +334,7 @@ public interface AllureConstants {
     String INTEGRATIONS_TESTS = "Integration Tests";
 
     interface IntegrationTestsStory {
+
     }
 
   }
@@ -420,6 +426,7 @@ public interface AllureConstants {
     String TRANSFORM_MESSAGE = "Transform Message";
 
     interface TransformMessageStory {
+
     }
 
   }
@@ -600,6 +607,17 @@ public interface AllureConstants {
   interface MuleEvent {
 
     String MULE_EVENT = "Mule Event";
+
+  }
+
+  interface ArtifactAst {
+
+    String ARTIFACT_AST = "Mule Artifact AST";
+
+    interface ParameterAst {
+
+      String PARAMETER_AST = "Parameter AST resolution";
+    }
 
   }
 
