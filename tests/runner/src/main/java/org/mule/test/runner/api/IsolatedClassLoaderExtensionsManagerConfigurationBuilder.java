@@ -102,6 +102,7 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
   }
 
   public void loadExtensionModels() {
+    extensionModels.clear();
     try {
       loadRuntimeExtensionModels().forEach(extensionModels::add);
       for (Object pluginClassLoader : pluginsClassLoaders) {
