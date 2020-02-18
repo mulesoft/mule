@@ -107,6 +107,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   private static ServiceManager serviceRepository;
   private static ClassLoaderRepository classLoaderRepository;
   private static IsolatedClassLoaderExtensionsManagerConfigurationBuilder extensionsManagerConfigurationBuilder;
+  private static IsolatedClassLoaderExtensionsManagerConfigurationBuilder alternativeExtensionsManagerConfigurationBuilder;
 
   private static TestServicesMuleContextConfigurator serviceConfigurator;
   private Once.RunOnce loadExtensions = Once.of(() -> extensionsManagerConfigurationBuilder.loadExtensionModels());
@@ -148,6 +149,9 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     pluginClassLoaders = artifactClassLoaders;
     if (!pluginClassLoaders.isEmpty()) {
       extensionsManagerConfigurationBuilder =
+          new IsolatedClassLoaderExtensionsManagerConfigurationBuilder(pluginClassLoaders);
+      extensionsManagerConfigurationBuilder.loadExtensionModels();
+      alternativeExtensionsManagerConfigurationBuilder =
           new IsolatedClassLoaderExtensionsManagerConfigurationBuilder(pluginClassLoaders);
     }
   }
@@ -244,8 +248,12 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     }
 
     if (extensionsManagerConfigurationBuilder != null) {
-      loadExtensions.runOnce();
-      builders.add(0, extensionsManagerConfigurationBuilder);
+      if (mustRegenerateExtensionModels()) {
+        alternativeExtensionsManagerConfigurationBuilder.loadExtensionModels();
+        builders.add(0, alternativeExtensionsManagerConfigurationBuilder);
+      } else {
+        builders.add(0, extensionsManagerConfigurationBuilder);
+      }
     }
 
     builders.add(0, new TestBootstrapServiceDiscovererConfigurationBuilder(containerClassLoader, getExecutionClassLoader(),
@@ -261,6 +269,17 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
                                                                         new NullPolicyProvider());
       }
     });
+  }
+
+  /**
+   * Subclasses can override this method so that extension models used are regenerated before running its tests. For example,
+   * some part of a extension model might only be created if a certain system property is in place, so the test classes that
+   * test that feature will have to generate the extension model when the property is already set.
+   *
+   * @return whether the tests on this class need for extensions model to be generated again.
+   */
+  protected boolean mustRegenerateExtensionModels() {
+    return false;
   }
 
   /**
