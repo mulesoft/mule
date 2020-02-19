@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -60,10 +59,14 @@ public class SourceConnectionManager {
     ConnectionHandler<Object> connectionHandler = connectionManager.getConnection(config.getValue());
     Object connection = connectionHandler.getConnection();
     Reference<Object> connReference = new Reference<>(connection);
-    withLock(lock, () -> {
+    lock.lock();
+    try {
       connections.get(connReference, k -> new Pair<>(new AtomicInteger(0), connectionHandler))
           .getFirst().incrementAndGet();
-    });
+    } finally {
+      lock.unlock();
+    }
+
     return (T) connection;
   }
 
@@ -123,14 +126,16 @@ public class SourceConnectionManager {
 
   private void decreaseConnectionReferenceCount(Reference<Object> connReference,
                                                 Consumer<ConnectionHandler<Object>> consumer) {
-    withLock(lock, () -> {
+    lock.lock();
+    try {
       final Pair<AtomicInteger, ConnectionHandler<Object>> connPair = connections.getIfPresent(connReference);
       if (connPair == null || connPair.getFirst().decrementAndGet() > 0) {
         return;
       }
       consumer.accept(connPair.getSecond());
       connections.invalidate(connReference);
-    });
+    } finally {
+      lock.unlock();
+    }
   }
-
 }

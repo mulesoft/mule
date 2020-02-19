@@ -853,7 +853,9 @@ public class ClassUtils {
    *
    * @param classLoader the context {@link ClassLoader} on which the {@code runnable} should be executed
    * @param runnable a closure
+   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually using {@link #setContextClassLoader(Thread, ClassLoader, ClassLoader)} instead
    */
+  @Deprecated
   public static void withContextClassLoader(ClassLoader classLoader, Runnable runnable) {
     try {
       withContextClassLoader(classLoader, runnable, RuntimeException.class, e -> {
@@ -873,7 +875,9 @@ public class ClassUtils {
    * @param classLoader the context {@link ClassLoader} on which the {@code runnable} should be executed
    * @param callable a {@link Callable}
    * @return the value that the {@code callable} produced
+   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually using {@link #setContextClassLoader(Thread, ClassLoader, ClassLoader)} instead
    */
+  @Deprecated
   public static <T> T withContextClassLoader(ClassLoader classLoader, Callable<T> callable) {
     return withContextClassLoader(classLoader, callable, RuntimeException.class, e -> {
       throw new MuleRuntimeException(e);
@@ -899,7 +903,9 @@ public class ClassUtils {
    * @param <T> the generic type of the return value
    * @param <E> the generic type of the expected exception
    * @throws E if the expected exception is actually thrown
+   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually using {@link #setContextClassLoader(Thread, ClassLoader, ClassLoader)} instead
    */
+  @Deprecated
   public static <T, E extends Exception> void withContextClassLoader(ClassLoader classLoader, Runnable runnable,
                                                                      Class<E> expectedExceptionType,
                                                                      ExceptionHandler<T, E> exceptionHandler)
@@ -938,7 +944,9 @@ public class ClassUtils {
    * @param <E> the generic type of the expected exception
    * @return a value returned by either the {@code callable} or the {@code exceptionHandler}
    * @throws E if the expected exception is actually thrown
+   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually using {@link #setContextClassLoader(Thread, ClassLoader, ClassLoader)} instead
    */
+  @Deprecated
   public static <T, E extends Exception> T withContextClassLoader(ClassLoader classLoader, Callable<T> callable,
                                                                   Class<E> expectedExceptionType,
                                                                   ExceptionHandler<T, E> exceptionHandler)
@@ -958,6 +966,39 @@ public class ClassUtils {
   }
 
   /**
+   * Sets {@code newClassLoader} as the context class loader for the {@code thread}, as long as said classloader is not the
+   * same instance as {@code currentClassLoader}.
+   *
+   * Since obtaining and setting the context classloader from a thread are expensive operations, the purpose of this method
+   * is to avoid performing those operations when possible, which is why the two classloaders are tested not to be the same
+   * before performing the set operation. For this method to make sense, {@code currentClassLoader} should actually be the
+   * current context classloader from the {@code thread}.
+   *
+   * This is how a typical use should look like:
+   * <pre>
+   *   Thread thread = Thread.currentThread();
+   *   ClassLoader currentClassLoader = thread.getContextClassLoader();
+   *   ClassLoader newClassLoader = getNewContextClassLoader(); // this one depends on your logic
+   *   ClassUtils.setContextClassLoader(thread, currentClassLoader, newClassLoader);
+   *   try {
+   *     // execute your logic
+   *   } finally {
+   *     // set things back as they were by reversing the arguments order
+   *     ClassUtils.setContextClassLoader(thread, newClassLoader, currentClassLoader);
+   *   }
+   * </pre>
+   * @param thread the thread which context classloader is to be changed
+   * @param currentClassLoader the thread's current context classloader
+   * @param newClassLoader the new classloader to be set
+   * @since 4.3.0
+   */
+  public static void setContextClassLoader(Thread thread, ClassLoader currentClassLoader, ClassLoader newClassLoader) {
+    if (currentClassLoader != newClassLoader) {
+      thread.setContextClassLoader(newClassLoader);
+    }
+  }
+
+  /**
    * Wraps the given function {@code f} so that results for a given input are cached in the given Map.
    *
    * @param f the function to memoize
@@ -965,9 +1006,7 @@ public class ClassUtils {
    * @return the memoized function
    */
   public static <I, O> Function<I, O> memoize(Function<I, O> f, Map<I, O> cache) {
-    return input -> {
-      return cache.computeIfAbsent(input, f);
-    };
+    return input -> cache.computeIfAbsent(input, f);
   }
 
   /**

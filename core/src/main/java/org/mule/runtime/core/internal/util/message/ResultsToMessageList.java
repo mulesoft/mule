@@ -39,78 +39,113 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
 
   @Override
   public void add(int index, Message element) {
-    lock.withWriteLock(() -> delegate.add(index, element));
+    writeLock.lock();
+    try {
+      delegate.add(index, element);
+    } finally {
+      writeLock.unlock();
+    }
   }
 
   @Override
   public boolean addAll(int index, Collection<? extends Message> c) {
-    return lock.withWriteLock(() -> delegate.addAll(index, c));
+    writeLock.lock();
+    try {
+      return delegate.addAll(index, c);
+    } finally {
+      writeLock.unlock();
+    }
   }
 
   @Override
   public int indexOf(Object o) {
-    return lock.withReadLock(() -> {
+    readLock.lock();
+    try {
       int i = delegate.indexOf(o);
       if (i == -1 && o instanceof Message) {
         i = delegate.indexOf(Result.builder((Message) o).build());
       }
 
       return i;
-    });
+    } finally {
+      readLock.unlock();
+    }
   }
 
   @Override
   public int lastIndexOf(Object o) {
-    return lock.withReadLock(() -> {
+    readLock.lock();
+    try {
       int i = delegate.lastIndexOf(o);
       if (i == -1 && o instanceof Message) {
         i = delegate.lastIndexOf(Result.builder((Message) o).build());
       }
 
       return i;
-    });
+    } finally {
+      readLock.unlock();
+    }
   }
 
   @Override
   public void sort(Comparator<? super Message> c) {
-    lock.withWriteLock(() -> delegate.sort((o1, o2) -> c.compare(toMessage(o1, cursorProviderFactory, eventContext),
-                                                                 toMessage(o2, cursorProviderFactory, eventContext))));
+    writeLock.lock();
+    try {
+      delegate.sort((o1, o2) -> c.compare(toMessage(o1, cursorProviderFactory, eventContext),
+                                          toMessage(o2, cursorProviderFactory, eventContext)));
+    } finally {
+      writeLock.unlock();
+    }
   }
 
   @Override
   public Message get(int index) {
-    return (Message) lock.withReadLock(r -> {
+    readLock.lock();
+    try {
       Object value = delegate.get(index);
       if (value instanceof Message) {
-        return value;
+        return (Message) value;
       }
-      r.release();
-      return lock.withWriteLock(() -> {
+      readLock.unlock();
+      writeLock.lock();
+      try {
         Object update = delegate.get(index);
         if (update instanceof Message) {
-          return update;
+          return (Message) update;
         }
         update = toMessage(update, cursorProviderFactory, eventContext);
         delegate.set(index, update);
-        return update;
-      });
-    });
+
+        return (Message) update;
+      } finally {
+        readLock.lock();
+        writeLock.unlock();
+      }
+    } finally {
+      readLock.unlock();
+    }
   }
 
   @Override
   public Message set(int index, Message message) {
-    return lock.withWriteLock(() -> {
+    writeLock.lock();
+    try {
       Object previous = delegate.set(index, message);
       return previous != null ? toMessage(previous, cursorProviderFactory, eventContext) : null;
-    });
+    } finally {
+      writeLock.unlock();
+    }
   }
 
   @Override
   public Message remove(int index) {
-    return lock.withWriteLock(() -> {
+    writeLock.lock();
+    try {
       Object previous = delegate.remove(index);
       return previous != null ? toMessage(previous, cursorProviderFactory, eventContext) : null;
-    });
+    } finally {
+      writeLock.unlock();
+    }
   }
 
   @Override
@@ -130,10 +165,12 @@ public final class ResultsToMessageList extends ResultsToMessageCollection imple
 
   @Override
   public List<Message> subList(int fromIndex, int toIndex) {
-    return lock.withReadLock(() -> {
+    readLock.lock();
+    try {
       List results = delegate.subList(fromIndex, toIndex);
       return new ResultsToMessageList(results, cursorProviderFactory, eventContext);
-    });
+    } finally {
+      readLock.unlock();
+    }
   }
-
 }
