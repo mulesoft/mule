@@ -871,7 +871,8 @@ class MuleExtensionModelDeclarer {
         .ofType(typeLoader.load(boolean.class))
         .defaultingTo(false)
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("Whether streamed iterable objects should follow the repeatability strategy of the iterable or use the default one.");
+        .describedAs("Whether streamed iterable objects should follow the repeatability strategy of the iterable or use the default one.")
+        .withModelProperty(new SinceMuleVersionModelProperty("4.3.0"));
 
     configuration.onDefaultParameterGroup()
         .withOptionalParameter("shutdownTimeout")
