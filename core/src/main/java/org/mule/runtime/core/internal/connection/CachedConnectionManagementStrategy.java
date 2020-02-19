@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.connection;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStopping;
-import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.unwrap;
 
@@ -83,9 +82,12 @@ final class CachedConnectionManagementStrategy<C> extends ConnectionManagementSt
   }
 
   private synchronized void lazyConnect() {
-    withLock(connectionLock, () -> {
+    connectionLock.lock();
+    try {
       connectionHandler = new LazyValue<>((CheckedSupplier<ConnectionHandlerAdapter<C>>) this::createConnection);
-    });
+    } finally {
+      connectionLock.unlock();
+    }
   }
 
   private ConnectionHandlerAdapter<C> createConnection() throws ConnectionException {
@@ -105,7 +107,12 @@ final class CachedConnectionManagementStrategy<C> extends ConnectionManagementSt
     try {
       close(connection);
     } finally {
-      withLock(connectionLock, () -> lazyConnect());
+      connectionLock.lock();
+      try {
+        lazyConnect();
+      } finally {
+        connectionLock.unlock();
+      }
     }
   }
 }

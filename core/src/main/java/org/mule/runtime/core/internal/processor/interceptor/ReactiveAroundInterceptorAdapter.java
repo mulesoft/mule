@@ -99,7 +99,6 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
       ClassLoader originalClassLoader = currentThread.getContextClassLoader();
       ClassLoader interceptorClassLoader = interceptor.getClass().getClassLoader();
       setContextClassLoader(currentThread, originalClassLoader, interceptorClassLoader);
-      currentThread.setContextClassLoader(interceptorClassLoader);
       try {
         future = interceptor.around(((Component) component).getLocation(),
                                     getResolvedParams(eventWithResolvedParams), interceptionEvent,

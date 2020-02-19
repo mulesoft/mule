@@ -381,7 +381,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
         }
       });
     } catch (ConnectionException e) {
-      return failure(newFailure(e).onKeys());
+      return failure(newFailure(e).onComponent());
     }
   }
 
@@ -402,7 +402,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
         }
       });
     } catch (ConnectionException e) {
-      return failure(newFailure(e).onKeys());
+      return failure(newFailure(e).onComponent());
     }
   }
 

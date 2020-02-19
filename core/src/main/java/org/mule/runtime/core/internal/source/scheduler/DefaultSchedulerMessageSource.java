@@ -14,6 +14,7 @@ import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_SCHEDULERS;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
@@ -135,11 +136,12 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
       pollingExecutor.execute(() -> {
         Thread currentThread = currentThread();
         ClassLoader originalTCCL = currentThread.getContextClassLoader();
-        currentThread.setContextClassLoader(muleContext.getExecutionClassLoader());
+        ClassLoader executionClassLoader = muleContext.getExecutionClassLoader();
+        setContextClassLoader(currentThread, originalTCCL, executionClassLoader);
         try {
           poll();
         } finally {
-          currentThread.setContextClassLoader(originalTCCL);
+          setContextClassLoader(currentThread, executionClassLoader, originalTCCL);
         }
       });
     }
@@ -202,7 +204,6 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
       executing = value;
     }
   }
-
 
   /**
    * <p>

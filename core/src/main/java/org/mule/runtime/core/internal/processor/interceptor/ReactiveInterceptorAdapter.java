@@ -162,11 +162,12 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
       try {
         Thread currentThread = currentThread();
         ClassLoader originalTCCL = currentThread.getContextClassLoader();
-        currentThread.setContextClassLoader(interceptor.getClass().getClassLoader());
+        ClassLoader contextClassLoader = interceptor.getClass().getClassLoader();
+        setContextClassLoader(currentThread, originalTCCL, contextClassLoader);
         try {
           interceptor.after(component.getLocation(), interceptionEvent, thrown);
         } finally {
-          currentThread.setContextClassLoader(originalTCCL);
+          setContextClassLoader(currentThread, contextClassLoader, originalTCCL);
         }
         return interceptionEvent.resolve();
       } catch (Exception e) {

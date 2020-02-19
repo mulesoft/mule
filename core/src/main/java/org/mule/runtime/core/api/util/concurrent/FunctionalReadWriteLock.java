@@ -20,13 +20,17 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * Exposes a {@link ReentrantReadWriteLock} through a functional interface
  *
  * @since 4.0
+ * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually instead
  */
+@Deprecated
 public final class FunctionalReadWriteLock {
 
   /**
    * Functional interface for releasing a subject lock.
+   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually instead
    */
   @FunctionalInterface
+  @Deprecated
   public interface LockReleaser {
 
     /**

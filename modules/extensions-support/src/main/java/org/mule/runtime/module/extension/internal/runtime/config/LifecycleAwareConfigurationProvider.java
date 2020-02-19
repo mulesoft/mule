@@ -119,6 +119,8 @@ public abstract class LifecycleAwareConfigurationProvider extends AbstractCompon
         }
       });
     } catch (MuleException e) {
+      throw e;
+    } catch (Exception e) {
       throw new DefaultMuleException(e);
     } finally {
       setContextClassLoader(thread, extensionClassLoader, currentClassLoader);
@@ -142,6 +144,8 @@ public abstract class LifecycleAwareConfigurationProvider extends AbstractCompon
         }
       });
     } catch (MuleException e) {
+      throw e;
+    } catch (Exception e) {
       throw new DefaultMuleException(e);
     } finally {
       setContextClassLoader(thread, extensionClassLoader, currentClassLoader);

@@ -95,8 +95,8 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
     // moved wrapper logic into the actual implementation, as redeploy() invokes it directly, bypassing
     // classloader cleanup
 
+    ClassLoader artifactCL = null;
     try {
-      ClassLoader artifactCL = null;
       if (getArtifactClassLoader() != null) {
         artifactCL = getArtifactClassLoader().getClassLoader();
       }
@@ -116,7 +116,7 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
       }
     } finally {
       // kill any refs to the old classloader to avoid leaks
-      currentThread.setContextClassLoader(originalClassLoader);
+      setContextClassLoader(currentThread, artifactCL, originalClassLoader);
       deploymentClassLoader = null;
     }
   }
