@@ -267,11 +267,11 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   public Set<Value> getConfigValues(String parameterName) throws ValueResolvingException {
     return valuesWithClassLoader(() -> new ValueProviderMediator<>(getConfigurationModel(), () -> muleContext,
                                                                    () -> reflectionCache)
-                                     .getValues(parameterName,
-                                                new ResolverSetBasedParameterResolver(resolverSet,
-                                                                                      getConfigurationModel(),
-                                                                                      reflectionCache,
-                                                                                      expressionManager)),
+                                                                       .getValues(parameterName,
+                                                                                  new ResolverSetBasedParameterResolver(resolverSet,
+                                                                                                                        getConfigurationModel(),
+                                                                                                                        reflectionCache,
+                                                                                                                        expressionManager)),
                                  getExtensionModel());
   }
 
@@ -283,21 +283,21 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     return valuesWithClassLoader(() -> {
       ConnectionProviderModel connectionProviderModel = getConnectionProviderModel()
           .orElseThrow(() -> new ValueResolvingException(
-              "Internal Error. Unable to resolve values because the service is unable to get the connection model",
-              UNKNOWN));
+                                                         "Internal Error. Unable to resolve values because the service is unable to get the connection model",
+                                                         UNKNOWN));
       ResolverSet resolverSet = ((Optional<ResolverSet>) connectionProviderResolver.getResolverSet())
           .orElseThrow(() -> new ValueResolvingException(
-              "Internal Error. Unable to resolve values because of the service is unable to retrieve connection parameters",
-              UNKNOWN));
+                                                         "Internal Error. Unable to resolve values because of the service is unable to retrieve connection parameters",
+                                                         UNKNOWN));
 
       return new ValueProviderMediator<>(connectionProviderModel,
                                          () -> muleContext,
                                          () -> reflectionCache)
-          .getValues(parameterName,
-                     new ResolverSetBasedParameterResolver(resolverSet,
-                                                           connectionProviderModel,
-                                                           reflectionCache,
-                                                           expressionManager));
+                                             .getValues(parameterName,
+                                                        new ResolverSetBasedParameterResolver(resolverSet,
+                                                                                              connectionProviderModel,
+                                                                                              reflectionCache,
+                                                                                              expressionManager));
     }, getExtensionModel());
   }
 

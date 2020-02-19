@@ -157,11 +157,11 @@ public abstract class LifecycleAwareConfigurationProvider extends AbstractCompon
     ClassLoader currentClassLoader = currentThread.getContextClassLoader();
     setContextClassLoader(currentThread, currentClassLoader, extensionClassLoader);
     try {
-        lifecycleManager.fireDisposePhase((phaseName, object) -> {
-          for (ConfigurationInstance configurationInstance : configurationInstances) {
-            disposeIfNeeded(configurationInstance, LOGGER);
-          }
-        });
+      lifecycleManager.fireDisposePhase((phaseName, object) -> {
+        for (ConfigurationInstance configurationInstance : configurationInstances) {
+          disposeIfNeeded(configurationInstance, LOGGER);
+        }
+      });
     } catch (Exception e) {
       LOGGER.error("Could not dispose configuration provider of name " + getName(), e);
     } finally {

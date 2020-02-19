@@ -121,8 +121,7 @@ public class ArtifactContextBuilder {
   private ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
   private LockFactory runtimeLockFactory;
 
-  private ArtifactContextBuilder() {
-  }
+  private ArtifactContextBuilder() {}
 
   /**
    * @return a new builder to create a {@link ArtifactContext} instance.
@@ -370,7 +369,7 @@ public class ArtifactContextBuilder {
    * @return the builder
    */
   public ArtifactContextBuilder setRuntimeComponentBuildingDefinitionProvider(
-      ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
+                                                                              ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
     this.runtimeComponentBuildingDefinitionProvider = runtimeComponentBuildingDefinitionProvider;
     return this;
   }

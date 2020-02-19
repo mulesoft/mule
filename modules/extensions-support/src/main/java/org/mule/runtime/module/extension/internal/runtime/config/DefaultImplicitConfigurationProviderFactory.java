@@ -51,7 +51,7 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
                                                                    MuleContext muleContext) {
     if (implicitConfigurationModel == null || !canBeUsedImplicitly(implicitConfigurationModel)) {
       throw new IllegalStateException("Could not find a config for extension '" + extensionModel.getName()
-                                          + "' and none can be created automatically. Please define one");
+          + "' and none can be created automatically. Please define one");
     }
 
     final String providerName = getImplicitConfigurationProviderName(extensionModel, implicitConfigurationModel);
@@ -81,7 +81,8 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
                                                                  resolverSet,
                                                                  expressionManager,
                                                                  muleContext)
-            .createConfiguration(providerName, event, implicitConnectionProviderValueResolver);
+                                                                     .createConfiguration(providerName, event,
+                                                                                          implicitConnectionProviderValueResolver);
       } finally {
         setContextClassLoader(currentThread, pluginClassloader, currentClassLoader);
       }
@@ -101,10 +102,10 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
 
     } catch (Exception e) {
       throw new MuleRuntimeException(
-          createStaticMessage(format("Could not create an implicit configuration '%s' for the extension '%s'",
-                                     implicitConfigurationModel.getName(),
-                                     extensionModel.getName())),
-          e);
+                                     createStaticMessage(format("Could not create an implicit configuration '%s' for the extension '%s'",
+                                                                implicitConfigurationModel.getName(),
+                                                                extensionModel.getName())),
+                                     e);
     }
   }
 

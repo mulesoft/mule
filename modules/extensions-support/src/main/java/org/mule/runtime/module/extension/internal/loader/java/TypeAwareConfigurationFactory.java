@@ -68,7 +68,7 @@ public final class TypeAwareConfigurationFactory implements ConfigurationFactory
       return configurationType.get().newInstance();
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Could not instantiate configuration of type "
-                                                             + configurationType.get().getName()), e);
+          + configurationType.get().getName()), e);
     } finally {
       setContextClassLoader(thread, extensionClassLoader, currentClassLoader);
     }

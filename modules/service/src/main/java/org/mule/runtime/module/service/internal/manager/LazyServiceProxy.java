@@ -203,7 +203,8 @@ public class LazyServiceProxy implements InvocationHandler {
           ((DisposableClassLoader) assembly.getClassLoader()).dispose();
         } catch (Exception e) {
           LOGGER.warn(format("Service '%s' class loader was not stopped properly: %s",
-                             assembly.getName(), e.getMessage()), e);
+                             assembly.getName(), e.getMessage()),
+                      e);
         }
       }
     } catch (RuntimeException e) {

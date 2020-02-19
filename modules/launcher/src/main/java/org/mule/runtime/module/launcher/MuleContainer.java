@@ -139,9 +139,9 @@ public class MuleContainer {
                                                     artifactResourcesRegistry.getApplicationFactory(),
                                                     artifactResourcesRegistry.getToolingApplicationDescriptorFactory());
     this.coreExtensionManager = new DefaultMuleCoreExtensionManagerServer(
-        new ClasspathMuleCoreExtensionDiscoverer(artifactResourcesRegistry
-                                                     .getContainerClassLoader()),
-        new ReflectionMuleCoreExtensionDependencyResolver());
+                                                                          new ClasspathMuleCoreExtensionDiscoverer(artifactResourcesRegistry
+                                                                              .getContainerClassLoader()),
+                                                                          new ReflectionMuleCoreExtensionDependencyResolver());
     this.muleLockFactory = artifactResourcesRegistry.getRuntimeLockFactory();
 
     artifactResourcesRegistry.getContainerClassLoader().dispose();
@@ -219,8 +219,8 @@ public class MuleContainer {
     if (!executionFolder.exists()) {
       if (!executionFolder.mkdirs()) {
         throw new MuleRuntimeException(CoreMessages.createStaticMessage(format(
-            "Could not create folder %s, validate that the process has permissions over that directory",
-            executionFolder.getAbsolutePath())));
+                                                                               "Could not create folder %s, validate that the process has permissions over that directory",
+                                                                               executionFolder.getAbsolutePath())));
       }
     }
   }

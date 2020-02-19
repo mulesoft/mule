@@ -248,9 +248,9 @@ public class PlatformManagedOAuthConnectionProvider<C> implements OAuthConnectio
 
   private MuleException newConnectionDescriptorException(Throwable e) {
     return new DefaultMuleException(
-        "Could not obtain descriptor for Platform Managed OAuth Connection "
-            + oauthConfig.getConnectionUri(),
-        e);
+                                    "Could not obtain descriptor for Platform Managed OAuth Connection "
+                                        + oauthConfig.getConnectionUri(),
+                                    e);
   }
 
   private FieldSetter<ConnectionProvider<C>, OAuthState> getOAuthStateSetter(ConnectionProvider<C> delegate) {
@@ -278,8 +278,8 @@ public class PlatformManagedOAuthConnectionProvider<C> implements OAuthConnectio
 
   private IllegalConnectionProviderModelDefinitionException illegalDelegateException() {
     return new IllegalConnectionProviderModelDefinitionException(format(
-        "Configuration '%s' cannot have a platform managed OAuth connection that delegates into itself",
-        oauthConfig.getOwnerConfigName()));
+                                                                        "Configuration '%s' cannot have a platform managed OAuth connection that delegates into itself",
+                                                                        oauthConfig.getOwnerConfigName()));
   }
 
   @Override

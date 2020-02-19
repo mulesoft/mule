@@ -88,9 +88,10 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
                                                                                              muleContext);
         configuration = configurationFactory.createConfiguration(name, initialiserEvent, connectionProviderResolver);
       } catch (MuleException e) {
-        throw new MuleRuntimeException(new ConfigurationException(createStaticMessage(format("Could not create configuration '%s' for the '%s'", name,
-                                                          extensionModel.getName())),
-                               e));
+        throw new MuleRuntimeException(new ConfigurationException(createStaticMessage(format("Could not create configuration '%s' for the '%s'",
+                                                                                             name,
+                                                                                             extensionModel.getName())),
+                                                                  e));
       } finally {
         if (initialiserEvent != null) {
           ((BaseEventContext) initialiserEvent.getContext()).success();

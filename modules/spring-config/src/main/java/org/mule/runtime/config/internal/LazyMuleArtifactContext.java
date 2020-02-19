@@ -382,17 +382,17 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           componentModel -> beanDefinitionFactory.isLanguageConstructComponent(componentModel.getIdentifier());
 
       final ArtifactAst minimalApplicationModel = graph.minimalArtifactFor(basePredicate
-                                                                               .or(txManagerPredicate)
-                                                                               .or(configPredicate)
-                                                                               .or(alwaysEnabledPredicate)
-                                                                               .or(languageConstructPredicate));
+          .or(txManagerPredicate)
+          .or(configPredicate)
+          .or(alwaysEnabledPredicate)
+          .or(languageConstructPredicate));
 
       if (locationOptional.map(loc -> minimalApplicationModel.recursiveStream()
           .noneMatch(comp -> comp.getLocation() != null
               && comp.getLocation().getLocation().equals(loc.toString())))
           .orElse(false)) {
         throw new NoSuchComponentModelException(createStaticMessage("No object found at location "
-                                                                        + locationOptional.get().toString()));
+            + locationOptional.get().toString()));
       }
 
       Set<String> requestedLocations = locationOptional.map(location -> (Set<String>) newHashSet(location.toString()))

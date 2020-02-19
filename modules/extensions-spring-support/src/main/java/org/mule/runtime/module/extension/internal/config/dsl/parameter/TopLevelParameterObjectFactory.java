@@ -50,7 +50,7 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
     objectClass = new LazyValue<>(() -> {
       Thread currentThread = currentThread();
       ClassLoader originalClassLoader = currentThread.getContextClassLoader();
-      ClassLoader contextClassLoader = this.getClass().getClassLoader();
+      ClassLoader contextClassLoader = classLoader;
       setContextClassLoader(currentThread, originalClassLoader, contextClassLoader);
       try {
         // We must add the annotations support with a proxy to avoid the SDK user to clutter the POJO definitions in an extension

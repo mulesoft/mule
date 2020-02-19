@@ -43,10 +43,10 @@ final class DefaultConnectionProviderFactory<C> implements ConnectionProviderFac
     this.extensionClassLoader = new WeakReference<>(extensionClassLoader);
     if (!ConnectionProvider.class.isAssignableFrom(providerClass)) {
       throw new IllegalConnectionProviderModelDefinitionException(String
-                                                                      .format(
-                                                                          "Class '%s' was specified as a connection provider but it doesn't implement the '%s' interface",
-                                                                          providerClass.getName(),
-                                                                          ConnectionProvider.class.getName()));
+          .format(
+                  "Class '%s' was specified as a connection provider but it doesn't implement the '%s' interface",
+                  providerClass.getName(),
+                  ConnectionProvider.class.getName()));
     }
 
     checkInstantiable(providerClass, new ReflectionCache());
@@ -66,7 +66,9 @@ final class DefaultConnectionProviderFactory<C> implements ConnectionProviderFac
       return (ConnectionProvider<C>) providerClass.get().newInstance();
     } catch (Exception e) {
       throw new MuleRuntimeException(
-          createStaticMessage("Could not create connection provider of type " + providerClass.get().getName()), e);
+                                     createStaticMessage("Could not create connection provider of type "
+                                         + providerClass.get().getName()),
+                                     e);
     } finally {
       setContextClassLoader(thread, contextClassLoader, currentClassLoader);
     }
