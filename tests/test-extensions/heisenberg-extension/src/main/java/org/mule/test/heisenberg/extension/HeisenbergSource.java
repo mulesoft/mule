@@ -196,7 +196,7 @@ public class HeisenbergSource extends Source<String, Object> {
     receivedInlineOnSuccess = successInfo != null && successInfo.getAge() != null && successInfo.getKnownAddresses() != null;
     executedOnSuccess = true;
 
-    notificationEmitter.fireLazy(BATCH_DELIVERED, () -> payment, fromType(Long.class));
+    //notificationEmitter.fireLazy(BATCH_DELIVERED, () -> payment, fromType(Long.class));
 
     if (fail) {
       throw new RuntimeException("Some internal exception");
@@ -215,7 +215,7 @@ public class HeisenbergSource extends Source<String, Object> {
     receivedGroupOnSource = ricin != null && ricin.getNextDoor() != null && ricin.getNextDoor().getAddress() != null;
     receivedInlineOnError = infoError != null && infoError.getName() != null && !infoError.getName().equals(HEISENBERG);
     executedOnError = true;
-    notificationEmitter.fireLazy(BATCH_DELIVERY_FAILED, () -> infoError, DataType.fromType(PersonalInfo.class));
+    //notificationEmitter.fireLazy(BATCH_DELIVERY_FAILED, () -> infoError, DataType.fromType(PersonalInfo.class));
     if (propagateError) {
       throw new RuntimeException("Some internal exception");
     }
@@ -240,16 +240,16 @@ public class HeisenbergSource extends Source<String, Object> {
       });
     }
     executedOnTerminate = true;
-    notificationEmitter.fireLazy(BATCH_TERMINATED, () -> sourceResult.getSourceCallbackContext().getVariable(BATCH_NUMBER).get(),
-                                 fromType(Integer.class));
+    //notificationEmitter.fireLazy(BATCH_TERMINATED, () -> sourceResult.getSourceCallbackContext().getVariable(BATCH_NUMBER).get(),
+    //                             fromType(Integer.class));
   }
 
   @OnBackPressure
   public void onBackPressure(BackPressureContext ctx, NotificationEmitter notificationEmitter) {
     LOGGER.error("onBackPressure()");
 
-    notificationEmitter.fireLazy(BATCH_FAILED, () -> ctx.getSourceCallbackContext().getVariable(BATCH_NUMBER).get(),
-                                 fromType(Integer.class));
+    //notificationEmitter.fireLazy(BATCH_FAILED, () -> ctx.getSourceCallbackContext().getVariable(BATCH_NUMBER).get(),
+    //                             fromType(Integer.class));
     heisenberg.onBackPressure(ctx);
   }
 

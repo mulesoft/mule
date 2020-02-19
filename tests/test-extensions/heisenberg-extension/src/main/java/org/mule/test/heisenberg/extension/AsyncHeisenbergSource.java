@@ -26,6 +26,9 @@ import org.mule.test.heisenberg.extension.model.Methylamine;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.stereotypes.AsyncSourceStereotype;
 
+import org.apache.log4j.Logger;
+
+
 @Alias("AsyncListenPayments")
 @EmitsResponse
 @Fires(SourceNotificationProvider.class)
@@ -33,6 +36,8 @@ import org.mule.test.heisenberg.extension.stereotypes.AsyncSourceStereotype;
 @Stereotype(AsyncSourceStereotype.class)
 @MediaType(TEXT_PLAIN)
 public class AsyncHeisenbergSource extends HeisenbergSource {
+
+  private static final Logger LOGGER = Logger.getLogger(AsyncHeisenbergSource.class);
 
   public static SourceCompletionCallback completionCallback;
 
@@ -43,6 +48,7 @@ public class AsyncHeisenbergSource extends HeisenbergSource {
                         @Optional boolean fail,
                         SourceCompletionCallback completionCallback,
                         NotificationEmitter notificationEmitter) {
+    LOGGER.error("onSuccess()");
 
     AsyncHeisenbergSource.completionCallback = completionCallback;
 
@@ -61,6 +67,7 @@ public class AsyncHeisenbergSource extends HeisenbergSource {
                       @Optional boolean propagateError,
                       SourceCompletionCallback completionCallback,
                       NotificationEmitter notificationEmitter) {
+    LOGGER.error("onError()");
 
     AsyncHeisenbergSource.completionCallback = completionCallback;
 
