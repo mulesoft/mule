@@ -641,7 +641,8 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
   @Test
   public void configuration() {
     ConstructModel configuration = coreExtensionModel.getConstructModel("configuration").get();
-    SinceMuleVersionModelProperty sinceModelProperty = configuration.getModelProperty(SinceMuleVersionModelProperty.class).get();
+    ParameterModel parameter = configuration.getAllParameterModels().stream().filter(pm -> "inheritIterableRepeatability".equals(pm.getName())).findAny().get();
+    SinceMuleVersionModelProperty sinceModelProperty = parameter.getModelProperty(SinceMuleVersionModelProperty.class).get();
     assertThat(sinceModelProperty.getVersion().toCompleteNumericVersion(), is("4.3.0"));
   }
 
