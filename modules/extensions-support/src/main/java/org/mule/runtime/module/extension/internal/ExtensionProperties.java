@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal;
 
 import static org.mule.runtime.core.api.config.MuleProperties.PROPERTY_PREFIX;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
@@ -28,6 +29,19 @@ public class ExtensionProperties {
    * @since 4.1.6 - 4.2.1
    */
   public static final String DO_NOT_RETRY = PROPERTY_PREFIX + "DO_NOT_RETRY";
+
+  /**
+   * Hackish property to abort retry in transactional cases for paged operations.
+   * @since 4.2.3
+   */
+  public static final String WAS_TRANSACTIONAL = PROPERTY_PREFIX + "WAS_TRANSACTIONAL";
+
+  /**
+   * Hackish property to abort retry for paged operations that fail after the first page was successfully retrieved and
+   * are being iterated by another component.
+   * @since 4.2.3
+   */
+  public static final String OPERATION_CONFIG_NAME = PROPERTY_PREFIX + "OPERATION_CONFIG_NAME";
 
   /**
    * The key of an execution context variable on which a {@link SourceCallbackContext} was set

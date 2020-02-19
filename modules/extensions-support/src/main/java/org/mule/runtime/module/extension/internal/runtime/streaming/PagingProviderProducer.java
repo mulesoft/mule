@@ -12,6 +12,8 @@ import static java.util.function.Function.identity;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.OPERATION_CONFIG_NAME;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.WAS_TRANSACTIONAL;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.isPartOfActiveTransaction;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
@@ -143,10 +145,10 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     Optional<String> exceptionConfigName =
         executionContext.getConfiguration().map(config -> ((ConfigurationInstance) config).getName());
     if (isPartOfActiveTransaction(config)) {
-      connectionException.addInfo("wasTransactional", true);
+      connectionException.addInfo(WAS_TRANSACTIONAL, true);
     }
     if (isFirstPage) {
-      exceptionConfigName.ifPresent(name -> connectionException.addInfo("operationConfigName", name));
+      exceptionConfigName.ifPresent(name -> connectionException.addInfo(OPERATION_CONFIG_NAME, name));
     }
     connectionSupplier.invalidateConnection();
   }

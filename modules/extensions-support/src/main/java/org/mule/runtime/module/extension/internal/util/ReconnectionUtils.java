@@ -9,14 +9,18 @@ package org.mule.runtime.module.extension.internal.util;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.OPERATION_CONFIG_NAME;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.WAS_TRANSACTIONAL;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -30,6 +34,8 @@ public class ReconnectionUtils {
    * @param t the {@link Throwable} thrown during the execution of the operation
    * @param context the {@link ExecutionContextAdapter} that contains the context information about the operation's execution
    * @return whether or not the operation should be retried
+   *
+   * @since 4.2.3
    */
   public static boolean shouldRetry(Throwable t, ExecutionContextAdapter<?> context) {
     Optional<String> contextConfigName = context.getConfiguration().map(ConfigurationInstance::getName);
@@ -42,21 +48,41 @@ public class ReconnectionUtils {
       return false;
     }
 
-    return validateConnectionException(connectionException.get(), contextConfigName.orElse(null));
+    return checkEnrichedConnectionException(connectionException.get(), contextConfigName.orElse(null));
   }
 
-  private static boolean validateConnectionException(ConnectionException connectionException, String contextConfigName) {
-    Boolean wasTransactional = (Boolean) connectionException.getInfo().get("wasTransactional");
+  /**
+   * To fix reconnection for paged operations that fail after the first page, the connection exception is intercepted at
+   * the {@link PagingProviderProducer} and enriched with additional information. This method reads that information and
+   * determines if the operation should be retried.
+   *
+   * This method first checks if the operation was involved in a transaction. If so, it returns false.
+   * Then it checks that the context trying to retry this operation has the same config as the operation itself. This is
+   * to prevent other components from retrying the operation. If the config names do no match, it returns false.
+   * Otherwise or if the connection exception was not enriched, this method returns true.
+   *
+   * @param connectionException the {@link ConnectionException} thrown during the execution of the operation
+   * @param contextConfigName the config name for the context that is attempting to retry the operation
+   * @return whether or not the operation should be retried
+   */
+  private static boolean checkEnrichedConnectionException(ConnectionException connectionException, String contextConfigName) {
+    Boolean wasTransactional = (Boolean) connectionException.getInfo().get(WAS_TRANSACTIONAL);
     if (wasTransactional != null && wasTransactional) {
       return false;
     }
-    Object operationConfigName = connectionException.getInfo().get("operationConfigName");
+    Object operationConfigName = connectionException.getInfo().get(OPERATION_CONFIG_NAME);
     if (operationConfigName != null && contextConfigName != null) {
-      return contextConfigName.equals(operationConfigName);
+      return Objects.equals(contextConfigName, operationConfigName);
     }
     return true;
   }
 
+  /**
+   * @param configurationInstance the {@link ConfigurationInstance} to check.
+   * @return whether or not it is part of an active transaction.
+   *
+   * @since 4.2.3
+   */
   public static boolean isPartOfActiveTransaction(ConfigurationInstance configurationInstance) {
     if (isTransactionActive()) {
       Transaction tx = TransactionCoordination.getInstance().getTransaction();
