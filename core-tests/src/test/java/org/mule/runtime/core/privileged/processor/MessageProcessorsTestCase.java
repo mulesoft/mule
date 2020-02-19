@@ -734,7 +734,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     when(flow.getProcessingStrategy()).thenReturn(ps);
     when(locator.find(location)).thenReturn(Optional.of(flow));
 
-    assertThat(getProcessingStrategy(locator, location), sameInstance(ps));
+    assertThat(getProcessingStrategy(locator, location).get(), sameInstance(ps));
   }
 
   @Test
@@ -748,7 +748,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     when(policy.getProcessingStrategy()).thenReturn(ps);
     when(locator.find(location)).thenReturn(Optional.of(policy));
 
-    assertThat(getProcessingStrategy(locator, location), sameInstance(ps));
+    assertThat(getProcessingStrategy(locator, location).get(), sameInstance(ps));
   }
 
   private Processor createChain(ReactiveProcessor processor) throws InitialisationException {
