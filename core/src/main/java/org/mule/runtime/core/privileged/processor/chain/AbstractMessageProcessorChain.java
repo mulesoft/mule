@@ -278,17 +278,15 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private Function<? super Publisher<CoreEvent>, ? extends Publisher<CoreEvent>> doOnNextOrErrorWithContext(Consumer<Context> contextConsumer) {
     return lift((scannable, subscriber) -> new CoreSubscriber<CoreEvent>() {
 
-      private final Context context = subscriber.currentContext();
-
       @Override
       public void onNext(CoreEvent event) {
-        contextConsumer.accept(context);
+        contextConsumer.accept(currentContext());
         subscriber.onNext(event);
       }
 
       @Override
       public void onError(Throwable throwable) {
-        contextConsumer.accept(context);
+        contextConsumer.accept(currentContext());
         subscriber.onError(throwable);
       }
 
@@ -299,7 +297,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
       @Override
       public Context currentContext() {
-        return context;
+        return subscriber.currentContext();
       }
 
       @Override

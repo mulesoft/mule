@@ -16,12 +16,12 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
-import org.reactivestreams.Publisher;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Abstract implementation that performs the chaining of a set of policies and the {@link Processor} being intercepted.
@@ -34,7 +34,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer> {
 
   private final List<Policy> parameterizedPolicies;
   private final Optional<ParametersTransformer> parametersTransformer;
-  private final ReactiveProcessor executionProcessor;
+  private ReactiveProcessor executionProcessor;
 
   /**
    * Creates a new composite policy.
@@ -47,6 +47,9 @@ public abstract class AbstractCompositePolicy<ParametersTransformer> {
     checkArgument(!policies.isEmpty(), "policies list cannot be empty");
     this.parameterizedPolicies = policies;
     this.parametersTransformer = parametersTransformer;
+  }
+
+  protected final void initProcessor() {
     this.executionProcessor = getPolicyProcessor();
   }
 

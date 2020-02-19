@@ -34,6 +34,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.internal.exception.SuppressedMuleException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +46,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.mule.runtime.internal.exception.SuppressedMuleException;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
@@ -119,7 +119,7 @@ class UntilSuccessfulRouter {
         });
 
     // Inner chain. Contains all retrial and error handling logic.
-    innerFlux = Flux.create(innerRecorder)
+    innerFlux = innerRecorder.flux()
         // Assume: resolver.currentContextForEvent(publishedEvent) is current context
         .transform(innerPublisher -> applyWithChildContext(innerPublisher, nestedChain,
                                                            Optional.of(owner.getLocation())))

@@ -11,9 +11,9 @@ import static java.lang.Runtime.getRuntime;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static reactor.core.publisher.Mono.create;
 
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
-import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
@@ -79,7 +79,10 @@ class CommonSourcePolicy {
   }
 
   public Disposable deferredDispose() {
-    return () -> policySink.dispose();
+    final FluxSinkSupplier<CoreEvent> policySinkToDispose = policySink;
+    return () -> {
+      policySinkToDispose.dispose();
+    };
   }
 
 }

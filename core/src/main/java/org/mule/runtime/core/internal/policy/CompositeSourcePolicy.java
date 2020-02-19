@@ -7,8 +7,10 @@
 package org.mule.runtime.core.internal.policy;
 
 import static java.util.Optional.ofNullable;
+import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
+import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
@@ -20,7 +22,6 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
@@ -56,12 +57,13 @@ public class CompositeSourcePolicy
       "policy.source.originalFailureResponseParameters";
   public static final String POLICY_SOURCE_ORIGINAL_RESPONSE_PARAMETERS = "policy.source.originalResponseParameters";
 
+  private static final PolicyEventMapper policyEventMapper = new PolicyEventMapper();
+
   private final CommonSourcePolicy commonPolicy;
 
   private final SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
   private final ReactiveProcessor flowExecutionProcessor;
 
-  private final PolicyEventMapper policyEventMapper;
   private final Optional<Function<MessagingException, MessagingException>> resolver;
 
   /**
@@ -96,9 +98,9 @@ public class CompositeSourcePolicy
     super(parameterizedPolicies, sourcePolicyParametersTransformer);
     this.flowExecutionProcessor = flowExecutionProcessor;
     this.sourcePolicyProcessorFactory = sourcePolicyProcessorFactory;
-    this.commonPolicy = new CommonSourcePolicy(new SourceWithPoliciesFluxObjectFactory(this));
-    this.policyEventMapper = new PolicyEventMapper();
     this.resolver = ofNullable(resolver);
+    initProcessor();
+    this.commonPolicy = new CommonSourcePolicy(new SourceWithPoliciesFluxObjectFactory(this));
   }
 
   private static final class SourceWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
@@ -116,7 +118,7 @@ public class CompositeSourcePolicy
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
 
       Flux<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> policyFlux =
-          Flux.create(sinkRef)
+          sinkRef.flux()
               .transform(compositeSourcePolicy.get().getExecutionProcessor())
               .map(policiesResultEvent -> right(SourcePolicyFailureResult.class,
                                                 new SourcePolicySuccessResult(policiesResultEvent,
@@ -183,25 +185,26 @@ public class CompositeSourcePolicy
    */
   @Override
   protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy lastPolicy) {
+    final Optional<SourcePolicyParametersTransformer> parametersTransformer = getParametersTransformer();
+    final Function<MessagingException, MessagingException> errorResolver = resolver.orElse(identity());
 
     return from(eventPub)
         .transform(flowExecutionProcessor)
         .map(flowExecutionResponse -> {
           try {
-            return policyEventMapper.onFlowFinish(flowExecutionResponse, getParametersTransformer());
+            return policyEventMapper.onFlowFinish(flowExecutionResponse, parametersTransformer);
           } catch (MessagingException e) {
-            throw Exceptions.propagateWrappingFatal(resolver.orElse(exc -> exc).apply(e));
+            throw propagateWrappingFatal(errorResolver.apply(e));
           }
         })
         .onErrorContinue(MessagingException.class, (error, v) -> {
-
           PolicyNotificationHelper notificationHelper =
               new PolicyNotificationHelper(lastPolicy.getPolicyChain().getMuleContext().getNotificationManager(),
                                            lastPolicy.getPolicyId(),
                                            lastPolicy.getPolicyChain());
 
           new OnExecuteNextErrorConsumer(event -> policyEventMapper.onFlowError(event, lastPolicy.getPolicyId(),
-                                                                                getParametersTransformer()),
+                                                                                parametersTransformer),
                                          notificationHelper, lastPolicy.getPolicyChain().getLocation())
                                              .accept(error);
         });
@@ -251,7 +254,7 @@ public class CompositeSourcePolicy
     }
   }
 
-  private void logEvent(String eventId, String policyName, Supplier<String> message, String startingMessage) {
+  private static void logEvent(String eventId, String policyName, Supplier<String> message, String startingMessage) {
     if (LOGGER.isTraceEnabled()) {
       // TODO Remove event id when first policy generates it. MULE-14455
       LOGGER.trace("Event Id: " + eventId + ".\n" + startingMessage + policyName + "\n" + message.get());
@@ -270,7 +273,7 @@ public class CompositeSourcePolicy
     return event.getMessage().getAttributes().getValue().toString();
   }
 
-  private String getPolicyName(Policy policy) {
+  private static String getPolicyName(Policy policy) {
     return policy.getPolicyId();
   }
 

@@ -65,7 +65,7 @@ public class StreamPerThreadSink implements Sink, Disposable {
     final Thread currentThread = currentThread();
     sinks.get(currentThread, t -> {
       final FluxSinkRecorder<CoreEvent> recorder = new FluxSinkRecorder<>();
-      Flux.create(recorder)
+      recorder.flux()
           .doOnNext(request -> eventConsumer.accept(request))
           .transform(processor)
           .subscribe(null, e -> sinks.invalidate(currentThread), () -> sinks.invalidate(currentThread));

@@ -16,6 +16,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.util.context.Context.empty;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
@@ -34,6 +35,7 @@ import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
@@ -165,7 +167,7 @@ class FirstSuccessfulRouter {
 
   private Flux<CoreEvent> createMidFlux(ProcessorRoute route, FluxSinkRecorder<CoreEvent> innerRecorder,
                                         Optional<FluxSinkRecorder<CoreEvent>> next) {
-    return Flux.create(innerRecorder)
+    return innerRecorder.flux()
         .transform(innerPublisher -> applyWithChildContext(innerPublisher, route.getProcessor(), of(owner.getLocation())))
         .doOnNext(successfulEvent -> {
           // If event finishes with error, then it must be treated as an error

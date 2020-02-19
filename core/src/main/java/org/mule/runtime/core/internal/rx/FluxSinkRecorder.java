@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.rx;
 
+import static reactor.core.publisher.Flux.create;
+import static reactor.util.context.Context.empty;
+
 import org.mule.runtime.core.internal.exception.MessagingException;
 
 import java.util.ArrayList;
@@ -26,6 +29,11 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
 
   // If a fluxSink as not yet been accepted, events are buffered until one is accepted
   private final List<Runnable> bufferedEvents = new ArrayList<Runnable>();
+
+  public Flux<T> flux() {
+    return create(this)
+        .subscriberContext(ctx -> empty());
+  }
 
   @Override
   public void accept(FluxSink<T> fluxSink) {

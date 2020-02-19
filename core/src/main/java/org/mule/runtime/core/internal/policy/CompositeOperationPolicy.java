@@ -30,10 +30,13 @@ import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.TransactionAwareFluxSinkSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
@@ -89,19 +92,27 @@ public class CompositeOperationPolicy
                                   OperationPolicyProcessorFactory operationPolicyProcessorFactory) {
     super(parameterizedPolicies, operationPolicyParametersTransformer);
     this.operationPolicyProcessorFactory = operationPolicyProcessorFactory;
+    initProcessor();
+
+    Supplier<FluxSink<CoreEvent>> factory = new OperationWithPoliciesFluxObjectFactory(this);
     this.policySinks = newBuilder()
         .removalListener((String key, FluxSinkSupplier<CoreEvent> value, RemovalCause cause) -> {
           value.dispose();
         })
         .build(componentLocation -> {
-          Supplier<FluxSink<CoreEvent>> factory = new OperationWithPoliciesFluxObjectFactory();
           return new TransactionAwareFluxSinkSupplier<>(factory,
                                                         new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(),
                                                                                          factory));
         });
   }
 
-  private final class OperationWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
+  private static final class OperationWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
+
+    private final Reference<CompositeOperationPolicy> compositeOperationPolicy;
+
+    public OperationWithPoliciesFluxObjectFactory(CompositeOperationPolicy compositeOperationPolicy) {
+      this.compositeOperationPolicy = new WeakReference<>(compositeOperationPolicy);
+    }
 
     @Override
     public FluxSink<CoreEvent> get() {
@@ -109,7 +120,7 @@ public class CompositeOperationPolicy
 
       Flux<CoreEvent> policyFlux =
           Flux.create(sinkRef)
-              .transform(getExecutionProcessor())
+              .transform(compositeOperationPolicy.get().getExecutionProcessor())
               .doOnNext(result -> {
                 final BaseEventContext childContext = getStoredChildContext(result);
                 if (!childContext.isComplete()) {
@@ -145,20 +156,33 @@ public class CompositeOperationPolicy
   @Override
   protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy lastPolicy) {
     return Flux.from(eventPub)
-        .flatMap(event -> {
-          OperationParametersProcessor parametersProcessor =
-              ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_PARAMETERS_PROCESSOR);
-          Map<String, Object> parametersMap = new HashMap<>(parametersProcessor.getOperationParameters());
-
-          if (getParametersTransformer().isPresent()) {
-            parametersMap.putAll(getParametersTransformer().get().fromMessageToParameters(event.getMessage()));
-          }
-
-          OperationExecutionFunction operationExecutionFunction =
-              ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_OPERATION_EXEC_FUNCTION);
-          return operationExecutionFunction.execute(parametersMap, event);
-        })
+        .flatMap(new OperationDispatcher(getParametersTransformer()))
         .map(response -> quickCopy(response, singletonMap(POLICY_OPERATION_NEXT_OPERATION_RESPONSE, response)));
+  }
+
+  private static final class OperationDispatcher implements Function<CoreEvent, Publisher<CoreEvent>> {
+
+    private final Optional<OperationPolicyParametersTransformer> parametersTransformer;
+
+    public OperationDispatcher(Optional<OperationPolicyParametersTransformer> parametersTransformer) {
+      this.parametersTransformer = parametersTransformer;
+    }
+
+    @Override
+    public Publisher<CoreEvent> apply(CoreEvent event) {
+      OperationParametersProcessor parametersProcessor =
+          ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_PARAMETERS_PROCESSOR);
+      Map<String, Object> parametersMap = new HashMap<>(parametersProcessor.getOperationParameters());
+
+      if (parametersTransformer.isPresent()) {
+        parametersMap.putAll(parametersTransformer.get().fromMessageToParameters(event.getMessage()));
+      }
+
+      OperationExecutionFunction operationExecutionFunction =
+          ((InternalEvent) event).getInternalParameter(POLICY_OPERATION_OPERATION_EXEC_FUNCTION);
+      return operationExecutionFunction.execute(parametersMap, event);
+    }
+
   }
 
   /**
@@ -214,6 +238,7 @@ public class CompositeOperationPolicy
 
   @Override
   public Disposable deferredDispose() {
+    final LoadingCache<String, FluxSinkSupplier<CoreEvent>> policySinks = this.policySinks;
     return () -> {
       policySinks.invalidateAll();
     };

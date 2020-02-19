@@ -15,7 +15,7 @@ import reactor.core.publisher.Flux;
 
 /**
  * Composition of a {@link ProcessorRoute} and everything required to convert it into a reactor executable chain.
- * 
+ *
  * @Since 4.3.0
  */
 class ExecutableRoute {
@@ -27,7 +27,8 @@ class ExecutableRoute {
   ExecutableRoute(ProcessorRoute route) {
     this.route = route;
     sinkRecorder = new FluxSinkRecorder<>();
-    publisher = Flux.create(sinkRecorder).transform(route.getProcessor());
+    publisher = sinkRecorder.flux()
+        .transform(route.getProcessor());
   }
 
   /**

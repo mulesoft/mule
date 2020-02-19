@@ -24,9 +24,11 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
+import java.lang.ref.Reference;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
@@ -82,7 +84,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
                 .map(event -> ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)
                     ? policyEventMapper.onSourcePolicyNext(event, ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))
                     : policyEventMapper.onOperationPolicyNext(event))
-                .transform(ctx.get(POLICY_NEXT_OPERATION))
+                .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get())
                 .cast(CoreEvent.class)))
         .doOnNext(coreEvent -> {
           notificationHelper.fireNotification(coreEvent, null, AFTER_NEXT);

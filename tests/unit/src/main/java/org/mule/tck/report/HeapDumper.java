@@ -6,6 +6,7 @@
  */
 package org.mule.tck.report;
 
+import static java.lang.System.currentTimeMillis;
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static java.lang.management.ManagementFactory.newPlatformMXBeanProxy;
 
@@ -66,7 +67,7 @@ public class HeapDumper {
 
   public static void main(String[] args) {
     // default heap dump file name
-    String fileName = "heap.bin";
+    String fileName = "heap_" + currentTimeMillis() + ".hprof";
     // by default dump only the live objects
     boolean live = true;
 

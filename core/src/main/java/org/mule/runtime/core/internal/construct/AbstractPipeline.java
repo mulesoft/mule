@@ -246,6 +246,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     return publisher -> from(publisher)
         .doOnNext(assertStarted())
         .flatMap(routeThroughProcessingStrategy())
+        .subscriberContext(ctx -> ctx.delete("policy.nextOperation"))
         // This replaces the onErrorContinue key if it exists, to prevent it from being propagated within the flow
         .compose(pub -> pub.subscriberContext(context -> {
           Optional<Object> onErrorStrategy = context.getOrEmpty(KEY_ON_NEXT_ERROR_STRATEGY);

@@ -17,10 +17,10 @@ import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
-import static reactor.core.publisher.Flux.create;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.subscriberContext;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -57,6 +57,7 @@ import java.util.function.Function;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -475,7 +476,7 @@ public class MessageProcessors {
                     // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
                     // it will be cancelled, ignoring the onErrorcontinue of the parent Flux.
                     .doOnComplete(() -> errorSwitchSinkSinkRef.complete())
-                    .mergeWith(create(errorSwitchSinkSinkRef))
+                    .mergeWith(errorSwitchSinkSinkRef.flux())
 
                     .map(childContextResponseMapper())
                     .distinct(event -> (BaseEventContext) event.getContext(), () -> seenContexts)
@@ -605,6 +606,7 @@ public class MessageProcessors {
    * @since 4.1
    * @deprecated Use {@link RxUtils} instead
    */
+  @Deprecated
   public static Publisher<CoreEvent> transform(Publisher<CoreEvent> publisher, ReactiveProcessor processor) {
     return RxUtils.transform(publisher, processor);
   }
@@ -619,6 +621,7 @@ public class MessageProcessors {
    * @since 4.2
    * @deprecated Use {@link RxUtils} instead
    */
+  @Deprecated
   public static Publisher<CoreEvent> map(Publisher<CoreEvent> publisher, Function<CoreEvent, CoreEvent> mapper) {
     return RxUtils.map(publisher, mapper);
   }
@@ -634,6 +637,7 @@ public class MessageProcessors {
    * @since 4.1
    * @deprecated Use {@link RxUtils} instead
    */
+  @Deprecated
   public static Publisher<CoreEvent> flatMap(Publisher<CoreEvent> publisher,
                                              Function<CoreEvent, Publisher<CoreEvent>> function, Component component) {
     return RxUtils.flatMap(publisher, function, component);
@@ -648,6 +652,7 @@ public class MessageProcessors {
    * @since 4.2
    * @deprecated Use {@link RxUtils} instead
    */
+  @Deprecated
   public static Publisher<CoreEvent> justPublishOn(CoreEvent event, ExecutorService executor) {
     return RxUtils.justPublishOn(event, executor);
   }

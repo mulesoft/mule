@@ -44,6 +44,7 @@ import org.mule.runtime.policy.api.SourcePolicyPointcutParametersFactory;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -331,6 +332,26 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
     noPolicySourceInstances.asMap().values().forEach(policy -> disposeIfNeeded(policy, LOGGER));
     sourcePolicyInnerCache.asMap().values().forEach(policy -> disposeIfNeeded(policy, LOGGER));
     operationPolicyInnerCache.asMap().values().forEach(policy -> disposeIfNeeded(policy, LOGGER));
+    noPolicySourceInstances.asMap().values().forEach(policy -> {
+      clearActive(policy);
+      disposeIfNeeded(policy, LOGGER);
+    });
+    sourcePolicyInnerCache.asMap().values().forEach(policy -> {
+      clearActive(policy);
+      disposeIfNeeded(policy, LOGGER);
+    });
+    operationPolicyInnerCache.asMap().values().forEach(policy -> {
+      clearActive(policy);
+      disposeIfNeeded(policy, LOGGER);
+    });
+  }
+
+  private void clearActive(Object policy) {
+    for (Iterator<DeferredDisposableWeakReference> iterator = activePolicies.iterator(); iterator.hasNext();) {
+      if (policy == iterator.next().get()) {
+        iterator.remove();
+      }
+    }
   }
 
   private void evictCaches() {
