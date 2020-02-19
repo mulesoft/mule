@@ -40,7 +40,9 @@ public class ConcurrencyUtils {
    * @param supplier a {@link CheckedSupplier}
    * @param <T>      the generic type of the returned value
    * @return the supplied value
+   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually instead
    */
+  @Deprecated
   public static <T> T withLock(Lock lock, CheckedSupplier<T> supplier) {
     lock.lock();
     try {
@@ -56,7 +58,9 @@ public class ConcurrencyUtils {
    *
    * @param lock     a {@link Lock}
    * @param delegate a {@link CheckedRunnable}
+   * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually instead
    */
+  @Deprecated
   public static void withLock(Lock lock, CheckedRunnable delegate) {
     lock.lock();
     try {
