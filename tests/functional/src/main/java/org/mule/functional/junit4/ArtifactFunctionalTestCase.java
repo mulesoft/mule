@@ -107,11 +107,14 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   private static ServiceManager serviceRepository;
   private static ClassLoaderRepository classLoaderRepository;
   private static IsolatedClassLoaderExtensionsManagerConfigurationBuilder extensionsManagerConfigurationBuilder;
-  private static IsolatedClassLoaderExtensionsManagerConfigurationBuilder alternativeExtensionsManagerConfigurationBuilder;
+  /**
+   * This is the {@link IsolatedClassLoaderExtensionsManagerConfigurationBuilder} used when there is a need to reload the
+   * extension models for a specific test class. When {@link #mustRegenerateExtensionModels()} returns true, the extension
+   * models will be reloaded and this configuration builder will be used.
+   */
+  private static IsolatedClassLoaderExtensionsManagerConfigurationBuilder reloadableExtensionsManagerConfigurationBuilder;
 
   private static TestServicesMuleContextConfigurator serviceConfigurator;
-  private Once.RunOnce loadExtensions = Once.of(() -> extensionsManagerConfigurationBuilder.loadExtensionModels());
-
 
   @BeforeClass
   public static void configureClassLoaderRepository() {
@@ -151,7 +154,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
       extensionsManagerConfigurationBuilder =
           new IsolatedClassLoaderExtensionsManagerConfigurationBuilder(pluginClassLoaders);
       extensionsManagerConfigurationBuilder.loadExtensionModels();
-      alternativeExtensionsManagerConfigurationBuilder =
+      reloadableExtensionsManagerConfigurationBuilder =
           new IsolatedClassLoaderExtensionsManagerConfigurationBuilder(pluginClassLoaders);
     }
   }
@@ -249,8 +252,8 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
 
     if (extensionsManagerConfigurationBuilder != null) {
       if (mustRegenerateExtensionModels()) {
-        alternativeExtensionsManagerConfigurationBuilder.loadExtensionModels();
-        builders.add(0, alternativeExtensionsManagerConfigurationBuilder);
+        reloadableExtensionsManagerConfigurationBuilder.loadExtensionModels();
+        builders.add(0, reloadableExtensionsManagerConfigurationBuilder);
       } else {
         builders.add(0, extensionsManagerConfigurationBuilder);
       }
