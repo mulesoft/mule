@@ -51,6 +51,17 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
     super(providerModel, resolverSet, poolingProfile, reconnectionConfig, extensionModel, expressionManager, muleContext);
   }
 
+  public DefaultConnectionProviderObjectBuilder(Class<?> prototypeClass, ConnectionProviderModel providerModel,
+                                                ResolverSet resolverSet,
+                                                PoolingProfile poolingProfile,
+                                                ReconnectionConfig reconnectionConfig,
+                                                ExtensionModel extensionModel,
+                                                ExpressionManager expressionManager,
+                                                MuleContext muleContext) {
+    super(prototypeClass, providerModel, resolverSet, poolingProfile, reconnectionConfig, extensionModel, expressionManager,
+          muleContext);
+  }
+
   @Override
   public final Pair<ConnectionProvider<C>, ResolverSetResult> build(ResolverSetResult result) throws MuleException {
     ConnectionProvider<C> provider = doBuild(result);

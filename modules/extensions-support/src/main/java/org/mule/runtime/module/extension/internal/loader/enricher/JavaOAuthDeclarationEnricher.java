@@ -96,9 +96,6 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
 
         @Override
         protected void onConnectionProvider(ConnectedDeclaration owner, ConnectionProviderDeclaration declaration) {
-          if (!visitedProviders.add(new Reference<>(declaration))) {
-            return;
-          }
 
           declaration.getModelProperty(OAuthModelProperty.class).ifPresent(mp -> {
             mp.getGrantTypes().forEach(grantType -> grantType.accept(new OAuthGrantTypeVisitor() {
@@ -123,6 +120,10 @@ public class JavaOAuthDeclarationEnricher implements DeclarationEnricher {
               oauthGloballySupported.set(true);
             } else if (owner instanceof ConfigurationDeclaration) {
               oauthConfigs.add(new Reference<>((ConfigurationDeclaration) owner));
+            }
+
+            if (!visitedProviders.add(new Reference<>(declaration))) {
+              return;
             }
 
             enrichOAuthParameters(declaration);

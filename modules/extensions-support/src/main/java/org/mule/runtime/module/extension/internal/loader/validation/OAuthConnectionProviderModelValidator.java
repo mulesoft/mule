@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -38,9 +40,7 @@ public class OAuthConnectionProviderModelValidator implements ExtensionModelVali
 
       @Override
       protected void onConnectionProvider(ConnectionProviderModel model) {
-        Class<?> implementingType = model.getModelProperty(ImplementingTypeModelProperty.class)
-            .map(ImplementingTypeModelProperty::getType)
-            .orElse(null);
+        Class<?> implementingType = getImplementingType(model).orElse(null);
 
         if (implementingType == null) {
           return;

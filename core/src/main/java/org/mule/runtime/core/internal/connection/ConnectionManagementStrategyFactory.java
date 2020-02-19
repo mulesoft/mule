@@ -84,7 +84,11 @@ final class ConnectionManagementStrategyFactory {
 
   private <C> ConnectionManagementType getManagementType(ConnectionProvider<C> connectionProvider) {
     ConnectionManagementType type = NONE;
-    connectionProvider = unwrapProviderWrapper(connectionProvider);
+
+    if (connectionProvider instanceof ConnectionProviderWrapper) {
+      return ((ConnectionProviderWrapper<C>) connectionProvider).getConnectionManagementType();
+    }
+
     if (connectionProvider instanceof PoolingConnectionProvider) {
       type = POOLING;
     } else if (connectionProvider instanceof CachedConnectionProvider) {

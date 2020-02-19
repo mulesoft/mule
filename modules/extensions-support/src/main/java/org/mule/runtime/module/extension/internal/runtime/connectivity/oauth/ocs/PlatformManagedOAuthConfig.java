@@ -22,7 +22,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConfig;
 
 import java.nio.charset.Charset;
@@ -42,7 +41,6 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
   private final String orgId;
   private final Charset encoding;
   private final PlatformManagedOAuthGrantType grantType;
-  private final ConfigurationInstance configurationInstance;
   private final ExtensionModel extensionModel;
   private final ConnectionProviderModel delegateConnectionProviderModel;
   private final OAuthGrantType delegateGrantType;
@@ -50,7 +48,6 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
   public static PlatformManagedOAuthConfig from(String ownerConfigName,
                                                 String connectionUri,
                                                 PlatformManagedOAuthGrantType grantType,
-                                                ConfigurationInstance configurationInstance,
                                                 ExtensionModel extensionModel,
                                                 ConnectionProviderModel delegateConnectionProviderModel,
                                                 OAuthGrantType delegateGrantType,
@@ -64,20 +61,14 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
                                           getProperty(configurationProperties, OCS_ORG_ID),
                                           UTF_8,
                                           grantType,
-                                          configurationInstance,
                                           extensionModel,
                                           delegateConnectionProviderModel,
                                           delegateGrantType);
   }
 
   private static String getProperty(ConfigurationProperties configurationProperties, String key) {
-    String value = configurationProperties.resolveStringProperty(key).orElseGet(() -> System.getProperty(key));
-
-    if (value == null) {
-      throw new IllegalArgumentException(format("OCS property '%s' has not been set", key));
-    }
-
-    return value;
+    return configurationProperties.resolveStringProperty(key)
+        .orElseThrow(() -> new IllegalArgumentException(format("OCS property '%s' has not been set", key)));
   }
 
   public PlatformManagedOAuthConfig(String ownerConfigName,
@@ -89,7 +80,6 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
                                     String orgId,
                                     Charset encoding,
                                     PlatformManagedOAuthGrantType grantType,
-                                    ConfigurationInstance configurationInstance,
                                     ExtensionModel extensionModel,
                                     ConnectionProviderModel delegateConnectionProviderModel,
                                     OAuthGrantType delegateGrantType) {
@@ -102,7 +92,6 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
     this.orgId = orgId;
     this.encoding = encoding;
     this.grantType = grantType;
-    this.configurationInstance = configurationInstance;
     this.extensionModel = extensionModel;
     this.delegateConnectionProviderModel = delegateConnectionProviderModel;
     this.delegateGrantType = delegateGrantType;
@@ -149,9 +138,6 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
     return grantType;
   }
 
-  public ConfigurationInstance getConfigurationInstance() {
-    return configurationInstance;
-  }
 
   public ExtensionModel getExtensionModel() {
     return extensionModel;

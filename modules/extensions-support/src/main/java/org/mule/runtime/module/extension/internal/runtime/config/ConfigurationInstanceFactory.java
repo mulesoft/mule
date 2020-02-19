@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.supportsConnectivity;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONFIGURATION_MODEL_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -86,7 +87,8 @@ public final class ConfigurationInstanceFactory<T> {
 
     Pair<T, ResolverSetResult> configValue = createConfigurationInstance(name, event);
     if (requiresConnection) {
-      try (ValueResolvingContext ctx = ValueResolvingContext.builder(event, expressionManager).build()) {
+      try (ValueResolvingContext ctx = ValueResolvingContext.builder(event, expressionManager)
+          .withProperty(CONFIGURATION_MODEL_PROPERTY_NAME, configurationModel).build()) {
         connectionProvider = ofNullable(resolver.resolve(ctx));
       }
     } else {

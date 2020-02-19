@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsOfType;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -35,8 +36,7 @@ public class ComponentLocationModelValidator implements ExtensionModelValidator 
 
       @Override
       protected void onSource(SourceModel model) {
-        model.getModelProperty(ImplementingTypeModelProperty.class)
-            .map(ImplementingTypeModelProperty::getType)
+        getImplementingType(model)
             .ifPresent(sourceType -> {
 
               List<Field> fields = getFieldsOfType(sourceType, ComponentLocation.class);

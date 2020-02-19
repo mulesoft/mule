@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.lang.String.format;
 import static org.mule.runtime.module.extension.internal.loader.validation.ModelValidationUtils.validateConfigOverrideParametersNotAllowed;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isSynthetic;
 
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -25,6 +26,7 @@ import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.extension.api.property.SyntheticModelModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
@@ -104,6 +106,9 @@ public final class ConnectionProviderModelValidator implements ExtensionModelVal
                                                   ProblemsReporter problemsReporter) {
     configLevelConnectionProviders.asMap().forEach((configModel, providerModels) -> {
       for (ConnectionProviderModel providerModel : providerModels) {
+        if (isSynthetic(providerModel)) {
+          continue;
+        }
         Type connectionType = MuleExtensionUtils.getConnectionType(providerModel);
         configModel.getOperationModels()
             .forEach(operationModel -> validateConnectionTypes(providerModel, operationModel, connectionType, problemsReporter));

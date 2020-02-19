@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
+import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
@@ -106,6 +107,12 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   private static ServiceManager serviceRepository;
   private static ClassLoaderRepository classLoaderRepository;
   private static IsolatedClassLoaderExtensionsManagerConfigurationBuilder extensionsManagerConfigurationBuilder;
+  /**
+   * This is the {@link IsolatedClassLoaderExtensionsManagerConfigurationBuilder} used when there is a need to reload the
+   * extension models for a specific test class. When {@link #mustRegenerateExtensionModels()} returns true, the extension
+   * models will be reloaded and this configuration builder will be used.
+   */
+  private static IsolatedClassLoaderExtensionsManagerConfigurationBuilder reloadableExtensionsManagerConfigurationBuilder;
 
   private static TestServicesMuleContextConfigurator serviceConfigurator;
 
@@ -147,6 +154,8 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
       extensionsManagerConfigurationBuilder =
           new IsolatedClassLoaderExtensionsManagerConfigurationBuilder(pluginClassLoaders);
       extensionsManagerConfigurationBuilder.loadExtensionModels();
+      reloadableExtensionsManagerConfigurationBuilder =
+          new IsolatedClassLoaderExtensionsManagerConfigurationBuilder(pluginClassLoaders);
     }
   }
 
@@ -242,7 +251,12 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     }
 
     if (extensionsManagerConfigurationBuilder != null) {
-      builders.add(0, extensionsManagerConfigurationBuilder);
+      if (mustRegenerateExtensionModels()) {
+        reloadableExtensionsManagerConfigurationBuilder.loadExtensionModels();
+        builders.add(0, reloadableExtensionsManagerConfigurationBuilder);
+      } else {
+        builders.add(0, extensionsManagerConfigurationBuilder);
+      }
     }
 
     builders.add(0, new TestBootstrapServiceDiscovererConfigurationBuilder(containerClassLoader, getExecutionClassLoader(),
@@ -258,6 +272,17 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
                                                                         new NullPolicyProvider());
       }
     });
+  }
+
+  /**
+   * Subclasses can override this method so that extension models used are regenerated before running its tests. For example,
+   * some part of a extension model might only be created if a certain system property is in place, so the test classes that
+   * test that feature will have to generate the extension model when the property is already set.
+   *
+   * @return whether the tests on this class need for extensions model to be generated again.
+   */
+  protected boolean mustRegenerateExtensionModels() {
+    return false;
   }
 
   /**
