@@ -10,10 +10,13 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MINUTES;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.junit.rules.ExpectedException.none;
@@ -302,7 +305,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
     when(connectionProviderResolver.resolve(any())).thenReturn(new Pair<>(connProvider, mock(ResolverSetResult.class)));
 
-    expected.expectCause(hasMessage(is(InitialisationException.class.getName() + ": " + expectedExceptionMessage)));
+    expected.expectCause(both(hasMessage(equalTo(expectedExceptionMessage))).and(is(instanceOf(InitialisationException.class))));
 
     try {
       provider.get(event);

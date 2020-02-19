@@ -18,9 +18,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
+
 import org.mule.runtime.api.connection.ConnectionHandler;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.DefaultMuleException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
@@ -34,7 +36,6 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
@@ -46,8 +47,7 @@ public class PagingProviderProducerTestCase {
   private PagingProvider<Object, String> delegate = mock(PagingProvider.class);
   private ConfigurationInstance config = mock(ConfigurationInstance.class);
 
-  @InjectMocks
-  private PagingProviderProducer<String> producer = createProducer();
+  private PagingProviderProducer<String> producer;
 
   private PagingProviderProducer<String> createProducer() {
     return new PagingProviderProducer<>(delegate, config, executionContext, extensionConnectionSupplier);
@@ -60,11 +60,13 @@ public class PagingProviderProducerTestCase {
     when(extensionConnectionSupplier.getConnection(executionContext)).thenReturn(handler);
 
     ExtensionModel extensionModel = mock(ExtensionModel.class);
+    mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
     when(executionContext.getExtensionModel()).thenReturn(extensionModel);
+    producer = createProducer();
   }
 
   @Test
-  public void produce() throws Exception {
+  public void produce() {
     List<String> page = asList("bleh");
     when(delegate.getPage(anyObject())).thenReturn(page);
     assertThat(page, sameInstance(producer.produce()));

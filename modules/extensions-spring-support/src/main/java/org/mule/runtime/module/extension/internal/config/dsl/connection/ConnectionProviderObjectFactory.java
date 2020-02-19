@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.config.dsl.connection;
 
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -77,7 +78,7 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
     ResolverSet resolverSet;
     Thread currentThread = currentThread();
     ClassLoader originalClassLoader = currentThread.getContextClassLoader();
-    ClassLoader contextClassLoader = this.getClass().getClassLoader();
+    ClassLoader contextClassLoader = getClassLoader(extensionModel);
     setContextClassLoader(currentThread, originalClassLoader, contextClassLoader);
     try {
       resolverSet = getParametersResolver().getParametersAsResolverSet(providerModel, muleContext);

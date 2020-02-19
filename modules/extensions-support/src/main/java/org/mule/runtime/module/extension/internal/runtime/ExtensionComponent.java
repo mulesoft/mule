@@ -256,6 +256,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     try {
       doStart();
     } catch (MuleException e) {
+      throw e;
+    } catch (Exception e) {
       throw new DefaultMuleException(e);
     } finally {
       setContextClassLoader(thread, classLoader, currentClassLoader);
@@ -275,6 +277,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     try {
       doStop();
     } catch (MuleException e) {
+      throw e;
+    } catch (Exception e) {
       throw new DefaultMuleException(e);
     } finally {
       setContextClassLoader(thread, classLoader, currentClassLoader);

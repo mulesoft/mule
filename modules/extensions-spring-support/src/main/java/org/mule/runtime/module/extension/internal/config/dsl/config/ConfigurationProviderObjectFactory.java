@@ -88,31 +88,39 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
       connectionProviderResolver.getResolverSet()
           .ifPresent((CheckedConsumer) resolver -> initialiseIfNeeded(resolver, true, muleContext));
 
-      if (resolverSet.isDynamic() || connectionProviderResolver.isDynamic()) {
-        return configurationProviderFactory.createDynamicConfigurationProvider(configName.get(),
-                                                                               extensionModel,
-                                                                               configurationModel,
-                                                                               resolverSet,
-                                                                               connectionProviderResolver,
-                                                                               expirationPolicy,
-                                                                               reflectionCache,
-                                                                               expressionManager,
-                                                                               muleContext);
-      } else {
-        return configurationProviderFactory.createStaticConfigurationProvider(configName.get(),
-                                                                              extensionModel,
-                                                                              configurationModel,
-                                                                              resolverSet,
-                                                                              connectionProviderResolver,
-                                                                              reflectionCache,
-                                                                              expressionManager,
-                                                                              muleContext);
+      try {
+        if (resolverSet.isDynamic() || connectionProviderResolver.isDynamic()) {
+          return configurationProviderFactory.createDynamicConfigurationProvider(configName.get(),
+                                                                                 extensionModel,
+                                                                                 configurationModel,
+                                                                                 resolverSet,
+                                                                                 connectionProviderResolver,
+                                                                                 expirationPolicy,
+                                                                                 reflectionCache,
+                                                                                 expressionManager,
+                                                                                 muleContext);
+        } else {
+          return configurationProviderFactory.createStaticConfigurationProvider(configName.get(),
+                                                                                extensionModel,
+                                                                                configurationModel,
+                                                                                resolverSet,
+                                                                                connectionProviderResolver,
+                                                                                reflectionCache,
+                                                                                expressionManager,
+                                                                                muleContext);
+        }
+      } catch (RuntimeException e) {
+        throw e;
+      } catch (Exception e) {
+        throw new MuleRuntimeException(
+                                       createStaticMessage(format("Could not create an implicit configuration '%s' for the extension '%s'",
+                                                                  configurationModel.getName(), extensionModel.getName())),
+                                       e);
       }
+    } catch (RuntimeException e) {
+      throw e;
     } catch (Exception e) {
-      throw new MuleRuntimeException(
-                                     createStaticMessage(format("Could not create an implicit configuration '%s' for the extension '%s'",
-                                                                configurationModel.getName(), extensionModel.getName())),
-                                     e);
+      throw new MuleRuntimeException(e);
     } finally {
       setContextClassLoader(currentThread, extensionClassLoader, originalClassLoader);
     }
