@@ -868,7 +868,7 @@ class MuleExtensionModelDeclarer {
         .withDsl(ParameterDslConfiguration.builder()
             .allowsReferences(true)
             .allowsInlineDefinition(false)
-            .allowTopLevelDefinition(true)
+            .allowTopLevelDefinition(false)
             .build());
 
     configuration.onDefaultParameterGroup()
@@ -910,7 +910,7 @@ class MuleExtensionModelDeclarer {
         .withDsl(ParameterDslConfiguration.builder()
             .allowsReferences(true)
             .allowsInlineDefinition(false)
-            .allowTopLevelDefinition(true)
+            .allowTopLevelDefinition(false)
             .build());
 
     configuration.onDefaultParameterGroup()
