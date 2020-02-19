@@ -865,11 +865,11 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .withAllowedStereotypes(singletonList(ERROR_HANDLER))
         .describedAs("The default error handler for every flow. This must be a reference to a global error handler.")
-    .withDsl(ParameterDslConfiguration.builder()
-                     .allowsReferences(true)
-                     .allowsInlineDefinition(false)
-                     .allowTopLevelDefinition(true)
-                     .build());
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsReferences(true)
+            .allowsInlineDefinition(false)
+            .allowTopLevelDefinition(true)
+            .build());
 
     configuration.onDefaultParameterGroup()
         .withOptionalParameter("inheritIterableRepeatability")
@@ -907,11 +907,11 @@ class MuleExtensionModelDeclarer {
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("An optional reference to an ObjectSerializer to be used as the application's default")
-            .withDsl(ParameterDslConfiguration.builder()
-                             .allowsReferences(true)
-                             .allowsInlineDefinition(false)
-                             .allowTopLevelDefinition(true)
-                             .build());;
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsReferences(true)
+            .allowsInlineDefinition(false)
+            .allowTopLevelDefinition(true)
+            .build());
 
     configuration.onDefaultParameterGroup()
         .withOptionalParameter("dynamicConfigExpiration")
