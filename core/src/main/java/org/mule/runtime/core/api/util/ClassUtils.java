@@ -965,6 +965,33 @@ public class ClassUtils {
     }
   }
 
+  /**
+   * Sets {@code newClassLoader} as the context class loader for the {@code thread}, as long as said classloader is not the
+   * same instance as {@code currentClassLoader}.
+   *
+   * Since obtaining and setting the context classloader from a thread are expensive operations, the purpose of this method
+   * is to avoid performing those operations when possible, which is why the two classloaders are tested not to be the same
+   * before performing the set operation. For this method to make sense, {@code currentClassLoader} should actually be the
+   * current context classloader from the {@code thread}.
+   *
+   * This is how a typical use should look like:
+   * <pre>
+   *   Thread thread = Thread.currentThread();
+   *   ClassLoader currentClassLoader = thread.getContextClassLoader();
+   *   ClassLoader newClassLoader = getNewContextClassLoader(); // this one depends on your logic
+   *   ClassUtils.setContextClassLoader(thread, currentClassLoader, newClassLoader);
+   *   try {
+   *     // execute your logic
+   *   } finally {
+   *     // set things back as they were by reversing the arguments order
+   *     ClassUtils.setContextClassLoader(thread, newClassLoader, currentClassLoader);
+   *   }
+   * </pre>
+   * @param thread the thread which context classloader is to be changed
+   * @param currentClassLoader the thread's current context classloader
+   * @param newClassLoader the new classloader to be set
+   * @since 4.3.0
+   */
   public static void setContextClassLoader(Thread thread, ClassLoader currentClassLoader, ClassLoader newClassLoader) {
     if (currentClassLoader != newClassLoader) {
       thread.setContextClassLoader(newClassLoader);
