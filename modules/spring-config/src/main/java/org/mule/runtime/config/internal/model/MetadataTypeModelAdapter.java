@@ -304,7 +304,9 @@ class MetadataTypeModelAdapter implements ParameterizedModel {
     public List<StereotypeModel> getAllowedStereotypes() {
       return wrappedFieldType.getAnnotation(StereotypeTypeAnnotation.class)
           .map(StereotypeTypeAnnotation::getAllowedStereotypes)
-          .orElse(emptyList());
+          .orElseGet(() -> wrappedFieldType.getValue().getAnnotation(StereotypeTypeAnnotation.class)
+              .map(StereotypeTypeAnnotation::getAllowedStereotypes)
+              .orElse(emptyList()));
     }
 
     @Override
