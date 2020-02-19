@@ -37,6 +37,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategySupplier;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
@@ -620,8 +621,8 @@ public class MessageProcessors {
   public static Optional<ProcessingStrategy> getProcessingStrategy(ConfigurationComponentLocator locator,
                                                                    Location rootContainerLocation) {
     return locator.find(rootContainerLocation)
-        .filter(loc -> loc instanceof FlowConstruct)
-        .map(loc -> ((FlowConstruct) loc).getProcessingStrategy());
+        .filter(loc -> loc instanceof ProcessingStrategySupplier)
+        .map(loc -> ((ProcessingStrategySupplier) loc).getProcessingStrategy());
   }
 
   public static ProcessingStrategyFactory getDefaultProcessingStrategyFactory(MuleContext muleContext) {

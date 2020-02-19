@@ -18,12 +18,14 @@ import static org.junit.Assert.fail;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
@@ -35,6 +37,8 @@ import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -43,7 +47,10 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.policy.DefaultPolicyInstance;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -714,6 +721,34 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     emitter.complete();
 
     assertThat(fluxCompleted.get(), is(true));
+  }
+
+  @Test
+  @Issue("MULE-18087")
+  public void processingStrategyFromFlow() {
+    final ProcessingStrategy ps = mock(ProcessingStrategy.class);
+
+    final ConfigurationComponentLocator locator = mock(ConfigurationComponentLocator.class);
+    Location location = Location.builderFromStringRepresentation("myFlow").build();
+    final DefaultFlow flow = mock(DefaultFlow.class);
+    when(flow.getProcessingStrategy()).thenReturn(ps);
+    when(locator.find(location)).thenReturn(Optional.of(flow));
+
+    assertThat(getProcessingStrategy(locator, location), sameInstance(ps));
+  }
+
+  @Test
+  @Issue("MULE-18087")
+  public void processingStrategyFromPolicy() {
+    final ProcessingStrategy ps = mock(ProcessingStrategy.class);
+
+    final ConfigurationComponentLocator locator = mock(ConfigurationComponentLocator.class);
+    Location location = Location.builderFromStringRepresentation("myPolicy").build();
+    final DefaultPolicyInstance policy = mock(DefaultPolicyInstance.class);
+    when(policy.getProcessingStrategy()).thenReturn(ps);
+    when(locator.find(location)).thenReturn(Optional.of(policy));
+
+    assertThat(getProcessingStrategy(locator, location), sameInstance(ps));
   }
 
   private Processor createChain(ReactiveProcessor processor) throws InitialisationException {
