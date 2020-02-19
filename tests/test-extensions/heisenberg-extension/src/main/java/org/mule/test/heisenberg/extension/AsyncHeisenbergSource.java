@@ -34,7 +34,7 @@ import org.mule.test.heisenberg.extension.stereotypes.AsyncSourceStereotype;
 @MediaType(TEXT_PLAIN)
 public class AsyncHeisenbergSource extends HeisenbergSource {
 
-  public static volatile SourceCompletionCallback completionCallback;
+  public static SourceCompletionCallback completionCallback;
 
   @OnSuccess
   public void onSuccess(@Optional(defaultValue = PAYLOAD) Long payment, @Optional String sameNameParameter,

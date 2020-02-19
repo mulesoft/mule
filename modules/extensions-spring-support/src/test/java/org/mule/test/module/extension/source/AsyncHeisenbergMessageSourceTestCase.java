@@ -12,19 +12,26 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.test.heisenberg.extension.AsyncHeisenbergSource.completionCallback;
 
+import org.mule.test.heisenberg.extension.HeisenbergSource;
+
+import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 
 public class AsyncHeisenbergMessageSourceTestCase extends HeisenbergMessageSourceTestCase {
 
+  private static final Logger LOGGER = Logger.getLogger(AsyncHeisenbergMessageSourceTestCase.class);
+
   @Override
   protected void doSetUp() throws Exception {
+    LOGGER.error("doSetUp()");
     super.doSetUp();
     completionCallback = null;
   }
 
   @Override
   protected void doTearDown() throws Exception {
+    LOGGER.error("doTearDown()");
     super.doTearDown();
     completionCallback = null;
   }
@@ -36,33 +43,36 @@ public class AsyncHeisenbergMessageSourceTestCase extends HeisenbergMessageSourc
 
   @Test
   public void asyncSource() throws Exception {
+    LOGGER.error("asyncSource()");
     startFlow("source");
 
-    assertSourceCompleted();
+    //assertSourceCompleted();
 
-    //try {
-    //  assertSourceCompleted();
-    //  fail("Source should not have completed");
-    //} catch (AssertionError e) {
-    //  assertThat(completionCallback, is(notNullValue()));
-    //  completionCallback.success();
-    //  assertSourceCompleted();
-    //}
+    try {
+      assertSourceCompleted();
+      LOGGER.error("assertSourceCompleted()");
+      fail("Source should not have completed");
+    } catch (AssertionError e) {
+      assertThat(completionCallback, is(notNullValue()));
+      completionCallback.success();
+      LOGGER.error("assertSourceCompleted() - 2");
+      assertSourceCompleted();
+    }
   }
 
   @Test
   public void asyncOnException() throws Exception {
     startFlow("sourceFailed");
 
-    assertSourceFailed();
+    //assertSourceFailed();
 
-    //try {
-    //  assertSourceFailed();
-    //  fail("Source should not have completed");
-    //} catch (AssertionError e) {
-    //  assertThat(completionCallback, is(notNullValue()));
-    //  completionCallback.error(new Exception());
-    //  assertSourceFailed();
-    //}
+    try {
+      assertSourceFailed();
+      fail("Source should not have completed");
+    } catch (AssertionError e) {
+      assertThat(completionCallback, is(notNullValue()));
+      completionCallback.error(new Exception());
+      assertSourceFailed();
+    }
   }
 }

@@ -73,6 +73,8 @@ import java.util.concurrent.ScheduledFuture;
 
 import javax.inject.Inject;
 
+import org.apache.log4j.Logger;
+
 @Alias("ListenPayments")
 @EmitsResponse
 @Fires(SourceNotificationProvider.class)
@@ -81,6 +83,8 @@ import javax.inject.Inject;
 @BackPressure(defaultMode = FAIL, supportedModes = {FAIL, DROP})
 @Deprecated(message = "This source is being tapped by the DEA, it's usage is discouraged.", since = "1.6.0", toRemoveIn = "3.0.0")
 public class HeisenbergSource extends Source<String, Object> {
+
+  private static final Logger LOGGER = Logger.getLogger(HeisenbergSource.class);
 
   public static final String CORE_POOL_SIZE_ERROR_MESSAGE = "corePoolSize cannot be a negative value";
   public static final String INITIAL_BATCH_NUMBER_ERROR_MESSAGE = "initialBatchNumber cannot be a negative value";
@@ -145,11 +149,14 @@ public class HeisenbergSource extends Source<String, Object> {
   private HeisenbergConnection connection;
 
   public HeisenbergSource() {
+    LOGGER.error("HeisenbergSource()");
     resetHeisenbergSource();
   }
 
   @Override
   public synchronized void onStart(SourceCallback<String, Object> sourceCallback) throws MuleException {
+    LOGGER.error("onStart()");
+
     checkArgument(heisenberg != null, "config not injected");
     HeisenbergExtension.sourceTimesStarted++;
     configName = refName;
@@ -182,6 +189,7 @@ public class HeisenbergSource extends Source<String, Object> {
                                      @ParameterGroup(name = "Success Info", showInDsl = true) PersonalInfo successInfo,
                                      @Optional boolean fail,
                                      NotificationEmitter notificationEmitter) {
+    LOGGER.error("onSuccess()");
 
     gatheredMoney += payment;
     receivedGroupOnSource = ricin != null && ricin.getNextDoor().getAddress() != null;
@@ -201,6 +209,8 @@ public class HeisenbergSource extends Source<String, Object> {
                                    @ParameterGroup(name = "Error Info", showInDsl = true) PersonalInfo infoError,
                                    @Optional boolean propagateError,
                                    NotificationEmitter notificationEmitter) {
+    LOGGER.error("onError()");
+
     gatheredMoney = -1;
     receivedGroupOnSource = ricin != null && ricin.getNextDoor() != null && ricin.getNextDoor().getAddress() != null;
     receivedInlineOnError = infoError != null && infoError.getName() != null && !infoError.getName().equals(HEISENBERG);
@@ -213,6 +223,8 @@ public class HeisenbergSource extends Source<String, Object> {
 
   @OnTerminate
   public synchronized void onTerminate(SourceResult sourceResult, NotificationEmitter notificationEmitter) {
+    LOGGER.error("onTerminate()");
+
     if (sourceResult.isSuccess()) {
       terminateStatus = SUCCESS;
       error = empty();
@@ -234,6 +246,8 @@ public class HeisenbergSource extends Source<String, Object> {
 
   @OnBackPressure
   public void onBackPressure(BackPressureContext ctx, NotificationEmitter notificationEmitter) {
+    LOGGER.error("onBackPressure()");
+
     notificationEmitter.fireLazy(BATCH_FAILED, () -> ctx.getSourceCallbackContext().getVariable(BATCH_NUMBER).get(),
                                  fromType(Integer.class));
     heisenberg.onBackPressure(ctx);
@@ -241,6 +255,8 @@ public class HeisenbergSource extends Source<String, Object> {
 
   @Override
   public synchronized void onStop() {
+    LOGGER.error("onStop()");
+
     if (executor != null && scheduledFuture != null) {
       scheduledFuture.cancel(true);
       executor.stop();
@@ -270,6 +286,8 @@ public class HeisenbergSource extends Source<String, Object> {
   }
 
   public static synchronized void resetHeisenbergSource() {
+    LOGGER.error("resetHeisenbergSource()");
+
     receivedGroupOnSource = false;
     receivedInlineOnSuccess = false;
     receivedInlineOnError = false;

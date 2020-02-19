@@ -79,6 +79,7 @@ public class PollingProber implements Prober {
 
   @Override
   public void check(Probe probe) {
+    LOGGER.error("Checking probe: " + probe.describeFailure());
     if (!poll(probe)) {
       LOGGER.error("test timed out. Maybe due to a deadlock?");
       if (LOGGER.isTraceEnabled()) {
@@ -93,10 +94,12 @@ public class PollingProber implements Prober {
 
     while (true) {
       if (probe.isSatisfied()) {
+        LOGGER.error("Probe success: " + probe.describeFailure());
         return true;
       } else if (timeout.hasTimedOut()) {
         return false;
       } else {
+        LOGGER.error("Probe poll: " + probe.describeFailure());
         waitFor(pollDelayMillis);
       }
     }

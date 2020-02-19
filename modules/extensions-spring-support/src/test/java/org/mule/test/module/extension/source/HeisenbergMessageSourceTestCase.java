@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.source;
 
+import static java.lang.String.valueOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -29,6 +30,9 @@ import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.sourceTimesStarted;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.CORE_POOL_SIZE_ERROR_MESSAGE;
+import static org.mule.test.heisenberg.extension.HeisenbergSource.gatheredMoney;
+import static org.mule.test.heisenberg.extension.HeisenbergSource.receivedGroupOnSource;
+import static org.mule.test.heisenberg.extension.HeisenbergSource.receivedInlineOnSuccess;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.resetHeisenbergSource;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_BODY;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_INVOKE;
@@ -132,9 +136,12 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   protected void assertSourceCompleted() {
-    probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS, () -> HeisenbergSource.gatheredMoney > 100
-        && HeisenbergSource.receivedGroupOnSource
-        && HeisenbergSource.receivedInlineOnSuccess);
+    probe(TIMEOUT_MILLIS,
+          POLL_DELAY_MILLIS,
+          () -> gatheredMoney > 100 && receivedGroupOnSource && receivedInlineOnSuccess,
+          () -> "gatheredMoney:" + gatheredMoney +
+              ";receivedGroupOnSource:" + receivedGroupOnSource +
+              ";receivedInlineOnSuccess:" + receivedInlineOnSuccess);
   }
 
   @Test
@@ -145,8 +152,8 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
 
   protected void assertSourceFailed() {
     probe(TIMEOUT_MILLIS, POLL_DELAY_MILLIS,
-          () -> HeisenbergSource.gatheredMoney == -1
-              && HeisenbergSource.receivedGroupOnSource
+          () -> gatheredMoney == -1
+              && receivedGroupOnSource
               && HeisenbergSource.receivedInlineOnError);
   }
 
