@@ -443,4 +443,129 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="pooled-provider-config">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractExtensionType">
+          <xs:sequence minOccurs="1" maxOccurs="1">
+            <xs:element minOccurs="1" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="required" name="name">
+            <xs:annotation>
+              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="pooled-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
+            <xs:element minOccurs="1" maxOccurs="1" name="oauth-authorization-code">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence></xs:sequence>
+                    <xs:attribute type="xs:string" use="required" name="consumerKey">
+                      <xs:annotation>
+                        <xs:documentation>The OAuth consumerKey as registered with the service provider</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="required" name="consumerSecret">
+                      <xs:annotation>
+                        <xs:documentation>The OAuth consumerSecret as registered with the service provider</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" default="authUrl" name="authorizationUrl">
+                      <xs:annotation>
+                        <xs:documentation>The service provider's authorization endpoint URL</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" default="accessTokenUrl" name="accessTokenUrl">
+                      <xs:annotation>
+                        <xs:documentation>The service provider's accessToken endpoint URL</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" default="defaultScope" name="scopes">
+                      <xs:annotation>
+                        <xs:documentation>The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="resourceOwnerId">
+                      <xs:annotation>
+                        <xs:documentation>The resourceOwnerId which each component should use if it doesn't reference otherwise.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="before">
+                      <xs:annotation>
+                        <xs:documentation>The name of a flow to be executed right before starting the OAuth dance</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="after">
+                      <xs:annotation>
+                        <xs:documentation>The name of a flow to be executed right after an accessToken has been received</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="1" maxOccurs="1" name="oauth-callback-config">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence></xs:sequence>
+                    <xs:attribute type="xs:string" use="required" name="listenerConfig">
+                      <xs:annotation>
+                        <xs:documentation>A reference to a &lt;http:listener-config /&gt; to be used in order to create the listener that will catch the access token callback endpoint.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="required" name="callbackPath">
+                      <xs:annotation>
+                        <xs:documentation>The path of the access token callback endpoint</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="required" name="authorizePath">
+                      <xs:annotation>
+                        <xs:documentation>The path of the local http endpoint which triggers the OAuth dance</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="externalCallbackUrl">
+                      <xs:annotation>
+                        <xs:documentation>If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="oauth-store-config">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence></xs:sequence>
+                    <xs:attribute type="xs:string" use="optional" name="objectStore">
+                      <xs:annotation>
+                        <xs:documentation>A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="mule:expressionDouble" use="optional" default="34.0" name="apiVersion"></xs:attribute>
+          <xs:attribute type="xs:string" use="required" name="display"></xs:attribute>
+          <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="immediate"></xs:attribute>
+          <xs:attribute type="mule:substitutableBoolean" use="optional" default="true" name="prompt"></xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>
