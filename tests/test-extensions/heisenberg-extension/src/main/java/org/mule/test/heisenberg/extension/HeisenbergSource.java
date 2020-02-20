@@ -216,6 +216,8 @@ public class HeisenbergSource extends Source<String, Object> {
                                    @Optional boolean propagateError,
                                    NotificationEmitter notificationEmitter) {
     LOGGER.error("onError()");
+    LOGGER.error(error.getErrorMessage());
+    LOGGER.error(error.getCause().getMessage());
 
     gatheredMoney = -1;
     receivedGroupOnSource = ricin != null && ricin.getNextDoor() != null && ricin.getNextDoor().getAddress() != null;
