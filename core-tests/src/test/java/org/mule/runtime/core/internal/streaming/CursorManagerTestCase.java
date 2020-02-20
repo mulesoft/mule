@@ -10,10 +10,12 @@ import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.probe.PollingProber.check;
@@ -33,10 +35,12 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -75,7 +79,8 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void manageTheSameProviderMultipleTimesWithConcurrency() throws Exception {
+  @Issue("MULE-17687")
+  public void manageTheSameProviderMultipleTimesWithConcurrency() {
     final int threadCount = 5;
     List<CursorProvider> managedProviders = new ArrayList<>(threadCount);
     Latch latch = new Latch();
@@ -100,19 +105,28 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
     latch.release();
 
     check(5000, 100, () -> managedProviders.size() == threadCount);
-    managedProviders.forEach(p -> {
-      ManagedCursorProvider managedProvider = (ManagedCursorProvider) p;
-      assertThat(managedProvider, is(instanceOf(ManagedCursorProvider.class)));
-      assertThat(managedProvider.getDelegate(), is(sameInstance(cursorProvider)));
+    assertThat(managedProviders.get(0), is(instanceOf(ManagedCursorProvider.class)));
 
-      verify(cursorProvider, never()).releaseResources();
-      verify(cursorProvider, never()).close();
-      verify(ghostBuster).track(managedProvider);
-    });
+    ManagedCursorProvider managedProvider = (ManagedCursorProvider) managedProviders.get(0);
+    assertThat(managedProvider.getDelegate(), is(sameInstance(cursorProvider)));
+    assertThat(managedProviders.stream().allMatch(p -> p == managedProvider), is(true));
 
-    ctx.success();
+    verify(ghostBuster).track(managedProvider);
+  }
 
-    verify(cursorProvider).releaseResources();
-    verify(cursorProvider).close();
+  @Test
+  @Issue("MULE-17687")
+  public void remanageCollectedDecorator() {
+    CursorStreamProvider provider = mock(CursorStreamProvider.class);
+    when(ghostBuster.track(any())).thenReturn(new WeakReference<>(null));
+
+    cursorManager.manage(provider, ctx);
+
+    ArgumentCaptor<ManagedCursorProvider> managedDecoratorCaptor = forClass(ManagedCursorProvider.class);
+    verify(ghostBuster, times(2)).track(managedDecoratorCaptor.capture());
+
+    List<ManagedCursorProvider> captured = managedDecoratorCaptor.getAllValues();
+    assertThat(captured, hasSize(2));
+    assertThat(captured.get(0), is(sameInstance(captured.get(1))));
   }
 }
