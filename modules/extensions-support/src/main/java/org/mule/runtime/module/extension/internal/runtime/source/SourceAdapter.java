@@ -85,6 +85,7 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -567,6 +568,6 @@ public class SourceAdapter implements Lifecycle {
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName() + ": " + source.toString();
+    return this.getClass().getSimpleName() + ": " + Objects.toString(source);
   }
 }
