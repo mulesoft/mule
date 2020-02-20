@@ -12,8 +12,8 @@ import static java.util.function.Function.identity;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.OPERATION_CONFIG_NAME;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.WAS_TRANSACTIONAL;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPONENT_CONFIG_NAME;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.IS_TRANSACTIONAL;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.isPartOfActiveTransaction;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
@@ -101,26 +101,30 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    * @return
    */
   private <R> R performWithConnection(Function<Object, R> function) {
-    Optional<MutableConfigurationStats> stats = getMutableConfigurationStats(executionContext);
     RetryPolicyTemplate retryPolicy =
         (RetryPolicyTemplate) executionContext.getRetryPolicyTemplate().orElseGet(NoRetryPolicyTemplate::new);
-    CompletableFuture<R> future = retryPolicy.applyPolicy(() -> completedFuture(withConnection(function)),
-                                                          e -> !isFirstPage && !delegate.useStickyConnections()
-                                                              && shouldRetry(e, executionContext),
-                                                          e -> {
-                                                          },
-                                                          e -> stats.ifPresent(s -> s.discountInflightOperation()),
-                                                          identity(),
-                                                          executionContext.getCurrentScheduler());
-    try {
-      return future.get();
-    } catch (ExecutionException e) {
-      if (e.getCause() instanceof RuntimeException) {
-        throw (RuntimeException) e.getCause();
+    if (retryPolicy.isEnabled()) {
+      Optional<MutableConfigurationStats> stats = getMutableConfigurationStats(executionContext);
+      CompletableFuture<R> future = retryPolicy.applyPolicy(() -> completedFuture(withConnection(function)),
+                                                            e -> !isFirstPage && !delegate.useStickyConnections()
+                                                                && shouldRetry(e, executionContext),
+                                                            e -> {
+                                                            },
+                                                            e -> stats.ifPresent(s -> s.discountInflightOperation()),
+                                                            identity(),
+                                                            executionContext.getCurrentScheduler());
+      try {
+        return future.get();
+      } catch (ExecutionException e) {
+        if (e.getCause() instanceof RuntimeException) {
+          throw (RuntimeException) e.getCause();
+        }
+        throw new MuleRuntimeException(createStaticMessage(COULD_NOT_EXECUTE), e.getCause());
+      } catch (InterruptedException e) {
+        throw new MuleRuntimeException(createStaticMessage(COULD_NOT_EXECUTE), e);
       }
-      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_EXECUTE), e.getCause());
-    } catch (InterruptedException e) {
-      throw new MuleRuntimeException(createStaticMessage(COULD_NOT_EXECUTE), e);
+    } else {
+      return withConnection(function);
     }
   }
 
@@ -145,11 +149,9 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     Optional<String> exceptionConfigName =
         executionContext.getConfiguration().map(config -> ((ConfigurationInstance) config).getName());
     if (isPartOfActiveTransaction(config)) {
-      connectionException.addInfo(WAS_TRANSACTIONAL, true);
+      connectionException.addInfo(IS_TRANSACTIONAL, true);
     }
-    if (isFirstPage) {
-      exceptionConfigName.ifPresent(name -> connectionException.addInfo(OPERATION_CONFIG_NAME, name));
-    }
+    exceptionConfigName.ifPresent(name -> connectionException.addInfo(COMPONENT_CONFIG_NAME, name));
     connectionSupplier.invalidateConnection();
   }
 
@@ -173,8 +175,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   }
 
   private ConnectionSupplierFactory createConnectionSupplierFactory() {
-    //TODO fix this isPartOfActiveTransaction(config) (currently is always false here because transaction has not been bound yet, it is bound on extensionConnectionSupplier.getConnection(executionContext))
-    if (delegate.useStickyConnections() || isPartOfActiveTransaction(config)) {
+    if (delegate.useStickyConnections()) {
       return new StickyConnectionSupplierFactory();
     }
 

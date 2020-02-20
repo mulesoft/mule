@@ -8,9 +8,9 @@ package org.mule.runtime.module.extension.internal.util;
 
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPONENT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.OPERATION_CONFIG_NAME;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.WAS_TRANSACTIONAL;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.IS_TRANSACTIONAL;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -20,7 +20,6 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -48,7 +47,7 @@ public class ReconnectionUtils {
       return false;
     }
 
-    return checkEnrichedConnectionException(connectionException.get(), contextConfigName.orElse(null));
+    return isConnectionExceptionFromCurrentComponent(connectionException.get(), contextConfigName.orElse(null));
   }
 
   /**
@@ -65,14 +64,15 @@ public class ReconnectionUtils {
    * @param contextConfigName the config name for the context that is attempting to retry the operation
    * @return whether or not the operation should be retried
    */
-  private static boolean checkEnrichedConnectionException(ConnectionException connectionException, String contextConfigName) {
-    Boolean wasTransactional = (Boolean) connectionException.getInfo().get(WAS_TRANSACTIONAL);
-    if (wasTransactional != null && wasTransactional) {
+  private static boolean isConnectionExceptionFromCurrentComponent(ConnectionException connectionException,
+                                                                   String contextConfigName) {
+    Boolean isTransactional = (Boolean) connectionException.getInfo().get(IS_TRANSACTIONAL);
+    if (isTransactional != null && isTransactional) {
       return false;
     }
-    Object operationConfigName = connectionException.getInfo().get(OPERATION_CONFIG_NAME);
+    Object operationConfigName = connectionException.getInfo().get(COMPONENT_CONFIG_NAME);
     if (operationConfigName != null && contextConfigName != null) {
-      return Objects.equals(contextConfigName, operationConfigName);
+      return contextConfigName.equals(operationConfigName);
     }
     return true;
   }

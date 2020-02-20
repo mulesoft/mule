@@ -25,9 +25,11 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.transactional.connection.TestLocalTransactionalConnection;
+import org.mule.test.transactional.connection.TestTransactionalConnection;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -86,6 +88,18 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
     Integer id2 = it.next();
 
     assertThat(id1, equalTo(id2));
+  }
+
+  @Test
+  public void pagedOperationInTxAlwaysUsesSameConnection() throws Exception {
+    CoreEvent event = flowRunner("pagedOperationInTxAlwaysUsesSameConnection").run();
+    List<TestTransactionalConnection> connections =
+        (List<TestTransactionalConnection>) event.getVariables().get("connections").getValue();
+    assertThat(connections, is(notNullValue()));
+    assertThat(connections, hasSize(2));
+
+    TestTransactionalConnection connection = connections.get(0);
+    assertThat(connections.stream().allMatch(c -> c == connection), is(true));
   }
 
   @Test
