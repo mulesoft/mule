@@ -54,6 +54,7 @@ import org.mule.metadata.api.model.impl.DefaultObjectType;
 import org.mule.metadata.api.model.impl.DefaultStringType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
@@ -635,6 +636,15 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(onErrorRef.getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(onErrorDelegate.getAllowedStereotypes(), hasSize(1));
     assertThat(onErrorDelegate.getAllowedStereotypes().iterator().next().getType(), is(ON_ERROR.getType()));
+  }
+
+  @Test
+  public void configuration() {
+    ConstructModel configuration = coreExtensionModel.getConstructModel("configuration").get();
+    ParameterModel parameter = configuration.getAllParameterModels().stream()
+        .filter(pm -> "inheritIterableRepeatability".equals(pm.getName())).findAny().get();
+    SinceMuleVersionModelProperty sinceModelProperty = parameter.getModelProperty(SinceMuleVersionModelProperty.class).get();
+    assertThat(sinceModelProperty.getVersion().toCompleteNumericVersion(), is("4.3.0"));
   }
 
   @Test

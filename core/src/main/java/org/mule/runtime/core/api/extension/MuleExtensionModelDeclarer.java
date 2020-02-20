@@ -864,14 +864,20 @@ class MuleExtensionModelDeclarer {
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
         .withAllowedStereotypes(singletonList(ERROR_HANDLER))
-        .describedAs("The default error handler for every flow. This must be a reference to a global error handler.");
+        .describedAs("The default error handler for every flow. This must be a reference to a global error handler.")
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsReferences(true)
+            .allowsInlineDefinition(false)
+            .allowTopLevelDefinition(false)
+            .build());
 
     configuration.onDefaultParameterGroup()
         .withOptionalParameter("inheritIterableRepeatability")
         .ofType(typeLoader.load(boolean.class))
         .defaultingTo(false)
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("Whether streamed iterable objects should follow the repeatability strategy of the iterable or use the default one.");
+        .describedAs("Whether streamed iterable objects should follow the repeatability strategy of the iterable or use the default one.")
+        .withModelProperty(new SinceMuleVersionModelProperty("4.3.0"));
 
     configuration.onDefaultParameterGroup()
         .withOptionalParameter("shutdownTimeout")
@@ -900,7 +906,12 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("defaultObjectSerializer-ref")
         .ofType(typeLoader.load(String.class))
         .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("An optional reference to an ObjectSerializer to be used as the application's default");
+        .describedAs("An optional reference to an ObjectSerializer to be used as the application's default")
+        .withDsl(ParameterDslConfiguration.builder()
+            .allowsReferences(true)
+            .allowsInlineDefinition(false)
+            .allowTopLevelDefinition(false)
+            .build());
 
     configuration.onDefaultParameterGroup()
         .withOptionalParameter("dynamicConfigExpiration")
