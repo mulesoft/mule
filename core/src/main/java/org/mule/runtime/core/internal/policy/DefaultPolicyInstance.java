@@ -129,4 +129,8 @@ public class DefaultPolicyInstance extends AbstractComponent
     return ofNullable(operationPolicyChain);
   }
 
+  @Override
+  public ProcessingStrategy getProcessingStrategy() {
+    return processingStrategy;
+  }
 }

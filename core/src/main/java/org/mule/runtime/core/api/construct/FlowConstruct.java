@@ -17,13 +17,14 @@ import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategySupplier;
 import org.mule.runtime.core.api.source.MessageSource;
 
 /**
  * A uniquely identified {@link FlowConstruct} that once implemented and configured defines a construct through which messages are
  * processed using {@link MessageSource} and {@link Processor} building blocks.
  */
-public interface FlowConstruct extends NamedObject, LifecycleStateEnabled, Component {
+public interface FlowConstruct extends NamedObject, LifecycleStateEnabled, ProcessingStrategySupplier, Component {
 
   /**
    * @return The exception listener that will be used to handle exceptions that may be thrown at different points during the
@@ -57,6 +58,7 @@ public interface FlowConstruct extends NamedObject, LifecycleStateEnabled, Compo
   /**
    * @return the {@link ProcessingStrategy} used.
    */
+  @Override
   default ProcessingStrategy getProcessingStrategy() {
     return DIRECT_PROCESSING_STRATEGY_INSTANCE;
   }
