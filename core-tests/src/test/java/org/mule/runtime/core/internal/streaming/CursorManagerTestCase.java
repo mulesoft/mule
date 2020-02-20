@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -78,6 +79,7 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("MULE-17687")
   public void manageTheSameProviderMultipleTimesWithConcurrency() {
     final int threadCount = 5;
     List<CursorProvider> managedProviders = new ArrayList<>(threadCount);
@@ -113,6 +115,7 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("MULE-17687")
   public void remanageCollectedDecorator() {
     CursorStreamProvider provider = mock(CursorStreamProvider.class);
     when(ghostBuster.track(any())).thenReturn(new WeakReference<>(null));
