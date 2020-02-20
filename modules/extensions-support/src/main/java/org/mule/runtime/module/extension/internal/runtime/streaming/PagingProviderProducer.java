@@ -7,27 +7,36 @@
 
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static java.util.function.Function.identity;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPONENT_CONFIG_NAME;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.IS_TRANSACTIONAL;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
+import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.isPartOfActiveTransaction;
+import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.iterator.Producer;
-import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
-import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -46,6 +55,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   public static final String COULD_NOT_OBTAIN_A_CONNECTION = "Could not obtain a connection for the configuration";
   public static final String COULD_NOT_CREATE_A_CONNECTION_SUPPLIER =
       "Could not obtain a connection supplier for the configuration";
+  public static final String COULD_NOT_EXECUTE = "Could not execute operation with connection";
   private PagingProvider<Object, T> delegate;
   private final ConfigurationInstance config;
   private final ExtensionConnectionSupplier extensionConnectionSupplier;
@@ -91,25 +101,58 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    * @return
    */
   private <R> R performWithConnection(Function<Object, R> function) {
+    RetryPolicyTemplate retryPolicy =
+        (RetryPolicyTemplate) executionContext.getRetryPolicyTemplate().orElseGet(NoRetryPolicyTemplate::new);
+    if (retryPolicy.isEnabled()) {
+      Optional<MutableConfigurationStats> stats = getMutableConfigurationStats(executionContext);
+      CompletableFuture<R> future = retryPolicy.applyPolicy(() -> completedFuture(withConnection(function)),
+                                                            e -> !isFirstPage && !delegate.useStickyConnections()
+                                                                && shouldRetry(e, executionContext),
+                                                            e -> {
+                                                            },
+                                                            e -> stats.ifPresent(s -> s.discountInflightOperation()),
+                                                            identity(),
+                                                            executionContext.getCurrentScheduler());
+      try {
+        return future.get();
+      } catch (ExecutionException e) {
+        if (e.getCause() instanceof RuntimeException) {
+          throw (RuntimeException) e.getCause();
+        }
+        throw new MuleRuntimeException(createStaticMessage(COULD_NOT_EXECUTE), e.getCause());
+      } catch (InterruptedException e) {
+        throw new MuleRuntimeException(createStaticMessage(COULD_NOT_EXECUTE), e);
+      }
+    } else {
+      return withConnection(function);
+    }
+  }
+
+  private <R> R withConnection(Function<Object, R> function) {
     ConnectionSupplier connectionSupplier = getConnectionSupplier();
     Object connection = getConnection(connectionSupplier);
     try {
       R result = function.apply(connection);
       return result;
-    } catch (Exception exception) {
+    } catch (Exception caughtException) {
       if (isFirstPage) {
         safely(() -> delegate.close(connection), e -> LOGGER.debug("Found exception closing paging provider", e));
       }
-      extractConnectionException(exception).ifPresent(ex -> {
-        if (isTransactional()) {
-          executionContext.setVariable(DO_NOT_RETRY, "true");
-        }
-        connectionSupplier.invalidateConnection();
-      });
-      throw exception;
+      extractConnectionException(caughtException).ifPresent(e -> handleConnectionException(e, connectionSupplier));
+      throw caughtException;
     } finally {
       safely(connectionSupplier::close, e -> LOGGER.debug("Found exception closing the connection supplier", e));
     }
+  }
+
+  private void handleConnectionException(ConnectionException connectionException, ConnectionSupplier connectionSupplier) {
+    Optional<String> exceptionConfigName =
+        executionContext.getConfiguration().map(config -> ((ConfigurationInstance) config).getName());
+    if (isPartOfActiveTransaction(config)) {
+      connectionException.addInfo(IS_TRANSACTIONAL, true);
+    }
+    exceptionConfigName.ifPresent(name -> connectionException.addInfo(COMPONENT_CONFIG_NAME, name));
+    connectionSupplier.invalidateConnection();
   }
 
   /**
@@ -132,7 +175,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   }
 
   private ConnectionSupplierFactory createConnectionSupplierFactory() {
-    if (delegate.useStickyConnections() || isTransactional()) {
+    if (delegate.useStickyConnections()) {
       return new StickyConnectionSupplierFactory();
     }
 
@@ -153,11 +196,6 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     } catch (MuleException e) {
       throw new MuleRuntimeException(createStaticMessage(COULD_NOT_OBTAIN_A_CONNECTION), e);
     }
-  }
-
-  private boolean isTransactional() {
-    Transaction tx = TransactionCoordination.getInstance().getTransaction();
-    return tx != null && tx.hasResource(new ExtensionTransactionKey(config));
   }
 
   private interface ConnectionSupplierFactory {
