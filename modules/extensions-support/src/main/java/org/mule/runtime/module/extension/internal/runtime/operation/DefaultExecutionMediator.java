@@ -12,16 +12,14 @@ import static java.util.Collections.emptyList;
 import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
-import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
+import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -30,8 +28,6 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.extension.api.runtime.Interceptable;
@@ -44,7 +40,6 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
-import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -100,7 +95,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
                                   ErrorTypeRepository typeRepository,
                                   ValueTransformer... valueTransformers) {
     this.connectionManager = connectionManager;
-    this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel);
+    this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel, typeRepository);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
     this.valueTransformers = valueTransformers != null ? asList(valueTransformers) : emptyList();
   }
@@ -110,7 +105,7 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
    * Executes the operation per the specification in this classes' javadoc
    *
    * @param executor an {@link ComponentExecutor}
-   * @param context the {@link ExecutionContextAdapter} for the {@code executor} to use
+   * @param context  the {@link ExecutionContextAdapter} for the {@code executor} to use
    * @return the operation's result
    * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invokation fails
    */
@@ -170,12 +165,13 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
             executedInterceptors.clear();
           }
         })
-        .transform(pub -> from(getRetryPolicyTemplate(context)
-            .applyPolicy(pub,
-                         e -> shouldRetry(e, context),
-                         e -> stats.ifPresent(s -> s.discountInflightOperation()),
-                         identity(),
-                         context.getCurrentScheduler())));
+        .transform(pub -> context.getRetryPolicyTemplate()
+            .map(retryPolicy -> from(retryPolicy.applyPolicy(pub,
+                                                             e -> shouldRetry(e, context),
+                                                             e -> stats.ifPresent(s -> s.discountInflightOperation()),
+                                                             identity(),
+                                                             context.getCurrentScheduler())))
+            .orElse(pub));
   }
 
   private Throwable mapError(ExecutionContextAdapter context, List<Interceptor> interceptors, Throwable e) {
@@ -192,20 +188,6 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
     }
 
     return value;
-  }
-
-  private boolean shouldRetry(Throwable t, ExecutionContextAdapter<T> context) {
-    if (Boolean.valueOf(context.getVariable(DO_NOT_RETRY)) || !extractConnectionException(t).isPresent()) {
-      return false;
-    }
-
-    if (isTransactionActive()) {
-      Transaction tx = TransactionCoordination.getInstance().getTransaction();
-
-      return !tx.hasResource(new ExtensionTransactionKey(context.getConfiguration().get()));
-    }
-
-    return true;
   }
 
   InterceptorsExecutionResult before(ExecutionContext executionContext, List<Interceptor> interceptors) {
@@ -277,28 +259,6 @@ public final class DefaultExecutionMediator<T extends ComponentModel> implements
     return context.getTransactionConfig()
         .map(txConfig -> ((ExecutionTemplate<T>) createTransactionalExecutionTemplate(context.getMuleContext(), txConfig)))
         .orElse((ExecutionTemplate<T>) defaultExecutionTemplate);
-  }
-
-  private RetryPolicyTemplate getRetryPolicyTemplate(ExecutionContextAdapter<T> context) {
-    // If there is a template, try to wrap it using the ReconnectionConfig
-    Optional<RetryPolicyTemplate> customTemplate = context.getRetryPolicyTemplate()
-        .map(delegate -> context.getConfiguration()
-            .map(config -> config.getConnectionProvider().orElse(null))
-            .map(provider -> connectionManager.getReconnectionConfigFor(provider).getRetryPolicyTemplate(delegate))
-            .orElse(delegate));
-
-    // In case of no template available in the context, use the one defined by the ConnectionProvider
-    return customTemplate.orElseGet(() -> context.getConfiguration()
-        .map(config -> config.getConnectionProvider().orElse(null))
-        .map(provider -> connectionManager.getRetryTemplateFor((ConnectionProvider<? extends Object>) provider))
-        .orElse(fallbackRetryPolicyTemplate));
-  }
-
-  private Optional<MutableConfigurationStats> getMutableConfigurationStats(ExecutionContext<T> context) {
-    return context.getConfiguration()
-        .map(ConfigurationInstance::getStatistics)
-        .filter(s -> s instanceof MutableConfigurationStats)
-        .map(s -> (MutableConfigurationStats) s);
   }
 
   private List<Interceptor> collectInterceptors(ExecutionContextAdapter<T> context, ComponentExecutor<T> executor) {
