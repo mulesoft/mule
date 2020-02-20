@@ -201,7 +201,7 @@ public class HeisenbergSource extends Source<String, Object> {
     executedOnSuccess = true;
     LOGGER.error("onSuccess() - Success");
 
-    //notificationEmitter.fireLazy(BATCH_DELIVERED, () -> payment, fromType(Long.class));
+    notificationEmitter.fireLazy(BATCH_DELIVERED, () -> payment, fromType(Long.class));
 
     if (fail) {
       LOGGER.error("onSuccess() - Fail");
@@ -226,7 +226,7 @@ public class HeisenbergSource extends Source<String, Object> {
 
     LOGGER.error("onError() - Success");
 
-    //notificationEmitter.fireLazy(BATCH_DELIVERY_FAILED, () -> infoError, DataType.fromType(PersonalInfo.class));
+    notificationEmitter.fireLazy(BATCH_DELIVERY_FAILED, () -> infoError, DataType.fromType(PersonalInfo.class));
     if (propagateError) {
       LOGGER.error("onError() - Error");
       throw new RuntimeException("Some internal exception");
@@ -252,16 +252,16 @@ public class HeisenbergSource extends Source<String, Object> {
       });
     }
     executedOnTerminate = true;
-    //notificationEmitter.fireLazy(BATCH_TERMINATED, () -> sourceResult.getSourceCallbackContext().getVariable(BATCH_NUMBER).get(),
-    //                             fromType(Integer.class));
+    notificationEmitter.fireLazy(BATCH_TERMINATED, () -> sourceResult.getSourceCallbackContext().getVariable(BATCH_NUMBER).get(),
+                                 fromType(Integer.class));
   }
 
   @OnBackPressure
   public void onBackPressure(BackPressureContext ctx, NotificationEmitter notificationEmitter) {
     LOGGER.error("onBackPressure()");
 
-    //notificationEmitter.fireLazy(BATCH_FAILED, () -> ctx.getSourceCallbackContext().getVariable(BATCH_NUMBER).get(),
-    //                             fromType(Integer.class));
+    notificationEmitter.fireLazy(BATCH_FAILED, () -> ctx.getSourceCallbackContext().getVariable(BATCH_NUMBER).get(),
+                                 fromType(Integer.class));
     heisenberg.onBackPressure(ctx);
   }
 
