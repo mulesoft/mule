@@ -666,4 +666,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     return configurationInstanceOptional;
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName() + ": " + sourceAdapter.toString();
+  }
 }

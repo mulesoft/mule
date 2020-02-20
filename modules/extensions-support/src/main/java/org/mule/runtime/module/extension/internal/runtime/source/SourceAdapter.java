@@ -564,4 +564,9 @@ public class SourceAdapter implements Lifecycle {
   private MessagingException createSourceException(CoreEvent event, Throwable cause) {
     return exceptionResolver.resolve(new MessagingException(event, cause), errorTypeLocator, exceptionContextProviders);
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName() + ": " + source.toString();
+  }
 }
