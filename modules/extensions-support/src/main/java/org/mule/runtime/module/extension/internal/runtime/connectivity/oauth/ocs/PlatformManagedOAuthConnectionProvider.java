@@ -29,6 +29,8 @@ import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.connection.PoolingConnectionProvider;
+import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -85,7 +87,8 @@ import org.slf4j.Logger;
  * @param <C> the generic type of the generated connections
  * @since 4.3.0
  */
-public class PlatformManagedOAuthConnectionProvider<C> implements OAuthConnectionProviderWrapper<C> {
+public class PlatformManagedOAuthConnectionProvider<C>
+    implements OAuthConnectionProviderWrapper<C>, PoolingConnectionProvider<C> {
 
   private static final Logger LOGGER = getLogger(PlatformManagedOAuthConnectionProvider.class);
 
@@ -107,6 +110,7 @@ public class PlatformManagedOAuthConnectionProvider<C> implements OAuthConnectio
   private ConnectionProvider<C> unwrappedDelegate;
   private FieldSetter<ConnectionProvider<C>, OAuthState> oauthStateFieldSetter;
   private PlatformManagedConnectionDescriptor descriptor;
+  private PoolingListener<C> delegatePoolingListener;
 
   public PlatformManagedOAuthConnectionProvider(PlatformManagedOAuthConfig oauthConfig,
                                                 PlatformManagedOAuthHandler oauthHandler,
@@ -148,6 +152,7 @@ public class PlatformManagedOAuthConnectionProvider<C> implements OAuthConnectio
       descriptor = fetchConnectionDescriptor();
       delegate = createDelegate(descriptor);
       unwrappedDelegate = unwrapConnectionProvider(delegate);
+      delegatePoolingListener = getDelegatePoolingListener();
       initialiseDelegate();
       startIfNeeded(getRetryPolicyTemplate());
     } catch (MuleException e) {
@@ -353,6 +358,46 @@ public class PlatformManagedOAuthConnectionProvider<C> implements OAuthConnectio
   @Override
   public ConnectionManagementType getConnectionManagementType() {
     return oauthConfig.getDelegateConnectionProviderModel().getConnectionManagementType();
+  }
+
+  @Override
+  public void onBorrow(C connection) {
+    delegatePoolingListener.onBorrow(connection);
+  }
+
+  @Override
+  public void onReturn(C connection) {
+    delegatePoolingListener.onReturn(connection);
+  }
+
+  private PoolingListener<C> getDelegatePoolingListener() {
+    if (unwrappedDelegate instanceof PoolingListener) {
+      return new PoolingListener<C>() {
+
+        @Override
+        public void onBorrow(C connection) {
+          ((PoolingListener) unwrappedDelegate).onBorrow(connection);
+        }
+
+        @Override
+        public void onReturn(C connection) {
+          ((PoolingListener) unwrappedDelegate).onReturn(connection);
+        }
+      };
+    } else {
+      return new PoolingListener<C>() {
+
+        @Override
+        public void onBorrow(C connection) {
+          throw new UnsupportedOperationException("The delegate connection provider does not support Pooling");
+        }
+
+        @Override
+        public void onReturn(C connection) {
+          throw new UnsupportedOperationException("The delegate connection provider does not support Pooling");
+        }
+      };
+    }
   }
 
 }
