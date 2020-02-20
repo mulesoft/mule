@@ -231,7 +231,7 @@ public class RxUtils {
   public static <T> Supplier<FluxSink<T>> createFluxSupplier(Function<Flux<T>, Flux<?>> configurer) {
     return () -> {
       final FluxSinkRecorder<T> sinkRef = new FluxSinkRecorder<>();
-      Flux<?> flux = configurer.apply(Flux.create(sinkRef));
+      Flux<?> flux = configurer.apply(sinkRef.flux());
 
       flux.subscribe();
       return sinkRef.getFluxSink();

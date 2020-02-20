@@ -713,7 +713,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     AtomicBoolean fluxCompleted = new AtomicBoolean(false);
 
     final FluxSinkRecorder<CoreEvent> emitter = new FluxSinkRecorder<>();
-    Flux.create(emitter)
+    emitter.flux()
         .transform(pub -> applyWithChildContext(pub, pubInner -> pubInner, Optional.empty()))
         .subscribe(event -> {
         }, e -> {

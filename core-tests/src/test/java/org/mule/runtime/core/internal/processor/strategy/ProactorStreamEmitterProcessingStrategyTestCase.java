@@ -88,7 +88,6 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import reactor.core.publisher.Flux;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(PROACTOR)
@@ -808,7 +807,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     final Sink sink = ps.createSink(flow, flow);
 
     final FluxSinkRecorder<CoreEvent> internalSink = new FluxSinkRecorder<>();
-    ps.registerInternalSink(Flux.create(internalSink), "internalSink");
+    ps.registerInternalSink(internalSink.flux(), "internalSink");
 
     disposeIfNeeded(sink, LOGGER);
     verify(cpuLight, never()).stop();

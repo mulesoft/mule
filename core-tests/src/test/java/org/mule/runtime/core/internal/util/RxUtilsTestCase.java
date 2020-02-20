@@ -85,7 +85,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
     })
         .transform(pub -> {
           final FluxSinkRecorder<String> emitter = new FluxSinkRecorder<>();
-          return propagateCompletion(pub, Flux.<String>create(emitter),
+          return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
                                      () -> emitter.complete(), t -> emitter.error(t),
                                      RECEIVE_TIMEOUT, scheduledExecutor);
@@ -105,7 +105,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
     final String result = Mono.<String>create(sink -> sink.success("Hello"))
         .transform(pub -> {
           final FluxSinkRecorder<String> emitter = new FluxSinkRecorder<>();
-          return propagateCompletion(pub, Flux.<String>create(emitter),
+          return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
                                      () -> emitter.complete(), t -> emitter.error(t),
                                      RECEIVE_TIMEOUT, scheduledExecutor);
@@ -128,7 +128,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
     })
         .transform(pub -> {
           final FluxSinkRecorder<String> emitter = new FluxSinkRecorder<>();
-          return propagateCompletion(pub, Flux.<String>create(emitter), innerPub -> transformer(emitter, innerPub),
+          return propagateCompletion(pub, emitter.flux(), innerPub -> transformer(emitter, innerPub),
                                      () -> emitter.complete(), t -> emitter.error(t),
                                      RECEIVE_TIMEOUT, scheduledExecutor);
         })
@@ -150,7 +150,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
     Mono.<String>create(sink -> sink.error(expected))
         .transform(pub -> {
           final FluxSinkRecorder<String> emitter = new FluxSinkRecorder<>();
-          return propagateCompletion(pub, Flux.<String>create(emitter),
+          return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
                                      () -> emitter.complete(), t -> emitter.error(t),
                                      RECEIVE_TIMEOUT, scheduledExecutor);
@@ -175,7 +175,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
             }))
         .transform(pub -> {
           final FluxSinkRecorder<String> emitter = new FluxSinkRecorder<>();
-          return propagateCompletion(pub, Flux.<String>create(emitter),
+          return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
                                      () -> emitter.complete(), t -> emitter.error(t),
                                      RECEIVE_TIMEOUT, scheduledExecutor);
@@ -211,7 +211,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
             }))
         .transform(pub -> {
           final FluxSinkRecorder<String> emitter = new FluxSinkRecorder<>();
-          return propagateCompletion(pub, Flux.<String>create(emitter),
+          return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
                                      () -> emitter.complete(), t -> emitter.error(t),
                                      RECEIVE_TIMEOUT, scheduledExecutor);

@@ -116,7 +116,7 @@ public class CompositeSourcePolicy
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
 
       Flux<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> policyFlux =
-          Flux.create(sinkRef)
+          sinkRef.flux()
               .transform(compositeSourcePolicy.get().getExecutionProcessor())
               .map(policiesResultEvent -> {
                 SourcePolicyContext ctx = from(policiesResultEvent);

@@ -15,7 +15,6 @@ import static org.mule.runtime.core.internal.policy.OperationPolicyContext.from;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
-import static reactor.core.publisher.Flux.create;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.Component;
@@ -116,7 +115,7 @@ public class CompositeOperationPolicy
     public FluxSink<CoreEvent> get() {
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
 
-      Flux<CoreEvent> policyFlux = create(sinkRef)
+      Flux<CoreEvent> policyFlux = sinkRef.flux()
           .transform(getExecutionProcessor())
           .doOnNext(result -> from(result).getOperationCallerCallback().complete(result))
           .onErrorContinue(MessagingException.class, (t, e) -> {
@@ -139,7 +138,7 @@ public class CompositeOperationPolicy
   protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy lastPolicy) {
     FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder = new FluxSinkRecorder<>();
 
-    return from(propagateCompletion(from(eventPub), create(sinkRecorder), pub -> from(pub)
+    return from(propagateCompletion(from(eventPub), sinkRecorder.flux(), pub -> from(pub)
         .doOnNext(event -> {
           OperationPolicyContext ctx = from(event);
           OperationExecutionFunction operationExecutionFunction = ctx.getOperationExecutionFunction();
