@@ -23,6 +23,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.api.loader.AbstractJavaExtensionModelLoader.VERSION;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -56,8 +57,10 @@ import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
@@ -74,13 +77,11 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Intercept
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.execution.OperationExecutorFactoryWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 import java.util.HashMap;
 import java.util.List;
@@ -90,6 +91,9 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Utilities for handling {@link ExtensionModel extensions}
@@ -505,6 +509,18 @@ public class MuleExtensionUtils {
     } else {
       return false;
     }
+  }
+
+  /**
+   * @return the {@link MutableConfigurationStats} for a given {@link ExecutionContext}
+   *
+   * @since 4.2.3
+   */
+  public static Optional<MutableConfigurationStats> getMutableConfigurationStats(ExecutionContext<?> context) {
+    return context.getConfiguration()
+        .map(ConfigurationInstance::getStatistics)
+        .filter(s -> s instanceof MutableConfigurationStats)
+        .map(s -> (MutableConfigurationStats) s);
   }
 
 }

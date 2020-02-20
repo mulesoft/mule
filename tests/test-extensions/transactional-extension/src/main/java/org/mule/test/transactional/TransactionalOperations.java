@@ -129,6 +129,37 @@ public class TransactionalOperations {
     };
   }
 
+  public PagingProvider<TestTransactionalConnection, Integer> stickyFailingPagedTransactionalOperation(Integer failOn)
+      throws Exception {
+    return new PagingProvider<TestTransactionalConnection, Integer>() {
+
+      private static final int SIZE = 2;
+      private int count = 0;
+
+      @Override
+      public List<Integer> getPage(TestTransactionalConnection connection) {
+        getPageCalls++;
+        if (getPageCalls == failOn) {
+          throw new ModuleException(CONNECTIVITY, new ConnectionException("Failed to retrieve Page"));
+        }
+        return count++ < SIZE ? asList(identityHashCode(connection)) : emptyList();
+      }
+
+      @Override
+      public Optional<Integer> getTotalResults(TestTransactionalConnection connection) {
+        return empty();
+      }
+
+      @Override
+      public void close(TestTransactionalConnection connection) throws MuleException {}
+
+      @Override
+      public boolean useStickyConnections() {
+        return true;
+      }
+    };
+  }
+
   public void fail() {
     throw new RuntimeException("you better rollback!");
   }
