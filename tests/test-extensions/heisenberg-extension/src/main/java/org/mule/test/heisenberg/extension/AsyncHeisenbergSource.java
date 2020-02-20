@@ -55,7 +55,9 @@ public class AsyncHeisenbergSource extends HeisenbergSource {
     try {
       super.onSuccess(payment, sameNameParameter, ricin, successInfo, fail, notificationEmitter);
       completionCallback.success();
+      LOGGER.error("onSuccess() - Success");
     } catch (Throwable t) {
+      LOGGER.error("onSuccess() - Error");
       completionCallback.error(t);
     }
   }
@@ -68,13 +70,17 @@ public class AsyncHeisenbergSource extends HeisenbergSource {
                       SourceCompletionCallback completionCallback,
                       NotificationEmitter notificationEmitter) {
     LOGGER.error("onError()");
+    LOGGER.error(error.getErrorMessage());
+    LOGGER.error(error.getCause().getMessage());
 
     AsyncHeisenbergSource.completionCallback = completionCallback;
 
     try {
       super.onError(error, sameNameParameter, methylamine, ricin, infoError, propagateError, notificationEmitter);
       completionCallback.success();
+      LOGGER.error("onError() - Success");
     } catch (Throwable t) {
+      LOGGER.error("onError() - Error");
       completionCallback.error(t);
     }
   }

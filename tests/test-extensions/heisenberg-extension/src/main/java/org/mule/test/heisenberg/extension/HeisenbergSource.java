@@ -163,6 +163,7 @@ public class HeisenbergSource extends Source<String, Object> {
     location = componentLocation.getLocation();
 
     if (corePoolSize < 0) {
+      LOGGER.error("onStart() - corePoolSize < 0");
       throw new RuntimeException(CORE_POOL_SIZE_ERROR_MESSAGE);
     }
 
@@ -174,6 +175,7 @@ public class HeisenbergSource extends Source<String, Object> {
     scheduledFuture = executor.scheduleAtFixedRate(() -> {
       final Result<String, Object> result = makeResult(sourceCallback);
       if (result != null) {
+        LOGGER.error("onStart() - result != null");
         SourceCallbackContext context = sourceCallback.createContext();
         context.addVariable(BATCH_NUMBER, initialBatchNumber);
         context.fireOnHandle(NEW_BATCH, TypedValue.of(initialBatchNumber));
@@ -181,6 +183,8 @@ public class HeisenbergSource extends Source<String, Object> {
         sourceCallback.handle(result, context);
       }
     }, 0, frequency, MILLISECONDS);
+
+    LOGGER.error("onStart() - Finished");
   }
 
   @OnSuccess
@@ -195,10 +199,12 @@ public class HeisenbergSource extends Source<String, Object> {
     receivedGroupOnSource = ricin != null && ricin.getNextDoor().getAddress() != null;
     receivedInlineOnSuccess = successInfo != null && successInfo.getAge() != null && successInfo.getKnownAddresses() != null;
     executedOnSuccess = true;
+    LOGGER.error("onSuccess() - Success");
 
     //notificationEmitter.fireLazy(BATCH_DELIVERED, () -> payment, fromType(Long.class));
 
     if (fail) {
+      LOGGER.error("onSuccess() - Fail");
       throw new RuntimeException("Some internal exception");
     }
   }
@@ -215,8 +221,12 @@ public class HeisenbergSource extends Source<String, Object> {
     receivedGroupOnSource = ricin != null && ricin.getNextDoor() != null && ricin.getNextDoor().getAddress() != null;
     receivedInlineOnError = infoError != null && infoError.getName() != null && !infoError.getName().equals(HEISENBERG);
     executedOnError = true;
+
+    LOGGER.error("onError() - Success");
+
     //notificationEmitter.fireLazy(BATCH_DELIVERY_FAILED, () -> infoError, DataType.fromType(PersonalInfo.class));
     if (propagateError) {
+      LOGGER.error("onError() - Error");
       throw new RuntimeException("Some internal exception");
     }
   }
