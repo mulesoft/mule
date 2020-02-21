@@ -7,7 +7,11 @@
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
+import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
+import static org.mule.runtime.extension.api.ExtensionConstants.OBJECT_STORE_ELEMENT_NAMESPACE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE_DEFINITION;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -35,6 +39,9 @@ import java.util.List;
  */
 public class ObjectStoreParameterDeclarationEnricher implements DeclarationEnricher {
 
+  public static final StereotypeModel BACKWARD_OBJECT_STORE =
+          newStereotype(OBJECT_STORE_DEFINITION.getName(), OBJECT_STORE_ELEMENT_NAMESPACE.toUpperCase()).build();
+
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
     final ExtensionDeclaration extension = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
@@ -48,6 +55,11 @@ public class ObjectStoreParameterDeclarationEnricher implements DeclarationEnric
           List<StereotypeModel> stereotypes = parameter.getAllowedStereotypeModels();
           if (!stereotypes.contains(OBJECT_STORE)) {
             stereotypes.add(OBJECT_STORE);
+          }
+          // Previous version of Mule 4.3 define OS:OBJECT_STORE therefore we have to include both. See MULE-18098
+          // for more information
+          if (!stereotypes.contains(BACKWARD_OBJECT_STORE)) {
+            stereotypes.add(BACKWARD_OBJECT_STORE);
           }
           hasObjectStoreParams.set(true);
         }
@@ -67,7 +79,7 @@ public class ObjectStoreParameterDeclarationEnricher implements DeclarationEnric
 
   private boolean isObjectStore(MetadataType type) {
     return getTypeId(type)
-        .filter(typeId -> ObjectStore.class.getName().equals(typeId))
-        .isPresent();
+            .filter(typeId -> ObjectStore.class.getName().equals(typeId))
+            .isPresent();
   }
 }
