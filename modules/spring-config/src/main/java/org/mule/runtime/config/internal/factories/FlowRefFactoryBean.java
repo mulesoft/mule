@@ -19,7 +19,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContextDontPropagateErrors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
@@ -273,7 +273,9 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     private Publisher<CoreEvent> applyForStaticFlow(Flow resolvedTarget, Flux<CoreEvent> pub,
                                                     Optional<ComponentLocation> location) {
-      return decoratePublisher(pub.transform(eventPub -> applyWithChildContext(eventPub, resolvedTarget.referenced(), location)));
+      return decoratePublisher(pub
+          // Let the error routing be done by the called flow instead of the context hierarchy
+          .transform(eventPub -> applyWithChildContextDontPropagateErrors(eventPub, resolvedTarget.referenced(), location)));
     }
 
     private Publisher<CoreEvent> applyForStaticSubFlow(ReactiveProcessor resolvedTarget, Flux<CoreEvent> pub,
