@@ -76,7 +76,11 @@ public final class OperationMessageProcessorBuilder
         throw new IllegalStateException("Obtained paging delegate cannot be null");
       }
       ConfigurationInstance config = (ConfigurationInstance) operationContext.getConfiguration().get();
-      Producer<?> producer = new PagingProviderProducer((PagingProvider) value, config, operationContext, connectionSupplier);
+      Producer<?> producer = new PagingProviderProducer((PagingProvider) value,
+                                                        config,
+                                                        operationContext,
+                                                        connectionSupplier,
+                                                        supportsOAuth);
       ListConsumer<?> consumer = new ListConsumer(producer);
       consumer.loadNextPage();
       return new ConsumerStreamingIterator<>(consumer);

@@ -103,7 +103,7 @@ public final class ExtensionsOAuthUtils {
 
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("AccessToken for resourceOwner '{}' expired at operation '{}:{}' using config '{}'. "
-                           + "Will attempt to refresh token and retry operation",
+              + "Will attempt to refresh token and retry operation",
                        rsId, operationContext.getExtensionModel().getName(),
                        operationContext.getComponentModel().getName(),
                        operationContext.getConfiguration().get().getName());
@@ -114,7 +114,7 @@ public final class ExtensionsOAuthUtils {
       public void visit(ClientCredentialsGrantType grantType) {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("AccessToken expired at operation '{}:{}' using config '{}'. "
-                           + "Will attempt to refresh token and retry operation",
+              + "Will attempt to refresh token and retry operation",
                        operationContext.getExtensionModel().getName(),
                        operationContext.getComponentModel().getName(),
                        operationContext.getConfiguration().get().getName());
@@ -128,13 +128,13 @@ public final class ExtensionsOAuthUtils {
       connectionProvider.refreshToken(resourceOwnerId.orElse(""));
     } catch (Exception refreshException) {
       throw new MuleRuntimeException(createStaticMessage(format(
-          "AccessToken %s expired at operation '%s:%s' using config '%s'. Refresh token "
-              + "workflow was attempted but failed with the following exception",
-          forResourceOwner(resourceOwnerId),
-          operationContext.getExtensionModel().getName(),
-          operationContext.getComponentModel().getName(),
-          operationContext.getConfiguration().get().getName()))
-          , refreshException);
+                                                                "AccessToken %s expired at operation '%s:%s' using config '%s'. Refresh token "
+                                                                    + "workflow was attempted but failed with the following exception",
+                                                                forResourceOwner(resourceOwnerId),
+                                                                operationContext.getExtensionModel().getName(),
+                                                                operationContext.getComponentModel().getName(),
+                                                                operationContext.getConfiguration().get().getName())),
+                                     refreshException);
     }
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Access Token successfully refreshed {} on config '{}'",
@@ -152,6 +152,5 @@ public final class ExtensionsOAuthUtils {
     return resourceOwnerId.map(id -> "for resource owner '" + id + "'").orElse("");
   }
 
-  private ExtensionsOAuthUtils() {
-  }
+  private ExtensionsOAuthUtils() {}
 }
