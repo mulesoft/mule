@@ -492,7 +492,7 @@
                         <xs:documentation>The service provider's accessToken endpoint URL</xs:documentation>
                       </xs:annotation>
                     </xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" default="defaultScope" name="scopes">
+                    <xs:attribute type="xs:string" use="optional" name="scopes">
                       <xs:annotation>
                         <xs:documentation>The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation</xs:documentation>
                       </xs:annotation>

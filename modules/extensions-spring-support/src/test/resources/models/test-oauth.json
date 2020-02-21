@@ -10515,7 +10515,6 @@
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "expressionSupport": "NOT_SUPPORTED",
-                  "defaultValue": "defaultScope",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -10827,8 +10826,7 @@
                   "authorizationUrl": "authUrl",
                   "accessTokenExpr": "#[payload.access_token]",
                   "expirationRegex": "#[payload.expires_in]",
-                  "refreshTokenExpr": "#[payload.refresh_token]",
-                  "defaultScope": "defaultScope"
+                  "refreshTokenExpr": "#[payload.refresh_token]"
                 }
               ]
             },

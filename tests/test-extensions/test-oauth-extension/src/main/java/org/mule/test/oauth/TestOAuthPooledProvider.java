@@ -20,8 +20,7 @@ import java.util.List;
 import java.util.Queue;
 
 @AuthorizationCode(accessTokenUrl = TestOAuthConnectionProvider.ACCESS_TOKEN_URL,
-    authorizationUrl = TestOAuthConnectionProvider.AUTH_URL,
-    defaultScopes = TestOAuthConnectionProvider.DEFAULT_SCOPE)
+    authorizationUrl = TestOAuthConnectionProvider.AUTH_URL)
 @Alias("pooled")
 public class TestOAuthPooledProvider extends TestOAuthConnectionState implements PoolingConnectionProvider<TestOAuthConnection> {
 
