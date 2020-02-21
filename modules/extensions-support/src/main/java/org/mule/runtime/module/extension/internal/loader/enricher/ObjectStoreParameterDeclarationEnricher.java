@@ -40,7 +40,7 @@ import java.util.List;
 public class ObjectStoreParameterDeclarationEnricher implements DeclarationEnricher {
 
   public static final StereotypeModel BACKWARD_OBJECT_STORE =
-          newStereotype(OBJECT_STORE_DEFINITION.getName(), OBJECT_STORE_ELEMENT_NAMESPACE.toUpperCase()).build();
+      newStereotype(OBJECT_STORE_DEFINITION.getName(), OBJECT_STORE_ELEMENT_NAMESPACE.toUpperCase()).build();
 
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
@@ -79,7 +79,7 @@ public class ObjectStoreParameterDeclarationEnricher implements DeclarationEnric
 
   private boolean isObjectStore(MetadataType type) {
     return getTypeId(type)
-            .filter(typeId -> ObjectStore.class.getName().equals(typeId))
-            .isPresent();
+        .filter(typeId -> ObjectStore.class.getName().equals(typeId))
+        .isPresent();
   }
 }
