@@ -85,6 +85,7 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -563,5 +564,10 @@ public class SourceAdapter implements Lifecycle {
 
   private MessagingException createSourceException(CoreEvent event, Throwable cause) {
     return exceptionResolver.resolve(new MessagingException(event, cause), errorTypeLocator, exceptionContextProviders);
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName() + ": " + Objects.toString(source);
   }
 }
