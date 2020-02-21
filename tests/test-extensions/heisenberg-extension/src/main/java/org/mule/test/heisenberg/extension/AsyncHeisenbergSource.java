@@ -6,6 +6,7 @@
  */
 package org.mule.test.heisenberg.extension;
 
+import static org.apache.log4j.Logger.getLogger;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.RICIN_GROUP_NAME;
@@ -26,6 +27,8 @@ import org.mule.test.heisenberg.extension.model.Methylamine;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.stereotypes.AsyncSourceStereotype;
 
+import org.apache.log4j.Logger;
+
 @Alias("AsyncListenPayments")
 @EmitsResponse
 @Fires(SourceNotificationProvider.class)
@@ -33,6 +36,8 @@ import org.mule.test.heisenberg.extension.stereotypes.AsyncSourceStereotype;
 @Stereotype(AsyncSourceStereotype.class)
 @MediaType(TEXT_PLAIN)
 public class AsyncHeisenbergSource extends HeisenbergSource {
+
+  private static Logger LOGGER = getLogger(AsyncHeisenbergSource.class);
 
   public static SourceCompletionCallback completionCallback;
 
@@ -43,14 +48,17 @@ public class AsyncHeisenbergSource extends HeisenbergSource {
                         @Optional boolean fail,
                         SourceCompletionCallback completionCallback,
                         NotificationEmitter notificationEmitter) {
+    LOGGER.error("onSuccess() - Start");
 
     AsyncHeisenbergSource.completionCallback = completionCallback;
 
     try {
       super.onSuccess(payment, sameNameParameter, ricin, successInfo, fail, notificationEmitter);
       completionCallback.success();
+      LOGGER.error("onSuccess() - Completed");
     } catch (Throwable t) {
       completionCallback.error(t);
+      LOGGER.error("onSuccess() - Exception");
     }
   }
 
@@ -61,14 +69,23 @@ public class AsyncHeisenbergSource extends HeisenbergSource {
                       @Optional boolean propagateError,
                       SourceCompletionCallback completionCallback,
                       NotificationEmitter notificationEmitter) {
+    LOGGER.error("onError() - Start");
+    LOGGER.error(error.getErrorMessage());
+    if (error.getCause() != null) {
+      LOGGER.error("onError() - Cause");
+      LOGGER.error(error.getCause());
+      LOGGER.error(error.getCause().getMessage());
+    }
 
     AsyncHeisenbergSource.completionCallback = completionCallback;
 
     try {
       super.onError(error, sameNameParameter, methylamine, ricin, infoError, propagateError, notificationEmitter);
       completionCallback.success();
+      LOGGER.error("onError() - Completed");
     } catch (Throwable t) {
       completionCallback.error(t);
+      LOGGER.error("onError() - Exception");
     }
   }
 }

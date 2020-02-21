@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.apache.log4j.Logger.getLogger;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
@@ -73,6 +74,8 @@ import java.util.concurrent.ScheduledFuture;
 
 import javax.inject.Inject;
 
+import org.apache.log4j.Logger;
+
 @Alias("ListenPayments")
 @EmitsResponse
 @Fires(SourceNotificationProvider.class)
@@ -81,6 +84,8 @@ import javax.inject.Inject;
 @BackPressure(defaultMode = FAIL, supportedModes = {FAIL, DROP})
 @Deprecated(message = "This source is being tapped by the DEA, it's usage is discouraged.", since = "1.6.0", toRemoveIn = "3.0.0")
 public class HeisenbergSource extends Source<String, Object> {
+
+  private static Logger LOGGER = getLogger(HeisenbergSource.class);
 
   public static final String CORE_POOL_SIZE_ERROR_MESSAGE = "corePoolSize cannot be a negative value";
   public static final String INITIAL_BATCH_NUMBER_ERROR_MESSAGE = "initialBatchNumber cannot be a negative value";
@@ -150,12 +155,15 @@ public class HeisenbergSource extends Source<String, Object> {
 
   @Override
   public synchronized void onStart(SourceCallback<String, Object> sourceCallback) throws MuleException {
+    LOGGER.error("onStart() - Start");
+
     checkArgument(heisenberg != null, "config not injected");
     HeisenbergExtension.sourceTimesStarted++;
     configName = refName;
     location = componentLocation.getLocation();
 
     if (corePoolSize < 0) {
+      LOGGER.error("onStart() - corePoolSize < 0 - Exception");
       throw new RuntimeException(CORE_POOL_SIZE_ERROR_MESSAGE);
     }
 
@@ -174,6 +182,8 @@ public class HeisenbergSource extends Source<String, Object> {
         sourceCallback.handle(result, context);
       }
     }, 0, frequency, MILLISECONDS);
+
+    LOGGER.error("onStart() - Completed");
   }
 
   @OnSuccess
@@ -182,6 +192,7 @@ public class HeisenbergSource extends Source<String, Object> {
                                      @ParameterGroup(name = "Success Info", showInDsl = true) PersonalInfo successInfo,
                                      @Optional boolean fail,
                                      NotificationEmitter notificationEmitter) {
+    LOGGER.error("onSuccess() - Start");
 
     gatheredMoney += payment;
     receivedGroupOnSource = ricin != null && ricin.getNextDoor().getAddress() != null;
@@ -191,8 +202,10 @@ public class HeisenbergSource extends Source<String, Object> {
     notificationEmitter.fireLazy(BATCH_DELIVERED, () -> payment, fromType(Long.class));
 
     if (fail) {
+      LOGGER.error("onSuccess() - Fail");
       throw new RuntimeException("Some internal exception");
     }
+    LOGGER.error("onSuccess() - Completed");
   }
 
   @OnError
@@ -201,22 +214,36 @@ public class HeisenbergSource extends Source<String, Object> {
                                    @ParameterGroup(name = "Error Info", showInDsl = true) PersonalInfo infoError,
                                    @Optional boolean propagateError,
                                    NotificationEmitter notificationEmitter) {
+    LOGGER.error("onError() - Start");
+    LOGGER.error(error.getErrorMessage());
+    if (error.getCause() != null) {
+      LOGGER.error("onError() - Cause");
+      LOGGER.error(error.getCause());
+      LOGGER.error(error.getCause().getMessage());
+    }
+
     gatheredMoney = -1;
     receivedGroupOnSource = ricin != null && ricin.getNextDoor() != null && ricin.getNextDoor().getAddress() != null;
     receivedInlineOnError = infoError != null && infoError.getName() != null && !infoError.getName().equals(HEISENBERG);
     executedOnError = true;
     notificationEmitter.fireLazy(BATCH_DELIVERY_FAILED, () -> infoError, DataType.fromType(PersonalInfo.class));
+    LOGGER.error("onError() - Completed");
     if (propagateError) {
+      LOGGER.error("onError() - Propagated");
       throw new RuntimeException("Some internal exception");
     }
   }
 
   @OnTerminate
   public synchronized void onTerminate(SourceResult sourceResult, NotificationEmitter notificationEmitter) {
+    LOGGER.error("onTerminate() - Start");
+
     if (sourceResult.isSuccess()) {
+      LOGGER.error("onTerminate() - isSuccess");
       terminateStatus = SUCCESS;
       error = empty();
     } else {
+      LOGGER.error("onTerminate() - notSuccess");
       sourceResult.getInvocationError().ifPresent(parameterError -> {
         terminateStatus = ERROR_INVOKE;
         error = of(parameterError);
@@ -230,17 +257,21 @@ public class HeisenbergSource extends Source<String, Object> {
     executedOnTerminate = true;
     notificationEmitter.fireLazy(BATCH_TERMINATED, () -> sourceResult.getSourceCallbackContext().getVariable(BATCH_NUMBER).get(),
                                  fromType(Integer.class));
+    LOGGER.error("onTerminate() - Completed");
   }
 
   @OnBackPressure
   public void onBackPressure(BackPressureContext ctx, NotificationEmitter notificationEmitter) {
+    LOGGER.error("onBackPressure() - Start");
     notificationEmitter.fireLazy(BATCH_FAILED, () -> ctx.getSourceCallbackContext().getVariable(BATCH_NUMBER).get(),
                                  fromType(Integer.class));
     heisenberg.onBackPressure(ctx);
+    LOGGER.error("onBackPressure() - Completed");
   }
 
   @Override
   public synchronized void onStop() {
+    LOGGER.error("onStop() - Start");
     if (executor != null && scheduledFuture != null) {
       scheduledFuture.cancel(true);
       executor.stop();
@@ -252,6 +283,7 @@ public class HeisenbergSource extends Source<String, Object> {
 
     receivedGroupOnSource = false;
     gatheredMoney = 0;
+    LOGGER.error("onStop() - Completed");
   }
 
   private Result<String, Object> makeResult(SourceCallback sourceCallback) {
