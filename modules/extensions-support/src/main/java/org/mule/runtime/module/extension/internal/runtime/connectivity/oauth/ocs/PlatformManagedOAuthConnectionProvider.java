@@ -385,18 +385,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
         }
       };
     } else {
-      return new PoolingListener<C>() {
-
-        @Override
-        public void onBorrow(C connection) {
-          throw new UnsupportedOperationException("The delegate connection provider does not support Pooling");
-        }
-
-        @Override
-        public void onReturn(C connection) {
-          throw new UnsupportedOperationException("The delegate connection provider does not support Pooling");
-        }
-      };
+      return new PoolingListener<C>() {};
     }
   }
 
