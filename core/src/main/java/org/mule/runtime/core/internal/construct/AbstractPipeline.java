@@ -406,6 +406,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       try {
         if (componentInitialStateManager.mustStartMessageSource(source)) {
           startIfStartable(source);
+        } else {
+          LOGGER.info("Not starting source for '{}' because of {}", getName(), componentInitialStateManager);
         }
       } catch (ConnectException ce) {
         // Let connection exceptions bubble up to trigger the reconnection strategy.
@@ -452,7 +454,13 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doStop() throws MuleException {
-    stopSafely(() -> stopIfStoppable(source));
+    stopSafely(() -> {
+      if (componentInitialStateManager.mustStartMessageSource(source)) {
+        stopIfStoppable(source);
+      } else {
+        LOGGER.info("Not stopping source for '{}', it was not started because of {}", getName(), componentInitialStateManager);
+      }
+    });
     canProcessMessage = false;
 
     stopSafely(() -> disposeIfDisposable(sink));

@@ -15,6 +15,8 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -26,7 +28,7 @@ import org.junit.Test;
 
 public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextTestCase {
 
-  protected static class DirectInboundMessageSource extends AbstractComponent implements MessageSource {
+  protected static class DirectInboundMessageSource extends AbstractComponent implements MessageSource, Startable, Stoppable {
 
     private Processor listener;
 
@@ -42,6 +44,16 @@ public abstract class AbstractFlowConstructTestCase extends AbstractMuleContextT
     @Override
     public String toString() {
       return ObjectUtils.toString(this);
+    }
+
+    @Override
+    public void stop() throws MuleException {
+      // Nothing to do
+    }
+
+    @Override
+    public void start() throws MuleException {
+      // Nothing to do
     }
   }
 

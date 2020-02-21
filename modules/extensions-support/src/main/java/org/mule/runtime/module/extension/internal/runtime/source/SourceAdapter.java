@@ -80,6 +80,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -550,5 +551,10 @@ public class SourceAdapter implements Lifecycle {
     MessagingException messagingException = new MessagingException(event, cause);
 
     return exceptionResolver.resolve(messagingException, muleContext);
+  }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName() + ": " + Objects.toString(source);
   }
 }

@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -35,7 +36,7 @@ import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrate
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static reactor.core.publisher.Mono.just;
 
-import io.qameta.allure.Issue;
+import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -53,9 +54,11 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.WorkQueueStreamProcessingStrategyFactory;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.transformer.simple.StringAppendTransformer;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.core.lifecycle.LifecycleTrackerProcessor;
@@ -78,6 +81,8 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.InOrder;
 import org.reactivestreams.Publisher;
+
+import io.qameta.allure.Issue;
 import reactor.core.publisher.Flux;
 
 @RunWith(Parameterized.class)
@@ -294,7 +299,51 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
     inOrder.verify((Disposable) sink).dispose();
     inOrder.verify((Stoppable) processor).stop();
     inOrder.verify((Stoppable) processingStrategy).stop();
+  }
 
+  @Test
+  @Issue("MULE-18089")
+  public void lifecycleWithStartSourceFalse() throws Exception {
+    MuleContextWithRegistry mcwr = (MuleContextWithRegistry) muleContext;
+    final MuleRegistry registry = spy(mcwr.getRegistry());
+    final ComponentInitialStateManager initialStateManager = mock(ComponentInitialStateManager.class);
+    when(initialStateManager.mustStartMessageSource(any())).thenReturn(false);
+    when(registry.lookupObject(ComponentInitialStateManager.SERVICE_ID)).thenReturn(initialStateManager);
+    when(mcwr.getRegistry()).thenReturn(registry);
+    directInboundMessageSource = spy(directInboundMessageSource);
+
+    muleContext.start();
+
+    Sink sink = mock(Sink.class, withSettings().extraInterfaces(Disposable.class));
+    Processor processor = mock(Processor.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
+    ProcessingStrategy processingStrategy =
+        mock(ProcessingStrategy.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
+    when(processingStrategy.createSink(any(FlowConstruct.class), any(ReactiveProcessor.class)))
+        .thenReturn(sink);
+    flow = (DefaultFlow) Flow.builder(FLOW_NAME, muleContext)
+        .source(directInboundMessageSource)
+        .processors(singletonList(processor))
+        .processingStrategyFactory((muleContext, s) -> processingStrategy)
+        .build();
+
+    flow.initialise();
+    flow.start();
+
+    InOrder inOrder = inOrder(sink, processor, processingStrategy);
+
+    verify((Startable) directInboundMessageSource, never()).start();
+    inOrder.verify((Startable) processingStrategy).start();
+    inOrder.verify(processingStrategy).createSink(any(FlowConstruct.class), any(ReactiveProcessor.class));
+    inOrder.verify((Startable) processor).start();
+
+    flow.stop();
+
+    verify((Stoppable) directInboundMessageSource, never()).stop();
+    inOrder.verify((Disposable) sink).dispose();
+    inOrder.verify((Stoppable) processor).stop();
+    inOrder.verify((Stoppable) processingStrategy).stop();
+
+    muleContext.stop();
   }
 
   @Test

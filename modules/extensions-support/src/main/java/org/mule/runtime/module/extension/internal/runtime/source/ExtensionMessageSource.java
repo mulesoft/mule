@@ -83,6 +83,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -670,4 +671,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     return configurationInstanceOptional;
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName() + ": " + Objects.toString(sourceAdapter);
+  }
 }
