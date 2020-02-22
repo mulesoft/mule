@@ -73,7 +73,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
 
   private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
-      getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionModelJson.updateExpectedFilesOnError");
+          getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionModelJson.updateExpectedFilesOnError");
 
   static final Map<String, ExtensionModel> extensionModels = new HashMap<>();
 
@@ -95,26 +95,26 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
     final ClassLoader classLoader = ExtensionModelJsonGeneratorTestCase.class.getClassLoader();
     final ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
     when(serviceRegistry.lookupProviders(DeclarationEnricher.class, classLoader))
-        .thenReturn(asList(new JavaXmlDeclarationEnricher()));
+            .thenReturn(asList(new JavaXmlDeclarationEnricher()));
 
     List<ExtensionJsonGeneratorTestUnit> extensions;
     extensions = asList(
-                        newTestUnit(javaLoader, VeganExtension.class, "vegan.json"),
-                        newTestUnit(javaLoader, PetStoreConnector.class, "petstore.json"),
-                        newTestUnit(javaLoader, MetadataExtension.class, "metadata.json"),
-                        newTestUnit(javaLoader, HeisenbergExtension.class, "heisenberg.json"),
-                        newTestUnit(javaLoader, SubstitutionGroupExtension.class, "substitutiongroup.json"),
-                        newTestUnit(javaLoader, TransactionalExtension.class, "tx-ext.json"),
-                        newTestUnit(javaLoader, SubTypesMappingConnector.class, "subtypes.json"),
-                        newTestUnit(javaLoader, MarvelExtension.class, "marvel.json"),
-                        newTestUnit(soapLoader, RickAndMortyExtension.class, "ram.json"),
-                        newTestUnit(javaLoader, TypedValueExtension.class, "typed-value.json"),
-                        newTestUnit(javaLoader, TestOAuthExtension.class, "test-oauth.json"),
-                        newTestUnit(javaLoader, WeaveFunctionExtension.class, "test-fn.json"),
-                        newTestUnit(javaLoader, ValuesExtension.class, "values.json"),
-                        newTestUnit(javaLoader, ImplicitConfigExtension.class, "implicit-config.json"),
-                        newTestUnit(javaLoader, NonImplicitConfigExtension.class, "non-implicit-config.json"),
-                        newTestUnit(javaLoader, ReconnectionExtension.class, "reconnection-extension.json"));
+            newTestUnit(javaLoader, VeganExtension.class, "vegan.json"),
+            newTestUnit(javaLoader, PetStoreConnector.class, "petstore.json"),
+            newTestUnit(javaLoader, MetadataExtension.class, "metadata.json"),
+            newTestUnit(javaLoader, HeisenbergExtension.class, "heisenberg.json"),
+            newTestUnit(javaLoader, SubstitutionGroupExtension.class, "substitutiongroup.json"),
+            newTestUnit(javaLoader, TransactionalExtension.class, "tx-ext.json"),
+            newTestUnit(javaLoader, SubTypesMappingConnector.class, "subtypes.json"),
+            newTestUnit(javaLoader, MarvelExtension.class, "marvel.json"),
+            newTestUnit(soapLoader, RickAndMortyExtension.class, "ram.json"),
+            newTestUnit(javaLoader, TypedValueExtension.class, "typed-value.json"),
+            newTestUnit(javaLoader, TestOAuthExtension.class, "test-oauth.json"),
+            newTestUnit(javaLoader, WeaveFunctionExtension.class, "test-fn.json"),
+            newTestUnit(javaLoader, ValuesExtension.class, "values.json"),
+            newTestUnit(javaLoader, ImplicitConfigExtension.class, "implicit-config.json"),
+            newTestUnit(javaLoader, NonImplicitConfigExtension.class, "non-implicit-config.json"),
+            newTestUnit(javaLoader, ReconnectionExtension.class, "reconnection-extension.json"));
 
     BiFunction<Class<?>, ExtensionModelLoader, ExtensionModel> createExtensionModel = (extension, loader) -> {
       ExtensionModel model = loadExtension(extension, loader);
@@ -128,8 +128,8 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
     };
 
     return extensions.stream()
-        .map(e -> e.toTestParams(createExtensionModel))
-        .collect(toList());
+            .map(e -> e.toTestParams(createExtensionModel))
+            .collect(toList());
   }
 
   /**
@@ -155,11 +155,13 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
     final String json = generator.serialize(extensionUnderTest).trim();
     try {
       JSONAssert.assertEquals(expectedJson, json, true);
-    } catch (AssertionError e) {
+    }
+    catch (AssertionError e) {
 
       if (shouldUpdateExpectedFilesOnError()) {
         updateExpectedJson(json);
-      } else {
+      }
+      else {
         System.out.println(json);
 
         throw e;
@@ -175,7 +177,7 @@ public class ExtensionModelJsonGeneratorTestCase extends AbstractMuleTestCase {
 
   private void updateExpectedJson(String json) throws URISyntaxException, IOException {
     File root = new File(getResourceAsUrl("models/" + expectedSource, getClass()).toURI()).getParentFile()
-        .getParentFile().getParentFile().getParentFile();
+            .getParentFile().getParentFile().getParentFile();
     File testDir = new File(root, "src/test/resources/models");
     File target = new File(testDir, expectedSource);
     stringToFile(target.getAbsolutePath(), json);
