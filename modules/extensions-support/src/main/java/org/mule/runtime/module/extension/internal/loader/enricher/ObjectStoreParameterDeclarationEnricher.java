@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
