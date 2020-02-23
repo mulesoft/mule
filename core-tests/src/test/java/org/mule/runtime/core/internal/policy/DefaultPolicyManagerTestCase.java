@@ -24,7 +24,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
-import static org.mule.tck.probe.PollingProber.probe;
+import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
@@ -47,6 +47,8 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 
 import java.util.List;
 import java.util.Map;
@@ -60,6 +62,8 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
+
+  private static final int GC_POLLING_TIMEOUT = 10000;
 
   private PolicyProvider policyProvider;
   private ArgumentCaptor<Runnable> policiesChangeCallbackCaptor;
@@ -323,10 +327,10 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     policyInstance = null;
 
     // Verify that dispose is called when the policy is no longer being used
-    probe(() -> {
+    new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       System.gc();
       return sourcePolicydisposed.get();
-    });
+    }));
 
     stopIfNeeded(policyManager);
   }
@@ -382,10 +386,10 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     policyInstance = null;
 
     // Verify that dispose is called when the policy is no longer being used
-    probe(() -> {
+    new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       System.gc();
       return operationPolicydisposed.get();
-    });
+    }));
 
     stopIfNeeded(policyManager);
   }
