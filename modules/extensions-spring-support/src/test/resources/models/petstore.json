@@ -11135,7 +11135,7 @@
                             "allowedStereotypes": [
                               {
                                 "type": "OBJECT_STORE",
-                                "namespace": "MULE"
+                                "namespace": "OS"
                               }
                             ]
                           },
@@ -11744,7 +11744,7 @@
                             "allowedStereotypes": [
                               {
                                 "type": "OBJECT_STORE",
-                                "namespace": "MULE"
+                                "namespace": "OS"
                               }
                             ]
                           },
@@ -12296,7 +12296,7 @@
                             "allowedStereotypes": [
                               {
                                 "type": "OBJECT_STORE",
-                                "namespace": "MULE"
+                                "namespace": "OS"
                               }
                             ]
                           },
@@ -21551,7 +21551,7 @@
                         "allowedStereotypes": [
                           {
                             "type": "OBJECT_STORE",
-                            "namespace": "MULE"
+                            "namespace": "OS"
                           }
                         ]
                       },
@@ -21924,7 +21924,7 @@
                         "allowedStereotypes": [
                           {
                             "type": "OBJECT_STORE",
-                            "namespace": "MULE"
+                            "namespace": "OS"
                           }
                         ]
                       },
@@ -22297,7 +22297,7 @@
                         "allowedStereotypes": [
                           {
                             "type": "OBJECT_STORE",
-                            "namespace": "MULE"
+                            "namespace": "OS"
                           }
                         ]
                       },
@@ -22565,7 +22565,7 @@
                         "allowedStereotypes": [
                           {
                             "type": "OBJECT_STORE",
-                            "namespace": "MULE"
+                            "namespace": "OS"
                           }
                         ]
                       },
@@ -22838,7 +22838,7 @@
                         "allowedStereotypes": [
                           {
                             "type": "OBJECT_STORE",
-                            "namespace": "MULE"
+                            "namespace": "OS"
                           }
                         ]
                       },
@@ -23268,7 +23268,7 @@
                         "allowedStereotypes": [
                           {
                             "type": "OBJECT_STORE",
-                            "namespace": "MULE"
+                            "namespace": "OS"
                           }
                         ]
                       },
@@ -23869,7 +23869,7 @@
                         "allowedStereotypes": [
                           {
                             "type": "OBJECT_STORE",
-                            "namespace": "MULE"
+                            "namespace": "OS"
                           }
                         ]
                       },
