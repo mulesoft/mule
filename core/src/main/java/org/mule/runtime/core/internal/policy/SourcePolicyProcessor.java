@@ -66,9 +66,6 @@ public class SourcePolicyProcessor implements ReactiveProcessor {
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
-        .subscriberContext(ctx -> ctx
-            .delete(POLICY_NEXT_OPERATION)
-            .delete(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))
         .map(policyEventMapper::onSourcePolicyBegin)
         .transform(policy.getPolicyChain())
         .subscriberContext(ctx -> ctx

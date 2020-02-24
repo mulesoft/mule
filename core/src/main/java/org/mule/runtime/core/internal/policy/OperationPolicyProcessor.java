@@ -63,7 +63,6 @@ public class OperationPolicyProcessor implements ReactiveProcessor {
     final String policyId = policy.getPolicyId();
 
     return from(publisher)
-        .subscriberContext(ctx -> ctx.delete(POLICY_NEXT_OPERATION))
         .map(policyEventMapper::onOperationPolicyBegin)
         .doOnNext(event -> logPolicy(event.getContext().getCorrelationId(), policyId, event, "Before operation"))
         .transform(policy.getPolicyChain().onChainError(t -> manageError((MessagingException) t)))

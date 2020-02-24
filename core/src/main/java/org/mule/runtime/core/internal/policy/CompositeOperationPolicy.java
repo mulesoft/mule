@@ -22,7 +22,6 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.OperationPolicyParametersTransformer;
 import org.mule.runtime.core.api.policy.Policy;
@@ -126,8 +125,6 @@ public class CompositeOperationPolicy
     public FluxSink<CoreEvent> get() {
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
 
-      Latch completionLatch = new Latch();
-
       Flux<CoreEvent> policyFlux = sinkRef.flux()
           .transform(compositeOperationPolicy.get().getExecutionProcessor())
           .doOnNext(result -> from(result).getOperationCallerCallback().complete(result))
@@ -136,11 +133,7 @@ public class CompositeOperationPolicy
             from(me.getEvent()).getOperationCallerCallback().error(me);
           });
 
-      policyFlux.subscribe(null, e -> {
-        LOGGER.error("Exception reached subscriber for " + toString(), e);
-        completionLatch.release();
-      },
-                           () -> completionLatch.release());
+      policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + toString(), e));
 
       return sinkRef.getFluxSink();
     }
