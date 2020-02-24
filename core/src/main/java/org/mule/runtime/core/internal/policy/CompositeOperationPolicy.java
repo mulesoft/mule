@@ -36,6 +36,8 @@ import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.TransactionAwareFluxSinkSupplier;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -96,27 +98,28 @@ public class CompositeOperationPolicy
     super(parameterizedPolicies, operationPolicyParametersTransformer);
     this.operation = operation;
     this.operationPolicyProcessorFactory = operationPolicyProcessorFactory;
+    this.shutdownTimeout = shutdownTimeout;
+    this.completionCallbackScheduler = completionCallbackScheduler;
+    initProcessor();
+
+    Supplier<FluxSink<CoreEvent>> factory = new OperationWithPoliciesFluxObjectFactory(this);
     this.policySinks = newBuilder()
         .removalListener((String key, FluxSinkSupplier<CoreEvent> value, RemovalCause cause) -> {
           value.dispose();
         })
         .build(componentLocation -> {
-          Supplier<FluxSink<CoreEvent>> factory = new OperationWithPoliciesFluxObjectFactory(getExecutionProcessor());
           return new TransactionAwareFluxSinkSupplier<>(factory,
                                                         new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(),
                                                                                          factory));
         });
-
-    this.shutdownTimeout = shutdownTimeout;
-    this.completionCallbackScheduler = completionCallbackScheduler;
   }
 
   private static final class OperationWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
 
-    private final ReactiveProcessor executionProcessor;
+    private final Reference<CompositeOperationPolicy> compositeOperationPolicy;
 
-    public OperationWithPoliciesFluxObjectFactory(ReactiveProcessor executionProcessor) {
-      this.executionProcessor = executionProcessor;
+    public OperationWithPoliciesFluxObjectFactory(CompositeOperationPolicy compositeOperationPolicy) {
+      this.compositeOperationPolicy = new WeakReference<>(compositeOperationPolicy);
     }
 
     @Override
@@ -126,7 +129,7 @@ public class CompositeOperationPolicy
       Latch completionLatch = new Latch();
 
       Flux<CoreEvent> policyFlux = sinkRef.flux()
-          .transform(executionProcessor)
+          .transform(compositeOperationPolicy.get().getExecutionProcessor())
           .doOnNext(result -> from(result).getOperationCallerCallback().complete(result))
           .onErrorContinue(MessagingException.class, (t, e) -> {
             final MessagingException me = (MessagingException) t;

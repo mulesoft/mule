@@ -37,6 +37,9 @@ import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.message.StringAttributes;
 
+import java.lang.ref.Reference;
+import java.util.function.Function;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -87,7 +90,8 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     CoreEvent modifiedMessageEvent = CoreEvent.builder(initialEvent).message(MESSAGE).build();
     mockFlowReturningEvent(modifiedMessageEvent);
     when(policy.getPolicyChain().apply(any())).thenAnswer(invocation -> subscriberContext()
-        .flatMap(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0)).transform(ctx.get(POLICY_NEXT_OPERATION))));
+        .flatMap(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0))
+            .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get())));
 
     CoreEvent resultEvent = just(initialEvent).transform(policyProcessor).block();
 
@@ -100,7 +104,7 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     when(policy.getPolicyChain().apply(any())).thenAnswer(invocation -> subscriberContext()
         .flatMap(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0))
             .map(e -> CoreEvent.builder(e).message(MESSAGE).build())
-            .transform(ctx.get(POLICY_NEXT_OPERATION))));
+            .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get())));
 
     just(initialEvent).transform(policyProcessor).block();
 
@@ -114,7 +118,8 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     CoreEvent modifiedSessionEvent = PrivilegedEvent.builder(initialEvent).session(session).build();
     mockFlowReturningEvent(modifiedSessionEvent);
     when(policy.getPolicyChain().apply(any())).thenAnswer(invocation -> subscriberContext()
-        .flatMap(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0)).transform(ctx.get(POLICY_NEXT_OPERATION))));
+        .flatMap(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0))
+            .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get())));
 
     CoreEvent resultEvent = just(initialEvent).transform(policyProcessor).block();
 
@@ -125,9 +130,12 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
   public void sessionModifiedBeforeNextProcessorIsPropagatedToIt() {
     DefaultMuleSession session = new DefaultMuleSession();
     when(policy.getPolicyChain().apply(any())).thenAnswer(invocation -> subscriberContext()
-        .flatMap(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0))
-            .map(e -> PrivilegedEvent.builder(e).session(session).build())
-            .transform(ctx.get(POLICY_NEXT_OPERATION))));
+        .flatMap(ctx -> {
+          return Mono.<CoreEvent>from(invocation.getArgument(0))
+              .map(e -> PrivilegedEvent.builder(e).session(session).build())
+              .transform((Function<? super Mono<PrivilegedEvent>, ? extends Publisher<Object>>) ((Reference) ctx
+                  .get(POLICY_NEXT_OPERATION)).get());
+        }));
 
     just(initialEvent).transform(policyProcessor).block();
 
