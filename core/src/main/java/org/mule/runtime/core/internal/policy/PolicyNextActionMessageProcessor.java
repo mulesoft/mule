@@ -30,9 +30,11 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.BaseExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
+import java.lang.ref.Reference;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
@@ -42,7 +44,7 @@ import org.slf4j.Logger;
 
 /**
  * Next-operation message processor implementation.
- *
+ * <p>
  * Such implementation handles a set of callbacks to execute as next operations that are must be configured before processing the
  * event.
  *
@@ -97,7 +99,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
                 .map(event -> ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS)
                     ? policyEventMapper.onSourcePolicyNext(event, ctx.get(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))
                     : policyEventMapper.onOperationPolicyNext(event))
-                .transform(ctx.get(POLICY_NEXT_OPERATION)));
+                .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get()));
       }
     }), policyNextErrorHandler());
     initialiseIfNeeded(nextDispatchAsChain, muleContext);
@@ -170,12 +172,12 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
         .push(new FlowStackElement(toPolicyLocation(getLocation()), null));
   }
 
-  private String toPolicyLocation(ComponentLocation componentLocation) {
+  private static String toPolicyLocation(ComponentLocation componentLocation) {
     return componentLocation.getParts().get(0).getPartPath() + "/" + componentLocation.getParts().get(1).getPartPath()
         + "[after next]";
   }
 
-  private Consumer<CoreEvent> popBeforeNextFlowFlowStackElement() {
+  private static Consumer<CoreEvent> popBeforeNextFlowFlowStackElement() {
     return event -> ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
   }
 
@@ -183,7 +185,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
     return muleContext.getConfiguration().getId();
   }
 
-  private void logExecuteNextEvent(String startingMessage, EventContext eventContext, Message message, String policyName) {
+  private static void logExecuteNextEvent(String startingMessage, EventContext eventContext, Message message, String policyName) {
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace("\nEvent Id: " + eventContext.getCorrelationId() + "\n" + startingMessage + ".\nPolicy: " + policyName
           + "\n" + message.getAttributes().getValue().toString());

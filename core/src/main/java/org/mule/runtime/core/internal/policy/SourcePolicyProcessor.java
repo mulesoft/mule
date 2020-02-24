@@ -10,12 +10,14 @@ import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProce
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
 import static reactor.core.publisher.Flux.from;
 
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 
 import org.reactivestreams.Publisher;
 
@@ -40,7 +42,7 @@ import org.reactivestreams.Publisher;
 public class SourcePolicyProcessor implements ReactiveProcessor {
 
   private final Policy policy;
-  private final ReactiveProcessor nextProcessor;
+  private final Reference<ReactiveProcessor> nextProcessorRef;
   private final PolicyEventMapper policyEventMapper;
 
   /**
@@ -51,7 +53,7 @@ public class SourcePolicyProcessor implements ReactiveProcessor {
    */
   public SourcePolicyProcessor(Policy policy, ReactiveProcessor nextProcessor) {
     this.policy = policy;
-    this.nextProcessor = nextProcessor;
+    this.nextProcessorRef = new WeakReference<>(nextProcessor);
     this.policyEventMapper = new PolicyEventMapper(policy.getPolicyId());
   }
 
@@ -64,10 +66,13 @@ public class SourcePolicyProcessor implements ReactiveProcessor {
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return from(publisher)
+        .subscriberContext(ctx -> ctx
+            .delete(POLICY_NEXT_OPERATION)
+            .delete(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))
         .map(policyEventMapper::onSourcePolicyBegin)
         .transform(policy.getPolicyChain())
         .subscriberContext(ctx -> ctx
-            .put(POLICY_NEXT_OPERATION, nextProcessor)
+            .put(POLICY_NEXT_OPERATION, nextProcessorRef)
             .put(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS, policy.getPolicyChain().isPropagateMessageTransformations()));
   }
 

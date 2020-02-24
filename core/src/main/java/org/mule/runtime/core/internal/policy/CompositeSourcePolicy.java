@@ -187,13 +187,16 @@ public class CompositeSourcePolicy
    */
   @Override
   protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy lastPolicy) {
+    final Optional<SourcePolicyParametersTransformer> parametersTransformer = getParametersTransformer();
+    final PolicyEventMapper policyEventMapper = this.policyEventMapper;
+    final Optional<Function<MessagingException, MessagingException>> resolver = this.resolver;
 
     return from(eventPub)
-        .doOnNext(e -> SourcePolicyContext.from(e).setParametersTransformer(getParametersTransformer()))
+        .doOnNext(e -> SourcePolicyContext.from(e).setParametersTransformer(parametersTransformer))
         .transform(flowExecutionProcessor)
         .map(flowExecutionResponse -> {
           try {
-            return policyEventMapper.onFlowFinish(flowExecutionResponse, getParametersTransformer());
+            return policyEventMapper.onFlowFinish(flowExecutionResponse, parametersTransformer);
           } catch (MessagingException e) {
             throw propagateWrappingFatal(resolver.orElse(exc -> exc).apply(e));
           }
@@ -242,7 +245,7 @@ public class CompositeSourcePolicy
     }
   }
 
-  private void logEvent(String eventId, String policyName, Supplier<String> message, String startingMessage) {
+  private static void logEvent(String eventId, String policyName, Supplier<String> message, String startingMessage) {
     if (LOGGER.isTraceEnabled()) {
       // TODO Remove event id when first policy generates it. MULE-14455
       LOGGER.trace("Event Id: " + eventId + ".\n" + startingMessage + policyName + "\n" + message.get());
@@ -261,7 +264,7 @@ public class CompositeSourcePolicy
     return event.getMessage().getAttributes().getValue().toString();
   }
 
-  private String getPolicyName(Policy policy) {
+  private static String getPolicyName(Policy policy) {
     return policy.getPolicyId();
   }
 

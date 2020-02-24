@@ -49,6 +49,7 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -58,6 +59,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -373,9 +375,26 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   }
 
   private void disposePolicies() {
-    noPolicySourceInstances.asMap().values().forEach(policy -> disposeIfNeeded(policy, LOGGER));
-    sourcePolicyInnerCache.asMap().values().forEach(policy -> disposeIfNeeded(policy, LOGGER));
-    operationPolicyInnerCache.asMap().values().forEach(policy -> disposeIfNeeded(policy, LOGGER));
+    noPolicySourceInstances.asMap().values().forEach(policy -> {
+      clearActive(policy);
+      disposeIfNeeded(policy, LOGGER);
+    });
+    sourcePolicyInnerCache.asMap().values().forEach(policy -> {
+      clearActive(policy);
+      disposeIfNeeded(policy, LOGGER);
+    });
+    operationPolicyInnerCache.asMap().values().forEach(policy -> {
+      clearActive(policy);
+      disposeIfNeeded(policy, LOGGER);
+    });
+  }
+
+  private void clearActive(@NonNull Object policy) {
+    for (Iterator<DeferredDisposableWeakReference> iterator = activePolicies.iterator(); iterator.hasNext();) {
+      if (policy == iterator.next().get()) {
+        iterator.remove();
+      }
+    }
   }
 
   private void evictCaches() {
