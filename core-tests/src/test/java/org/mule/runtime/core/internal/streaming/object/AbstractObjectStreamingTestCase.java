@@ -66,35 +66,36 @@ public abstract class AbstractObjectStreamingTestCase extends AbstractMuleContex
 
     return list;
   }
+}
 
-  private class TestConsumer<T> implements Consumer<T> {
 
-    private final Iterator<T> delegate;
-    private final int size;
+class TestConsumer<T> implements Consumer<T> {
 
-    private TestConsumer(Collection<T> collection) {
-      this.delegate = collection.iterator();
-      size = collection.size();
-    }
+  private final Iterator<T> delegate;
+  private final int size;
 
-    @Override
-    public T consume() throws NoSuchElementException {
-      return delegate.next();
-    }
+  TestConsumer(Collection<T> collection) {
+    this.delegate = collection.iterator();
+    size = collection.size();
+  }
 
-    @Override
-    public boolean isConsumed() {
-      return !delegate.hasNext();
-    }
+  @Override
+  public T consume() throws NoSuchElementException {
+    return delegate.next();
+  }
 
-    @Override
-    public void close() throws IOException {
+  @Override
+  public boolean isConsumed() {
+    return !delegate.hasNext();
+  }
 
-    }
+  @Override
+  public void close() throws IOException {
 
-    @Override
-    public int getSize() {
-      return size;
-    }
+  }
+
+  @Override
+  public int getSize() {
+    return size;
   }
 }

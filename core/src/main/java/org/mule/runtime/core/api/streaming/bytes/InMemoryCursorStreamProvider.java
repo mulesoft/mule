@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.streaming.bytes;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.internal.streaming.bytes.BufferedCursorStream;
 import org.mule.runtime.core.internal.streaming.bytes.InMemoryStreamBuffer;
@@ -28,12 +29,32 @@ public final class InMemoryCursorStreamProvider extends AbstractCursorStreamProv
    * @param wrappedStream the stream to buffer from
    * @param config        the config of the generated buffer
    * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
+   * @param originatingLocation indicates where the cursor was created
    */
   public InMemoryCursorStreamProvider(InputStream wrappedStream,
                                       InMemoryCursorStreamConfig config,
-                                      ByteBufferManager bufferManager) {
-    super(wrappedStream);
+                                      ByteBufferManager bufferManager,
+                                      ComponentLocation originatingLocation) {
+    super(wrappedStream, originatingLocation);
     buffer = new InMemoryStreamBuffer(wrappedStream, config, bufferManager);
+  }
+
+  /**
+   * Creates a new instance
+   *
+   * @param wrappedStream the stream to buffer from
+   * @param config        the config of the generated buffer
+   * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
+   * 
+   * @deprecated Please use
+   *             {@link #InMemoryCursorStreamProvider(InputStream, InMemoryCursorStreamConfig, ByteBufferManager, ComponentLocation)}
+   *             instead.
+   */
+  @Deprecated
+  public InMemoryCursorStreamProvider(InputStream wrappedStream,
+                                      InMemoryCursorStreamConfig config,
+                                      ByteBufferManager bufferManager) {
+    this(wrappedStream, config, bufferManager, null);
   }
 
   /**
