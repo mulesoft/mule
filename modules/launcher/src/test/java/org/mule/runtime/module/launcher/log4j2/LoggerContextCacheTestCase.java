@@ -6,30 +6,31 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
-import static org.mule.test.allure.AllureConstants.ComponentsFeature.LoggerStory.LOGGER;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.LoggerStory.LOGGER;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.tck.size.SmallTest;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mule.tck.size.SmallTest;
-import org.apache.logging.log4j.core.LoggerContext;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -64,10 +65,8 @@ public class LoggerContextCacheTestCase {
     LoggerContext actualLoggerContext;
     try {
       actualLoggerContext = loggerContextCache.getLoggerContext(currentClassLoader);
-      fail("Recursive instantiation should throw RecursiveInstantiationException");
-    } catch (MuleRuntimeException e) {
-      assertThat("Exception should be caused by RecursiveContextInstantiation", e.getClass(),
-                 equalTo(RecursiveLoggerContextInstantiationException.class));
+      fail("Recursive instantiation should throw RecursiveLoggerContextInstantiationException");
+    } catch (RecursiveLoggerContextInstantiationException e) {
       actualLoggerContext = loggerContextCache.getLoggerContext(currentClassLoader);
     }
     assertThat("Invalid LoggerContext", actualLoggerContext, equalTo(expectedLoggerContext));

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.launcher.log4j2;
 
 import static java.util.Optional.empty;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -21,22 +22,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FORCE_CONSOLE_LOG;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.launcher.log4j2.LoggerContextConfigurer.FORCED_CONSOLE_APPENDER_NAME;
 import static org.mule.runtime.module.launcher.log4j2.LoggerContextConfigurer.PER_APP_FILE_APPENDER_NAME;
 
-import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Appender;
@@ -45,7 +45,7 @@ import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.apache.logging.log4j.core.appender.RollingFileAppender;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
-import org.apache.logging.log4j.core.config.ConfiguratonFileWatcher;
+import org.apache.logging.log4j.core.config.ConfigurationFileWatcher;
 import org.apache.logging.log4j.core.config.DefaultConfiguration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.config.Reconfigurable;
@@ -56,9 +56,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -89,22 +87,12 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
 
     converter = null;
 
-    doAnswer(new Answer<Object>() {
-
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        converter = invocation.getArguments()[1];
-        return null;
-      }
+    doAnswer(invocation -> {
+      converter = invocation.getArguments()[1];
+      return null;
     }).when(configuration).addComponent(eq("Converter"), anyObject());
 
-    when(configuration.getComponent(CONVERTER_COMPONENT)).thenAnswer(new Answer<Object>() {
-
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        return converter;
-      }
-    });
+    when(configuration.getComponent(CONVERTER_COMPONENT)).thenAnswer(invocation -> converter);
   }
 
   @Test
@@ -120,32 +108,28 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
 
     when(context.getConfigFile()).thenReturn(new File(CURRENT_DIRECTORY).toURI());
     contextConfigurer.configure(context);
-    ArgumentCaptor<ConfiguratonFileWatcher> captor = ArgumentCaptor.forClass(ConfiguratonFileWatcher.class);
+    ArgumentCaptor<ConfigurationFileWatcher> captor = ArgumentCaptor.forClass(ConfigurationFileWatcher.class);
     verify(watchManager).watchFile(any(File.class), captor.capture());
 
-    assertThat(captor.getValue(), instanceOf(ConfiguratonFileWatcher.class));
-    verify(watchManager).setIntervalSeconds(eq((int) TimeUnit.MILLISECONDS.toSeconds(MONITOR_INTERVAL)));
+    assertThat(captor.getValue(), instanceOf(ConfigurationFileWatcher.class));
+    verify(watchManager).setIntervalSeconds(eq((int) MILLISECONDS.toSeconds(MONITOR_INTERVAL)));
   }
 
   @Test
   public void forceConsoleLog() {
-    withForceConsoleLog(new Runnable() {
+    withForceConsoleLog(() -> {
+      contextConfigurer.update(context);
+      ArgumentCaptor<ConsoleAppender> appenderCaptor = ArgumentCaptor.forClass(ConsoleAppender.class);
+      verify(context.getConfiguration()).addAppender(appenderCaptor.capture());
 
-      @Override
-      public void run() {
-        contextConfigurer.update(context);
-        ArgumentCaptor<ConsoleAppender> appenderCaptor = ArgumentCaptor.forClass(ConsoleAppender.class);
-        verify(context.getConfiguration()).addAppender(appenderCaptor.capture());
+      Appender forcedConsoleAppender = appenderCaptor.getValue();
 
-        Appender forcedConsoleAppender = appenderCaptor.getValue();
+      assertThat(forcedConsoleAppender, notNullValue());
+      assertThat(forcedConsoleAppender.getName(), equalTo(FORCED_CONSOLE_APPENDER_NAME));
+      assertThat(forcedConsoleAppender.isStarted(), is(true));
 
-        assertThat(forcedConsoleAppender, notNullValue());
-        assertThat(forcedConsoleAppender.getName(), equalTo(FORCED_CONSOLE_APPENDER_NAME));
-        assertThat(forcedConsoleAppender.isStarted(), is(true));
-
-        LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
-        verify(rootLogger).addAppender(forcedConsoleAppender, Level.ALL, null);
-      }
+      LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
+      verify(rootLogger).addAppender(forcedConsoleAppender, Level.ALL, null);
     });
   }
 
@@ -189,28 +173,24 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void forceConsoleLogWithAppenderAlreadyPresent() {
-    withForceConsoleLog(new Runnable() {
+    withForceConsoleLog(() -> {
+      LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
+      Collection<Appender> appenders = new ArrayList<>();
+      appenders.add(ConsoleAppender.createAppender(mock(Layout.class), null, null, "Console", null, null));
+      when(rootLogger.getAppenders().values()).thenReturn(appenders);
 
-      @Override
-      public void run() {
-        LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
-        Collection<Appender> appenders = new ArrayList<>();
-        appenders.add(ConsoleAppender.createAppender(mock(Layout.class), null, null, "Console", null, null));
-        when(rootLogger.getAppenders().values()).thenReturn(appenders);
-
-        contextConfigurer.configure(context);
-        verify(context.getConfiguration(), never()).addAppender(any(ConsoleAppender.class));
-        verify(rootLogger, never()).addAppender(any(ConsoleAppender.class), same(Level.INFO), any(Filter.class));
-      }
+      contextConfigurer.configure(context);
+      verify(context.getConfiguration(), never()).addAppender(any(ConsoleAppender.class));
+      verify(rootLogger, never()).addAppender(any(ConsoleAppender.class), same(Level.INFO), any(Filter.class));
     });
   }
 
   private void withForceConsoleLog(Runnable assertion) {
-    System.setProperty(MuleProperties.MULE_FORCE_CONSOLE_LOG, "");
+    System.setProperty(MULE_FORCE_CONSOLE_LOG, "");
     try {
       assertion.run();
     } finally {
-      System.clearProperty(MuleProperties.MULE_FORCE_CONSOLE_LOG);
+      System.clearProperty(MULE_FORCE_CONSOLE_LOG);
     }
   }
 }
