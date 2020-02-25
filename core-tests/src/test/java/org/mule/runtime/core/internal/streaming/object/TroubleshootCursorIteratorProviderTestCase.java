@@ -8,30 +8,16 @@
 package org.mule.runtime.core.internal.streaming.object;
 
 import static java.util.Arrays.asList;
-import static org.mule.runtime.api.util.DataUnit.BYTE;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.TROUBLESHOOTING;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.List;
 
-import org.junit.After;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.api.util.DataSize;
-import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
-import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
 import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
-import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
 import org.mule.runtime.core.internal.streaming.AbstractTroubleshootCursorProviderTestCase;
-import org.mule.runtime.core.internal.streaming.bytes.PoolingByteBufferManager;
-import org.mule.runtime.core.internal.streaming.object.AbstractObjectStreamingTestCase;
-import org.mule.runtime.core.internal.streaming.object.InMemoryCursorIteratorProvider;
-import org.mule.runtime.core.internal.streaming.object.factory.InMemoryCursorIteratorProviderFactory;
-import org.mule.tck.size.SmallTest;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;

@@ -18,8 +18,6 @@ import org.mule.runtime.api.util.DataSize;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.AbstractTroubleshootCursorProviderTestCase;
-import org.mule.runtime.core.internal.streaming.bytes.PoolingByteBufferManager;
-import org.mule.tck.size.SmallTest;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
