@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
-import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -24,7 +23,6 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 /**
@@ -40,8 +38,6 @@ import reactor.core.publisher.Mono;
  * @since 4.0
  */
 public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
-
-  private static Logger LOGGER = getLogger(OAuthOperationMessageProcessor.class);
 
   public OAuthOperationMessageProcessor(ExtensionModel extensionModel,
                                         OperationModel operationModel,
