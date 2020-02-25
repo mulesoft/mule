@@ -42,7 +42,7 @@ public class MuleApplicationPolicyProvider implements ApplicationPolicyProvider,
   private final PolicyInstanceProviderFactory policyInstanceProviderFactory;
   private final List<RegisteredPolicyTemplate> registeredPolicyTemplates = new LinkedList<>();
   private final List<RegisteredPolicyInstanceProvider> registeredPolicyInstanceProviders = new LinkedList<>();
-  private PolicyAwareAttributes sourcePolicyAwareAttributes;
+  private PolicyAwareAttributes sourcePolicyAwareAttributes = noAttributes();
   private Application application;
 
   private Runnable policiesChangedCallback = () -> {
