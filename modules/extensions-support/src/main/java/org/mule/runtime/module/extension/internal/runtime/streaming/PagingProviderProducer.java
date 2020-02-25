@@ -174,8 +174,8 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
         connectionException.addInfo(IS_TRANSACTIONAL, true);
       }
       connectionException.addInfo(COMPONENT_CONFIG_NAME, config.getName());
+      connectionSupplier.invalidateConnection();
     }
-    connectionSupplier.invalidateConnection();
   }
 
   /**
