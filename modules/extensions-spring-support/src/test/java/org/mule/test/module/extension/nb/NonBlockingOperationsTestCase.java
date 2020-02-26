@@ -6,9 +6,11 @@
  */
 package org.mule.test.module.extension.nb;
 
+import static java.lang.Thread.currentThread;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.api.exception.ExpectedError.none;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
@@ -18,15 +20,21 @@ import static org.mule.test.marvel.model.Villain.KABOOM;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
 
 import org.mule.functional.api.exception.ExpectedError;
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.Event;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.marvel.ironman.IronMan;
 import org.mule.test.marvel.model.MissileProofVillain;
 import org.mule.test.marvel.model.Villain;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -95,6 +103,19 @@ public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTe
 
     assertThat(villain.isAlive(), is(false));
     assertThat(result, is(KABOOM));
+  }
+
+  public static class ThreadCaptor extends AbstractComponent implements Processor {
+
+    private static Set<Thread> capturedThreads = new HashSet<>();
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      assertThat(currentThread().getName(), startsWith("SimpleUnitTestSupportScheduler."));
+      capturedThreads.add(currentThread());
+
+      return event;
+    }
   }
 
 }

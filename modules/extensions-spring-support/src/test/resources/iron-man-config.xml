@@ -22,16 +22,30 @@
     <flow name="fireMissile">
         <test:assert-intercepting responseSameTask="false" />
         <marvel:fire-missile at="#[payload]" config-ref="ironMan"/>
+        
+        <custom-processor class="org.mule.test.module.extension.nb.NonBlockingOperationsTestCase$ThreadCaptor" />
+        <error-handler>
+            <on-error-propagate>
+                <logger/>
+                <!-- MULE-18118 -->
+                <!-- <custom-processor class="org.mule.test.module.extension.nb.NonBlockingOperationsTestCase$ThreadCaptor" /> -->
+            </on-error-propagate>
+        </error-handler>
     </flow>
 
     <flow name="warMachineFireMissile">
         <test:assert-intercepting responseSameTask="false" />
         <marvel:fire-missile at="#[payload]" config-ref="warMachine"/>
+
+        <custom-processor class="org.mule.test.module.extension.nb.NonBlockingOperationsTestCase$ThreadCaptor" />
     </flow>
 
     <flow name="computeFlightPlan">
         <test:assert-intercepting responseSameTask="false" />
         <marvel:compute-flight-plan config-ref="ironMan" />
+
+        <!-- MULE-18119 -->
+        <!-- <custom-processor class="org.mule.test.module.extension.nb.NonBlockingOperationsTestCase$ThreadCaptor" /> -->
     </flow>
 
 </mule>

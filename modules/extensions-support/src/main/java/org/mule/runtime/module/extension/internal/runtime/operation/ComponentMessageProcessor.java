@@ -33,6 +33,7 @@ import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessi
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.createRoundRobinFluxSupplier;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.createDefaultProcessingStrategyFactory;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
@@ -91,6 +92,7 @@ import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
@@ -473,12 +475,44 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                 @Override
                 public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
                   return subscriberContext()
-                      .flatMapMany(ctx -> from(publisher)
-                          .doOnNext(event -> prepareAndExecuteOperation(event,
-                                                                        () -> from(event)
-                                                                            .getOperationExecutionParams()
-                                                                            .getCallback(),
-                                                                        ctx)));
+                      .flatMapMany(ctx -> {
+                        final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter = new FluxSinkRecorder<>();
+
+                        return subscribeFluxOnPublisherSubscription(emitter.flux(), from(publisher)
+                            .doOnComplete(() -> emitter.complete())
+                            .doOnError(e -> emitter.error(e))
+                            .doOnNext(event -> prepareAndExecuteOperation(event,
+                                                                          // The callback must be listened to within the
+                                                                          // processingStrategy's onProcessor, so that any thread
+                                                                          // switch that may occur after the operation (for
+                                                                          // instance, getting away from the selector thread after
+                                                                          // a non-blocking operation) is actually performed.
+                                                                          () -> new ExecutorCallback() {
+
+                                                                            @Override
+                                                                            public void complete(Object value) {
+                                                                              emitter.next(right((CoreEvent) value));
+                                                                            }
+
+                                                                            @Override
+                                                                            public void error(Throwable e) {
+                                                                              // if `sink.error` is called here, it will cancel
+                                                                              // the flux altogether.
+                                                                              // That's why an `Either` is used here,
+                                                                              // so the error can be propagated afterwards in a
+                                                                              // way consistent with our expected error handling.
+                                                                              emitter
+                                                                                  .next(left(new EventProcessingException(event,
+                                                                                                                          e)));
+                                                                            }
+                                                                          },
+                                                                          ctx)))
+                                                                              .map(result -> {
+                                                                                return result.reduce(me -> {
+                                                                                  throw propagateWrappingFatal(me);
+                                                                                }, response -> response);
+                                                                              });
+                      });
                 }
 
                 @Override
@@ -491,8 +525,16 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                   return ComponentMessageProcessor.this.isAsync();
                 }
               }))
-              .onErrorContinue((t, event) -> LOGGER.error("Unhandled error in operation (" + toString() + ") flux",
-                                                          t))));
+              .doOnNext(result -> from(result)
+                  .getOperationExecutionParams()
+                  .getCallback().complete(result))
+              .onErrorContinue((t, result) -> {
+                final CoreEvent event = ((EventProcessingException) t).getEvent();
+
+                from(event)
+                    .getOperationExecutionParams()
+                    .getCallback().error(((EventProcessingException) t).getCause());
+              })));
     },
                                                 getRuntime().availableProcessors());
   }
@@ -539,6 +581,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     if (shouldUsePrecalculatedContext(event)) {
       operationContext = getPrecalculatedContext(oep.getOperationEvent());
       operationContext.setCurrentScheduler(currentScheduler);
+      ((InternalEvent) operationContext.getEvent()).setSdkInternalContext(((InternalEvent) event).getSdkInternalContext());
     } else {
       operationContext = createExecutionContext(oep.getConfiguration(),
                                                 oep.getParameters(),
