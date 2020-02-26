@@ -214,8 +214,7 @@ public class DefaultFlowBuilder implements Builder {
 
     @Override
     public ReactiveProcessor referenced() {
-      return pub -> from(pub)
-          .transform(dispatchToFlow());
+      return dispatchToFlow();
     }
 
     /**

@@ -25,6 +25,7 @@ import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContextDontPropagateErrors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
@@ -44,11 +45,13 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
+import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.DefaultPolicyInstance;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
@@ -327,6 +330,25 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
+  public void applyWithChildContextDontPropagateErrorInChainRegainsParentContext() throws Exception {
+    Reference<EventContext> contextReference = new Reference<>();
+
+    ((DefaultFlowCallStack) input.getFlowCallStack()).push(new FlowStackElement("flow", "processor"));
+
+    Processor errorProcessor = createChain(error);
+    just(input).transform(inputPub -> from(applyWithChildContextDontPropagateErrors(inputPub, errorProcessor, Optional.empty()))
+        .doOnError(e -> {
+          if (e instanceof MessagingException) {
+            contextReference.set(((MessagingException) e).getEvent().getContext());
+          }
+        }))
+        .subscribe();
+
+    assertThat(contextReference.get(), notNullValue());
+    assertThat(contextReference.get(), is(input.getContext()));
+  }
+
+  @Test
   public void processWithChildContextBlockingSuccessInChainRegainsParentContext() throws Exception {
     CoreEvent event = processWithChildContextBlocking(input, createChain(map), Optional.empty());
     assertThat(event.getContext(), sameInstance(input.getContext()));
@@ -355,6 +377,22 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
                                                                             eventPub -> Flux.from(eventPub)
                                                                                 .handle(failWithExpected(expected)),
                                                                             Optional.empty())),
+                                 newChildContext(input, Optional.empty())))
+                                     .block();
+  }
+
+  @Test
+  public void applyWithinProcessErrorDontPropagate() {
+    final NullPointerException expected = new NullPointerException();
+
+    thrown.expect(hasRootCause(sameInstance(expected)));
+
+    from(processWithChildContext(input,
+                                 pub -> Flux.from(pub)
+                                     .transform(ep -> applyWithChildContextDontPropagateErrors(ep,
+                                                                                               eventPub -> Flux.from(eventPub)
+                                                                                                   .handle(failWithExpected(expected)),
+                                                                                               Optional.empty())),
                                  newChildContext(input, Optional.empty())))
                                      .block();
   }
