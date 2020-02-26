@@ -11,7 +11,7 @@ import static java.lang.System.getProperty;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_SCHEDULERS;
+import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_SCHEDULER_SOURCES_PROPERTY;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
@@ -68,7 +68,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
   private final PeriodicScheduler scheduler;
   private final boolean disallowConcurrentExecution;
-  private static boolean disabled = parseBoolean(getProperty(MULE_DISABLE_SCHEDULERS));
+  private static boolean disabled = parseBoolean(getProperty(DISABLE_SCHEDULER_SOURCES_PROPERTY));
 
   private Scheduler pollingExecutor;
   private ScheduledFuture<?> schedulingJob;
