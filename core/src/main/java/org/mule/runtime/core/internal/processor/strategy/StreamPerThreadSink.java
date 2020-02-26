@@ -62,12 +62,13 @@ public class StreamPerThreadSink implements Sink, Disposable {
       throw new IllegalStateException("Already disposed");
     }
 
-    sinks.get(currentThread(), t -> {
+    final Thread currentThread = currentThread();
+    sinks.get(currentThread, t -> {
       final FluxSinkRecorder<CoreEvent> recorder = new FluxSinkRecorder<>();
       Flux.create(recorder)
           .doOnNext(request -> eventConsumer.accept(request))
           .transform(processor)
-          .subscribe(null, e -> sinks.invalidate(currentThread()), () -> sinks.invalidate(currentThread()));
+          .subscribe(null, e -> sinks.invalidate(currentThread), () -> sinks.invalidate(currentThread));
 
       return recorder.getFluxSink();
     })
@@ -89,7 +90,7 @@ public class StreamPerThreadSink implements Sink, Disposable {
     long startMillis = currentTimeMillis();
 
     while (!sinks.asMap().isEmpty()
-        && currentTimeMillis() - startMillis > shutdownTimeout
+        && currentTimeMillis() <= shutdownTimeout + startMillis
         && !currentThread().isInterrupted()) {
       yield();
     }
