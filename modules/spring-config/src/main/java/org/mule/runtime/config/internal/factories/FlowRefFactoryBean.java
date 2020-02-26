@@ -103,6 +103,8 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
   @Inject
   private ConfigurationComponentLocator locator;
 
+  private static final Object referencedFlowLock = new Object();
+
   public void setName(String name) {
     this.refName = name;
   }
@@ -145,7 +147,10 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
                                            flowRefMessageProcessor);
     }
 
-    Component referencedFlow = getReferencedProcessor(name);
+    Component referencedFlow;
+    synchronized (referencedFlowLock) {
+      referencedFlow = getReferencedProcessor(name);
+    }
     if (referencedFlow == null) {
       throw new RoutePathNotFoundException(createStaticMessage("No flow/sub-flow with name '%s' found", name),
                                            flowRefMessageProcessor);
