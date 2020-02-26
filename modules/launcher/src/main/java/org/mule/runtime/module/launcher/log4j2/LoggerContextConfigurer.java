@@ -28,6 +28,15 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
+import java.io.File;
+import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.util.List;
+import java.util.Properties;
+import java.util.function.Function;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Appender;
@@ -41,21 +50,12 @@ import org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy;
 import org.apache.logging.log4j.core.appender.rolling.TimeBasedTriggeringPolicy;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
 import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.ConfigurationFileWatcher;
 import org.apache.logging.log4j.core.config.ConfigurationListener;
-import org.apache.logging.log4j.core.config.ConfiguratonFileWatcher;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.config.Reconfigurable;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.core.util.FileWatcher;
-
-import java.io.File;
-import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.util.List;
-import java.util.Properties;
-import java.util.function.Function;
 
 /**
  * This component grabs a {link MuleLoggerContext} which has just been created reading a configuration file and applies
@@ -148,7 +148,8 @@ final class LoggerContextConfigurer {
 
     if (configFile != null && configuration instanceof Reconfigurable) {
       configuration.getWatchManager().setIntervalSeconds(DEFAULT_MONITOR_INTERVAL_SECS);
-      FileWatcher watcher = new ConfiguratonFileWatcher((Reconfigurable) configuration, getListeners(configuration));
+      FileWatcher watcher = new ConfigurationFileWatcher(configuration, (Reconfigurable) configuration,
+                                                         getListeners(configuration), configFile.lastModified());
       configuration.getWatchManager().watchFile(configFile, watcher);
     }
   }
