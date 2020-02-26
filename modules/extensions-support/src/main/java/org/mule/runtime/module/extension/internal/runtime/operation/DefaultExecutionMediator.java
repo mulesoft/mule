@@ -9,9 +9,10 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
-import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
+import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
+import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -21,8 +22,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarati
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
@@ -34,7 +33,6 @@ import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigur
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
-import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -151,8 +149,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     },
                             e -> shouldRetry(e, context),
                             e -> interceptorChain.onError(context, e),
-                            e -> {
-                            },
+                            NULL_THROWABLE_CONSUMER,
                             identity(),
                             context.getCurrentScheduler())
         .whenComplete((v, e) -> {
@@ -162,20 +159,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
             callback.complete(v);
           }
         });
-  }
-
-  private boolean shouldRetry(Throwable t, ExecutionContextAdapter<M> context) {
-    if (!extractConnectionException(t).isPresent()) {
-      return false;
-    }
-
-    if (isTransactionActive()) {
-      Transaction tx = TransactionCoordination.getInstance().getTransaction();
-
-      return !tx.hasResource(new ExtensionTransactionKey(context.getConfiguration().get()));
-    }
-
-    return true;
   }
 
   private void executeWithInterceptors(CompletableComponentExecutor<M> executor,
@@ -269,14 +252,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
                                                                           context.getTransactionConfig().get()));
     } else {
       return (ExecutionTemplate<T>) defaultExecutionTemplate;
-    }
-  }
-
-  private MutableConfigurationStats getMutableConfigurationStats(ExecutionContext<M> context) {
-    if (context.getConfiguration().isPresent()) {
-      return (MutableConfigurationStats) (context.getConfiguration().get()).getStatistics();
-    } else {
-      return null;
     }
   }
 }

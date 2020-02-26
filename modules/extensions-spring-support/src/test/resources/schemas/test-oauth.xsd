@@ -275,13 +275,20 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/test-oauth" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetFlackyConnectionType" substitutionGroup="mule:abstract-operator" name="get-flacky-connection"></xs:element>
-  <xs:complexType name="GetFlackyConnectionType">
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/test-oauth" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PagedOperationType" substitutionGroup="mule:abstract-operator" name="paged-operation"></xs:element>
+  <xs:complexType name="PagedOperationType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
         </xs:sequence>
+        <xs:attribute type="mule:expressionInt" use="optional" default="0" name="failAt"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute type="xs:string" use="required" name="config-ref">
           <xs:annotation>
             <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>

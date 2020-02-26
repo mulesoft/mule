@@ -28,8 +28,8 @@ import org.mule.runtime.api.connection.PoolingConnectionProvider;
 public class ReconnectableConnectionProvider implements CachedConnectionProvider<ReconnectableConnection> {
 
   public static volatile boolean fail;
-  public static volatile int disconnectCalls = 0;
   private int reconnectionAttempts = 0;
+  public static volatile int disconnectCalls = 0;
 
   @Override
   public ReconnectableConnection connect() throws ConnectionException {

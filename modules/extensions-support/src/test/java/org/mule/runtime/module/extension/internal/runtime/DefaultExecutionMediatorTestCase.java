@@ -18,7 +18,9 @@ import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyVararg;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -31,8 +33,10 @@ import static org.mockito.junit.MockitoJUnit.rule;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
 import static org.mule.tck.MuleTestUtils.stubComponentExecutor;
 import static org.mule.tck.MuleTestUtils.stubFailingComponentExecutor;
+import static org.mule.test.heisenberg.extension.HeisenbergErrors.CONNECTIVITY;
 import static org.mule.test.heisenberg.extension.HeisenbergErrors.HEALTH;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static reactor.core.Exceptions.unwrap;
@@ -382,6 +386,34 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             interceptorChain,
                                             errorTypeRepository, failingTransformer);
     execute();
+  }
+
+  @Test
+  public void notReconnectInValueTransformerWhenVariableIsSet() throws Throwable {
+    int expectedRetries = retryPolicy instanceof SimpleRetryPolicyTemplate
+        ? 1
+        : 0;
+    final ModuleException moduleExceptionToThrow = new ModuleException(ERROR, CONNECTIVITY, connectionException);
+    when(operationContext.getVariable(DO_NOT_RETRY)).thenReturn("true");
+    clearInvocations(operationContext);
+    mockExceptionEnricher(operationModel, () -> new NullExceptionEnricher());
+    final ResultTransformer failingTransformer = mock(ResultTransformer.class);
+    when(failingTransformer.apply(eq(operationContext), any())).thenThrow(moduleExceptionToThrow);
+
+    mediator = new DefaultExecutionMediator(extensionModel,
+                                            operationModel,
+                                            interceptorChain,
+                                            mockErrorModel(),
+                                            failingTransformer);
+
+    try {
+      execute();
+    } catch (Exception e) {
+      assertThat(e.getCause(), sameInstance(connectionException));
+      assertThat(e.getCause().getMessage(), is("Connection failure"));
+      verify(failingTransformer, times(1)).apply(any(), any());
+      verify(operationContext, times(expectedRetries)).getVariable(DO_NOT_RETRY);
+    }
   }
 
   private ErrorTypeRepository mockErrorModel() {

@@ -21,6 +21,7 @@ import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProvid
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * Utilities for handling reconnection on operations that use a connection.
@@ -28,6 +29,9 @@ import java.util.Optional;
  * @since 4.2.3
  */
 public class ReconnectionUtils {
+
+  public static Consumer<Throwable> NULL_THROWABLE_CONSUMER = e -> {
+  };
 
   /**
    * @param t the {@link Throwable} thrown during the execution of the operation
@@ -39,7 +43,7 @@ public class ReconnectionUtils {
   public static boolean shouldRetry(Throwable t, ExecutionContextAdapter<?> context) {
     Optional<String> contextConfigName = context.getConfiguration().map(ConfigurationInstance::getName);
     Optional<ConnectionException> connectionException = extractConnectionException(t);
-    if (Boolean.valueOf(context.getVariable(DO_NOT_RETRY)) || !connectionException.isPresent()) {
+    if (!connectionException.isPresent() || Boolean.valueOf(context.getVariable(DO_NOT_RETRY))) {
       return false;
     }
 

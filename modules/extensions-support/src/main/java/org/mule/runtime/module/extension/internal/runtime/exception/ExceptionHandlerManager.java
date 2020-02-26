@@ -88,9 +88,13 @@ public final class ExceptionHandlerManager {
   }
 
   private Throwable resolveConnectionException(ConnectionException connectionException) {
-    if (!connectionException.getErrorType().isPresent() && connectionErrorType != null) {
-      return new ConnectionException(connectionException.getMessage(), connectionException.getCause(),
-                                     connectionErrorType, connectionException.getConnection().orElse(null));
+    if (connectionErrorType != null && !connectionException.getErrorType().isPresent()) {
+      ConnectionException newException = new ConnectionException(connectionException.getMessage(),
+                                                                 connectionException.getCause(),
+                                                                 connectionErrorType,
+                                                                 connectionException.getConnection().orElse(null));
+      newException.getInfo().putAll(connectionException.getInfo());
+      return newException;
     }
     return connectionException;
   }

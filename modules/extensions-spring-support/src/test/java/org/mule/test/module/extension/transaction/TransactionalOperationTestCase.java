@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.mule.test.transactional.TransactionalOperations.getPageCalls;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.tx.TransactionException;
@@ -24,9 +25,11 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.transactional.connection.TestLocalTransactionalConnection;
+import org.mule.test.transactional.connection.TestTransactionalConnection;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -88,6 +91,18 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
   }
 
   @Test
+  public void pagedOperationInTxAlwaysUsesSameConnection() throws Exception {
+    CoreEvent event = flowRunner("pagedOperationInTxAlwaysUsesSameConnection").run();
+    List<TestTransactionalConnection> connections =
+        (List<TestTransactionalConnection>) event.getVariables().get("connections").getValue();
+    assertThat(connections, is(notNullValue()));
+    assertThat(connections, hasSize(2));
+
+    TestTransactionalConnection connection = connections.get(0);
+    assertThat(connections.stream().allMatch(c -> c == connection), is(true));
+  }
+
+  @Test
   public void pagedOperationWithoutTx() throws Exception {
     CoreEvent event = flowRunner("pagedOperationWithoutTx").run();
     Collection<Integer> accumulator = (Collection<Integer>) event.getVariables().get("accumulator").getValue();
@@ -99,6 +114,73 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
     Integer id2 = it.next();
 
     assertThat(id1, not(equalTo(id2)));
+  }
+
+  @Test
+  public void doNotReconnectPagedOperationInTx() throws Exception {
+    resetCounters();
+    expectedException.expectCause(instanceOf(ConnectionException.class));
+    expectedException.expectMessage("Failed to retrieve Page");
+    flowRunner("failingPagedOperationInTx").withVariable("failOn", 1).run();
+  }
+
+  @Test
+  public void doNotReconnectStickyPagedOperationInTx() throws Exception {
+    resetCounters();
+    expectedException.expectCause(instanceOf(ConnectionException.class));
+    expectedException.expectMessage("Failed to retrieve Page");
+    flowRunner("stickyFailingPagedOperationInTx").withVariable("failOn", 1).run();
+  }
+
+  @Test
+  public void doNotReconnectPagedOperationInTxWhenConnectionExceptionOnSecondPage() throws Exception {
+    resetCounters();
+    expectedException.expectCause(instanceOf(ConnectionException.class));
+    expectedException.expectMessage("Failed to retrieve Page");
+    flowRunner("failingPagedOperationInTx").withVariable("failOn", 2).run();
+  }
+
+  @Test
+  public void doNotReconnectStickyPagedOperationInTxWhenConnectionExceptionOnSecondPage() throws Exception {
+    resetCounters();
+    expectedException.expectCause(instanceOf(ConnectionException.class));
+    expectedException.expectMessage("Failed to retrieve Page");
+    flowRunner("stickyFailingPagedOperationInTx").withVariable("failOn", 2).run();
+  }
+
+  @Test
+  public void doReconnectPagedOperationWithoutTx() throws Exception {
+    resetCounters();
+    CoreEvent event = flowRunner("failingPagedOperationWithoutTx").withVariable("failOn", 1).run();
+    Collection<Integer> accumulator = (Collection<Integer>) event.getVariables().get("accumulator").getValue();
+    assertThat(accumulator, is(notNullValue()));
+    assertThat(accumulator, hasSize(2));
+  }
+
+  @Test
+  public void doReconnectStickyPagedOperationWithoutTx() throws Exception {
+    resetCounters();
+    CoreEvent event = flowRunner("stickyFailingPagedOperationWithoutTx").withVariable("failOn", 1).run();
+    Collection<Integer> accumulator = (Collection<Integer>) event.getVariables().get("accumulator").getValue();
+    assertThat(accumulator, is(notNullValue()));
+    assertThat(accumulator, hasSize(2));
+  }
+
+  @Test
+  public void doReconnectPagedOperationWithoutTxWhenConnectionExceptionOnSecondPage() throws Exception {
+    resetCounters();
+    CoreEvent event = flowRunner("failingPagedOperationWithoutTx").withVariable("failOn", 2).run();
+    Collection<Integer> accumulator = (Collection<Integer>) event.getVariables().get("accumulator").getValue();
+    assertThat(accumulator, is(notNullValue()));
+    assertThat(accumulator, hasSize(2));
+  }
+
+  @Test
+  public void doNotReconnectStickyPagedOperationWithoutTxWhenConnectionExceptionOnSecondPage() throws Exception {
+    resetCounters();
+    expectedException.expectCause(instanceOf(ConnectionException.class));
+    expectedException.expectMessage("Failed to retrieve Page");
+    flowRunner("stickyFailingPagedOperationInTx").withVariable("failOn", 2).run();
   }
 
   @Test
@@ -118,5 +200,9 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
     expectedException.expectCause(instanceOf(ConnectionException.class));
     expectedException.expectMessage("1");
     flowRunner("doNotRetryOnTxReconnection").run();
+  }
+
+  private void resetCounters() {
+    getPageCalls = 0;
   }
 }

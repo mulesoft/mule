@@ -113,6 +113,7 @@ import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalC
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ResultTransformer;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigOverrideValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -175,6 +176,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
 
   private final ReflectionCache reflectionCache;
+  private final ResultTransformer resultTransformer;
   private final RetryPolicyTemplate fallbackRetryPolicyTemplate = new NoRetryPolicyTemplate();
 
   protected final ExtensionModel extensionModel;
@@ -223,6 +225,22 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
                                    ReflectionCache reflectionCache) {
+    this(extensionModel, componentModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
+         retryPolicyTemplate, extensionManager, policyManager, reflectionCache, null);
+  }
+
+  public ComponentMessageProcessor(ExtensionModel extensionModel,
+                                   T componentModel,
+                                   ConfigurationProvider configurationProvider,
+                                   String target,
+                                   String targetValue,
+                                   ResolverSet resolverSet,
+                                   CursorProviderFactory cursorProviderFactory,
+                                   RetryPolicyTemplate retryPolicyTemplate,
+                                   ExtensionManager extensionManager,
+                                   PolicyManager policyManager,
+                                   ReflectionCache reflectionCache,
+                                   ResultTransformer resultTransformer) {
     super(extensionModel, componentModel, configurationProvider, cursorProviderFactory, extensionManager);
     this.extensionModel = extensionModel;
     this.resolverSet = resolverSet;
@@ -231,7 +249,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     this.policyManager = policyManager;
     this.retryPolicyTemplate = retryPolicyTemplate;
     this.reflectionCache = reflectionCache;
-
+    this.resultTransformer = resultTransformer;
     this.hasNestedChain = componentModel.getNestedComponents().stream()
         .anyMatch(nestedComp -> {
           return nestedComp instanceof NestedRouteModel

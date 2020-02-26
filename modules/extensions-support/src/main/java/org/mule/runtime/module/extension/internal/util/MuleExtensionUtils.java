@@ -55,7 +55,6 @@ import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.property.SyntheticModelModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
@@ -519,10 +518,11 @@ public class MuleExtensionUtils {
    *
    * @since 4.2.3 - 4.3.0
    */
-  public static Optional<MutableConfigurationStats> getMutableConfigurationStats(ExecutionContext<?> context) {
-    return context.getConfiguration()
-        .map(ConfigurationInstance::getStatistics)
-        .filter(s -> s instanceof MutableConfigurationStats)
-        .map(s -> (MutableConfigurationStats) s);
+  public static MutableConfigurationStats getMutableConfigurationStats(ExecutionContext<?> context) {
+    if (context.getConfiguration().isPresent()) {
+      return (MutableConfigurationStats) (context.getConfiguration().get()).getStatistics();
+    } else {
+      return null;
+    }
   }
 }

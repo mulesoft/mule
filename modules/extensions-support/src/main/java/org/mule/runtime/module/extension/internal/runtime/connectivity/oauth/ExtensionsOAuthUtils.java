@@ -195,14 +195,14 @@ public final class ExtensionsOAuthUtils {
     }
   }
 
-  public static boolean refreshTokenIfNecessary(ExecutionContextAdapter<OperationModel> operationContext, Exception e) {
-    OAuthConnectionProviderWrapper connectionProvider = getOAuthConnectionProvider(operationContext);
-    if (connectionProvider == null) {
+  public static boolean refreshTokenIfNecessary(ExecutionContextAdapter<OperationModel> operationContext, Throwable e) {
+    AccessTokenExpiredException expiredException = getTokenExpirationException(e);
+    if (expiredException == null) {
       return false;
     }
 
-    AccessTokenExpiredException expiredException = getTokenExpirationException(e);
-    if (expiredException == null) {
+    OAuthConnectionProviderWrapper connectionProvider = getOAuthConnectionProvider(operationContext);
+    if (connectionProvider == null) {
       return false;
     }
 
@@ -217,7 +217,7 @@ public final class ExtensionsOAuthUtils {
 
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("AccessToken for resourceOwner '{}' expired at operation '{}:{}' using config '{}'. "
-                           + "Will attempt to refresh token and retry operation",
+              + "Will attempt to refresh token and retry operation",
                        rsId, operationContext.getExtensionModel().getName(),
                        operationContext.getComponentModel().getName(),
                        operationContext.getConfiguration().get().getName());
@@ -237,7 +237,7 @@ public final class ExtensionsOAuthUtils {
       private void logTokenExpiration(ExecutionContextAdapter<OperationModel> operationContext) {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("AccessToken expired at operation '{}:{}' using config '{}'. "
-                           + "Will attempt to refresh token and retry operation",
+              + "Will attempt to refresh token and retry operation",
                        operationContext.getExtensionModel().getName(),
                        operationContext.getComponentModel().getName(),
                        operationContext.getConfiguration().get().getName());
@@ -251,12 +251,12 @@ public final class ExtensionsOAuthUtils {
       connectionProvider.refreshToken(resourceOwnerId.orElse(""));
     } catch (Exception refreshException) {
       throw new MuleRuntimeException(createStaticMessage(format(
-          "AccessToken %s expired at operation '%s:%s' using config '%s'. Refresh token "
-              + "workflow was attempted but failed with the following exception",
-          forResourceOwner(resourceOwnerId),
-          operationContext.getExtensionModel().getName(),
-          operationContext.getComponentModel().getName(),
-          operationContext.getConfiguration().get().getName())),
+                                                                "AccessToken %s expired at operation '%s:%s' using config '%s'. Refresh token "
+                                                                    + "workflow was attempted but failed with the following exception",
+                                                                forResourceOwner(resourceOwnerId),
+                                                                operationContext.getExtensionModel().getName(),
+                                                                operationContext.getComponentModel().getName(),
+                                                                operationContext.getConfiguration().get().getName())),
                                      refreshException);
     }
     if (LOGGER.isDebugEnabled()) {
@@ -267,7 +267,7 @@ public final class ExtensionsOAuthUtils {
     return true;
   }
 
-  private static AccessTokenExpiredException getTokenExpirationException(Exception e) {
+  private static AccessTokenExpiredException getTokenExpirationException(Throwable e) {
     return extractOfType(e, AccessTokenExpiredException.class).orElse(null);
   }
 
