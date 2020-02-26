@@ -23,6 +23,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
+import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator.ValueTransformer;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingProviderProducer;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -50,11 +51,13 @@ public final class OperationMessageProcessorBuilder
   protected OperationMessageProcessor createMessageProcessor(ExtensionManager extensionManager, ResolverSet arguments) {
     ConfigurationProvider configurationProvider = getConfigurationProvider();
     OperationMessageProcessor processor;
-    DefaultExecutionMediator.ValueTransformer valueTransformer = null;
+    ValueTransformer valueTransformer = null;
+
+    final boolean supportsOAuth = supportsOAuth(extensionModel);
     if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
-      valueTransformer = transformPagingDelegate(extensionConnectionSupplier);
+      valueTransformer = transformPagingDelegate(extensionConnectionSupplier, supportsOAuth);
     }
-    if (supportsOAuth(extensionModel)) {
+    if (supportsOAuth) {
       processor = new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue,
                                                      arguments, cursorProviderFactory, retryPolicyTemplate, extensionManager,
                                                      policyManager, reflectionCache, valueTransformer);
@@ -67,13 +70,17 @@ public final class OperationMessageProcessorBuilder
     return processor;
   }
 
-  private DefaultExecutionMediator.ValueTransformer transformPagingDelegate(ExtensionConnectionSupplier connectionSupplier) {
+  private ValueTransformer transformPagingDelegate(ExtensionConnectionSupplier connectionSupplier, boolean supportsOAuth) {
     return (operationContext, value) -> {
       if (value == null) {
         throw new IllegalStateException("Obtained paging delegate cannot be null");
       }
       ConfigurationInstance config = (ConfigurationInstance) operationContext.getConfiguration().get();
-      Producer<?> producer = new PagingProviderProducer((PagingProvider) value, config, operationContext, connectionSupplier);
+      Producer<?> producer = new PagingProviderProducer((PagingProvider) value,
+                                                        config,
+                                                        operationContext,
+                                                        connectionSupplier,
+                                                        supportsOAuth);
       ListConsumer<?> consumer = new ListConsumer(producer);
       consumer.loadNextPage();
       return new ConsumerStreamingIterator<>(consumer);
