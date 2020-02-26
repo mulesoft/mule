@@ -55,9 +55,11 @@ import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.property.SyntheticModelModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
+import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
@@ -75,6 +77,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Implement
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ComponentExecutorCompletableAdapterFactory;
 import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ReactiveOperationExecutorFactoryWrapper;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -509,5 +512,17 @@ public class MuleExtensionUtils {
    */
   public static Optional<Class> getImplementingType(EnrichableModel enrichableModel) {
     return enrichableModel.getModelProperty(ImplementingTypeModelProperty.class).map(mp -> mp.getType());
+  }
+
+  /**
+   * @return the {@link MutableConfigurationStats} for a given {@link ExecutionContext}
+   *
+   * @since 4.2.3 - 4.3.0
+   */
+  public static Optional<MutableConfigurationStats> getMutableConfigurationStats(ExecutionContext<?> context) {
+    return context.getConfiguration()
+        .map(ConfigurationInstance::getStatistics)
+        .filter(s -> s instanceof MutableConfigurationStats)
+        .map(s -> (MutableConfigurationStats) s);
   }
 }

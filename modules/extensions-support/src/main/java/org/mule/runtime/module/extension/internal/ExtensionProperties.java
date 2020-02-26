@@ -8,8 +8,10 @@ package org.mule.runtime.module.extension.internal;
 
 import static org.mule.runtime.core.api.config.MuleProperties.PROPERTY_PREFIX;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
 /**
  * Constants for the Extensions Framework
@@ -76,6 +78,25 @@ public class ExtensionProperties {
    * @since 4.3.0
    */
   public static final String CONFIGURATION_MODEL_PROPERTY_NAME = "Configuration model";
+
+  /**
+   * The key of an execution context variable indicating that RETRY should not be attempted
+   * @since 4.1.6 - 4.2.1 - 4.3.0
+   */
+  public static final String DO_NOT_RETRY = PROPERTY_PREFIX + "DO_NOT_RETRY";
+
+  /**
+   * The key of a property or variable indicating that a component was executed while participating in a transaction
+   * @since 4.2.3 - 4.3.0
+   */
+  public static final String IS_TRANSACTIONAL = PROPERTY_PREFIX + "IS_TRANSACTIONAL";
+
+  /**
+   * The key of a property or variable holding the name of a component's config object
+   * @since 4.2.3 - 4.3.0
+   */
+  public static final String COMPONENT_CONFIG_NAME = PROPERTY_PREFIX + "COMPONENT_CONFIG_NAME";
+
 
   private ExtensionProperties() {}
 }
