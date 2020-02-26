@@ -56,7 +56,7 @@ public abstract class AbstractTroubleshootCursorProviderTestCase extends Abstrac
 
   @Before
   public void before() throws NoSuchFieldException, IllegalAccessException {
-    setStaticField(CursorProvider.class, "trackCursorProviderClose", trackStackTrace);
+    setStaticField(CursorProvider.class, "TRACK_CURSOR_PROVIDER_CLOSE", trackStackTrace);
 
     cursorProvider = createCursorProvider();
   }
