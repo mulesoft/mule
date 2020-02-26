@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+import static java.lang.System.getProperty;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.yield;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.construct.BackPressureReason;
@@ -62,15 +65,17 @@ public class StreamPerThreadSink implements Sink, Disposable {
       throw new IllegalStateException("Already disposed");
     }
 
-    sinks.get(currentThread(), t -> {
+
+    final Thread currentThread = currentThread();
+    sinks.get(currentThread, t -> {
       final FluxSinkRecorder<CoreEvent> recorder = new FluxSinkRecorder<>();
       Flux.create(recorder)
           .doOnNext(request -> eventConsumer.accept(request))
           .transform(processor)
           .subscribe(null, e -> {
             LOGGER.error("Exception reached PS subscriber for flow '" + flowConstruct.getName() + "'", e);
-            sinks.invalidate(currentThread());
-          }, () -> sinks.invalidate(currentThread()));
+            sinks.invalidate(currentThread);
+          }, () -> sinks.invalidate(currentThread));
 
       return recorder.getFluxSink();
     })
@@ -92,18 +97,29 @@ public class StreamPerThreadSink implements Sink, Disposable {
     long startMillis = currentTimeMillis();
 
     while (!sinks.asMap().isEmpty()
-        && currentTimeMillis() - startMillis > shutdownTimeout
+        && currentTimeMillis() <= shutdownTimeout + startMillis
         && !currentThread().isInterrupted()) {
       yield();
     }
 
     if (currentThread().isInterrupted()) {
-      LOGGER.warn("Subscribers of ProcessingStrategy for flow '{}' not completed before thread interruption",
-                  flowConstruct.getName());
+      if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
+        throw new IllegalStateException(format("TX Subscribers of ProcessingStrategy for flow '%s' not completed before thread interruption",
+                                               flowConstruct.getName()));
+      } else {
+        LOGGER.warn("TX Subscribers of ProcessingStrategy for flow '{}' not completed before thread interruption",
+                    flowConstruct.getName());
+      }
       sinks.invalidateAll();
     } else if (!sinks.asMap().isEmpty()) {
-      LOGGER.warn("Subscribers of ProcessingStrategy for flow '{}' not completed in {} ms", flowConstruct.getName(),
-                  shutdownTimeout);
+      if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
+        throw new IllegalStateException(format("TX Subscribers of ProcessingStrategy for flow '%s' not completed in %d ms",
+                                               flowConstruct.getName(),
+                                               shutdownTimeout));
+      } else {
+        LOGGER.warn("TX Subscribers of ProcessingStrategy for flow '{}' not completed in {} ms", flowConstruct.getName(),
+                    shutdownTimeout);
+      }
       sinks.invalidateAll();
     }
   }
