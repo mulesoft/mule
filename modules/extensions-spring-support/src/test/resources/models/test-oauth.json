@@ -10791,7 +10791,7 @@
                   "allowedStereotypeModels": [
                     {
                       "type": "OBJECT_STORE",
-                      "namespace": "MULE"
+                      "namespace": "OS"
                     }
                   ],
                   "name": "objectStore",
