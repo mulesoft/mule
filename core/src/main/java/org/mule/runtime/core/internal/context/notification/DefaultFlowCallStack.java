@@ -32,7 +32,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
 
   // BaseEventContext.class.getName() is here for backwards compatibility, since it was the equivalent property until 4.2.x
   private static final int MAX_DEPTH =
-      getInteger(MULE_FLOW_STACK_MAX_DEPTH, getInteger(BaseEventContext.class.getName() + ".maxDepth", 50));
+      getInteger(MULE_FLOW_STACK_MAX_DEPTH, getInteger(BaseEventContext.class.getName() + ".maxDepth", 45));
 
   private final Deque<FlowStackElement> innerStack;
 
