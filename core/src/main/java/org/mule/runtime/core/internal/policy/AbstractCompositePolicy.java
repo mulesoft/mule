@@ -34,7 +34,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer> {
 
   private final List<Policy> parameterizedPolicies;
   private final Optional<ParametersTransformer> parametersTransformer;
-  private final ReactiveProcessor executionProcessor;
+  private ReactiveProcessor executionProcessor;
 
   /**
    * Creates a new composite policy.
@@ -47,6 +47,9 @@ public abstract class AbstractCompositePolicy<ParametersTransformer> {
     checkArgument(!policies.isEmpty(), "policies list cannot be empty");
     this.parameterizedPolicies = policies;
     this.parametersTransformer = parametersTransformer;
+  }
+
+  protected final void initProcessor() {
     this.executionProcessor = getPolicyProcessor();
   }
 

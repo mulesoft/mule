@@ -52,7 +52,7 @@ public class CompositeSourcePolicyBenchmark extends AbstractBenchmark {
       public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
         return publisher;
       }
-    }, "")), eventPub -> eventPub, empty(), (policy, nextProcessor) -> nextProcessor);
+    }, "")), eventPub -> eventPub, empty(), (policy, nextProcessor) -> nextProcessor, null);
 
     sourceRpp = new MessageSourceResponseParametersProcessor() {
 

@@ -32,7 +32,6 @@ import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getDefaultProcessingStrategyFactory;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static reactor.core.Exceptions.propagate;
-import static reactor.core.publisher.Flux.create;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -286,7 +285,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder = new FluxSinkRecorder<>();
 
     return pub -> from(propagateCompletion(pub,
-                                           create(sinkRecorder),
+                                           sinkRecorder.flux(),
                                            innerEventPub -> from(innerEventPub)
                                                .doOnNext(event -> {
                                                  // Retrieve response publisher before error is communicated

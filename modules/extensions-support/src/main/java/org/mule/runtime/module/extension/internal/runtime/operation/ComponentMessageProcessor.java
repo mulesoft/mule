@@ -50,7 +50,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Flux.create;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 
@@ -256,7 +255,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         .flatMapMany(ctx -> {
           final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
-          Flux<CoreEvent> transformed = from(propagateCompletion(from(publisher), create(errorSwitchSinkSinkRef), pub -> from(pub)
+          Flux<CoreEvent> transformed = from(propagateCompletion(from(publisher), errorSwitchSinkSinkRef.flux(), pub -> from(pub)
               .map(event -> {
                 try {
                   return addContextToEvent(event, ctx);

@@ -137,7 +137,7 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
   @Test
   public void singlePolicy() throws Throwable {
     compositeSourcePolicy = new CompositeSourcePolicy(asList(firstPolicy), flowExecutionProcessor,
-                                                      of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory);
+                                                      of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory, null);
 
     Either<SourcePolicyFailureResult, SourcePolicySuccessResult> sourcePolicyResult =
         block(callback -> compositeSourcePolicy.process(initialEvent, sourceParametersProcessor, callback));
@@ -158,7 +158,7 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
   public void compositePolicy() throws Throwable {
     compositeSourcePolicy =
         new CompositeSourcePolicy(asList(firstPolicy, secondPolicy), flowExecutionProcessor,
-                                  of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory);
+                                  of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory, null);
 
     Either<SourcePolicyFailureResult, SourcePolicySuccessResult> sourcePolicyResult =
         block(callback -> compositeSourcePolicy.process(initialEvent, sourceParametersProcessor, callback));
@@ -180,7 +180,7 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
   @Test(expected = IllegalArgumentException.class)
   public void emptyPolicyList() {
     compositeSourcePolicy = new CompositeSourcePolicy(emptyList(), flowExecutionProcessor,
-                                                      of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory);
+                                                      of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory, null);
   }
 
   @Test
@@ -195,7 +195,7 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
 
     compositeSourcePolicy =
         new CompositeSourcePolicy(asList(firstPolicy, secondPolicy), flowExecutionProcessor,
-                                  of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory);
+                                  of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory, null);
 
     Either<SourcePolicyFailureResult, SourcePolicySuccessResult> sourcePolicyResult =
         block(callback -> compositeSourcePolicy.process(initialEvent, sourceParametersProcessor, callback));
@@ -226,7 +226,7 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
 
     compositeSourcePolicy =
         new CompositeSourcePolicy(asList(firstPolicy, secondPolicy), flowExecutionProcessor,
-                                  of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory);
+                                  of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory, null);
 
     Either<SourcePolicyFailureResult, SourcePolicySuccessResult> sourcePolicyResult =
         block(callback -> compositeSourcePolicy.process(initialEvent, sourceParametersProcessor, callback));
@@ -265,7 +265,7 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
 
     compositeSourcePolicy =
         new CompositeSourcePolicy(asList(firstPolicy, secondPolicy), flowExecutionProcessor,
-                                  of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory);
+                                  of(sourcePolicyParametersTransformer), sourcePolicyProcessorFactory, null);
 
     Either<SourcePolicyFailureResult, SourcePolicySuccessResult> sourcePolicyResult =
         block(callback -> compositeSourcePolicy.process(initialEvent, sourceParametersProcessor, callback));
@@ -305,7 +305,7 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
     public InvocationsRecordingCompositeSourcePolicy(List<Policy> parameterizedPolicies, ReactiveProcessor flowExecutionProcessor,
                                                      Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer,
                                                      SourcePolicyProcessorFactory sourcePolicyProcessorFactory) {
-      super(parameterizedPolicies, flowExecutionProcessor, sourcePolicyParametersTransformer, sourcePolicyProcessorFactory);
+      super(parameterizedPolicies, flowExecutionProcessor, sourcePolicyParametersTransformer, sourcePolicyProcessorFactory, null);
     }
 
     public static void reset() {

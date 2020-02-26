@@ -15,7 +15,6 @@ import static org.mule.runtime.core.internal.policy.OperationPolicyContext.from;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
-import static reactor.core.publisher.Flux.create;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.Component;
@@ -36,9 +35,12 @@ import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.TransactionAwareFluxSinkSupplier;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
@@ -95,29 +97,36 @@ public class CompositeOperationPolicy
     super(parameterizedPolicies, operationPolicyParametersTransformer);
     this.operation = operation;
     this.operationPolicyProcessorFactory = operationPolicyProcessorFactory;
+    this.shutdownTimeout = shutdownTimeout;
+    this.completionCallbackScheduler = completionCallbackScheduler;
+    initProcessor();
+
+    Supplier<FluxSink<CoreEvent>> factory = new OperationWithPoliciesFluxObjectFactory(this);
     this.policySinks = newBuilder()
         .removalListener((String key, FluxSinkSupplier<CoreEvent> value, RemovalCause cause) -> {
           value.dispose();
         })
         .build(componentLocation -> {
-          Supplier<FluxSink<CoreEvent>> factory = new OperationWithPoliciesFluxObjectFactory();
           return new TransactionAwareFluxSinkSupplier<>(factory,
                                                         new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(),
                                                                                          factory));
         });
-
-    this.shutdownTimeout = shutdownTimeout;
-    this.completionCallbackScheduler = completionCallbackScheduler;
   }
 
-  private final class OperationWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
+  private static final class OperationWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
+
+    private final Reference<CompositeOperationPolicy> compositeOperationPolicy;
+
+    public OperationWithPoliciesFluxObjectFactory(CompositeOperationPolicy compositeOperationPolicy) {
+      this.compositeOperationPolicy = new WeakReference<>(compositeOperationPolicy);
+    }
 
     @Override
     public FluxSink<CoreEvent> get() {
       final FluxSinkRecorder<CoreEvent> sinkRef = new FluxSinkRecorder<>();
 
-      Flux<CoreEvent> policyFlux = create(sinkRef)
-          .transform(getExecutionProcessor())
+      Flux<CoreEvent> policyFlux = sinkRef.flux()
+          .transform(compositeOperationPolicy.get().getExecutionProcessor())
           .doOnNext(result -> from(result).getOperationCallerCallback().complete(result))
           .onErrorContinue(MessagingException.class, (t, e) -> {
             final MessagingException me = (MessagingException) t;
@@ -125,6 +134,7 @@ public class CompositeOperationPolicy
           });
 
       policyFlux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + toString(), e));
+
       return sinkRef.getFluxSink();
     }
   }
@@ -139,34 +149,8 @@ public class CompositeOperationPolicy
   protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy lastPolicy) {
     FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder = new FluxSinkRecorder<>();
 
-    return from(propagateCompletion(from(eventPub), create(sinkRecorder), pub -> from(pub)
-        .doOnNext(event -> {
-          OperationPolicyContext ctx = from(event);
-          OperationExecutionFunction operationExecutionFunction = ctx.getOperationExecutionFunction();
-
-          operationExecutionFunction.execute(resolveOperationParameters(event, ctx), event, new ExecutorCallback() {
-
-            @Override
-            public void complete(Object value) {
-              sinkRecorder.next(right(Throwable.class, (CoreEvent) value));
-            }
-
-            @Override
-            public void error(Throwable e) {
-              // if `sink.error` is called here, it will cancel the flux altogether. That's why an `Either` is used here, so
-              // the error can be propagated afterwards in a way consistent with our expected error handling.
-              sinkRecorder.next(left(mapError(e, event), CoreEvent.class));
-            }
-
-            private Throwable mapError(Throwable t, CoreEvent event) {
-              t = Exceptions.unwrap(t);
-              if (!(t instanceof MessagingException)) {
-                t = new MessagingException(event, t, operation);
-              }
-              return t;
-            }
-          });
-        })
+    return from(propagateCompletion(from(eventPub), sinkRecorder.flux(), pub -> from(pub)
+        .doOnNext(new OperationDispatcher(sinkRecorder, getParametersTransformer(), this.operation))
         .map(e -> Either.empty()), sinkRecorder::complete, sinkRecorder::error,
                                     shutdownTimeout,
                                     completionCallbackScheduler))
@@ -179,11 +163,59 @@ public class CompositeOperationPolicy
                                             .setNextOperationResponse((InternalEvent) response));
   }
 
-  private Map<String, Object> resolveOperationParameters(CoreEvent event, OperationPolicyContext ctx) {
+  private static final class OperationDispatcher implements Consumer<CoreEvent> {
+
+    private final FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder;
+    private final Optional<OperationPolicyParametersTransformer> parametersTransformer;
+    private final Component operation;
+
+    public OperationDispatcher(FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder,
+                               Optional<OperationPolicyParametersTransformer> parametersTransformer, Component operation) {
+      this.sinkRecorder = sinkRecorder;
+      this.parametersTransformer = parametersTransformer;
+      this.operation = operation;
+    }
+
+    @Override
+    public void accept(CoreEvent event) {
+      OperationPolicyContext ctx = from(event);
+      OperationExecutionFunction operationExecutionFunction = ctx.getOperationExecutionFunction();
+
+      operationExecutionFunction.execute(resolveOperationParameters(event, parametersTransformer, ctx), event,
+                                         new ExecutorCallback() {
+
+                                           @Override
+                                           public void complete(Object value) {
+                                             sinkRecorder.next(right(Throwable.class, (CoreEvent) value));
+                                           }
+
+                                           @Override
+                                           public void error(Throwable e) {
+                                             // if `sink.error` is called here, it will cancel the flux altogether. That's why an
+                                             // `Either` is used here, so
+                                             // the error can be propagated afterwards in a way consistent with our expected error
+                                             // handling.
+                                             sinkRecorder.next(left(mapError(e, event), CoreEvent.class));
+                                           }
+
+                                           private Throwable mapError(Throwable t, CoreEvent event) {
+                                             t = Exceptions.unwrap(t);
+                                             if (!(t instanceof MessagingException)) {
+                                               t = new MessagingException(event, t, operation);
+                                             }
+                                             return t;
+                                           }
+                                         });
+    }
+  }
+
+  private static Map<String, Object> resolveOperationParameters(CoreEvent event,
+                                                                Optional<OperationPolicyParametersTransformer> parametersTransformer,
+                                                                OperationPolicyContext ctx) {
     OperationParametersProcessor parametersProcessor = ctx.getOperationParametersProcessor();
     final Map<String, Object> operationParameters = parametersProcessor.getOperationParameters();
 
-    return getParametersTransformer()
+    return parametersTransformer
         .map(paramsTransformer -> {
           Map<String, Object> parametersMap = copy(operationParameters);
           parametersMap.putAll(paramsTransformer.fromMessageToParameters(event.getMessage()));
@@ -242,6 +274,8 @@ public class CompositeOperationPolicy
 
   @Override
   public Disposable deferredDispose() {
+    final LoadingCache<String, FluxSinkSupplier<CoreEvent>> policySinks = this.policySinks;
+    final Scheduler completionCallbackScheduler = this.completionCallbackScheduler;
     return () -> {
       policySinks.invalidateAll();
       completionCallbackScheduler.stop();

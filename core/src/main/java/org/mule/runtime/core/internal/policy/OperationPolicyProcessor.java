@@ -17,6 +17,9 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
@@ -40,12 +43,12 @@ public class OperationPolicyProcessor implements ReactiveProcessor {
   private static final Logger LOGGER = getLogger(OperationPolicyProcessor.class);
 
   private final Policy policy;
-  private final ReactiveProcessor nextProcessor;
+  private final Reference<ReactiveProcessor> nextProcessorRef;
   private final PolicyEventMapper policyEventMapper;
 
   public OperationPolicyProcessor(Policy policy, ReactiveProcessor nextProcessor) {
     this.policy = policy;
-    this.nextProcessor = nextProcessor;
+    this.nextProcessorRef = new WeakReference<>(nextProcessor);
     this.policyEventMapper = new PolicyEventMapper(policy.getPolicyId());
   }
 
@@ -57,23 +60,23 @@ public class OperationPolicyProcessor implements ReactiveProcessor {
    */
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+    final String policyId = policy.getPolicyId();
+
     return from(publisher)
         .map(policyEventMapper::onOperationPolicyBegin)
-        .doOnNext(event -> logPolicy(event.getContext().getCorrelationId(), policy.getPolicyId(),
-                                     event, "Before operation"))
+        .doOnNext(event -> logPolicy(event.getContext().getCorrelationId(), policyId, event, "Before operation"))
         .transform(policy.getPolicyChain().onChainError(t -> manageError((MessagingException) t)))
-        .subscriberContext(ctx -> ctx.put(POLICY_NEXT_OPERATION, nextProcessor))
+        .subscriberContext(ctx -> ctx.put(POLICY_NEXT_OPERATION, nextProcessorRef))
         .map(policyChainResult -> policyEventMapper
             .onOperationPolicyFinish(policyChainResult, policy.getPolicyChain().isPropagateMessageTransformations()))
-        .doOnNext(event -> logPolicy(event.getContext().getCorrelationId(), policy.getPolicyId(),
-                                     event, "After operation"));
+        .doOnNext(event -> logPolicy(event.getContext().getCorrelationId(), policyId, event, "After operation"));
   }
 
   private void manageError(MessagingException messagingException) {
     messagingException.setProcessedEvent(policyEventMapper.onOperationPolicyError(messagingException.getEvent()));
   }
 
-  private String getMessageAttributesAsString(CoreEvent event) {
+  private static String getMessageAttributesAsString(CoreEvent event) {
     if (event.getMessage() == null || event.getMessage().getAttributes() == null
         || event.getMessage().getAttributes().getValue() == null) {
       return "";
@@ -81,7 +84,7 @@ public class OperationPolicyProcessor implements ReactiveProcessor {
     return event.getMessage().getAttributes().getValue().toString();
   }
 
-  private void logPolicy(String eventId, String policyName, CoreEvent event, String startingMessage) {
+  private static void logPolicy(String eventId, String policyName, CoreEvent event, String startingMessage) {
     if (LOGGER.isTraceEnabled()) {
       // TODO Remove event id when first policy generates it. MULE-14455
       LOGGER.trace("Event Id: " + eventId + ".\n" + startingMessage + "\nPolicy:" + policyName + "\n"

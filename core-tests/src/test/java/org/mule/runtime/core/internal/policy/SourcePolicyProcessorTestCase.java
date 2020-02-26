@@ -19,6 +19,8 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
+import java.lang.ref.Reference;
+
 import org.junit.Test;
 
 import reactor.core.publisher.Mono;
@@ -36,7 +38,8 @@ public class SourcePolicyProcessorTestCase extends AbstractPolicyProcessorTestCa
     mockFlowReturningEvent(modifiedMessageEvent);
     when(policy.getPolicyChain().isPropagateMessageTransformations()).thenReturn(false);
     when(policy.getPolicyChain().apply(any())).thenAnswer(invocation -> subscriberContext()
-        .flatMap(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0)).transform(ctx.get(POLICY_NEXT_OPERATION))));
+        .flatMap(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0))
+            .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get())));
 
     just(initialEvent).transform(policyProcessor).block();
 

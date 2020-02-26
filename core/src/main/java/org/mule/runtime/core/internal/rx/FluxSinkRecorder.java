@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.rx;
 
+import static reactor.core.publisher.Flux.create;
+import static reactor.util.context.Context.empty;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -21,6 +24,11 @@ import reactor.core.publisher.FluxSink;
 public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
 
   private volatile FluxSinkRecorderDelegate<T> delegate = new NotYetAcceptedDelegate<>();
+
+  public Flux<T> flux() {
+    return create(this)
+        .subscriberContext(ctx -> empty());
+  }
 
   @Override
   public void accept(FluxSink<T> fluxSink) {

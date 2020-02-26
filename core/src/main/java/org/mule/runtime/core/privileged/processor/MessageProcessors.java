@@ -17,7 +17,6 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
-import static reactor.core.publisher.Flux.create;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.subscriberContext;
@@ -507,7 +506,7 @@ public class MessageProcessors {
                     .doOnError(t -> errorSwitchSinkSinkRef.error(t))
                     .doOnComplete(() -> errorSwitchSinkSinkRef.complete());
 
-                return subscribeFluxOnPublisherSubscription(create(errorSwitchSinkSinkRef), upstream)
+                return subscribeFluxOnPublisherSubscription(errorSwitchSinkSinkRef.flux(), upstream)
                     .map(propagateErrorResponseMapper().andThen(MessageProcessors::toParentContext));
               }
             }));
