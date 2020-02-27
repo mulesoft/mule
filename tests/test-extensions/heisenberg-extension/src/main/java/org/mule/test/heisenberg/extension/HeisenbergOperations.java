@@ -19,6 +19,7 @@ import static org.mule.runtime.extension.api.client.DefaultOperationParameters.b
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.KNOCKED_DOOR;
 import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.KNOCKING_DOOR;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
@@ -320,6 +321,11 @@ public class HeisenbergOperations implements Disposable {
       System.out.println("Finished tapping phone with error with message: " + error.getMessage());
       callback.error(error);
     });
+  }
+
+  @MediaType(ANY)
+  public void nonBlockingError(CompletionCallback<Object, Object> callback) {
+    throw new RuntimeException("Unexpected error in non-blocking operation");
   }
 
   @Deprecated(message = "The usage of this operation must be replaced by the knock operation.", since = "1.5.0",

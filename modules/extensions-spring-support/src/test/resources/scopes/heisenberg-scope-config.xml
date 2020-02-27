@@ -78,7 +78,7 @@
 
     <flow name="failWithConnectivityErrorFromOtherExtension">
         <heisenberg:tap-phones>
-            <petstore:fail petNames="#[{'name' : 'Pino'}]" />
+            <petstore:fail petNames="#[{'name' : 'Pino'}]"/>
         </heisenberg:tap-phones>
     </flow>
 
@@ -86,6 +86,10 @@
         <heisenberg:tap-phones>
             <petstore:fails-to-read-stream config-ref="config"/>
         </heisenberg:tap-phones>
+    </flow>
+
+    <flow name="failWithUnexpextedErrorInNonBlockingOperation">
+        <heisenberg:non-blocking-error/>
     </flow>
 
     <flow name="alwaysFailsWrapperFailure">
