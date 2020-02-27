@@ -13,10 +13,12 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-import static org.junit.runners.Parameterized.*;
+import static org.junit.runners.Parameterized.Parameter;
+import static org.junit.runners.Parameterized.Parameters;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -27,8 +29,8 @@ import org.junit.runners.Parameterized;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 
 @RunWith(Parameterized.class)
 public abstract class AbstractTroubleshootCursorProviderTestCase extends AbstractMuleTestCase {
@@ -56,7 +58,7 @@ public abstract class AbstractTroubleshootCursorProviderTestCase extends Abstrac
 
   @Before
   public void before() throws NoSuchFieldException, IllegalAccessException {
-    setStaticField(CursorProvider.class, "TRACK_CURSOR_PROVIDER_CLOSE", trackStackTrace);
+    setStaticField(getCursorProviderImplementation(), getCursorProviderTrackingCloseField(), trackStackTrace);
 
     cursorProvider = createCursorProvider();
   }
@@ -65,8 +67,6 @@ public abstract class AbstractTroubleshootCursorProviderTestCase extends Abstrac
   public void after() {
     cursorProvider.close();
   }
-
-  protected abstract CursorProvider createCursorProvider();
 
   @Test
   @Issue("MULE-18047")
@@ -97,8 +97,14 @@ public abstract class AbstractTroubleshootCursorProviderTestCase extends Abstrac
     cursorProvider.openCursor();
   }
 
+  protected abstract CursorProvider createCursorProvider();
+
+  protected abstract Class getCursorProviderImplementation();
+
+  protected abstract String getCursorProviderTrackingCloseField();
+
   private void setStaticField(Class cls, String fieldName, Object value) throws NoSuchFieldException, IllegalAccessException {
-    Field field = cls.getField(fieldName);
+    Field field = cls.getDeclaredField(fieldName);
     Field modifiers = Field.class.getDeclaredField("modifiers");
 
     boolean wasAccessible = field.isAccessible();

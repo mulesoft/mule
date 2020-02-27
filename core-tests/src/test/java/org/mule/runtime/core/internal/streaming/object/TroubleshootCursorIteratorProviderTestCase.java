@@ -33,4 +33,14 @@ public class TroubleshootCursorIteratorProviderTestCase extends AbstractTroubles
                                               new InMemoryCursorIteratorConfig(1, 1, 10),
                                               setComponentLocation ? fromSingleComponent("log") : null);
   }
+
+  @Override
+  protected Class getCursorProviderImplementation() {
+    return AbstractCursorIteratorProvider.class;
+  }
+
+  @Override
+  protected String getCursorProviderTrackingCloseField() {
+    return "TRACK_CURSOR_PROVIDER_CLOSE";
+  }
 }

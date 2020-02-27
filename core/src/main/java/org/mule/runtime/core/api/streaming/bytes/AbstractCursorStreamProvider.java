@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.api.streaming.bytes;
 
+import static java.lang.Boolean.getBoolean;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.util.MuleSystemProperties.TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY;
 
 import java.io.InputStream;
 import java.util.Optional;
@@ -34,6 +36,8 @@ public abstract class AbstractCursorStreamProvider extends AbstractComponent imp
   private final ComponentLocation originatingLocation;
 
   private Exception closerResponsible;
+
+  private static final boolean TRACK_CURSOR_PROVIDER_CLOSE = getBoolean(TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY);
 
   /**
    * Creates a new instance
@@ -76,7 +80,7 @@ public abstract class AbstractCursorStreamProvider extends AbstractComponent imp
    */
   @Override
   public void close() {
-    if (isTrackCursorProviderClose()) {
+    if (TRACK_CURSOR_PROVIDER_CLOSE) {
       closerResponsible = new Exception("Responsible for closing the stream.");
     }
     closed.set(true);

@@ -15,6 +15,7 @@ import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingSto
 import org.junit.After;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.DataSize;
+import org.mule.runtime.core.api.streaming.bytes.AbstractCursorStreamProvider;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.AbstractTroubleshootCursorProviderTestCase;
@@ -33,6 +34,12 @@ public class TroubleshootStreamCursorProviderTestCase extends AbstractTroublesho
 
   private PoolingByteBufferManager bufferManager;
 
+  @After
+  public void after() {
+    super.after();
+    bufferManager.dispose();
+  }
+
   protected CursorStreamProvider createCursorProvider() {
     int bufferSize = 1;
     int maxBufferSize = 10;
@@ -49,10 +56,13 @@ public class TroubleshootStreamCursorProviderTestCase extends AbstractTroublesho
                                             setComponentLocation ? fromSingleComponent("log") : null);
   }
 
-  @After
-  public void after() {
-    super.after();
-    bufferManager.dispose();
+  @Override
+  protected Class getCursorProviderImplementation() {
+    return AbstractCursorStreamProvider.class;
   }
 
+  @Override
+  protected String getCursorProviderTrackingCloseField() {
+    return "TRACK_CURSOR_PROVIDER_CLOSE";
+  }
 }

@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.internal.streaming.object;
 
+import static java.lang.Boolean.getBoolean;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.util.MuleSystemProperties.TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -28,6 +30,8 @@ public abstract class AbstractCursorIteratorProvider implements CursorIteratorPr
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final ComponentLocation originatingLocation;
   private Exception closerResponsible;
+
+  private static final boolean TRACK_CURSOR_PROVIDER_CLOSE = getBoolean(TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY);
 
   /**
    * Creates a new instance
@@ -71,7 +75,7 @@ public abstract class AbstractCursorIteratorProvider implements CursorIteratorPr
    */
   @Override
   public void close() {
-    if (isTrackCursorProviderClose()) {
+    if (TRACK_CURSOR_PROVIDER_CLOSE) {
       closerResponsible = new Exception("Responsible for closing the stream.");
     }
     closed.set(true);

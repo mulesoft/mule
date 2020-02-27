@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.streaming;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
-import static org.mule.runtime.api.streaming.CursorProvider.TRACK_CURSOR_PROVIDER_CLOSE;
+import static org.mule.runtime.api.util.MuleSystemProperties.TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -55,7 +55,7 @@ public class CursorProviderAlreadyClosedException extends RuntimeException {
       StringWriter stringWriter = new StringWriter();
       r.printStackTrace(new PrintWriter(stringWriter));
       return format("The cursor provider was closed by: \n %s", stringWriter.toString());
-    }).orElse(format("Run with -M-D%s=true for more details", TRACK_CURSOR_PROVIDER_CLOSE));
+    }).orElse(format("Run with -M-D%s=true for more details", TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY));
 
     return format("%s: %s. %s.", message, openedByDescription, responsibleDescription);
   }
