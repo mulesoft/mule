@@ -27,7 +27,7 @@
         <error-handler>
             <on-error-propagate>
                 <logger/>
-                <!-- MULE-18118 -->
+                <!-- TODO: MULE-18118 - uncomment the following line when this issue is fixed -->
                 <!-- <custom-processor class="org.mule.test.module.extension.nb.NonBlockingOperationsTestCase$ThreadCaptor" /> -->
             </on-error-propagate>
         </error-handler>
@@ -44,7 +44,7 @@
         <test:assert-intercepting responseSameTask="false" />
         <marvel:compute-flight-plan config-ref="ironMan" />
 
-        <!-- MULE-18119 -->
+        <!-- TODO: MULE-18119 - uncomment the following line when this issue is fixed -->
         <!-- <custom-processor class="org.mule.test.module.extension.nb.NonBlockingOperationsTestCase$ThreadCaptor" /> -->
     </flow>
 
