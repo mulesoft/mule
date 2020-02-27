@@ -52,6 +52,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.activation.DataHandler;
 
@@ -73,6 +74,8 @@ public class MuleEventToHttpRequest
 
     private AttributeEvaluator requestStreamingMode;
     private AttributeEvaluator sendBody;
+
+    private AtomicBoolean xCorrelationIdWaringAlreadyLogged = new AtomicBoolean(false);
 
 
     public MuleEventToHttpRequest(DefaultHttpRequester requester, MuleContext muleContext, AttributeEvaluator requestStreamingMode, AttributeEvaluator sendBody)
@@ -117,8 +120,11 @@ public class MuleEventToHttpRequest
                       (String) event.getMessage().getOutboundProperty(X_CORRELATION_ID) : builder.getHeaders().get(X_CORRELATION_ID);
                     if (xCorrelationId != null)
                     {
-                        logger.warn("Explicitly configured 'X-Correlation-ID: {}' header could interfere with 'MULE_CORRELATION_ID: {}' header.",
-                                    muleCorrelationId, xCorrelationId);
+                        if (xCorrelationIdWaringAlreadyLogged.compareAndSet(false, true))
+                        {
+                            logger.warn("Explicitly configured 'X-Correlation-ID: {}' header could interfere with 'MULE_CORRELATION_ID: {}' header.",
+                                        muleCorrelationId, xCorrelationId);
+                        }
                     }
                 }
                 else
