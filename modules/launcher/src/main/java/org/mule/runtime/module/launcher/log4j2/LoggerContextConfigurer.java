@@ -106,7 +106,7 @@ final class LoggerContextConfigurer {
 
     if (context.isArtifactClassloader()) {
       addDefaultArtifactContext(context);
-    } else if (!context.isStandlone()) {
+    } else if (!context.isStandalone()) {
       addDefaultAppender(context, "mule-main.log");
     }
 

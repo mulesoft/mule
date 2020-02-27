@@ -102,6 +102,6 @@ public class MuleLoggerContextTestCase extends AbstractMuleTestCase {
 
   private MuleLoggerContext getDefaultContext() {
     return new MuleLoggerContext(DEFAULT_CONTEXT_NAME, null, Thread.currentThread().getContextClassLoader(), contextSelector,
-                                 true);
+                                 true, true);
   }
 }

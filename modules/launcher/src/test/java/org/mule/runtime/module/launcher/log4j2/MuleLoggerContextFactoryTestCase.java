@@ -59,7 +59,7 @@ public class MuleLoggerContextFactoryTestCase extends AbstractMuleTestCase {
     when(artifactDescriptor.getLogConfigFile()).thenReturn(customLogConfig);
     final MuleLoggerContextFactory loggerCtxFactory = mockLoggerContextFactory();
 
-    final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class));
+    final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class), true);
     assertThat(ctx.getConfigLocation(), equalTo(customLogConfig.toURI()));
   }
 
@@ -70,7 +70,7 @@ public class MuleLoggerContextFactoryTestCase extends AbstractMuleTestCase {
     when(artifactDescriptor.getLogConfigFile()).thenReturn(customLogConfig);
     final MuleLoggerContextFactory loggerCtxFactory = mockLoggerContextFactory();
 
-    final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class));
+    final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class), true);
     assertThat(ctx.getConfigLocation(), equalTo(CONFIG_LOCATION.toURI()));
   }
 
@@ -82,7 +82,7 @@ public class MuleLoggerContextFactoryTestCase extends AbstractMuleTestCase {
     assertThat(customLogConfig.exists(), is(true));
     when(artifactDescriptorDomain.getLogConfigFile()).thenReturn(customLogConfig);
     final MuleLoggerContextFactory loggerCtxFactory = mockLoggerContextFactory();
-    final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class));
+    final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class), true);
     assertThat(ctx.getConfigLocation(), equalTo(customLogConfig.toURI()));
   }
 

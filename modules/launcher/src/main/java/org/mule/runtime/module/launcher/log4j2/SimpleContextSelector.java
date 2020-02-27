@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static java.util.Arrays.asList;
+
 import java.net.URI;
 import java.util.List;
 
@@ -14,25 +16,27 @@ import org.apache.logging.log4j.core.selector.ContextSelector;
 
 public class SimpleContextSelector implements ContextSelector {
 
-  private MuleLoggerContext context;
+  private final MuleLoggerContextFactory loggerContextFactory = new MuleLoggerContextFactory();
+
+  private LoggerContext context;
 
   public SimpleContextSelector() {
-    this.context = new MuleLoggerContext("SingleLoggerContext", this, )
+    this.context = loggerContextFactory.build(getClass().getClassLoader(), this, false);
   }
 
   @Override
   public LoggerContext getContext(String fqcn, ClassLoader loader, boolean currentContext) {
-    return null;
+    return context;
   }
 
   @Override
   public LoggerContext getContext(String fqcn, ClassLoader loader, boolean currentContext, URI configLocation) {
-    return null;
+    return context;
   }
 
   @Override
   public List<LoggerContext> getLoggerContexts() {
-    return null;
+    return asList(context);
   }
 
   @Override
