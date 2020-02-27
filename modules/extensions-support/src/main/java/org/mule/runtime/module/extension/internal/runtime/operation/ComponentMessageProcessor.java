@@ -847,7 +847,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   protected ExecutionMediator createExecutionMediator() {
-    return new DefaultExecutionMediator(extensionModel, componentModel, createInterceptorChain(), errorTypeRepository);
+    return new DefaultExecutionMediator(extensionModel,
+                                        componentModel,
+                                        createInterceptorChain(),
+                                        errorTypeRepository,
+                                        resultTransformer);
   }
 
   protected InterceptorChain createInterceptorChain() {

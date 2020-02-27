@@ -19,7 +19,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Optional;
 
 /**
@@ -75,7 +74,7 @@ public final class ExceptionHandlerManager {
    * Given a {@link Throwable} instance this method will get the specific failure reason.
    * <p>
    * If there is a {@link ConnectionException} in the stacktrace is going to be considered the main failure reason,
-   * otherwise it will check if there is a {@link UndeclaredThrowableException} reflective wrapper exception
+   * otherwise it will check if there is a {@link SdkMethodInvocationException} wrapper exception
    * in the stacktrace wrapping the real failure.
    */
   public Throwable handleThrowable(Throwable e) {

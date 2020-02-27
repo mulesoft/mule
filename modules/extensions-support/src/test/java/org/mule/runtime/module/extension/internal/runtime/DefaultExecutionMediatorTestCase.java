@@ -389,10 +389,8 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   }
 
   @Test
-  public void notReconnectInValueTransformerWhenVariableIsSet() throws Throwable {
-    int expectedRetries = retryPolicy instanceof SimpleRetryPolicyTemplate
-        ? 1
-        : 0;
+  public void notReconnectInValueTransformerWhenVariableIsSet() {
+    int expectedRetries = retryPolicy.isEnabled() ? 1 : 0;
     final ModuleException moduleExceptionToThrow = new ModuleException(ERROR, CONNECTIVITY, connectionException);
     when(operationContext.getVariable(DO_NOT_RETRY)).thenReturn("true");
     clearInvocations(operationContext);
@@ -409,8 +407,8 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     try {
       execute();
     } catch (Exception e) {
-      assertThat(e.getCause(), sameInstance(connectionException));
-      assertThat(e.getCause().getMessage(), is("Connection failure"));
+      assertThat(e, is(instanceOf(ConnectionException.class)));
+      assertThat(e.getMessage(), is("Connection failure"));
       verify(failingTransformer, times(1)).apply(any(), any());
       verify(operationContext, times(expectedRetries)).getVariable(DO_NOT_RETRY);
     }
