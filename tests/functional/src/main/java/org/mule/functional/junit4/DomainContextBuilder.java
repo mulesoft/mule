@@ -8,6 +8,7 @@ package org.mule.functional.junit4;
 
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory.createConfigurationBuilder;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -15,9 +16,12 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
+import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.internal.policy.NullPolicyProvider;
+import org.mule.tck.config.TestPolicyProviderConfigurationBuilder;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.MockExtensionManagerConfigurationBuilder;
 
@@ -47,6 +51,7 @@ public class DomainContextBuilder {
     List<ConfigurationBuilder> builders = new ArrayList<>(3);
     ConfigurationBuilder cfgBuilder = getDomainBuilder(domainConfig);
     builders.add(new MockExtensionManagerConfigurationBuilder());
+    builders.add(new TestPolicyProviderConfigurationBuilder());
     builders.add(cfgBuilder);
     testServicesConfigBuilder = new TestServicesConfigurationBuilder();
     addBuilders(builders);
