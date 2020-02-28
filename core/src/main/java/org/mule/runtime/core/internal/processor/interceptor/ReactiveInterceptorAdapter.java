@@ -7,17 +7,19 @@
 package org.mule.runtime.core.internal.processor.interceptor;
 
 import static java.lang.String.valueOf;
+import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.util.collection.SmallMap.forSize;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_PARAMS;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
@@ -49,7 +51,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Hooks the {@link ProcessorInterceptor}s for a {@link Processor} into the {@code Reactor} pipeline.
@@ -59,7 +60,7 @@ import org.slf4j.LoggerFactory;
 public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
     implements BiFunction<Processor, ReactiveProcessor, ReactiveProcessor> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveInterceptorAdapter.class);
+  private static final Logger LOGGER = getLogger(ReactiveInterceptorAdapter.class);
 
   private static final String BEFORE_METHOD_NAME = "before";
   private static final String AFTER_METHOD_NAME = "after";
@@ -127,12 +128,19 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
         LOGGER.debug("Calling before() for '{}' in processor '{}'...", interceptor,
                      component.getLocation().getLocation());
       }
-
       try {
-        withContextClassLoader(interceptor.getClass().getClassLoader(),
-                               () -> interceptor.before(component.getLocation(),
-                                                        getResolvedParams(eventWithResolvedParams),
-                                                        interceptionEvent));
+        Thread currentThread = currentThread();
+        ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+        ClassLoader contextClassLoader = interceptor.getClass().getClassLoader();
+        setContextClassLoader(currentThread, currentClassLoader, contextClassLoader);
+        try {
+          interceptor.before(component.getLocation(),
+                             getResolvedParams(eventWithResolvedParams),
+                             interceptionEvent);
+        } finally {
+          setContextClassLoader(currentThread, contextClassLoader, currentClassLoader);
+        }
+
         return interceptionEvent.resolve();
       } catch (Exception e) {
         throw propagate(new MessagingException(interceptionEvent.resolve(), e.getCause(), component));
@@ -150,10 +158,17 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
         LOGGER.debug("Calling after() for '{}' in processor '{}'...", interceptor,
                      component.getLocation().getLocation());
       }
-
       try {
-        withContextClassLoader(interceptor.getClass().getClassLoader(),
-                               () -> interceptor.after(component.getLocation(), interceptionEvent, thrown));
+        Thread currentThread = currentThread();
+        ClassLoader currentClassLoader = currentThread.getContextClassLoader();
+        ClassLoader contextClassLoader = interceptor.getClass().getClassLoader();
+        setContextClassLoader(currentThread, currentClassLoader, contextClassLoader);
+        try {
+          interceptor.after(component.getLocation(), interceptionEvent, thrown);
+        } finally {
+          setContextClassLoader(currentThread, contextClassLoader, currentClassLoader);
+        }
+
         return interceptionEvent.resolve();
       } catch (Exception e) {
         throw propagate(createMessagingException(interceptionEvent.resolve(), e.getCause(), component, empty()));
@@ -230,7 +245,8 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
         ((ParametersResolverProcessor<?>) component).resolveParameters(builder, (params, context) -> {
           resolvedParameters.putAll(params.entrySet().stream()
               .collect(toMap(e -> e.getKey(),
-                             e -> new DefaultProcessorParameterValue(e.getKey(), null, () -> e.getValue().get()))));
+                             e -> new DefaultProcessorParameterValue(e.getKey(), null,
+                                                                     () -> e.getValue().get()))));
 
           builder.addInternalParameter(INTERCEPTION_RESOLVED_CONTEXT, context);
           builder.addInternalParameter(INTERCEPTION_RESOLVED_PARAMS, resolvedParameters);

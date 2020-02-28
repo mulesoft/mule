@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -38,8 +39,15 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, I
   @Override
   public void processMessage(FlowProcessTemplate messageProcessTemplate,
                              MessageProcessContext messageProcessContext) {
-    withContextClassLoader(messageProcessContext.getExecutionClassLoader(),
-                           () -> mediator.process(messageProcessTemplate, messageProcessContext, this));
+    Thread currentThread = currentThread();
+    ClassLoader originalTCCL = currentThread.getContextClassLoader();
+    ClassLoader executionClassLoader = messageProcessContext.getExecutionClassLoader();
+    setContextClassLoader(currentThread, originalTCCL, executionClassLoader);
+    try {
+      mediator.process(messageProcessTemplate, messageProcessContext, this);
+    } finally {
+      setContextClassLoader(currentThread, executionClassLoader, originalTCCL);
+    }
   }
 
   @Override
