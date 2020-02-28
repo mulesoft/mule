@@ -59,9 +59,12 @@ public class RxUtils {
    * <p>
    * In this method, A corresponds to <it>deferredSubscriber</it>; and B to <it>triggeringSubscriber</it>.
    *
-   * @param triggeringSubscriber the {@link Flux} whose subscription will trigger the subscription of the
+   * @param <T> the element type of the downstream {@link Flux}
+   * @param <U> the element type of the upstream {@link Flux}
+   *
+   * @param triggeringSubscriber the downstream {@link Flux}, whose subscription will trigger the subscription of the
    *        <it>deferredSubscriber</it> {@link Flux}, on the same context as the former one.
-   * @param deferredSubscriber the {@link Flux} whose subscription will be deferred
+   * @param deferredSubscriber the upstream {@link Flux}, whose subscription will be deferred
    * @return the triggeringSubscriber {@link Flux}, decorated with the callback that will perform this deferred subscription.
    * @since 4.3
    */
