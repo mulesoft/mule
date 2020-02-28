@@ -22,6 +22,8 @@ import java.util.List;
 
 public class TestOAuthOperations {
 
+  private static int executedCounter = 0;
+
   public TestOAuthConnection getConnection(@Connection TestOAuthConnection connection) {
     return connection;
   }
@@ -77,5 +79,12 @@ public class TestOAuthOperations {
 
       }
     };
+  }
+
+  public TestOAuthConnection getFlackyConnection(@Connection TestOAuthConnection connection) {
+    if (executedCounter++ % 2 == 0) {
+      throw new AccessTokenExpiredException();
+    }
+    return connection;
   }
 }
