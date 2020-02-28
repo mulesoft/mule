@@ -14,6 +14,14 @@ import java.util.List;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 
+/**
+ * A simple {@link ContextSelector} which always returns the same {@link MuleLoggerContext} created through a
+ * {@link MuleLog4jContextFactory}.
+ * <p>
+ * Log separation will always be disabled on the returned context.
+ *
+ * @since 4.3.0
+ */
 public class SimpleContextSelector implements ContextSelector {
 
   private final MuleLoggerContextFactory loggerContextFactory = new MuleLoggerContextFactory();
