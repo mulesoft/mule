@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXTENSIONS_CLIENT_CACHE_IS_DISABLED;
 import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
@@ -37,13 +38,15 @@ import org.mule.test.vegan.extension.VeganPolicy;
 import java.util.Collection;
 import java.util.List;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
 import javax.inject.Inject;
+
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
 
 @Feature("EXTENSIONS_CLIENT")
 public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigTestCase {
@@ -254,6 +257,13 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
     exception.expectMessage("No configuration [configDontExist] found");
     OperationParameters params = builder().configName("configDontExist").build();
     doExecute(VEGAN, "applyPolicy", params);
+  }
+
+  @Test
+  @Description("Tries to execute an operation that takes a long time")
+  public void longOperation() throws Throwable {
+    OperationParameters params = builder().build();
+    assertThat(doExecute(VEGAN, "longDigest", params), not(nullValue()));
   }
 
   @Test

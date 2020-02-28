@@ -107,8 +107,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
           final FluxSinkRecorder<String> emitter = new FluxSinkRecorder<>();
           return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
-                                     () -> emitter.complete(), t -> emitter.error(t),
-                                     RECEIVE_TIMEOUT, scheduledExecutor);
+                                     () -> emitter.complete(), t -> emitter.error(t));
         })
         .block();
 
@@ -152,8 +151,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
           final FluxSinkRecorder<String> emitter = new FluxSinkRecorder<>();
           return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
-                                     () -> emitter.complete(), t -> emitter.error(t),
-                                     RECEIVE_TIMEOUT, scheduledExecutor);
+                                     () -> emitter.complete(), t -> emitter.error(t));
         })
         .block();
   }

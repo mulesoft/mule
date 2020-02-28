@@ -38,9 +38,10 @@ public class ConstructMessageProcessor extends ComponentMessageProcessor<Constru
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
-                                   ReflectionCache reflectionCache) {
+                                   ReflectionCache reflectionCache,
+                                   long terminationTimeout) {
     super(extensionModel, constructModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-          retryPolicyTemplate, extensionManager, policyManager, reflectionCache);
+          retryPolicyTemplate, extensionManager, policyManager, reflectionCache, null, terminationTimeout);
   }
 
   @Override

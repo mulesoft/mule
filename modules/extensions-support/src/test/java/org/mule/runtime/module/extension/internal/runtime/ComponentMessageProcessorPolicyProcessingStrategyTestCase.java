@@ -131,7 +131,8 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
                                                               componentModel, null, null, null,
                                                               resolverSet, null, null,
                                                               extensionManager,
-                                                              policyManager, null) {
+                                                              policyManager, null, null,
+                                                              muleContext.getConfiguration().getShutdownTimeout()) {
 
       @Override
       protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {}

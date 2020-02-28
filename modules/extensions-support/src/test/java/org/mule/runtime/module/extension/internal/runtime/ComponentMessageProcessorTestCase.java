@@ -91,7 +91,8 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
                                                               componentModel, null, null, null,
                                                               resolverSet, null, null,
                                                               extensionManager,
-                                                              mockPolicyManager, null) {
+                                                              mockPolicyManager, null, null,
+                                                              muleContext.getConfiguration().getShutdownTimeout()) {
 
       @Override
       protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {}

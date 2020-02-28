@@ -47,6 +47,7 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   protected Registry registry;
   protected final ExtensionConnectionSupplier extensionConnectionSupplier;
   protected ConfigurationProvider configurationProvider;
+  protected long terminationTimeout;
 
   protected Map<String, ?> parameters;
   protected String target;
@@ -75,6 +76,7 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
     this.registry = registry;
     this.extensionConnectionSupplier = registry.lookupByType(ExtensionConnectionSupplier.class).get();
     this.expressionManager = expressionManager;
+    this.terminationTimeout = muleContext.getConfiguration().getShutdownTimeout();
   }
 
   public P build() {
@@ -144,6 +146,11 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
 
   public ComponentMessageProcessorBuilder<M, P> setNestedProcessors(RetryPolicyTemplate retryPolicyTemplate) {
     this.retryPolicyTemplate = retryPolicyTemplate;
+    return this;
+  }
+
+  public ComponentMessageProcessorBuilder<M, P> setTerminationTimeout(long terminationTimeout) {
+    this.terminationTimeout = terminationTimeout;
     return this;
   }
 

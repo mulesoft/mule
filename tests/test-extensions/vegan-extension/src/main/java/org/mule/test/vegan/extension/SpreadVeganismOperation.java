@@ -7,6 +7,7 @@
 package org.mule.test.vegan.extension;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
@@ -17,9 +18,13 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class SpreadVeganismOperation implements Initialisable {
 
@@ -58,6 +63,12 @@ public class SpreadVeganismOperation implements Initialisable {
   @OutputResolver(output = FruitMetadataResolver.class)
   public FarmedFood getHealthyFood(HealthyFood healthyFood) {
     return healthyFood;
+  }
+
+  @MediaType(TEXT_PLAIN)
+  public void longDigest(CompletionCallback<String, Object> callback) {
+    Executors.newScheduledThreadPool(1)
+        .schedule(() -> callback.success(Result.<String, Object>builder().output("Hello!").build()), 10, TimeUnit.SECONDS);
   }
 
   public Map<String, String> addVeganProductsDescriptions(@Optional @NullSafe Map<String, String> productDescription) {
