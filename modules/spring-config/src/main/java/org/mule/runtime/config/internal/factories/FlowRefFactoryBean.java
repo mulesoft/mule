@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.factories;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
@@ -15,6 +16,7 @@ import static java.util.stream.Collectors.joining;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.updateAnnotationValue;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -69,7 +71,12 @@ import javax.xml.namespace.QName;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.support.ManagedList;
+import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -103,7 +110,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
   @Inject
   private ConfigurationComponentLocator locator;
 
-  private static final Object referencedFlowLock = new Object();
+  private static final Object referencedProcessorLock = new Object();
 
   public void setName(String name) {
     this.refName = name;
@@ -147,10 +154,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
                                            flowRefMessageProcessor);
     }
 
-    Component referencedFlow;
-    synchronized (referencedFlowLock) {
-      referencedFlow = getReferencedProcessor(name);
-    }
+    Component referencedFlow = getReferencedProcessor(name);
     if (referencedFlow == null) {
       throw new RoutePathNotFoundException(createStaticMessage("No flow/sub-flow with name '%s' found", name),
                                            flowRefMessageProcessor);
@@ -201,10 +205,15 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
   private Component getReferencedProcessor(String name) {
     if (applicationContext instanceof MuleArtifactContext) {
       MuleArtifactContext muleArtifactContext = (MuleArtifactContext) applicationContext;
-
       try {
-        if (muleArtifactContext.getBeanFactory().getBeanDefinition(name).isPrototype()) {
-          muleArtifactContext.getPrototypeBeanWithRootContainer(name, getRootContainerLocation().toString());
+        BeanDefinition processorBeanDefinition = muleArtifactContext.getBeanFactory().getBeanDefinition(name);
+        if (processorBeanDefinition.isPrototype()) {
+          // Synchronization between all FlowRefFactoryBean instances is needed to prevent root container inconsistencies
+          // (otherwise two FlowRefFactoryBean instances could mutate and instantiate the same prototype bean in parallel)
+          synchronized (referencedProcessorLock) {
+            updateBeanDefinitionRootContainerName(getRootContainerLocation().toString(), processorBeanDefinition);
+            return (Component) applicationContext.getBean(name);
+          }
         }
       } catch (NoSuchBeanDefinitionException e) {
         // Null is handled by the caller method
@@ -212,6 +221,46 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       }
     }
     return (Component) applicationContext.getBean(name);
+  }
+
+  private void updateBeanDefinitionRootContainerName(String rootContainerName, BeanDefinition beanDefinition) {
+    Class<?> beanClass = null;
+    try {
+      beanClass = currentThread().getContextClassLoader().loadClass(beanDefinition.getBeanClassName());
+    } catch (ClassNotFoundException e) {
+      // Nothing to do, spring will break because of this eventually
+    }
+
+    if (beanClass == null || Component.class.isAssignableFrom(beanClass)) {
+      updateAnnotationValue(ROOT_CONTAINER_NAME_KEY, rootContainerName, beanDefinition);
+    }
+
+    for (PropertyValue propertyValue : beanDefinition.getPropertyValues().getPropertyValueList()) {
+      Object value = propertyValue.getValue();
+      processBeanValue(rootContainerName, value);
+    }
+
+    for (ConstructorArgumentValues.ValueHolder valueHolder : beanDefinition.getConstructorArgumentValues()
+        .getGenericArgumentValues()) {
+      processBeanValue(rootContainerName, valueHolder.getValue());
+    }
+  }
+
+  private void processBeanValue(String rootContainerName, Object value) {
+    if (value instanceof BeanDefinition) {
+      updateBeanDefinitionRootContainerName(rootContainerName, (BeanDefinition) value);
+    } else if (value instanceof ManagedList) {
+      ManagedList managedList = (ManagedList) value;
+      for (int i = 0; i < managedList.size(); i++) {
+        Object itemValue = managedList.get(i);
+        if (itemValue instanceof BeanDefinition) {
+          updateBeanDefinitionRootContainerName(rootContainerName, (BeanDefinition) itemValue);
+        }
+      }
+    } else if (value instanceof ManagedMap) {
+      ManagedMap managedMap = (ManagedMap) value;
+      managedMap.forEach((key, mapValue) -> processBeanValue(rootContainerName, mapValue));
+    }
   }
 
   @Override

@@ -7,18 +7,15 @@
 package org.mule.runtime.config.internal;
 
 import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptySet;
 import static java.util.Comparator.comparing;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.CORE_ERROR_NS;
@@ -26,7 +23,6 @@ import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.parserErrorType;
-import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.updateAnnotationValue;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getArtifactComponentBuildingDefinitions;
@@ -48,7 +44,6 @@ import static org.springframework.context.annotation.AnnotationConfigUtils.CONFI
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -117,19 +112,15 @@ import javax.xml.parsers.SAXParserFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.beans.factory.support.ManagedList;
-import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.annotation.ConfigurationClassPostProcessor;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
@@ -732,59 +723,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   public OptionalObjectsController getOptionalObjectsController() {
     return optionalObjectsController;
-  }
-
-  /**
-   * Returns a prototype chain of processors mutating the root container name of the set of beans created from that prototype
-   * object.
-   *
-   * @param name              the bean name
-   * @param rootContainerName the new root container name.
-   */
-  public synchronized void getPrototypeBeanWithRootContainer(String name, String rootContainerName) {
-    BeanDefinition beanDefinition = getBeanFactory().getBeanDefinition(name);
-    checkState(beanDefinition.isPrototype(), format("Bean with name %s is not a prototype", name));
-    updateBeanDefinitionRootContainerName(rootContainerName, beanDefinition);
-  }
-
-  private void updateBeanDefinitionRootContainerName(String rootContainerName, BeanDefinition beanDefinition) {
-    Class<?> beanClass = null;
-    try {
-      beanClass = currentThread().getContextClassLoader().loadClass(beanDefinition.getBeanClassName());
-    } catch (ClassNotFoundException e) {
-      // Nothing to do, spring will break because of this eventually
-    }
-
-    if (beanClass == null || Component.class.isAssignableFrom(beanClass)) {
-      updateAnnotationValue(ROOT_CONTAINER_NAME_KEY, rootContainerName, beanDefinition);
-    }
-
-    for (PropertyValue propertyValue : beanDefinition.getPropertyValues().getPropertyValueList()) {
-      Object value = propertyValue.getValue();
-      processBeanValue(rootContainerName, value);
-    }
-
-    for (ConstructorArgumentValues.ValueHolder valueHolder : beanDefinition.getConstructorArgumentValues()
-        .getGenericArgumentValues()) {
-      processBeanValue(rootContainerName, valueHolder.getValue());
-    }
-  }
-
-  private void processBeanValue(String rootContainerName, Object value) {
-    if (value instanceof BeanDefinition) {
-      updateBeanDefinitionRootContainerName(rootContainerName, (BeanDefinition) value);
-    } else if (value instanceof ManagedList) {
-      ManagedList managedList = (ManagedList) value;
-      for (int i = 0; i < managedList.size(); i++) {
-        Object itemValue = managedList.get(i);
-        if (itemValue instanceof BeanDefinition) {
-          updateBeanDefinitionRootContainerName(rootContainerName, (BeanDefinition) itemValue);
-        }
-      }
-    } else if (value instanceof ManagedMap) {
-      ManagedMap managedMap = (ManagedMap) value;
-      managedMap.forEach((key, mapValue) -> processBeanValue(rootContainerName, mapValue));
-    }
   }
 
   public Registry getRegistry() {
