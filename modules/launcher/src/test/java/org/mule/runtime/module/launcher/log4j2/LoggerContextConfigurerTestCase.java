@@ -82,7 +82,7 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
   @Before
   public void before() {
     contextConfigurer = new LoggerContextConfigurer();
-    when(context.isStandlone()).thenReturn(true);
+    when(context.isStandalone()).thenReturn(true);
     when(context.getConfiguration()).thenReturn(configuration);
 
     converter = null;

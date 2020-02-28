@@ -9,21 +9,23 @@ package org.mule.runtime.module.launcher.log4j2;
 import static java.lang.System.getProperty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.launcher.log4j2.ArtifactAwareContextSelector.LOGGER;
+import static org.mule.runtime.module.launcher.log4j2.ArtifactAwareContextSelector.resolveLoggerContextClassLoader;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleBase;
+import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleConfDir;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.DirectoryResourceLocator;
 import org.mule.runtime.module.artifact.api.classloader.LocalResourceLocator;
-import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
-
-import org.apache.logging.log4j.core.LoggerContext;
 
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.selector.ContextSelector;
 
 /**
  * Encapsulates the logic to get the proper log configuration.
@@ -38,23 +40,30 @@ public class MuleLoggerContextFactory {
    * Builds a new {@link LoggerContext} for the given {@code classLoader} and {@code selector}
    *
    * @param classLoader the classloader of the artifact this logger context is for.
-   * @param selector the selector to bew used when building the loggers for the new context.
+   * @param selector    the selector to bew used when building the loggers for the new context.
    * @return
    */
-  public LoggerContext build(final ClassLoader classLoader, final ArtifactAwareContextSelector selector) {
+  public LoggerContext build(final ClassLoader classLoader, final ContextSelector selector, boolean logSeparationEnabled) {
     NewContextParameters parameters = resolveContextParameters(classLoader);
     if (parameters == null) {
-      return getDefaultContext(selector);
+      return getDefaultContext(selector, logSeparationEnabled);
     }
 
     MuleLoggerContext loggerContext =
-        new MuleLoggerContext(parameters.contextName, parameters.loggerConfigFile, classLoader, selector, isStandalone());
+        new MuleLoggerContext(parameters.contextName,
+                              parameters.loggerConfigFile,
+                              classLoader,
+                              selector,
+                              isStandalone(),
+                              logSeparationEnabled);
 
-    if (classLoader instanceof ArtifactClassLoader) {
+    if ((classLoader instanceof ArtifactClassLoader) &&
+        selector instanceof ArtifactAwareContextSelector) {
       final ArtifactClassLoader artifactClassLoader = (ArtifactClassLoader) classLoader;
 
-      artifactClassLoader.addShutdownListener(() -> selector
-          .destroyLoggersFor(ArtifactAwareContextSelector.resolveLoggerContextClassLoader(classLoader)));
+      artifactClassLoader.addShutdownListener(
+                                              () -> ((ArtifactAwareContextSelector) selector)
+                                                  .destroyLoggersFor(resolveLoggerContextClassLoader(classLoader)));
     }
 
     return loggerContext;
@@ -66,9 +75,9 @@ public class MuleLoggerContextFactory {
       return new NewContextParameters(getArtifactLoggingConfig(artifactClassLoader), artifactClassLoader.getArtifactId());
     } else {
       // this is not an app init, use the top-level defaults
-      if (MuleContainerBootstrapUtils.getMuleConfDir() != null) {
-        return new NewContextParameters(getLogConfig(new DirectoryResourceLocator(MuleContainerBootstrapUtils.getMuleConfDir()
-            .getAbsolutePath())), classLoader.toString());
+      if (getMuleConfDir() != null) {
+        return new NewContextParameters(getLogConfig(new DirectoryResourceLocator(getMuleConfDir().getAbsolutePath())),
+                                        classLoader.toString());
       }
     }
 
@@ -102,12 +111,12 @@ public class MuleLoggerContextFactory {
     return appLogConfig;
   }
 
-  private LoggerContext getDefaultContext(ArtifactAwareContextSelector selector) {
-    return new MuleLoggerContext("Default", selector, isStandalone());
+  private LoggerContext getDefaultContext(ContextSelector selector, boolean logSeparationEnabled) {
+    return new MuleLoggerContext("Default", selector, isStandalone(), logSeparationEnabled);
   }
 
   private boolean isStandalone() {
-    return MuleContainerBootstrapUtils.getMuleConfDir() != null;
+    return getMuleConfDir() != null;
   }
 
   /**

@@ -42,24 +42,31 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
   private final LoggerContextConfigurer loggerContextConfigurer = new LoggerContextConfigurer();
 
   private final URI configFile;
-  private final boolean standlone;
+  private final boolean standalone;
+  private final boolean logSeparationEnabled;
   private final ContextSelector contextSelector;
   private final boolean artifactClassloader;
   private final boolean applicationClassloader;
   private final String artifactName;
   private final int ownerClassLoaderHash;
+
   private ArtifactDescriptor artifactDescriptor;
 
-  MuleLoggerContext(String name, ContextSelector contextSelector, boolean standalone) {
-    this(name, null, null, contextSelector, standalone);
+  MuleLoggerContext(String name, ContextSelector contextSelector, boolean standalone, boolean logSeparationEnabled) {
+    this(name, null, null, contextSelector, standalone, logSeparationEnabled);
   }
 
-  MuleLoggerContext(String name, URI configLocn, ClassLoader ownerClassLoader, ContextSelector contextSelector,
-                    boolean standalone) {
+  MuleLoggerContext(String name,
+                    URI configLocn,
+                    ClassLoader ownerClassLoader,
+                    ContextSelector contextSelector,
+                    boolean standalone,
+                    boolean logSeparationEnabled) {
     super(name, null, configLocn);
     configFile = configLocn;
     this.contextSelector = contextSelector;
-    this.standlone = standalone;
+    this.standalone = standalone;
+    this.logSeparationEnabled = logSeparationEnabled;
     ownerClassLoaderHash =
         ownerClassLoader != null ? ownerClassLoader.hashCode() : getClass().getClassLoader().getSystemClassLoader().hashCode();
 
@@ -116,7 +123,7 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
   @Override
   protected Logger newInstance(LoggerContext ctx, final String name, final MessageFactory messageFactory) {
     Logger logger = super.newInstance(ctx, name, messageFactory);
-    if (artifactClassloader || applicationClassloader) {
+    if (artifactClassloader || applicationClassloader || !logSeparationEnabled) {
       return logger;
     }
 
@@ -135,8 +142,8 @@ class MuleLoggerContext extends LoggerContext implements LogConfigChangeSubject 
     return configFile;
   }
 
-  protected boolean isStandlone() {
-    return standlone;
+  protected boolean isStandalone() {
+    return standalone;
   }
 
   protected boolean isArtifactClassloader() {

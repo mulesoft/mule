@@ -6,6 +6,7 @@
  */
 package org.mule.test.infrastructure.deployment;
 
+import static java.lang.System.setProperty;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.copyURLToFile;
@@ -19,13 +20,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
 import static org.mule.runtime.container.api.MuleFoldersUtil.APPS_FOLDER;
 import static org.mule.runtime.container.api.MuleFoldersUtil.DOMAINS_FOLDER;
 import static org.mule.runtime.container.api.MuleFoldersUtil.SERVICES_FOLDER;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_SIMPLE_LOG;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleCoreExtension;
@@ -79,7 +81,7 @@ public class FakeMuleServer {
   static {
     // NOTE: this causes mule.simpleLog to no work on these tests
     if (!Boolean.getBoolean(FAKE_SERVER_DISABLE_LOG_REPOSITORY_SELECTOR)) {
-      System.setProperty(MULE_SIMPLE_LOG, "true");
+      setProperty(MULE_SIMPLE_LOG, "true");
     }
   }
 
@@ -106,7 +108,7 @@ public class FakeMuleServer {
     muleHome = new File(muleHomePath);
     muleHome.deleteOnExit();
     try {
-      System.setProperty(MULE_HOME_DIRECTORY_PROPERTY, getMuleHome().getCanonicalPath());
+      setProperty(MULE_HOME_DIRECTORY_PROPERTY, getMuleHome().getCanonicalPath());
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

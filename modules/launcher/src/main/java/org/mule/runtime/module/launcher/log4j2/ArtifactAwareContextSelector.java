@@ -18,14 +18,13 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
 
+import java.net.URI;
+import java.util.List;
+
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.status.StatusLogger;
-
-import com.github.benmanes.caffeine.cache.LoadingCache;
-
-import java.net.URI;
-import java.util.List;
 
 /**
  * Implementation of {@link org.apache.logging.log4j.core.selector.ContextSelector} which is used to implement log separation
@@ -156,6 +155,6 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable {
   }
 
   LoggerContext buildContext(final ClassLoader classLoader) {
-    return loggerContextFactory.build(classLoader, this);
+    return loggerContextFactory.build(classLoader, this, true);
   }
 }

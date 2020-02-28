@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static java.lang.System.setProperty;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.module.launcher.api.log4j2.AsyncLoggerExceptionHandler;
@@ -50,13 +51,13 @@ public class MuleLog4jContextFactory extends Log4jContextFactory implements Disp
   private static final String LOG_CONFIGURATION_FACTORY_PROPERTY = "log4j.configurationFactory";
   private static final String DEFAULT_LOG_CONFIGURATION_FACTORY = XmlConfigurationFactory.class.getName();
   private static final String ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY = "AsyncLoggerConfig.ExceptionHandler";
-  private static final String DEFAULT_ASYNC_LOGGER_EXCEPTION_HANLDER = AsyncLoggerExceptionHandler.class.getName();
+  private static final String DEFAULT_ASYNC_LOGGER_EXCEPTION_HANDLER = AsyncLoggerExceptionHandler.class.getName();
 
   /**
    * Initializes using a {@link ArtifactAwareContextSelector}
    */
-  public MuleLog4jContextFactory() {
-    this(new ArtifactAwareContextSelector());
+  public MuleLog4jContextFactory(boolean logSeparationEnabled) {
+    this(logSeparationEnabled ? new ArtifactAwareContextSelector() : new SimpleContextSelector());
 
   }
 
@@ -76,13 +77,13 @@ public class MuleLog4jContextFactory extends Log4jContextFactory implements Disp
   }
 
   private void setupConfigurationFactory() {
-    System.setProperty(LOG_CONFIGURATION_FACTORY_PROPERTY, DEFAULT_LOG_CONFIGURATION_FACTORY);
+    setProperty(LOG_CONFIGURATION_FACTORY_PROPERTY, DEFAULT_LOG_CONFIGURATION_FACTORY);
   }
 
   private void setupAsyncLoggerExceptionHandler() {
     String handler = System.getProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY);
     if (StringUtils.isBlank(handler)) {
-      System.setProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY, DEFAULT_ASYNC_LOGGER_EXCEPTION_HANLDER);
+      setProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY, DEFAULT_ASYNC_LOGGER_EXCEPTION_HANDLER);
     }
   }
 
