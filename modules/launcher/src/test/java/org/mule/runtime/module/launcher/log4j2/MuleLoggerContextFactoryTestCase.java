@@ -7,28 +7,29 @@
 package org.mule.runtime.module.launcher.log4j2;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.util.ClassUtils.getResource;
 
-import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 
 import org.apache.logging.log4j.core.LoggerContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -38,7 +39,7 @@ public class MuleLoggerContextFactoryTestCase extends AbstractMuleTestCase {
 
   private static final File CONFIG_LOCATION = new File("my/local/log4j2.xml");
 
-  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private RegionClassLoader classLoader;
   private ApplicationDescriptor artifactDescriptor;
   private DomainDescriptor artifactDescriptorDomain;
@@ -53,40 +54,54 @@ public class MuleLoggerContextFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void externalConf() throws IOException, URISyntaxException {
+  public void externalConf() throws URISyntaxException {
     File customLogConfig = new File(getResource("log4j2-test-custom.xml", getClass()).toURI());
     assertThat(customLogConfig.exists(), is(true));
     when(artifactDescriptor.getLogConfigFile()).thenReturn(customLogConfig);
-    final MuleLoggerContextFactory loggerCtxFactory = mockLoggerContextFactory();
+    final MuleLoggerContextFactory loggerCtxFactory = spyLoggerContextFactory();
 
     final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class), true);
     assertThat(ctx.getConfigLocation(), equalTo(customLogConfig.toURI()));
   }
 
   @Test
-  public void externalConfInvalid() throws IOException {
+  public void externalConfInvalid() {
     File customLogConfig = new File("src/test/resources/log4j2-test-custom-invalid.xml");
     assertThat(customLogConfig.exists(), is(false));
     when(artifactDescriptor.getLogConfigFile()).thenReturn(customLogConfig);
-    final MuleLoggerContextFactory loggerCtxFactory = mockLoggerContextFactory();
+    final MuleLoggerContextFactory loggerCtxFactory = spyLoggerContextFactory();
 
     final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class), true);
     assertThat(ctx.getConfigLocation(), equalTo(CONFIG_LOCATION.toURI()));
   }
 
   @Test
-  public void externalConfDomain() throws IOException, URISyntaxException {
+  public void externalConfDomain() throws URISyntaxException {
     when(classLoader.getArtifactDescriptor()).thenReturn(artifactDescriptorDomain);
-
     File customLogConfig = new File(getResource("log4j2-test-custom.xml", getClass()).toURI());
     assertThat(customLogConfig.exists(), is(true));
     when(artifactDescriptorDomain.getLogConfigFile()).thenReturn(customLogConfig);
-    final MuleLoggerContextFactory loggerCtxFactory = mockLoggerContextFactory();
+
+    final MuleLoggerContextFactory loggerCtxFactory = spyLoggerContextFactory();
     final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class), true);
     assertThat(ctx.getConfigLocation(), equalTo(customLogConfig.toURI()));
   }
 
-  protected MuleLoggerContextFactory mockLoggerContextFactory() throws IOException {
+  @Test
+  public void disableLogSeparation() throws URISyntaxException {
+    when(classLoader.getArtifactDescriptor()).thenReturn(artifactDescriptorDomain);
+    File customLogConfig = new File(getResource("log4j2-test-custom.xml", getClass()).toURI());
+    assertThat(customLogConfig.exists(), is(true));
+    when(artifactDescriptorDomain.getLogConfigFile()).thenReturn(customLogConfig);
+
+    final MuleLoggerContextFactory loggerCtxFactory = spyLoggerContextFactory();
+    final LoggerContext ctx = loggerCtxFactory.build(classLoader, new SimpleContextSelector(), false);
+
+    assertThat(ctx.getLogger(getClass().getName()), is(not(instanceOf(DispatchingLogger.class))));
+    assertThat(ctx.getConfigLocation(), equalTo(customLogConfig.toURI()));
+  }
+
+  protected MuleLoggerContextFactory spyLoggerContextFactory() {
     return spy(new MuleLoggerContextFactory());
   }
 }

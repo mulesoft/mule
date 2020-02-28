@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 
@@ -17,6 +19,7 @@ import org.mule.tck.size.SmallTest;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.async.AsyncLoggerConfig;
 import org.apache.logging.log4j.core.config.AppenderRef;
 import org.apache.logging.log4j.core.config.LoggerConfig;
@@ -49,24 +52,23 @@ public class MuleLoggerContextTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() {
-    context = getDefaultContext();
+    context = getDefaultContext(true);
     testAppender = new TestAppender(TEST_APPENDER, null, null);
-    context.getConfiguration().addAppender(testAppender);
-
-    LoggerConfig loggerConfig =
-        AsyncLoggerConfig.createLogger("false", LEVEL.name(), CATEGORY, "true",
-                                       new AppenderRef[] {AppenderRef.createAppenderRef(TEST_APPENDER, null, null)}, null,
-                                       context.getConfiguration(), null);
-
-    loggerConfig.addAppender(testAppender, null, null);
-    context.getConfiguration().addLogger(CATEGORY, loggerConfig);
-    context.getConfiguration().start();
-    context.updateLoggers();
+    addTestAppender(context, testAppender);
   }
 
   @Test
   public void dispatchingLogger() {
     assertThat(context.newInstance(context, "", messageFactory), instanceOf(DispatchingLogger.class));
+  }
+
+  @Test
+  public void disableLogSeparation() {
+    context = getDefaultContext(false);
+    addTestAppender(context, testAppender);
+
+    assertThat(context.newInstance(context, "", messageFactory), is(not(instanceOf(DispatchingLogger.class))));
+    reconfigureAsyncLoggers();
   }
 
   @Test
@@ -100,8 +102,22 @@ public class MuleLoggerContextTestCase extends AbstractMuleTestCase {
 
   }
 
-  private MuleLoggerContext getDefaultContext() {
+  private MuleLoggerContext getDefaultContext(boolean logSeparationEnabled) {
     return new MuleLoggerContext(DEFAULT_CONTEXT_NAME, null, Thread.currentThread().getContextClassLoader(), contextSelector,
-                                 true, true);
+                                 true, logSeparationEnabled);
+  }
+
+  private void addTestAppender(MuleLoggerContext context, Appender testAppender) {
+    context.getConfiguration().addAppender(testAppender);
+
+    LoggerConfig loggerConfig =
+        AsyncLoggerConfig.createLogger("false", LEVEL.name(), CATEGORY, "true",
+                                       new AppenderRef[] {AppenderRef.createAppenderRef(TEST_APPENDER, null, null)}, null,
+                                       context.getConfiguration(), null);
+
+    loggerConfig.addAppender(testAppender, null, null);
+    context.getConfiguration().addLogger(CATEGORY, loggerConfig);
+    context.getConfiguration().start();
+    context.updateLoggers();
   }
 }
