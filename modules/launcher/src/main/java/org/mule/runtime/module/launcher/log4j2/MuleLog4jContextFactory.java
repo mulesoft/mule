@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static java.lang.System.setProperty;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.module.launcher.api.log4j2.AsyncLoggerExceptionHandler;
@@ -76,13 +77,13 @@ public class MuleLog4jContextFactory extends Log4jContextFactory implements Disp
   }
 
   private void setupConfigurationFactory() {
-    System.setProperty(LOG_CONFIGURATION_FACTORY_PROPERTY, DEFAULT_LOG_CONFIGURATION_FACTORY);
+    setProperty(LOG_CONFIGURATION_FACTORY_PROPERTY, DEFAULT_LOG_CONFIGURATION_FACTORY);
   }
 
   private void setupAsyncLoggerExceptionHandler() {
     String handler = System.getProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY);
     if (StringUtils.isBlank(handler)) {
-      System.setProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY, DEFAULT_ASYNC_LOGGER_EXCEPTION_HANDLER);
+      setProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY, DEFAULT_ASYNC_LOGGER_EXCEPTION_HANDLER);
     }
   }
 
