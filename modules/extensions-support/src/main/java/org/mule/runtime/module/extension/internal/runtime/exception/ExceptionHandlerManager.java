@@ -19,7 +19,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Optional;
 
 /**
@@ -75,7 +74,7 @@ public final class ExceptionHandlerManager {
    * Given a {@link Throwable} instance this method will get the specific failure reason.
    * <p>
    * If there is a {@link ConnectionException} in the stacktrace is going to be considered the main failure reason,
-   * otherwise it will check if there is a {@link UndeclaredThrowableException} reflective wrapper exception
+   * otherwise it will check if there is a {@link SdkMethodInvocationException} wrapper exception
    * in the stacktrace wrapping the real failure.
    */
   public Throwable handleThrowable(Throwable e) {
@@ -88,9 +87,13 @@ public final class ExceptionHandlerManager {
   }
 
   private Throwable resolveConnectionException(ConnectionException connectionException) {
-    if (!connectionException.getErrorType().isPresent() && connectionErrorType != null) {
-      return new ConnectionException(connectionException.getMessage(), connectionException.getCause(),
-                                     connectionErrorType, connectionException.getConnection().orElse(null));
+    if (connectionErrorType != null && !connectionException.getErrorType().isPresent()) {
+      ConnectionException newException = new ConnectionException(connectionException.getMessage(),
+                                                                 connectionException.getCause(),
+                                                                 connectionErrorType,
+                                                                 connectionException.getConnection().orElse(null));
+      newException.getInfo().putAll(connectionException.getInfo());
+      return newException;
     }
     return connectionException;
   }

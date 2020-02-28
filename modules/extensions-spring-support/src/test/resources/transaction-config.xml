@@ -65,6 +65,28 @@
         <tx:verify-transaction-commited config-ref="localTx1"/>
     </flow>
 
+    <flow name="pagedOperationWithoutTx">
+        <set-variable variableName="accumulator" value="#[[]]" />
+        <tx:paged-transactional-operation config-ref="nonPoolingTx"/>
+        <flow-ref name="accumulatePages" />
+    </flow>
+
+    <flow name="failingPagedOperationWithoutTx">
+        <set-variable variableName="accumulator" value="#[[]]" />
+        <tx:failing-paged-transactional-operation failOn="#[vars.failOn]" config-ref="nonPoolingTx">
+            <reconnect count="5" frequency="10" />
+        </tx:failing-paged-transactional-operation>
+        <flow-ref name="accumulatePages" />
+    </flow>
+
+    <flow name="stickyFailingPagedOperationWithoutTx">
+        <set-variable variableName="accumulator" value="#[[]]" />
+        <tx:sticky-failing-paged-transactional-operation failOn="#[vars.failOn]" config-ref="nonPoolingTx">
+            <reconnect count="5" frequency="10" />
+        </tx:sticky-failing-paged-transactional-operation>
+        <flow-ref name="accumulatePages" />
+    </flow>
+
     <flow name="pagedOperationInTx">
         <set-variable variableName="accumulator" value="#[[]]" />
         <try transactionalAction="ALWAYS_BEGIN">
@@ -73,10 +95,36 @@
         </try>
     </flow>
 
-    <flow name="pagedOperationWithoutTx">
+    <flow name="pagedOperationInTxAlwaysUsesSameConnection">
+        <set-variable variableName="connections" value="#[[]]" />
+        <try transactionalAction="ALWAYS_BEGIN">
+            <tx:paged-transactional-operation config-ref="nonPoolingTx"/>
+            <foreach>
+                <tx:get-connection target="connection" config-ref="nonPoolingTx"/>
+                <set-variable variableName="connections" value="#[vars.connections + vars.connection]" />
+            </foreach>
+        </try>
+    </flow>
+
+
+    <flow name="failingPagedOperationInTx">
         <set-variable variableName="accumulator" value="#[[]]" />
-        <tx:paged-transactional-operation config-ref="nonPoolingTx"/>
-        <flow-ref name="accumulatePages" />
+        <try transactionalAction="ALWAYS_BEGIN">
+            <tx:failing-paged-transactional-operation failOn="#[vars.failOn]" config-ref="nonPoolingTx">
+                <reconnect count="5" frequency="10" />
+            </tx:failing-paged-transactional-operation>
+            <flow-ref name="accumulatePages" />
+        </try>
+    </flow>
+
+    <flow name="stickyFailingPagedOperationInTx">
+        <set-variable variableName="accumulator" value="#[[]]" />
+        <try transactionalAction="ALWAYS_BEGIN">
+            <tx:sticky-failing-paged-transactional-operation failOn="#[vars.failOn]" config-ref="nonPoolingTx">
+                <reconnect count="5" frequency="10" />
+            </tx:sticky-failing-paged-transactional-operation>
+            <flow-ref name="accumulatePages" />
+        </try>
     </flow>
 
     <sub-flow name="accumulatePages">

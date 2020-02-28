@@ -9,20 +9,18 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
-import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
+import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
+import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
@@ -34,7 +32,6 @@ import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigur
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
-import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -92,7 +89,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
    * Executes the operation per the specification in this classes' javadoc
    *
    * @param executor an {@link CompletableComponentExecutor}
-   * @param context the {@link ExecutionContextAdapter} for the {@code executor} to use
+   * @param context  the {@link ExecutionContextAdapter} for the {@code executor} to use
    * @return the operation's result
    * @throws Exception if the operation or a {@link Interceptor#before(ExecutionContext)} invokation fails
    */
@@ -118,27 +115,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     }
   }
 
-  private class FutureExecutionCallbackDecorator implements ExecutorCallback {
-
-    private final CompletableFuture<Object> future;
-    private final Reference<Object> valueReference = new Reference<>();
-
-    private FutureExecutionCallbackDecorator(CompletableFuture<Object> future) {
-      this.future = future;
-    }
-
-    @Override
-    public void complete(Object value) {
-      valueReference.set(value);
-      future.complete(value);
-    }
-
-    @Override
-    public void error(Throwable e) {
-      future.completeExceptionally(e);
-    }
-  }
-
   private void executeWithRetry(ExecutionContextAdapter<M> context,
                                 RetryPolicyTemplate retryPolicy,
                                 Consumer<ExecutorCallback> executeCommand,
@@ -151,8 +127,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     },
                             e -> shouldRetry(e, context),
                             e -> interceptorChain.onError(context, e),
-                            e -> {
-                            },
+                            NULL_THROWABLE_CONSUMER,
                             identity(),
                             context.getCurrentScheduler())
         .whenComplete((v, e) -> {
@@ -162,20 +137,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
             callback.complete(v);
           }
         });
-  }
-
-  private boolean shouldRetry(Throwable t, ExecutionContextAdapter<M> context) {
-    if (!extractConnectionException(t).isPresent()) {
-      return false;
-    }
-
-    if (isTransactionActive()) {
-      Transaction tx = TransactionCoordination.getInstance().getTransaction();
-
-      return !tx.hasResource(new ExtensionTransactionKey(context.getConfiguration().get()));
-    }
-
-    return true;
   }
 
   private void executeWithInterceptors(CompletableComponentExecutor<M> executor,
@@ -190,9 +151,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
         // after() method cannot be invoked in the finally. Needs to be explicitly called before completing the callback.
         // Race conditions appear otherwise, specially in connection pooling scenarios.
         try {
-          if (resultTransformer != null) {
-            value = resultTransformer.apply(context, value);
-          }
           interceptorChain.onSuccess(context, value);
           executorCallback.complete(value);
         } catch (Throwable t) {
@@ -236,6 +194,9 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
                               ExecutorCallback callback) {
     Throwable t = interceptorChain.before(context, callback);
     if (t == null) {
+      if (resultTransformer != null) {
+        callback = new TransformingExecutionCallbackDecorator(callback, context, resultTransformer);
+      }
       final Thread currentThread = Thread.currentThread();
       final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
       currentThread.setContextClassLoader(extensionClassLoader);
@@ -272,11 +233,52 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     }
   }
 
-  private MutableConfigurationStats getMutableConfigurationStats(ExecutionContext<M> context) {
-    if (context.getConfiguration().isPresent()) {
-      return (MutableConfigurationStats) (context.getConfiguration().get()).getStatistics();
-    } else {
-      return null;
+  private static class FutureExecutionCallbackDecorator implements ExecutorCallback {
+
+    private final CompletableFuture<Object> future;
+
+    private FutureExecutionCallbackDecorator(CompletableFuture<Object> future) {
+      this.future = future;
+    }
+
+    @Override
+    public void complete(Object value) {
+      future.complete(value);
+    }
+
+    @Override
+    public void error(Throwable e) {
+      future.completeExceptionally(e);
+    }
+  }
+
+
+  private static class TransformingExecutionCallbackDecorator<M extends ComponentModel> implements ExecutorCallback {
+
+    private final ExecutorCallback delegate;
+    private final ExecutionContextAdapter<M> executionContext;
+    private final ResultTransformer resultTransformer;
+
+    public TransformingExecutionCallbackDecorator(ExecutorCallback delegate,
+                                                  ExecutionContextAdapter<M> executionContext,
+                                                  ResultTransformer resultTransformer) {
+      this.delegate = delegate;
+      this.executionContext = executionContext;
+      this.resultTransformer = resultTransformer;
+    }
+
+    @Override
+    public void complete(Object value) {
+      try {
+        delegate.complete(resultTransformer.apply(executionContext, value));
+      } catch (Exception e) {
+        delegate.error(e);
+      }
+    }
+
+    @Override
+    public void error(Throwable e) {
+      delegate.error(e);
     }
   }
 }
