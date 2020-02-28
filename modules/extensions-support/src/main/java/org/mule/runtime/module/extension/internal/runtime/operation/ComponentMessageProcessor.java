@@ -503,7 +503,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                                                               // way consistent with our expected error handling.
                                                                               emitter
                                                                                   .next(left(new EventProcessingException(event,
-                                                                                                                          e)));
+                                                                                                                          e,
+                                                                                                                          false)));
                                                                             }
                                                                           },
                                                                           ctx)))

@@ -36,7 +36,11 @@ public class EventProcessingException extends MuleException {
   }
 
   public EventProcessingException(CoreEvent event, Throwable cause) {
-    super(getCause(cause));
+    this(event, cause, true);
+  }
+
+  public EventProcessingException(CoreEvent event, Throwable cause, boolean resolveType) {
+    super(resolveType ? getCause(cause) : cause);
     this.event = event;
     storeErrorTypeInfo(cause);
   }
