@@ -46,25 +46,11 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
                                         RetryPolicyTemplate retryPolicyTemplate,
                                         ExtensionManager extensionManager,
                                         PolicyManager policyManager,
-                                        ReflectionCache reflectionCache) {
-    super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-          retryPolicyTemplate, extensionManager, policyManager, reflectionCache);
-  }
-
-  public OAuthOperationMessageProcessor(ExtensionModel extensionModel,
-                                        OperationModel operationModel,
-                                        ConfigurationProvider configurationProvider,
-                                        String target,
-                                        String targetValue,
-                                        ResolverSet resolverSet,
-                                        CursorProviderFactory cursorProviderFactory,
-                                        RetryPolicyTemplate retryPolicyTemplate,
-                                        ExtensionManager extensionManager,
-                                        PolicyManager policyManager,
                                         ReflectionCache reflectionCache,
-                                        DefaultExecutionMediator.ResultTransformer resultTransformer) {
+                                        DefaultExecutionMediator.ResultTransformer resultTransformer,
+                                        long outerFluxTerminationTimeout) {
     super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-          retryPolicyTemplate, extensionManager, policyManager, reflectionCache, resultTransformer);
+          retryPolicyTemplate, extensionManager, policyManager, reflectionCache, resultTransformer, outerFluxTerminationTimeout);
   }
 
   @Override

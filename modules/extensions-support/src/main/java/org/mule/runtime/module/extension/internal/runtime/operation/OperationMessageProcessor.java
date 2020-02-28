@@ -59,7 +59,7 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
                                    PolicyManager policyManager,
                                    ReflectionCache reflectionCache) {
     this(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-         retryPolicyTemplate, extensionManager, policyManager, reflectionCache, null);
+         retryPolicyTemplate, extensionManager, policyManager, reflectionCache, null, -1);
   }
 
   public OperationMessageProcessor(ExtensionModel extensionModel,
@@ -73,10 +73,11 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
                                    ReflectionCache reflectionCache,
-                                   ResultTransformer resultTransformer) {
+                                   ResultTransformer resultTransformer,
+                                   long terminationTimeout) {
     super(extensionModel, operationModel, configurationProvider, target, targetValue, resolverSet,
           cursorProviderFactory, retryPolicyTemplate, extensionManager, policyManager, reflectionCache,
-          resultTransformer);
+          resultTransformer, terminationTimeout);
     this.entityMetadataMediator = new EntityMetadataMediator(operationModel);
   }
 

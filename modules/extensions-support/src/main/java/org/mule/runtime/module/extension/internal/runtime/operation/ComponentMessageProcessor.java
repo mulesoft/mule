@@ -188,6 +188,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected final String targetValue;
   protected final RetryPolicyTemplate retryPolicyTemplate;
 
+  private final long outerFluxTerminationTimeout;
   private final Object fluxSupplierDisposeLock = new Object();
 
   private final AtomicInteger activeOuterPublishersCount = new AtomicInteger(0);
@@ -226,23 +227,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                    RetryPolicyTemplate retryPolicyTemplate,
                                    ExtensionManager extensionManager,
                                    PolicyManager policyManager,
-                                   ReflectionCache reflectionCache) {
-    this(extensionModel, componentModel, configurationProvider, target, targetValue, resolverSet, cursorProviderFactory,
-         retryPolicyTemplate, extensionManager, policyManager, reflectionCache, null);
-  }
-
-  public ComponentMessageProcessor(ExtensionModel extensionModel,
-                                   T componentModel,
-                                   ConfigurationProvider configurationProvider,
-                                   String target,
-                                   String targetValue,
-                                   ResolverSet resolverSet,
-                                   CursorProviderFactory cursorProviderFactory,
-                                   RetryPolicyTemplate retryPolicyTemplate,
-                                   ExtensionManager extensionManager,
-                                   PolicyManager policyManager,
                                    ReflectionCache reflectionCache,
-                                   ResultTransformer resultTransformer) {
+                                   ResultTransformer resultTransformer,
+                                   long terminationTimeout) {
     super(extensionModel, componentModel, configurationProvider, cursorProviderFactory, extensionManager);
     this.extensionModel = extensionModel;
     this.resolverSet = resolverSet;
@@ -258,6 +245,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
               || ((NestedComponentModel) nestedComp).getAllowedStereotypes().stream()
                   .anyMatch(st -> st.isAssignableTo(PROCESSOR));
         });
+    this.outerFluxTerminationTimeout = terminationTimeout;
   }
 
   @Override
@@ -273,67 +261,26 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     return subscriberContext()
         .flatMapMany(ctx -> {
-          final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
-
-          Flux<CoreEvent> transformed = from(propagateCompletion(from(publisher), errorSwitchSinkSinkRef.flux(), pub -> from(pub)
-              .map(event -> {
-                try {
-                  return addContextToEvent(event, ctx);
-                } catch (MuleException t) {
-                  throw propagateWrappingFatal(localOperatorErrorHook.apply(t, event));
-                }
-              })
-              .doOnNext(event -> {
-                final ExecutorCallback executorCallback = new ExecutorCallback() {
-
-                  @Override
-                  public void error(Throwable e) {
-                    // if `sink.error` is called here, it will cancel the flux altogether.
-                    // That's why an `Either` is used here,
-                    // so the error can be propagated afterwards in a way consistent with our expected error handling.
-                    errorSwitchSinkSinkRef.next(left(
-                                                     // Force the error mapper from the chain to be used.
-                                                     // When using Mono.create with sink.error, the error mapper from the
-                                                     // context is ignored, so it has to be explicitly used here.
-                                                     localOperatorErrorHook.apply(e, event), CoreEvent.class));
+          Flux<CoreEvent> transformed = createOuterFlux(from(publisher), localOperatorErrorHook, async, ctx)
+              .doOnNext(result -> {
+                result.apply(me -> {
+                  final SdkInternalContext sdkCtx =
+                      from(((MessagingException) me).getEvent());
+                  if (sdkCtx != null) {
+                    sdkCtx.popContext();
                   }
-
-                  @Override
-                  public void complete(Object value) {
-                    errorSwitchSinkSinkRef.next(right(Throwable.class, (CoreEvent) value));
+                }, response -> {
+                  final SdkInternalContext sdkCtx = from(response);
+                  if (sdkCtx != null) {
+                    sdkCtx.popContext();
                   }
-                };
-
-                if (!async && from(event).isNoPolicyOperation()) {
-                  onEventSynchronous(event, executorCallback, ctx);
-                } else {
-                  onEvent(event, executorCallback);
-                }
+                });
               })
-              .map(e -> Either.empty()),
-                                                                 () -> errorSwitchSinkSinkRef.complete(),
-                                                                 t -> errorSwitchSinkSinkRef.error(t),
-                                                                 muleContext.getConfiguration().getShutdownTimeout(),
-                                                                 outerFluxCompletionScheduler))
-                                                                     .doOnNext(result -> {
-                                                                       result.apply(me -> {
-                                                                         final SdkInternalContext sdkCtx =
-                                                                             from(((MessagingException) me).getEvent());
-                                                                         if (sdkCtx != null) {
-                                                                           sdkCtx.popContext();
-                                                                         }
-                                                                       }, response -> {
-                                                                         final SdkInternalContext sdkCtx = from(response);
-                                                                         if (sdkCtx != null) {
-                                                                           sdkCtx.popContext();
-                                                                         }
-                                                                       });
-                                                                     })
-                                                                     .map(result -> {
-                                                                       return result.reduce(me -> {
-                                                                         throw propagateWrappingFatal(me);
-                                                                       }, response -> response);
-                                                                     });
+              .map(result -> {
+                return result.reduce(me -> {
+                  throw propagateWrappingFatal(me);
+                }, response -> response);
+              });
 
           if (publisher instanceof Flux && !ctx.getOrEmpty(WITHIN_PROCESS_TO_APPLY).isPresent()) {
             return transformed
@@ -345,6 +292,62 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
             return transformed;
           }
         });
+  }
+
+  private Flux<Either<Throwable, CoreEvent>> createOuterFlux(final Flux<CoreEvent> publisher,
+                                                             final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook,
+                                                             final boolean async, Context ctx) {
+    final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
+
+    final Function<Publisher<CoreEvent>, Publisher<Either<Throwable, CoreEvent>>> transformer =
+        pub -> from(pub)
+            .map(event -> {
+              try {
+                return addContextToEvent(event, ctx);
+              } catch (MuleException t) {
+                throw propagateWrappingFatal(localOperatorErrorHook.apply(t, event));
+              }
+            })
+            .doOnNext(event -> {
+              final ExecutorCallback executorCallback = new ExecutorCallback() {
+
+                @Override
+                public void error(Throwable e) {
+                  // if `sink.error` is called here, it will cancel the flux altogether.
+                  // That's why an `Either` is used here,
+                  // so the error can be propagated afterwards in a way consistent with our expected error handling.
+                  errorSwitchSinkSinkRef.next(left(
+                                                   // Force the error mapper from the chain to be used.
+                                                   // When using Mono.create with sink.error, the error mapper from the
+                                                   // context is ignored, so it has to be explicitly used here.
+                                                   localOperatorErrorHook.apply(e, event), CoreEvent.class));
+                }
+
+                @Override
+                public void complete(Object value) {
+                  errorSwitchSinkSinkRef.next(right(Throwable.class, (CoreEvent) value));
+                }
+              };
+
+              if (!async && from(event).isNoPolicyOperation()) {
+                onEventSynchronous(event, executorCallback, ctx);
+              } else {
+                onEvent(event, executorCallback);
+              }
+            })
+            .map(e -> Either.empty());
+
+    if (outerFluxTerminationTimeout < 0) {
+      return from(propagateCompletion(from(publisher), errorSwitchSinkSinkRef.flux(), transformer,
+                                      () -> errorSwitchSinkSinkRef.complete(),
+                                      t -> errorSwitchSinkSinkRef.error(t)));
+    } else {
+      return from(propagateCompletion(from(publisher), errorSwitchSinkSinkRef.flux(), transformer,
+                                      () -> errorSwitchSinkSinkRef.complete(),
+                                      t -> errorSwitchSinkSinkRef.error(t),
+                                      outerFluxTerminationTimeout,
+                                      outerFluxCompletionScheduler));
+    }
   }
 
   @Override
@@ -839,8 +842,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     if (ownedProcessingStrategy) {
       startIfNeeded(processingStrategy);
     }
-    outerFluxCompletionScheduler = muleContext.getSchedulerService().ioScheduler(muleContext.getSchedulerBaseConfig()
-        .withMaxConcurrentTasks(1).withName(toString() + ".outer.flux."));
+    if (outerFluxTerminationTimeout >= 0) {
+      outerFluxCompletionScheduler = muleContext.getSchedulerService().ioScheduler(muleContext.getSchedulerBaseConfig()
+          .withMaxConcurrentTasks(1).withName(toString() + ".outer.flux."));
+    }
 
     startInnerFlux();
   }
@@ -854,7 +859,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       stopIfNeeded(processingStrategy);
     }
 
-    if (outerFluxCompletionScheduler != null) {
+    if (outerFluxTerminationTimeout >= 0 && outerFluxCompletionScheduler != null) {
       outerFluxCompletionScheduler.stop();
       outerFluxCompletionScheduler = null;
     }

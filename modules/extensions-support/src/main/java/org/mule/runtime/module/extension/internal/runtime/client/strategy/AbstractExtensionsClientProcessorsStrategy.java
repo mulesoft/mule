@@ -82,6 +82,7 @@ public abstract class AbstractExtensionsClientProcessorsStrategy implements Exte
           new OperationMessageProcessorBuilder(extension, operation, policyManager, muleContext, registry)
               .setConfigurationProvider(config)
               .setParameters(resolvedParams)
+              .setTerminationTimeout(-1)
               .build();
 
       initialiseIfNeeded(processor, muleContext);
