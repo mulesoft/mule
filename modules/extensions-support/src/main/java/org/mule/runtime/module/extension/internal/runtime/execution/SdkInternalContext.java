@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
+import static java.util.Optional.empty;
 import static java.util.function.Function.identity;
 
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -120,7 +121,7 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
 
     private OperationExecutionParams operationExecutionParams;
 
-    private Optional<ConfigurationInstance> configuration;
+    private Optional<ConfigurationInstance> configuration = empty();
 
     private Map<String, Object> resolutionResult;
 
