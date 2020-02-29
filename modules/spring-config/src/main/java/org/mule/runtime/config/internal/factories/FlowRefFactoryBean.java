@@ -110,8 +110,6 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
   @Inject
   private ConfigurationComponentLocator locator;
 
-  private static final Object referencedProcessorLock = new Object();
-
   public void setName(String name) {
     this.refName = name;
   }
@@ -210,7 +208,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
         if (processorBeanDefinition.isPrototype()) {
           // Synchronization between all FlowRefFactoryBean instances is needed to prevent root container inconsistencies
           // (otherwise two FlowRefFactoryBean instances could mutate and instantiate the same prototype bean in parallel)
-          synchronized (referencedProcessorLock) {
+          synchronized (applicationContext) {
             updateBeanDefinitionRootContainerName(getRootContainerLocation().toString(), processorBeanDefinition);
             return (Component) applicationContext.getBean(name);
           }
