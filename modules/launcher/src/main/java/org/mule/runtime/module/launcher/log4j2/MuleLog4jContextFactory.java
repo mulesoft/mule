@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
 import static java.util.concurrent.Executors.newCachedThreadPool;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_SEPARATION_DISABLED;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.module.launcher.api.log4j2.AsyncLoggerExceptionHandler;
 
@@ -53,12 +56,22 @@ public class MuleLog4jContextFactory extends Log4jContextFactory implements Disp
   private static final String ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY = "AsyncLoggerConfig.ExceptionHandler";
   private static final String DEFAULT_ASYNC_LOGGER_EXCEPTION_HANDLER = AsyncLoggerExceptionHandler.class.getName();
 
+  private static final boolean LOG_SEPARATION_ENABLED = getProperty(MULE_LOG_SEPARATION_DISABLED) == null;
+
+  /**
+   * Initializes using a {@link ArtifactAwareContextSelector}
+   * <p>
+   * Log4j tries to instantiate this class using a default constructor.
+   */
+  public MuleLog4jContextFactory() {
+    this(LOG_SEPARATION_ENABLED);
+  }
+
   /**
    * Initializes using a {@link ArtifactAwareContextSelector}
    */
   public MuleLog4jContextFactory(boolean logSeparationEnabled) {
     this(logSeparationEnabled ? new ArtifactAwareContextSelector() : new SimpleContextSelector());
-
   }
 
   /**
@@ -96,10 +109,10 @@ public class MuleLog4jContextFactory extends Log4jContextFactory implements Disp
 
   private static class MuleShutdownCallbackRegistry implements ShutdownCallbackRegistry, Disposable {
 
-    private ExecutorService executorService =
+    private final ExecutorService executorService =
         newCachedThreadPool(runnable -> new Thread(runnable, "[MuleRuntime].log4j.shudownhook"));
 
-    private List<Runnable> hooks = new ArrayList<>();
+    private final List<Runnable> hooks = new ArrayList<>();
 
     @Override
     public Cancellable addShutdownCallback(Runnable callback) {
