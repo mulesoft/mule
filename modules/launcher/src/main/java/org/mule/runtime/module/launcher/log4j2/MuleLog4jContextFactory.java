@@ -51,12 +51,12 @@ import org.apache.logging.log4j.core.util.ShutdownCallbackRegistry;
  */
 public class MuleLog4jContextFactory extends Log4jContextFactory implements Disposable, ShutdownCallbackRegistry {
 
+  public static final boolean LOG_SEPARATION_ENABLED = getProperty(MULE_LOG_SEPARATION_DISABLED) == null;
+
   private static final String LOG_CONFIGURATION_FACTORY_PROPERTY = "log4j.configurationFactory";
   private static final String DEFAULT_LOG_CONFIGURATION_FACTORY = XmlConfigurationFactory.class.getName();
   private static final String ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY = "AsyncLoggerConfig.ExceptionHandler";
   private static final String DEFAULT_ASYNC_LOGGER_EXCEPTION_HANDLER = AsyncLoggerExceptionHandler.class.getName();
-
-  private static final boolean LOG_SEPARATION_ENABLED = getProperty(MULE_LOG_SEPARATION_DISABLED) == null;
 
   /**
    * Initializes using a {@link ArtifactAwareContextSelector}
