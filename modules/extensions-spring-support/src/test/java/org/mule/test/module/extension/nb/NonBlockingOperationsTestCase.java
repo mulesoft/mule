@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.api.exception.ExpectedError.none;
+import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.test.marvel.ironman.IronManOperations.FLIGHT_PLAN;
 import static org.mule.test.marvel.model.MissileProofVillain.MISSILE_PROOF;
@@ -39,6 +40,8 @@ import java.util.Set;
 import org.junit.Rule;
 import org.junit.Test;
 
+import io.qameta.allure.Issue;
+
 public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Rule
@@ -52,6 +55,14 @@ public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTe
   @Test
   public void nonBlockingConnectedOperation() throws Exception {
     fireMissileAndAssert("fireMissile");
+  }
+
+  @Test
+  @Issue("MULE-18124")
+  public void failingNonBlockingConnectedOperationThrownInsteadOfCallback() throws Exception {
+    flowRunner("fireMissileMishap")
+        .withPayload(new Villain())
+        .runExpectingException(hasMessage("Ultron jammed the missile system!"));
   }
 
   @Test

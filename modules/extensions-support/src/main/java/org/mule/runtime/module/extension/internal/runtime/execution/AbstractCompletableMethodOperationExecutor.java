@@ -57,17 +57,17 @@ abstract class AbstractCompletableMethodOperationExecutor<M extends ComponentMod
     try {
       doExecute(executionContext, callback);
     } catch (SdkMethodInvocationException e) {
-      callback.error(handleError(wrapFatal(e.getCause()), (ExecutionContextAdapter<M>) executionContext));
+      handleError(wrapFatal(e.getCause()), (ExecutionContextAdapter<M>) executionContext, callback);
     } catch (Exception e) {
-      callback.error(handleError(e, (ExecutionContextAdapter<M>) executionContext));
+      handleError(e, (ExecutionContextAdapter<M>) executionContext, callback);
     } catch (Throwable t) {
-      callback.error(handleError(wrapFatal(t), (ExecutionContextAdapter<M>) executionContext));
+      handleError(wrapFatal(t), (ExecutionContextAdapter<M>) executionContext, callback);
     }
   }
 
   protected abstract void doExecute(ExecutionContext<M> executionContext, ExecutorCallback callback);
 
-  protected Throwable handleError(Throwable t, ExecutionContextAdapter<M> executionContext) {
+  protected void handleError(Throwable t, ExecutionContextAdapter<M> executionContext, ExecutorCallback callback) {
     CompletionCallback completionCallback = executionContext.getVariable(COMPLETION_CALLBACK_CONTEXT_PARAM);
     if (completionCallback != null) {
       if (t instanceof Exception) {
@@ -75,9 +75,9 @@ abstract class AbstractCompletableMethodOperationExecutor<M extends ComponentMod
       } else {
         completionCallback.error(new MuleRuntimeException(t));
       }
+    } else {
+      callback.error(t);
     }
-
-    return t;
   }
 
   @Override
