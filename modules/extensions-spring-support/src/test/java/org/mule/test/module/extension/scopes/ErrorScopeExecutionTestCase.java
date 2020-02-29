@@ -34,9 +34,4 @@ public class ErrorScopeExecutionTestCase extends AbstractScopeExecutionTestCase 
     runFlow("failWithCustomErrorFromOtherExtension");
   }
 
-  @Test
-  public void failWithUnexpextedErrorInNonBlockingOperation() throws Exception {
-    runFlow("failWithUnexpextedErrorInNonBlockingOperation");
-  }
-
 }
