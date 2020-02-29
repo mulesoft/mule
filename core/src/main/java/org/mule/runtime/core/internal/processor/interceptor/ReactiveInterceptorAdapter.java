@@ -143,7 +143,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
 
         return interceptionEvent.resolve();
       } catch (Exception e) {
-        throw propagate(new MessagingException(interceptionEvent.resolve(), e.getCause(), component));
+        throw propagate(new MessagingException(interceptionEvent.resolve(), e, component));
       }
     };
   }
@@ -171,7 +171,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
 
         return interceptionEvent.resolve();
       } catch (Exception e) {
-        throw propagate(createMessagingException(interceptionEvent.resolve(), e.getCause(), component, empty()));
+        throw propagate(createMessagingException(interceptionEvent.resolve(), e, component, empty()));
       }
     };
   }
