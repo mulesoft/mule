@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextProperties.COMPLETION_CALLBACK_CONTEXT_PARAM;
+
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -27,6 +28,7 @@ public class NonBlockingCompletableMethodOperationExecutor<M extends ComponentMo
     super(operationModel, operationMethod, operationInstance);
   }
 
+  @Override
   protected void doExecute(ExecutionContext<M> executionContext, ExecutorCallback callback) {
     final ExecutionContextAdapter<M> context = (ExecutionContextAdapter<M>) executionContext;
     context.setVariable(COMPLETION_CALLBACK_CONTEXT_PARAM, new ExecutorCompletionCallbackAdapter(callback));

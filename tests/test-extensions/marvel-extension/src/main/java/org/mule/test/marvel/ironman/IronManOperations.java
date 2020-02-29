@@ -68,6 +68,15 @@ public class IronManOperations implements Initialisable, Disposable {
   }
 
   @MediaType(TEXT_PLAIN)
+  public void fireMissileMishap(@Config IronMan ironMan,
+                                @Connection Missile missile,
+                                Villain at,
+                                CompletionCallback<String, Void> callback) {
+    // A non blocking operation throwing an exception instead of calling callback#error.
+    throw new IllegalStateException("Ultron jammed the missile system!");
+  }
+
+  @MediaType(TEXT_PLAIN)
   public void fireMissileEpicShot(@Config IronMan ironMan,
                                   @Connection Missile missile,
                                   Villain at,

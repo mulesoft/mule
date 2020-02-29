@@ -33,6 +33,10 @@
         </error-handler>
     </flow>
 
+    <flow name="fireMissileMishap">
+        <marvel:fire-missile-mishap at="#[payload]" config-ref="ironMan"/>
+    </flow>
+
     <flow name="warMachineFireMissile">
         <test:assert-intercepting responseSameTask="false" />
         <marvel:fire-missile at="#[payload]" config-ref="warMachine"/>
