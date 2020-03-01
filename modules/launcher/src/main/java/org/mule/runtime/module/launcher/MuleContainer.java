@@ -13,7 +13,6 @@ import static java.lang.System.setProperty;
 import static org.apache.commons.lang3.reflect.MethodUtils.invokeStaticMethod;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_SEPARATION_DISABLED;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShutdown;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorWhileRunning;
@@ -93,7 +92,7 @@ public class MuleContainer {
   private final ToolingService toolingService;
   private final MuleCoreExtensionManagerServer coreExtensionManager;
   private ServerLockFactory muleLockFactory;
-  private MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder().build();
+  private final MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder().build();
   private static MuleLog4jContextFactory log4jContextFactory;
 
   static {
@@ -104,15 +103,15 @@ public class MuleContainer {
       LoggerFactory.getLogger("triggerDefaultFactoryCreation");
       // We need to set this property so log4j uses the same context factory everywhere
       setProperty("log4j2.loggerContextFactory", MuleLog4jContextFactory.class.getName());
-      log4jContextFactory = new MuleLog4jContextFactory(getProperty(MULE_LOG_SEPARATION_DISABLED) == null);
+      log4jContextFactory = new MuleLog4jContextFactory();
       LogManager.setFactory(log4jContextFactory);
     }
 
     logger = LoggerFactory.getLogger(MuleContainer.class);
   }
 
-  private ServiceManager serviceManager;
-  private ExtensionModelLoaderManager extensionModelLoaderManager;
+  private final ServiceManager serviceManager;
+  private final ExtensionModelLoaderManager extensionModelLoaderManager;
 
   /**
    * Application entry point.
