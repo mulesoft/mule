@@ -18,6 +18,9 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getPatchesLibFolder
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServerPluginsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.module.reboot.MuleContainerBootstrap.getJavaPID;
+import static org.mule.runtime.module.reboot.MuleContainerBootstrap.getWrapperPID;
+
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.NetworkUtils;
@@ -83,6 +86,10 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
     doBody(String.format("OS: %s%s (%s, %s)", System.getProperty("os.name"),
                          (patch != null && !"unknown".equalsIgnoreCase(patch) ? " - " + patch : ""),
                          System.getProperty("os.version"), System.getProperty("os.arch")));
+
+    doBody(String.format("Wrapper PID: %d", getWrapperPID()));
+    doBody(String.format("Java PID: %d", getJavaPID()));
+
     try {
       InetAddress host = NetworkUtils.getLocalHost();
       doBody(String.format("Host: %s (%s)", host.getHostName(), host.getHostAddress()));

@@ -91,6 +91,24 @@ public class MuleContainerBootstrap {
     return muleBase;
   }
 
+  /**
+   * @return The Mule Runtime wrapper pid
+   *
+   * @since 4.3.0
+   */
+  public static long getWrapperPID() {
+    return WrapperManager.getWrapperPID();
+  }
+
+  /**
+   * @return The Mule Runtime JVM PID
+   *
+   * @since 4.3.0
+   */
+  public static long getJavaPID() {
+    return WrapperManager.getJavaPID();
+  }
+
   private static void setSystemMuleVersion() {
     InputStream propertiesStream = null;
     try {
