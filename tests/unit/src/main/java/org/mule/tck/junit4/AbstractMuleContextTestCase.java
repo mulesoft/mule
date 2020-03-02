@@ -17,6 +17,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
@@ -57,6 +58,7 @@ import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.TriggerableMessageSource;
+import org.mule.tck.config.TestPolicyProviderConfigurationBuilder;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 
 import com.google.common.collect.ImmutableMap;
@@ -274,6 +276,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         builders.add(new SimpleConfigurationBuilder(getStartUpRegistryObjects()));
         addBuilders(builders);
         builders.add(new MockExtensionManagerConfigurationBuilder());
+        builders.add(new TestPolicyProviderConfigurationBuilder());
         builders.add(getBuilder());
         MuleContextBuilder contextBuilder = MuleContextBuilder.builder(APP);
         DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
