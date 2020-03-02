@@ -49,6 +49,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
   private TypedValue correlationIdBinding;
   private TypedValue authenticationBinding;
   private TypedValue itemSequenceInfoBinding;
+  private ClassLoader classLoader;
 
   private boolean bindingAdded = false;
 
@@ -70,6 +71,12 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
     correlationIdBinding = bindingContext.lookup(CORRELATION_ID).orElse(null);
     authenticationBinding = bindingContext.lookup(AUTHENTICATION).orElse(null);
     itemSequenceInfoBinding = bindingContext.lookup(ITEM_SEQUENCE_INFO).orElse(null);
+  }
+
+  @Override
+  public BindingContext.Builder setClassloader(ClassLoader classLoader) {
+    this.classLoader = classLoader;
+    return this;
   }
 
   @Override
@@ -155,7 +162,8 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
                                                           payloadBinding, attributesBinding, varsBinding,
                                                           errorBinding, correlationIdBinding, authenticationBinding,
                                                           itemSequenceInfoBinding,
-                                                          modules != null ? unmodifiableCollection(modules) : emptyList()));
+                                                          modules != null ? unmodifiableCollection(modules) : emptyList(),
+                                                          classLoader));
       payloadBinding = null;
       attributesBinding = null;
       varsBinding = empty();
@@ -198,7 +206,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
                                             bindings == null ? emptyMap() : unmodifiableMap(bindings),
                                             payloadBinding, attributesBinding, varsBinding,
                                             errorBinding, correlationIdBinding, authenticationBinding, itemSequenceInfoBinding,
-                                            modules != null ? unmodifiableCollection(modules) : emptyList());
+                                            modules != null ? unmodifiableCollection(modules) : emptyList(), classLoader);
   }
 
   public BindingContext flattenAndBuild() {
@@ -226,7 +234,8 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
                                             original.lookup(CORRELATION_ID).orElse(null),
                                             original.lookup(AUTHENTICATION).orElse(null),
                                             original.lookup(ITEM_SEQUENCE_INFO).orElse(null),
-                                            original.modules());
+                                            original.modules(),
+                                            original.classLoader().orElse(null));
   }
 
 
@@ -241,6 +250,7 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
     private final Optional<TypedValue> correlationIdBinding;
     private final Optional<TypedValue> authenticationBinding;
     private final Optional<TypedValue> itemSequenceInfoBinding;
+    private final Optional<ClassLoader> classLoader;
 
     private final Map<String, Supplier<TypedValue>> bindings;
     private final Collection<ExpressionModule> modules;
@@ -250,9 +260,11 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
                                          Optional<Supplier<TypedValue>> varsBinding,
                                          TypedValue errorBinding, TypedValue correlationIdBinding,
                                          TypedValue authenticationBinding, TypedValue itemSequenceInfoBinding,
-                                         Collection<ExpressionModule> modules) {
+                                         Collection<ExpressionModule> modules,
+                                         ClassLoader classLoader) {
       this.delegates = delegates;
       this.bindings = bindings;
+      this.classLoader = ofNullable(classLoader);
 
       this.payloadBinding = ofNullable(payloadBinding);
       this.attributesBinding = ofNullable(attributesBinding);
@@ -355,5 +367,11 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
       }
       return mods;
     }
+
+    @Override
+    public Optional<ClassLoader> classLoader() {
+      return classLoader;
+    }
+
   }
 }

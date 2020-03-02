@@ -12,7 +12,9 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 
@@ -174,6 +176,19 @@ public class DefaultBindingContextBuilderTestCase extends AbstractMuleTestCase {
         .addBinding("misc", new LazyValue<>(() -> mapValue()))
         .build();
     assertLookup(BindingContext.builder(globalBinding()).addAll(localBinding).build(), "misc");
+  }
+
+  @Test
+  public void withoutClassLoaderSet() {
+    BindingContext localBinding = BindingContext.builder().build();
+    assertFalse(localBinding.classLoader().isPresent());
+  }
+
+  @Test
+  public void withClassLoaderSet() {
+    BindingContext localBinding = BindingContext.builder().setClassloader(getClass().getClassLoader()).build();
+    assertTrue(localBinding.classLoader().isPresent());
+    assertThat(localBinding.classLoader().get(), is(getClass().getClassLoader()));
   }
 
   private TypedValue<Map<String, TypedValue<String>>> mapValue() {
