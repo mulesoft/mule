@@ -6,17 +6,33 @@
  */
 package org.mule.tck.config;
 
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
-import org.mule.runtime.core.internal.policy.NullPolicyProvider;
+import org.mule.runtime.core.api.policy.Policy;
+import org.mule.runtime.core.api.policy.PolicyProvider;
+import org.mule.runtime.policy.api.PolicyPointcutParameters;
+
+import java.util.List;
 
 public class TestPolicyProviderConfigurationBuilder extends AbstractConfigurationBuilder {
 
   @Override
   protected void doConfigure(MuleContext muleContext) {
-    muleContext.getCustomizationService().registerCustomServiceImpl(OBJECT_POLICY_PROVIDER, new NullPolicyProvider());
+    muleContext.getCustomizationService().registerCustomServiceImpl(OBJECT_POLICY_PROVIDER, new PolicyProvider() {
+
+      @Override
+      public List<Policy> findSourceParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters) {
+        return emptyList();
+      }
+
+      @Override
+      public List<Policy> findOperationParameterizedPolicies(PolicyPointcutParameters policyPointcutParameters) {
+        return emptyList();
+      }
+    });
   }
 
 }
