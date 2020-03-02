@@ -8,6 +8,7 @@ package org.mule.runtime.core.privileged.security.tls;
 
 import static java.lang.String.format;
 import static java.security.KeyStore.getInstance;
+import static java.util.Collections.list;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotLoadFromClasspath;
@@ -275,8 +276,9 @@ public final class TlsConfiguration extends AbstractComponent
     Enumeration<String> aliases = keyStore.aliases();
     if (!isBlank(keyAlias)) {
       boolean aliasFound = false;
-      while (aliases.hasMoreElements()) {
-        String alias = aliases.nextElement();
+      // Transform alias Enumeration into List because PKCS12KeyStore wrap 'alias' using 'Collections.enumeration'
+      // to avoid java.util.ConcurrentModificationException when trying to remove an entry
+      for (String alias : list(aliases)) {
         if (alias.equals(keyAlias)) {
           // if alias is found all is valid but continue processing to strip out all
           // other (unwanted) keys

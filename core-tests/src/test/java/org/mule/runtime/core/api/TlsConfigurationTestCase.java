@@ -114,6 +114,19 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void testTlsConfigurationUsingPKCS12KeystoreWithMultipleKeys() throws Exception {
+    TlsConfiguration configuration = new TlsConfiguration(DEFAULT_KEYSTORE);
+    configuration.setKeyPassword("passw0rd");
+    configuration.setKeyStorePassword("passw0rd");
+    configuration.setKeyStore("keystoreMultiplesKeys.p12");
+    configuration.setKeyStoreType("pkcs12");
+    configuration.setKeyAlias("ldnmulvs01");
+    configuration.initialise(false, JSSE_NAMESPACE);
+    SSLSocketFactory socketFactory = configuration.getSocketFactory();
+    assertTrue("socket is useless", socketFactory.getSupportedCipherSuites().length > 0);
+  }
+
+  @Test
   public void testExceptionOnInvalidKeyAlias() throws Exception {
     URL keystoreUrl = getClass().getClassLoader().getResource("serverKeystore");
     File keystoreFile = new File(keystoreUrl.toURI());
