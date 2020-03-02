@@ -306,6 +306,5 @@ public class ExceptionUtils {
     return obj.getIdentifier();
   }
 
-  private ExceptionUtils() {
-  }
+  private ExceptionUtils() {}
 }

@@ -451,7 +451,7 @@ public class ClassUtils {
         argsString.append(arg.getName()).append(", ");
       }
       throw new NoSuchMethodException("could not find constructor on class: " + clazz + ", with matching arg params: "
-                                          + argsString);
+          + argsString);
     }
 
     return (T) ctor.newInstance(constructorArgs);
@@ -1036,6 +1036,5 @@ public class ClassUtils {
     return foundInterfaces.toArray(new Class<?>[0]);
   }
 
-  private ClassUtils() {
-  }
+  private ClassUtils() {}
 }
