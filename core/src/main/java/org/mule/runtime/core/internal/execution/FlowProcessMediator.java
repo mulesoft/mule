@@ -69,7 +69,8 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
-import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceCallbackAdapter;
+import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceSuccessCallbackAdapter;
+import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceFailureCallbackAdapter;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -119,7 +120,8 @@ public class FlowProcessMediator implements Initialisable {
   private MuleContext muleContext;
 
   private final PolicyManager policyManager;
-  private final List<CompletableInterceptorSourceCallbackAdapter> additionalInterceptors = new LinkedList<>();
+  private final List<CompletableInterceptorSourceSuccessCallbackAdapter> additionalSuccessInterceptors = new LinkedList<>();
+  private final List<CompletableInterceptorSourceFailureCallbackAdapter> additionalFailureInterceptors = new LinkedList<>();
   private ErrorType sourceResponseGenerateErrorType;
   private ErrorType sourceResponseSendErrorType;
   private ErrorType sourceErrorResponseGenerateErrorType;
@@ -144,14 +146,18 @@ public class FlowProcessMediator implements Initialisable {
 
     if (processorInterceptorManager != null) {
       processorInterceptorManager.getSourceInterceptorFactories().stream().forEach(interceptorFactory -> {
-        CompletableInterceptorSourceCallbackAdapter reactiveInterceptorAdapter =
-            new CompletableInterceptorSourceCallbackAdapter(interceptorFactory);
+        CompletableInterceptorSourceSuccessCallbackAdapter reactiveInterceptorSuccessAdapter =
+            new CompletableInterceptorSourceSuccessCallbackAdapter(interceptorFactory);
+        CompletableInterceptorSourceFailureCallbackAdapter reactiveInterceptorFailureAdapter =
+            new CompletableInterceptorSourceFailureCallbackAdapter(interceptorFactory);
         try {
-          muleContext.getInjector().inject(reactiveInterceptorAdapter);
+          muleContext.getInjector().inject(reactiveInterceptorSuccessAdapter);
+          muleContext.getInjector().inject(reactiveInterceptorFailureAdapter);
         } catch (MuleException e) {
           throw new MuleRuntimeException(e);
         }
-        additionalInterceptors.add(0, reactiveInterceptorAdapter);
+        additionalSuccessInterceptors.add(0, reactiveInterceptorSuccessAdapter);
+        additionalFailureInterceptors.add(0, reactiveInterceptorFailureAdapter);
       });
     }
   }
@@ -313,7 +319,7 @@ public class FlowProcessMediator implements Initialisable {
       };
 
       try {
-        for (CompletableInterceptorSourceCallbackAdapter interceptor : additionalInterceptors) {
+        for (CompletableInterceptorSourceSuccessCallbackAdapter interceptor : additionalSuccessInterceptors) {
           sendResponseToClient = interceptor.apply(ctx.messageSource, sendResponseToClient);
         }
 
@@ -335,22 +341,34 @@ public class FlowProcessMediator implements Initialisable {
       fireNotification(ctx.messageProcessContext.getMessageSource(), failureResult.getMessagingException().getEvent(),
                        ctx.flowConstruct, MESSAGE_ERROR_RESPONSE);
 
-      sendErrorResponse(failureResult.getMessagingException(),
-                        event -> failureResult.getErrorResponseParameters().get(),
-                        ctx, new CompletableCallback<Void>() {
+      BiConsumer<SourcePolicyFailureResult, CompletableCallback<Void>> sendErrorResponse =
+          (result, responseCallback) -> sendErrorResponse(result.getMessagingException(),
+                                                          event -> result.getErrorResponseParameters().get(), ctx,
+                                                          responseCallback);
 
-                          @Override
-                          public void complete(Void value) {
-                            onTerminate(ctx, left(failureResult.getMessagingException()));
-                            finish(ctx);
-                          }
+      CompletableCallback<Void> responseCallback = new CompletableCallback<Void>() {
 
-                          @Override
-                          public void error(Throwable e) {
-                            ctx.exception = e;
-                            finish(ctx);
-                          }
-                        });
+        @Override
+        public void complete(Void value) {
+          onTerminate(ctx, left(failureResult.getMessagingException()));
+          finish(ctx);
+        }
+
+        @Override
+        public void error(Throwable e) {
+          ctx.exception = e;
+          finish(ctx);
+        }
+      };
+      try {
+        for (CompletableInterceptorSourceFailureCallbackAdapter interceptor : additionalFailureInterceptors) {
+          sendErrorResponse = interceptor.apply(ctx.messageSource, sendErrorResponse);
+        }
+        sendErrorResponse.accept(failureResult, responseCallback);
+      } catch (Exception e) {
+        responseCallback.error(new SourceErrorException(failureResult.getResult(), sourceErrorResponseGenerateErrorType, e,
+                                                        failureResult.getMessagingException()));
+      }
     };
   }
 
