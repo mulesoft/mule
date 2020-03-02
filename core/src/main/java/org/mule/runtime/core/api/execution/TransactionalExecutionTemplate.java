@@ -10,7 +10,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -61,7 +60,7 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
       transactionConfig = new MuleTransactionConfig();
     }
     final boolean processTransactionOnException = true;
-    ExecutionInterceptor<CoreEvent> tempExecutionInterceptor = new ExecuteCallbackInterceptor<>();
+    ExecutionInterceptor<T> tempExecutionInterceptor = new ExecuteCallbackInterceptor<>();
     tempExecutionInterceptor =
         new BeginAndResolveTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig, applicationName,
                                                     notificationDispatcher, transactionFactoryManager,
@@ -74,7 +73,7 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
                                                                      processTransactionOnException);
     tempExecutionInterceptor =
         new ValidateTransactionalStateInterceptor<>(tempExecutionInterceptor, transactionConfig, resolvePreviousTx);
-    this.executionInterceptor = new IsolateCurrentTransactionInterceptor(tempExecutionInterceptor, transactionConfig);
+    this.executionInterceptor = new IsolateCurrentTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig);
   }
 
   /**
