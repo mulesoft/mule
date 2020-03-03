@@ -122,23 +122,4 @@ public abstract class AbstractTroubleshootCursorProviderTestCase extends Abstrac
 
   protected abstract CursorProvider createCursorProvider();
 
-  private void setStaticField(Class cls, String fieldName, Object value) throws NoSuchFieldException, IllegalAccessException {
-    Field field = cls.getDeclaredField(fieldName);
-    Field modifiers = Field.class.getDeclaredField("modifiers");
-
-    boolean wasAccessible = field.isAccessible();
-
-    modifiers.setAccessible(true);
-    field.setAccessible(true);
-
-    int prevModifiers = modifiers.getInt(field);
-
-    modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
-    field.set(null, value);
-
-    modifiers.setInt(field, prevModifiers);
-    modifiers.setAccessible(false);
-    field.setAccessible(wasAccessible);
-  }
 }

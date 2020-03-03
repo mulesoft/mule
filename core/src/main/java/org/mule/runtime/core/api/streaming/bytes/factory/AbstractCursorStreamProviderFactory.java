@@ -36,7 +36,7 @@ public abstract class AbstractCursorStreamProviderFactory extends AbstractCompon
 
   protected final ByteBufferManager bufferManager;
   protected final StreamingManager streamingManager;
-  protected final boolean trackCursorProviderClose;
+  protected static boolean trackCursorProviderClose;
 
   /**
    * Creates a new instance
