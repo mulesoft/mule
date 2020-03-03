@@ -15,13 +15,14 @@ import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.interception.SourceInterceptor;
 import org.mule.runtime.api.interception.SourceInterceptorFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
+import org.mule.runtime.core.internal.policy.SourcePolicyResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 
 import org.reactivestreams.Publisher;
@@ -34,25 +35,23 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
- * Hooks the {@link ProcessorInterceptor}s for a {@link MessageSource} callback into the {@code Reactor} response handling
- * pipeline.
+ * Hooks the {@link SourceInterceptor}s for a {@link MessageSource} callback into the {@code Reactor} response handling pipeline.
  *
  * @since 4.0
  */
-public class ReactiveInterceptorSourceCallbackAdapter extends AbstractInterceptorAdapter implements
-    BiFunction<MessageSource, Function<SourcePolicySuccessResult, Publisher<Void>>, Function<SourcePolicySuccessResult, Publisher<Void>>> {
+public abstract class AbstractReactiveInterceptorSourceCallbackAdapter<T extends SourcePolicyResult> extends
+    AbstractInterceptorAdapter implements BiFunction<MessageSource, Function<T, Publisher<Void>>, Function<T, Publisher<Void>>> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveInterceptorSourceCallbackAdapter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractReactiveInterceptorSourceCallbackAdapter.class);
 
   private SourceInterceptorFactory interceptorFactory;
 
-  public ReactiveInterceptorSourceCallbackAdapter(SourceInterceptorFactory interceptorFactory) {
+  public AbstractReactiveInterceptorSourceCallbackAdapter(SourceInterceptorFactory interceptorFactory) {
     this.interceptorFactory = interceptorFactory;
   }
 
   @Override
-  public Function<SourcePolicySuccessResult, Publisher<Void>> apply(MessageSource source,
-                                                                    Function<SourcePolicySuccessResult, Publisher<Void>> next) {
+  public Function<T, Publisher<Void>> apply(MessageSource source, Function<T, Publisher<Void>> next) {
     if (!isInterceptable(source)) {
       return next;
     }
@@ -66,9 +65,8 @@ public class ReactiveInterceptorSourceCallbackAdapter extends AbstractIntercepto
       final SourceInterceptor interceptor = interceptorFactory.get();
       Map<String, String> dslParameters = (Map<String, String>) (source).getAnnotation(ANNOTATION_PARAMETERS);
 
-      SourcePolicySuccessResult interceptedBeforeResult =
-          new SourcePolicySuccessResult(doBefore(interceptor, source, dslParameters).apply((InternalEvent) result.getResult()),
-                                        result.getResponseParameters(), result.getMessageSourceResponseParametersProcessor());
+      T interceptedBeforeResult =
+          applyBefore(doBefore(interceptor, source, dslParameters).apply((InternalEvent) result.getResult()), result);
 
       try {
         Publisher<Void> publisher = next.apply(interceptedBeforeResult);
@@ -80,6 +78,15 @@ public class ReactiveInterceptorSourceCallbackAdapter extends AbstractIntercepto
       }
     };
   }
+
+  /**
+   * Applies the result of the before interception to the given result
+   *
+   * @param event Resulting event of the before interception
+   * @param result Input result of the source
+   * @return Result with the before event applied
+   */
+  protected abstract T applyBefore(InternalEvent event, T result);
 
   protected Function<InternalEvent, InternalEvent> doBefore(SourceInterceptor interceptor, Component component,
                                                             Map<String, String> dslParameters) {
