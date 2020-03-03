@@ -31,11 +31,11 @@ public class TransactionalQueueManager extends AbstractQueueManager {
   private LocalTxQueueTransactionRecoverer localTxQueueTransactionRecoverer;
   private XaTxQueueTransactionJournal xaTransactionJournal;
   private XaTransactionRecoverer xaTransactionRecoverer;
-  private QueueXaResourceManager queueXaResourceManager = new QueueXaResourceManager();
+  private final QueueXaResourceManager queueXaResourceManager = new QueueXaResourceManager();
   // Due to current VMConnector and TransactionQueueManager relationship we must close all the recovered queues
   // since queue configuration is applied after recovery and not taking into consideration once queues are created
   // for recovery. See https://www.mulesoft.org/jira/browse/MULE-7420
-  private Map<String, RecoverableQueueStore> queuesAccessedForRecovery = new HashMap<String, RecoverableQueueStore>();
+  private final Map<String, RecoverableQueueStore> queuesAccessedForRecovery = new HashMap<>();
 
   /**
    * {@inheritDoc}
@@ -43,11 +43,12 @@ public class TransactionalQueueManager extends AbstractQueueManager {
    * @return an instance of {@link TransactionalQueueSession}
    */
   @Override
-  public synchronized QueueSession getQueueSession() {
+  public QueueSession getQueueSession() {
     return new TransactionalQueueSession(this, queueXaResourceManager, queueXaResourceManager, xaTransactionRecoverer,
                                          localTxTransactionJournal, getMuleContext());
   }
 
+  @Override
   protected DefaultQueueStore createQueueStore(String name, QueueConfiguration config) {
     return new DefaultQueueStore(name, getMuleContext(), config);
   }
