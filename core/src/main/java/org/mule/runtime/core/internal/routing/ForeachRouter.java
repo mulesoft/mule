@@ -12,8 +12,8 @@ import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurer;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerIterator;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerList;
@@ -53,7 +53,7 @@ class ForeachRouter {
   private static final String MULE_FOREACH_CONTEXT_KEY = "mule.foreach.router.foreachContext";
   static final String MAP_NOT_SUPPORTED_MESSAGE =
       "Foreach does not support 'java.util.Map' with no collection expression. To iterate over Map entries use '#[dw::core::Objects::entrySet(payload)]'";
-  private final EventInternalContextResolver<Map<String, ForeachContext>> foreachContextResolver;
+  private final Map<String, ForeachContext> foreachContextResolver = new HashMap<>();
   private final Foreach owner;
 
   private Flux<CoreEvent> upstreamFlux;
@@ -69,8 +69,6 @@ class ForeachRouter {
   ForeachRouter(Foreach owner, Publisher<CoreEvent> publisher, String expression, int batchSize,
                 MessageProcessorChain nestedChain) {
     this.owner = owner;
-    this.foreachContextResolver = new EventInternalContextResolver<>(MULE_FOREACH_CONTEXT_KEY,
-                                                                     HashMap::new);
 
     upstreamFlux = Flux.from(publisher)
         .doOnNext(event -> {
@@ -80,16 +78,17 @@ class ForeachRouter {
             downstreamRecorder.next(left(new IllegalArgumentException(MAP_NOT_SUPPORTED_MESSAGE)));
           }
 
-          // Create ForEachContext
-          ForeachContext foreachContext = this.createForeachContext(event);
-          // Save it inside the internalParameters of the event
-          Map<String, ForeachContext> currentContextFromEvent = foreachContextResolver.getCurrentContextFromEvent(event);
-          currentContextFromEvent.put(event.getContext().getId(), foreachContext);
-
-          final CoreEvent innerEvent =
+          final CoreEvent responseEvent =
               builder(event).addVariable(owner.getRootMessageVariableName(), event.getMessage()).build();
 
-          CoreEvent responseEvent = foreachContextResolver.eventWithContext(innerEvent, currentContextFromEvent);
+          // Create ForEachContext
+          ForeachContext foreachContext = this.createForeachContext(event);
+
+          // Save it to handle nested routers
+          foreachContextResolver.put(event.getContext().getId(), foreachContext);
+
+          // Save it inside the internalParameters of the event
+          ((InternalEvent) responseEvent).setForEachContext(foreachContext);
 
           inflightEvents.getAndIncrement();
           try {
@@ -100,9 +99,10 @@ class ForeachRouter {
             innerRecorder.next(responseEvent);
           } catch (Exception e) {
             // Delete foreach context
+            ((InternalEvent) responseEvent).setForEachContext(null);
             // Wrap any exception that occurs during split in a MessagingException. This is required as the
             // automatic wrapping is only applied when the signal is an Event.
-            downstreamRecorder.next(left(new MessagingException(this.eventWithCurrentContextDeleted(responseEvent), e, owner)));
+            downstreamRecorder.next(left(new MessagingException(responseEvent, e, owner)));
             completeRouterIfNecessary();
           }
         })
@@ -116,8 +116,7 @@ class ForeachRouter {
 
     innerFlux = Flux.create(innerRecorder)
         .map(event -> {
-          ForeachContext foreachContext =
-              foreachContextResolver.getCurrentContextFromEvent(event).get(event.getContext().getId());
+          ForeachContext foreachContext = foreachContextResolver.get(event.getContext().getId());
 
           Iterator<TypedValue<?>> iterator = foreachContext.getIterator();
           if (!iterator.hasNext() && foreachContext.getElementNumber().get() == 0) {
@@ -132,7 +131,7 @@ class ForeachRouter {
         .transform(innerPub -> applyWithChildContext(innerPub, nestedChain, of(owner.getLocation())))
         .doOnNext(evt -> {
           try {
-            ForeachContext foreachContext = foreachContextResolver.getCurrentContextFromEvent(evt).get(evt.getContext().getId());
+            ForeachContext foreachContext = foreachContextResolver.get(evt.getContext().getId());
 
             if (foreachContext.getOnComplete().isPresent()) {
               foreachContext.getOnComplete().get().run();
@@ -148,12 +147,14 @@ class ForeachRouter {
             }
           } catch (Exception e) {
             // Delete foreach context
-            downstreamRecorder.next(left(new MessagingException(this.eventWithCurrentContextDeleted(evt), e, owner)));
+            ((InternalEvent) evt).setForEachContext(null);
+            downstreamRecorder.next(left(new MessagingException(evt, e, owner)));
             completeRouterIfNecessary();
           }
         }).onErrorContinue(MessagingException.class, (e, o) -> {
-          CoreEvent event = this.eventWithCurrentContextDeleted(((MessagingException) e).getEvent());
-          ((MessagingException) e).setProcessedEvent(event);
+          MessagingException exception = (MessagingException) e;
+          ((InternalEvent) exception.getEvent()).setForEachContext(null);
+          exception.setProcessedEvent(exception.getEvent());
           downstreamRecorder.next(left(e));
           completeRouterIfNecessary();
         });
@@ -229,9 +230,11 @@ class ForeachRouter {
       // Otherwise create a new message
       partEventBuilder.message(Message.builder().payload(currentValue).build());
     }
-    return partEventBuilder
+    CoreEvent partEvent = partEventBuilder
         .addVariable(owner.getCounterVariableName(), foreachContext.getElementNumber().incrementAndGet())
         .build();
+    ((InternalEvent) partEvent).setForEachContext(foreachContext);
+    return partEvent;
   }
 
   private ForeachContext createForeachContext(CoreEvent event) {
@@ -245,12 +248,6 @@ class ForeachRouter {
             : null;
 
     return new ForeachContext(previousCounterVar, previousRootMessageVar, event.getMessage(), event.getItemSequenceInfo());
-  }
-
-  private CoreEvent eventWithCurrentContextDeleted(CoreEvent event) {
-    Map<String, ForeachContext> foreachContextContainer = foreachContextResolver.getCurrentContextFromEvent(event);
-    foreachContextContainer.remove(event.getContext().getId());
-    return foreachContextResolver.eventWithContext(event, foreachContextContainer);
   }
 
   private Iterator<TypedValue<?>> splitRequest(CoreEvent request, String expression) {
@@ -296,12 +293,15 @@ class ForeachRouter {
   }
 
   private CoreEvent createResponseEvent(CoreEvent event) {
-    ForeachContext foreachContext = foreachContextResolver.getCurrentContextFromEvent(event).get(event.getContext().getId());
+    ForeachContext foreachContext = foreachContextResolver.get(event.getContext().getId());
 
     final CoreEvent.Builder responseBuilder =
         builder(event).message(foreachContext.getOriginalMessage()).itemSequenceInfo(foreachContext.getItemSequenceInfo());
     restoreVariables(foreachContext.getPreviousCounter(), foreachContext.getPreviousRootMessage(), responseBuilder);
-    return eventWithCurrentContextDeleted(responseBuilder.build());
+
+    CoreEvent responseEvent = responseBuilder.build();
+    ((InternalEvent) responseEvent).setForEachContext(null);
+    return responseEvent;
   }
 
   private void restoreVariables(Object previousCounterVar, Object previousRootMessageVar, CoreEvent.Builder responseBuilder) {
