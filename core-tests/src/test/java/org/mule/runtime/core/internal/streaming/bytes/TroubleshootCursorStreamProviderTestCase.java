@@ -57,13 +57,4 @@ public class TroubleshootCursorStreamProviderTestCase extends AbstractTroublesho
     return (CursorStreamProvider) providerFactory.of(eventContext, dataStream);
   }
 
-  @Override
-  protected Class getCursorProviderImplementation() {
-    return AbstractCursorStreamProvider.class;
-  }
-
-  @Override
-  protected String getCursorProviderTrackingCloseField() {
-    return "TRACK_CURSOR_PROVIDER_CLOSE";
-  }
 }

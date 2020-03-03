@@ -36,13 +36,4 @@ public class TroubleshootCursorIteratorProviderTestCase extends AbstractTroubles
     return (CursorProvider) providerFactory.of(eventContext, asList(DATA).iterator());
   }
 
-  @Override
-  protected Class getCursorProviderImplementation() {
-    return AbstractCursorIteratorProvider.class;
-  }
-
-  @Override
-  protected String getCursorProviderTrackingCloseField() {
-    return "TRACK_CURSOR_PROVIDER_CLOSE";
-  }
 }

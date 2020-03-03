@@ -122,10 +122,6 @@ public abstract class AbstractTroubleshootCursorProviderTestCase extends Abstrac
 
   protected abstract CursorProvider createCursorProvider();
 
-  protected abstract Class getCursorProviderImplementation();
-
-  protected abstract String getCursorProviderTrackingCloseField();
-
   private void setStaticField(Class cls, String fieldName, Object value) throws NoSuchFieldException, IllegalAccessException {
     Field field = cls.getDeclaredField(fieldName);
     Field modifiers = Field.class.getDeclaredField("modifiers");
