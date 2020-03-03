@@ -298,7 +298,8 @@ class ForeachRouter {
   private CoreEvent createResponseEvent(CoreEvent event) {
     ForeachContext foreachContext = foreachContextResolver.getCurrentContextFromEvent(event).get(event.getContext().getId());
 
-    final CoreEvent.Builder responseBuilder = builder(event).message(foreachContext.getOriginalMessage()).itemSequenceInfo(foreachContext.getItemSequenceInfo());
+    final CoreEvent.Builder responseBuilder =
+        builder(event).message(foreachContext.getOriginalMessage()).itemSequenceInfo(foreachContext.getItemSequenceInfo());
     restoreVariables(foreachContext.getPreviousCounter(), foreachContext.getPreviousRootMessage(), responseBuilder);
     return eventWithCurrentContextDeleted(responseBuilder.build());
   }
