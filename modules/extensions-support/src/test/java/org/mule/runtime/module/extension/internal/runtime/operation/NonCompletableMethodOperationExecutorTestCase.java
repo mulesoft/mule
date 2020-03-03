@@ -129,7 +129,7 @@ public class NonCompletableMethodOperationExecutorTestCase extends AbstractMuleC
     when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     operationContext = new DefaultExecutionContext(extensionModel, of(configurationInstance), parameters.asMap(), operationModel,
                                                    muleEvent, cursorProviderFactory, streamingManager, component,
-                                                   retryPolicyTemplate, IMMEDIATE_SCHEDULER, muleContext);
+                                                   retryPolicyTemplate, IMMEDIATE_SCHEDULER, empty(), muleContext);
     operationContext = spy(operationContext);
   }
 

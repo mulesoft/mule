@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.functional.Either.left;
@@ -41,6 +43,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.from;
@@ -50,6 +53,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
@@ -80,7 +84,10 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
@@ -99,6 +106,7 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
@@ -122,6 +130,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.streaming.CursorResetInterceptor;
+import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.io.InputStream;
@@ -143,7 +152,6 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
@@ -173,6 +181,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     implements Processor, ParametersResolverProcessor<T>, Lifecycle {
 
   private static final Logger LOGGER = getLogger(ComponentMessageProcessor.class);
+  private static final ExtensionTransactionFactory TRANSACTION_FACTORY = new ExtensionTransactionFactory();
 
   static final String INVALID_TARGET_MESSAGE =
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
@@ -188,6 +197,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected final String targetValue;
   protected final RetryPolicyTemplate retryPolicyTemplate;
 
+  private Optional<TransactionConfig> transactionConfig;
   private final long outerFluxTerminationTimeout;
   private final Object fluxSupplierDisposeLock = new Object();
 
@@ -239,12 +249,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     this.retryPolicyTemplate = retryPolicyTemplate;
     this.reflectionCache = reflectionCache;
     this.resultTransformer = resultTransformer;
-    this.hasNestedChain = componentModel.getNestedComponents().stream()
-        .anyMatch(nestedComp -> {
-          return nestedComp instanceof NestedRouteModel
-              || ((NestedComponentModel) nestedComp).getAllowedStereotypes().stream()
-                  .anyMatch(st -> st.isAssignableTo(PROCESSOR));
-        });
+    this.hasNestedChain = hasNestedChain(componentModel);
     this.outerFluxTerminationTimeout = terminationTimeout;
   }
 
@@ -452,13 +457,18 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, componentModel, event,
                                          getCursorProviderFactory(), streamingManager, this,
-                                         getRetryPolicyTemplate(configuration), currentScheduler, muleContext);
+                                         getRetryPolicyTemplate(configuration), currentScheduler, transactionConfig, muleContext);
   }
 
   @Override
   protected void doInitialise() throws InitialisationException {
     if (!initialised) {
       initRetryPolicyResolver();
+      try {
+        transactionConfig = buildTransactionConfig();
+      } catch (MuleException e) {
+        throw new InitialisationException(createStaticMessage("Could not resolve transactional configuration"), e, this);
+      }
       returnDelegate = createReturnDelegate();
       initialiseIfNeeded(resolverSet, muleContext);
       componentExecutor = createComponentExecutor();
@@ -1009,6 +1019,47 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       return location.equals(component.getLocation());
     }
     return false;
+  }
+
+  private boolean supportsTransactions(T componentModel) {
+    return componentModel instanceof ConnectableComponentModel && ((ConnectableComponentModel) componentModel).isTransactional();
+  }
+
+  private boolean hasNestedChain(T componentModel) {
+    return componentModel.getNestedComponents().stream()
+        .anyMatch(nestedComp -> nestedComp instanceof NestedRouteModel
+            || ((NestedComponentModel) nestedComp).getAllowedStereotypes().stream().anyMatch(st -> st.isAssignableTo(PROCESSOR)));
+  }
+
+  private Optional<TransactionConfig> buildTransactionConfig() throws MuleException {
+    if (supportsTransactions(componentModel)) {
+      MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
+      transactionConfig.setAction(toActionCode(getTransactionalAction()));
+      transactionConfig.setMuleContext(muleContext);
+      transactionConfig.setFactory(TRANSACTION_FACTORY);
+
+      return of(transactionConfig);
+    }
+
+    return empty();
+  }
+
+  private OperationTransactionalAction getTransactionalAction() throws MuleException {
+    ValueResolver<OperationTransactionalAction> resolver =
+        (ValueResolver<OperationTransactionalAction>) resolverSet.getResolvers().get(TRANSACTIONAL_ACTION_PARAMETER_NAME);
+    if (resolver == null) {
+      throw new IllegalArgumentException(
+                                         format("Operation '%s' from extension '%s' is transactional but no transactional action defined",
+                                                componentModel.getName(),
+                                                extensionModel.getName()));
+    }
+
+    CoreEvent initializerEvent = NullEventFactory.getNullEvent(muleContext);
+    try {
+      return resolver.resolve(ValueResolvingContext.builder(initializerEvent).build());
+    } finally {
+      ((BaseEventContext) initializerEvent.getContext()).success();
+    }
   }
 
   @Override
