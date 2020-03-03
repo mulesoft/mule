@@ -32,11 +32,10 @@ import java.util.Iterator;
 public abstract class AbstractCursorIteratorProviderFactory implements CursorIteratorProviderFactory {
 
   protected final StreamingManager streamingManager;
-  protected final boolean trackCursorProviderClose;
+  protected final static boolean trackCursorProviderClose = getBoolean(TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY);
 
   public AbstractCursorIteratorProviderFactory(StreamingManager streamingManager) {
     this.streamingManager = streamingManager;
-    trackCursorProviderClose = getBoolean(TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY);
   }
 
   /**

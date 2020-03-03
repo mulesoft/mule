@@ -19,7 +19,6 @@ import org.mule.runtime.core.internal.streaming.AbstractTroubleshootCursorProvid
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.mule.runtime.core.internal.streaming.object.factory.InMemoryCursorIteratorProviderFactory;
 
 @Feature(STREAMING)
 @Story(TROUBLESHOOTING)
@@ -31,9 +30,8 @@ public class TroubleshootCursorIteratorProviderTestCase extends AbstractTroubles
 
     InMemoryCursorIteratorConfig config = new InMemoryCursorIteratorConfig(1, 1, 10);
 
-    InMemoryCursorIteratorProviderFactory providerFactory = new InMemoryCursorIteratorProviderFactory(config, streamingManager);
+    return new InMemoryCursorIteratorProvider(DATA.iterator(), config, componentLocation, trackStackTrace);
 
-    return (CursorProvider) providerFactory.of(eventContext, asList(DATA).iterator());
   }
 
 }

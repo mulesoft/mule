@@ -36,7 +36,7 @@ public abstract class AbstractCursorStreamProviderFactory extends AbstractCompon
 
   protected final ByteBufferManager bufferManager;
   protected final StreamingManager streamingManager;
-  protected static boolean trackCursorProviderClose;
+  protected static final boolean trackCursorProviderClose = getBoolean(TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY);
 
   /**
    * Creates a new instance
@@ -46,7 +46,6 @@ public abstract class AbstractCursorStreamProviderFactory extends AbstractCompon
   protected AbstractCursorStreamProviderFactory(ByteBufferManager bufferManager, StreamingManager streamingManager) {
     this.bufferManager = bufferManager;
     this.streamingManager = streamingManager;
-    trackCursorProviderClose = getBoolean(TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY);
   }
 
   @Override

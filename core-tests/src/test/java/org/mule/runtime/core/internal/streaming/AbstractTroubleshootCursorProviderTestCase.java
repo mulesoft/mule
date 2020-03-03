@@ -16,14 +16,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.mockito.junit.MockitoJUnit.*;
 import static org.mule.runtime.api.util.MuleSystemProperties.TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 
 import org.junit.After;
 import org.junit.Before;
@@ -32,11 +26,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoRule;
-import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import io.qameta.allure.Description;
@@ -48,22 +39,15 @@ public abstract class AbstractTroubleshootCursorProviderTestCase extends Abstrac
   @Rule
   public ExpectedException expectedException = none();
 
-  @Rule
-  public MockitoRule mockitoRule = rule();
-
   @Parameter
   public Boolean trackStackTrace;
 
   @Parameter(1)
   public boolean setComponentLocation;
 
-  @Mock
-  protected EventContext eventContext;
-
-  @Mock
-  protected StreamingManager streamingManager;
-
   private CursorProvider cursorProvider;
+
+  protected ComponentLocation componentLocation;
 
   @Parameters(name = "Track StackTrace: {0}, set ComponentLocation: {1}")
   public static Object[] getParameters() {
@@ -79,9 +63,7 @@ public abstract class AbstractTroubleshootCursorProviderTestCase extends Abstrac
   public void before() throws NoSuchFieldException, IllegalAccessException {
     setProperty(TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY, trackStackTrace.toString());
 
-    when(eventContext.getOriginatingLocation()).then(a -> setComponentLocation ? fromSingleComponent("log") : null);
-
-    when(streamingManager.manage(any(CursorProvider.class), any(EventContext.class))).then(a -> a.getArgument(0));
+    componentLocation = setComponentLocation ? fromSingleComponent("log") : null;
 
     cursorProvider = createCursorProvider();
   }

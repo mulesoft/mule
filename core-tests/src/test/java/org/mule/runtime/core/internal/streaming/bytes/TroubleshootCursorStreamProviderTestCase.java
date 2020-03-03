@@ -14,9 +14,8 @@ import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingSto
 import org.junit.After;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.DataSize;
-import org.mule.runtime.core.api.streaming.bytes.AbstractCursorStreamProvider;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
-import org.mule.runtime.core.api.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
+import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.AbstractTroubleshootCursorProviderTestCase;
 
 import io.qameta.allure.Feature;
@@ -51,10 +50,7 @@ public class TroubleshootCursorStreamProviderTestCase extends AbstractTroublesho
                                        new DataSize(bufferSize / 2, BYTE),
                                        new DataSize(maxBufferSize, BYTE));
 
-    InMemoryCursorStreamProviderFactory providerFactory =
-        new InMemoryCursorStreamProviderFactory(bufferManager, config, streamingManager);
-
-    return (CursorStreamProvider) providerFactory.of(eventContext, dataStream);
+    return new InMemoryCursorStreamProvider(dataStream, config, bufferManager, componentLocation, trackStackTrace);
   }
 
 }
