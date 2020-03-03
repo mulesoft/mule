@@ -122,7 +122,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     } catch (ClassNotFoundException e) {
       LOGGER.debug("ApplicationClassLoader interface not available in current context", e);
     }
-
   }
 
   private final String name;

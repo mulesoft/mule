@@ -78,6 +78,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private EventInternalContext sdkInternalContext;
   private EventInternalContext sourcePolicyContext;
   private EventInternalContext operationPolicyContext;
+  private EventInternalContext forEachContext;
   private InternalEvent originalEvent;
   private boolean modified;
   private boolean internalParametersInitialized = false;
@@ -107,6 +108,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     sdkInternalContext = copyOf(event.getSdkInternalContext());
     sourcePolicyContext = copyOf(event.getSourcePolicyContext());
     operationPolicyContext = copyOf(event.getOperationPolicyContext());
+    forEachContext = copyOf(event.getForEachContext());
   }
 
   public DefaultEventBuilder(BaseEventContext messageContext, InternalEvent event) {
@@ -380,6 +382,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private transient EventInternalContext sdkInternalContext;
     private transient EventInternalContext sourcePolicyContext;
     private transient EventInternalContext operationPolicyContext;
+    private transient EventInternalContext forEachContext;
     private transient LazyValue<BindingContext> bindingContextBuilder =
         new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
 
@@ -396,6 +399,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.sdkInternalContext = null;
       this.sourcePolicyContext = null;
       this.operationPolicyContext = null;
+      this.forEachContext = null;
       this.internalParameters = new SmallMap<>();
     }
 
@@ -628,6 +632,16 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     @Override
     public void setOperationPolicyContext(EventInternalContext operationPolicyContext) {
       this.operationPolicyContext = operationPolicyContext;
+    }
+
+    @Override
+    public EventInternalContext getForEachContext() {
+      return forEachContext;
+    }
+
+    @Override
+    public void setForEachContext(EventInternalContext forEachContext) {
+      this.forEachContext = forEachContext;
     }
 
     @Override

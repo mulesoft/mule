@@ -10,6 +10,7 @@ import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.internal.message.EventInternalContext;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -17,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Optional.empty;
 
-class ForeachContext {
+class ForeachContext implements EventInternalContext {
 
   private Object previousCounter;
   private Object previousRootMessage;
@@ -28,7 +29,8 @@ class ForeachContext {
   private Optional<DataType> batchDataType = empty();
   private Optional<Runnable> onComplete = empty();
 
-  ForeachContext(Object previousCounter, Object previousRootMessage, Message message, Optional<ItemSequenceInfo> itemSequenceInfo) {
+  ForeachContext(Object previousCounter, Object previousRootMessage, Message message,
+                 Optional<ItemSequenceInfo> itemSequenceInfo) {
     this.previousCounter = previousCounter;
     this.previousRootMessage = previousRootMessage;
     this.originalMessage = message;
@@ -78,4 +80,10 @@ class ForeachContext {
   public Optional<ItemSequenceInfo> getItemSequenceInfo() {
     return itemSequenceInfo;
   }
+
+  @Override
+  public EventInternalContext copy() {
+    return this;
+  }
+
 }

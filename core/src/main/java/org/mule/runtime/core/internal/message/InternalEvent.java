@@ -88,6 +88,20 @@ public interface InternalEvent extends PrivilegedEvent {
   <T extends EventInternalContext> void setOperationPolicyContext(EventInternalContext<T> context);
 
   /**
+   * @return a {@link EventInternalContext} with state from the foreach router
+   * @since 4.3.0
+   */
+  <T extends EventInternalContext> EventInternalContext<T> getForEachContext();
+
+  /**
+   * Sets context related to the foreach router
+   *
+   * @param context an {@link EventInternalContext}
+   * @since 4.3.0
+   */
+  <T extends EventInternalContext> void setForEachContext(EventInternalContext<T> context);
+
+  /**
    * Create new {@link Builder} based on an existing {@link CoreEvent} instance. The existing {@link EventContext} is conserved.
    *
    * @param event existing event to use as a template to create builder instance
