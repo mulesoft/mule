@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 import static reactor.core.publisher.Flux.from;
@@ -19,8 +18,6 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -87,7 +84,7 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
   }
 
   private Boolean isTxActive(Context ctx) {
-    return ctx.<Deque<String>>getOrEmpty(TX_SCOPES_KEY).map(txScopes -> txScopes.size() > 0).orElse(false);
+    return ctx.<Integer>getOrEmpty(TX_SCOPES_KEY).map(txScopes -> txScopes > 0).orElse(false);
   }
 
   /**
@@ -97,8 +94,10 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
    */
   public static Function<Context, Context> popTxFromSubscriberContext() {
     return context -> {
-      Deque<String> currentTxChains = new ArrayDeque<>(context.getOrDefault(TX_SCOPES_KEY, emptyList()));
-      currentTxChains.pop();
+      Integer currentTxChains = context.getOrDefault(TX_SCOPES_KEY, 0);
+      currentTxChains--;
+      // Deque<String> currentTxChains = new ArrayDeque<>(context.getOrDefault(TX_SCOPES_KEY, emptyList()));
+      // currentTxChains.pop();
       return context.put(TX_SCOPES_KEY, currentTxChains);
     };
   }
@@ -110,8 +109,10 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
    */
   public static Function<Context, Context> pushTxToSubscriberContext(String location) {
     return context -> {
-      Deque<String> currentTxChains = new ArrayDeque<>(context.getOrDefault(TX_SCOPES_KEY, emptyList()));
-      currentTxChains.push(location);
+      Integer currentTxChains = context.getOrDefault(TX_SCOPES_KEY, 0);
+      currentTxChains++;
+      // Deque<String> currentTxChains = new ArrayDeque<>(context.getOrDefault(TX_SCOPES_KEY, emptyList()));
+      // currentTxChains.push(location);
       return context.put(TX_SCOPES_KEY, currentTxChains);
     };
   }
