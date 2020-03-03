@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.internal.transaction.xa;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Objects.requireNonNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 
@@ -16,7 +18,6 @@ import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Base class for an XAResource implementation.
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class DefaultXASession<T extends AbstractXaTransactionContext> implements XAResource {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultXASession.class);
+  private static final Logger LOGGER = getLogger(DefaultXASession.class);
 
   private Xid localXid;
   private final AbstractXAResourceManager<T> resourceManager;
@@ -57,7 +58,7 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
   @Override
   public void start(Xid xid, int flags) throws XAException {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(new StringBuilder(128).append("Thread ").append(Thread.currentThread())
+      LOGGER.debug(new StringBuilder(128).append("Thread ").append(currentThread())
           .append(flags == TMNOFLAGS ? " starts" : flags == TMJOIN ? " joins" : " resumes")
           .append(" work on behalf of transaction branch ").append(xid).toString());
     }
@@ -99,7 +100,7 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
   @Override
   public void end(Xid xid, int flags) throws XAException {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(new StringBuilder(128).append("Thread ").append(Thread.currentThread())
+      LOGGER.debug(new StringBuilder(128).append("Thread ").append(currentThread())
           .append(flags == TMSUSPEND ? " suspends" : flags == TMFAIL ? " fails" : " ends")
           .append(" work on behalf of transaction branch ").append(xid).toString());
     }
@@ -140,15 +141,11 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
     }
     T context = resourceManager.getActiveTransactionalResource(xid);
     if (context == null) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Commit called without a transaction context");
-      }
+      LOGGER.debug("Commit called without a transaction context");
       commitDanglingTransaction(xid, onePhase);
       return;
     }
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Committing transaction branch " + xid);
-    }
+    LOGGER.debug("Committing transaction branch {}", xid);
     if (context.status == Status.STATUS_MARKED_ROLLBACK) {
       throw new XAException(XAException.XA_RBROLLBACK);
     }
@@ -177,15 +174,11 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
     }
     AbstractTransactionContext context = resourceManager.getActiveTransactionalResource(xid);
     if (context == null) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Rollback called without a transaction context");
-      }
+      LOGGER.debug("Rollback called without a transaction context");
       rollbackDandlingTransaction(xid);
       return;
     }
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Rolling back transaction branch " + xid);
-    }
+    LOGGER.debug("Rolling back transaction branch {}", xid);
     try {
       resourceManager.rollbackTransaction(context);
       localContext = null;
@@ -207,9 +200,7 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
       throw new XAException(XAException.XAER_NOTA);
     }
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Preparing transaction branch " + xid);
-    }
+    LOGGER.debug("Preparing transaction branch {}", xid);
 
     if (context.status == Status.STATUS_MARKED_ROLLBACK) {
       throw new XAException(XAException.XA_RBROLLBACK);
@@ -224,9 +215,7 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
 
   @Override
   public void forget(Xid xid) throws XAException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Forgetting transaction branch " + xid);
-    }
+    LOGGER.debug("Forgetting transaction branch {}", xid);
     AbstractTransactionContext context = resourceManager.getTransactionalResource(xid);
     if (context == null) {
       throw new XAException(XAException.XAER_NOTA);
