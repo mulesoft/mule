@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.internal.streaming;
 
+import static java.lang.System.setProperty;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -15,6 +16,11 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.junit.runners.Parameterized.Parameter;
 import static org.junit.runners.Parameterized.Parameters;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.mockito.junit.MockitoJUnit.*;
+import static org.mule.runtime.api.util.MuleSystemProperties.TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -26,7 +32,11 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoRule;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import io.qameta.allure.Description;
@@ -38,13 +48,22 @@ public abstract class AbstractTroubleshootCursorProviderTestCase extends Abstrac
   @Rule
   public ExpectedException expectedException = none();
 
-  private CursorProvider cursorProvider;
+  @Rule
+  public MockitoRule mockitoRule = rule();
 
   @Parameter
   public Boolean trackStackTrace;
 
   @Parameter(1)
   public boolean setComponentLocation;
+
+  @Mock
+  protected EventContext eventContext;
+
+  @Mock
+  protected StreamingManager streamingManager;
+
+  private CursorProvider cursorProvider;
 
   @Parameters(name = "Track StackTrace: {0}, set ComponentLocation: {1}")
   public static Object[] getParameters() {
@@ -58,7 +77,11 @@ public abstract class AbstractTroubleshootCursorProviderTestCase extends Abstrac
 
   @Before
   public void before() throws NoSuchFieldException, IllegalAccessException {
-    setStaticField(getCursorProviderImplementation(), getCursorProviderTrackingCloseField(), trackStackTrace);
+    setProperty(TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY, trackStackTrace.toString());
+
+    when(eventContext.getOriginatingLocation()).then(a -> setComponentLocation ? fromSingleComponent("log") : null);
+
+    when(streamingManager.manage(any(CursorProvider.class), any(EventContext.class))).then(a -> a.getArgument(0));
 
     cursorProvider = createCursorProvider();
   }

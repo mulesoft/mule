@@ -30,12 +30,16 @@ public final class InMemoryCursorStreamProvider extends AbstractCursorStreamProv
    * @param config        the config of the generated buffer
    * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
    * @param originatingLocation indicates where the cursor was created
+   * @param trackCursorProviderClose if the provider should save the stack trace from where it was closed
+   *
+   * @since 4.3.0
    */
   public InMemoryCursorStreamProvider(InputStream wrappedStream,
                                       InMemoryCursorStreamConfig config,
                                       ByteBufferManager bufferManager,
-                                      ComponentLocation originatingLocation) {
-    super(wrappedStream, originatingLocation);
+                                      ComponentLocation originatingLocation,
+                                      boolean trackCursorProviderClose) {
+    super(wrappedStream, originatingLocation, trackCursorProviderClose);
     buffer = new InMemoryStreamBuffer(wrappedStream, config, bufferManager);
   }
 
@@ -46,15 +50,15 @@ public final class InMemoryCursorStreamProvider extends AbstractCursorStreamProv
    * @param config        the config of the generated buffer
    * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
    * 
-   * @deprecated Please use
-   *             {@link #InMemoryCursorStreamProvider(InputStream, InMemoryCursorStreamConfig, ByteBufferManager, ComponentLocation)}
+   * @deprecated On 4.3.0, please use
+   *             {@link #InMemoryCursorStreamProvider(InputStream, InMemoryCursorStreamConfig, ByteBufferManager, ComponentLocation, boolean)}
    *             instead.
    */
   @Deprecated
   public InMemoryCursorStreamProvider(InputStream wrappedStream,
                                       InMemoryCursorStreamConfig config,
                                       ByteBufferManager bufferManager) {
-    this(wrappedStream, config, bufferManager, null);
+    this(wrappedStream, config, bufferManager, null, false);
   }
 
   /**

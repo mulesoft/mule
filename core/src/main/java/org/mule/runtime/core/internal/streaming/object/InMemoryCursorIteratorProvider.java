@@ -28,10 +28,12 @@ public class InMemoryCursorIteratorProvider extends AbstractCursorIteratorProvid
    * @param stream the stream to buffer from
    * @param config        the config of the generated buffer
    * @param originatingLocation indicates where the cursor was created
+   *                            
+   * @since 4.3.0
    */
   public InMemoryCursorIteratorProvider(Iterator stream, InMemoryCursorIteratorConfig config,
-                                        ComponentLocation originatingLocation) {
-    super(stream, originatingLocation);
+                                        ComponentLocation originatingLocation, boolean trackCursorProviderClose) {
+    super(stream, originatingLocation, trackCursorProviderClose);
     buffer = new InMemoryObjectStreamBuffer(stream, config);
     buffer.initialise();
   }
@@ -41,11 +43,11 @@ public class InMemoryCursorIteratorProvider extends AbstractCursorIteratorProvid
    *
    * @param stream the stream to buffer from
    * @param config the config of the generated buffer
-   * @deprecated Please use {@link #InMemoryCursorIteratorProvider(Iterator, InMemoryCursorIteratorConfig, ComponentLocation)}
+   * @deprecated On 4.3.0, please use {@link #InMemoryCursorIteratorProvider(Iterator, InMemoryCursorIteratorConfig, ComponentLocation, boolean)}
    *             instead.
    */
   public InMemoryCursorIteratorProvider(Iterator stream, InMemoryCursorIteratorConfig config) {
-    this(stream, config, null);
+    this(stream, config, null, false);
   }
 
   /**

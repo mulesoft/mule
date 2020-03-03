@@ -80,7 +80,7 @@ public class CursorIteratorProviderTestCase extends AbstractObjectStreamingTestC
   }
 
   protected CursorIteratorProvider createStreamProvider(List<Object> data) {
-    return new InMemoryCursorIteratorProvider(toStreamingIterator(data), config, fromSingleComponent("log"));
+    return new InMemoryCursorIteratorProvider(toStreamingIterator(data), config, fromSingleComponent("log"), false);
   }
 
   @After

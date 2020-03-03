@@ -15,11 +15,11 @@ import java.io.StringWriter;
 import java.util.Optional;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.streaming.CursorProvider;
 
 /**
- * This {@link RuntimeException} is thrown when it is trying to open a closed
- * {@link org.mule.runtime.api.streaming.CursorProvider}. It can contain optionally the
- * {@link org.mule.runtime.api.component.location.ComponentLocation} where the Cursor was created.
+ * This {@link RuntimeException} is thrown when it is trying to open a closed {@link CursorProvider}. It can contain optionally
+ * the {@link ComponentLocation} where the Cursor was created.
  * 
  * @since 4.3.0
  */
@@ -55,7 +55,7 @@ public class CursorProviderAlreadyClosedException extends RuntimeException {
       StringWriter stringWriter = new StringWriter();
       r.printStackTrace(new PrintWriter(stringWriter));
       return format("The cursor provider was closed by: \n %s", stringWriter.toString());
-    }).orElse(format("Run with -M-D%s=true for more details", TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY));
+    }).orElse(format("Set SystemProperty '%s' in true for more details", TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY));
 
     return format("%s: %s. %s.", message, openedByDescription, responsibleDescription);
   }

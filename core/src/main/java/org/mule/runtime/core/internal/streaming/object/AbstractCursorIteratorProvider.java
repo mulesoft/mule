@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.object;
 
-import static java.lang.Boolean.getBoolean;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.api.util.MuleSystemProperties.TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -31,7 +29,7 @@ public abstract class AbstractCursorIteratorProvider implements CursorIteratorPr
   private final ComponentLocation originatingLocation;
   private Exception closerResponsible;
 
-  private static final boolean TRACK_CURSOR_PROVIDER_CLOSE = getBoolean(TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY);
+  private final boolean trackCursorProviderClose;
 
   /**
    * Creates a new instance
@@ -39,20 +37,22 @@ public abstract class AbstractCursorIteratorProvider implements CursorIteratorPr
    * @param stream the original stream to be decorated
    * @param originatingLocation indicates where the provider was created
    */
-  public AbstractCursorIteratorProvider(Iterator<?> stream, ComponentLocation originatingLocation) {
+  public AbstractCursorIteratorProvider(Iterator<?> stream, ComponentLocation originatingLocation,
+                                        boolean trackCursorProviderClose) {
     this.stream = stream;
     this.originatingLocation = originatingLocation;
+    this.trackCursorProviderClose = trackCursorProviderClose;
   }
 
   /**
    * Creates a new instance
    *
    * @param stream the original stream to be decorated
-   * @deprecated Please use {@link #AbstractCursorIteratorProvider(Iterator, ComponentLocation)} instead.
+   * @deprecated Please use {@link #AbstractCursorIteratorProvider(Iterator, ComponentLocation, boolean)} instead.
    */
   @Deprecated
   public AbstractCursorIteratorProvider(Iterator<?> stream) {
-    this(stream, null);
+    this(stream, null, false);
   }
 
 
@@ -75,10 +75,10 @@ public abstract class AbstractCursorIteratorProvider implements CursorIteratorPr
    */
   @Override
   public void close() {
-    if (TRACK_CURSOR_PROVIDER_CLOSE) {
+    closed.set(true);
+    if (trackCursorProviderClose) {
       closerResponsible = new Exception("Responsible for closing the stream.");
     }
-    closed.set(true);
   }
 
   /**

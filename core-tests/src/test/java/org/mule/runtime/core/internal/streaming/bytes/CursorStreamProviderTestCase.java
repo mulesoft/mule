@@ -95,7 +95,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
                                        new DataSize(bufferSize / 2, BYTE),
                                        new DataSize(maxBufferSize, BYTE));
 
-    return new InMemoryCursorStreamProvider(dataStream, config, bufferManager, fromSingleComponent("log"));
+    return new InMemoryCursorStreamProvider(dataStream, config, bufferManager, fromSingleComponent("log"), false);
   }
 
   @After

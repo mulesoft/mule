@@ -8,7 +8,6 @@
 package org.mule.runtime.core.internal.streaming.bytes;
 
 import static org.mule.runtime.api.util.DataUnit.BYTE;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.TROUBLESHOOTING;
 
@@ -17,7 +16,7 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.DataSize;
 import org.mule.runtime.core.api.streaming.bytes.AbstractCursorStreamProvider;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
-import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
+import org.mule.runtime.core.api.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
 import org.mule.runtime.core.internal.streaming.AbstractTroubleshootCursorProviderTestCase;
 
 import io.qameta.allure.Feature;
@@ -28,7 +27,7 @@ import java.io.InputStream;
 
 @Feature(STREAMING)
 @Story(TROUBLESHOOTING)
-public class TroubleshootStreamCursorProviderTestCase extends AbstractTroubleshootCursorProviderTestCase {
+public class TroubleshootCursorStreamProviderTestCase extends AbstractTroubleshootCursorProviderTestCase {
 
   private static final byte[] DATA = "Hello".getBytes();
 
@@ -52,8 +51,10 @@ public class TroubleshootStreamCursorProviderTestCase extends AbstractTroublesho
                                        new DataSize(bufferSize / 2, BYTE),
                                        new DataSize(maxBufferSize, BYTE));
 
-    return new InMemoryCursorStreamProvider(dataStream, config, bufferManager,
-                                            setComponentLocation ? fromSingleComponent("log") : null);
+    InMemoryCursorStreamProviderFactory providerFactory =
+        new InMemoryCursorStreamProviderFactory(bufferManager, config, streamingManager);
+
+    return (CursorStreamProvider) providerFactory.of(eventContext, dataStream);
   }
 
   @Override
