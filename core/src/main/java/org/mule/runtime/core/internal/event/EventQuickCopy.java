@@ -49,7 +49,7 @@ public final class EventQuickCopy {
       if (event instanceof InternalEvent && context instanceof BaseEventContext) {
         return new EventQuickCopyContextDecorator((BaseEventContext) context, (InternalEvent) event);
       } else {
-         return CoreEvent.builder(context, event).build();
+        return CoreEvent.builder(context, event).build();
       }
     }
   }
