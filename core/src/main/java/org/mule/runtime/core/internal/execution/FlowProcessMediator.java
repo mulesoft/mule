@@ -297,11 +297,6 @@ public class FlowProcessMediator implements Initialisable {
       fireNotification(ctx.messageProcessContext.getMessageSource(), successResult.getResult(),
                        ctx.flowConstruct, MESSAGE_RESPONSE);
 
-      BiConsumer<SourcePolicySuccessResult, CompletableCallback<Void>> sendResponseToClient =
-          (result, responseCallback) -> ctx.template.sendResponseToClient(result.getResult(),
-                                                                          result.getResponseParameters().get(),
-                                                                          responseCallback);
-
       CompletableCallback<Void> responseCallback = new CompletableCallback<Void>() {
 
         @Override
@@ -317,13 +312,20 @@ public class FlowProcessMediator implements Initialisable {
                              ctx);
         }
       };
-
       try {
-        for (CompletableInterceptorSourceSuccessCallbackAdapter interceptor : additionalSuccessInterceptors) {
-          sendResponseToClient = interceptor.apply(ctx.messageSource, sendResponseToClient);
-        }
+        if (additionalSuccessInterceptors.isEmpty()) {
+          ctx.template.sendResponseToClient(successResult.getResult(), successResult.getResponseParameters().get(),
+                                            responseCallback);
+        } else {
+          BiConsumer<SourcePolicySuccessResult, CompletableCallback<Void>> sendResponseToClient =
+              (result, callback) -> ctx.template.sendResponseToClient(result.getResult(),
+                                                                      result.getResponseParameters().get(), callback);
+          for (CompletableInterceptorSourceSuccessCallbackAdapter interceptor : additionalSuccessInterceptors) {
+            sendResponseToClient = interceptor.apply(ctx.messageSource, sendResponseToClient);
+          }
 
-        sendResponseToClient.accept(successResult, responseCallback);
+          sendResponseToClient.accept(successResult, responseCallback);
+        }
       } catch (Exception e) {
         policySuccessError(new SourceErrorException(successResult.getResult(), sourceResponseGenerateErrorType, e),
                            successResult,
@@ -341,10 +343,7 @@ public class FlowProcessMediator implements Initialisable {
       fireNotification(ctx.messageProcessContext.getMessageSource(), failureResult.getMessagingException().getEvent(),
                        ctx.flowConstruct, MESSAGE_ERROR_RESPONSE);
 
-      BiConsumer<SourcePolicyFailureResult, CompletableCallback<Void>> sendErrorResponse =
-          (result, responseCallback) -> sendErrorResponse(result.getMessagingException(),
-                                                          event -> result.getErrorResponseParameters().get(), ctx,
-                                                          responseCallback);
+
 
       CompletableCallback<Void> responseCallback = new CompletableCallback<Void>() {
 
@@ -361,10 +360,18 @@ public class FlowProcessMediator implements Initialisable {
         }
       };
       try {
-        for (CompletableInterceptorSourceFailureCallbackAdapter interceptor : additionalFailureInterceptors) {
-          sendErrorResponse = interceptor.apply(ctx.messageSource, sendErrorResponse);
+        if (additionalFailureInterceptors.isEmpty()) {
+          sendErrorResponse(failureResult.getMessagingException(), event -> failureResult.getErrorResponseParameters().get(), ctx,
+                            responseCallback);
+        } else {
+          BiConsumer<SourcePolicyFailureResult, CompletableCallback<Void>> sendErrorResponse =
+              (result, callback) -> sendErrorResponse(result.getMessagingException(),
+                                                      event -> result.getErrorResponseParameters().get(), ctx, callback);
+          for (CompletableInterceptorSourceFailureCallbackAdapter interceptor : additionalFailureInterceptors) {
+            sendErrorResponse = interceptor.apply(ctx.messageSource, sendErrorResponse);
+          }
+          sendErrorResponse.accept(failureResult, responseCallback);
         }
-        sendErrorResponse.accept(failureResult, responseCallback);
       } catch (Exception e) {
         responseCallback.error(new SourceErrorException(failureResult.getResult(), sourceErrorResponseGenerateErrorType, e,
                                                         failureResult.getMessagingException()));
