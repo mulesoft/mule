@@ -94,7 +94,6 @@ public class AssertionMessageProcessor extends AbstractComponent implements Flow
     return "Flow assertion '" + message + "' failed @ '" + processorPath + "'. ";
   }
 
-
   public Boolean countFailOrNullEvent() throws InterruptedException // added for testing (cant assert on asserts)
   {
     return !isProcessesCountCorrect();

@@ -138,7 +138,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     } else if (responseCount > 0 && responseSameTask) {
       assertThat(failureMessagePrefix() + "Response task was not same as request task", responseTaskToken,
                  is(requestTaskToken));
-    } else if (responseCount > 0 && !responseSameTask) {
+    } else if (responseCount > 0) {
       assertThat(failureMessagePrefix() + "Response task was same as request task. Response stack trace is " + lineSeparator()
           + responseStackTrace, responseTaskToken, not(is(requestTaskToken)));
     }

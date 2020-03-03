@@ -29,7 +29,7 @@ import org.reactivestreams.Publisher;
 /**
  * Test async non-blocking {@link Processor} implementation that will return control to the Flow in a custom {@link Scheduler}
  * thread in the same way as, for example, a HTTP requester would.
- */
+ */ //TODO MULE-18135 Migrate this extension using mule SDK
 public class TestNonBlockingProcessor extends AbstractComponent
     implements Processor, Initialisable, Disposable {
 

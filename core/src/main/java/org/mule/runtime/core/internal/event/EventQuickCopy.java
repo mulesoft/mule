@@ -46,9 +46,11 @@ public final class EventQuickCopy {
         && ((EventQuickCopyContextDecorator) event).getEvent().getContext() == context) {
       return ((EventQuickCopyContextDecorator) event).getEvent();
     } else {
-      return (event instanceof InternalEvent && context instanceof BaseEventContext)
-          ? new EventQuickCopyContextDecorator((BaseEventContext) context, (InternalEvent) event)
-          : CoreEvent.builder(context, event).build();
+      if (event instanceof InternalEvent && context instanceof BaseEventContext) {
+        return new EventQuickCopyContextDecorator((BaseEventContext) context, (InternalEvent) event);
+      } else {
+         return CoreEvent.builder(context, event).build();
+      }
     }
   }
 
