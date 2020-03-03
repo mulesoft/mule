@@ -6,12 +6,15 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
+import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
 import org.mule.runtime.core.api.util.queue.QueueConfiguration;
@@ -20,10 +23,9 @@ import org.mule.runtime.core.api.util.queue.QueueManager;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Abstract implementation for a QueueManager.
@@ -33,10 +35,9 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractQueueManager
     implements QueueManager, QueueProvider, QueueStoreCacheListener, MuleContextAware, Initialisable, Disposable {
 
-  protected transient Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger LOGGER = getLogger(AbstractQueueManager.class);
 
-  private final ReentrantLock queuesLock = new ReentrantLock();
-  private final Map<String, CacheAwareQueueStore> queues = new HashMap<>();
+  private final Map<String, CacheAwareQueueStore> queues = new ConcurrentHashMap<>();
   private final Map<String, QueueConfiguration> queueConfigurations = new HashMap<>();
   private QueueConfiguration defaultQueueConfiguration = new DefaultQueueConfiguration();
   private MuleContext muleContext;
@@ -53,20 +54,22 @@ public abstract class AbstractQueueManager
    * {@inheritDoc}
    */
   @Override
-  public synchronized void setQueueConfiguration(String queueName, QueueConfiguration newConfig) {
-    // We allow calling this method only if the new config is equals to the previous one because of MULE-7420
-    if (queues.containsKey(queueName) && !newConfig.equals(queueConfigurations.get(queueName))) {
-      throw new MuleRuntimeException(CoreMessages.createStaticMessage(String
-          .format("A queue with name %s is in use so we cannot change it's configuration", queueName)));
-    }
-    if (logger.isDebugEnabled()) {
-      if (queueConfigurations.containsKey(queueName)) {
-        QueueConfiguration oldConfiguration = queueConfigurations.get(queueName);
-        logger.debug(String.format("Replacing queue %s configuration: %s with new newConfig: %s", queueName, oldConfiguration,
-                                   newConfig));
+  public void setQueueConfiguration(String queueName, QueueConfiguration newConfig) {
+    synchronized (queueConfigurations) {
+      // We allow calling this method only if the new config is equals to the previous one because of MULE-7420
+      if (queues.containsKey(queueName) && !newConfig.equals(queueConfigurations.get(queueName))) {
+        throw new MuleRuntimeException(createStaticMessage(format("A queue with name %s is in use so we cannot change it's configuration",
+                                                                  queueName)));
       }
+      if (LOGGER.isDebugEnabled()) {
+        if (queueConfigurations.containsKey(queueName)) {
+          QueueConfiguration oldConfiguration = queueConfigurations.get(queueName);
+          LOGGER.debug(format("Replacing queue %s configuration: %s with new newConfig: %s", queueName, oldConfiguration,
+                              newConfig));
+        }
+      }
+      queueConfigurations.put(queueName, newConfig);
     }
-    queueConfigurations.put(queueName, newConfig);
   }
 
   /**
@@ -74,7 +77,9 @@ public abstract class AbstractQueueManager
    */
   @Override
   public Optional<QueueConfiguration> getQueueConfiguration(String queueName) {
-    return ofNullable(queueConfigurations.get(queueName));
+    synchronized (queueConfigurations) {
+      return ofNullable(queueConfigurations.get(queueName));
+    }
   }
 
   private QueueStore getQueue(String name, QueueConfiguration config) {
@@ -82,18 +87,8 @@ public abstract class AbstractQueueManager
     if (queueStore != null) {
       return queueStore;
     }
-    queuesLock.lock();
-    try {
-      queueStore = queues.get(name);
-      if (queueStore == null) {
-        queueStore = new CacheAwareQueueStore(createQueueStore(name, config), this);
-        queues.put(name, queueStore);
-      }
 
-      return queueStore;
-    } finally {
-      queuesLock.unlock();
-    }
+    return queues.computeIfAbsent(name, n -> new CacheAwareQueueStore(createQueueStore(n, config), this));
   }
 
   @Override
@@ -127,14 +122,8 @@ public abstract class AbstractQueueManager
         throw new IllegalArgumentException("Queue to be disposed cannot be null");
       }
       final String queueName = queueStore.getName();
-      queuesLock.lock();
-      try {
-        if (!this.queues.containsKey(queueName)) {
-          throw new IllegalArgumentException(String.format("There's no queue for name %s", queueName));
-        }
-        this.queues.remove(queueName);
-      } finally {
-        queuesLock.unlock();
+      if (this.queues.remove(queueName) == null) {
+        throw new IllegalArgumentException(format("There's no queue for name %s", queueName));
       }
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
@@ -147,16 +136,20 @@ public abstract class AbstractQueueManager
   }
 
   private QueueConfiguration defineQueueConfiguration(String queueName) {
-    if (!queueConfigurations.containsKey(queueName)) {
-      setQueueConfiguration(queueName, defaultQueueConfiguration);
-      return defaultQueueConfiguration;
-    } else {
-      return queueConfigurations.get(queueName);
+    synchronized (queueConfigurations) {
+      if (!queueConfigurations.containsKey(queueName)) {
+        setQueueConfiguration(queueName, defaultQueueConfiguration);
+        return defaultQueueConfiguration;
+      } else {
+        return queueConfigurations.get(queueName);
+      }
     }
   }
 
   protected void clearQueueConfiguration(String queueName) {
-    this.queueConfigurations.remove(queueName);
+    synchronized (queueConfigurations) {
+      this.queueConfigurations.remove(queueName);
+    }
   }
 
 
