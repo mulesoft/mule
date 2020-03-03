@@ -13,6 +13,7 @@ import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
@@ -38,7 +39,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.hamcrest.Matchers;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
@@ -48,6 +48,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -81,7 +82,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   private static final Logger LOGGER = getLogger(ForeachTestCase.class);
-  private static final String MULE_FOREACH_CONTEXT_KEY = "mule.foreach.router.foreachContext";
 
   protected Foreach foreach;
   private Foreach simpleForeach;
@@ -534,8 +534,8 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   }
 
   private void assertNoForEachContext(InternalEvent event) {
-    Map<String, Object> forEachContext = event.getInternalParameter(MULE_FOREACH_CONTEXT_KEY);
-    assertThat(forEachContext.isEmpty(), Matchers.is(true));
+    EventInternalContext forEachContext = event.getForEachContext();
+    assertThat(forEachContext, is(nullValue()));
   }
 
   public class DummySimpleIterableClass implements Iterable<String> {
