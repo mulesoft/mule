@@ -36,6 +36,6 @@ public class InMemoryCursorIteratorProviderFactory extends AbstractCursorIterato
    */
   @Override
   protected Object resolve(Iterator iterator, EventContext eventContext) {
-    return new InMemoryCursorIteratorProvider(iterator, config);
+    return new InMemoryCursorIteratorProvider(iterator, config, eventContext.getOriginatingLocation(), trackCursorProviderClose);
   }
 }

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.streaming.bytes.factory;
 
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -44,7 +45,7 @@ public class InMemoryCursorStreamProviderFactory extends AbstractCursorStreamPro
 
   @Override
   protected Object resolve(InputStream inputStream, EventContext eventContext) {
-    return doResolve(inputStream);
+    return doResolve(inputStream, eventContext.getOriginatingLocation());
   }
 
   /**
@@ -54,10 +55,11 @@ public class InMemoryCursorStreamProviderFactory extends AbstractCursorStreamPro
    */
   @Override
   protected Object resolve(InputStream inputStream, CoreEvent event) {
-    return doResolve(inputStream);
+    return doResolve(inputStream, event.getContext().getOriginatingLocation());
   }
 
-  private Object doResolve(InputStream inputStream) {
-    return new InMemoryCursorStreamProvider(inputStream, config, getBufferManager());
+  private Object doResolve(InputStream inputStream, ComponentLocation originatingLocation) {
+    return new InMemoryCursorStreamProvider(inputStream, config, getBufferManager(), originatingLocation,
+                                            trackCursorProviderClose);
   }
 }
