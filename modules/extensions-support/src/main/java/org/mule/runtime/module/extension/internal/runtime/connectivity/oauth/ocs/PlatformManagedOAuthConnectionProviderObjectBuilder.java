@@ -69,7 +69,6 @@ public class PlatformManagedOAuthConnectionProviderObjectBuilder<C> extends Base
     final ResolverSetResult resolverSetResult = resolverSet.resolve(context);
     final Pair<ConnectionProviderModel, OAuthGrantType> delegateModel =
         getDelegateOAuthConnectionProviderModel(configurationModel);
-    final String ownerConfigName = configurationModel.getName();
     final String connectionId = (String) resolverSetResult.get(PLATFORM_MANAGED_CONNECTION_ID_PARAMETER_NAME);
     final PlatformManagedOAuthConfig config = from(ownerConfigName,
                                                    connectionId,

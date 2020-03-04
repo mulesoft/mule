@@ -221,6 +221,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
                                                        oauthConfig.getExtensionModel(),
                                                        expressionManager,
                                                        muleContext);
+      builder.setOwnerConfigName(oauthConfig.getOwnerConfigName());
 
       CoreEvent event = getNullEvent(muleContext);
       ValueResolvingContext ctx = null;
