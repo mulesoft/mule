@@ -107,11 +107,11 @@ public class SourcePolicyContext implements EventInternalContext<SourcePolicyCon
     return parametersTransformer;
   }
 
-  public Map<String, TypedValue<?>> getVariables(String key) {
-    return variables.get(key);
+  public Map<String, TypedValue<?>> getVariables(String policyId) {
+    return variables.get(policyId);
   }
 
-  public void addVariables(String key, Map<String, TypedValue<?>> variables) {
-    this.variables.put(key, variables);
+  public void addVariables(String policyId, Map<String, TypedValue<?>> variables) {
+    this.variables.put(policyId, variables);
   }
 }

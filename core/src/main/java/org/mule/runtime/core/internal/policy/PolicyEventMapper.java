@@ -28,17 +28,16 @@ import org.slf4j.Logger;
  */
 public class PolicyEventMapper {
 
-  private static final String POLICY_VARS_PREFIX = "policy.vars.";
   private static final Logger LOGGER = getLogger(PolicyEventMapper.class);
 
-  private final String policyVarsInternalParameterName;
+  private final String policyId;
 
   public PolicyEventMapper() {
     this(null);
   }
 
   public PolicyEventMapper(String policyId) {
-    policyVarsInternalParameterName = POLICY_VARS_PREFIX + policyId;
+    this.policyId = policyId;
   }
 
   /**
@@ -285,10 +284,6 @@ public class PolicyEventMapper {
         .build();
   }
 
-  private String policyVarsInternalParameterName(String policyId) {
-    return POLICY_VARS_PREFIX + policyId;
-  }
-
   private PrivilegedEvent getOriginalEvent(CoreEvent event) {
     final PrivilegedEvent operationOriginalEvent = getOperationOriginalEvent(event);
     return operationOriginalEvent != null ? operationOriginalEvent : getSourceOriginalEvent(event);
@@ -305,14 +300,14 @@ public class PolicyEventMapper {
   }
 
   private void storeVariablesInContext(CoreEvent event, Map<String, TypedValue<?>> variables) {
-    SourcePolicyContext.from(event).addVariables(policyVarsInternalParameterName, variables);
+    SourcePolicyContext.from(event).addVariables(policyId, variables);
   }
 
   private Map<String, TypedValue<?>> loadVars(CoreEvent event) {
-    return SourcePolicyContext.from(event).getVariables(policyVarsInternalParameterName);
+    return SourcePolicyContext.from(event).getVariables(policyId);
   }
 
   private Map<String, TypedValue<?>> loadVars(CoreEvent event, String policyId) {
-    return SourcePolicyContext.from(event).getVariables(policyVarsInternalParameterName(policyId));
+    return SourcePolicyContext.from(event).getVariables(policyId);
   }
 }
