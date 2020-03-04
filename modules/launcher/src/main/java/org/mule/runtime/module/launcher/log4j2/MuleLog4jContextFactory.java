@@ -19,28 +19,31 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.lmax.disruptor.ExceptionHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.core.config.ConfigurationFactory;
 import org.apache.logging.log4j.core.config.xml.XmlConfigurationFactory;
 import org.apache.logging.log4j.core.impl.Log4jContextFactory;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.core.util.Cancellable;
 import org.apache.logging.log4j.core.util.ShutdownCallbackRegistry;
+import org.apache.logging.log4j.spi.LoggerContextFactory;
 
 /**
- * Implementation of {@link org.apache.logging.log4j.spi.LoggerContextFactory} which acts as the bootstrap for mule's logging
+ * Implementation of {@link LoggerContextFactory} which acts as the bootstrap for mule's logging
  * mechanism.
  * <p/>
- * It forces {@link org.mule.runtime.module.launcher.log4j2.ArtifactAwareContextSelector} as the only selector,
- * {@link org.apache.logging.log4j.core.config.xml.XmlConfigurationFactory} as the only available
- * {@link org.apache.logging.log4j.core.config.ConfigurationFactory}, and sets
- * {@link AsyncLoggerExceptionHandler} as the {@link com.lmax.disruptor.ExceptionHandler}
+ * It forces {@link ArtifactAwareContextSelector} as the only selector,
+ * {@link XmlConfigurationFactory} as the only available
+ * {@link ConfigurationFactory}, and sets
+ * {@link AsyncLoggerExceptionHandler} as the {@link ExceptionHandler}
  * for failing async loggers.
  * <p/>
- * Other than that, it's pretty much a copy paste of {@link org.apache.logging.log4j.core.impl.Log4jContextFactory}, due to that
+ * Other than that, it's pretty much a copy paste of {@link Log4jContextFactory}, due to that
  * classes' lack of extensibility.
  * <p/>
- * By forcing {@link org.apache.logging.log4j.core.config.xml.XmlConfigurationFactory} as the only available
- * {@link org.apache.logging.log4j.core.config.ConfigurationFactory} we're disabling log4j2's ability to take json and yaml
+ * By forcing {@link XmlConfigurationFactory} as the only available
+ * {@link ConfigurationFactory} we're disabling log4j2's ability to take json and yaml
  * configurations. This is so because those configuration factories depend on versions of the jackson libraries which would cause
  * conflict with the ones in mule. TODO: Upgrade the jackson libraries bundled with mule so that this restriction can be lifted
  * off
@@ -102,7 +105,10 @@ public class MuleLog4jContextFactory extends Log4jContextFactory implements Disp
 
   @Override
   public void dispose() {
-    ((ArtifactAwareContextSelector) getSelector()).dispose();
+    ContextSelector selector = getSelector();
+    if (selector instanceof Disposable) {
+      ((Disposable) selector).dispose();
+    }
     MuleShutdownCallbackRegistry shutdownCallbackRegistry = (MuleShutdownCallbackRegistry) getShutdownCallbackRegistry();
     shutdownCallbackRegistry.dispose();
   }
