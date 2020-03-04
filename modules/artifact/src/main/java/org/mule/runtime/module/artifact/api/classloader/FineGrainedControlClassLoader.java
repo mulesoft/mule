@@ -99,7 +99,12 @@ public class FineGrainedControlClassLoader extends URLClassLoader
     }
 
     if (result == null) {
-      throw new CompositeClassNotFoundException(name, lookupStrategy, exceptions);
+      final CompositeClassNotFoundException compositeClassNotFoundException =
+          new CompositeClassNotFoundException(name, lookupStrategy, exceptions);
+      if (verboseLogging) {
+        LOGGER.warn(compositeClassNotFoundException.getMessage());
+      }
+      throw compositeClassNotFoundException;
     }
 
     if (verboseLogging) {
