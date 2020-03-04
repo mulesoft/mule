@@ -15,6 +15,7 @@ import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.util.context.Context.empty;
 
@@ -69,7 +70,7 @@ class ForeachRouter {
                 MessageProcessorChain nestedChain) {
     this.owner = owner;
 
-    upstreamFlux = Flux.from(publisher)
+    upstreamFlux = from(publisher)
         .doOnNext(event -> {
 
           if (expression.equals(DEFAULT_SPLIT_EXPRESSION)
@@ -291,7 +292,9 @@ class ForeachRouter {
   }
 
   private void subscribeUpstreamChains(Context downstreamContext) {
-    innerFlux.subscriberContext(downstreamContext).subscribe();
+    innerFlux.subscriberContext(downstreamContext)
+            .doOnError(e -> LOGGER.error("Exception during foreach execution: " + e.getCause()))
+            .subscribe();
     upstreamFlux.subscriberContext(downstreamContext).subscribe();
   }
 
