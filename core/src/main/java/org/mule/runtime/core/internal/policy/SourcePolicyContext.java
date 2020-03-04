@@ -10,6 +10,8 @@ import static java.util.Optional.empty;
 
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.functional.Either;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.internal.message.EventInternalContext;
@@ -44,6 +46,7 @@ public class SourcePolicyContext implements EventInternalContext<SourcePolicyCon
   private Map<String, Object> originalResponseParameters;
   private Map<String, Object> originalFailureResponseParameters;
   private Optional<SourcePolicyParametersTransformer> parametersTransformer = empty();
+  private Map<String, Map<String, TypedValue<?>>> variables = new SmallMap<>();
 
   public SourcePolicyContext(PolicyPointcutParameters pointcutParameters) {
     this.pointcutParameters = pointcutParameters;
@@ -102,5 +105,13 @@ public class SourcePolicyContext implements EventInternalContext<SourcePolicyCon
 
   public Optional<SourcePolicyParametersTransformer> getParametersTransformer() {
     return parametersTransformer;
+  }
+
+  public Map<String, TypedValue<?>> getVariables(String key) {
+    return variables.get(key);
+  }
+
+  public void addVariables(String key, Map<String, TypedValue<?>> variables) {
+    this.variables.put(key, variables);
   }
 }

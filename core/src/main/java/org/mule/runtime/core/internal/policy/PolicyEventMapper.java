@@ -97,9 +97,10 @@ public class PolicyEventMapper {
     OperationPolicyContext ctx = from(result);
     final InternalEvent operationResult = ctx.getNextOperationResponse();
 
+    storeVariablesInContext(result, result.getVariables());
+
     if (operationResult == null) {
       return InternalEvent.builder(result)
-          .addInternalParameter(policyVarsInternalParameterName(), result.getVariables())
           .variablesTyped(ctx.getOriginalEvent().getVariables())
           .build();
 
@@ -107,7 +108,6 @@ public class PolicyEventMapper {
       Message message = propagate ? result.getMessage() : operationResult.getMessage();
 
       InternalEvent next = InternalEvent.builder(result)
-          .addInternalParameter(policyVarsInternalParameterName(), result.getVariables())
           .message(message)
           .variables(operationResult.getVariables())
           .build();
@@ -139,17 +139,16 @@ public class PolicyEventMapper {
     final OperationPolicyContext ctx = from(result);
     final InternalEvent nextOperationResponse = ctx.getNextOperationResponse();
 
+    storeVariablesInContext(result, result.getVariables());
     if (nextOperationResponse == null) {
       // Operation was not executed or failed, so variables from the initial event are used
       return InternalEvent.builder(result)
-          .addInternalParameter(policyVarsInternalParameterName(), result.getVariables())
           .variablesTyped(ctx.getOriginalEvent().getVariables())
           .build();
     } else {
       // Operation was successfully executed, so variables from the operation response are used
       ctx.setNextOperationResponse(nextOperationResponse);
       return InternalEvent.builder(result)
-          .addInternalParameter(policyVarsInternalParameterName(), result.getVariables())
           .variablesTyped(nextOperationResponse.getVariables())
           .build();
     }
@@ -277,16 +276,13 @@ public class PolicyEventMapper {
   private CoreEvent onPolicyNext(CoreEvent event, boolean propagate) {
     PrivilegedEvent originalEvent = getOriginalEvent(event);
 
+    storeVariablesInContext(event, event.getVariables());
+
     return InternalEvent
         .builder(event)
         .message(propagate ? event.getMessage() : originalEvent.getMessage())
         .variables(originalEvent.getVariables())
-        .addInternalParameter(policyVarsInternalParameterName(), event.getVariables())
         .build();
-  }
-
-  private String policyVarsInternalParameterName() {
-    return policyVarsInternalParameterName;
   }
 
   private String policyVarsInternalParameterName(String policyId) {
@@ -308,11 +304,15 @@ public class PolicyEventMapper {
     return ctx != null ? (PrivilegedEvent) ctx.getOriginalEvent() : null;
   }
 
+  private void storeVariablesInContext(CoreEvent event, Map<String, TypedValue<?>> variables) {
+    SourcePolicyContext.from(event).addVariables(policyVarsInternalParameterName, variables);
+  }
+
   private Map<String, TypedValue<?>> loadVars(CoreEvent event) {
-    return ((InternalEvent) event).getInternalParameter(policyVarsInternalParameterName());
+    return SourcePolicyContext.from(event).getVariables(policyVarsInternalParameterName);
   }
 
   private Map<String, TypedValue<?>> loadVars(CoreEvent event, String policyId) {
-    return ((InternalEvent) event).getInternalParameter(policyVarsInternalParameterName(policyId));
+    return SourcePolicyContext.from(event).getVariables(policyVarsInternalParameterName(policyId));
   }
 }
