@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.object;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.core.api.streaming.object.InMemoryCursorIteratorConfig;
 
@@ -26,11 +27,27 @@ public class InMemoryCursorIteratorProvider extends AbstractCursorIteratorProvid
    *
    * @param stream the stream to buffer from
    * @param config        the config of the generated buffer
+   * @param originatingLocation indicates where the cursor was created
+   *                            
+   * @since 4.3.0
    */
-  public InMemoryCursorIteratorProvider(Iterator stream, InMemoryCursorIteratorConfig config) {
-    super(stream);
+  public InMemoryCursorIteratorProvider(Iterator stream, InMemoryCursorIteratorConfig config,
+                                        ComponentLocation originatingLocation, boolean trackCursorProviderClose) {
+    super(stream, originatingLocation, trackCursorProviderClose);
     buffer = new InMemoryObjectStreamBuffer(stream, config);
     buffer.initialise();
+  }
+
+  /**
+   * Creates a new instance
+   *
+   * @param stream the stream to buffer from
+   * @param config the config of the generated buffer
+   * @deprecated On 4.3.0, please use {@link #InMemoryCursorIteratorProvider(Iterator, InMemoryCursorIteratorConfig, ComponentLocation, boolean)}
+   *             instead.
+   */
+  public InMemoryCursorIteratorProvider(Iterator stream, InMemoryCursorIteratorConfig config) {
+    this(stream, config, null, false);
   }
 
   /**
