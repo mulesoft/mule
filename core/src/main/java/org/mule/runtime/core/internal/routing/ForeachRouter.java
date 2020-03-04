@@ -6,6 +6,18 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static java.util.Optional.of;
+import static org.mule.runtime.api.functional.Either.left;
+import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.api.metadata.DataType.fromObject;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
+import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
+import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Mono.subscriberContext;
+import static reactor.util.context.Context.empty;
+
 import com.google.common.collect.Iterators;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.message.ItemSequenceInfo;
@@ -34,23 +46,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static java.util.Optional.of;
-import static org.mule.runtime.api.functional.Either.left;
-import static org.mule.runtime.api.functional.Either.right;
-import static org.mule.runtime.api.metadata.DataType.fromObject;
-import static org.mule.runtime.core.api.event.CoreEvent.builder;
-import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
-import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.Exceptions.propagate;
-import static reactor.core.publisher.Mono.subscriberContext;
-import static reactor.util.context.Context.empty;
-
 class ForeachRouter {
 
   private static final Logger LOGGER = getLogger(ForeachRouter.class);
 
-  private static final String MULE_FOREACH_CONTEXT_KEY = "mule.foreach.router.foreachContext";
   static final String MAP_NOT_SUPPORTED_MESSAGE =
       "Foreach does not support 'java.util.Map' with no collection expression. To iterate over Map entries use '#[dw::core::Objects::entrySet(payload)]'";
   private final Map<String, ForeachContext> foreachContextResolver = new HashMap<>();
@@ -78,33 +77,12 @@ class ForeachRouter {
             downstreamRecorder.next(left(new IllegalArgumentException(MAP_NOT_SUPPORTED_MESSAGE)));
           }
 
-          final CoreEvent responseEvent =
-              builder(event).addVariable(owner.getRootMessageVariableName(), event.getMessage()).build();
-
-          // Create ForEachContext
-          ForeachContext foreachContext = this.createForeachContext(event);
-
-          // Save it to handle nested routers
-          foreachContextResolver.put(event.getContext().getId(), foreachContext);
-
-          // Save it inside the internalParameters of the event
-          ((InternalEvent) responseEvent).setForEachContext(foreachContext);
+          final CoreEvent responseEvent = prepareEvent(event, expression);
 
           inflightEvents.getAndIncrement();
-          try {
-            // Set the Iterator<TypedValue> calculated
-            foreachContext.setIterator(this.splitRequest(responseEvent, expression));
+          // Inject it into the inner flux
+          innerRecorder.next(responseEvent);
 
-            // Inject it into the inner flux
-            innerRecorder.next(responseEvent);
-          } catch (Exception e) {
-            // Delete foreach context
-            ((InternalEvent) responseEvent).setForEachContext(null);
-            // Wrap any exception that occurs during split in a MessagingException. This is required as the
-            // automatic wrapping is only applied when the signal is an Event.
-            downstreamRecorder.next(left(new MessagingException(responseEvent, e, owner)));
-            completeRouterIfNecessary();
-          }
         })
         .doOnComplete(() -> {
           if (inflightEvents.get() == 0) {
@@ -189,6 +167,30 @@ class ForeachRouter {
     downstreamRecorder.complete();
   }
 
+  private CoreEvent prepareEvent(CoreEvent event, String expression) {
+    final CoreEvent responseEvent =
+        builder(event).addVariable(owner.getRootMessageVariableName(), event.getMessage()).build();
+
+    try {
+      Iterator<TypedValue<?>> typedValueIterator = this.splitRequest(responseEvent, expression);
+
+      // Create ForEachContext
+      ForeachContext foreachContext = this.createForeachContext(event, typedValueIterator);
+
+      // Save it to handle nested routers
+      foreachContextResolver.put(event.getContext().getId(), foreachContext);
+
+      // Save it inside the internalParameters of the event
+      ((InternalEvent) responseEvent).setForEachContext(foreachContext);
+    } catch (Exception e) {
+      // Wrap any exception that occurs during split in a MessagingException. This is required as the
+      // automatic wrapping is only applied when the signal is an Event.
+      downstreamRecorder.next(left(new MessagingException(responseEvent, e, owner)));
+      completeRouterIfNecessary();
+    }
+    return responseEvent;
+  }
+
   private TypedValue setCurrentValue(int batchSize, ForeachContext foreachContext) {
     TypedValue currentValue;
     Iterator<TypedValue<?>> iterator = foreachContext.getIterator();
@@ -237,7 +239,7 @@ class ForeachRouter {
     return partEvent;
   }
 
-  private ForeachContext createForeachContext(CoreEvent event) {
+  private ForeachContext createForeachContext(CoreEvent event, Iterator<TypedValue<?>> iterator) {
     // Keep reference to existing rootMessage/count variables in order to restore later to support foreach nesting.
     Object previousCounterVar = event.getVariables().containsKey(owner.getCounterVariableName())
         ? event.getVariables().get(owner.getCounterVariableName()).getValue()
@@ -247,7 +249,8 @@ class ForeachRouter {
             ? event.getVariables().get(owner.getRootMessageVariableName()).getValue()
             : null;
 
-    return new ForeachContext(previousCounterVar, previousRootMessageVar, event.getMessage(), event.getItemSequenceInfo());
+    return new ForeachContext(previousCounterVar, previousRootMessageVar, event.getMessage(), event.getItemSequenceInfo(),
+                              iterator);
   }
 
   private Iterator<TypedValue<?>> splitRequest(CoreEvent request, String expression) {
