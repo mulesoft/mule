@@ -30,11 +30,12 @@ class ForeachContext implements EventInternalContext {
   private Optional<Runnable> onComplete = empty();
 
   ForeachContext(Object previousCounter, Object previousRootMessage, Message message,
-                 Optional<ItemSequenceInfo> itemSequenceInfo) {
+                 Optional<ItemSequenceInfo> itemSequenceInfo, Iterator<TypedValue<?>> iterator) {
     this.previousCounter = previousCounter;
     this.previousRootMessage = previousRootMessage;
     this.originalMessage = message;
     this.itemSequenceInfo = itemSequenceInfo;
+    this.iterator = iterator;
   }
 
   Object getPreviousCounter() {
