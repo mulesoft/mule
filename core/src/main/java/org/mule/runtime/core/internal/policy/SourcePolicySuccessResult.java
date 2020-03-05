@@ -15,12 +15,12 @@ import java.util.function.Supplier;
 /**
  * Result of a successful execution of a {@link SourcePolicy}.
  *
- * It contains the {@link CoreEvent} result of the flow execution and the response parameters and error response parameters to be sent
- * by the source.
+ * It contains the {@link CoreEvent} result of the flow execution and the response parameters and error response parameters to be
+ * sent by the source.
  *
  * @since 4.0
  */
-public class SourcePolicySuccessResult {
+public class SourcePolicySuccessResult implements SourcePolicyResult {
 
   private final CoreEvent result;
   private final Supplier<Map<String, Object>> responseParameters;
@@ -43,6 +43,7 @@ public class SourcePolicySuccessResult {
   /**
    * @return the result of the flow execution.
    */
+  @Override
   public CoreEvent getResult() {
     return result;
   }

@@ -61,7 +61,9 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
-import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorSourceCallbackAdapter;
+import org.mule.runtime.core.internal.processor.interceptor.AbstractReactiveInterceptorSourceCallbackAdapter;
+import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorSourceFailureCallbackAdapter;
+import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorSourceSuccessCallbackAdapter;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
@@ -105,7 +107,8 @@ public class ModuleFlowProcessingPhase
 
   private final PolicyManager policyManager;
 
-  private final List<ReactiveInterceptorSourceCallbackAdapter> additionalInterceptors = new LinkedList<>();
+  private final List<ReactiveInterceptorSourceSuccessCallbackAdapter> additionalSuccessInterceptors = new LinkedList<>();
+  private final List<ReactiveInterceptorSourceFailureCallbackAdapter> additionalFailureInterceptors = new LinkedList<>();
 
   @Inject
   private InterceptorManager processorInterceptorManager;
@@ -128,14 +131,18 @@ public class ModuleFlowProcessingPhase
 
     if (processorInterceptorManager != null) {
       processorInterceptorManager.getSourceInterceptorFactories().stream().forEach(interceptorFactory -> {
-        ReactiveInterceptorSourceCallbackAdapter reactiveInterceptorAdapter =
-            new ReactiveInterceptorSourceCallbackAdapter(interceptorFactory);
+        ReactiveInterceptorSourceSuccessCallbackAdapter reactiveInterceptorSuccessAdapter =
+            new ReactiveInterceptorSourceSuccessCallbackAdapter(interceptorFactory);
+        ReactiveInterceptorSourceFailureCallbackAdapter reactiveInterceptorFailureAdapter =
+            new ReactiveInterceptorSourceFailureCallbackAdapter(interceptorFactory);
         try {
-          muleContext.getInjector().inject(reactiveInterceptorAdapter);
+          muleContext.getInjector().inject(reactiveInterceptorSuccessAdapter);
+          muleContext.getInjector().inject(reactiveInterceptorFailureAdapter);
         } catch (MuleException e) {
           throw new MuleRuntimeException(e);
         }
-        additionalInterceptors.add(0, reactiveInterceptorAdapter);
+        additionalSuccessInterceptors.add(0, reactiveInterceptorSuccessAdapter);
+        additionalFailureInterceptors.add(0, reactiveInterceptorFailureAdapter);
       });
     }
   }
@@ -257,7 +264,7 @@ public class ModuleFlowProcessingPhase
       try {
         Function<SourcePolicySuccessResult, Publisher<Void>> sendResponseToClient =
             result -> ctx.template.sendResponseToClient(result.getResult(), result.getResponseParameters().get());
-        for (ReactiveInterceptorSourceCallbackAdapter interceptor : additionalInterceptors) {
+        for (ReactiveInterceptorSourceSuccessCallbackAdapter interceptor : additionalSuccessInterceptors) {
           sendResponseToClient = interceptor.apply(messageSource, sendResponseToClient);
         }
 
@@ -283,10 +290,15 @@ public class ModuleFlowProcessingPhase
     return failureResult -> {
       fireNotification(ctx.messageProcessContext.getMessageSource(), failureResult.getMessagingException().getEvent(),
                        flowConstruct, MESSAGE_ERROR_RESPONSE);
-      return sendErrorResponse(failureResult.getMessagingException(), event -> failureResult.getErrorResponseParameters().get(),
-                               ctx, flowConstruct)
-                                   .doOnSuccess(v -> onTerminate(flowConstruct, messageSource, ctx.terminateConsumer,
-                                                                 left(failureResult.getMessagingException())));
+      Function<SourcePolicyFailureResult, Publisher<Void>> sendErrorResponse =
+          result -> sendErrorResponse(failureResult.getMessagingException(),
+                                      event -> failureResult.getErrorResponseParameters().get(), ctx, flowConstruct);
+      for (ReactiveInterceptorSourceFailureCallbackAdapter interceptor : additionalFailureInterceptors) {
+        sendErrorResponse = interceptor.apply(messageSource, sendErrorResponse);
+      }
+      return from(sendErrorResponse.apply(failureResult))
+          .doOnSuccess(v -> onTerminate(flowConstruct, messageSource, ctx.terminateConsumer,
+                                        left(failureResult.getMessagingException())));
     };
   }
 
