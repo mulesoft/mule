@@ -81,7 +81,8 @@ public abstract class AbstractCompletableInterceptorSourceCallbackAdapter<T exte
 
   /**
    * Applies the result of the before interception to the given result
-   * @param event Resulting event of the before interception
+   *
+   * @param event  Resulting event of the before interception
    * @param result Input result of the source
    * @return Result with the before event applied
    */
@@ -93,10 +94,7 @@ public abstract class AbstractCompletableInterceptorSourceCallbackAdapter<T exte
       final InternalEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
       DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
 
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Calling before() for '{}' in processor '{}'...", interceptor,
-                     component.getLocation().getLocation());
-      }
+      LOGGER.debug("Calling before() for '{}' in processor '{}'...", interceptor, component.getLocation().getLocation());
 
       try {
         Thread currentThread = currentThread();
@@ -123,10 +121,7 @@ public abstract class AbstractCompletableInterceptorSourceCallbackAdapter<T exte
       final InternalEvent eventWithResolvedParams = removeResolvedParameters(event);
       DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
 
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Calling after() for '{}' in processor '{}'...", interceptor,
-                     component.getLocation().getLocation());
-      }
+      LOGGER.debug("Calling after() for '{}' in processor '{}'...", interceptor, component.getLocation().getLocation());
 
       try {
         Thread currentThread = currentThread();
