@@ -11,6 +11,7 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static reactor.core.publisher.Mono.error;
@@ -107,20 +108,29 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
       routers.put(errorListener, errorListener.router(publisherPostProcessor, continueCallback, propagateCallback));
     }
 
-    return error -> {
-      MessagingException messagingError = (MessagingException) error;
-      CoreEvent event = messagingError.getEvent();
-      try {
-        for (MessagingExceptionHandlerAcceptor errorListener : exceptionListeners) {
-          if (errorListener.accept(event)) {
-            routers.get(errorListener).accept(error);
-            return;
+    return new ExceptionRouter() {
+
+      @Override
+      public void dispose() {
+        routers.values().forEach(r -> disposeIfNeeded(r, logger));
+      }
+
+      @Override
+      public void accept(Exception error) {
+        MessagingException messagingError = (MessagingException) error;
+        CoreEvent event = messagingError.getEvent();
+        try {
+          for (MessagingExceptionHandlerAcceptor errorListener : exceptionListeners) {
+            if (errorListener.accept(event)) {
+              routers.get(errorListener).accept(error);
+              return;
+            }
           }
+          throw new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE));
+        } catch (Exception e) {
+          propagateCallback.accept(messagingExceptionResolver.resolve(new MessagingException(event, e, ErrorHandler.this),
+                                                                      errorTypeLocator, exceptionContextProviders));
         }
-        throw new MuleRuntimeException(createStaticMessage(MUST_ACCEPT_ANY_EVENT_MESSAGE));
-      } catch (Exception e) {
-        propagateCallback.accept(messagingExceptionResolver.resolve(new MessagingException(event, e, this),
-                                                                    errorTypeLocator, exceptionContextProviders));
       }
     };
   }

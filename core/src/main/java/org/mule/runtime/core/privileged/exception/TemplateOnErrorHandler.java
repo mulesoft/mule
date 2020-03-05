@@ -56,6 +56,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContext;
+import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -135,15 +136,19 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         onErrorFlux = onErrorFlux.compose(TemplateOnErrorHandler.this::route);
       }
 
-      onErrorFlux = Flux.from(publisherPostProcessor.apply(onErrorFlux
-          .onErrorContinue(MessagingException.class, onRoutingError())
-          .map(afterRouting())
-          .doOnNext(result -> {
-            final ErrorHandlerContext ctx = ErrorHandlerContext.from(result);
-            final String parameterId = getParameterId(result);
-            fireEndNotification(ctx.getOriginalEvent(parameterId), result, ctx.getException(parameterId));
-          })
-          .doOnNext(TemplateOnErrorHandler.this::resolveHandling)));
+      onErrorFlux = Flux.from(publisherPostProcessor
+          .apply(onErrorFlux
+              .onErrorContinue(MessagingException.class, onRoutingError())
+              .map(afterRouting())
+              .doOnNext(result -> {
+                final ErrorHandlerContext ctx = ErrorHandlerContext.from(result);
+                final String parameterId = getParameterId(result);
+                fireEndNotification(ctx.getOriginalEvent(parameterId), result, ctx.getException(parameterId));
+              })
+              .doOnNext(TemplateOnErrorHandler.this::resolveHandling)))
+          .doAfterTerminate(() -> {
+            fluxSinks.remove(sinkRef.getFluxSink());
+          });
 
       if (processingStrategy.isPresent()) {
         processingStrategy.get().registerInternalSink(onErrorFlux, "error handler '" + getLocation().getLocation() + "'");
@@ -177,20 +182,29 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
                                     Consumer<Throwable> propagateCallback) {
     FluxSink<CoreEvent> fluxSink = fluxFactory.apply(publisherPostProcessor);
 
-    return error -> {
-      // All calling methods will end up transforming any error class other than MessagingException into that one
-      MessagingException messagingError = (MessagingException) error;
-      CoreEvent failureEvent = messagingError.getEvent();
+    return new ExceptionRouter() {
 
-      ErrorHandlerContext ctx = ErrorHandlerContext.from(failureEvent);
-
-      if (ctx == null) {
-        ctx = new ErrorHandlerContext();
-        failureEvent = quickCopy(failureEvent, of(ERROR_HANDLER_CONTEXT, ctx));
+      @Override
+      public void dispose() {
+        fluxSink.complete();
       }
 
-      ctx.addContextItem(getParameterId(failureEvent), error, failureEvent, continueCallback, propagateCallback);
-      fluxSink.next(failureEvent);
+      @Override
+      public void accept(Exception error) {
+        // All calling methods will end up transforming any error class other than MessagingException into that one
+        MessagingException messagingError = (MessagingException) error;
+        CoreEvent failureEvent = messagingError.getEvent();
+
+        ErrorHandlerContext ctx = ErrorHandlerContext.from(failureEvent);
+
+        if (ctx == null) {
+          ctx = new ErrorHandlerContext();
+          failureEvent = quickCopy(failureEvent, of(ERROR_HANDLER_CONTEXT, ctx));
+        }
+
+        ctx.addContextItem(getParameterId(failureEvent), error, failureEvent, continueCallback, propagateCallback);
+        fluxSink.next(failureEvent);
+      }
     };
   }
 
