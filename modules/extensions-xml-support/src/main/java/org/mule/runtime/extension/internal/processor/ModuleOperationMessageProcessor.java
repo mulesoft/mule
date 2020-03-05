@@ -319,7 +319,10 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
     addVariables(event, builder, parameters);
     builder.internalParameters(((InternalEvent) event).getInternalParameters());
     builder.addInternalParameter(getParameterId(ORIGINAL_EVENT_KEY, event), event);
-    return builder.build();
+    builder.securityContext(event.getSecurityContext());
+    InternalEvent newEvent = builder.build();
+    newEvent.setSourcePolicyContext(((InternalEvent) event).getSourcePolicyContext());
+    return newEvent;
   }
 
   private void addVariables(CoreEvent event, CoreEvent.Builder builder,
