@@ -6,41 +6,29 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.security.SecurityContext;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
-import org.mule.runtime.extension.internal.property.TransactionalActionModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * Default implementation of {@link ExecutionContextAdapter} which adds additional information which is relevant to this
@@ -49,10 +37,6 @@ import java.util.function.Supplier;
  * @since 3.7.0
  */
 public class DefaultExecutionContext<M extends ComponentModel> implements ExecutionContextAdapter<M> {
-
-  private static final ExtensionTransactionFactory TRANSACTION_FACTORY = new ExtensionTransactionFactory();
-
-  private static final Supplier<Optional<TransactionConfig>> EMPTY_TX_CONFIG = () -> empty();
 
   private final ExtensionModel extensionModel;
   private final Optional<ConfigurationInstance> configuration;
@@ -64,7 +48,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   private SecurityContext securityContext;
   private final CursorProviderFactory cursorProviderFactory;
   private final StreamingManager streamingManager;
-  private final Supplier<Optional<TransactionConfig>> transactionConfig;
+  private final Optional<TransactionConfig> transactionConfig;
   private final Component component;
   private final RetryPolicyTemplate retryPolicyTemplate;
   private Scheduler currentScheduler;
@@ -92,8 +76,8 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
                                  Component component,
                                  RetryPolicyTemplate retryPolicyTemplate,
                                  Scheduler currentScheduler,
+                                 Optional<TransactionConfig> transactionConfig,
                                  MuleContext muleContext) {
-
     this.extensionModel = extensionModel;
     this.configuration = configuration;
     this.event = event;
@@ -106,9 +90,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
     this.component = component;
     this.retryPolicyTemplate = retryPolicyTemplate;
     this.currentScheduler = currentScheduler;
-
-    final boolean isTransactional = isTransactional(componentModel);
-    this.transactionConfig = isTransactional ? new LazyValue<>(() -> of(buildTransactionConfig())) : EMPTY_TX_CONFIG;
+    this.transactionConfig = transactionConfig;
   }
 
   /**
@@ -257,7 +239,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
    */
   @Override
   public Optional<TransactionConfig> getTransactionConfig() {
-    return transactionConfig.get();
+    return transactionConfig;
   }
 
   /**
@@ -290,41 +272,5 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   @Override
   public Optional<RetryPolicyTemplate> getRetryPolicyTemplate() {
     return ofNullable(retryPolicyTemplate);
-  }
-
-  private TransactionConfig buildTransactionConfig() {
-    MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
-    transactionConfig.setAction(toActionCode(getTransactionalAction()));
-    transactionConfig.setMuleContext(muleContext);
-    transactionConfig.setFactory(TRANSACTION_FACTORY);
-
-    return transactionConfig;
-  }
-
-  private OperationTransactionalAction getTransactionalAction() {
-    try {
-      Optional<ParameterModel> transactionalParameter = getTransactionalActionParameter();
-      if (transactionalParameter.isPresent()) {
-        return getParameter(transactionalParameter.get().getName());
-      } else {
-        throw new NoSuchElementException();
-      }
-    } catch (NoSuchElementException e) {
-      throw new IllegalArgumentException(
-                                         format("Operation '%s' from extension '%s' is transactional but no transactional action defined",
-                                                componentModel.getName(),
-                                                extensionModel.getName()));
-    }
-  }
-
-  private Optional<ParameterModel> getTransactionalActionParameter() {
-    return componentModel.getAllParameterModels()
-        .stream()
-        .filter(p -> p.getModelProperty(TransactionalActionModelProperty.class).isPresent())
-        .findAny();
-  }
-
-  private boolean isTransactional(M componentModel) {
-    return componentModel instanceof ConnectableComponentModel && ((ConnectableComponentModel) componentModel).isTransactional();
   }
 }

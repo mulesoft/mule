@@ -108,7 +108,7 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
     operationContext =
         new DefaultExecutionContext<>(extensionModel, of(configuration), resolverSetResult.asMap(), operationModel,
                                       event, cursorProviderFactory, streamingManager, component, retryPolicyTemplate,
-                                      IMMEDIATE_SCHEDULER, muleContext);
+                                      IMMEDIATE_SCHEDULER, empty(), muleContext);
   }
 
   @Test

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
@@ -141,6 +142,7 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
                                                                                           component,
                                                                                           null,
                                                                                           IMMEDIATE_SCHEDULER,
+                                                                                          empty(),
                                                                                           muleContext);
 
     executionContext.setVariable(SOURCE_CALLBACK_CONTEXT_PARAM, callbackContext);
