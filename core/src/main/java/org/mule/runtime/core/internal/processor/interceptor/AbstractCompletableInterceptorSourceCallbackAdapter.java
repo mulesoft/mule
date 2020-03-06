@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.internal.processor.interceptor;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
@@ -80,7 +81,8 @@ public abstract class AbstractCompletableInterceptorSourceCallbackAdapter<T exte
 
   /**
    * Applies the result of the before interception to the given result
-   * @param event Resulting event of the before interception
+   *
+   * @param event  Resulting event of the before interception
    * @param result Input result of the source
    * @return Result with the before event applied
    */
@@ -92,16 +94,20 @@ public abstract class AbstractCompletableInterceptorSourceCallbackAdapter<T exte
       final InternalEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
       DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
 
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Calling before() for '{}' in processor '{}'...", interceptor,
-                     component.getLocation().getLocation());
-      }
+      LOGGER.debug("Calling before() for '{}' in processor '{}'...", interceptor, component.getLocation().getLocation());
 
       try {
-        withContextClassLoader(interceptor.getClass().getClassLoader(),
-                               () -> interceptor.beforeCallback(component.getLocation(),
-                                                                getResolvedParams(eventWithResolvedParams),
-                                                                interceptionEvent));
+        Thread currentThread = currentThread();
+        ClassLoader originalTCCL = currentThread.getContextClassLoader();
+        ClassLoader ctxClassLoader = interceptor.getClass().getClassLoader();
+        setContextClassLoader(currentThread, originalTCCL, ctxClassLoader);
+        try {
+          interceptor.beforeCallback(component.getLocation(),
+                                     getResolvedParams(eventWithResolvedParams),
+                                     interceptionEvent);
+        } finally {
+          setContextClassLoader(currentThread, ctxClassLoader, originalTCCL);
+        }
         return interceptionEvent.resolve();
       } catch (Exception e) {
         throw propagate(new MessagingException(interceptionEvent.resolve(), e.getCause(), component));
@@ -115,14 +121,18 @@ public abstract class AbstractCompletableInterceptorSourceCallbackAdapter<T exte
       final InternalEvent eventWithResolvedParams = removeResolvedParameters(event);
       DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
 
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Calling after() for '{}' in processor '{}'...", interceptor,
-                     component.getLocation().getLocation());
-      }
+      LOGGER.debug("Calling after() for '{}' in processor '{}'...", interceptor, component.getLocation().getLocation());
 
       try {
-        withContextClassLoader(interceptor.getClass().getClassLoader(),
-                               () -> interceptor.afterCallback(component.getLocation(), interceptionEvent, thrown));
+        Thread currentThread = currentThread();
+        ClassLoader originalTCCL = currentThread.getContextClassLoader();
+        ClassLoader ctxClassLoader = interceptor.getClass().getClassLoader();
+        setContextClassLoader(currentThread, originalTCCL, ctxClassLoader);
+        try {
+          interceptor.afterCallback(component.getLocation(), interceptionEvent, thrown);
+        } finally {
+          setContextClassLoader(currentThread, ctxClassLoader, originalTCCL);
+        }
         return interceptionEvent.resolve();
       } catch (Exception e) {
         throw propagate(createMessagingException(interceptionEvent.resolve(), e.getCause(), component, empty()));

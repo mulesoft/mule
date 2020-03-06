@@ -23,7 +23,6 @@ import java.lang.reflect.Method;
 public class NonBlockingCompletableMethodOperationExecutor<M extends ComponentModel>
     extends AbstractCompletableMethodOperationExecutor<M> {
 
-
   public NonBlockingCompletableMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
     super(operationModel, operationMethod, operationInstance);
   }
@@ -35,5 +34,4 @@ public class NonBlockingCompletableMethodOperationExecutor<M extends ComponentMo
 
     executor.execute(executionContext);
   }
-
 }

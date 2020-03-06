@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.core.api.util.func;
 
-import static org.mule.runtime.core.internal.util.ConcurrencyUtils.withLock;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -41,9 +38,9 @@ public class Once {
   /**
    * Executes a given {@link CheckedConsumer} only once.
    * <p>
-   * Once the {@link #consumeOnce()} method has been successfully executed, subsequent invocations to
+   * Once the {@link #consumeOnce(Object)} method has been successfully executed, subsequent invocations to
    * such method will have no effect, even if the supplied value is different. Notice that the key word here
-   * is {@code successfully}. If the method fails, each invocation to {@link #consumeOnce()} WILL run the delegate
+   * is {@code successfully}. If the method fails, each invocation to {@link #consumeOnce(Object)}  WILL run the delegate
    * until it completes successfully.
    * <p>
    * Instances are thread safe, which means that if two threads are competing for the first successful invocation, only
@@ -56,18 +53,19 @@ public class Once {
     private CheckedConsumer<T> consumer;
 
     private ConsumeOnce(CheckedConsumer<T> delegate) {
-      consumer = v -> withLock(lock, () -> {
-        if (!done) {
-          delegate.accept(v);
-          done = true;
-          consumer = x -> {
-          };
-        }
-      });
+      consumer = delegate;
     }
 
     public void consumeOnce(T value) {
-      consumer.accept(value);
+      if (!done) {
+        synchronized (this) {
+          if (!done) {
+            consumer.accept(value);
+            done = true;
+            consumer = null;
+          }
+        }
+      }
     }
   }
 
@@ -88,21 +86,22 @@ public class Once {
     private CheckedRunnable runner;
 
     private RunOnce(CheckedRunnable delegate) {
-      runner = () -> withLock(lock, () -> {
-        if (!done) {
-          delegate.run();
-          done = true;
-          runner = () -> {
-          };
-        }
-      });
+      runner = delegate;
     }
 
     /**
      * Runs (or not) the delegate according to the behaviour described on the class javadoc
      */
     public void runOnce() {
-      runner.run();
+      if (!done) {
+        synchronized (this) {
+          if (!done) {
+            runner.run();
+            done = true;
+            runner = null;
+          }
+        }
+      }
     }
   }
 

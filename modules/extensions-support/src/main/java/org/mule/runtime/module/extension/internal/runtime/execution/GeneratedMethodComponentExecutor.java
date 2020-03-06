@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -150,15 +150,22 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
 
   @Override
   public Function<ExecutionContext<M>, Map<String, Object>> createArgumentResolver(M operationModel) {
-    return ec -> withContextClassLoader(extensionClassLoader, () -> {
-      final Object[] resolved = getParameterValues(ec, method.getParameterTypes());
+    return ec -> {
+      Thread thread = Thread.currentThread();
+      ClassLoader currentClassLoader = thread.getContextClassLoader();
+      setContextClassLoader(thread, currentClassLoader, extensionClassLoader);
+      try {
+        final Object[] resolved = getParameterValues(ec, method.getParameterTypes());
 
-      int parameterCount = method.getParameterCount();
-      final Map<String, Object> resolvedParams = forSize(parameterCount);
-      for (int i = 0; i < parameterCount; ++i) {
-        resolvedParams.put(method.getParameters()[i].getName(), resolved[i]);
+        int parameterCount = method.getParameterCount();
+        final Map<String, Object> resolvedParams = forSize(parameterCount);
+        for (int i = 0; i < parameterCount; ++i) {
+          resolvedParams.put(method.getParameters()[i].getName(), resolved[i]);
+        }
+        return resolvedParams;
+      } finally {
+        setContextClassLoader(thread, extensionClassLoader, currentClassLoader);
       }
-      return resolvedParams;
-    });
+    };
   }
 }
