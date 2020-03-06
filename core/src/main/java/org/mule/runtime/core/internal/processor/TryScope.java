@@ -22,6 +22,8 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALW
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_BEGIN_OR_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.internal.processor.strategy.TransactionAwareStreamEmitterProcessingStrategyDecorator.popTxFromSubscriberContext;
+import static org.mule.runtime.core.internal.processor.strategy.TransactionAwareStreamEmitterProcessingStrategyDecorator.pushTxToSubscriberContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
@@ -76,7 +78,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    if (isTransactionActive() || transactionConfig.getAction() != ACTION_INDIFFERENT) {
+    if (transactionConfig.getAction() != ACTION_INDIFFERENT) {
       ExecutionTemplate<CoreEvent> executionTemplate = createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
       final I18nMessage txErrorMessage = errorInvokingMessageProcessorWithinTransaction(nestedChain, transactionConfig);
 
@@ -117,8 +119,10 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   private CoreEvent processBlocking(Context ctx, CoreEvent event) throws MuleException {
     try {
       return just(event)
+          .subscriberContext(popTxFromSubscriberContext())
           .transform(nestedChain)
           .onErrorStop()
+          .subscriberContext(pushTxToSubscriberContext(getLocation().getLocation()))
           .subscriberContext(ctx)
           .block();
     } catch (Throwable e) {
