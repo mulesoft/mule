@@ -18,7 +18,6 @@ import java.lang.reflect.Method;
  */
 public class CompletableMethodOperationExecutor<M extends ComponentModel> extends AbstractCompletableMethodOperationExecutor<M> {
 
-
   public CompletableMethodOperationExecutor(M operationModel, Method operationMethod, Object operationInstance) {
     super(operationModel, operationMethod, operationInstance);
   }
