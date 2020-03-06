@@ -17,6 +17,7 @@ import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
+import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import static org.mule.module.http.api.requester.HttpStreamingType.ALWAYS;
 import static org.mule.module.http.api.requester.HttpStreamingType.AUTO;
 import org.mule.api.MessagingException;
@@ -117,6 +118,11 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         }
 
         ParameterMap resolvedHeaders = resolveParams(event, HttpParamType.HEADER);
+        if (muleContext != null && !muleContext.isStarted())
+        {
+            resolvedHeaders.remove(CONNECTION);
+            resolvedHeaders.put(CONNECTION, CLOSE);
+        }
         for (String name : resolvedHeaders.keySet())
         {
             final Collection<String> paramValues = resolvedHeaders.getAll(name);
