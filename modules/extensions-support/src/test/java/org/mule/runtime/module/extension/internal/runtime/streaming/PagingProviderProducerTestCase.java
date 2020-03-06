@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -19,12 +20,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -32,12 +35,10 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.Extension
 import org.mule.tck.size.SmallTest;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
@@ -49,8 +50,7 @@ public class PagingProviderProducerTestCase {
   private PagingProvider<Object, String> delegate = mock(PagingProvider.class);
   private ConfigurationInstance config = mock(ConfigurationInstance.class);
 
-  @InjectMocks
-  private PagingProviderProducer<String> producer = createProducer();
+  private PagingProviderProducer<String> producer;
 
   private PagingProviderProducer<String> createProducer() {
     return new PagingProviderProducer<>(delegate, config, executionContext, extensionConnectionSupplier);
@@ -58,12 +58,17 @@ public class PagingProviderProducerTestCase {
 
   @Before
   public void setUp() throws MuleException {
+    ExtensionModel extensionModel = mock(ExtensionModel.class);
+    when(executionContext.getExtensionModel()).thenReturn(extensionModel);
+    ClassLoaderModelProperty property = new ClassLoaderModelProperty(getClass().getClassLoader());
+    when(extensionModel.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(of(property));
+
+    producer = createProducer();
+    initMocks(producer);
+
     ConnectionHandler handler = mock(ConnectionHandler.class);
     when(handler.getConnection()).thenReturn(new Object());
     when(extensionConnectionSupplier.getConnection(executionContext)).thenReturn(handler);
-
-    ExtensionModel extensionModel = mock(ExtensionModel.class);
-    when(executionContext.getExtensionModel()).thenReturn(extensionModel);
   }
 
   @Test
@@ -106,7 +111,7 @@ public class PagingProviderProducerTestCase {
   @Test
   public void totalAvailable() {
     final int total = 10;
-    when(delegate.getTotalResults(anyObject())).thenReturn(Optional.of(total));
+    when(delegate.getTotalResults(anyObject())).thenReturn(of(total));
     assertThat(total, is(producer.getSize()));
   }
 
