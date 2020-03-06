@@ -300,14 +300,21 @@ public class PolicyEventMapper {
   }
 
   private void storeVariablesInContext(CoreEvent event, Map<String, TypedValue<?>> variables) {
-    SourcePolicyContext.from(event).addVariables(policyId, variables);
+    SourcePolicyContext ctx = SourcePolicyContext.from(event);
+    if (ctx == null) {
+      ctx = new SourcePolicyContext(null);
+      ((InternalEvent) event).setSourcePolicyContext(ctx);
+    }
+    ctx.addVariables(policyId, variables);
   }
 
   private Map<String, TypedValue<?>> loadVars(CoreEvent event) {
-    return SourcePolicyContext.from(event).getVariables(policyId);
+    SourcePolicyContext ctx = SourcePolicyContext.from(event);
+    return ctx != null ? ctx.getVariables(policyId) : emptyMap();
   }
 
   private Map<String, TypedValue<?>> loadVars(CoreEvent event, String policyId) {
-    return SourcePolicyContext.from(event).getVariables(policyId);
+    SourcePolicyContext ctx = SourcePolicyContext.from(event);
+    return ctx != null ? ctx.getVariables(policyId) : emptyMap();
   }
 }
