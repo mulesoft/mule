@@ -185,7 +185,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                     .map(event -> right(MessagingException.class, event))
                     .doOnNext(r -> errorSwitchSinkSinkRef.next(r))
                     .doOnError(t -> errorSwitchSinkSinkRef.error(t))
-                    .doOnComplete(() -> errorSwitchSinkSinkRef.complete());
+                    .doOnComplete(() -> errorSwitchSinkSinkRef.complete())
+                    .doOnTerminate(() -> disposeIfNeeded(errorRouter, LOGGER));
 
             return subscribeFluxOnPublisherSubscription(errorSwitchSinkSinkRef.flux()
                 .map(result -> result.reduce(me -> {
