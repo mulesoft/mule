@@ -12,7 +12,9 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -129,8 +131,8 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     }
 
     if (expressionManager.isExpression(refName)) {
-      return new DynamicFlowRefMessageProcessor(this, event -> (String) expressionManager.evaluate(refName, event, getLocation())
-          .getValue());
+      return new DynamicFlowRefMessageProcessor(this, event -> (String) expressionManager
+          .evaluate(refName, STRING, NULL_BINDING_CONTEXT, event, getLocation(), true).getValue());
     } else {
       return new StaticFlowRefMessageProcessor(this, new DynamicFlowRefMessageProcessor(this, event -> refName));
     }
