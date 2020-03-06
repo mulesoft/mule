@@ -29,8 +29,10 @@ import static reactor.core.publisher.Flux.from;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.el.BindingContextUtils;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.config.internal.MuleArtifactContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -129,8 +131,12 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     }
 
     if (expressionManager.isExpression(refName)) {
-      return new DynamicFlowRefMessageProcessor(this, event -> (String) expressionManager.evaluate(refName, event, getLocation())
-          .getValue());
+      return new DynamicFlowRefMessageProcessor(this,
+                                                event -> (String) expressionManager
+                                                    .evaluate(refName, DataType.STRING, BindingContextUtils.NULL_BINDING_CONTEXT,
+                                                              event,
+                                                              getLocation(), true)
+                                                    .getValue());
     } else {
       return new StaticFlowRefMessageProcessor(this, new DynamicFlowRefMessageProcessor(this, event -> refName));
     }
