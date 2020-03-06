@@ -476,7 +476,8 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
      * @throws MuleException
      */
     protected Processor resolveTargetFlowOrSubflow(CoreEvent event) throws MuleException {
-      String targetFlowName = (String) expressionManager.evaluate(refName, STRING, NULL_BINDING_CONTEXT, event, getLocation(), true).getValue();
+      String targetFlowName =
+          (String) expressionManager.evaluate(refName, STRING, NULL_BINDING_CONTEXT, event, getLocation(), true).getValue();
       try {
         return targetsCache.getUnchecked(targetFlowName);
 
