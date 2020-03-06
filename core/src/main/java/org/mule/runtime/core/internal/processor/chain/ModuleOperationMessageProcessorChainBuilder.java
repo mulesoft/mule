@@ -46,6 +46,7 @@ import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -282,7 +283,7 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
     }
 
     private CoreEvent createNewEventFromJustMessage(CoreEvent request, CoreEvent response) {
-      final CoreEvent.Builder builder = CoreEvent.builder(request);
+      final InternalEvent.Builder builder = InternalEvent.builder(request);
       if (target.isPresent()) {
         TypedValue result =
             expressionManager.evaluate(targetValue, getTargetBindingContext(response.getMessage()));
@@ -290,14 +291,17 @@ public class ModuleOperationMessageProcessorChainBuilder extends DefaultMessageP
       } else {
         builder.message(builder(response.getMessage()).build());
       }
+      ((InternalEvent) response).getInternalParameters().forEach(builder::addInternalParameter);
       return builder.build();
     }
 
     private CoreEvent createEventWithParameters(CoreEvent event) {
-      CoreEvent.Builder builder = CoreEvent.builder(event.getContext());
+      InternalEvent.Builder builder = InternalEvent.builder(event.getContext());
       builder.message(builder().nullValue().build());
       addVariables(event, builder, properties);
       addVariables(event, builder, parameters);
+      builder.internalParameters(((InternalEvent) event).getInternalParameters());
+      builder.securityContext(event.getSecurityContext());
       return builder.build();
     }
 
