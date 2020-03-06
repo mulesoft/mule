@@ -7,7 +7,6 @@
 package org.mule.runtime.config.internal.factories;
 
 import static java.util.Arrays.asList;
-
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
@@ -47,8 +46,24 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mockito.MockSettings;
+import org.mockito.stubbing.Answer;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -84,32 +99,16 @@ import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import javax.inject.Inject;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.MockSettings;
-import org.mockito.stubbing.Answer;
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 
 @SmallTest
@@ -290,6 +289,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
 
   @Test
   public void dynamicFlowRefDoesNotExist() throws Exception {
+    doReturn(true).when(expressionManager).isExpression(anyString());
     doReturn(new TypedValue<>("other", STRING)).when(expressionManager).evaluate(eq(DYNAMIC_NON_EXISTANT), eq(DataType.STRING),
                                                                                  eq(NULL_BINDING_CONTEXT), any(CoreEvent.class),
                                                                                  any(ComponentLocation.class), eq(true));
@@ -326,7 +326,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
                                    .setScope(BeanDefinition.SCOPE_PROTOTYPE)
                                    .getBeanDefinition();
     beanFactory.registerBeanDefinition(PARSED_DYNAMIC_REFERENCED_FLOW, subFlowBeanDefinition);
-    //Additional flow and processing strategy (needed to generate a concurrent subflow instantiation)
+    // Additional flow and processing strategy (needed to generate a concurrent subflow instantiation)
     Flow concurrentCallerFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);
     ProcessingStrategy concurrentCallerFlowProcessingStrategy = mock(ProcessingStrategy.class);
     when(locator.find(Location.builder().globalName("concurrentFlow").build())).thenReturn(of(concurrentCallerFlow));
@@ -486,6 +486,11 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   private FlowRefFactoryBean createDynamicFlowRefFactoryBean(Processor target, Object targetBuilder,
                                                              ApplicationContext applicationContext)
       throws Exception {
+    doReturn(true).when(expressionManager).isExpression(anyString());
+    doReturn(new TypedValue<>(PARSED_DYNAMIC_REFERENCED_FLOW, STRING)).when(expressionManager)
+        .evaluate(eq(DYNAMIC_REFERENCED_FLOW), eq(DataType.STRING),
+                  eq(NULL_BINDING_CONTEXT), any(CoreEvent.class),
+                  any(ComponentLocation.class), eq(true));
     if (targetBuilder != null) {
       doReturn(targetBuilder).when(applicationContext).getBean(eq(PARSED_DYNAMIC_REFERENCED_FLOW));
     } else {
