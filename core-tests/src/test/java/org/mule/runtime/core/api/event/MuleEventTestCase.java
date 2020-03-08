@@ -43,6 +43,10 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+
 
 public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
@@ -189,6 +193,16 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     CoreEvent eventCopy = CoreEvent.builder(event).message(Message.of("copy")).build();
 
     assertThat(securityContext, sameInstance(eventCopy.getSecurityContext()));
+  }
+
+  @Test
+  @Issue("MULE-18157")
+  public void securityContextNull() throws Exception {
+    CoreEvent event = CoreEvent.builder(testEvent()).securityContext(null).build();
+
+    CoreEvent eventCopy = CoreEvent.builder(event).message(Message.of("copy")).securityContext(null).build();
+
+    assertThat(eventCopy.getMessage().getPayload().getValue(), is("copy"));
   }
 
   @Test
