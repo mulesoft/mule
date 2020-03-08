@@ -287,7 +287,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   public DefaultEventBuilder securityContext(SecurityContext securityContext) {
     SecurityContext originalValue = this.securityContext;
     this.securityContext = securityContext;
-    this.modified = originalValue != securityContext;
+    this.modified = modified || originalValue != securityContext;
     return this;
   }
 

@@ -19,9 +19,6 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.test.allure.AllureConstants.MuleEvent.MULE_EVENT;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -50,6 +47,10 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 
 
 @Feature(MULE_EVENT)
@@ -267,6 +268,16 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     CoreEvent eventCopy = CoreEvent.builder(event).message(Message.of("copy")).build();
 
     assertThat(securityContext, sameInstance(eventCopy.getSecurityContext()));
+  }
+
+  @Test
+  @Issue("MULE-18157")
+  public void securityContextNull() throws Exception {
+    CoreEvent event = CoreEvent.builder(testEvent()).securityContext(null).build();
+
+    CoreEvent eventCopy = CoreEvent.builder(event).message(Message.of("copy")).securityContext(null).build();
+
+    assertThat(eventCopy.getMessage().getPayload().getValue(), is("copy"));
   }
 
   @Test
