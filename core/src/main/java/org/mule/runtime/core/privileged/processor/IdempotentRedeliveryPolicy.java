@@ -146,7 +146,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   }
 
   private Supplier<ObjectStore> internalObjectStoreSupplier() {
-    return () -> objectStoreManager.createObjectStore(getLocation().getRootContainerName() + "." + getClass().getName(),
+    return () -> objectStoreManager.createObjectStore(getObjectStoreName(),
                                                       ObjectStoreSettings.builder()
                                                           .persistent(false)
                                                           .entryTtl((long) 60 * 5 * 1000)
@@ -162,7 +162,11 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       } catch (ObjectStoreException e) {
         LOGGER.warn("error closing object store: " + e.getMessage(), e);
       }
-      disposeIfNeeded(store, LOGGER);
+      try {
+        objectStoreManager.disposeStore(getObjectStoreName());
+      } catch (ObjectStoreException e) {
+        LOGGER.warn("error disposing object store: " + e.getMessage(), e);
+      }
       store = null;
     }
   }
@@ -320,6 +324,10 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   @Inject
   public void setExpressionManager(ExpressionManager expressionManager) {
     this.expressionManager = expressionManager;
+  }
+
+  private String getObjectStoreName() {
+    return getLocation().getRootContainerName() + "." + getClass().getName();
   }
 
 }
