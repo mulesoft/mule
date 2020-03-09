@@ -181,11 +181,11 @@ public class RxUtils {
         .doOnError(t -> {
           upstreamError.set(t);
 
-          if (inflightCounter.get() == 0) {
-            errorForwarder.consumeOnce(t);
-          } else {
-            scheduledCompletion.set(scheduleErrorCompletion.apply(t));
-          }
+          // if (inflightCounter.get() == 0) {
+          errorForwarder.consumeOnce(t);
+          // } else {
+          // scheduledCompletion.set(scheduleErrorCompletion.apply(t));
+          // }
         });
 
     return subscribeFluxOnPublisherSubscription(Flux.from(downstream)
@@ -199,16 +199,24 @@ public class RxUtils {
               }
             }
 
-            final Throwable t = upstreamError.get();
-            if (t != null) {
-              errorForwarder.consumeOnce(t);
-              final ScheduledFuture<?> scheduledFuture = scheduledCompletion.get();
-              if (scheduledFuture != null) {
-                scheduledFuture.cancel(true);
-              }
-            }
+            // final Throwable t = upstreamError.get();
+            // if (t != null) {
+            // errorForwarder.consumeOnce(t);
+            // final ScheduledFuture<?> scheduledFuture = scheduledCompletion.get();
+            // if (scheduledFuture != null) {
+            // scheduledFuture.cancel(true);
+            // }
+            // }
           }
-        }),
+        })
+    // .doOnError(t -> {
+    // errorForwarder.consumeOnce(t);
+    // final ScheduledFuture<?> scheduledFuture = scheduledCompletion.get();
+    // if (scheduledFuture != null) {
+    // scheduledFuture.cancel(true);
+    // }
+    // })
+                                                ,
                                                 enrichedUpstream);
   }
 
