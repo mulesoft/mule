@@ -24,6 +24,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.exception.SdkMethodInvocationException;
 import org.mule.runtime.module.extension.internal.runtime.execution.executor.MethodExecutor;
@@ -153,7 +154,8 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
     return ec -> {
       Thread thread = Thread.currentThread();
       ClassLoader currentClassLoader = thread.getContextClassLoader();
-      setContextClassLoader(thread, currentClassLoader, extensionClassLoader);
+      final CompositeClassLoader compositeClassLoader = new CompositeClassLoader(extensionClassLoader, currentClassLoader);
+      setContextClassLoader(thread, currentClassLoader, compositeClassLoader);
       try {
         final Object[] resolved = getParameterValues(ec, method.getParameterTypes());
 
@@ -164,7 +166,7 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
         }
         return resolvedParams;
       } finally {
-        setContextClassLoader(thread, extensionClassLoader, currentClassLoader);
+        setContextClassLoader(thread, compositeClassLoader, currentClassLoader);
       }
     };
   }
