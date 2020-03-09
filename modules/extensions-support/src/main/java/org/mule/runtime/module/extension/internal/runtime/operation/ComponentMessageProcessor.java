@@ -152,6 +152,7 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
@@ -342,11 +343,18 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
             })
             .map(e -> Either.empty());
 
-    if (outerFluxTerminationTimeout < 0) {
+    if (outerFluxTerminationTimeout < 0
+        // When there is a mono involved in some part of the chain, we cannot use the termination timeout because that would
+        // impose a timeout in the operation, which we don't want to.
+        // In this case, the flux will be complete when there are no more inflight operations.
+        || ctx.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
       return from(propagateCompletion(from(publisher), errorSwitchSinkSinkRef.flux(), transformer,
                                       () -> errorSwitchSinkSinkRef.complete(),
                                       t -> errorSwitchSinkSinkRef.error(t)));
     } else {
+      // For fluxes, the only way they would complete is when the flow that owns the flux is stopped.
+      // In that case we need to enforce the timeout configured in the app so that the stop of the flow doesn't take more than
+      // that time.
       return from(propagateCompletion(from(publisher), errorSwitchSinkSinkRef.flux(), transformer,
                                       () -> errorSwitchSinkSinkRef.complete(),
                                       t -> errorSwitchSinkSinkRef.error(t),
