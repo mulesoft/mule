@@ -8,6 +8,10 @@ package org.mule.runtime.core.internal.util.rx;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.internal.processor.strategy.TransactionAwareStreamEmitterProcessingStrategyDecorator.popTxFromSubscriberContext;
+import static org.mule.runtime.core.internal.processor.strategy.TransactionAwareStreamEmitterProcessingStrategyDecorator.pushTxToSubscriberContext;
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -33,6 +37,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
@@ -41,6 +46,8 @@ import reactor.core.publisher.FluxSink;
  * Reactor specific utils
  */
 public class RxUtils {
+
+  private static final Logger LOGGER = getLogger(RxUtils.class);
 
   public static final String KEY_ON_NEXT_ERROR_STRATEGY = "reactor.onNextError.localStrategy";
   public static final String ON_NEXT_FAILURE_STRATEGY = "reactor.core.publisher.OnNextFailureStrategy$ResumeStrategy";
@@ -278,9 +285,22 @@ public class RxUtils {
   public static <T> Supplier<FluxSink<T>> createFluxSupplier(Function<Flux<T>, Flux<?>> configurer) {
     return () -> {
       final FluxSinkRecorder<T> sinkRef = new FluxSinkRecorder<>();
-      Flux<?> flux = configurer.apply(sinkRef.flux());
 
-      flux.subscribe();
+      final Flux<T> upstream;
+      if (isTransactionActive()) {
+        upstream = sinkRef.flux()
+            .subscriberContext(popTxFromSubscriberContext());
+      } else {
+        upstream = sinkRef.flux();
+      }
+
+      Flux<?> flux = configurer.apply(upstream);
+
+      if (isTransactionActive()) {
+        flux = flux.subscriberContext(pushTxToSubscriberContext(configurer.toString()));
+      }
+
+      flux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + configurer.toString(), e));
       return sinkRef.getFluxSink();
     };
   }
@@ -295,6 +315,8 @@ public class RxUtils {
    * @return a new {@link FluxSinkSupplier}
    */
   public static <T> FluxSinkSupplier<T> createRoundRobinFluxSupplier(Function<Flux<T>, Flux<?>> configurer, int size) {
-    return new RoundRobinFluxSinkSupplier<>(size, createFluxSupplier(configurer));
+    final Supplier<FluxSink<T>> factory = createFluxSupplier(configurer);
+    return new TransactionAwareFluxSinkSupplier<>(factory,
+                                                  new RoundRobinFluxSinkSupplier<>(size, factory));
   }
 }
