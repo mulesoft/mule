@@ -35,7 +35,6 @@ import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessi
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.createRoundRobinFluxSupplier;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
-import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.createDefaultProcessingStrategyFactory;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
@@ -145,6 +144,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -499,64 +499,68 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     // Create and register an internal flux, which will be the one to really use the processing strategy for this operation.
     // This is a round robin so it can handle concurrent events, and its lifecycle is tied to the lifecycle of the main flux.
     fluxSupplier = createRoundRobinFluxSupplier(p -> {
+      final OperationInnerProcessor innerProcessor = new OperationInnerProcessor() {
+
+        @Override
+        public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+          return subscriberContext()
+              .flatMapMany(ctx -> {
+                final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter = new FluxSinkRecorder<>();
+
+                return propagateCompletion(from(publisher), emitter.flux()
+                    .map(result -> {
+                      return result.reduce(me -> {
+                        throw propagateWrappingFatal(me);
+                      }, response -> response);
+                    }),
+                                           pub -> from(pub)
+                                               .doOnNext(innerEventDispatcher(ctx, emitter)),
+                                           () -> emitter.complete(), e -> emitter.error(e));
+              });
+        }
+
+        private Consumer<? super CoreEvent> innerEventDispatcher(Context ctx,
+                                                                 final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter) {
+          return event -> prepareAndExecuteOperation(event,
+                                                     // The callback must be listened to within the
+                                                     // processingStrategy's onProcessor, so that any thread
+                                                     // switch that may occur after the operation (for
+                                                     // instance, getting away from the selector thread after
+                                                     // a non-blocking operation) is actually performed.
+                                                     () -> new ExecutorCallback() {
+
+                                                       @Override
+                                                       public void complete(Object value) {
+                                                         emitter.next(right((CoreEvent) value));
+                                                       }
+
+                                                       @Override
+                                                       public void error(Throwable e) {
+                                                         // if `sink.error` is called here, it will cancel
+                                                         // the flux altogether.
+                                                         // That's why an `Either` is used here,
+                                                         // so the error can be propagated afterwards in a
+                                                         // way consistent with our expected error handling.
+                                                         emitter.next(left(new EventProcessingException(event, e, false)));
+                                                       }
+                                                     },
+                                                     ctx);
+        }
+
+        @Override
+        public ProcessingType getProcessingType() {
+          return getInnerProcessingType();
+        }
+
+        @Override
+        public boolean isAsync() {
+          return ComponentMessageProcessor.this.isAsync();
+        }
+      };
+
       return from(processingStrategy
           .configureInternalPublisher(from(p)
-              .transform(processingStrategy.onProcessor(new OperationInnerProcessor() {
-
-                @Override
-                public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-                  return subscriberContext()
-                      .flatMapMany(ctx -> {
-                        final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter = new FluxSinkRecorder<>();
-
-                        return subscribeFluxOnPublisherSubscription(emitter.flux(), from(publisher)
-                            .doOnComplete(() -> emitter.complete())
-                            .doOnError(e -> emitter.error(e))
-                            .doOnNext(event -> prepareAndExecuteOperation(event,
-                                                                          // The callback must be listened to within the
-                                                                          // processingStrategy's onProcessor, so that any thread
-                                                                          // switch that may occur after the operation (for
-                                                                          // instance, getting away from the selector thread after
-                                                                          // a non-blocking operation) is actually performed.
-                                                                          () -> new ExecutorCallback() {
-
-                                                                            @Override
-                                                                            public void complete(Object value) {
-                                                                              emitter.next(right((CoreEvent) value));
-                                                                            }
-
-                                                                            @Override
-                                                                            public void error(Throwable e) {
-                                                                              // if `sink.error` is called here, it will cancel
-                                                                              // the flux altogether.
-                                                                              // That's why an `Either` is used here,
-                                                                              // so the error can be propagated afterwards in a
-                                                                              // way consistent with our expected error handling.
-                                                                              emitter
-                                                                                  .next(left(new EventProcessingException(event,
-                                                                                                                          e,
-                                                                                                                          false)));
-                                                                            }
-                                                                          },
-                                                                          ctx)))
-                                                                              .map(result -> {
-                                                                                return result.reduce(me -> {
-                                                                                  throw propagateWrappingFatal(me);
-                                                                                }, response -> response);
-                                                                              });
-                      });
-                }
-
-                @Override
-                public ProcessingType getProcessingType() {
-                  return getInnerProcessingType();
-                }
-
-                @Override
-                public boolean isAsync() {
-                  return ComponentMessageProcessor.this.isAsync();
-                }
-              }))
+              .transform(processingStrategy.onProcessor(innerProcessor))
               .doOnNext(result -> from(result)
                   .getOperationExecutionParams()
                   .getCallback().complete(result))

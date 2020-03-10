@@ -62,20 +62,20 @@ public class BlockingProcessingStrategyFactory implements ProcessingStrategyFact
     @Override
     public ReactiveProcessor onProcessor(ReactiveProcessor processor) {
       if (processor.getProcessingType() == CPU_LITE_ASYNC) {
-        return publisher -> from(publisher)
-            .flatMap(e -> subscriberContext()
-                .flatMap(ctx -> just(e).handle((event, sink) -> {
-                  try {
-                    CoreEvent result = just(event).transform(processor)
-                        .subscriberContext(ctx)
-                        .block();
-                    if (result != null) {
-                      sink.next(result);
-                    }
-                  } catch (Throwable throwable) {
-                    sink.error(wrapFatal(unwrap(throwable)));
-                  }
-                })));
+        return publisher -> subscriberContext()
+            .flatMapMany(ctx -> from(publisher).handle((event, sink) -> {
+              try {
+                CoreEvent result = just(event).transform(processor)
+                    .onErrorStop()
+                    .subscriberContext(ctx)
+                    .block();
+                if (result != null) {
+                  sink.next(result);
+                }
+              } catch (Throwable throwable) {
+                sink.error(wrapFatal(unwrap(throwable)));
+              }
+            }));
       } else {
         return processor;
       }
