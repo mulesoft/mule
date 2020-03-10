@@ -8,12 +8,10 @@
 package org.mule.test.implicit.config.extension.extension.internal;
 
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.BLOCKING;
-import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.test.implicit.config.extension.extension.api.Counter;
@@ -37,7 +35,6 @@ public class ImplicitOperations {
   /**
    * Test async operation
    */
-  @MediaType(TEXT_PLAIN)
   public void simpleAsyncOperation(CompletionCallback<String, Void> completionCallback) {
     timer.schedule(
                    new TimerTask() {
@@ -53,7 +50,6 @@ public class ImplicitOperations {
    * Test async operation
    */
   @Execution(BLOCKING)
-  @MediaType(TEXT_PLAIN)
   public void blockingAsyncOperation(CompletionCallback<String, Void> completionCallback) {
     timer.schedule(
                    new TimerTask() {
