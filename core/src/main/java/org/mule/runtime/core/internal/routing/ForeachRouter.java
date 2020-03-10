@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Flux.create;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.util.context.Context.empty;
@@ -84,7 +85,7 @@ class ForeachRouter {
           }
         });
 
-    innerFlux = Flux.create(innerRecorder)
+    innerFlux = create(innerRecorder)
         .map(event -> {
           ForeachContext foreachContext = foreachContextResolver.get(event.getContext().getId());
 
@@ -243,8 +244,8 @@ class ForeachRouter {
 
   private void subscribeUpstreamChains(Context downstreamContext) {
     innerFlux.subscriberContext(downstreamContext)
-            .doOnError(e -> LOGGER.error("Exception during foreach execution: " + e.getCause()))
-            .subscribe();
+        .doOnError(e -> LOGGER.error("Exception during foreach execution: " + e.getCause()))
+        .subscribe();
     upstreamFlux.subscriberContext(downstreamContext).subscribe();
   }
 

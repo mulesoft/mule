@@ -127,8 +127,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
   boolean validateExpression(CoreEvent event) {
     return expression.equals(DEFAULT_SPLIT_EXPRESSION)
-            && Map.class.isAssignableFrom(event.getMessage().getPayload().getDataType().getType());
-    }
+        && Map.class.isAssignableFrom(event.getMessage().getPayload().getDataType().getType());
+  }
 
   Iterator<TypedValue<?>> splitRequest(CoreEvent request, String expression) {
     Object payloadValue = request.getMessage().getPayload().getValue();
@@ -136,7 +136,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerList) {
       // Support EventBuilderConfigurerList currently used by Batch Module
       result = Iterators.transform(((EventBuilderConfigurerList<Object>) payloadValue).eventBuilderConfigurerIterator(),
-              TypedValue::of);
+                                   TypedValue::of);
     } else if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerIterator) {
       // Support EventBuilderConfigurerIterator currently used by Batch Module
       result = new EventBuilderConfigurerIteratorWrapper((EventBuilderConfigurerIterator) payloadValue);
@@ -145,8 +145,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     }
     if (LOGGER.isDebugEnabled() && !result.hasNext()) {
       LOGGER.debug(
-              "<foreach> expression \"{}\" returned no results. If this is not expected please check your expression",
-              expression);
+                   "<foreach> expression \"{}\" returned no results. If this is not expected please check your expression",
+                   expression);
     }
     return result;
   }
