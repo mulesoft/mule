@@ -7,6 +7,9 @@
 
 package org.mule.test.implicit.config.extension.extension.internal;
 
+import static org.mule.runtime.api.meta.model.operation.ExecutionType.BLOCKING;
+import org.mule.runtime.api.meta.model.operation.ExecutionType;
+import org.mule.runtime.extension.api.annotation.execution.Execution;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -39,6 +42,21 @@ public class ImplicitOperations {
                      @Override
                      public void run() {
                        completionCallback.success(Result.<String, Void>builder().output("async!").build());
+                     }
+                   }, 5000);
+  }
+
+  /**
+   * Test async operation
+   */
+  @Execution(BLOCKING)
+  public void blockingAsyncOperation(CompletionCallback<String, Void> completionCallback) {
+    timer.schedule(
+                   new TimerTask() {
+
+                     @Override
+                     public void run() {
+                       completionCallback.success(Result.<String, Void>builder().output("blocking-async").build());
                      }
                    }, 5000);
   }

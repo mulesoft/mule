@@ -21,4 +21,19 @@
             </route>
         </scatter-gather>
     </flow>
+
+    <flow name="scatterBlockingAsync">
+        <scatter-gather>
+            <route>
+                <set-variable variableName="dummy" value="#['dummy']"/>
+                <implicit:simple-async-operation />
+                <set-variable variableName="route1" value="#[payload]"/>
+            </route>
+            <route>
+                <set-variable variableName="dummy" value="#['dummy']"/>
+                <implicit:blocking-async-operation />
+                <set-variable variableName="route2" value="#[payload]"/>
+            </route>
+        </scatter-gather>
+    </flow>
 </mule>
