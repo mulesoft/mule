@@ -16,6 +16,8 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.exception.MuleException;
@@ -33,7 +35,6 @@ import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -52,7 +53,6 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
 
   @Inject
   private SchedulerService schedulerService;
-  private CountDownLatch messageSentTimer;
 
   @Override
   protected String getConfigFile() {
@@ -71,8 +71,8 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
       @Override
       public void configure(MuleContext muleContext) {
         final AtomicReference<Optional<PolicyInstance>> policyReference = new AtomicReference<>();
-        muleContext.getCustomizationService().registerCustomServiceImpl("customPolicyProvider",
-                                                                        new TestPolicyProvider(policyReference));
+        muleContext.getCustomizationService().overrideDefaultServiceImpl(OBJECT_POLICY_PROVIDER,
+                                                                         new TestPolicyProvider(policyReference));
       }
 
       @Override
@@ -85,11 +85,10 @@ public class PolicyTestCase extends MuleArtifactFunctionalTestCase {
   @Before
   public void setUp() {
     processorWasDisposed.set(false);
-    messageSentTimer = new CountDownLatch(1);
   }
 
   @Test
-  public void parsesPolicy() throws Exception {
+  public void parsesPolicy() {
     assertThat(policyProvider, instanceOf(TestPolicyProvider.class));
     TestPolicyProvider testPolicyProvider = (TestPolicyProvider) policyProvider;
     assertThat(testPolicyProvider.policyReference.get(), is(not(nullValue())));
