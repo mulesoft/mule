@@ -9,13 +9,8 @@ package org.mule.test.implicit.config.extension.extension.internal;
 
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.test.implicit.config.extension.extension.api.Counter;
 import org.mule.test.implicit.config.extension.extension.api.ImplicitConfigExtension;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class ImplicitOperations {
 
@@ -25,21 +20,5 @@ public class ImplicitOperations {
 
   public Counter getConnection(@Connection Counter connection) {
     return connection;
-  }
-
-  private static Timer timer = new Timer();
-
-  /**
-   * Test async operation
-   */
-  public void simpleAsyncOperation(CompletionCallback<String, Void> completionCallback) {
-    timer.schedule(
-                   new TimerTask() {
-
-                     @Override
-                     public void run() {
-                       completionCallback.success(Result.<String, Void>builder().output("async!").build());
-                     }
-                   }, 5000);
   }
 }
