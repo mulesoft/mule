@@ -8,7 +8,7 @@
     <test-policy:proxy name="async-policy">
         <test-policy:operation>
             <async>
-                <logger level="INFO" message="#[mel:new org.foo.EchoTest()]"/>
+                <logger level="INFO" message="Policy being executed"/>
             </async>
 
             <set-variable variableName="policyParameter" value="${policyPropertyKey}"/>
