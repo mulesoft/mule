@@ -39,12 +39,4 @@ public class AsyncOperationTestCase extends AbstractExtensionFunctionalTestCase 
     assertThat(vars.get("route1").getValue(), is(equalTo("async!")));
     assertThat(vars.get("route2").getValue(), is(equalTo("async!")));
   }
-
-  @Test
-  public void scatteredBlockingAsync() throws Exception {
-    Map<String, TypedValue<?>> vars = flowRunner("scatterBlockingAsync").run().getVariables();
-
-    assertThat(vars.get("route1").getValue(), is(equalTo("async!")));
-    assertThat(vars.get("route2").getValue(), is(equalTo("blocking-async")));
-  }
 }
