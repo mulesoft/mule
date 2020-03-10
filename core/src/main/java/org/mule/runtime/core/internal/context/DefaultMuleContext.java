@@ -139,6 +139,7 @@ import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMuleContext {
@@ -265,8 +266,8 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   static {
     // Log dropped events/errors
-    Hooks.onErrorDropped(error -> LOGGER.debug("ERROR DROPPED " + error));
-    Hooks.onNextDropped(event -> LOGGER.debug("EVENT DROPPED " + event));
+    Hooks.onErrorDropped(error -> LOGGER.warn("ERROR DROPPED " + error));
+    Hooks.onNextDropped(event -> LOGGER.warn("EVENT DROPPED " + event));
   }
 
   public DefaultMuleContext() {

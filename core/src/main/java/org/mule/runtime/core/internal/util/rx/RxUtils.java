@@ -114,7 +114,7 @@ public class RxUtils {
 
     return doPropagateCompletion(upstream, downstream, transformer,
                                  Once.of(completionCallback), Once.of(errorCallback),
-                                 () -> null, t -> null);
+                                 () -> null);
   }
 
   /**
@@ -157,16 +157,14 @@ public class RxUtils {
     final ConsumeOnce<Throwable> errorForwarder = Once.of(errorCallback);
 
     return doPropagateCompletion(upstream, downstream, transformer, completer, errorForwarder,
-                                 () -> delayedExecutor.schedule(() -> completer.runOnce(), completionTimeoutMillis, MILLISECONDS),
-                                 t -> delayedExecutor.schedule(() -> errorForwarder.consumeOnce(t), completionTimeoutMillis,
-                                                               MILLISECONDS));
+                                 () -> delayedExecutor.schedule(() -> completer.runOnce(), completionTimeoutMillis,
+                                                                MILLISECONDS));
   }
 
   private static <T, U> Publisher<T> doPropagateCompletion(Publisher<U> upstream, Publisher<T> downstream,
                                                            Function<Publisher<U>, Publisher<T>> transformer,
                                                            final RunOnce completer, final ConsumeOnce<Throwable> errorForwarder,
-                                                           final Supplier<ScheduledFuture<?>> scheduleCompletion,
-                                                           final Function<Throwable, ScheduledFuture<?>> scheduleErrorCompletion) {
+                                                           final Supplier<ScheduledFuture<?>> scheduleCompletion) {
     AtomicInteger inflightCounter = new AtomicInteger(0);
     AtomicBoolean upstreamComplete = new AtomicBoolean(false);
     AtomicReference<Throwable> upstreamError = new AtomicReference<>();
@@ -187,32 +185,16 @@ public class RxUtils {
         })
         .doOnError(t -> {
           upstreamError.set(t);
-
-          if (inflightCounter.get() == 0) {
-            errorForwarder.consumeOnce(t);
-          } else {
-            scheduledCompletion.set(scheduleErrorCompletion.apply(t));
-          }
+          errorForwarder.consumeOnce(t);
         });
 
     return subscribeFluxOnPublisherSubscription(Flux.from(downstream)
         .doOnNext(s -> {
-          if (inflightCounter.decrementAndGet() == 0) {
-            if (upstreamComplete.get()) {
-              completer.runOnce();
-              final ScheduledFuture<?> scheduledFuture = scheduledCompletion.get();
-              if (scheduledFuture != null) {
-                scheduledFuture.cancel(true);
-              }
-            }
-
-            final Throwable t = upstreamError.get();
-            if (t != null) {
-              errorForwarder.consumeOnce(t);
-              final ScheduledFuture<?> scheduledFuture = scheduledCompletion.get();
-              if (scheduledFuture != null) {
-                scheduledFuture.cancel(true);
-              }
+          if (inflightCounter.decrementAndGet() == 0 && upstreamComplete.get()) {
+            completer.runOnce();
+            final ScheduledFuture<?> scheduledFuture = scheduledCompletion.get();
+            if (scheduledFuture != null) {
+              scheduledFuture.cancel(true);
             }
           }
         }),

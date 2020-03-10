@@ -6,6 +6,8 @@
  */
 package org.mule.functional.util.http;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -17,7 +19,7 @@ import com.sun.net.httpserver.HttpServer;
 
 /**
  * Simple HTTP server implementation for testing purposes.
- * 
+ *
  * @since 4.0
  */
 public class SimpleHttpServer {
@@ -25,8 +27,9 @@ public class SimpleHttpServer {
   public static final String DEFAULT_RESPONSE = "This is the response";
   private final int port;
   private HttpServer server;
-  private LinkedList<HttpMessage> httpRequests = new LinkedList<>();
+  private final LinkedList<HttpMessage> httpRequests = new LinkedList<>();
   private int statusCode = 200;
+  private long responseDelay = -1;
 
   public HttpMessage getLastHttpRequest() {
     return httpRequests.getLast();
@@ -82,6 +85,16 @@ public class SimpleHttpServer {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
       httpRequests.addLast(new HttpMessage(exchange));
+
+      if (responseDelay > 0) {
+        try {
+          Thread.sleep(responseDelay);
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          throw new MuleRuntimeException(e);
+        }
+      }
+
       String response = DEFAULT_RESPONSE;
       exchange.sendResponseHeaders(statusCode, response.length());
       OutputStream os = exchange.getResponseBody();
@@ -94,4 +107,7 @@ public class SimpleHttpServer {
     this.statusCode = statusCode;
   }
 
+  public void setResponseDelay(long responseDelay) {
+    this.responseDelay = responseDelay;
+  }
 }
