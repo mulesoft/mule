@@ -9,9 +9,7 @@ package org.mule.runtime.core.internal.routing;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
-import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
-import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
@@ -19,7 +17,6 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.util.context.Context.empty;
 
-import com.google.common.collect.Iterators;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
@@ -28,8 +25,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurer;
-import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerIterator;
-import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerList;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.reactivestreams.Publisher;
@@ -37,10 +32,8 @@ import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -73,13 +66,11 @@ class ForeachRouter {
     upstreamFlux = from(publisher)
         .doOnNext(event -> {
 
-          if (expression.equals(DEFAULT_SPLIT_EXPRESSION)
-              && Map.class.isAssignableFrom(event.getMessage().getPayload().getDataType().getType())) {
+          if (owner.validateExpression(event)) {
             downstreamRecorder.next(left(new IllegalArgumentException(MAP_NOT_SUPPORTED_MESSAGE)));
           }
 
           final CoreEvent responseEvent = prepareEvent(event, expression);
-
           inflightEvents.getAndIncrement();
           // Inject it into the inner flux
           innerRecorder.next(responseEvent);
@@ -103,7 +94,7 @@ class ForeachRouter {
             completeRouterIfNecessary();
           }
 
-          TypedValue currentValue = setCurrentValue(batchSize, foreachContext);
+          TypedValue currentValue = owner.setCurrentValue(batchSize, foreachContext);
           return createTypedValuePartToProcess(owner, event, foreachContext, currentValue);
 
         })
@@ -173,7 +164,7 @@ class ForeachRouter {
         builder(event).addVariable(owner.getRootMessageVariableName(), event.getMessage()).build();
 
     try {
-      Iterator<TypedValue<?>> typedValueIterator = this.splitRequest(responseEvent, expression);
+      Iterator<TypedValue<?>> typedValueIterator = owner.splitRequest(responseEvent, expression);
 
       // Create ForEachContext
       ForeachContext foreachContext = this.createForeachContext(event, typedValueIterator);
@@ -192,26 +183,6 @@ class ForeachRouter {
     return responseEvent;
   }
 
-  private TypedValue setCurrentValue(int batchSize, ForeachContext foreachContext) {
-    TypedValue currentValue;
-    Iterator<TypedValue<?>> iterator = foreachContext.getIterator();
-    if (batchSize > 1) {
-      int counter = 0;
-      List currentBatch = new ArrayList<>();
-      while (iterator.hasNext() && counter < batchSize) {
-        currentBatch.add(iterator.next());
-        counter++;
-      }
-
-      if (!foreachContext.getBatchDataType().isPresent()) {
-        foreachContext.setBatchDataType(of(fromObject(currentBatch)));
-      }
-      currentValue = new TypedValue<>(currentBatch, foreachContext.getBatchDataType().get());
-    } else {
-      currentValue = iterator.next();
-    }
-    return currentValue;
-  }
 
   private CoreEvent createTypedValuePartToProcess(Foreach owner, CoreEvent event, ForeachContext foreachContext,
                                                   TypedValue currentValue) {
@@ -252,27 +223,6 @@ class ForeachRouter {
 
     return new ForeachContext(previousCounterVar, previousRootMessageVar, event.getMessage(), event.getItemSequenceInfo(),
                               iterator);
-  }
-
-  private Iterator<TypedValue<?>> splitRequest(CoreEvent request, String expression) {
-    Object payloadValue = request.getMessage().getPayload().getValue();
-    Iterator<TypedValue<?>> result;
-    if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerList) {
-      // Support EventBuilderConfigurerList currently used by Batch Module
-      result = Iterators.transform(((EventBuilderConfigurerList<Object>) payloadValue).eventBuilderConfigurerIterator(),
-                                   TypedValue::of);
-    } else if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerIterator) {
-      // Support EventBuilderConfigurerIterator currently used by Batch Module
-      result = new EventBuilderConfigurerIteratorWrapper((EventBuilderConfigurerIterator) payloadValue);
-    } else {
-      result = owner.getSplittingStrategy().split(request);
-    }
-    if (LOGGER.isDebugEnabled() && !result.hasNext()) {
-      LOGGER.debug(
-                   "<foreach> expression \"{}\" returned no results. If this is not expected please check your expression",
-                   expression);
-    }
-    return result;
   }
 
   /**
@@ -321,25 +271,6 @@ class ForeachRouter {
       responseBuilder.addVariable(owner.getRootMessageVariableName(), previousRootMessageVar);
     } else {
       responseBuilder.removeVariable(owner.getRootMessageVariableName());
-    }
-  }
-
-  private static class EventBuilderConfigurerIteratorWrapper implements Iterator<TypedValue<?>> {
-
-    private final EventBuilderConfigurerIterator configurerIterator;
-
-    EventBuilderConfigurerIteratorWrapper(EventBuilderConfigurerIterator configurerIterator) {
-      this.configurerIterator = configurerIterator;
-    }
-
-    @Override
-    public boolean hasNext() {
-      return configurerIterator.hasNext();
-    }
-
-    @Override
-    public TypedValue<?> next() {
-      return TypedValue.of(configurerIterator.nextEventBuilderConfigurer());
     }
   }
 
