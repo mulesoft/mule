@@ -7,11 +7,15 @@
 package org.mule.runtime.core.internal.routing;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.of;
+import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.core.internal.routing.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.slf4j.LoggerFactory.getLogger;
 
+import com.google.common.collect.Iterators;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -21,14 +25,19 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerIterator;
+import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerList;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 /**
  * The {@code foreach} {@link Processor} allows iterating over a collection payload, or any collection obtained by an expression,
@@ -43,6 +52,8 @@ import org.reactivestreams.Publisher;
  * The {@link CoreEvent} sent to the next message processor is the same that arrived to foreach.
  */
 public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, Scope {
+
+  private static final Logger LOGGER = getLogger(AbstractMessageProcessorOwner.class);
 
   static final String DEFAULT_COUNTER_VARIABLE = "counter";
   public static final String DEFAULT_ROOT_MESSAGE_VARIABLE = "rootMessage";
@@ -113,4 +124,71 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   public SplittingStrategy<CoreEvent, Iterator<TypedValue<?>>> getSplittingStrategy() {
     return splittingStrategy;
   }
+
+  boolean validateExpression(CoreEvent event) {
+    return expression.equals(DEFAULT_SPLIT_EXPRESSION)
+            && Map.class.isAssignableFrom(event.getMessage().getPayload().getDataType().getType());
+    }
+
+  Iterator<TypedValue<?>> splitRequest(CoreEvent request, String expression) {
+    Object payloadValue = request.getMessage().getPayload().getValue();
+    Iterator<TypedValue<?>> result;
+    if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerList) {
+      // Support EventBuilderConfigurerList currently used by Batch Module
+      result = Iterators.transform(((EventBuilderConfigurerList<Object>) payloadValue).eventBuilderConfigurerIterator(),
+              TypedValue::of);
+    } else if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerIterator) {
+      // Support EventBuilderConfigurerIterator currently used by Batch Module
+      result = new EventBuilderConfigurerIteratorWrapper((EventBuilderConfigurerIterator) payloadValue);
+    } else {
+      result = getSplittingStrategy().split(request);
+    }
+    if (LOGGER.isDebugEnabled() && !result.hasNext()) {
+      LOGGER.debug(
+              "<foreach> expression \"{}\" returned no results. If this is not expected please check your expression",
+              expression);
+    }
+    return result;
+  }
+
+  TypedValue setCurrentValue(int batchSize, ForeachContext foreachContext) {
+    TypedValue currentValue;
+    Iterator<TypedValue<?>> iterator = foreachContext.getIterator();
+    if (batchSize > 1) {
+      int counter = 0;
+      List currentBatch = new ArrayList<>();
+      while (iterator.hasNext() && counter < batchSize) {
+        currentBatch.add(iterator.next());
+        counter++;
+      }
+
+      if (!foreachContext.getBatchDataType().isPresent()) {
+        foreachContext.setBatchDataType(of(fromObject(currentBatch)));
+      }
+      currentValue = new TypedValue<>(currentBatch, foreachContext.getBatchDataType().get());
+    } else {
+      currentValue = iterator.next();
+    }
+    return currentValue;
+  }
+
+  private static class EventBuilderConfigurerIteratorWrapper implements Iterator<TypedValue<?>> {
+
+    private final EventBuilderConfigurerIterator configurerIterator;
+
+    EventBuilderConfigurerIteratorWrapper(EventBuilderConfigurerIterator configurerIterator) {
+      this.configurerIterator = configurerIterator;
+    }
+
+    @Override
+    public boolean hasNext() {
+      return configurerIterator.hasNext();
+    }
+
+    @Override
+    public TypedValue<?> next() {
+      return TypedValue.of(configurerIterator.nextEventBuilderConfigurer());
+    }
+  }
+
 }
