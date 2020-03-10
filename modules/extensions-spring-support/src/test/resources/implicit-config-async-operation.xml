@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:implicit="http://www.mulesoft.org/schema/mule/implicit"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/implicit http://www.mulesoft.org/schema/mule/implicit/current/mule-implicit.xsd">
+
+    <flow name="simpleAsync">
+        <implicit:simple-async-operation />
+    </flow>
+
+    <flow name="scatterAsync">
+        <scatter-gather>
+            <route>
+                <implicit:simple-async-operation />
+                <set-variable variableName="route1" value="#[payload]"/>
+            </route>
+            <route>
+                <implicit:simple-async-operation />
+                <set-variable variableName="route2" value="#[payload]"/>
+            </route>
+        </scatter-gather>
+    </flow>
+</mule>
