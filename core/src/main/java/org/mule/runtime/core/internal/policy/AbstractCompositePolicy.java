@@ -59,9 +59,7 @@ public abstract class AbstractCompositePolicy<ParametersTransformer> {
       interceptors.add(next -> eventPub -> from(applyPolicy(policy, next, eventPub)));
     }
 
-    Policy lastPolicy = getLastPolicy();
-
-    ReactiveProcessor chainedPoliciesAndOperation = eventPub -> from(applyNextOperation(eventPub, lastPolicy));
+    ReactiveProcessor chainedPoliciesAndOperation = eventPub -> from(applyNextOperation(eventPub));
     // Take processor publisher function itself and transform it by applying interceptor transformations onto it.
     reverse(interceptors);
     for (Function<ReactiveProcessor, ReactiveProcessor> interceptor : interceptors) {
@@ -93,11 +91,10 @@ public abstract class AbstractCompositePolicy<ParametersTransformer> {
    * Template method for executing the final processor of the chain.
    *
    * @param eventPub the event to use for executing the next operation.
-   * @param lastPolicy the last policy that was executed before executing the flow or operation
    * @return the event to use for processing the after phase of the policy
    * @throws MuleException if there's an error executing processing the next operation.
    */
-  protected abstract Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy lastPolicy);
+  protected abstract Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub);
 
   /**
    * Template method for executing a policy.

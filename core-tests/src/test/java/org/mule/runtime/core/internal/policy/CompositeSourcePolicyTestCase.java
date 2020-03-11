@@ -314,9 +314,9 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
     }
 
     @Override
-    protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy policy) {
+    protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub) {
       nextOperation.incrementAndGet();
-      return super.applyNextOperation(eventPub, policy);
+      return super.applyNextOperation(eventPub);
     }
 
     @Override
