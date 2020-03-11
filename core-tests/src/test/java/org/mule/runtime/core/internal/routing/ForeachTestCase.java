@@ -36,9 +36,6 @@ import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ForeachStory.FOR_EACH;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
@@ -61,6 +58,7 @@ import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +73,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 
-import java.util.concurrent.atomic.AtomicReference;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 @Feature(ROUTERS)
 @Story(FOR_EACH)
