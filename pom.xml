@@ -734,6 +734,12 @@
                 <version>${weaveVersion}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.mule.runtime</groupId>
+                <artifactId>mule-dwb-api</artifactId>                
+                <version>${weaveVersion}</version>
+            </dependency>
+
             <!--Logging-->
             <dependency>
                 <groupId>org.slf4j</groupId>
