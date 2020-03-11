@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE;
+import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_COUNTER_VARIABLE;
@@ -442,7 +443,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     assertThat(variables.get(DEFAULT_ROOT_MESSAGE_VARIABLE).getValue(), equalTo(in.getMessage()));
 
     assertThat(variables.get(DEFAULT_COUNTER_VARIABLE).getDataType(),
-               equalTo(DataType.builder().type(Number.class).build()));
+               equalTo(NUMBER));
     assertThat(variables.get(DEFAULT_COUNTER_VARIABLE).getValue(), equalTo(2));
   }
 
