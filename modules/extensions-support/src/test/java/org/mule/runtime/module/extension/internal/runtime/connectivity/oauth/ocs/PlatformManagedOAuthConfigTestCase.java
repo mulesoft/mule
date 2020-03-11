@@ -41,25 +41,20 @@ public class PlatformManagedOAuthConfigTestCase extends AbstractMuleTestCase {
     when(configurationProperties.resolveStringProperty(OCS_CLIENT_ID)).thenReturn(of(CLIENT_ID));
     when(configurationProperties.resolveStringProperty(OCS_ORG_ID)).thenReturn(of(ORG_ID));
     when(configurationProperties.resolveStringProperty(OCS_SERVICE_URL)).thenReturn(of(SERVICE_URL));
+    when(configurationProperties.resolveStringProperty(OCS_PLATFORM_AUTH_URL)).thenReturn(of(PLATFORM_URL));
   }
 
 
   @Test
-  public void onGetPlatformAuthUrl() {
-    when(configurationProperties.resolveStringProperty(OCS_PLATFORM_AUTH_URL)).thenReturn(of(PLATFORM_URL));
-
+  public void getPlatformAuthUrl() {
     PlatformManagedOAuthConfig config = PlatformManagedOAuthConfig.from("", "", null, null, null, null, configurationProperties);
-
     assertThat(config.getPlatformAuthUrl(), equalTo(PLATFORM_URL + PLATFORM_SUFFIX_DEFAULT));
   }
 
   @Test
-  public void onGetPlatformAuthUrlWithPlatformSuffix() {
-    when(configurationProperties.resolveStringProperty(OCS_PLATFORM_AUTH_URL)).thenReturn(of(PLATFORM_URL));
+  public void getPlatformAuthUrlWithPlatformSuffix() {
     when(configurationProperties.resolveStringProperty(OCS_PLATFORM_AUTH_URL_SUFFIX)).thenReturn(of(PLATFORM_SUFFIX));
-
     PlatformManagedOAuthConfig config = PlatformManagedOAuthConfig.from("", "", null, null, null, null, configurationProperties);
-
     assertThat(config.getPlatformAuthUrl(), equalTo(PLATFORM_URL + PLATFORM_SUFFIX));
   }
 
