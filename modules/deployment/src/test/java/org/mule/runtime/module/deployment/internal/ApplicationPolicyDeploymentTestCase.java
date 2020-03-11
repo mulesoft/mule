@@ -504,13 +504,13 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
   private void doApplicationPolicyExecutionTest(PolicyPointcut pointcut, int expectedPolicyInvocations,
                                                 Object expectedPolicyParametrization)
-    throws Exception {
+      throws Exception {
     doApplicationPolicyExecutionTest(pointcut, expectedPolicyInvocations, expectedPolicyParametrization, "/fooPolicy.xml");
   }
 
   private void doApplicationPolicyExecutionTest(PolicyPointcut pointcut, int expectedPolicyInvocations,
                                                 Object expectedPolicyParametrization, String policyFile)
-    throws Exception {
+      throws Exception {
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
