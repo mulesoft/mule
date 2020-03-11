@@ -11,7 +11,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
-import static org.mule.runtime.extension.internal.ocs.OCSConstants.*;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_ID;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_SECRET;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_ORG_ID;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL_SUFFIX;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_SERVICE_URL;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.meta.model.ExtensionModel;
