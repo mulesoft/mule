@@ -182,6 +182,7 @@ class ForeachRouter {
       // Create ForEachContext
       ForeachContext foreachContext = this.createForeachContext(event, typedValueIterator);
 
+      // TODO MULE-18174
       // Save it inside the internalParameters of the event
       Map<String, ForeachContext> currentContextFromEvent = foreachContextResolver.getCurrentContextFromEvent(event);
       currentContextFromEvent.put(event.getContext().getId(), foreachContext);
