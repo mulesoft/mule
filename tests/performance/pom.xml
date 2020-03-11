@@ -107,7 +107,10 @@
             <artifactId>mule-service-weave</artifactId>
             <classifier>mule-service</classifier>
         </dependency>
-
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-dwb-api</artifactId>                
+        </dependency>
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.mule.tests</groupId>

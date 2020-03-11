@@ -51,6 +51,10 @@
             <classifier>mule-service</classifier>
         </dependency>
         <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-dwb-api</artifactId>                
+        </dependency>
+        <dependency>
             <groupId>asm</groupId>
             <artifactId>asm</artifactId>
             <version>${asmVersion}</version>
