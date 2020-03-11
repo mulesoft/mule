@@ -18,10 +18,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Optional.empty;
 
-class ForeachContext implements EventInternalContext {
+class ForeachContext {
 
-  private Object previousCounter;
-  private Object previousRootMessage;
+  private Integer previousCounter;
+  private Message previousRootMessage;
   private Message originalMessage;
   private Optional<ItemSequenceInfo> itemSequenceInfo;
   private Iterator<TypedValue<?>> iterator;
@@ -29,7 +29,7 @@ class ForeachContext implements EventInternalContext {
   private Optional<DataType> batchDataType = empty();
   private Optional<Runnable> onComplete = empty();
 
-  ForeachContext(Object previousCounter, Object previousRootMessage, Message message,
+  ForeachContext(Integer previousCounter, Message previousRootMessage, Message message,
                  Optional<ItemSequenceInfo> itemSequenceInfo, Iterator<TypedValue<?>> iterator) {
     this.previousCounter = previousCounter;
     this.previousRootMessage = previousRootMessage;
@@ -38,11 +38,11 @@ class ForeachContext implements EventInternalContext {
     this.iterator = iterator;
   }
 
-  Object getPreviousCounter() {
+  Integer getPreviousCounter() {
     return previousCounter;
   }
 
-  Object getPreviousRootMessage() {
+  Message getPreviousRootMessage() {
     return previousRootMessage;
   }
 
@@ -80,11 +80,6 @@ class ForeachContext implements EventInternalContext {
 
   public Optional<ItemSequenceInfo> getItemSequenceInfo() {
     return itemSequenceInfo;
-  }
-
-  @Override
-  public EventInternalContext copy() {
-    return this;
   }
 
 }
