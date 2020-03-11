@@ -13,7 +13,6 @@ import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
@@ -36,6 +35,7 @@ import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ForeachStory.FOR_EACH;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.hamcrest.Matchers;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
@@ -45,7 +45,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -83,17 +82,18 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
   private static final Logger LOGGER = getLogger(ForeachTestCase.class);
 
-  protected Foreach foreach;
+  private Foreach foreach;
   private Foreach simpleForeach;
   private Foreach nestedForeach;
   private ArrayList<CoreEvent> processedEvents;
-  protected Map<String, TypedValue<?>> variables;
+  private Map<String, TypedValue<?>> variables;
 
   private static String ERR_NUMBER_MESSAGES = "Not a correct number of messages processed";
   private static String ERR_PAYLOAD_TYPE = "Type error on processed payloads";
   private static String ERR_OUTPUT = "Messages processed incorrectly";
   private static final String ERR_INVALID_ITEM_SEQUENCE = "Null ItemSequence received";
   private static final String ERR_SEQUENCE_OVERRIDDEN = "Sequence should't be overridden after foreach";
+  private static final String MULE_FOREACH_CONTEXT_KEY = "mule.foreach.router.foreachContext";
 
   @Rule
   public ExpectedException expectedException = none();
@@ -442,7 +442,7 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
     assertThat(variables.get(DEFAULT_ROOT_MESSAGE_VARIABLE).getValue(), equalTo(in.getMessage()));
 
     assertThat(variables.get(DEFAULT_COUNTER_VARIABLE).getDataType(),
-               equalTo(DataType.builder().type(Integer.class).build()));
+               equalTo(DataType.builder().type(Number.class).build()));
     assertThat(variables.get(DEFAULT_COUNTER_VARIABLE).getValue(), equalTo(2));
   }
 
@@ -534,8 +534,8 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
   }
 
   private void assertNoForEachContext(InternalEvent event) {
-    EventInternalContext forEachContext = event.getForEachContext();
-    assertThat(forEachContext, is(nullValue()));
+    Map<String, Object> forEachContext = event.getInternalParameter(MULE_FOREACH_CONTEXT_KEY);
+    assertThat(forEachContext.isEmpty(), Matchers.is(true));
   }
 
   public class DummySimpleIterableClass implements Iterable<String> {
