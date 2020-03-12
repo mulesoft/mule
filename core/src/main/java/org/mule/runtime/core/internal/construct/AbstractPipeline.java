@@ -506,6 +506,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
   }
 
+  protected void checkBackpressureReferenced(CoreEvent event) throws RuntimeException {
+    try {
+      backpressureStrategySelector.checkWithWaitStrategy(event);
+    } catch (FlowBackPressureException e) {
+      throw propagate(e);
+    }
+  }
+
   public Map<BackPressureReason, FlowBackPressureException> getBackPressureExceptions() {
     return backPressureExceptions;
   }
