@@ -69,6 +69,7 @@ import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.interception.ReactiveInterceptor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -77,7 +78,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -86,6 +86,7 @@ import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
+import org.slf4j.MDC;
 
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
@@ -168,6 +169,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
+    final List<ReactiveInterceptor> interceptors = resolveInterceptors();
+
     if (messagingExceptionHandler != null) {
       final FluxSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
@@ -179,7 +182,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                         rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class)));
 
             final Flux<Either<MessagingException, CoreEvent>> upstream =
-                from(doApply(publisher, (context, throwable) -> errorRouter.accept(throwable)))
+                from(doApply(publisher, interceptors, (context, throwable) -> errorRouter.accept(throwable)))
                     // This Either here is used to propagate errors. If the error is sent directly through the merged Flux,
                     // it will be cancelled, ignoring the onErrorcontinue of the parent Flux.
                     .map(event -> right(MessagingException.class, event))
@@ -195,13 +198,22 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           });
 
     } else {
-      return doApply(publisher, (context, throwable) -> context.error(throwable));
+      return doApply(publisher, interceptors, (context, throwable) -> context.error(throwable));
     }
   }
 
+  /**
+   * @deprecated Since 4.3, kept for backwards compatibility since this is public in a privileged package.
+   */
+  @Deprecated
   public Publisher<CoreEvent> doApply(Publisher<CoreEvent> publisher,
                                       BiConsumer<BaseEventContext, ? super Exception> errorBubbler) {
-    List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptors = resolveInterceptors();
+    return doApply(publisher, resolveInterceptors(), errorBubbler);
+  }
+
+  private Publisher<CoreEvent> doApply(Publisher<CoreEvent> publisher,
+                                       List<ReactiveInterceptor> interceptors,
+                                       BiConsumer<BaseEventContext, ? super Exception> errorBubbler) {
     Flux<CoreEvent> stream = from(publisher);
     for (Processor processor : getProcessorsToExecute()) {
       // Perform assembly for processor chain by transforming the existing publisher with a publisher function for each processor
@@ -283,11 +295,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         .accept(resolvedException);
   }
 
-  private ReactiveProcessor applyInterceptors(List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptorsToBeExecuted,
+  private ReactiveProcessor applyInterceptors(List<ReactiveInterceptor> interceptorsToBeExecuted,
                                               Processor processor) {
     ReactiveProcessor interceptorWrapperProcessorFunction = processor;
     // Take processor publisher function itself and transform it by applying interceptor transformations onto it.
-    for (BiFunction<Processor, ReactiveProcessor, ReactiveProcessor> interceptor : interceptorsToBeExecuted) {
+    for (ReactiveInterceptor interceptor : interceptorsToBeExecuted) {
       interceptorWrapperProcessorFunction = interceptor.apply(processor, interceptorWrapperProcessorFunction);
     }
     return interceptorWrapperProcessorFunction;
@@ -296,8 +308,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   /**
    * @return the interceptors to apply to a processor, sorted from inside-out.
    */
-  private List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> resolveInterceptors() {
-    List<BiFunction<Processor, ReactiveProcessor, ReactiveProcessor>> interceptors = new ArrayList<>();
+  private List<ReactiveInterceptor> resolveInterceptors() {
+    List<ReactiveInterceptor> interceptors = new ArrayList<>();
 
     // Set thread context
     interceptors.add((processor, next) -> stream -> from(stream)
@@ -332,20 +344,40 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     interceptors.addAll(additionalInterceptors);
 
     // #4 Wrap execution, before processing strategy, on flow thread.
-    interceptors.add((processor, next) -> stream -> from(stream)
-        .doOnNext(event -> {
-          if (!canProcessMessage) {
-            throw propagate(new MessagingException(event, new LifecycleException(isStopped(name), event.getMessage())));
-          }
-          preNotification(event, processor);
-        })
-        .transform(next)
-        .map(result -> {
-          postNotification(processor).accept(result);
-          setCurrentEvent((PrivilegedEvent) result);
-          // If the processor returns a CursorProvider, then have the StreamingManager manage it
-          return updateEventForStreaming(streamingManager).apply(result);
-        }));
+    interceptors.add((processor, next) -> {
+      String processorPath;
+      if ("true".equals(System.getProperty("mule.log.processorPath"))
+          && processor instanceof Component
+          && ((Component) processor).getLocation() != null) {
+        processorPath = ((Component) processor).getLocation().getLocation();
+      } else {
+        processorPath = null;
+      }
+
+      return stream -> from(stream)
+          .doOnNext(event -> {
+            if (!canProcessMessage) {
+              throw propagate(new MessagingException(event, new LifecycleException(isStopped(name), event.getMessage())));
+            }
+            if (processorPath != null) {
+              MDC.put("processorPath", processorPath);
+            }
+            preNotification(event, processor);
+          })
+          .transform(next)
+          .map(result -> {
+            try {
+              postNotification(processor).accept(result);
+              setCurrentEvent((PrivilegedEvent) result);
+              // If the processor returns a CursorProvider, then have the StreamingManager manage it
+              return updateEventForStreaming(streamingManager).apply(result);
+            } finally {
+              if (processorPath != null) {
+                MDC.remove("processorPath");
+              }
+            }
+          });
+    });
 
     return interceptors;
   }
