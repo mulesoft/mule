@@ -122,7 +122,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     } catch (ClassNotFoundException e) {
       LOGGER.debug("ApplicationClassLoader interface not available in current context", e);
     }
-
   }
 
   private final String name;
@@ -181,7 +180,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             final Flux<Either<MessagingException, CoreEvent>> upstream =
                 from(doApply(publisher, (context, throwable) -> errorRouter.accept(throwable)))
                     // This Either here is used to propagate errors. If the error is sent directly through the merged Flux,
-                    // it will be cancelled, ignoring the onErrorcontinue of the parent Flux.
+                    // it will be cancelled, ignoring the onErrorContinue of the parent Flux.
                     .map(event -> right(MessagingException.class, event))
                     .doOnNext(r -> errorSwitchSinkSinkRef.next(r))
                     .doOnError(t -> errorSwitchSinkSinkRef.error(t))

@@ -20,6 +20,7 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
+import org.mule.runtime.extension.api.annotation.Ignore;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
@@ -115,6 +116,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Ignore //TODO MULE-18176: Fix flaky test: propagateErrorFlux
   public void propagateErrorFlux() {
     List<String> results = new ArrayList<>();
     AtomicBoolean completeWithError = new AtomicBoolean();
