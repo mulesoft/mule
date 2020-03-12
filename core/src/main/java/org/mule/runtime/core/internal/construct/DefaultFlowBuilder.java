@@ -42,8 +42,7 @@ import reactor.core.publisher.Flux;
 
 /**
  * Creates instances of {@link Flow} with a default implementation
- *
- * <p/>
+ * <p>
  * Builder instance can be configured using the methods that follow the builder pattern until the flow is built. After that point,
  * builder methods will fail to update the builder state.
  */
@@ -67,7 +66,7 @@ public class DefaultFlowBuilder implements Builder {
    * @param name name of the flow to be created. Non empty.
    * @param muleContext context where the flow will be associated with. Non null.
    * @param componentInitialStateManager component state manager used by the flow to determine what components must be started or
-   *        not. Noo null.
+   *        not. Not null.
    */
   public DefaultFlowBuilder(String name, MuleContext muleContext, ComponentInitialStateManager componentInitialStateManager) {
     checkArgument(isNotEmpty(name), "name cannot be empty");
@@ -214,7 +213,9 @@ public class DefaultFlowBuilder implements Builder {
 
     @Override
     public ReactiveProcessor referenced() {
-      return dispatchToFlow();
+      return pub -> from(pub)
+          .doOnNext(this::checkBackpressureReferenced)
+          .transform(dispatchToFlow());
     }
 
     /**
