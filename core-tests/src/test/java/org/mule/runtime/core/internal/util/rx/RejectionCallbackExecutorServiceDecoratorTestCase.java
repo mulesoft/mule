@@ -42,12 +42,12 @@ public class RejectionCallbackExecutorServiceDecoratorTestCase extends AbstractM
   @Before
   public void before() {
     decorated = new RejectionCallbackExecutorServiceDecorator(new RejectingScheduler(newSingleThreadScheduledExecutor()),
-                                                      newSingleThreadScheduledExecutor(),
-                                                      () -> {
-                                                      },
-                                                      () -> {
-                                                      },
-                                                      Duration.of(1, NANOS));
+                                                              newSingleThreadScheduledExecutor(),
+                                                              () -> {
+                                                              },
+                                                              () -> {
+                                                              },
+                                                              Duration.of(1, NANOS));
   }
 
   @After
