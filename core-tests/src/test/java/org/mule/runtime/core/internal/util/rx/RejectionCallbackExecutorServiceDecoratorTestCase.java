@@ -8,6 +8,9 @@ package org.mule.runtime.core.internal.util.rx;
 
 import static java.time.temporal.ChronoUnit.NANOS;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
@@ -35,6 +38,7 @@ import io.qameta.allure.Issue;
 
 public class RejectionCallbackExecutorServiceDecoratorTestCase extends AbstractMuleTestCase {
 
+  private static final int RECEIVE_TIMEOUT = 5000;
   private static final int REJECTION_COUNT = 10000;
 
   private RejectionCallbackExecutorServiceDecorator decorated;
@@ -65,7 +69,7 @@ public class RejectionCallbackExecutorServiceDecoratorTestCase extends AbstractM
       return 0;
     });
 
-    latch.await();
+    assertThat(latch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
   }
 
   @Test
@@ -77,7 +81,7 @@ public class RejectionCallbackExecutorServiceDecoratorTestCase extends AbstractM
       latch.countDown();
     }, -1);
 
-    latch.await();
+    assertThat(latch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
   }
 
   @Test
@@ -89,7 +93,7 @@ public class RejectionCallbackExecutorServiceDecoratorTestCase extends AbstractM
       latch.countDown();
     });
 
-    latch.await();
+    assertThat(latch.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
   }
 
   static class TestScheduler extends ScheduledThreadPoolExecutor implements Scheduler {
