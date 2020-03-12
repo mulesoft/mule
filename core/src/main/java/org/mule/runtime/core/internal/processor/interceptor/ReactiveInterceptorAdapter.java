@@ -43,11 +43,11 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
+import org.mule.runtime.core.privileged.interception.ReactiveInterceptor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -57,8 +57,7 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
-    implements BiFunction<Processor, ReactiveProcessor, ReactiveProcessor> {
+public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter implements ReactiveInterceptor {
 
   private static final Logger LOGGER = getLogger(ReactiveInterceptorAdapter.class);
 
