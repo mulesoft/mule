@@ -10,7 +10,6 @@ import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.internal.message.EventInternalContext;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -20,8 +19,8 @@ import static java.util.Optional.empty;
 
 class ForeachContext {
 
-  private Integer previousCounter;
-  private Message previousRootMessage;
+  private Object previousCounter;
+  private Object previousRootMessage;
   private Message originalMessage;
   private Optional<ItemSequenceInfo> itemSequenceInfo;
   private Iterator<TypedValue<?>> iterator;
@@ -29,7 +28,7 @@ class ForeachContext {
   private Optional<DataType> batchDataType = empty();
   private Optional<Runnable> onComplete = empty();
 
-  ForeachContext(Integer previousCounter, Message previousRootMessage, Message message,
+  ForeachContext(Object previousCounter, Object previousRootMessage, Message message,
                  Optional<ItemSequenceInfo> itemSequenceInfo, Iterator<TypedValue<?>> iterator) {
     this.previousCounter = previousCounter;
     this.previousRootMessage = previousRootMessage;
@@ -38,11 +37,11 @@ class ForeachContext {
     this.iterator = iterator;
   }
 
-  Integer getPreviousCounter() {
+  Object getPreviousCounter() {
     return previousCounter;
   }
 
-  Message getPreviousRootMessage() {
+  Object getPreviousRootMessage() {
     return previousRootMessage;
   }
 

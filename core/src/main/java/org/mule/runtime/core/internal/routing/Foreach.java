@@ -53,7 +53,7 @@ import org.slf4j.Logger;
  */
 public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, Scope {
 
-  private static final Logger LOGGER = getLogger(AbstractMessageProcessorOwner.class);
+  private static final Logger LOGGER = getLogger(Foreach.class);
 
   static final String DEFAULT_COUNTER_VARIABLE = "counter";
   public static final String DEFAULT_ROOT_MESSAGE_VARIABLE = "rootMessage";

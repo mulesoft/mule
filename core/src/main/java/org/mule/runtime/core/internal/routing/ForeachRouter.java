@@ -23,7 +23,6 @@ import static reactor.util.context.Context.empty;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.event.EventInternalContextResolver;
@@ -220,20 +219,19 @@ class ForeachRouter {
       // Otherwise create a new message
       partEventBuilder.message(Message.builder().payload(currentValue).build());
     }
-    CoreEvent partEvent = partEventBuilder
+    return partEventBuilder
         .addVariable(owner.getCounterVariableName(), foreachContext.getElementNumber().incrementAndGet(), NUMBER)
         .build();
-    return partEvent;
   }
 
   private ForeachContext createForeachContext(CoreEvent event, Iterator<TypedValue<?>> iterator) {
     // Keep reference to existing rootMessage/count variables in order to restore later to support foreach nesting.
-    Integer previousCounterVar = event.getVariables().containsKey(owner.getCounterVariableName())
-        ? (Integer) event.getVariables().get(owner.getCounterVariableName()).getValue()
+    Object previousCounterVar = event.getVariables().containsKey(owner.getCounterVariableName())
+        ? event.getVariables().get(owner.getCounterVariableName()).getValue()
         : null;
-    Message previousRootMessageVar =
+    Object previousRootMessageVar =
         event.getVariables().containsKey(owner.getRootMessageVariableName())
-            ? (Message) event.getVariables().get(owner.getRootMessageVariableName()).getValue()
+            ? event.getVariables().get(owner.getRootMessageVariableName()).getValue()
             : null;
 
     return new ForeachContext(previousCounterVar, previousRootMessageVar, event.getMessage(), event.getItemSequenceInfo(),
