@@ -7,8 +7,12 @@
 package org.mule.runtime.module.reboot.internal;
 
 import org.mule.runtime.module.reboot.MuleContainerBootstrap;
+import static org.tanukisoftware.wrapper.WrapperManager.WRAPPER_LOG_LEVEL_ERROR;
+import static org.tanukisoftware.wrapper.WrapperManager.log;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
@@ -49,7 +53,10 @@ public class MuleContainerWrapper implements WrapperListener {
       startMethod.invoke(mule, true);
       return null;
     } catch (Exception e) {
-      e.printStackTrace();
+      StringWriter stackWriter = new StringWriter();
+      e.printStackTrace(new PrintWriter(stackWriter));
+
+      log(WRAPPER_LOG_LEVEL_ERROR, stackWriter.toString());
       return 1;
     }
   }
