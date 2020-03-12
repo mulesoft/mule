@@ -346,9 +346,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     // #4 Wrap execution, before processing strategy, on flow thread.
     interceptors.add((processor, next) -> {
       String processorPath;
-      if ("true".equals(System.getProperty("mule.log.processorPath"))
-          && processor instanceof Component
-          && ((Component) processor).getLocation() != null) {
+      if (processor instanceof Component && ((Component) processor).getLocation() != null) {
         processorPath = ((Component) processor).getLocation().getLocation();
       } else {
         processorPath = null;
