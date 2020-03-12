@@ -38,7 +38,6 @@ import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -58,15 +57,16 @@ public class CompositeSourcePolicy
   private final SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
   private final ReactiveProcessor flowExecutionProcessor;
   private final Optional<Function<MessagingException, MessagingException>> resolver;
+  private final PolicyTraceLogger policyTraceLogger = new PolicyTraceLogger();
 
   /**
    * Creates a new source policy composed by several {@link Policy} that will be chain together.
    *
-   * @param parameterizedPolicies             the list of policies to use in this composite policy.
-   * @param flowExecutionProcessor            the operation that executes the flow
+   * @param parameterizedPolicies the list of policies to use in this composite policy.
+   * @param flowExecutionProcessor the operation that executes the flow
    * @param sourcePolicyParametersTransformer a transformer from a source response parameters to a message and vice versa
-   * @param sourcePolicyProcessorFactory      factory to create a {@link Processor} from each {@link Policy}
-   * @param resolver                          a mapper to update the eventual errors in source policy
+   * @param sourcePolicyProcessorFactory factory to create a {@link Processor} from each {@link Policy}
+   * @param resolver a mapper to update the eventual errors in source policy
    */
   public CompositeSourcePolicy(List<Policy> parameterizedPolicies,
                                ReactiveProcessor flowExecutionProcessor,
@@ -89,6 +89,7 @@ public class CompositeSourcePolicy
   private static final class SourceWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
 
     private final Reference<CompositeSourcePolicy> compositeSourcePolicy;
+    private final PolicyTraceLogger policyTraceLogger = new PolicyTraceLogger();
 
     public SourceWithPoliciesFluxObjectFactory(CompositeSourcePolicy compositeSourcePolicy) {
       // Avoid instances of this class from preventing the policy from being gc'd
@@ -111,8 +112,6 @@ public class CompositeSourcePolicy
                                                            ctx.getResponseParametersProcessor()));
               })
               .doOnNext(result -> {
-                logSourcePolicySuccessfullResult(result.getRight());
-
                 compositeSourcePolicy.get().commonPolicy.finishFlowProcessing(result.getRight().getResult(), result);
               })
               .doOnError(e -> !(e instanceof MessagingException), e -> LOGGER.error(e.getMessage(), e))
@@ -124,7 +123,7 @@ public class CompositeSourcePolicy
                     left(new SourcePolicyFailureResult(me, resolveErrorResponseParameters(me, ctx)),
                          SourcePolicySuccessResult.class);
 
-                logSourcePolicyFailureResult(result.getLeft());
+                policyTraceLogger.logSourcePolicyFailureResult(result.getLeft());
 
                 compositeSourcePolicy.get().commonPolicy.finishFlowProcessing(me.getEvent(), result, me, ctx);
               });
@@ -171,7 +170,7 @@ public class CompositeSourcePolicy
    * sent by the source.
    */
   @Override
-  protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy lastPolicy) {
+  protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub) {
     final Optional<SourcePolicyParametersTransformer> parametersTransformer = getParametersTransformer();
     final Function<MessagingException, MessagingException> errorResolver = resolver.orElse(identity());
 
@@ -195,11 +194,9 @@ public class CompositeSourcePolicy
   protected Publisher<CoreEvent> applyPolicy(Policy policy, ReactiveProcessor nextProcessor, Publisher<CoreEvent> eventPub) {
     final ReactiveProcessor createSourcePolicy = sourcePolicyProcessorFactory.createSourcePolicy(policy, nextProcessor);
     return from(eventPub)
-        .doOnNext(s -> logEvent(getCoreEventId(s), getPolicyName(policy), () -> getCoreEventAttributesAsString(s),
-                                "Starting Policy "))
+        .doOnNext(event -> policyTraceLogger.logSourcePolicyStart(policy, event))
         .transform(createSourcePolicy)
-        .doOnNext(responseEvent -> logEvent(getCoreEventId(responseEvent), getPolicyName(policy),
-                                            () -> getCoreEventAttributesAsString(responseEvent), "At the end of the Policy "));
+        .doOnNext(event -> policyTraceLogger.logSourcePolicyEnd(policy, event));
   }
 
   /**
@@ -226,44 +223,6 @@ public class CompositeSourcePolicy
       Map<String, Object> concatMap = copy(originalResponseParameters);
       policyResponseParameters.forEach((k, v) -> concatMap.merge(k, v, (v1, v2) -> v2));
       return concatMap;
-    }
-  }
-
-  private static void logEvent(String eventId, String policyName, Supplier<String> message, String startingMessage) {
-    if (LOGGER.isTraceEnabled()) {
-      // TODO Remove event id when first policy generates it. MULE-14455
-      LOGGER.trace("Event Id: " + eventId + ".\n" + startingMessage + policyName + "\n" + message.get());
-    }
-  }
-
-  private static String getCoreEventId(CoreEvent event) {
-    return event.getContext().getId();
-  }
-
-  private static String getCoreEventAttributesAsString(CoreEvent event) {
-    if (event.getMessage() == null || event.getMessage().getAttributes() == null
-        || event.getMessage().getAttributes().getValue() == null) {
-      return "";
-    }
-    return event.getMessage().getAttributes().getValue().toString();
-  }
-
-  private static String getPolicyName(Policy policy) {
-    return policy.getPolicyId();
-  }
-
-  private static void logSourcePolicySuccessfullResult(SourcePolicySuccessResult result) {
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("Event id: " + result.getResult().getContext().getId() + "\nFinished processing. \n" +
-          getCoreEventAttributesAsString(result.getResult()));
-    }
-  }
-
-  private static void logSourcePolicyFailureResult(SourcePolicyFailureResult result) {
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("Event id: " + result.getMessagingException().getEvent().getContext().getId()
-          + "\nFinished processing with failure. \n" +
-          "Error message: " + result.getMessagingException().getMessage());
     }
   }
 

@@ -35,6 +35,9 @@ import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.TransactionAwareFluxSinkSupplier;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.RemovalCause;
+
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -45,10 +48,6 @@ import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
-import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.github.benmanes.caffeine.cache.RemovalCause;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -72,6 +71,7 @@ public class CompositeOperationPolicy
 
   private final long shutdownTimeout;
   private final Scheduler completionCallbackScheduler;
+  private final PolicyTraceLogger policyTraceLogger = new PolicyTraceLogger();
 
   /**
    * Creates a new composite policy.
@@ -146,7 +146,7 @@ public class CompositeOperationPolicy
    * @param eventPub the event to execute the operation.
    */
   @Override
-  protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub, Policy lastPolicy) {
+  protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub) {
     FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder = new FluxSinkRecorder<>();
 
     return from(propagateCompletion(from(eventPub), sinkRecorder.flux(), pub -> from(pub)
@@ -234,8 +234,7 @@ public class CompositeOperationPolicy
    */
   @Override
   protected Publisher<CoreEvent> applyPolicy(Policy policy, ReactiveProcessor nextProcessor, Publisher<CoreEvent> eventPub) {
-    return from(eventPub)
-        .transform(operationPolicyProcessorFactory.createOperationPolicy(policy, nextProcessor));
+    return from(eventPub).transform(operationPolicyProcessorFactory.createOperationPolicy(policy, nextProcessor));
   }
 
   @Override
