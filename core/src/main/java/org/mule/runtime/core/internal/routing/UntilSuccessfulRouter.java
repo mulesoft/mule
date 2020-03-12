@@ -111,6 +111,7 @@ class UntilSuccessfulRouter {
           innerRecorder.next(eventWithCurrentContext(event, ctx));
         })
         .doOnComplete(() -> {
+          //TODO MULE-18170
           if (inflightEvents.get() == 0) {
             completeRouter();
           } else {

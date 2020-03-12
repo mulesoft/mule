@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.event;
 
-
 import static java.lang.System.lineSeparator;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
