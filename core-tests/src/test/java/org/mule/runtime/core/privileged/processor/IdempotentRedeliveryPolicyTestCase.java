@@ -214,14 +214,6 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
     verify(payloadValue).hashCode();
   }
 
-  @Test
-  public void objectStoreIsRemovedWhenDisposed() throws Exception {
-    irp.setObjectStore(mockObjectStore);
-    irp.dispose();
-    verify(mockObjectStoreManager)
-        .disposeStore(TEST_CONNECTOR_LOCATION.getRootContainerName() + "." + IdempotentRedeliveryPolicy.class.getName());
-  }
-
   private void processUntilFailure() {
     for (int i = 0; i < MAX_REDELIVERY_COUNT + 2; i++) {
       try {
