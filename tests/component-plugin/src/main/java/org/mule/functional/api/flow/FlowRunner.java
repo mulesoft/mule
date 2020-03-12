@@ -25,7 +25,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
@@ -34,11 +33,11 @@ import org.mule.tck.junit4.matcher.ErrorTypeMatcher;
 import org.mule.tck.junit4.matcher.EventMatcher;
 import org.mule.tck.processor.FlowAssert;
 
-import org.hamcrest.Matcher;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
+
+import org.hamcrest.Matcher;
 
 /**
  * Provides a fluent API for running events through flows.
@@ -47,15 +46,16 @@ import java.util.function.Function;
  */
 public class FlowRunner extends FlowConstructRunner<FlowRunner> {
 
-  private String flowName;
+  private final String flowName;
+  private final Flow flow;
 
   private ExecutionTemplate<CoreEvent> txExecutionTemplate = callback -> callback.process();
 
-  private Function<CoreEvent, CoreEvent> responseEventTransformer = input -> input;
+  private final Function<CoreEvent, CoreEvent> responseEventTransformer = input -> input;
 
   private Scheduler scheduler;
 
-  private CompletableFuture<Void> externalCompletionCallback = new CompletableFuture<>();
+  private final CompletableFuture<Void> externalCompletionCallback = new CompletableFuture<>();
 
   private boolean wasFlowOriginallyStopped = false;
 
@@ -69,7 +69,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
     super(registry);
     this.flowName = flowName;
 
-    final FlowConstruct flow = getFlowConstruct();
+    flow = (Flow) getFlowConstruct();
     if (((LifecycleStateEnabled) flow).getLifecycleState().isStopped()) {
       wasFlowOriginallyStopped = true;
       try {
@@ -157,13 +157,12 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
    * @throws Exception
    */
   public CoreEvent runAndVerify(String... flowNamesToVerify) throws Exception {
-    Flow flow = (Flow) getFlowConstruct();
     CoreEvent response;
     if (scheduler == null) {
-      response = txExecutionTemplate.execute(getFlowRunCallback(flow));
+      response = txExecutionTemplate.execute(getFlowRunCallback());
     } else {
       try {
-        response = scheduler.submit(() -> txExecutionTemplate.execute(getFlowRunCallback(flow))).get();
+        response = scheduler.submit(() -> txExecutionTemplate.execute(getFlowRunCallback())).get();
       } catch (ExecutionException executionException) {
         Throwable cause = executionException.getCause();
         throw cause instanceof Exception ? (Exception) cause : new RuntimeException(cause);
@@ -184,9 +183,8 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
    * return a result.
    */
   public void dispatch() throws Exception {
-    Flow flow = (Flow) getFlowConstruct();
     try {
-      txExecutionTemplate.execute(getFlowDispatchCallback(flow));
+      txExecutionTemplate.execute(getFlowDispatchCallback());
     } catch (Exception e) {
       // Ignore
     }
@@ -205,21 +203,20 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
    */
   public void dispatchAsync(Scheduler scheduler) throws Exception {
     this.scheduler = scheduler;
-    Flow flow = (Flow) getFlowConstruct();
     try {
-      scheduler.submit(() -> txExecutionTemplate.execute(getFlowDispatchCallback(flow)));
+      scheduler.submit(() -> txExecutionTemplate.execute(getFlowDispatchCallback()));
     } catch (Exception e) {
       // Ignore
     }
     FlowAssert.verify(flowName);
   }
 
-  private ExecutionCallback<CoreEvent> getFlowRunCallback(final Flow flow) {
+  private ExecutionCallback<CoreEvent> getFlowRunCallback() {
     // TODO MULE-13053 Update and improve FlowRunner to support non-blocking flow execution and assertions.
     return () -> flow.process(getOrBuildEvent());
   }
 
-  private ExecutionCallback<CoreEvent> getFlowDispatchCallback(final Flow flow) {
+  private ExecutionCallback<CoreEvent> getFlowDispatchCallback() {
     return () -> {
       // TODO MULE-13053 Update and improve FlowRunner to support non-blocking flow execution and assertions.
       flow.process(getOrBuildEvent());
@@ -354,12 +351,20 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
     super.dispose();
 
     if (wasFlowOriginallyStopped) {
-      final FlowConstruct flow = getFlowConstruct();
       try {
         stopIfNeeded(flow);
       } catch (MuleException e) {
         throw new MuleRuntimeException(e);
       }
+    }
+  }
+
+  @Override
+  protected FlowConstruct getFlowConstruct() {
+    if (flow != null) {
+      return flow;
+    } else {
+      return super.getFlowConstruct();
     }
   }
 }
