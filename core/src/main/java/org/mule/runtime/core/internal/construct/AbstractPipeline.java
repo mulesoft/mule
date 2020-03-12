@@ -389,10 +389,15 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   private void fireCompleteNotification(CoreEvent event, MessagingException messagingException) {
-    FlowCallStack flowCallStack = event.getFlowCallStack();
-    if (flowCallStack instanceof DefaultFlowCallStack) {
-      ((DefaultFlowCallStack) flowCallStack).pop();
+    if (event != null) {
+      FlowCallStack flowCallStack = event.getFlowCallStack();
+      if (flowCallStack instanceof DefaultFlowCallStack) {
+        ((DefaultFlowCallStack) flowCallStack).pop();
+      }
+    } else {
+      LOGGER.warn("No event on flow completion", messagingException);
     }
+
     notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, messagingException, AbstractPipeline.this),
                                                                AbstractPipeline.this.getName(), PROCESS_COMPLETE));
   }
@@ -550,6 +555,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   public void checkBackpressure(CoreEvent event) throws RuntimeException {
     try {
       backpressureStrategySelector.check(event);
+    } catch (FlowBackPressureException e) {
+      throw propagate(e);
+    }
+  }
+
+  protected void checkBackpressureReferenced(CoreEvent event) throws RuntimeException {
+    try {
+      backpressureStrategySelector.checkWithWaitStrategy(event);
     } catch (FlowBackPressureException e) {
       throw propagate(e);
     }
