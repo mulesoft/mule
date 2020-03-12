@@ -96,9 +96,6 @@ public class MuleContainer {
   private static MuleLog4jContextFactory log4jContextFactory;
 
   static {
-    // Before doing any further action, we need to check for a valid license
-    validateLicense();
-
     if (getProperty(MULE_SIMPLE_LOG) == null) {
       // We need to force the creation of a logger before we can change the manager factory.
       // This is because if not, any logger that will be acquired by MuleLog4jContextFactory code
@@ -246,6 +243,7 @@ public class MuleContainer {
       coreExtensionManager.setToolingService(toolingService);
       coreExtensionManager.setServiceRepository(serviceManager);
 
+      validateLicense();
       showSplashScreen();
 
       coreExtensionManager.initialise();
@@ -259,7 +257,7 @@ public class MuleContainer {
     }
   }
 
-  private static void validateLicense() {
+  private void validateLicense() {
     try {
       invokeStaticMethod(MuleContainerBootstrap.class, "awaitLicenseValidation");
     } catch (NoSuchMethodException e) {
