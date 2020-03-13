@@ -11,6 +11,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
+import static org.mule.runtime.core.api.util.StringUtils.sanitizeUrl;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_ID;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_SECRET;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_ORG_ID;
@@ -145,17 +146,8 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
     return grantType;
   }
 
-
   public ExtensionModel getExtensionModel() {
     return extensionModel;
-  }
-
-  private static String sanitizeUrl(String url) {
-    if (url.endsWith("/")) {
-      url = url.substring(0, url.length() - 1);
-    }
-
-    return url;
   }
 
 }

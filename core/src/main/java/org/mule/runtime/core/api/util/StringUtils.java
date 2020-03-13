@@ -169,5 +169,17 @@ public class StringUtils {
     return org.apache.commons.lang3.StringUtils.trim(str);
   }
 
+  /**
+   * Remove trailing slash from {@code url}
+   *
+   * @param url    an url
+   */
+  public static String sanitizeUrl(String url) {
+    if (url.endsWith("/")) {
+      url = url.substring(0, url.length() - 1);
+    }
+    return url;
+  }
+
   private StringUtils() {}
 }
