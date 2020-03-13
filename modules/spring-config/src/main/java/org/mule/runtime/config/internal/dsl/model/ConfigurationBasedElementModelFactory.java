@@ -351,14 +351,14 @@ class ConfigurationBasedElementModelFactory {
       public void visitObject(ObjectType objectType) {
         Optional<ComponentIdentifier> identifier = getIdentifier(modelDsl);
         if (identifier.isPresent()) {
+
+          ComponentConfiguration fieldComponent = getSingleComponentConfiguration(getNestedComponents(configuration), identifier);
+
           if (isMap(objectType)) {
-            typeBuilder.containing(createMapElement(objectType, modelDsl, configuration));
+            typeBuilder.containing(createMapElement(objectType, modelDsl, fieldComponent));
             return;
           }
 
-          Multimap<ComponentIdentifier, ComponentConfiguration> nestedComponents = getNestedComponents(configuration);
-          ComponentConfiguration fieldComponent =
-              nestedComponents.containsKey(identifier.get()) ? nestedComponents.get(identifier.get()).iterator().next() : null;
           fieldComponent = fieldComponent == null ? configuration : fieldComponent;
 
           String value = fieldComponent.getParameters().get(modelDsl.getAttributeName());
@@ -393,7 +393,7 @@ class ConfigurationBasedElementModelFactory {
         .withDsl(modelDsl)
         .withConfig(configuration);
 
-    if (!configuration.getNestedComponents().isEmpty()) {
+    if (configuration != null && !configuration.getNestedComponents().isEmpty()) {
       populateMapEntries(objectType, modelDsl, mapBuilder, configuration);
     }
 
