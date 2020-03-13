@@ -16,8 +16,8 @@ import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_ID
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_SECRET;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_ORG_ID;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL;
-import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL_PATH;
-import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL_PATH_DEFAULT;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_PATH;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_DEFAULT_PATH;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_SERVICE_URL;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -76,7 +76,7 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
 
   private static String resolvePlatformAuthUrl(ConfigurationProperties configurationProperties) {
     return sanitizeUrl(getProperty(configurationProperties, OCS_PLATFORM_AUTH_URL))
-        + configurationProperties.resolveStringProperty(OCS_PLATFORM_AUTH_URL_PATH).orElse(OCS_PLATFORM_AUTH_URL_PATH_DEFAULT);
+        + configurationProperties.resolveStringProperty(OCS_PLATFORM_AUTH_PATH).orElse(OCS_PLATFORM_AUTH_DEFAULT_PATH);
   }
 
   public PlatformManagedOAuthConfig(String ownerConfigName,

@@ -173,6 +173,8 @@ public class StringUtils {
    * Remove trailing slash from {@code url}
    *
    * @param url    an url
+   *
+   * @since 4.3.0
    */
   public static String sanitizeUrl(String url) {
     if (url.endsWith("/")) {
