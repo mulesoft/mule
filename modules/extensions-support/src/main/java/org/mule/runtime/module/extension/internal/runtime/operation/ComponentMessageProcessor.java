@@ -515,15 +515,14 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
               .flatMapMany(ctx -> {
                 final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter = new FluxSinkRecorder<>();
 
-                return propagateCompletion(from(publisher), emitter.flux()
-                    .map(result -> {
-                      return result.reduce(me -> {
-                        throw propagateWrappingFatal(me);
-                      }, response -> response);
-                    }),
-                                           pub -> from(pub)
-                                               .doOnNext(innerEventDispatcher(ctx, emitter)),
-                                           () -> emitter.complete(), e -> emitter.error(e));
+                return from(propagateCompletion(from(publisher), emitter.flux(),
+                                                pub -> from(pub)
+                                                    .doOnNext(innerEventDispatcher(ctx, emitter))
+                                                    .map(e -> Either.empty()),
+                                                () -> emitter.complete(), e -> emitter.error(e)))
+                                                    .map(result -> result.reduce(me -> {
+                                                      throw propagateWrappingFatal(me);
+                                                    }, response -> response));
               });
         }
 
