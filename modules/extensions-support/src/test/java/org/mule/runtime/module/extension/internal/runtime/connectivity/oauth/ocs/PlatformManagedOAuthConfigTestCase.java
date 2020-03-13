@@ -11,7 +11,12 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.extension.internal.ocs.OCSConstants.*;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_ID;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_SECRET;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_ORG_ID;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_SERVICE_URL;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL_PATH;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,13 +30,13 @@ import org.mule.tck.size.SmallTest;
 @RunWith(MockitoJUnitRunner.class)
 public class PlatformManagedOAuthConfigTestCase extends AbstractMuleTestCase {
 
-  private static final String CLIENT_ID = "a";
-  private static final String SECRET_ID = "b";
-  private static final String ORG_ID = "b";
-  private static final String SERVICE_URL = "c";
-  private static final String PLATFORM_URL = "http://localhost/accounts";
-  private static final String PLATFORM_SUFFIX_DEFAULT = "/oauth2/token";
-  private static final String PLATFORM_SUFFIX = "/token";
+  private static final String CLIENT_ID = "client_id";
+  private static final String SECRET_ID = "secret_id";
+  private static final String ORG_ID = "org_id";
+  private static final String SERVICE_URL = "service_url";
+  private static final String PLATFORM_AUTH_URL = "http://localhost/accounts";
+  private static final String PLATFORM_AUTH_URL_PATH_DEFAULT = "/oauth2/token";
+  private static final String PLATFORM_AUTH_URL_PATH = "/token";
   private ConfigurationProperties configurationProperties;
 
   @Before
@@ -41,21 +46,21 @@ public class PlatformManagedOAuthConfigTestCase extends AbstractMuleTestCase {
     when(configurationProperties.resolveStringProperty(OCS_CLIENT_ID)).thenReturn(of(CLIENT_ID));
     when(configurationProperties.resolveStringProperty(OCS_ORG_ID)).thenReturn(of(ORG_ID));
     when(configurationProperties.resolveStringProperty(OCS_SERVICE_URL)).thenReturn(of(SERVICE_URL));
-    when(configurationProperties.resolveStringProperty(OCS_PLATFORM_AUTH_URL)).thenReturn(of(PLATFORM_URL));
+    when(configurationProperties.resolveStringProperty(OCS_PLATFORM_AUTH_URL)).thenReturn(of(PLATFORM_AUTH_URL));
   }
 
 
   @Test
   public void getPlatformAuthUrl() {
     PlatformManagedOAuthConfig config = PlatformManagedOAuthConfig.from("", "", null, null, null, null, configurationProperties);
-    assertThat(config.getPlatformAuthUrl(), equalTo(PLATFORM_URL + PLATFORM_SUFFIX_DEFAULT));
+    assertThat(config.getPlatformAuthUrl(), equalTo(PLATFORM_AUTH_URL + PLATFORM_AUTH_URL_PATH_DEFAULT));
   }
 
   @Test
-  public void getPlatformAuthUrlWithPlatformSuffix() {
-    when(configurationProperties.resolveStringProperty(OCS_PLATFORM_AUTH_URL_SUFFIX)).thenReturn(of(PLATFORM_SUFFIX));
+  public void getPlatformAuthUrlWithPath() {
+    when(configurationProperties.resolveStringProperty(OCS_PLATFORM_AUTH_URL_PATH)).thenReturn(of(PLATFORM_AUTH_URL_PATH));
     PlatformManagedOAuthConfig config = PlatformManagedOAuthConfig.from("", "", null, null, null, null, configurationProperties);
-    assertThat(config.getPlatformAuthUrl(), equalTo(PLATFORM_URL + PLATFORM_SUFFIX));
+    assertThat(config.getPlatformAuthUrl(), equalTo(PLATFORM_AUTH_URL + PLATFORM_AUTH_URL_PATH));
   }
 
 }
