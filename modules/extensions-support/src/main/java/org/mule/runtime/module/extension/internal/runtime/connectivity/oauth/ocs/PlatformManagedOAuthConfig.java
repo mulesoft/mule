@@ -16,6 +16,7 @@ import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_SE
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_ORG_ID;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL_PATH;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL_PATH_DEFAULT;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_SERVICE_URL;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -33,8 +34,6 @@ import java.nio.charset.Charset;
  * @since 4.3.0
  */
 public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuthGrantType> {
-
-  private static final String DEFAULT_PLATFORM_AUTH_URL_SUFFIX = "/oauth2/token";
 
   private final String connectionUri;
   private final String serviceUrl;
@@ -61,7 +60,7 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
                                           resolvePlatformAuthUrl(getProperty(configurationProperties, OCS_PLATFORM_AUTH_URL),
                                                                  getProperty(configurationProperties,
                                                                              OCS_PLATFORM_AUTH_URL_PATH,
-                                                                             DEFAULT_PLATFORM_AUTH_URL_SUFFIX)),
+                                                                             OCS_PLATFORM_AUTH_URL_PATH_DEFAULT)),
                                           getProperty(configurationProperties, OCS_CLIENT_ID),
                                           getProperty(configurationProperties, OCS_CLIENT_SECRET),
                                           getProperty(configurationProperties, OCS_ORG_ID),
