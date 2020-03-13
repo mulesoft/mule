@@ -15,7 +15,7 @@ import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_ID
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_SECRET;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_ORG_ID;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL;
-import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL_SUFFIX;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL_PATH;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_SERVICE_URL;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -60,7 +60,7 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
                                           getProperty(configurationProperties, OCS_SERVICE_URL),
                                           resolvePlatformAuthUrl(getProperty(configurationProperties, OCS_PLATFORM_AUTH_URL),
                                                                  getProperty(configurationProperties,
-                                                                             OCS_PLATFORM_AUTH_URL_SUFFIX,
+                                                                             OCS_PLATFORM_AUTH_URL_PATH,
                                                                              DEFAULT_PLATFORM_AUTH_URL_SUFFIX)),
                                           getProperty(configurationProperties, OCS_CLIENT_ID),
                                           getProperty(configurationProperties, OCS_CLIENT_SECRET),
