@@ -93,16 +93,21 @@ public class RejectionCallbackExecutorServiceDecorator implements ScheduledExecu
 
       CompletableFuture<T> retryedFuture = new CompletableFuture<>();
       retryScheduler.schedule(() -> {
-        submit(() -> {
-          try {
-            final T call = task.call();
-            retryedFuture.complete(call);
-            return call;
-          } catch (Exception e) {
-            retryedFuture.completeExceptionally(e);
-            throw e;
-          }
-        });
+        if (task instanceof RetriedCallable) {
+          submit(task);
+        } else {
+          submit((RetriedCallable<T>) () -> {
+            try {
+              final T call = task.call();
+              retryedFuture.complete(call);
+              return call;
+            } catch (Exception e) {
+              retryedFuture.completeExceptionally(e);
+              throw e;
+            }
+          });
+        }
+
       }, retryInterval.toMillis(), MILLISECONDS);
       return retryedFuture.thenApply(r -> {
         onRetrySuccessful.run();
@@ -120,10 +125,14 @@ public class RejectionCallbackExecutorServiceDecorator implements ScheduledExecu
 
       CompletableFuture<T> retryedFuture = new CompletableFuture<>();
       retryScheduler.schedule(() -> {
-        submit(() -> {
-          task.run();
-          retryedFuture.complete(null);
-        }, result);
+        if (task instanceof RetriedRunnable) {
+          submit(task);
+        } else {
+          submit((RetriedRunnable) () -> {
+            task.run();
+            retryedFuture.complete(null);
+          }, result);
+        }
       }, retryInterval.toMillis(), MILLISECONDS);
       return retryedFuture.thenApply(r -> {
         onRetrySuccessful.run();
@@ -141,10 +150,14 @@ public class RejectionCallbackExecutorServiceDecorator implements ScheduledExecu
 
       CompletableFuture<?> retryedFuture = new CompletableFuture<>();
       retryScheduler.schedule(() -> {
-        submit(() -> {
-          task.run();
-          retryedFuture.complete(null);
-        });
+        if (task instanceof RetriedRunnable) {
+          submit(task);
+        } else {
+          submit((RetriedRunnable) () -> {
+            task.run();
+            retryedFuture.complete(null);
+          });
+        }
       }, retryInterval.toMillis(), MILLISECONDS);
       return retryedFuture.thenApply(r -> {
         onRetrySuccessful.run();
@@ -206,6 +219,14 @@ public class RejectionCallbackExecutorServiceDecorator implements ScheduledExecu
   @Override
   public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
     return delegate.scheduleWithFixedDelay(command, initialDelay, delay, unit);
+  }
+
+  private interface RetriedCallable<T> extends Callable<T> {
+
+  }
+
+  private interface RetriedRunnable extends Runnable {
+
   }
 
 }
