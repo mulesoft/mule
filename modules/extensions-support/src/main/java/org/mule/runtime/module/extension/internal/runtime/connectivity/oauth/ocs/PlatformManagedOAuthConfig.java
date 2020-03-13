@@ -57,10 +57,7 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
     return new PlatformManagedOAuthConfig(ownerConfigName,
                                           connectionUri,
                                           getProperty(configurationProperties, OCS_SERVICE_URL),
-                                          resolvePlatformAuthUrl(getProperty(configurationProperties, OCS_PLATFORM_AUTH_URL),
-                                                                 getProperty(configurationProperties,
-                                                                             OCS_PLATFORM_AUTH_URL_PATH,
-                                                                             OCS_PLATFORM_AUTH_URL_PATH_DEFAULT)),
+                                          resolvePlatformAuthUrl(configurationProperties),
                                           getProperty(configurationProperties, OCS_CLIENT_ID),
                                           getProperty(configurationProperties, OCS_CLIENT_SECRET),
                                           getProperty(configurationProperties, OCS_ORG_ID),
@@ -76,12 +73,9 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
         .orElseThrow(() -> new IllegalArgumentException(format("OCS property '%s' has not been set", key)));
   }
 
-  private static String getProperty(ConfigurationProperties configurationProperties, String key, String def) {
-    return configurationProperties.resolveStringProperty(key).orElse(def);
-  }
-
-  private static String resolvePlatformAuthUrl(String url, String suffix) {
-    return sanitizeUrl(url) + suffix;
+  private static String resolvePlatformAuthUrl(ConfigurationProperties configurationProperties) {
+    return sanitizeUrl(getProperty(configurationProperties, OCS_PLATFORM_AUTH_URL))
+        + configurationProperties.resolveStringProperty(OCS_PLATFORM_AUTH_URL_PATH).orElse(OCS_PLATFORM_AUTH_URL_PATH_DEFAULT);
   }
 
   public PlatformManagedOAuthConfig(String ownerConfigName,
