@@ -143,7 +143,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                        maxConcurrency,
                                                        true,
                                                        false,
-                                                       muleContext.getConfiguration().getShutdownTimeout());
+                                                       () -> muleContext.getConfiguration().getShutdownTimeout());
   }
 
   @Override
@@ -303,7 +303,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     2,
                                                                                                     true,
                                                                                                     false,
-                                                                                                    muleContext.getConfiguration()
+                                                                                                    () -> muleContext
+                                                                                                        .getConfiguration()
                                                                                                         .getShutdownTimeout()))
         .build();
     flow.initialise();
@@ -344,7 +345,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     2,
                                                                                                     true,
                                                                                                     false,
-                                                                                                    muleContext.getConfiguration()
+                                                                                                    () -> muleContext
+                                                                                                        .getConfiguration()
                                                                                                         .getShutdownTimeout()))
         .build();
     flow.initialise();
@@ -383,7 +385,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     1,
                                                                                                     true,
                                                                                                     false,
-                                                                                                    muleContext.getConfiguration()
+                                                                                                    () -> muleContext
+                                                                                                        .getConfiguration()
                                                                                                         .getShutdownTimeout())),
                        true, CPU_LITE, 1);
     assertThat(threads, hasSize(1));
@@ -407,7 +410,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     2,
                                                                                                     true,
                                                                                                     false,
-                                                                                                    muleContext.getConfiguration()
+                                                                                                    () -> muleContext
+                                                                                                        .getConfiguration()
                                                                                                         .getShutdownTimeout())),
                        true, CPU_LITE, 2);
     assertThat(threads, hasSize(2));
@@ -433,7 +437,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     1,
                                                                                                     true,
                                                                                                     false,
-                                                                                                    muleContext.getConfiguration()
+                                                                                                    () -> muleContext
+                                                                                                        .getConfiguration()
                                                                                                         .getShutdownTimeout())),
                        true, BLOCKING, 1);
     assertThat(threads, hasSize(1));
@@ -459,7 +464,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     2,
                                                                                                     true,
                                                                                                     false,
-                                                                                                    muleContext.getConfiguration()
+                                                                                                    () -> muleContext
+                                                                                                        .getConfiguration()
                                                                                                         .getShutdownTimeout())),
                        true, BLOCKING, 2);
     assertThat(threads, hasSize(2));
@@ -511,7 +517,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     2,
                                                                                                     true,
                                                                                                     false,
-                                                                                                    muleContext.getConfiguration()
+                                                                                                    () -> muleContext
+                                                                                                        .getConfiguration()
                                                                                                         .getShutdownTimeout()))
         .processors(blockingProcessor)
         .build();
@@ -749,7 +756,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     2,
                                                                                                     true,
                                                                                                     false,
-                                                                                                    muleContext.getConfiguration()
+                                                                                                    () -> muleContext
+                                                                                                        .getConfiguration()
                                                                                                         .getShutdownTimeout()))
         .source(triggerableMessageSource)
         .processors(cpuLightProcessor, cpuIntensiveProcessor).build();

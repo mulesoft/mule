@@ -71,7 +71,7 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
                                                                                                                     MAX_VALUE,
                                                                                                                     false,
                                                                                                                     false,
-                                                                                                                    muleContext
+                                                                                                                    () -> muleContext
                                                                                                                         .getConfiguration()
                                                                                                                         .getShutdownTimeout()));
   }
@@ -90,7 +90,7 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
                                                                                                                     maxConcurrency,
                                                                                                                     true,
                                                                                                                     false,
-                                                                                                                    muleContext
+                                                                                                                    () -> muleContext
                                                                                                                         .getConfiguration()
                                                                                                                         .getShutdownTimeout()));
   }

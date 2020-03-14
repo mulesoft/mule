@@ -69,7 +69,7 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
                                                        getMaxConcurrency(),
                                                        isMaxConcurrencyEagerCheck(),
                                                        muleContext.getConfiguration().isThreadLoggingEnabled(),
-                                                       muleContext.getConfiguration().getShutdownTimeout());
+                                                       () -> muleContext.getConfiguration().getShutdownTimeout());
   }
 
   @Override
@@ -98,9 +98,9 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
                                                    int maxConcurrency,
                                                    boolean maxConcurrencyEagerCheck,
                                                    boolean isThreadLoggingEnabled,
-                                                   long shutdownTimeout) {
+                                                   Supplier<Long> shutdownTimeoutSupplier) {
       super(bufferSize, subscriberCount, flowDispatchSchedulerSupplier, cpuLightSchedulerSupplier, parallelism, maxConcurrency,
-            maxConcurrencyEagerCheck, shutdownTimeout);
+            maxConcurrencyEagerCheck, shutdownTimeoutSupplier);
       this.blockingSchedulerSupplier = blockingSchedulerSupplier;
       this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
       this.isThreadLoggingEnabled = isThreadLoggingEnabled;

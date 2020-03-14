@@ -74,7 +74,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
                                                resolveParallelism(),
                                                getMaxConcurrency(),
                                                isMaxConcurrencyEagerCheck(),
-                                               muleContext.getConfiguration().getShutdownTimeout());
+                                               () -> muleContext.getConfiguration().getShutdownTimeout());
   }
 
   @Override
@@ -119,7 +119,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
             : MIN_VALUE;
 
     private final int sinksCount;
-    private final long shutdownTimeout;
+    private final Supplier<Long> shutdownTimeoutSupplier;
 
     // This counter keeps track of how many sinks are created for fluxes that use this processing strategy.
     // Using it, an eager stop of the schedulers is implmented in `stopSchedulersIfNeeded`
@@ -132,17 +132,18 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
                                            int parallelism,
                                            int maxConcurrency,
                                            boolean maxConcurrencyEagerCheck,
-                                           long shutdownTimeout) {
+                                           Supplier<Long> shutdownTimeoutSupplier) {
       super(subscribers, cpuLightSchedulerSupplier, parallelism, maxConcurrency, maxConcurrencyEagerCheck);
       this.bufferSize = bufferSize;
       this.flowDispatchSchedulerLazy = new LazyValue<>(flowDispatchSchedulerSupplier);
       this.sinksCount = getSinksCount();
-      this.shutdownTimeout = shutdownTimeout;
+      this.shutdownTimeoutSupplier = shutdownTimeoutSupplier;
     }
 
     @Override
     public void dispose() {
       final long startMillis = currentTimeMillis();
+      final long shutdownTimeout = shutdownTimeoutSupplier.get();
 
       while (!allSchedulersStopped() && currentTimeMillis() - startMillis < shutdownTimeout) {
         try {
@@ -206,7 +207,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
         ReactorSink<CoreEvent> sink =
             new DefaultReactorSink<>(processor.sink(BUFFER),
                                      prepareDisposeTimestamp -> {
-                                       awaitSubscribersCompletion(flowConstruct, shutdownTimeout, completionLatch,
+                                       awaitSubscribersCompletion(flowConstruct, shutdownTimeoutSupplier.get(), completionLatch,
                                                                   prepareDisposeTimestamp);
                                        stopSchedulersIfNeeded();
                                      },
