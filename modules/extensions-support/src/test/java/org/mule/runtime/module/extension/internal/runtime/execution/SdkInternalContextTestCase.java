@@ -32,7 +32,6 @@ public class SdkInternalContextTestCase extends AbstractMuleTestCase {
   @Issue("MULE-18189")
   @Description("scatter-gather sends tha same event to different routes. In that case, the relationship of what context belongs to the operation on what route must be kept.")
   public void contextSharedOnParallelRoutes() throws MuleException {
-
     final SdkInternalContext ctx = new SdkInternalContext();
 
     final ComponentLocation comp1 = fromSingleComponent("comp1");
@@ -66,5 +65,4 @@ public class SdkInternalContextTestCase extends AbstractMuleTestCase {
       }
     });
   }
-
 }
