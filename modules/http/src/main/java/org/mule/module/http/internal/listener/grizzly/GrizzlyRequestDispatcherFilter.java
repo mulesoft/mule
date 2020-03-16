@@ -35,6 +35,8 @@ import org.glassfish.grizzly.http.HttpEvents.OutgoingHttpUpgradeEvent;
 import org.glassfish.grizzly.http.HttpHeader;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
+import org.glassfish.grizzly.nio.transport.TCPNIOServerConnection;
+
 import org.mule.module.http.api.HttpConstants.HttpStatus;
 import org.mule.module.http.internal.domain.EmptyHttpEntity;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
@@ -82,6 +84,15 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
         {
             sendEmptyResponse(ctx, request, DROPPED);
             return ctx.getStopAction();
+        }
+
+        // handle the case when the server is already shutdown
+        Object serverConnection = ctx.getConnection().getAttributes().getAttribute("Server Connection");
+        if (serverConnection instanceof TCPNIOServerConnection) {
+            if (!((TCPNIOServerConnection) serverConnection).isOpen()) {
+                ctx.getConnection().closeSilently();
+                return ctx.getStopAction();
+            }
         }
 
         // Handle Expect Continue

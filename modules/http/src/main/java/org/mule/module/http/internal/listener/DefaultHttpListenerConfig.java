@@ -26,6 +26,7 @@ import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.listener.HttpListenerConfig;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.listener.async.RequestHandler;
+import org.mule.module.http.internal.listener.grizzly.GrizzlyServer;
 import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.transport.ssl.api.TlsContextFactory;
@@ -311,9 +312,18 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject implement
             {
                 workManager = null;
             }
-            server.stop();
+            stopServer();
             started = false;
             logger.info("Stopped listener on " + listenerUrl());
+        }
+    }
+
+    public void stopServer()
+    {
+        server.stop();
+        if (server instanceof GrizzlyServer)
+        {
+            ((GrizzlyServer) server).cleanIdleConnections();
         }
     }
 

@@ -290,6 +290,10 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
     @Override
     public synchronized void stop() throws MuleException
     {
+        if (muleContext.isStopping())
+        {
+            config.stop();
+        }
         requestHandlerManager.stop();
     }
 
