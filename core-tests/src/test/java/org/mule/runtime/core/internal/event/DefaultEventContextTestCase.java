@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.event;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.contains;
@@ -26,7 +27,7 @@ import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EVENT_CONTEXT;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EventContextStory.RESPONSE_AND_COMPLETION_PUBLISHERS;
 import static reactor.core.publisher.Mono.from;
-import static reactor.core.scheduler.Schedulers.single;
+import static reactor.core.scheduler.Schedulers.fromExecutor;
 
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -103,7 +104,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   private final AtomicBoolean childCompletion = new AtomicBoolean();
 
 
-  public DefaultEventContextTestCase(Supplier<DefaultEventContext> context,
+  public DefaultEventContextTestCase(String name, Supplier<DefaultEventContext> context,
                                      Function<CompletableFuture<Void>, BaseEventContext> contextWithCompletion,
                                      Function<ComponentLocation, BaseEventContext> contextWithComponentLocation) {
     this.context = context;
@@ -140,10 +141,11 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     child.onTerminated((response, throwable) -> childCompletion.set(true));
   }
 
-  @Parameters
+  @Parameters(name = "{0}")
   public static List<Object[]> data() {
     return asList(new Object[][] {
         {
+            "FlowContext",
             (CheckedSupplier<EventContext>) () -> create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION),
             (CheckedFunction<CompletableFuture<Void>, EventContext>) externalCompletion -> create(getTestFlow(muleContext),
                                                                                                   TEST_CONNECTOR_LOCATION,
@@ -152,6 +154,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
             (CheckedFunction<ComponentLocation, EventContext>) location -> create(getTestFlow(muleContext), location)
         },
         {
+            "RawContext",
             (CheckedSupplier<EventContext>) () -> create("id", DefaultEventContextTestCase.class.getName(),
                                                          TEST_CONNECTOR_LOCATION, null, empty()),
             (CheckedFunction<CompletableFuture<Void>, EventContext>) externalCompletion -> create("id",
@@ -268,15 +271,21 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
     AtomicInteger responseCounter = new AtomicInteger();
 
-    // Call getResponsePublisher twice to receive the response in 2 different places
-    Flux.from(parent.getResponsePublisher())
-        .mergeWith(parent.getResponsePublisher())
-        .subscribeOn(single())
-        .subscribe(e -> responseCounter.incrementAndGet());
+    final reactor.core.scheduler.Scheduler singleScheduler = fromExecutor(newSingleThreadExecutor());
 
-    parent.success(event);
+    try {
+      // Call getResponsePublisher twice to receive the response in 2 different places
+      Flux.from(parent.getResponsePublisher())
+          .mergeWith(parent.getResponsePublisher())
+          .subscribeOn(singleScheduler)
+          .subscribe(e -> responseCounter.incrementAndGet());
 
-    probe(() -> responseCounter.get() == 2);
+      parent.success(event);
+
+      probe(() -> responseCounter.get() == 2);
+    } finally {
+      singleScheduler.dispose();
+    }
   }
 
   @Test
@@ -334,13 +343,10 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
     final Object referencedInCallback = new Object();
 
     parent.onResponse((e, t) -> {
-      System.out.println(referencedInCallback.toString());
     });
     parent.onComplete((e, t) -> {
-      System.out.println(referencedInCallback.toString());
     });
     parent.onTerminated((e, t) -> {
-      System.out.println(referencedInCallback.toString());
     });
 
     parent.success();

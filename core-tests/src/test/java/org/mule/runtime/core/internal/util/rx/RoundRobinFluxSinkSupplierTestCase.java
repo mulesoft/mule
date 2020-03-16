@@ -6,23 +6,26 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.Test;
-import reactor.core.publisher.FluxSink;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class RoundRobinFluxSinkSupplierTestCase {
+import org.junit.Test;
+
+import reactor.core.publisher.FluxSink;
+
+public class RoundRobinFluxSinkSupplierTestCase extends AbstractMuleTestCase {
 
   private static final int SINKS_COUNT = 10;
 

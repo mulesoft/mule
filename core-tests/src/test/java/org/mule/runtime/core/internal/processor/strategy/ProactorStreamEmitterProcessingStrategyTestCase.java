@@ -48,6 +48,7 @@ import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
 import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.from;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -141,7 +142,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                        CORES,
                                                        maxConcurrency,
                                                        true,
-                                                       false);
+                                                       false,
+                                                       () -> muleContext.getConfiguration().getShutdownTimeout());
   }
 
   @Override
@@ -300,7 +302,10 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     1,
                                                                                                     2,
                                                                                                     true,
-                                                                                                    false))
+                                                                                                    false,
+                                                                                                    () -> muleContext
+                                                                                                        .getConfiguration()
+                                                                                                        .getShutdownTimeout()))
         .build();
     flow.initialise();
     flow.start();
@@ -339,7 +344,10 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     1,
                                                                                                     2,
                                                                                                     true,
-                                                                                                    false))
+                                                                                                    false,
+                                                                                                    () -> muleContext
+                                                                                                        .getConfiguration()
+                                                                                                        .getShutdownTimeout()))
         .build();
     flow.initialise();
     flow.start();
@@ -376,7 +384,10 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     CORES,
                                                                                                     1,
                                                                                                     true,
-                                                                                                    false)),
+                                                                                                    false,
+                                                                                                    () -> muleContext
+                                                                                                        .getConfiguration()
+                                                                                                        .getShutdownTimeout())),
                        true, CPU_LITE, 1);
     assertThat(threads, hasSize(1));
     assertThat(threads, hasItem(startsWith(CPU_LIGHT)));
@@ -398,7 +409,10 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     CORES,
                                                                                                     2,
                                                                                                     true,
-                                                                                                    false)),
+                                                                                                    false,
+                                                                                                    () -> muleContext
+                                                                                                        .getConfiguration()
+                                                                                                        .getShutdownTimeout())),
                        true, CPU_LITE, 2);
     assertThat(threads, hasSize(2));
     assertThat(threads, not(hasItem(startsWith(IO))));
@@ -422,7 +436,10 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     CORES,
                                                                                                     1,
                                                                                                     true,
-                                                                                                    false)),
+                                                                                                    false,
+                                                                                                    () -> muleContext
+                                                                                                        .getConfiguration()
+                                                                                                        .getShutdownTimeout())),
                        true, BLOCKING, 1);
     assertThat(threads, hasSize(1));
     assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(1l));
@@ -446,7 +463,10 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     1,
                                                                                                     2,
                                                                                                     true,
-                                                                                                    false)),
+                                                                                                    false,
+                                                                                                    () -> muleContext
+                                                                                                        .getConfiguration()
+                                                                                                        .getShutdownTimeout())),
                        true, BLOCKING, 2);
     assertThat(threads, hasSize(2));
     // assertThat(threads.stream().filter(name -> name.startsWith(IO)).count(), equalTo(2l));
@@ -496,7 +516,10 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     4,
                                                                                                     2,
                                                                                                     true,
-                                                                                                    false))
+                                                                                                    false,
+                                                                                                    () -> muleContext
+                                                                                                        .getConfiguration()
+                                                                                                        .getShutdownTimeout()))
         .processors(blockingProcessor)
         .build();
     flow.initialise();
@@ -732,7 +755,10 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
                                                                                                     4,
                                                                                                     2,
                                                                                                     true,
-                                                                                                    false))
+                                                                                                    false,
+                                                                                                    () -> muleContext
+                                                                                                        .getConfiguration()
+                                                                                                        .getShutdownTimeout()))
         .source(triggerableMessageSource)
         .processors(cpuLightProcessor, cpuIntensiveProcessor).build();
     flow.initialise();
@@ -750,13 +776,19 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   @Issue("MULE-17048")
   @Description("Verify that the event loop scheduler (cpu lite) is stopped before the others. Otherwise, an interrupted event may resume processing on ")
   public void schedulersStoppedInOrder() throws MuleException {
-    cpuLight = spy(cpuLight);
-    blocking = spy(blocking);
-    cpuIntensive = spy(cpuIntensive);
+    spySchedulers();
+
+    flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
+    flow.initialise();
+    flow.start();
 
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "schedulersStoppedInOrder");
 
     startIfNeeded(ps);
+
+    final Sink sink = ps.createSink(flow, flow);
+    disposeIfNeeded(sink, LOGGER);
+
     stopIfNeeded(ps);
     disposeIfNeeded(ps, LOGGER);
 
@@ -768,20 +800,17 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
   @Test
   public void schedulersStoppedOnFluxesComplete() throws MuleException {
+    spySchedulers();
+
     flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
     flow.initialise();
     flow.start();
-
-    cpuLight = spy(cpuLight);
-    blocking = spy(blocking);
-    cpuIntensive = spy(cpuIntensive);
 
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "schedulersStoppedInOrder");
 
     startIfNeeded(ps);
 
     final Sink sink = ps.createSink(flow, flow);
-
     disposeIfNeeded(sink, LOGGER);
 
     final InOrder inOrder = inOrder(cpuLight, cpuIntensive, blocking);
@@ -792,13 +821,11 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
   @Test
   public void schedulersStoppedOnInternalFluxesComplete() throws MuleException {
+    spySchedulers();
+
     flow = flowBuilder.get().processors(cpuLightProcessor, cpuIntensiveProcessor, blockingProcessor).build();
     flow.initialise();
     flow.start();
-
-    cpuLight = spy(cpuLight);
-    blocking = spy(blocking);
-    cpuIntensive = spy(cpuIntensive);
 
     final ProcessingStrategy ps = createProcessingStrategy(muleContext, "schedulersStoppedInOrder");
 
@@ -819,5 +846,53 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
     inOrder.verify(cpuLight).stop();
     inOrder.verify(blocking).stop();
     inOrder.verify(cpuIntensive).stop();
+  }
+
+  @Test
+  @Issue("MULE-18183")
+  public void disposeWithRegisteredInternalSink() throws MuleException {
+    spySchedulers();
+
+    final ProcessingStrategy ps = createProcessingStrategy(muleContext, "withRegisteredInternalSink");
+
+    startIfNeeded(ps);
+
+    final FluxSinkRecorder<CoreEvent> fluxSinkRecorder = new FluxSinkRecorder<>();
+    ps.registerInternalSink(fluxSinkRecorder.flux(), "justAnEvent");
+
+    fluxSinkRecorder.complete();
+    disposeIfNeeded(ps, LOGGER);
+
+    verify(cpuLight).stop();
+    verify(blocking).stop();
+    verify(cpuIntensive).stop();
+
+  }
+
+  @Test
+  @Issue("MULE-18183")
+  public void disposeWithConfiguredInternalPublisher() throws MuleException {
+    spySchedulers();
+
+    final ProcessingStrategy ps = createProcessingStrategy(muleContext, "withConfiguredInternalPublisher");
+
+    startIfNeeded(ps);
+
+    final FluxSinkRecorder<CoreEvent> fluxSinkRecorder = new FluxSinkRecorder<>();
+    from(ps.configureInternalPublisher(fluxSinkRecorder.flux()))
+        .subscribe();
+
+    fluxSinkRecorder.complete();
+    disposeIfNeeded(ps, LOGGER);
+
+    verify(cpuLight).stop();
+    verify(blocking).stop();
+    verify(cpuIntensive).stop();
+  }
+
+  private void spySchedulers() {
+    cpuLight = spy(cpuLight);
+    blocking = spy(blocking);
+    cpuIntensive = spy(cpuIntensive);
   }
 }

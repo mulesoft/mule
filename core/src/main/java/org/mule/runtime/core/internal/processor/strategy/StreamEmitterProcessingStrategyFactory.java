@@ -7,11 +7,15 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static java.lang.Long.MIN_VALUE;
+import static java.lang.System.currentTimeMillis;
+import static java.lang.System.getProperty;
 import static java.lang.System.nanoTime;
 import static java.lang.Thread.currentThread;
+import static java.lang.Thread.sleep;
 import static java.time.Duration.ofMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY;
 import static org.mule.runtime.core.api.construct.BackPressureReason.REQUIRED_SCHEDULER_BUSY_WITH_FULL_BUFFER;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
@@ -51,7 +55,6 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 import reactor.core.publisher.EmitterProcessor;
-import reactor.core.publisher.Flux;
 
 /**
  * {@link AbstractStreamProcessingStrategyFactory} implementation for Reactor streams using a {@link EmitterProcessor}
@@ -70,7 +73,8 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
                                                                             schedulersNamePrefix),
                                                resolveParallelism(),
                                                getMaxConcurrency(),
-                                               isMaxConcurrencyEagerCheck());
+                                               isMaxConcurrencyEagerCheck(),
+                                               () -> muleContext.getConfiguration().getShutdownTimeout());
   }
 
   @Override
@@ -115,6 +119,8 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
             : MIN_VALUE;
 
     private final int sinksCount;
+    private final Supplier<Long> shutdownTimeoutSupplier;
+
     // This counter keeps track of how many sinks are created for fluxes that use this processing strategy.
     // Using it, an eager stop of the schedulers is implmented in `stopSchedulersIfNeeded`
     private final AtomicInteger activeSinksCount = new AtomicInteger(0);
@@ -125,16 +131,42 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
                                            Supplier<Scheduler> cpuLightSchedulerSupplier,
                                            int parallelism,
                                            int maxConcurrency,
-                                           boolean maxConcurrencyEagerCheck) {
+                                           boolean maxConcurrencyEagerCheck,
+                                           Supplier<Long> shutdownTimeoutSupplier) {
       super(subscribers, cpuLightSchedulerSupplier, parallelism, maxConcurrency, maxConcurrencyEagerCheck);
       this.bufferSize = bufferSize;
       this.flowDispatchSchedulerLazy = new LazyValue<>(flowDispatchSchedulerSupplier);
       this.sinksCount = getSinksCount();
+      this.shutdownTimeoutSupplier = shutdownTimeoutSupplier;
     }
 
     @Override
     public void dispose() {
-      stopSchedulersIfNeeded();
+      final long startMillis = currentTimeMillis();
+      final long shutdownTimeout = shutdownTimeoutSupplier.get();
+
+      while (!allSchedulersStopped() && currentTimeMillis() - startMillis < shutdownTimeout) {
+        try {
+          sleep(10);
+        } catch (InterruptedException e) {
+          currentThread().interrupt();
+          return;
+        }
+      }
+
+      if (!allSchedulersStopped()) {
+        if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
+          throw new IllegalStateException("Schedulers of ProcessingStrategy not stopped before shutdown timeout.");
+        } else {
+          LOGGER.warn("Schedulers of ProcessingStrategy not stopped before shutdown timeout.");
+        }
+      }
+
+      super.dispose();
+    }
+
+    private boolean allSchedulersStopped() {
+      return activeSinksCount.get() == 0;
     }
 
     @Override
@@ -157,8 +189,6 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
     @Override
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor function) {
-      final long shutdownTimeout = flowConstruct.getMuleContext().getConfiguration().getShutdownTimeout();
-
       List<ReactorSink<CoreEvent>> sinks = new ArrayList<>();
       final int bufferQueueSize = getBufferQueueSize();
 
@@ -177,7 +207,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
         ReactorSink<CoreEvent> sink =
             new DefaultReactorSink<>(processor.sink(BUFFER),
                                      prepareDisposeTimestamp -> {
-                                       awaitSubscribersCompletion(flowConstruct, shutdownTimeout, completionLatch,
+                                       awaitSubscribersCompletion(flowConstruct, shutdownTimeoutSupplier.get(), completionLatch,
                                                                   prepareDisposeTimestamp);
                                        stopSchedulersIfNeeded();
                                      },
@@ -193,22 +223,22 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     public void registerInternalSink(Publisher<CoreEvent> flux, String sinkRepresentation) {
       Latch completionLatch = new Latch();
 
-      Flux.from(flux).subscribe(null, e -> {
+      from(flux).subscribe(null, e -> {
         LOGGER.error("Exception reached PS subscriber for " + sinkRepresentation, e);
         completionLatch.release();
         stopSchedulersIfNeeded();
       },
-                                () -> {
-                                  completionLatch.release();
-                                  stopSchedulersIfNeeded();
-                                });
+                           () -> {
+                             completionLatch.release();
+                             stopSchedulersIfNeeded();
+                           });
 
       activeSinksCount.incrementAndGet();
     }
 
     @Override
     public Publisher<CoreEvent> configureInternalPublisher(Publisher<CoreEvent> flux) {
-      return Flux.from(flux)
+      return from(flux)
           .doAfterTerminate(() -> stopSchedulersIfNeeded())
           .doOnSubscribe(s -> activeSinksCount.incrementAndGet());
     }
