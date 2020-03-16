@@ -56,22 +56,25 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import java.util.HashMap;
 import java.util.List;
 
-import com.google.common.collect.ImmutableList;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
+import com.google.common.collect.ImmutableList;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class DynamicConfigurationProviderTestCase extends AbstractConfigurationProviderTestCase<HeisenbergExtension> {
 
   private static final Class MODULE_CLASS = HeisenbergExtension.class;
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule().silent();
 
   @Rule
   public ExpectedException expected = none();

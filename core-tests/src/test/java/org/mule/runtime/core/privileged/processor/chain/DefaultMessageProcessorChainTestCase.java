@@ -101,6 +101,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 import reactor.core.publisher.Flux;
 
@@ -108,6 +109,8 @@ import reactor.core.publisher.Flux;
 @SmallTest
 @SuppressWarnings("deprecation")
 public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProcessorTestCase {
+
+  private static final Logger LOGGER = getLogger(DefaultMessageProcessorChainTestCase.class);
 
   protected MuleContext muleContext;
 
@@ -695,7 +698,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
       assertThat(process(newChain(empty(), choiceRouter), getTestEventUsingFlow("0")).getMessage().getPayload().getValue(),
                  equalTo("01"));
     } finally {
-      disposeIfNeeded(choiceRouter, getLogger(getClass()));
+      disposeIfNeeded(choiceRouter, LOGGER);
     }
   }
 
@@ -794,7 +797,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     initialiseIfNeeded(processingStrategy);
     startIfNeeded(processingStrategy);
 
-
     try {
       final MessageProcessorChain innerChain = newChain(Optional.of(processingStrategy), p -> p);
       final MessageProcessorChain outerChain = newChain(Optional.of(processingStrategy), new Processor() {
@@ -841,11 +843,10 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
         };
       };
 
-
       process(caller, testEvent());
     } finally {
       stopIfNeeded(processingStrategy);
-      disposeIfNeeded(processingStrategy, getLogger(DefaultMessageProcessorChainTestCase.class));
+      disposeIfNeeded(processingStrategy, LOGGER);
     }
   }
 

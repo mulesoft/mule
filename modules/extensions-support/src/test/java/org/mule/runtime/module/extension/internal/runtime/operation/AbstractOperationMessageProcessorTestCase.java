@@ -119,15 +119,15 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractOperationMessageProcessorTestCase extends AbstractMuleContextTestCase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractOperationMessageProcessorTestCase.class);
@@ -136,6 +136,9 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected static final String CONFIG_NAME = "config";
   protected static final String OPERATION_NAME = "operation";
   protected static final String TARGET_VAR = "myFlowVar";
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule().silent();
 
   @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   protected ExtensionModel extensionModel;
@@ -431,14 +434,11 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   }
 
   @Test
-  public void stop() throws Exception {
+  public void stopAndDispose() throws Exception {
     messageProcessor.stop();
-    verify((Stoppable) operationExecutor).stop();
-  }
-
-  @Test
-  public void dispose() throws Exception {
     messageProcessor.dispose();
+
+    verify((Stoppable) operationExecutor).stop();
     verify((Disposable) operationExecutor).dispose();
   }
 

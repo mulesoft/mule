@@ -68,7 +68,8 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
                                                        resolveParallelism(),
                                                        getMaxConcurrency(),
                                                        isMaxConcurrencyEagerCheck(),
-                                                       muleContext.getConfiguration().isThreadLoggingEnabled());
+                                                       muleContext.getConfiguration().isThreadLoggingEnabled(),
+                                                       () -> muleContext.getConfiguration().getShutdownTimeout());
   }
 
   @Override
@@ -96,9 +97,10 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
                                                    int parallelism,
                                                    int maxConcurrency,
                                                    boolean maxConcurrencyEagerCheck,
-                                                   boolean isThreadLoggingEnabled) {
+                                                   boolean isThreadLoggingEnabled,
+                                                   Supplier<Long> shutdownTimeoutSupplier) {
       super(bufferSize, subscriberCount, flowDispatchSchedulerSupplier, cpuLightSchedulerSupplier, parallelism, maxConcurrency,
-            maxConcurrencyEagerCheck);
+            maxConcurrencyEagerCheck, shutdownTimeoutSupplier);
       this.blockingSchedulerSupplier = blockingSchedulerSupplier;
       this.cpuIntensiveSchedulerSupplier = cpuIntensiveSchedulerSupplier;
       this.isThreadLoggingEnabled = isThreadLoggingEnabled;
@@ -128,9 +130,11 @@ public class ProactorStreamEmitterProcessingStrategyFactory extends AbstractStre
 
         if (blockingScheduler != null) {
           blockingScheduler.stop();
+          blockingScheduler = null;
         }
         if (cpuIntensiveScheduler != null) {
           cpuIntensiveScheduler.stop();
+          cpuIntensiveScheduler = null;
         }
 
         return true;
