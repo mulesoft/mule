@@ -145,12 +145,14 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleTestCase {
 
     @Override
     public void doStart() throws MuleException {
+      super.doStart();
       startStopOrder.add(this);
     }
 
     @Override
     public void doStop() throws MuleException {
       startStopOrder.add(this);
+      super.doStop();
     }
   }
 }

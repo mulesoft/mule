@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -41,12 +42,14 @@ public class RejectionCallbackExecutorServiceDecoratorTestCase extends AbstractM
   private static final int RECEIVE_TIMEOUT = 5000;
   private static final int REJECTION_COUNT = 10000;
 
+  private ScheduledExecutorService retryScheduler;
   private RejectionCallbackExecutorServiceDecorator decorated;
 
   @Before
   public void before() {
-    decorated = new RejectionCallbackExecutorServiceDecorator(new RejectingScheduler(newSingleThreadScheduledExecutor()),
-                                                              newSingleThreadScheduledExecutor(),
+    retryScheduler = newSingleThreadScheduledExecutor();
+    decorated = new RejectionCallbackExecutorServiceDecorator(new RejectingScheduler(retryScheduler),
+                                                              retryScheduler,
                                                               () -> {
                                                               },
                                                               () -> {
@@ -57,6 +60,7 @@ public class RejectionCallbackExecutorServiceDecoratorTestCase extends AbstractM
   @After
   public void after() {
     decorated.shutdownNow();
+    retryScheduler.shutdownNow();
   }
 
   @Test

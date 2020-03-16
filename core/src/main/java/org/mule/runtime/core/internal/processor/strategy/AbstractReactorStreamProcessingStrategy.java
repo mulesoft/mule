@@ -127,6 +127,7 @@ abstract class AbstractReactorStreamProcessingStrategy extends AbstractStreamPro
   protected boolean stopSchedulersIfNeeded() {
     if (cpuLightScheduler != null) {
       cpuLightScheduler.stop();
+      cpuLightScheduler = null;
     }
 
     return true;

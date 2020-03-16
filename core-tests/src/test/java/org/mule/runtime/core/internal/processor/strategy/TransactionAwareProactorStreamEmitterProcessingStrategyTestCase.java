@@ -70,7 +70,10 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
                                                                                                                     MAX_VALUE,
                                                                                                                     MAX_VALUE,
                                                                                                                     false,
-                                                                                                                    false));
+                                                                                                                    false,
+                                                                                                                    () -> muleContext
+                                                                                                                        .getConfiguration()
+                                                                                                                        .getShutdownTimeout()));
   }
 
   @Override
@@ -86,7 +89,10 @@ public class TransactionAwareProactorStreamEmitterProcessingStrategyTestCase
                                                                                                                     maxConcurrency,
                                                                                                                     maxConcurrency,
                                                                                                                     true,
-                                                                                                                    false));
+                                                                                                                    false,
+                                                                                                                    () -> muleContext
+                                                                                                                        .getConfiguration()
+                                                                                                                        .getShutdownTimeout()));
   }
 
   @Override
