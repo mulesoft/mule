@@ -186,7 +186,7 @@
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
         <greenmailVersion>1.5.0</greenmailVersion>
-        <groovyVersion>2.4.15</groovyVersion>
+        <groovyVersion>3.0.2</groovyVersion>
         <guavaVersion>25.1-jre</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <jacksonVersion>1.9.14-MULE-002</jacksonVersion>
@@ -935,7 +935,7 @@
             </dependency>
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy-all</artifactId>
+                <artifactId>groovy</artifactId>
                 <version>${groovyVersion}</version>
                 <classifier>indy</classifier>
                 <exclusions>
@@ -1663,7 +1663,7 @@
                         -->
                         <dependency>
                             <groupId>org.codehaus.groovy</groupId>
-                            <artifactId>groovy-all</artifactId>
+                            <artifactId>groovy</artifactId>
                             <version>${groovyVersion}</version>
                         </dependency>
                     </dependencies>
