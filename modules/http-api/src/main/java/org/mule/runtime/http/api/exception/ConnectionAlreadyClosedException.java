@@ -16,9 +16,7 @@ import java.io.IOException;
  */
 public class ConnectionAlreadyClosedException extends IOException {
 
-  public ConnectionAlreadyClosedException() {
-    super();
-  }
+  private static final long serialVersionUID = 1271427847005415136L;
 
   public ConnectionAlreadyClosedException(Throwable cause) {
     super(cause);
