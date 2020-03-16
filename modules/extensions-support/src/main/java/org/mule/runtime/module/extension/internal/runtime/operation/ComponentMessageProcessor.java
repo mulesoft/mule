@@ -569,21 +569,19 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         }
       };
 
-      final ComponentLocation location = getLocation();
-
       return from(processingStrategy
           .configureInternalPublisher(from(p)
               .transform(processingStrategy.onProcessor(innerProcessor))
               .doOnNext(result -> {
                 from(result)
-                    .getOperationExecutionParams(location)
+                    .getOperationExecutionParams(getLocation())
                     .getCallback().complete(result);
               })
               .onErrorContinue((t, result) -> {
                 final CoreEvent event = ((EventProcessingException) t).getEvent();
 
                 from(event)
-                    .getOperationExecutionParams(location)
+                    .getOperationExecutionParams(getLocation())
                     .getCallback().error(((EventProcessingException) t).getCause());
               })));
     },
