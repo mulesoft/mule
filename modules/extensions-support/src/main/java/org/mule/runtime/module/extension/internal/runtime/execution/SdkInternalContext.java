@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 import static java.util.Optional.empty;
 import static java.util.function.Function.identity;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -17,8 +19,6 @@ import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -46,62 +46,63 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
    * SDK components may be nested within each other, so some of the context must be kept separately for the component it belongs
    * to.
    */
-  private final Deque<LocationSpecificSdkInternalContext> locationSpecificContext = new ArrayDeque<>();
+  private final Map<ComponentLocation, LocationSpecificSdkInternalContext> locationSpecificContext = new SmallMap<>();
 
   private Function<Context, Context> innerChainSubscriberContextMapping = identity();
 
-  public void popContext() {
-    locationSpecificContext.pop();
+  public void removeContext(ComponentLocation location) {
+    locationSpecificContext.remove(location);
   }
 
-  public void pushContext() {
-    locationSpecificContext.push(new LocationSpecificSdkInternalContext());
+  public void putContext(ComponentLocation location) {
+    locationSpecificContext.put(location, new LocationSpecificSdkInternalContext());
   }
 
   /**
    * For a given location, this method has to always be called first, so the context for this location is properly initialized.
    *
+   * @param location the location of the operation that generated this context.
    * @param configuration the configuration of the operation.
    */
-  public void setConfiguration(Optional<ConfigurationInstance> configuration) {
-    locationSpecificContext.peek().setConfiguration(configuration);
+  public void setConfiguration(ComponentLocation location, Optional<ConfigurationInstance> configuration) {
+    locationSpecificContext.get(location).setConfiguration(configuration);
   }
 
-  public Optional<ConfigurationInstance> getConfiguration() {
-    return locationSpecificContext.peek().getConfiguration();
+  public Optional<ConfigurationInstance> getConfiguration(ComponentLocation location) {
+    return locationSpecificContext.get(location).getConfiguration();
   }
 
-  public void setOperationExecutionParams(Optional<ConfigurationInstance> configuration,
+  public void setOperationExecutionParams(ComponentLocation location, Optional<ConfigurationInstance> configuration,
                                           Map<String, Object> parameters, CoreEvent operationEvent, ExecutorCallback callback) {
-    locationSpecificContext.peek().setOperationExecutionParams(configuration, parameters, operationEvent,
-                                                               callback);
+    locationSpecificContext.get(location).setOperationExecutionParams(configuration, parameters, operationEvent,
+                                                                      callback);
   }
 
-  public OperationExecutionParams getOperationExecutionParams() {
-    return locationSpecificContext.peek().getOperationExecutionParams();
+  public OperationExecutionParams getOperationExecutionParams(ComponentLocation location) {
+    return locationSpecificContext.get(location).getOperationExecutionParams();
   }
 
-  public Map<String, Object> getResolutionResult() {
-    return locationSpecificContext.peek().getResolutionResult();
+  public Map<String, Object> getResolutionResult(ComponentLocation location) {
+    return locationSpecificContext.get(location).getResolutionResult();
   }
 
-  public void setResolutionResult(Map<String, Object> resolutionResult) {
-    locationSpecificContext.peek().setResolutionResult(resolutionResult);
+  public void setResolutionResult(ComponentLocation location, Map<String, Object> resolutionResult) {
+    locationSpecificContext.get(location).setResolutionResult(resolutionResult);
   }
 
-  public OperationPolicy getPolicyToApply() {
-    return locationSpecificContext.peek().getPolicyToApply();
+  public OperationPolicy getPolicyToApply(ComponentLocation location) {
+    return locationSpecificContext.get(location).getPolicyToApply();
   }
 
-  public void setPolicyToApply(OperationPolicy policyToApply) {
-    locationSpecificContext.peek().setPolicyToApply(policyToApply);
+  public void setPolicyToApply(ComponentLocation location, OperationPolicy policyToApply) {
+    locationSpecificContext.get(location).setPolicyToApply(policyToApply);
   }
 
   /**
    * @return {@code true} if the policy to be applied is a no-op, {@code false} if a policy is actually applied.
    */
-  public boolean isNoPolicyOperation() {
-    return DefaultPolicyManager.isNoPolicyOperation(getPolicyToApply());
+  public boolean isNoPolicyOperation(ComponentLocation location) {
+    return DefaultPolicyManager.isNoPolicyOperation(getPolicyToApply(location));
   }
 
   public Function<Context, Context> getInnerChainSubscriberContextMapping() {
