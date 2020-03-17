@@ -127,6 +127,7 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
     extensionManager = mock(ExtensionManager.class);
     policyManager = mock(PolicyManager.class);
 
+    final ComponentLocation location = mock(ComponentLocation.class);
     processor = new ComponentMessageProcessor<ComponentModel>(extensionModel,
                                                               componentModel, null, null, null,
                                                               resolverSet, null, null,
@@ -149,7 +150,7 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
 
       @Override
       public ComponentLocation getLocation() {
-        return mock(ComponentLocation.class);
+        return location;
       }
 
       @Override
