@@ -311,8 +311,25 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
             .map(event -> {
               try {
                 return addContextToEvent(event, ctx);
-              } catch (MuleException t) {
-                throw propagateWrappingFatal(localOperatorErrorHook.apply(t, event));
+              } catch (Exception t) {
+                // Force the error mapper from the chain to be used.
+                // When using Mono.create with sink.error, the error mapper from the
+                // context is ignored, so it has to be explicitly used here.
+                final Throwable mapped = localOperatorErrorHook.apply(t, event);
+
+                if (outerFluxTerminationTimeout < 0
+                    // When there is a mono involved in some part of the chain, we cannot use the termination timeout because that
+                    // would
+                    // impose a timeout in the operation, which we don't want to.
+                    // In this case, the flux will be complete when there are no more inflight operations.
+                    || ctx.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
+                  // if `sink.error` is called here, it will cancel the flux altogether.
+                  // That's why an `Either` is used here,
+                  // so the error can be propagated afterwards in a way consistent with our expected error handling.
+                  errorSwitchSinkSinkRef.next(left(mapped, CoreEvent.class));
+                }
+
+                throw propagateWrappingFatal(mapped);
               }
             })
             .doOnNext(event -> {

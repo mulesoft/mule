@@ -130,7 +130,7 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     when(resolverSet.resolve(any(ValueResolvingContext.class))).thenThrow(thrown);
 
-    expect(thrown);
+    expectWrapped(thrown);
     from(processor.apply(just(testEvent()))).block();
   }
 
@@ -150,26 +150,8 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     when(resolverSet.resolve(any(ValueResolvingContext.class))).thenThrow(thrown);
 
-    expect(thrown);
+    expectWrapped(thrown);
     from(processor.apply(just(testEvent()))).block();
-  }
-
-  private void expect(Exception expect) {
-    expected.expect(new BaseMatcher<Exception>() {
-
-      @Override
-      public boolean matches(Object o) {
-        Exception e = (Exception) unwrap((Exception) o);
-        assertThat(e, is(sameInstance(expect)));
-
-        return true;
-      }
-
-      @Override
-      public void describeTo(Description description) {
-        description.appendText("condition not met");
-      }
-    });
   }
 
   private void expectWrapped(Exception expect) {
