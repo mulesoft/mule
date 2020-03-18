@@ -66,6 +66,8 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import io.qameta.allure.Issue;
+
 /**
  * Contains test for application deployment with policies on the default domain
  */
@@ -469,6 +471,30 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
                                                       getResourceFile("/policy-using-policy-class-in-expression.xml"),
+                                                      emptyList()));
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
+  @Issue("MULE-18196")
+  public void appliesPolicyAndAppWithCollidingErrorNamespace() throws Exception {
+    ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
+
+    policyManager.registerPolicyTemplate(policyWithPluginAndResource().getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices("app-with-colliding-error.xml",
+                                                                                           simpleExtensionPlugin);
+
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
+                            new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
+                                                      getResourceFile("/policy-with-colliding-error.xml"),
                                                       emptyList()));
 
     executeApplicationFlow("main");
