@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
 import static org.mule.runtime.module.launcher.log4j2.LoggerContextReaperThreadFactory.THREAD_NAME;
 import static org.mule.runtime.module.launcher.log4j2.MuleLoggerContextFactory.LOG4J_CONFIGURATION_FILE_PROPERTY;
 import static org.mule.tck.MuleTestUtils.getRunningThreadByName;
@@ -54,22 +54,24 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
 
   private static final String POLICY_TEMPLATE_NAME = "policyTemplate";
   private static final String POLICY_TEMPLATE_ARTIFACT_ID = "domain/app/anApp/policy/aPolicy";
 
-  private static final File CONFIG_LOCATION = new File("my/local/log4j2.xml");
+  private static final File CONFIG_LOCATION = new File("src/test/resources/log4j2-test-custom.xml");
   private static final int PROBER_TIMEOUT = 5000;
   private static final int PROBER_FREQ = 500;
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule().silent();
 
   @Rule
   public SystemProperty disposeDelay = new SystemProperty(MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS, "200");
@@ -254,6 +256,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
       @Override
       protected boolean test() throws Exception {
         if (context.getState().equals(LifeCycle.State.STOPPED)) {
+          assertThat(context, not(getContext()));
           return true;
         } else {
           LoggerContext currentContext = getContext();
@@ -270,7 +273,6 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
       }
     });
 
-    assertThat(context, not(getContext()));
     assertThat(contextWasAccessibleDuringShutdown.get(), is(true));
   }
 }
