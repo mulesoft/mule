@@ -16,6 +16,8 @@ import org.mule.runtime.api.i18n.I18nMessage;
 @NoExtend
 public class ExpressionRuntimeException extends MuleRuntimeException {
 
+  private static final long serialVersionUID = -8632366166228091959L;
+
   /**
    * @param message the exception message
    */
