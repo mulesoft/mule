@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:simple="http://www.mulesoft.org/schema/mule/simple"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/simple http://www.mulesoft.org/schema/mule/simple/current/mule-simple.xsd">
+
+    <flow name="main">
+        <scheduler>
+            <scheduling-strategy>
+                <fixed-frequency frequency="10000"/>
+            </scheduling-strategy>
+        </scheduler>
+        <set-payload value=""/>
+        <simple:print-message/>
+        <try>
+            <raise-error type="COLLIDING_NS:APP_ERROR"/>
+            <error-handler>
+                <on-error-continue type="COLLIDING_NS:APP_ERROR">
+                    <logger/>
+                </on-error-continue>
+            </error-handler>
+        </try>
+    </flow>
+</mule>

@@ -23,6 +23,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createCompositeErrorTypeRepository;
+import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.getMuleContext;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.isConfigLess;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.withArtifactMuleContext;
@@ -112,7 +113,7 @@ public class ArtifactContextBuilder {
   private List<ConfigurationBuilder> additionalBuilders = emptyList();
   private ClassLoaderRepository classLoaderRepository;
   private PolicyProvider policyProvider;
-  private List<ServiceConfigurator> serviceConfigurators = new ArrayList<>();
+  private final List<ServiceConfigurator> serviceConfigurators = new ArrayList<>();
   private ExtensionManagerFactory extensionManagerFactory;
   private DeployableArtifact parentArtifact;
   private Optional<Properties> properties = empty();
@@ -373,7 +374,8 @@ public class ArtifactContextBuilder {
   }
 
   /**
-   * @param runtimeLockFactory {@link LockFactory} for the runtime that can be shared along deployable artifacts to synchronize access on different deployable artifacts to the same resources.
+   * @param runtimeLockFactory {@link LockFactory} for the runtime that can be shared along deployable artifacts to synchronize
+   *        access on different deployable artifacts to the same resources.
    * @return the builder
    */
   public ArtifactContextBuilder setRuntimeLockFactory(LockFactory runtimeLockFactory) {
@@ -490,7 +492,9 @@ public class ArtifactContextBuilder {
           builders.add(new ConnectionManagerConfigurationBuilder(parentArtifact));
 
           withArtifactMuleContext(parentArtifact, parentContext -> muleContextBuilder
-              .setErrorTypeRepository(createCompositeErrorTypeRepository(parentContext.getErrorTypeRepository())));
+              .setErrorTypeRepository(POLICY.equals(artifactType)
+                  ? createDefaultErrorTypeRepository()
+                  : createCompositeErrorTypeRepository(parentContext.getErrorTypeRepository())));
         } else {
           builders.add(new ConnectionManagerConfigurationBuilder());
         }
