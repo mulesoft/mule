@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test-policy="http://www.mulesoft.org/schema/mule/test-policy"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/test-policy http://www.mulesoft.org/schema/mule/test-policy/current/mule-test-policy.xsd">
+
+    <test-policy:proxy name="async-policy">
+        <test-policy:operation>
+            <try>
+                <raise-error type="COLLIDING_NS:POLICY_ERROR"/>
+                <error-handler>
+                    <on-error-continue type="COLLIDING_NS:POLICY_ERROR">
+                        <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
+            
+                        <test-policy:execute-next/>
+                    </on-error-continue>
+                </error-handler>
+            </try>
+        </test-policy:operation>
+    </test-policy:proxy>
+</mule>
