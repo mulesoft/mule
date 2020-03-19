@@ -405,6 +405,7 @@ public class FlowProcessMediator implements Initialisable {
                                   }
                                 });
 
+    // TODO MULE-18205 refactor this
     final Consumer<Exception> router = ctx.flowConstruct.getExceptionListener()
         .router(identity(),
                 event -> terminationCallback.accept(messagingException),
