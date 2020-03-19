@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.api.exception;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.exception.ExceptionRouter;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -46,13 +48,23 @@ public abstract class BaseExceptionHandler implements FlowExceptionHandler {
                                     Consumer<CoreEvent> continueCallback, Consumer<Throwable> propagateCallback) {
     final Consumer<Exception> router =
         FlowExceptionHandler.super.router(publisherPostProcessor, continueCallback, propagateCallback);
-    return error -> {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Routing error in '" + this.toString() + "'...");
+
+    return new ExceptionRouter() {
+
+      @Override
+      public void accept(Exception error) {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Routing error in '" + this.toString() + "'...");
+        }
+
+        onError(error);
+        router.accept(error);
       }
 
-      onError(error);
-      router.accept(error);
+      @Override
+      public void dispose() {
+        disposeIfNeeded(router, LOGGER);
+      }
     };
   }
 
