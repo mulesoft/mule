@@ -214,9 +214,17 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private Mono<CoreEvent> applyInternal(final Exception exception) {
-    return Mono.create(sink -> router(identity(), handledEvent -> sink.success(handledEvent),
-                                      rethrownError -> sink.error(rethrownError))
-                                          .accept(exception));
+    return Mono.create(sink -> {
+      final Consumer<Exception> router = router(identity(),
+                                                handledEvent -> sink.success(handledEvent),
+                                                rethrownError -> sink.error(rethrownError));
+
+      try {
+        router.accept(exception);
+      } finally {
+        disposeIfNeeded(router, LOGGER);
+      }
+    });
   }
 
   private void resolveHandling(CoreEvent result) {
