@@ -27,6 +27,7 @@ import java.net.URL;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigObject;
@@ -127,6 +128,18 @@ public class MavenConfigBuilder {
           }
         });
       }
+
+      ConfigObject userPropertiesEntry =
+          mavenConfig.hasPath("userProperties") ? mavenConfig.getObject("userProperties") : null;
+      if (userPropertiesEntry != null) {
+        Map<String, Object> userPropertiesAsMap = userPropertiesEntry.unwrapped();
+        final Properties userProperties = new Properties();
+        userPropertiesAsMap.entrySet().stream().forEach(entry -> {
+          userProperties.put(entry.getKey(), ((Map<String, Object>) entry.getValue()).get("value"));
+        });
+        mavenConfigurationBuilder.userProperties(userProperties);
+      }
+
       return mavenConfigurationBuilder.build();
     } catch (Exception e) {
       if (e instanceof RuntimeGlobalConfigException) {
