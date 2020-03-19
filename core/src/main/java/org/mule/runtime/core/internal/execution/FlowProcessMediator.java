@@ -22,6 +22,7 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_GENERATE;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_SEND;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.createErrorEvent;
@@ -69,8 +70,8 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
-import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceSuccessCallbackAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceFailureCallbackAdapter;
+import org.mule.runtime.core.internal.processor.interceptor.CompletableInterceptorSourceSuccessCallbackAdapter;
 import org.mule.runtime.core.internal.util.mediatype.MediaTypeDecoratedResultCollection;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -404,10 +405,16 @@ public class FlowProcessMediator implements Initialisable {
                                   }
                                 });
 
-    ctx.flowConstruct.getExceptionListener()
-        .router(identity(), event -> terminationCallback.accept(messagingException),
-                error -> terminationCallback.accept(messagingException))
-        .accept(messagingException);
+    // TODO MULE-18205 refactor this
+    final Consumer<Exception> router = ctx.flowConstruct.getExceptionListener()
+        .router(identity(),
+                event -> terminationCallback.accept(messagingException),
+                error -> terminationCallback.accept(messagingException));
+    try {
+      router.accept(messagingException);
+    } finally {
+      disposeIfNeeded(router, LOGGER);
+    }
   }
 
   /**

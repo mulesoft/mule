@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.leftPad;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static reactor.core.publisher.Mono.empty;
 
 import org.mule.runtime.api.functional.Either;
@@ -175,9 +176,14 @@ abstract class AbstractEventContext implements BaseEventContext {
         LOGGER.debug("{} handling messaging exception.", this);
       }
 
-      exceptionHandler.router(identity(), handled -> success(handled),
-                              rethrown -> responseDone(left(rethrown)))
-          .accept((Exception) throwable);
+      final Consumer<Exception> router = exceptionHandler.router(identity(),
+                                                                 handled -> success(handled),
+                                                                 rethrown -> responseDone(left(rethrown)));
+      try {
+        router.accept((Exception) throwable);
+      } finally {
+        disposeIfNeeded(router, LOGGER);
+      }
     } else {
       responseDone(left(throwable));
     }
