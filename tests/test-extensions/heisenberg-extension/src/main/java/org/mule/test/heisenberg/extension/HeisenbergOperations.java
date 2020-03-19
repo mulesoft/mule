@@ -19,6 +19,7 @@ import static org.mule.runtime.extension.api.client.DefaultOperationParameters.b
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.KNOCKED_DOOR;
 import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.KNOCKING_DOOR;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
@@ -80,8 +81,6 @@ import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.heisenberg.extension.stereotypes.EmpireStereotype;
 import org.mule.test.heisenberg.extension.stereotypes.KillingStereotype;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -95,6 +94,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 
 import javax.inject.Inject;
+
+import com.google.common.collect.ImmutableMap;
 
 
 @Stereotype(EmpireStereotype.class)
@@ -114,7 +115,7 @@ public class HeisenbergOperations implements Disposable {
   public static final String GREETING_PARAMETER = "greeting";
   public static final String OPERATION_PARAMETER_EXAMPLE = "Hello my friend!";
 
-  public static boolean disposed = false;
+  public static volatile boolean disposed = false;
 
   @Inject
   private ExtensionManager extensionManager;
