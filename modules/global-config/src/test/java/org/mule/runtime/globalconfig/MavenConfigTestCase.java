@@ -15,8 +15,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperties;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-import static org.mule.test.allure.AllureConstants.RuntimeGlobalConfiguration.RUNTIME_GLOBAL_CONFIGURATION;
 import static org.mule.test.allure.AllureConstants.RuntimeGlobalConfiguration.MavenGlobalConfiguration.MAVEN_GLOBAL_CONFIGURATION_STORY;
+import static org.mule.test.allure.AllureConstants.RuntimeGlobalConfiguration.RUNTIME_GLOBAL_CONFIGURATION;
 
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.api.model.RemoteRepository;
@@ -31,14 +31,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 @Feature(RUNTIME_GLOBAL_CONFIGURATION)
 @Story(MAVEN_GLOBAL_CONFIGURATION_STORY)
@@ -187,6 +186,28 @@ public class MavenConfigTestCase extends AbstractMuleTestCase {
 
       assertThat(mavenConfig.getUserSettingsLocation().isPresent(), is(true));
       assertThat(mavenConfig.getUserSettingsLocation().get(), is(userSettings));
+    });
+  }
+
+  @Description("Checks that userProperties are read by the configuration")
+  @Test
+  public void loadUserProperties() throws Exception {
+    Map<String, String> userProperties = new HashMap<>();
+    userProperties.put("muleRuntimeConfig.maven.userProperties.key1.value", "value1");
+    userProperties.put("muleRuntimeConfig.maven.userProperties.key2.value", "value2");
+
+    testWithSystemProperties(userProperties, () -> {
+      GlobalConfigLoader.reset();
+      MavenConfiguration mavenConfig = getMavenConfig();
+      List<RemoteRepository> mavenRemoteRepositories = mavenConfig.getMavenRemoteRepositories();
+      assertThat(mavenRemoteRepositories, hasSize(1));
+      assertThat(mavenRemoteRepositories.get(0).getId(), is("mavenCentral"));
+
+      assertThat(mavenConfig.getUserProperties().isPresent(), is(true));
+      assertThat(mavenConfig.getUserProperties().get().get("key1"), is("value1"));
+
+      assertThat(mavenConfig.getUserProperties().isPresent(), is(true));
+      assertThat(mavenConfig.getUserProperties().get().get("key2"), is("value2"));
     });
   }
 
