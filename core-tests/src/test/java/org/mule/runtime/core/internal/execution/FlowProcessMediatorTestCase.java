@@ -163,8 +163,6 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
         .thenReturn(flowErrorHandlerRouter);
 
     when(((AbstractFlowConstruct) flow).getExceptionListener()).thenReturn(exceptionHandler);
-    // when(exceptionHandler.apply(any()))
-    // .thenAnswer(invocationOnMock -> error((MessagingException) invocationOnMock.getArgument(0)));
     when(flow.getMuleContext()).thenReturn(muleContext);
 
     context = mock(MessageProcessContext.class);
