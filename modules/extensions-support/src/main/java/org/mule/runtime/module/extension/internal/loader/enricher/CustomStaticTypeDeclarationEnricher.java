@@ -71,7 +71,7 @@ import java.util.Set;
  */
 public final class CustomStaticTypeDeclarationEnricher implements DeclarationEnricher {
 
-  private MetadataTypeEnricher enricher = new MetadataTypeEnricher();
+  private final MetadataTypeEnricher enricher = new MetadataTypeEnricher();
 
   @Override
   public DeclarationEnricherPhase getExecutionPhase() {
