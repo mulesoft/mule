@@ -10,7 +10,6 @@ package org.mule.runtime.module.extension.internal.loader.enricher;
 import static java.util.Arrays.asList;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
-import static org.reflections.ReflectionUtils.withAnnotation;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -18,21 +17,25 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputXmlType;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.lang.reflect.Method;
 import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
-public class CustomStaticTypeDeclarationEnricherTestCase {
+public class CustomStaticTypeDeclarationEnricherTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -49,6 +52,8 @@ public class CustomStaticTypeDeclarationEnricherTestCase {
   @Mock(answer = RETURNS_DEEP_STUBS)
   private OperationDeclaration operationDeclaration;
 
+  private Method schemaNotFoundMethod;
+
   private final CustomStaticTypeDeclarationEnricher enricher = new CustomStaticTypeDeclarationEnricher();
 
   @Before
@@ -56,16 +61,17 @@ public class CustomStaticTypeDeclarationEnricherTestCase {
     when(extensionLoadingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
     when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
     when(extensionDeclaration.getOperations()).thenReturn(asList(operationDeclaration));
+    // Keep a reference to avoid GC from taking this method and null the WeakReference of ImplementingMethodModelProperty
+    schemaNotFoundMethod = TestOperations.class.getMethod("schemaNotFound");
+
     when(operationDeclaration.getModelProperty(ImplementingMethodModelProperty.class))
-        .thenReturn(Optional.of(new ImplementingMethodModelProperty(TestOperations.class.getMethods()[0])));
+        .thenReturn(Optional.of(new ImplementingMethodModelProperty(schemaNotFoundMethod)));
   }
 
   @Test
   public void schemaNotFound() throws Exception {
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage("Can't load schema [invalid.xsd]. It was not found in the resources.");
-    when(operationDeclaration.getModelProperty(ImplementingMethodModelProperty.class))
-        .thenReturn(Optional.of(new ImplementingMethodModelProperty(TestOperations.class.getMethod("schemaNotFound"))));
     enricher.enrich(extensionLoadingContext);
   }
 

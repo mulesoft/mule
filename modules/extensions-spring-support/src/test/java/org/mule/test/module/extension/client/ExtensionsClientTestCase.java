@@ -16,6 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXTENSIONS_CLIENT_CACHE_IS_DISABLED;
 import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
+import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
 import static org.mule.test.vegan.extension.VeganExtension.VEGAN;
@@ -265,14 +266,27 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
       muleContext.dispose();
     }
 
-    assertThat(HeisenbergOperations.disposed, is(true));
+    probe(() -> {
+      assertThat(HeisenbergOperations.disposed, is(true));
+      return true;
+    });
   }
 
   @Test
   @Description("Checks that an operation disposes the resources when an error occurred while executing")
   public void disposeOnFailureOperation() throws Throwable {
-    executeFailureOperation();
-    assertThat(HeisenbergOperations.disposed, is(true));
+    try {
+      executeFailureOperation();
+    } finally {
+      if (usingCachedStrategy()) {
+        muleContext.dispose();
+      }
+
+      probe(() -> {
+        assertThat(HeisenbergOperations.disposed, is(true));
+        return true;
+      });
+    }
   }
 
   private boolean usingCachedStrategy() {
