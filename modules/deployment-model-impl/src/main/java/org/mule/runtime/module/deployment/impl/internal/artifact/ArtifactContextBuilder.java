@@ -493,7 +493,12 @@ public class ArtifactContextBuilder {
 
           withArtifactMuleContext(parentArtifact, parentContext -> muleContextBuilder
               .setErrorTypeRepository(POLICY.equals(artifactType)
-                  ? createDefaultErrorTypeRepository()
+                  // Since there is already a workaround to allow poliices to use http connector without declaring the dependency
+                  // and relying on it provided by the app, this case has to be accounted for here when handling error codes as
+                  // well.
+                  ? new FilteredCompositeErrorTypeRepository(createDefaultErrorTypeRepository(),
+                                                             parentContext.getErrorTypeRepository(),
+                                                             "HTTP")
                   : createCompositeErrorTypeRepository(parentContext.getErrorTypeRepository())));
         } else {
           builders.add(new ConnectionManagerConfigurationBuilder());
