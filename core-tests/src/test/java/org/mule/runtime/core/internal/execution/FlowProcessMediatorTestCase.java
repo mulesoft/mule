@@ -252,7 +252,8 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
   @Test
   public void avoidSendFailureResponseToClientWhenConnectionExceptionOccurs() throws Exception {
     ConnectionException connectionException = new ConnectionException("Broken pipe");
-    doAnswer(onCallback(callback -> callback.error(connectionException))).when(template).sendResponseToClient(any(), any(), any());
+    doAnswer(onCallback(callback -> callback.error(connectionException))).when(template).sendResponseToClient(any(), any(),
+                                                                                                              any());
 
     flowProcessMediator.process(template, context, notifier);
 
