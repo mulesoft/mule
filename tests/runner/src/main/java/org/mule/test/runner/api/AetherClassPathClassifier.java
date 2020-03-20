@@ -244,21 +244,24 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     List<ArtifactClassificationNode> servicesClassified = newArrayList();
 
     final Predicate<Dependency> muleServiceClassifiedDependencyFilter =
-        dependency -> dependency.getArtifact().getClassifier().equals(MULE_SERVICE_CLASSIFIER)
-            && dependency.getScope().equals(COMPILE);
+        dependency -> dependency.getArtifact().getClassifier().equals(MULE_SERVICE_CLASSIFIER);
     List<Artifact> serviceArtifactsDeclared = filterArtifacts(directDependencies,
                                                               muleServiceClassifiedDependencyFilter);
     logger.debug("{} services defined to be classified", serviceArtifactsDeclared.size());
 
+    final Predicate<Dependency> nestedServicesClassifier =
+        dependency -> muleServiceClassifiedDependencyFilter.test(dependency)
+            && dependency.getScope().equals(COMPILE);
+
     if (SERVICE.equals(rootArtifactType)) {
       logger.debug("rootArtifact '{}' identified as Mule service", rootArtifactType);
-      buildPluginUrlClassification(context.getRootArtifact(), context, muleServiceClassifiedDependencyFilter, servicesClassified,
+      buildPluginUrlClassification(context.getRootArtifact(), context, nestedServicesClassifier, servicesClassified,
                                    rootArtifactRemoteRepositories);
     }
 
     serviceArtifactsDeclared.stream()
         .forEach(serviceArtifact -> buildPluginUrlClassification(serviceArtifact, context,
-                                                                 muleServiceClassifiedDependencyFilter, servicesClassified,
+                                                                 nestedServicesClassifier, servicesClassified,
                                                                  rootArtifactRemoteRepositories));
 
     return toServiceUrlClassification(resolveArtifactsUsingSemanticVersioning(servicesClassified));
