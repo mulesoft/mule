@@ -6,31 +6,50 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
-import static java.util.Collections.singletonList;
+import static java.util.Collections.unmodifiableList;
+
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
-import com.vdurmont.semver4j.Semver;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vdurmont.semver4j.Semver;
+
 /**
  * Utility class to check whether a plugin should use its local resources and packages instead of the ones of the
  * artifact where it is included.
+ * <p>
  * The check was added to provide backward compatibility for artifacts that use the bug fixed in MULE-17112
  * as a feature.
+ * <p>
  * In order to have a way to add new artifacts to the blacklist, the check was added in a separate class.
  *
  * @since 4.2.2
  */
 public class PluginLocalDependenciesBlacklist {
 
-  private static final Logger logger = LoggerFactory.getLogger(PluginLocalDependenciesBlacklist.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(PluginLocalDependenciesBlacklist.class);
 
-  private static List<BundleDescriptor> pluginsBlacklist = singletonList(new BundleDescriptor.Builder()
-      .setGroupId("com.mulesoft.connectors").setArtifactId("mule-ibm-ctg-connector").setVersion("2.3.1").build());
+  private static final List<BundleDescriptor> PLUGINS_BLACKLIST;
+
+  static {
+    List<BundleDescriptor> blacklist = new ArrayList<>();
+
+    blacklist.add(new BundleDescriptor.Builder()
+        .setGroupId("com.mulesoft.connectors")
+        .setArtifactId("mule-ibm-ctg-connector")
+        .setVersion("2.3.1").build());
+
+    blacklist.add(new BundleDescriptor.Builder()
+        .setGroupId("com.mulesoft.connectors")
+        .setArtifactId("mule-microsoft-dynamics-nav-connector")
+        .setVersion("2.0.1").build());
+
+    PLUGINS_BLACKLIST = unmodifiableList(blacklist);
+  }
 
   /**
    * Checks if the {@link BundleDescriptor} is blacklisted. It means that exists a blacklisted bundle
@@ -41,9 +60,9 @@ public class PluginLocalDependenciesBlacklist {
    * @return true if the {@link BundleDescriptor} is blacklisted, or false otherwise.
    */
   public static boolean isBlacklisted(BundleDescriptor pluginDescriptor) {
-    for (BundleDescriptor blacklistedPluginDescriptor : pluginsBlacklist) {
+    for (BundleDescriptor blacklistedPluginDescriptor : PLUGINS_BLACKLIST) {
       if (doDescriptorsMatch(blacklistedPluginDescriptor, pluginDescriptor)) {
-        logger
+        LOGGER
             .warn("Plugin '{}' local dependencies won't have precedence over the dependencies of the artifact being deployed. Please update to the latest plugin version",
                   pluginDescriptor);
         return true;
