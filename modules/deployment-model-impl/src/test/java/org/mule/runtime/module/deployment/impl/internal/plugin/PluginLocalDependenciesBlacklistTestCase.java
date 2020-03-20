@@ -10,6 +10,7 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.module.deployment.impl.internal.plugin.PluginLocalDependenciesBlacklist.isBlacklisted;
+
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -23,6 +24,13 @@ public class PluginLocalDependenciesBlacklistTestCase extends AbstractMuleTestCa
   public void ibmCTGIsBlacklisted() {
     BundleDescriptor ctgBundleDescriptor = new BundleDescriptor.Builder().setGroupId("com.mulesoft.connectors")
         .setArtifactId("mule-ibm-ctg-connector").setVersion("2.3.1").build();
+    assertThat(isBlacklisted(ctgBundleDescriptor), is(true));
+  }
+
+  @Test
+  public void microsoftDynamicsNavIsBlacklisted() {
+    BundleDescriptor ctgBundleDescriptor = new BundleDescriptor.Builder().setGroupId("com.mulesoft.connectors")
+        .setArtifactId("mule-microsoft-dynamics-nav-connector").setVersion("2.0.1").build();
     assertThat(isBlacklisted(ctgBundleDescriptor), is(true));
   }
 
