@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.functional.Either.left;
 import static org.mule.runtime.core.api.functional.Either.right;
+import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
 import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.createErrorEvent;
@@ -36,6 +37,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -72,6 +74,7 @@ import org.mule.runtime.core.privileged.execution.MessageProcessContext;
 import org.mule.runtime.core.privileged.execution.MessageProcessTemplate;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -329,11 +332,16 @@ public class ModuleFlowProcessingPhase
                                        final PhaseContext ctx, FlowConstruct flowConstruct) {
     CoreEvent event = messagingException.getEvent();
     try {
-      return from(ctx.template
-          .sendFailureResponseToClient(messagingException, errorParameters.apply(event)))
-              .onErrorMap(e -> new SourceErrorException(builder(event)
-                  .error(builder(e).errorType(sourceErrorResponseSendErrorType).build()).build(),
-                                                        sourceErrorResponseSendErrorType, e));
+      // When broken pipe happens there's not need to send failure response to client
+      if (!containsType(messagingException, ConnectionException.class)) {
+        return from(ctx.template
+            .sendFailureResponseToClient(messagingException, errorParameters.apply(event)))
+                .onErrorMap(e -> new SourceErrorException(builder(event)
+                    .error(builder(e).errorType(sourceErrorResponseSendErrorType).build()).build(),
+                                                          sourceErrorResponseSendErrorType, e));
+      } else {
+        return empty();
+      }
     } catch (Exception e) {
       return error(new SourceErrorException(event, sourceErrorResponseGenerateErrorType, e, messagingException));
     }
