@@ -23,6 +23,7 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Ha
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_SEND;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
 import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.createErrorEvent;
@@ -38,6 +39,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -429,21 +431,27 @@ public class FlowProcessMediator implements Initialisable {
     CoreEvent event = messagingException.getEvent();
 
     try {
-      ctx.template.sendFailureResponseToClient(messagingException, errorParameters.apply(event), new CompletableCallback<Void>() {
+      if (!containsType(messagingException, ConnectionException.class)) {
+        ctx.template.sendFailureResponseToClient(messagingException, errorParameters.apply(event),
+                                                 new CompletableCallback<Void>() {
 
-        @Override
-        public void complete(Void value) {
-          callback.complete(value);
-        }
+                                                   @Override
+                                                   public void complete(Void value) {
+                                                     callback.complete(value);
+                                                   }
 
-        @Override
-        public void error(Throwable e) {
-          callback.error(new SourceErrorException(builder(event)
-              .error(builder(e).errorType(sourceErrorResponseSendErrorType).build())
-              .build(),
-                                                  sourceErrorResponseSendErrorType, e));
-        }
-      });
+                                                   @Override
+                                                   public void error(Throwable e) {
+                                                     callback.error(new SourceErrorException(builder(event)
+                                                         .error(builder(e).errorType(sourceErrorResponseSendErrorType).build())
+                                                         .build(),
+                                                                                             sourceErrorResponseSendErrorType,
+                                                                                             e));
+                                                   }
+                                                 });
+      } else {
+        callback.complete(null);
+      }
     } catch (Exception e) {
       callback.error(new SourceErrorException(event, sourceErrorResponseGenerateErrorType, e, messagingException));
     }

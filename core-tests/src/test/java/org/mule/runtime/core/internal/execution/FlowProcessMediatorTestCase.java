@@ -47,6 +47,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.message.ErrorType;
@@ -245,6 +246,28 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     verify(notifier, never()).phaseFailure(any());
 
     verify(flowErrorHandlerRouter).accept(argThat(hasCause(sameInstance(mockException))));
+    verify(flowErrorHandlerRouter).dispose();
+  }
+
+  @Test
+  public void avoidSendFailureResponseToClientWhenConnectionExceptionOccurs() throws Exception {
+    ConnectionException connectionException = new ConnectionException("Broken pipe");
+    doAnswer(onCallback(callback -> callback.error(connectionException))).when(template).sendResponseToClient(any(), any(),
+                                                                                                              any());
+
+    flowProcessMediator.process(template, context, notifier);
+
+    verifyFlowErrorHandler(isErrorTypeSourceResponseSend());
+    verify(template).sendResponseToClient(any(), any(), any());
+    verify(template, never()).sendFailureResponseToClient(any(), any(), any());
+    // The error handler is called with the appropriate type, but for the termination it counts as successful if the error
+    // response
+    // was sent.
+    verify(template).afterPhaseExecution(argThat(leftMatches(Matchers.any(MessagingException.class))));
+    verify(notifier).phaseSuccessfully();
+    verify(notifier, never()).phaseFailure(any());
+
+    verify(flowErrorHandlerRouter).accept(argThat(hasCause(sameInstance(connectionException))));
     verify(flowErrorHandlerRouter).dispose();
   }
 
