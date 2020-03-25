@@ -136,7 +136,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   /**
    * Creates an instance of the classifier.
    *
-   * @param dependencyResolver {@link DependencyResolver} to resolve dependencies. Non null.
+   * @param dependencyResolver                 {@link DependencyResolver} to resolve dependencies. Non null.
    * @param artifactClassificationTypeResolver {@link ArtifactClassificationTypeResolver} to identify rootArtifact type. Non null.
    */
   public AetherClassPathClassifier(DependencyResolver dependencyResolver,
@@ -232,8 +232,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * <p/>
    * Once identified and classified these Maven artifacts will be excluded from container classification.
    *
-   * @param context {@link ClassPathClassifierContext} with settings for the classification process
-   * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
+   * @param context                        {@link ClassPathClassifierContext} with settings for the classification process
+   * @param directDependencies             {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
    * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact.
    * @return a {@link List} of {@link ArtifactUrlClassification}s that would be the one used for the plugins class loaders.
    */
@@ -249,15 +249,19 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                                                               muleServiceClassifiedDependencyFilter);
     logger.debug("{} services defined to be classified", serviceArtifactsDeclared.size());
 
+    final Predicate<Dependency> nestedServicesClassifier =
+        dependency -> muleServiceClassifiedDependencyFilter.test(dependency)
+            && dependency.getScope().equals(COMPILE);
+
     if (SERVICE.equals(rootArtifactType)) {
       logger.debug("rootArtifact '{}' identified as Mule service", rootArtifactType);
-      buildPluginUrlClassification(context.getRootArtifact(), context, muleServiceClassifiedDependencyFilter, servicesClassified,
+      buildPluginUrlClassification(context.getRootArtifact(), context, nestedServicesClassifier, servicesClassified,
                                    rootArtifactRemoteRepositories);
     }
 
     serviceArtifactsDeclared.stream()
         .forEach(serviceArtifact -> buildPluginUrlClassification(serviceArtifact, context,
-                                                                 muleServiceClassifiedDependencyFilter, servicesClassified,
+                                                                 nestedServicesClassifier, servicesClassified,
                                                                  rootArtifactRemoteRepositories));
 
     return toServiceUrlClassification(resolveArtifactsUsingSemanticVersioning(servicesClassified));
@@ -268,8 +272,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * Classifies the {@link List} of {@link URL}s from {@value org.eclipse.aether.util.artifact.JavaScopes#TEST} scope direct
    * dependencies to be added as plugin runtime shared libraries.
    *
-   * @param context {@link ClassPathClassifierContext} with settings for the classification process
-   * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
+   * @param context                        {@link ClassPathClassifierContext} with settings for the classification process
+   * @param directDependencies             {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
    * @param rootArtifactRemoteRepositories remote repositories defined at rootArtifact.
    * @return {@link List} of {@link URL}s to be added to runtime shared libraries.
    */
@@ -378,9 +382,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * In order to resolve correctly the {@value org.eclipse.aether.util.artifact.JavaScopes#PROVIDED} direct dependencies it will
    * get for each one the manage dependencies and use that list to resolve the graph.
    *
-   * @param context {@link ClassPathClassifierContext} with settings for the classification process
-   * @param pluginUrlClassifications {@link PluginUrlClassification}s to check if rootArtifact was classified as plugin
-   * @param rootArtifactType {@link ArtifactClassificationType} for rootArtifact
+   * @param context                        {@link ClassPathClassifierContext} with settings for the classification process
+   * @param pluginUrlClassifications       {@link PluginUrlClassification}s to check if rootArtifact was classified as plugin
+   * @param rootArtifactType               {@link ArtifactClassificationType} for rootArtifact
    * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact
    * @return {@link List} of {@link URL}s for the container class loader
    */
@@ -401,7 +405,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
               .anyMatch(artifactUrlClassification -> artifactUrlClassification.getArtifactId()
                   .equals(toVersionlessId(artifact)))
               && !pluginUrlClassifications.stream()
-                  // Plugins may have ended up with a highest version due to transitive dependencies... therefore comparing without version 
+                  // Plugins may have ended up with a highest version due to transitive dependencies... therefore comparing without version
                   .anyMatch(artifactUrlClassification -> artifactUrlClassification.getArtifactId()
                       .equals(toVersionlessId(artifact)))
               && !applicationSharedLibUrls.stream()
@@ -475,9 +479,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * the rootArtifact is a {@link ArtifactClassificationType#MODULE} it will use its managed dependencies, other case it collects
    * managed dependencies for each direct dependencies selected for Container.
    *
-   * @param context {@link ClassPathClassifierContext} with settings for the classification process
-   * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
-   * @param rootArtifactType {@link ArtifactClassificationType} for rootArtifact
+   * @param context                        {@link ClassPathClassifierContext} with settings for the classification process
+   * @param directDependencies             {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
+   * @param rootArtifactType               {@link ArtifactClassificationType} for rootArtifact
    * @param rootArtifactRemoteRepositories repositories to be used when reading artifact descriptors
    * @return {@link List} of {@link Dependency} to be used as managed dependencies when resolving Container dependencies
    */
@@ -549,9 +553,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * The resulting {@link PluginUrlClassification} for each plugin will have as name the Maven artifact id coordinates:
    * {@code <groupId>:<artifactId>:<extension>[:<classifier>]:<version>}.
    *
-   * @param context {@link ClassPathClassifierContext} with settings for the classification process
-   * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
-   * @param rootArtifactType {@link ArtifactClassificationType} for rootArtifact
+   * @param context                        {@link ClassPathClassifierContext} with settings for the classification process
+   * @param directDependencies             {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
+   * @param rootArtifactType               {@link ArtifactClassificationType} for rootArtifact
    * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact
    * @return {@link List} of {@link PluginUrlClassification}s for plugins class loaders
    */
@@ -710,9 +714,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * resolved for building the {@link URL}'s for the class loader. Once classified the node is added to {@link Map} of
    * artifactsClassified.
    *
-   * @param artifactToClassify {@link Artifact} that represents the artifact to be classified
-   * @param context {@link ClassPathClassifierContext} with settings for the classification process
-   * @param artifactsClassified {@link Map} that contains already classified plugins
+   * @param artifactToClassify             {@link Artifact} that represents the artifact to be classified
+   * @param context                        {@link ClassPathClassifierContext} with settings for the classification process
+   * @param artifactsClassified            {@link Map} that contains already classified plugins
    * @param rootArtifactRemoteRepositories remote repositories defined at the root artifact.
    */
   private void buildPluginUrlClassification(Artifact artifactToClassify, ClassPathClassifierContext context,
@@ -781,8 +785,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   /**
    * Resolves the exported plugin classes from the given {@link Artifact}
    *
-   * @param exporterArtifact {@link Artifact} used to resolve the exported classes
-   * @param context {@link ClassPathClassifierContext} with settings for the classification process
+   * @param exporterArtifact               {@link Artifact} used to resolve the exported classes
+   * @param context                        {@link ClassPathClassifierContext} with settings for the classification process
    * @param rootArtifactRemoteRepositories remote repositories defined by the rootArtifact
    * @return {@link List} of {@link Class} that the given {@link Artifact} exports
    */
@@ -826,10 +830,10 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * If enabled generates the Extension metadata and returns the {@link List} of {@link URL}s with the folder were metadata is
    * generated as first entry in the list.
    *
-   * @param plugin plugin {@link Artifact} to generate its Extension metadata
-   * @param context {@link ClassPathClassifierContext} with settings for the classification process
-   * @param pluginGenerator {@link ExtensionPluginMetadataGenerator} extensions metadata generator
-   * @param urls current {@link List} of {@link URL}s classified for the plugin
+   * @param plugin                         plugin {@link Artifact} to generate its Extension metadata
+   * @param context                        {@link ClassPathClassifierContext} with settings for the classification process
+   * @param pluginGenerator                {@link ExtensionPluginMetadataGenerator} extensions metadata generator
+   * @param urls                           current {@link List} of {@link URL}s classified for the plugin
    * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact
    * @return {@link List} of {@link URL}s classified for the plugin
    */
@@ -855,12 +859,12 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   /**
    * Finds the direct {@link Dependency} from rootArtifact for the given groupId and artifactId.
    *
-   * @param groupId of the artifact to be found
-   * @param artifactId of the artifact to be found
-   * @param classifier of the artifact to be found
+   * @param groupId            of the artifact to be found
+   * @param artifactId         of the artifact to be found
+   * @param classifier         of the artifact to be found
    * @param directDependencies the rootArtifact direct {@link Dependency}s
    * @return {@link Optional} {@link Dependency} to the dependency. Could be empty it if not present in the list of direct
-   *         dependencies
+   * dependencies
    */
   private Optional<Dependency> findDirectDependency(String groupId, String artifactId, Optional<String> classifier,
                                                     List<Dependency> directDependencies) {
@@ -878,8 +882,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * Finds the plugin shared lib {@link Dependency} from the direct dependencies of the rootArtifact.
    *
    * @param pluginSharedLibCoords Maven coordinates that define the plugin shared lib artifact
-   * @param rootArtifact {@link Artifact} that defines the current artifact that requested to build this class loaders
-   * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
+   * @param rootArtifact          {@link Artifact} that defines the current artifact that requested to build this class loaders
+   * @param directDependencies    {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
    * @return {@link Artifact} representing the plugin shared lib artifact
    */
   private Dependency findApplicationSharedLibArtifact(String pluginSharedLibCoords, Artifact rootArtifact,
@@ -926,11 +930,11 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * If the coordinates matches to the rootArtifact it will return a {@value org.eclipse.aether.util.artifact.JavaScopes#COMPILE}
    * {@link Dependency}.
    *
-   * @param artifactCoords Maven coordinates that define the artifact dependency
-   * @param rootArtifact {@link Artifact} that defines the current artifact that requested to build this class loaders
+   * @param artifactCoords     Maven coordinates that define the artifact dependency
+   * @param rootArtifact       {@link Artifact} that defines the current artifact that requested to build this class loaders
    * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
    * @return {@link Dependency} representing the artifact if declared as direct dependency or rootArtifact if they match it or
-   *         {@link Optional#EMPTY} if couldn't found the dependency.
+   * {@link Optional#EMPTY} if couldn't found the dependency.
    * @throws {@link IllegalArgumentException} if artifactCoords are not in the expected format
    */
   private Optional<Dependency> discoverDependency(String artifactCoords, Artifact rootArtifact,
@@ -976,9 +980,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * If the application artifact has not been classified as plugin its going to be resolved as {@value #JAR_EXTENSION} in order to
    * include this its compiled classes classification.
    *
-   * @param context {@link ClassPathClassifierContext} with settings for the classification process
-   * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
-   * @param rootArtifactType {@link ArtifactClassificationType} for rootArtifact @return {@link URL}s for application class loader
+   * @param context                        {@link ClassPathClassifierContext} with settings for the classification process
+   * @param directDependencies             {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
+   * @param rootArtifactType               {@link ArtifactClassificationType} for rootArtifact @return {@link URL}s for application class loader
    * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact
    */
   private List<URL> buildTestRunnerUrlClassification(ClassPathClassifierContext context,
@@ -1129,7 +1133,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * At the same time IDEs or even Maven when running tests will resolve to timestamped versions instead, so we must do this
    * "resolve" operation that matches SNAPSHOTs resolved artifacts to timestamped SNAPSHOT versions from classpath.
    *
-   * @param resolvedURLs {@link URL}s resolved from the dependency graph
+   * @param resolvedURLs  {@link URL}s resolved from the dependency graph
    * @param classpathURLs {@link URL}s already provided in class path by IDE or Maven
    */
   private void resolveSnapshotVersionsToTimestampedFromClassPath(List<URL> resolvedURLs, List<URL> classpathURLs) {
@@ -1198,8 +1202,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   /**
    * Finds the corresponding {@link URL} in class path grouped by folder {@link Map} for the given artifact {@link File}.
    *
-   * @param classpathFolders a {@link Map} that has as entry the folder of the artifacts from class path and value a {@link List}
-   *        with the artifacts (jar, tests.jar, etc).
+   * @param classpathFolders     a {@link Map} that has as entry the folder of the artifacts from class path and value a {@link List}
+   *                             with the artifacts (jar, tests.jar, etc).
    * @param artifactResolvedFile the {@link Artifact} resolved from the Maven dependencies and resolved as SNAPSHOT
    * @return {@link URL} for the artifact found in the class path or {@code null}
    */
