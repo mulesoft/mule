@@ -49,6 +49,7 @@ import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.util.Reference;
@@ -229,6 +230,23 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
     // The error handler is called with the appropriate type, but for the termination it counts as successful if the error
     // response
     // was sent.
+    verify(template).afterPhaseExecution(argThat(leftMatches(Matchers.any(MessagingException.class))));
+    verify(notifier).phaseSuccessfully();
+    verify(notifier, never()).phaseFailure(any());
+  }
+
+  @Test
+  public void avoidSendFailureResponseToClientWhenConnectionExceptionOccurs() throws Exception {
+    when(template.sendResponseToClient(any(), any())).thenReturn(error(new ConnectionException("Broken pipe")));
+
+    moduleFlowProcessingPhase.runPhase(template, context, notifier);
+
+    verifyFlowErrorHandler(isErrorTypeSourceResponseSend());
+    verify(template).sendResponseToClient(any(), any());
+
+    // When broken pipe happens there's not need to send failure response to client
+    verify(template, never()).sendFailureResponseToClient(any(), any());
+
     verify(template).afterPhaseExecution(argThat(leftMatches(Matchers.any(MessagingException.class))));
     verify(notifier).phaseSuccessfully();
     verify(notifier, never()).phaseFailure(any());
