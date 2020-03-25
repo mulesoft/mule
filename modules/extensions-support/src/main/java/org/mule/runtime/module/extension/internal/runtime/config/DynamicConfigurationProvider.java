@@ -10,6 +10,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStopping;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -153,6 +154,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
 
   private ConfigurationInstance createConfiguration(Pair<ResolverSetResult, ResolverSetResult> values, CoreEvent event)
       throws MuleException {
+    assertNotStopping(muleContext, "Mule is shutting down... Cannot create new dynamic configurations");
 
     ConfigurationInstance configuration;
     ResolverSetResult connectionProviderValues = values.getSecond();
