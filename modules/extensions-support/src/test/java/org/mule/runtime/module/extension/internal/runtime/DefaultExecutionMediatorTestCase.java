@@ -84,7 +84,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -95,6 +94,8 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoRule;
 import org.mockito.verification.VerificationMode;
+
+import com.google.common.collect.ImmutableList;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -116,7 +117,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   }
 
   @Rule
-  public MockitoRule mockito = rule();
+  public MockitoRule mockito = rule().silent();
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -160,7 +161,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   @Mock
   private ConnectionManagerAdapter connectionManagerAdapter;
 
-  private String name;
+  private final String name;
   private final Object result = new Object();
   private final RetryPolicyTemplate retryPolicy;
   private final ConnectionException connectionException = new ConnectionException("Connection failure");

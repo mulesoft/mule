@@ -270,7 +270,7 @@ public class LifecycleUtils {
    * @since 4.0
    */
   public static void assertNotStopping(MuleContext muleContext, String errorMessage) {
-    if (muleContext.isStopping()) {
+    if (muleContext.isStopped() || muleContext.isStopping()) {
       throw new IllegalStateException(errorMessage);
     }
   }

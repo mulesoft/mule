@@ -10,6 +10,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStopping;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -55,8 +56,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
 import org.slf4j.Logger;
+
+import com.github.benmanes.caffeine.cache.Caffeine;
 
 /**
  * A {@link ConfigurationProvider} which continuously evaluates the same {@link ResolverSet} and then uses the resulting
@@ -145,12 +147,14 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     });
   }
 
-  private ConfigurationInstance getConfiguration(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult, CoreEvent event) {
+  private ConfigurationInstance getConfiguration(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult,
+                                                 CoreEvent event) {
     return cache.get(new ResolverResultAndEvent(resolverSetResult, event));
   }
 
   private ConfigurationInstance createConfiguration(Pair<ResolverSetResult, ResolverSetResult> values, CoreEvent event)
       throws MuleException {
+    assertNotStopping(muleContext, "Mule is shutting down... Cannot create new dynamic configurations");
 
     ConfigurationInstance configuration;
     ResolverSetResult connectionProviderValues = values.getSecond();
@@ -299,8 +303,8 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
 
   private static class ResolverResultAndEvent {
 
-    private Pair<ResolverSetResult, ResolverSetResult> resolverSetResult;
-    private CoreEvent event;
+    private final Pair<ResolverSetResult, ResolverSetResult> resolverSetResult;
+    private final CoreEvent event;
 
     ResolverResultAndEvent(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult, CoreEvent event) {
       this.resolverSetResult = resolverSetResult;
