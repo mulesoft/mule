@@ -147,7 +147,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   }
 
   private ConfigurationInstance getConfiguration(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult,
-                                                     CoreEvent event) {
+                                                 CoreEvent event) {
     return cache.get(new ResolverResultAndEvent(resolverSetResult, event));
   }
 
