@@ -88,6 +88,18 @@
                 "type": "Object",
                 "annotations": {
                   "typeId": "org.mule.runtime.extension.api.runtime.ExpirationPolicy",
+                  "classInformation": {
+                    "classname": "org.mule.runtime.extension.api.runtime.ExpirationPolicy",
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
                   "description": {
                     "value": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit."
                   },
@@ -264,7 +276,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -312,6 +336,18 @@
                           "JOIN_IF_POSSIBLE",
                           "NOT_SUPPORTED"
                         ]
+                      },
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.tx.OperationTransactionalAction",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "java.lang.Enum",
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -672,7 +708,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -720,6 +768,18 @@
                           "JOIN_IF_POSSIBLE",
                           "NOT_SUPPORTED"
                         ]
+                      },
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.tx.OperationTransactionalAction",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "java.lang.Enum",
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -1243,7 +1303,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -1291,6 +1363,18 @@
                           "JOIN_IF_POSSIBLE",
                           "NOT_SUPPORTED"
                         ]
+                      },
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.tx.OperationTransactionalAction",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "java.lang.Enum",
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -1626,6 +1710,18 @@
                     "JOIN_IF_POSSIBLE",
                     "NOT_SUPPORTED"
                   ]
+                },
+                "classInformation": {
+                  "classname": "org.mule.runtime.extension.api.tx.OperationTransactionalAction",
+                  "hasDefaultConstructor": false,
+                  "isInterface": false,
+                  "isInstantiable": false,
+                  "isAbstract": false,
+                  "isFinal": true,
+                  "implementedInterfaces": [],
+                  "parent": "java.lang.Enum",
+                  "genericTypes": [],
+                  "isMap": false
                 }
               }
             },
@@ -1679,6 +1775,18 @@
                           "JOIN_IF_POSSIBLE",
                           "NOT_SUPPORTED"
                         ]
+                      },
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.tx.OperationTransactionalAction",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "java.lang.Enum",
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -1711,7 +1819,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -2113,7 +2233,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -2161,6 +2293,18 @@
                           "JOIN_IF_POSSIBLE",
                           "NOT_SUPPORTED"
                         ]
+                      },
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.tx.OperationTransactionalAction",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "java.lang.Enum",
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -2762,7 +2906,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -2810,6 +2966,18 @@
                           "JOIN_IF_POSSIBLE",
                           "NOT_SUPPORTED"
                         ]
+                      },
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.tx.OperationTransactionalAction",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "java.lang.Enum",
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -3333,7 +3501,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -3381,6 +3561,18 @@
                           "JOIN_IF_POSSIBLE",
                           "NOT_SUPPORTED"
                         ]
+                      },
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.tx.OperationTransactionalAction",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "java.lang.Enum",
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -3696,7 +3888,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -3744,6 +3948,18 @@
                           "JOIN_IF_POSSIBLE",
                           "NOT_SUPPORTED"
                         ]
+                      },
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.tx.OperationTransactionalAction",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "java.lang.Enum",
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -4026,7 +4242,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -4074,6 +4302,18 @@
                           "JOIN_IF_POSSIBLE",
                           "NOT_SUPPORTED"
                         ]
+                      },
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.tx.OperationTransactionalAction",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "java.lang.Enum",
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -4356,7 +4596,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -4404,6 +4656,18 @@
                           "JOIN_IF_POSSIBLE",
                           "NOT_SUPPORTED"
                         ]
+                      },
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.tx.OperationTransactionalAction",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "java.lang.Enum",
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -4686,7 +4950,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -4734,6 +5010,18 @@
                           "JOIN_IF_POSSIBLE",
                           "NOT_SUPPORTED"
                         ]
+                      },
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.tx.OperationTransactionalAction",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "java.lang.Enum",
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -5843,7 +6131,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -5890,6 +6190,18 @@
                           "ALWAYS_BEGIN",
                           "NONE"
                         ]
+                      },
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.tx.SourceTransactionalAction",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "java.lang.Enum",
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -5958,6 +6270,18 @@
                           "LOCAL",
                           "XA"
                         ]
+                      },
+                      "classInformation": {
+                        "classname": "org.mule.runtime.api.tx.TransactionType",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "java.lang.Enum",
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -6368,6 +6692,18 @@
                     "ALWAYS_BEGIN",
                     "NONE"
                   ]
+                },
+                "classInformation": {
+                  "classname": "org.mule.runtime.extension.api.tx.SourceTransactionalAction",
+                  "hasDefaultConstructor": false,
+                  "isInterface": false,
+                  "isInstantiable": false,
+                  "isAbstract": false,
+                  "isFinal": true,
+                  "implementedInterfaces": [],
+                  "parent": "java.lang.Enum",
+                  "genericTypes": [],
+                  "isMap": false
                 }
               }
             },
@@ -6428,7 +6764,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -6475,6 +6823,18 @@
                           "LOCAL",
                           "XA"
                         ]
+                      },
+                      "classInformation": {
+                        "classname": "org.mule.runtime.api.tx.TransactionType",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "java.lang.Enum",
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -6543,6 +6903,18 @@
                           "ALWAYS_BEGIN",
                           "NONE"
                         ]
+                      },
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.tx.SourceTransactionalAction",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "java.lang.Enum",
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
