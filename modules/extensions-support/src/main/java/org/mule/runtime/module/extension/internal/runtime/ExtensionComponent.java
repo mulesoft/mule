@@ -224,14 +224,10 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       configurationResolver = event -> {
         ConfigurationInstance instance = configurationProvider.get().get(event);
         if (instance == null) {
-          if (muleContext.isStopping() || muleContext.isStopped()) {
-            return empty();
-          } else {
-            throw new IllegalModelDefinitionException(format(
-                                                             "Root component '%s' contains a reference to config '%s' but it doesn't exists",
-                                                             getLocation().getRootContainerName(),
-                                                             configurationProvider));
-          }
+          throw new IllegalModelDefinitionException(format(
+                                                           "Root component '%s' contains a reference to config '%s' but it doesn't exists",
+                                                           getLocation().getRootContainerName(),
+                                                           configurationProvider));
         }
 
         return of(instance);

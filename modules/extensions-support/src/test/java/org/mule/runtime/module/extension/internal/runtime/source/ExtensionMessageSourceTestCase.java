@@ -38,6 +38,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
@@ -319,7 +320,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   }
 
   @Test
-  public void workManagerDisposedIfSourceFailsToStart() throws Exception {
+  public void workManagerDisposedIfSourceFailsToStop() throws Exception {
     start();
 
     Exception e = new RuntimeException();
@@ -337,6 +338,23 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
         description.appendText("Exception was not wrapped as expected");
       }
     });
+  }
+
+  @Test
+  public void actualSourceStoppedIfMessageSourceFailsToStop() throws Exception {
+    when(configurationProvider.isDynamic()).thenReturn(true);
+    start();
+
+    Exception e = new RuntimeException();
+    doThrow(e).when(configurationProvider).get(any(CoreEvent.class));
+
+    expectedException.expectCause(sameInstance(e));
+
+    try {
+      messageSource.stop();
+    } finally {
+      verify(source).onStop();
+    }
   }
 
   private BaseMatcher<Throwable> exhaustedBecauseOf(Throwable cause) {
