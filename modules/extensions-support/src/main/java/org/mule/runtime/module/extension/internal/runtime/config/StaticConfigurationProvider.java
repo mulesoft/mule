@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
 
@@ -20,6 +21,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,7 +38,7 @@ public class StaticConfigurationProvider extends LifecycleAwareConfigurationProv
   public StaticConfigurationProvider(String name, ExtensionModel extensionModel, ConfigurationModel configurationModel,
                                      ConfigurationInstance configuration, MuleContext muleContext) {
     super(name, extensionModel, configurationModel, muleContext);
-    this.configuration = configuration;
+    this.configuration = requireNonNull(configuration);
     registerConfiguration(configuration);
   }
 
@@ -49,6 +51,11 @@ public class StaticConfigurationProvider extends LifecycleAwareConfigurationProv
   @Override
   public ConfigurationInstance get(Event muleEvent) {
     return configuration;
+  }
+
+  @Override
+  public Optional<ConfigurationInstance> getIfPresent(Event event) {
+    return Optional.of(configuration);
   }
 
   @Override

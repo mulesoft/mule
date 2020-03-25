@@ -55,8 +55,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
 import org.slf4j.Logger;
+
+import com.github.benmanes.caffeine.cache.Caffeine;
 
 /**
  * A {@link ConfigurationProvider} which continuously evaluates the same {@link ResolverSet} and then uses the resulting
@@ -140,13 +141,33 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
         if (connectionProviderResolver.getResolverSet().isPresent()) {
           providerResult = ((ResolverSet) connectionProviderResolver.getResolverSet().get()).resolve(resolvingContext);
         }
-        return getConfiguration(new Pair<>(result, providerResult), (CoreEvent) event);
+        return computeConfiguration(new Pair<>(result, providerResult), (CoreEvent) event);
       }
     });
   }
 
-  private ConfigurationInstance getConfiguration(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult, CoreEvent event) {
+  @Override
+  public Optional<ConfigurationInstance> getIfPresent(Event event) {
+    return withContextClassLoader(getExtensionClassLoader(), () -> {
+      try (ValueResolvingContext resolvingContext = ValueResolvingContext.builder(((CoreEvent) event))
+          .withExpressionManager(expressionManager).build()) {
+        ResolverSetResult result = resolverSet.resolve(resolvingContext);
+        ResolverSetResult providerResult = null;
+        if (connectionProviderResolver.getResolverSet().isPresent()) {
+          providerResult = ((ResolverSet) connectionProviderResolver.getResolverSet().get()).resolve(resolvingContext);
+        }
+        return ofNullable(getConfiguration(new Pair<>(result, providerResult), (CoreEvent) event));
+      }
+    });
+  }
+
+  private ConfigurationInstance computeConfiguration(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult,
+                                                     CoreEvent event) {
     return cache.get(new ResolverResultAndEvent(resolverSetResult, event));
+  }
+
+  private ConfigurationInstance getConfiguration(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult, CoreEvent event) {
+    return cache.asMap().get(new ResolverResultAndEvent(resolverSetResult, event));
   }
 
   private ConfigurationInstance createConfiguration(Pair<ResolverSetResult, ResolverSetResult> values, CoreEvent event)
@@ -299,8 +320,8 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
 
   private static class ResolverResultAndEvent {
 
-    private Pair<ResolverSetResult, ResolverSetResult> resolverSetResult;
-    private CoreEvent event;
+    private final Pair<ResolverSetResult, ResolverSetResult> resolverSetResult;
+    private final CoreEvent event;
 
     ResolverResultAndEvent(Pair<ResolverSetResult, ResolverSetResult> resolverSetResult, CoreEvent event) {
       this.resolverSetResult = resolverSetResult;

@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.util.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
+import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 
@@ -243,14 +244,20 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
     timeSupplier.move(10, MINUTES);
 
+    assertThat(instance.getStop(), is(0));
+    assertThat(instance.getDispose(), is(0));
+
     List<ConfigurationInstance> expired = provider.getExpired();
     assertThat(expired.isEmpty(), is(false));
 
+    probe(() -> {
+      assertThat(instance.getStop(), is(1));
+      assertThat(instance.getDispose(), is(1));
+      return true;
+    });
+
     provider.stop();
     provider.dispose();
-
-    assertThat(instance.getStop(), is(0));
-    assertThat(instance.getDispose(), is(0));
   }
 
   @Test
@@ -263,6 +270,9 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
     List<ConfigurationInstance> expired = provider.getExpired();
     assertThat(expired.isEmpty(), is(true));
+
+    assertThat(instance.getStop(), is(0));
+    assertThat(instance.getDispose(), is(0));
 
     provider.stop();
     provider.dispose();
