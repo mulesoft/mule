@@ -26,6 +26,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -119,6 +120,8 @@ public class HeisenbergOperations implements Disposable {
 
   @Inject
   private ExtensionManager extensionManager;
+
+  private final LazyValue<ExecutorService> executor = new LazyValue<>(() -> newSingleThreadExecutor());
 
   public List<Result<String, Object>> getSimpleBlacklist(@Config HeisenbergExtension config) {
     List<Result<String, Object>> blacklist = new LinkedList<>();
@@ -397,9 +400,7 @@ public class HeisenbergOperations implements Disposable {
 
   @MediaType(TEXT_PLAIN)
   public void callGusFringNonBlocking(CompletionCallback<Void, Void> callback) {
-    final ExecutorService executor = newSingleThreadExecutor();
-
-    executor.execute(() -> {
+    executor.get().execute(() -> {
       callback.error(new HeisenbergException(CALL_GUS_MESSAGE));
     });
   }
@@ -522,6 +523,7 @@ public class HeisenbergOperations implements Disposable {
 
   @Override
   public void dispose() {
+    executor.ifComputed(ExecutorService::shutdownNow);
     disposed = true;
   }
 

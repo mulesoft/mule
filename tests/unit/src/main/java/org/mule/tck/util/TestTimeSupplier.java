@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TestTimeSupplier implements TimeSupplier {
 
-  private long timeInMillis;
+  private volatile long timeInMillis;
 
   /**
    * Creates a new instance
@@ -39,12 +39,12 @@ public class TestTimeSupplier implements TimeSupplier {
    * Returns the current virtualized time in milliseconds
    */
   @Override
-  public Long get() {
+  public synchronized Long get() {
     return timeInMillis;
   }
 
   @Override
-  public long getAsLong() {
+  public synchronized long getAsLong() {
     return timeInMillis;
   }
 
@@ -57,7 +57,7 @@ public class TestTimeSupplier implements TimeSupplier {
    * @return the updated {@link #timeInMillis}
    * @throws IllegalArgumentException if {@code timeOffset} is negative
    */
-  public long move(long timeOffset, TimeUnit unit) {
+  public synchronized long move(long timeOffset, TimeUnit unit) {
     checkArgument(timeOffset >= 0, "I told you not to go into the past McFly...");
     return this.timeInMillis += unit.toMillis(timeOffset);
   }

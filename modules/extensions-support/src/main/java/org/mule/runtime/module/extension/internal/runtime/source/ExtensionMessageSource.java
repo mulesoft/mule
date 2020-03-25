@@ -226,17 +226,22 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   private void stopSource() throws MuleException {
     if (sourceAdapter != null) {
+      final String sourceName = sourceAdapter.getName();
+
       CoreEvent initialiserEvent = null;
       try {
         initialiserEvent = getInitialiserEvent(muleContext);
-        stopUsingConfiguration(initialiserEvent);
-        sourceAdapter.stop();
-        if (usesDynamicConfiguration()) {
-          disposeSource();
+        try {
+          stopUsingConfiguration(initialiserEvent);
+        } finally {
+          sourceAdapter.stop();
+          if (usesDynamicConfiguration()) {
+            disposeSource();
+          }
         }
       } catch (Exception e) {
         throw new DefaultMuleException(format("Found exception stopping source '%s' of root component '%s'",
-                                              sourceAdapter.getName(),
+                                              sourceName,
                                               getLocation().getRootContainerName()),
                                        e);
       } finally {

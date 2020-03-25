@@ -7,11 +7,13 @@
 package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static java.util.Arrays.asList;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -26,8 +28,6 @@ import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeW
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import com.google.gson.reflect.TypeToken;
-
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Optional;
@@ -36,16 +36,20 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
+import com.google.gson.reflect.TypeToken;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class ParameterTypeModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+  public MockitoRule rule = MockitoJUnit.rule();
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   private ExtensionModel extensionModel;
@@ -60,12 +64,12 @@ public class ParameterTypeModelValidatorTestCase extends AbstractMuleTestCase {
   private ExtensionParameter extensionParameter;
 
 
-  private Type objectKey = new TypeToken<Map<Object, Object>>() {}.getType();
-  private Type stringMap = new TypeToken<Map<String, Object>>() {}.getType();
-  private Type wildcardMap = new TypeToken<Map<?, ?>>() {}.getType();
-  private Type rawMap = new TypeToken<Map>() {}.getType();
+  private final Type objectKey = new TypeToken<Map<Object, Object>>() {}.getType();
+  private final Type stringMap = new TypeToken<Map<String, Object>>() {}.getType();
+  private final Type wildcardMap = new TypeToken<Map<?, ?>>() {}.getType();
+  private final Type rawMap = new TypeToken<Map>() {}.getType();
 
-  private ParameterTypeModelValidator validator = new ParameterTypeModelValidator();
+  private final ParameterTypeModelValidator validator = new ParameterTypeModelValidator();
 
   @Before
   public void before() {
