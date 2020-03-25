@@ -94,7 +94,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -159,7 +158,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   protected MetadataCacheIdGenerator<ComponentAst> cacheIdGenerator;
 
-  private BiFunction<CoreEvent, Boolean, Optional<ConfigurationInstance>> configurationResolver;
+  private Function<CoreEvent, Optional<ConfigurationInstance>> configurationResolver;
 
   private List<ErrorMapping> errorMappings = emptyList();
 
@@ -207,7 +206,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   private void initConfigurationResolver() {
     if (!requiresConfig.get()) {
-      configurationResolver = (event, stopping) -> empty();
+      configurationResolver = event -> empty();
       return;
     }
 
@@ -216,31 +215,30 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
     Optional<ConfigurationInstance> staticConfiguration = getStaticConfiguration();
     if (staticConfiguration.isPresent()) {
-      configurationResolver = (event, stopping) -> staticConfiguration;
+      configurationResolver = event -> staticConfiguration;
       return;
     }
 
     if (isConfigurationSpecified()) {
       // the config is dynamic
-      configurationResolver = (event, stopping) -> {
-        if (stopping) {
-          // Avoid populating the cache of dynamic connections if stopping
-          return configurationProvider.get().getIfPresent(event);
-        } else {
-          ConfigurationInstance instance = configurationProvider.get().get(event);
-          if (instance == null) {
+      configurationResolver = event -> {
+        ConfigurationInstance instance = configurationProvider.get().get(event);
+        if (instance == null) {
+          if (muleContext.isStopping() || muleContext.isStopped()) {
+            return empty();
+          } else {
             throw new IllegalModelDefinitionException(format(
                                                              "Root component '%s' contains a reference to config '%s' but it doesn't exists",
                                                              getLocation().getRootContainerName(),
                                                              configurationProvider));
           }
-
-          return of(instance);
         }
+
+        return of(instance);
       };
     } else {
       // obtain implicit instance
-      configurationResolver = (event, stopping) -> extensionManager.getConfiguration(extensionModel, componentModel, event);
+      configurationResolver = event -> extensionManager.getConfiguration(extensionModel, componentModel, event);
     }
   }
 
@@ -462,7 +460,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     try {
       fakeEvent = getInitialiserEvent(muleContext);
 
-      Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent, false);
+      Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
 
       if (configuration.isPresent()) {
         ConfigurationProvider configurationProvider = findConfigurationProvider()
@@ -490,7 +488,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       CoreEvent fakeEvent = null;
       try {
         fakeEvent = getInitialiserEvent(muleContext);
-        return getConfiguration(fakeEvent, false);
+        return getConfiguration(fakeEvent);
       } finally {
         if (fakeEvent != null) {
           ((BaseEventContext) fakeEvent.getContext()).success();
@@ -503,8 +501,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    * @param event a {@link CoreEvent}
    * @return a configuration instance for the current component with a given {@link CoreEvent}
    */
-  protected Optional<ConfigurationInstance> getConfiguration(CoreEvent event, boolean stopping) {
-    return configurationResolver.apply(event, stopping);
+  protected Optional<ConfigurationInstance> getConfiguration(CoreEvent event) {
+    return configurationResolver.apply(event);
   }
 
   protected boolean requiresConfig() {
@@ -535,7 +533,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     CoreEvent initialiserEvent = null;
     try {
       initialiserEvent = getNullEvent(muleContext);
-      return configurationResolver.apply(initialiserEvent, false);
+      return configurationResolver.apply(initialiserEvent);
     } finally {
       if (initialiserEvent != null) {
         ((BaseEventContext) initialiserEvent.getContext()).success();

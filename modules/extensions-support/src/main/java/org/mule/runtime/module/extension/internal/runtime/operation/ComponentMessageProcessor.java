@@ -462,7 +462,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       return getPrecalculatedContext(event).getConfiguration();
     } else {
       // Otherwise, generate the context as usual.
-      return getConfiguration(event, false);
+      return getConfiguration(event);
     }
   }
 
@@ -1038,7 +1038,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private ExecutionContextAdapter<T> createExecutionContext(CoreEvent event) throws MuleException {
-    Optional<ConfigurationInstance> configuration = getConfiguration(event, false);
+    Optional<ConfigurationInstance> configuration = getConfiguration(event);
     return createExecutionContext(configuration, getResolutionResult(event, configuration), event, IMMEDIATE_SCHEDULER);
   }
 

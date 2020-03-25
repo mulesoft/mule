@@ -141,22 +141,12 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
         if (connectionProviderResolver.getResolverSet().isPresent()) {
           providerResult = ((ResolverSet) connectionProviderResolver.getResolverSet().get()).resolve(resolvingContext);
         }
-        return computeConfiguration(new Pair<>(result, providerResult), (CoreEvent) event);
-      }
-    });
-  }
 
-  @Override
-  public Optional<ConfigurationInstance> getIfPresent(Event event) {
-    return withContextClassLoader(getExtensionClassLoader(), () -> {
-      try (ValueResolvingContext resolvingContext = ValueResolvingContext.builder(((CoreEvent) event))
-          .withExpressionManager(expressionManager).build()) {
-        ResolverSetResult result = resolverSet.resolve(resolvingContext);
-        ResolverSetResult providerResult = null;
-        if (connectionProviderResolver.getResolverSet().isPresent()) {
-          providerResult = ((ResolverSet) connectionProviderResolver.getResolverSet().get()).resolve(resolvingContext);
+        if (muleContext.isStopping() || muleContext.isStopped()) {
+          return getConfiguration(new Pair<>(result, providerResult), (CoreEvent) event);
+        } else {
+          return computeConfiguration(new Pair<>(result, providerResult), (CoreEvent) event);
         }
-        return ofNullable(getConfiguration(new Pair<>(result, providerResult), (CoreEvent) event));
       }
     });
   }
