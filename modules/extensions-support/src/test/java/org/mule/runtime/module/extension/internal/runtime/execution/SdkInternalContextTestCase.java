@@ -15,6 +15,7 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -30,33 +31,52 @@ public class SdkInternalContextTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("MULE-18189")
-  @Description("scatter-gather sends tha same event to different routes. In that case, the relationship of what context belongs to the operation on what route must be kept.")
+  @Description("scatter-gather sends the same event to different routes. In that case, the relationship of what context belongs to the operation on what route must be kept.")
   public void contextSharedOnParallelRoutes() throws MuleException {
     final SdkInternalContext ctx = new SdkInternalContext();
 
     final ComponentLocation comp1 = fromSingleComponent("comp1");
     final ComponentLocation comp2 = fromSingleComponent("comp2");
 
-    final List<ComponentLocation> completedForComponents = new ArrayList<>();
+    final List<Pair<ComponentLocation, String>> completedForComponents = new ArrayList<>();
 
-    pushContext(ctx, comp1, completedForComponents);
-    pushContext(ctx, comp2, completedForComponents);
+    pushContext(ctx, comp1, "event1", completedForComponents);
+    pushContext(ctx, comp2, "event1", completedForComponents);
 
-    ctx.getOperationExecutionParams(comp1).getCallback().complete(comp1);
-    ctx.getOperationExecutionParams(comp2).getCallback().complete(comp2);
+    ctx.getOperationExecutionParams(comp1, "event1").getCallback().complete(comp1);
+    ctx.getOperationExecutionParams(comp2, "event1").getCallback().complete(comp2);
 
-    assertThat(completedForComponents, contains(comp1, comp2));
+    assertThat(completedForComponents, contains(new Pair<>(comp1, "event1"), new Pair<>(comp2, "event1")));
   }
 
-  private void pushContext(final SdkInternalContext ctx, final ComponentLocation location,
-                           final List<ComponentLocation> completedForComponents)
+  @Test
+  @Issue("MULE-18227")
+  @Description("parallel-foreach sends differenr events to the same routes. In that case, the relationship of what context belongs to the operation on what route must be kept.")
+  public void contextSharedOnParallelEvents() throws MuleException {
+    final SdkInternalContext ctx = new SdkInternalContext();
+
+    final ComponentLocation comp1 = fromSingleComponent("comp1");
+
+    final List<Pair<ComponentLocation, String>> completedForComponents = new ArrayList<>();
+
+    pushContext(ctx, comp1, "event1", completedForComponents);
+    pushContext(ctx, comp1, "event2", completedForComponents);
+
+    ctx.getOperationExecutionParams(comp1, "event1").getCallback().complete(comp1);
+    ctx.getOperationExecutionParams(comp1, "event2").getCallback().complete(comp1);
+
+    assertThat(completedForComponents, contains(new Pair<>(comp1, "event1"), new Pair<>(comp1, "event2")));
+  }
+
+  private void pushContext(final SdkInternalContext ctx, ComponentLocation location, String eventId,
+                           final List<Pair<ComponentLocation, String>> completedForComponents)
       throws MuleException {
-    ctx.putContext(location);
-    ctx.setOperationExecutionParams(location, empty(), emptyMap(), testEvent(), new ExecutorCallback() {
+    ctx.putContext(location, eventId);
+    ctx.setOperationExecutionParams(location, eventId, empty(), emptyMap(), testEvent(), new ExecutorCallback() {
 
       @Override
       public void complete(Object value) {
-        completedForComponents.add(location);
+        completedForComponents.add(new Pair<>(location, eventId));
       }
 
       @Override
