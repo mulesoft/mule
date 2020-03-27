@@ -6,13 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
-import static java.util.Collections.synchronizedMap;
 import static java.util.Optional.empty;
 import static java.util.function.Function.identity;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -23,6 +21,7 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import reactor.util.context.Context;
@@ -49,16 +48,16 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
    * to.
    */
   private final Map<Pair<ComponentLocation, String>, LocationSpecificSdkInternalContext> locationSpecificContext =
-      synchronizedMap(new SmallMap<>());
+      new ConcurrentHashMap<>();
 
   private Function<Context, Context> innerChainSubscriberContextMapping = identity();
 
-  public void removeContext(Pair<ComponentLocation, String> locationAndEventId) {
-    locationSpecificContext.remove(locationAndEventId);
+  public void removeContext(ComponentLocation location, String eventId) {
+    locationSpecificContext.remove(new Pair<>(location, eventId));
   }
 
-  public void putContext(Pair<ComponentLocation, String> locationAndEventId) {
-    locationSpecificContext.put(locationAndEventId, new LocationSpecificSdkInternalContext());
+  public void putContext(ComponentLocation location, String eventId) {
+    locationSpecificContext.put(new Pair<>(location, eventId), new LocationSpecificSdkInternalContext());
   }
 
   /**
@@ -67,47 +66,48 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
    * @param location the location of the operation that generated this context.
    * @param configuration the configuration of the operation.
    */
-  public void setConfiguration(Pair<ComponentLocation, String> locationAndEventId,
+  public void setConfiguration(ComponentLocation location, String eventId,
                                Optional<ConfigurationInstance> configuration) {
-    locationSpecificContext.get(locationAndEventId).setConfiguration(configuration);
+    locationSpecificContext.get(new Pair<>(location, eventId)).setConfiguration(configuration);
   }
 
-  public Optional<ConfigurationInstance> getConfiguration(Pair<ComponentLocation, String> locationAndEventId) {
-    return locationSpecificContext.get(locationAndEventId).getConfiguration();
+  public Optional<ConfigurationInstance> getConfiguration(ComponentLocation location, String eventId) {
+    return locationSpecificContext.get(new Pair<>(location, eventId)).getConfiguration();
   }
 
-  public void setOperationExecutionParams(Pair<ComponentLocation, String> locationAndEventId,
+  public void setOperationExecutionParams(ComponentLocation location, String eventId,
                                           Optional<ConfigurationInstance> configuration,
                                           Map<String, Object> parameters, CoreEvent operationEvent, ExecutorCallback callback) {
-    locationSpecificContext.get(locationAndEventId).setOperationExecutionParams(configuration, parameters, operationEvent,
-                                                                                callback);
+    locationSpecificContext.get(new Pair<>(location, eventId)).setOperationExecutionParams(configuration, parameters,
+                                                                                           operationEvent,
+                                                                                           callback);
   }
 
-  public OperationExecutionParams getOperationExecutionParams(Pair<ComponentLocation, String> locationAndEventId) {
-    return locationSpecificContext.get(locationAndEventId).getOperationExecutionParams();
+  public OperationExecutionParams getOperationExecutionParams(ComponentLocation location, String eventId) {
+    return locationSpecificContext.get(new Pair<>(location, eventId)).getOperationExecutionParams();
   }
 
-  public Map<String, Object> getResolutionResult(Pair<ComponentLocation, String> locationAndEventId) {
-    return locationSpecificContext.get(locationAndEventId).getResolutionResult();
+  public Map<String, Object> getResolutionResult(ComponentLocation location, String eventId) {
+    return locationSpecificContext.get(new Pair<>(location, eventId)).getResolutionResult();
   }
 
-  public void setResolutionResult(Pair<ComponentLocation, String> locationAndEventId, Map<String, Object> resolutionResult) {
-    locationSpecificContext.get(locationAndEventId).setResolutionResult(resolutionResult);
+  public void setResolutionResult(ComponentLocation location, String eventId, Map<String, Object> resolutionResult) {
+    locationSpecificContext.get(new Pair<>(location, eventId)).setResolutionResult(resolutionResult);
   }
 
-  public OperationPolicy getPolicyToApply(Pair<ComponentLocation, String> locationAndEventId) {
-    return locationSpecificContext.get(locationAndEventId).getPolicyToApply();
+  public OperationPolicy getPolicyToApply(ComponentLocation location, String eventId) {
+    return locationSpecificContext.get(new Pair<>(location, eventId)).getPolicyToApply();
   }
 
-  public void setPolicyToApply(Pair<ComponentLocation, String> locationAndEventId, OperationPolicy policyToApply) {
-    locationSpecificContext.get(locationAndEventId).setPolicyToApply(policyToApply);
+  public void setPolicyToApply(ComponentLocation location, String eventId, OperationPolicy policyToApply) {
+    locationSpecificContext.get(new Pair<>(location, eventId)).setPolicyToApply(policyToApply);
   }
 
   /**
    * @return {@code true} if the policy to be applied is a no-op, {@code false} if a policy is actually applied.
    */
-  public boolean isNoPolicyOperation(Pair<ComponentLocation, String> locationAndEventId) {
-    return DefaultPolicyManager.isNoPolicyOperation(getPolicyToApply(locationAndEventId));
+  public boolean isNoPolicyOperation(ComponentLocation location, String eventId) {
+    return DefaultPolicyManager.isNoPolicyOperation(getPolicyToApply(location, eventId));
   }
 
   public Function<Context, Context> getInnerChainSubscriberContextMapping() {

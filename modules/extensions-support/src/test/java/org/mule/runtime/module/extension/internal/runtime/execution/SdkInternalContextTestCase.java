@@ -35,18 +35,18 @@ public class SdkInternalContextTestCase extends AbstractMuleTestCase {
   public void contextSharedOnParallelRoutes() throws MuleException {
     final SdkInternalContext ctx = new SdkInternalContext();
 
-    final Pair<ComponentLocation, String> comp1 = new Pair<>(fromSingleComponent("comp1"), "event1");
-    final Pair<ComponentLocation, String> comp2 = new Pair<>(fromSingleComponent("comp2"), "event1");
+    final ComponentLocation comp1 = fromSingleComponent("comp1");
+    final ComponentLocation comp2 = fromSingleComponent("comp2");
 
     final List<Pair<ComponentLocation, String>> completedForComponents = new ArrayList<>();
 
-    pushContext(ctx, comp1, completedForComponents);
-    pushContext(ctx, comp2, completedForComponents);
+    pushContext(ctx, comp1, "event1", completedForComponents);
+    pushContext(ctx, comp2, "event1", completedForComponents);
 
-    ctx.getOperationExecutionParams(comp1).getCallback().complete(comp1);
-    ctx.getOperationExecutionParams(comp2).getCallback().complete(comp2);
+    ctx.getOperationExecutionParams(comp1, "event1").getCallback().complete(comp1);
+    ctx.getOperationExecutionParams(comp2, "event1").getCallback().complete(comp2);
 
-    assertThat(completedForComponents, contains(comp1, comp2));
+    assertThat(completedForComponents, contains(new Pair<>(comp1, "event1"), new Pair<>(comp2, "event1")));
   }
 
   @Test
@@ -55,29 +55,28 @@ public class SdkInternalContextTestCase extends AbstractMuleTestCase {
   public void contextSharedOnParallelEvents() throws MuleException {
     final SdkInternalContext ctx = new SdkInternalContext();
 
-    final Pair<ComponentLocation, String> comp1a = new Pair<>(fromSingleComponent("comp1"), "event1");
-    final Pair<ComponentLocation, String> comp1b = new Pair<>(fromSingleComponent("comp1"), "event2");
+    final ComponentLocation comp1 = fromSingleComponent("comp1");
 
     final List<Pair<ComponentLocation, String>> completedForComponents = new ArrayList<>();
 
-    pushContext(ctx, comp1a, completedForComponents);
-    pushContext(ctx, comp1b, completedForComponents);
+    pushContext(ctx, comp1, "event1", completedForComponents);
+    pushContext(ctx, comp1, "event2", completedForComponents);
 
-    ctx.getOperationExecutionParams(comp1a).getCallback().complete(comp1a);
-    ctx.getOperationExecutionParams(comp1b).getCallback().complete(comp1b);
+    ctx.getOperationExecutionParams(comp1, "event1").getCallback().complete(comp1);
+    ctx.getOperationExecutionParams(comp1, "event2").getCallback().complete(comp1);
 
-    assertThat(completedForComponents, contains(comp1a, comp1b));
+    assertThat(completedForComponents, contains(new Pair<>(comp1, "event1"), new Pair<>(comp1, "event2")));
   }
 
-  private void pushContext(final SdkInternalContext ctx, final Pair<ComponentLocation, String> location,
+  private void pushContext(final SdkInternalContext ctx, ComponentLocation location, String eventId,
                            final List<Pair<ComponentLocation, String>> completedForComponents)
       throws MuleException {
-    ctx.putContext(location);
-    ctx.setOperationExecutionParams(location, empty(), emptyMap(), testEvent(), new ExecutorCallback() {
+    ctx.putContext(location, eventId);
+    ctx.setOperationExecutionParams(location, eventId, empty(), emptyMap(), testEvent(), new ExecutorCallback() {
 
       @Override
       public void complete(Object value) {
-        completedForComponents.add(location);
+        completedForComponents.add(new Pair<>(location, eventId));
       }
 
       @Override
