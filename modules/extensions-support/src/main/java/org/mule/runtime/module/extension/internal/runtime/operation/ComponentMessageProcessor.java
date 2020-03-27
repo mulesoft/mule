@@ -271,15 +271,16 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           Flux<CoreEvent> transformed = createOuterFlux(from(publisher), localOperatorErrorHook, async, ctx)
               .doOnNext(result -> {
                 result.apply(me -> {
+                  final CoreEvent event = ((MessagingException) me).getEvent();
                   final SdkInternalContext sdkCtx =
-                      from(((MessagingException) me).getEvent());
+                      from(event);
                   if (sdkCtx != null) {
-                    sdkCtx.removeContext(location);
+                    sdkCtx.removeContext(location, event.getContext().getId());
                   }
                 }, response -> {
                   final SdkInternalContext sdkCtx = from(response);
                   if (sdkCtx != null) {
-                    sdkCtx.removeContext(location);
+                    sdkCtx.removeContext(location, response.getContext().getId());
                   }
                 });
               })
@@ -353,7 +354,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                 }
               };
 
-              if (!async && from(event).isNoPolicyOperation(getLocation())) {
+              if (!async && from(event).isNoPolicyOperation(getLocation(), event.getContext().getId())) {
                 onEventSynchronous(event, executorCallback, ctx);
               } else {
                 onEvent(event, executorCallback);
@@ -396,12 +397,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     try {
       SdkInternalContext sdkInternalContext = from(event);
       final ComponentLocation location = getLocation();
+      final String eventId = event.getContext().getId();
 
-      final Optional<ConfigurationInstance> configuration = sdkInternalContext.getConfiguration(location);
-      final Map<String, Object> resolutionResult = sdkInternalContext.getResolutionResult(location);
+      final Optional<ConfigurationInstance> configuration = sdkInternalContext.getConfiguration(location, eventId);
+      final Map<String, Object> resolutionResult = sdkInternalContext.getResolutionResult(location, eventId);
 
       OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent, callback) -> {
-        sdkInternalContext.setOperationExecutionParams(location, configuration, parameters, operationEvent, callback);
+        sdkInternalContext.setOperationExecutionParams(location, eventId, configuration, parameters, operationEvent, callback);
 
         fluxSupplier.get().next(operationEvent);
       };
@@ -409,7 +411,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       if (location != null) {
         ((DefaultFlowCallStack) event.getFlowCallStack())
             .setCurrentProcessorPath(resolvedProcessorRepresentation);
-        sdkInternalContext.getPolicyToApply(location)
+        sdkInternalContext.getPolicyToApply(location, eventId)
             .process(event, operationExecutionFunction, () -> resolutionResult, location, executorCallback);
       } else {
         // If this operation has no component location then it is internal. Don't apply policies on internal operations.
@@ -424,12 +426,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     try {
       SdkInternalContext sdkInternalContext = from(event);
       final ComponentLocation location = getLocation();
+      final String eventId = event.getContext().getId();
 
-      final Optional<ConfigurationInstance> configuration = sdkInternalContext.getConfiguration(location);
-      final Map<String, Object> resolutionResult = sdkInternalContext.getResolutionResult(location);
+      final Optional<ConfigurationInstance> configuration = sdkInternalContext.getConfiguration(location, eventId);
+      final Map<String, Object> resolutionResult = sdkInternalContext.getResolutionResult(location, eventId);
 
       OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent, callback) -> {
-        sdkInternalContext.setOperationExecutionParams(location, configuration, parameters, operationEvent, callback);
+        sdkInternalContext.setOperationExecutionParams(location, eventId, configuration, parameters, operationEvent, callback);
 
         prepareAndExecuteOperation(event, () -> callback, ctx);
       };
@@ -591,14 +594,14 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
               .transform(processingStrategy.onProcessor(innerProcessor))
               .doOnNext(result -> {
                 from(result)
-                    .getOperationExecutionParams(getLocation())
+                    .getOperationExecutionParams(getLocation(), result.getContext().getId())
                     .getCallback().complete(result);
               })
               .onErrorContinue((t, result) -> {
                 final CoreEvent event = ((EventProcessingException) t).getEvent();
 
                 from(event)
-                    .getOperationExecutionParams(getLocation())
+                    .getOperationExecutionParams(getLocation(), event.getContext().getId())
                     .getCallback().error(((EventProcessingException) t).getCause());
               })));
     },
@@ -613,8 +616,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
 
     final ComponentLocation location = getLocation();
+    final String eventId = event.getContext().getId();
 
-    sdkInternalContext.putContext(location);
+    sdkInternalContext.putContext(location, eventId);
 
     if (hasNestedChain
         && (ctx.hasKey(POLICY_NEXT_OPERATION) || ctx.hasKey(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS))) {
@@ -630,10 +634,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       });
     }
 
-    sdkInternalContext.setConfiguration(location, resolveConfiguration(event));
-    final Map<String, Object> resolutionResult = getResolutionResult(event, sdkInternalContext.getConfiguration(location));
-    sdkInternalContext.setResolutionResult(location, resolutionResult);
-    sdkInternalContext.setPolicyToApply(location, location != null
+    sdkInternalContext.setConfiguration(location, eventId, resolveConfiguration(event));
+    final Map<String, Object> resolutionResult =
+        getResolutionResult(event, sdkInternalContext.getConfiguration(location, eventId));
+    sdkInternalContext.setResolutionResult(location, eventId, resolutionResult);
+    sdkInternalContext.setPolicyToApply(location, eventId, location != null
         ? policyManager.createOperationPolicy(this, event, () -> resolutionResult)
         : noPolicyOperation());
 
@@ -641,7 +646,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private void prepareAndExecuteOperation(CoreEvent event, Supplier<ExecutorCallback> callbackSupplier, Context ctx) {
-    OperationExecutionParams oep = from(event).getOperationExecutionParams(getLocation());
+    OperationExecutionParams oep = from(event).getOperationExecutionParams(getLocation(), event.getContext().getId());
 
     final Scheduler currentScheduler = (Scheduler) ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY)
         .orElse(IMMEDIATE_SCHEDULER);
