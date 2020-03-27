@@ -42,17 +42,8 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
   protected static final Logger logger = LoggerFactory.getLogger(DomainClassLoaderFactory.class);
 
   private final ClassLoader containerClassLoader;
-  private NativeLibraryFinderFactory nativeLibraryFinderFactory;
+  private final NativeLibraryFinderFactory nativeLibraryFinderFactory;
   private Map<String, ArtifactClassLoader> domainArtifactClassLoaders = new HashMap<>();
-
-  /**
-   * Creates a new instance
-   *
-   * @param containerClassLoader parent classLoader of the created instance. Can be null.
-   */
-  public DomainClassLoaderFactory(ClassLoader containerClassLoader) {
-    this(containerClassLoader, null);
-  }
 
   /**
    * Creates a new instance
@@ -63,6 +54,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
    */
   public DomainClassLoaderFactory(ClassLoader containerClassLoader, NativeLibraryFinderFactory nativeLibraryFinderFactory) {
     checkArgument(containerClassLoader != null, "parentClassLoader cannot be null");
+    checkArgument(nativeLibraryFinderFactory != null, "nativeLibraryFinderFactory cannot be null");
     this.containerClassLoader = containerClassLoader;
     this.nativeLibraryFinderFactory = nativeLibraryFinderFactory;
   }
@@ -92,11 +84,8 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
           if (descriptor.getName().equals(DEFAULT_DOMAIN_NAME)) {
             domainClassLoader = getDefaultDomainClassLoader(parent, parent.getClassLoaderLookupPolicy());
           } else {
-            NativeLibraryFinder nativeLibraryFinder = null;
-            if (nativeLibraryFinderFactory != null) {
-              nativeLibraryFinder = nativeLibraryFinderFactory.create(descriptor.getDataFolderName(),
-                                                                      descriptor.getClassLoaderModel().getUrls());
-            }
+            NativeLibraryFinder nativeLibraryFinder =
+                nativeLibraryFinderFactory.create(descriptor.getDataFolderName(), descriptor.getClassLoaderModel().getUrls());
             domainClassLoader = getCustomDomainClassLoader(parent, descriptor, artifactClassLoaders, nativeLibraryFinder);
           }
 
