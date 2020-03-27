@@ -76,15 +76,15 @@ public class AsyncHeisenbergSource extends HeisenbergSource {
 
     if (error != null) {
       LOGGER.error(error);
-    if (error.getErrorMessage() != null) {
-      LOGGER.error(error.getErrorMessage());
+      if (error.getErrorMessage() != null) {
+        LOGGER.error(error.getErrorMessage());
+      }
+      if (error.getCause() != null) {
+        LOGGER.error("Async onError() - Cause");
+        LOGGER.error(error.getCause());
+        LOGGER.error(error.getCause().getMessage());
+      }
     }
-    if (error.getCause() != null) {
-      LOGGER.error("Async onError() - Cause");
-      LOGGER.error(error.getCause());
-      LOGGER.error(error.getCause().getMessage());
-    }
-  }
 
     AsyncHeisenbergSource.completionCallback = completionCallback;
 
