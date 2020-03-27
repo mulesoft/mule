@@ -113,6 +113,51 @@ public class RxUtils {
     requireNonNull(errorCallback, "'errorCallback' must not be null");
 
     return doPropagateCompletion(upstream, downstream, transformer,
+                                 new AtomicInteger(0),
+                                 Once.of(completionCallback), Once.of(errorCallback),
+                                 () -> null);
+  }
+
+  /**
+   * As {@link #subscribeFluxOnPublisherSubscription(Flux, Flux)}, but also propagates completion and cancellation events in the
+   * upstream to the downstream.
+   * <p>
+   * Internal state is kept so that any pending items still being processed are waited for before propagating any completion or
+   * cancellation event, while it may also wait for executions happening aoutside of this method. This implementation will not
+   * reject new items after receiving the completion or cancellation event. It is up to the caller to avoid sending new items to
+   * be processed when completion or cancellation is expected.
+   * <p>
+   * Upon termination of the {@code upstream}, the downstream will be terminated as well when there are no more inflight events,
+   * or after {@code completionTimeoutMillis} have elapsed, canceling the inflight events.
+   *
+   * @param upstream the source of the items, completion of cancellation events to be processed and propagated downstream.
+   * @param downstream the downstream that will receive the items, completion of cancellation events, as well as trigger the
+   *        subscription to upstream.
+   * @param transformer the data transformation to be done on the items of upstream. If any items are in any operators of this
+   *        transformation when a completion or cancellation event is received, that event will wait for any in-flight events to
+   *        finish.
+   * @param inflightCounter a counter where externally executing items may be accounted for, to avoid premature completion of the
+   *        downstream flux.
+   * @param completionCallback how a completion event will be triggered on the downstream.
+   * @param errorCallback how a cancellation event will be triggered on the downstream.
+   * @param completionTimeoutMillis how long to wait for pending items to finish processing before actually propagating the
+   *        completion or cancellation downstream.
+   * @param delayedExecutor the executor that will delay the completion or cancellation propagation when there are pending items
+   * @return an enriched downstream where items and events will be triggered according to the rules defined for this method.
+   */
+  public static <T, U> Publisher<T> propagateCompletion(Publisher<U> upstream, Publisher<T> downstream,
+                                                        Function<Publisher<U>, Publisher<T>> transformer,
+                                                        AtomicInteger inflightCounter,
+                                                        CheckedRunnable completionCallback,
+                                                        CheckedConsumer<Throwable> errorCallback) {
+    requireNonNull(upstream, "'upstream' must not be null");
+    requireNonNull(downstream, "'downstream' must not be null");
+    requireNonNull(transformer, "'transformer' must not be null");
+    requireNonNull(completionCallback, "'completionCallback' must not be null");
+    requireNonNull(errorCallback, "'errorCallback' must not be null");
+
+    return doPropagateCompletion(upstream, downstream, transformer,
+                                 inflightCounter,
                                  Once.of(completionCallback), Once.of(errorCallback),
                                  () -> null);
   }
@@ -156,16 +201,17 @@ public class RxUtils {
     final RunOnce completer = Once.of(completionCallback);
     final ConsumeOnce<Throwable> errorForwarder = Once.of(errorCallback);
 
-    return doPropagateCompletion(upstream, downstream, transformer, completer, errorForwarder,
+    return doPropagateCompletion(upstream, downstream, transformer,
+                                 new AtomicInteger(0), completer, errorForwarder,
                                  () -> delayedExecutor.schedule(() -> completer.runOnce(), completionTimeoutMillis,
                                                                 MILLISECONDS));
   }
 
   private static <T, U> Publisher<T> doPropagateCompletion(Publisher<U> upstream, Publisher<T> downstream,
                                                            Function<Publisher<U>, Publisher<T>> transformer,
+                                                           AtomicInteger inflightCounter,
                                                            final RunOnce completer, final ConsumeOnce<Throwable> errorForwarder,
                                                            final Supplier<ScheduledFuture<?>> scheduleCompletion) {
-    AtomicInteger inflightCounter = new AtomicInteger(0);
     AtomicBoolean upstreamComplete = new AtomicBoolean(false);
     AtomicReference<Throwable> upstreamError = new AtomicReference<>();
 

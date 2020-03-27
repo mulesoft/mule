@@ -25,7 +25,7 @@ import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStream
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
-import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
@@ -77,6 +77,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -175,25 +176,32 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
       return subscriberContext()
           .flatMapMany(ctx -> {
+            // take into account events that might still be in an error handler to keep the flux from completing until those are
+            // finished.
+            final AtomicInteger inflightEvents = new AtomicInteger();
+
             final Consumer<Exception> errorRouter = messagingExceptionHandler
                 .router(pub -> from(pub).subscriberContext(ctx),
                         handled -> errorSwitchSinkSinkRef.next(right(handled)),
                         rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class)));
 
-            final Flux<Either<MessagingException, CoreEvent>> upstream =
-                from(doApply(publisher, interceptors, (context, throwable) -> errorRouter.accept(throwable)))
-                    // This Either here is used to propagate errors. If the error is sent directly through the merged Flux,
-                    // it will be cancelled, ignoring the onErrorContinue of the parent Flux.
-                    .map(event -> right(MessagingException.class, event))
-                    .doOnNext(r -> errorSwitchSinkSinkRef.next(r))
-                    .doOnError(t -> errorSwitchSinkSinkRef.error(t))
-                    .doOnComplete(() -> errorSwitchSinkSinkRef.complete())
-                    .doOnTerminate(() -> disposeIfNeeded(errorRouter, LOGGER));
+            final Flux<CoreEvent> upstream =
+                from(doApply(publisher, interceptors, (context, throwable) -> {
+                  inflightEvents.incrementAndGet();
+                  errorRouter.accept(throwable);
+                }));
 
-            return subscribeFluxOnPublisherSubscription(errorSwitchSinkSinkRef.flux()
-                .map(result -> result.reduce(me -> {
-                  throw propagateWrappingFatal(me);
-                }, response -> response)), upstream);
+            return from(propagateCompletion(upstream, errorSwitchSinkSinkRef.flux(),
+                                            pub -> from(pub)
+                                                .map(event -> right(MessagingException.class, event))
+                                                .doOnNext(r -> errorSwitchSinkSinkRef.next(r)),
+                                            inflightEvents,
+                                            () -> errorSwitchSinkSinkRef.complete(),
+                                            t -> errorSwitchSinkSinkRef.error(t)))
+                                                .map(result -> result.reduce(me -> {
+                                                  throw propagateWrappingFatal(me);
+                                                }, response -> response))
+                                                .doOnTerminate(() -> disposeIfNeeded(errorRouter, LOGGER));
           });
 
     } else {
