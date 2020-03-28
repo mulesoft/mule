@@ -45,16 +45,25 @@ public class CompositeClassLoader extends ClassLoader {
   }
 
   @Override
-  public Class<?> loadClass(String name) throws ClassNotFoundException {
+  protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+    Class<?> result = null;
     ClassNotFoundException firstException = null;
     for (ClassLoader classLoader : delegates) {
       try {
-        return classLoader.loadClass(name);
+        result = classLoader.loadClass(name);
+        break;
       } catch (ClassNotFoundException e) {
         firstException = e;
       }
     }
-    throw firstException;
+    if (result == null) {
+      throw firstException;
+    }
+
+    if (resolve) {
+      resolveClass(result);
+    }
+    return result;
   }
 
   @Override
