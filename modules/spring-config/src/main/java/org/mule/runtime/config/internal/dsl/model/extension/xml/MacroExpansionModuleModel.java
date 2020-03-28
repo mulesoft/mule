@@ -17,6 +17,7 @@ import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NA
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -197,6 +198,7 @@ public class MacroExpansionModuleModel {
             .namespace(extensionModel.getXmlDslModel().getPrefix())
             .name(DEFAULT_GLOBAL_ELEMENTS).build())
         .build();
+    configRefModel.setComponentLocation(fromSingleComponent(DEFAULT_GLOBAL_ELEMENTS));
 
     globalElements.forEach(globalElementComponenModel -> {
       final ComponentModel macroExpandedImplicitGlobalElement =

@@ -440,13 +440,17 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     final Predicate<? super ComponentAst> languageConstructPredicate =
         componentModel -> beanDefinitionFactory.isLanguageConstructComponent(componentModel.getIdentifier());
 
-    return new ArtifactAst() {
+    final ArtifactAst predicatedModel = graph.minimalArtifactFor(basePredicate
+        .or(txManagerPredicate)
+        .or(configPredicate)
+        .or(alwaysEnabledPredicate)
+        .or(languageConstructPredicate));
 
-      final ArtifactAst predicatedModel = graph.minimalArtifactFor(basePredicate
-          .or(txManagerPredicate)
-          .or(configPredicate)
-          .or(alwaysEnabledPredicate)
-          .or(languageConstructPredicate));
+    final Set<String> allNamespaces = predicatedModel.recursiveStream()
+        .map(comp -> comp.getIdentifier().getNamespaceUri())
+        .collect(toSet());
+
+    return new ArtifactAst() {
 
       @Override
       public Stream<ComponentAst> topLevelComponentsStream() {
@@ -471,8 +475,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       }
 
       private Stream<ComponentAst> getDefaultGlobalElements() {
+        // defaultGlobalElements from XML DSK components are not referenced from the app, so we need to initialize those if there
+        // is any operation that may use it in the app.
         return applicationModel.topLevelComponentsStream()
-            .filter(comp -> DEFAULT_GLOBAL_ELEMENTS.equals(comp.getIdentifier().getName()))
+            .filter(comp -> DEFAULT_GLOBAL_ELEMENTS.equals(comp.getIdentifier().getName())
+                && allNamespaces.contains(comp.getIdentifier().getNamespaceUri()))
             .flatMap(comp -> comp.directChildrenStream());
       }
     };
