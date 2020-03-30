@@ -1,13 +1,13 @@
 {
-  "title" : "Mule Config",
-  "type" : "object",
-  "properties" : {
-    "maven" : {
-      "type" : "object",
-      "properties" : {
-        "repositories" : {
-          "description" : "Map of maven repositories to access for fetching maven artifacts. If not defined and no settings.xml provided with remote repositories, then the mule runtime will work in offline mode",
-          "type" : "object",
+  "title": "Mule Config",
+  "type": "object",
+  "properties": {
+    "maven": {
+      "type": "object",
+      "properties": {
+        "repositories": {
+          "description": "Map of maven repositories to access for fetching maven artifacts. If not defined and no settings.xml provided with remote repositories, then the mule runtime will work in offline mode",
+          "type": "object",
           "additionalProperties": {
             "type": "object",
             "properties": {
@@ -52,87 +52,106 @@
                 }
               }
             },
-            "required" : ["url"]
+            "required": [
+              "url"
+            ]
           }
         },
-        "globalSettingsLocation" : {
-          "description" : "Location of the maven global settings.xml file. It can be a classpath reference in which case the file can be placed in the MULE_HOME/conf folder or an absolute path to the file. If defined, the repositories and proxies configured on it will be used by the runtime",
-          "type" : "string"
+        "globalSettingsLocation": {
+          "description": "Location of the maven global settings.xml file. It can be a classpath reference in which case the file can be placed in the MULE_HOME/conf folder or an absolute path to the file. If defined, the repositories and proxies configured on it will be used by the runtime",
+          "type": "string"
         },
-        "userSettingsLocation" : {
-          "description" : "Location of the maven user settings.xml file. It can be a classpath reference in which case the file can be placed in the MULE_HOME/conf folder or an absolute path to the file. If defined, the repositories and proxies configured on it will be used by the runtime. If a global settings is configured, it will be merged with the user settings",
-          "type" : "string"
+        "userSettingsLocation": {
+          "description": "Location of the maven user settings.xml file. It can be a classpath reference in which case the file can be placed in the MULE_HOME/conf folder or an absolute path to the file. If defined, the repositories and proxies configured on it will be used by the runtime. If a global settings is configured, it will be merged with the user settings",
+          "type": "string"
         },
-        "settingsSecurityLocation" : {
-          "description" : "Location of the maven settings-security.xml file. It can be a classpath reference in which case the file can be placed in the MULE_HOME/conf folder or an absolute path to the file. If defined, the encrypted passwords for servers on user and global settings will be decrypted using the master password defined on this file",
-          "type" : "string"
+        "settingsSecurityLocation": {
+          "description": "Location of the maven settings-security.xml file. It can be a classpath reference in which case the file can be placed in the MULE_HOME/conf folder or an absolute path to the file. If defined, the encrypted passwords for servers on user and global settings will be decrypted using the master password defined on this file",
+          "type": "string"
         },
-        "repositoryLocation" : {
-          "description" : "Repository location for the mule runtime to use. If not provided it will be the MULE_HOME/repository folder"
+        "repositoryLocation": {
+          "description": "Repository location for the mule runtime to use. If not provided it will be the MULE_HOME/repository folder"
         },
-        "ignoreArtifactDescriptorRepositories" : {
-          "description" : "Flag to ignore additional repositories from artifact descriptors, false to merge those with the originally specified remote repositories. Default value is true"
+        "ignoreArtifactDescriptorRepositories": {
+          "description": "Flag to ignore additional repositories from artifact descriptors, false to merge those with the originally specified remote repositories. Default value is true"
         },
-        "offLineMode" : {
-          "description" : "Flag to control whether the repository system operates in offline mode and avoids/refuses any access to remote repositories"
+        "offLineMode": {
+          "description": "Flag to control whether the repository system operates in offline mode and avoids/refuses any access to remote repositories"
         },
         "forcePolicyUpdateNever": {
           "description": "Flag to control whether the repository system operates with an UPDATE_POLICY_NEVER for SNAPSHOTS. By default it is set to false. This is the equivalent to {@code -nsu} option for Maven CLI"
         },
         "forcePolicyUpdateAlways": {
           "description": "Flag to control whether the repository system operates with an UPDATE_POLICY_ALWAYS for SNAPSHOTS. By default it is set to false. This is the equivalent to {@code -U} option for Maven CLI. This value is ignored if {@code forcePolicyUpdateNever} is set to {@code true}"
-        }
-      }
-    },
-    "cluster" : {
-      "type" : "object",
-      "properties" : {
-        "objectStore" : {
-          "description" : "Configuration for Object Stores implementation for clustering",
-          "type" : "object",
-          "enabled": {
-            "type": "boolean",
-            "defaultValue": "true",
-            "description": "If true and if cluster is configured then the object store (org.mule.runtime.api.store.ObjectStore) implementation of the runtime will be overwritten with the Mule EE cluster implementation"
-          }
         },
-        "lockFactory" : {
-          "description" : "Configuration for Lock Factory implementation for clustering",
-          "type" : "object",
-          "enabled": {
-            "type": "boolean",
-            "defaultValue": "true",
-            "description": "If true and if cluster is configured then the lock factory (org.mule.runtime.api.lock.LockFactory) implementation of the runtime will be overwritten with the Mule EE cluster implementation"
-          }
-        },
-        "timeSupplier" : {
-          "description" : "Configuration for Time Supplier implementation for clustering",
-          "type" : "object",
-          "enabled": {
-            "type": "boolean",
-            "defaultValue": "true",
-            "description": "If true and if cluster is configured then the time supplier (org.mule.runtime.api.time.TimeSupplier) implementation of the runtime will be overwritten with the Mule EE cluster implementation"
-          }
-        },
-        "queueManager" : {
-          "description" : "Configuration for Queue Manager implementation for clustering",
-          "type" : "object",
-          "enabled": {
-            "type": "boolean",
-            "defaultValue": "true",
-            "description": "If true and if cluster is configured then the queue manager (org.mule.runtime.core.api.util.queue.QueueManager) implementation of the runtime will be overwritten with the Mule EE cluster implementation"
-          }
-        },
-        "clusterService" : {
-          "description" : "Configuration for Cluster Service implementation for clustering",
-          "type" : "object",
-          "enabled": {
-            "type": "boolean",
-            "defaultValue": "true",
-            "description": "If true and if cluster is configured then the cluster service (org.mule.runtime.api.cluster.ClusterService) implementation of the runtime will be overwritten with the Mule EE cluster implementation"
+        "userProperties": {
+          "description": "Object that represents user properties that come from command line -Dproperty=value",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "description": "Name for the property",
+                "type": "string"
+              }
+            },
+            "required": [
+              "value"
+            ]
           }
         }
       }
     }
+  },
+  "cluster": {
+    "type": "object",
+    "properties": {
+      "objectStore": {
+        "description": "Configuration for Object Stores implementation for clustering",
+        "type": "object",
+        "enabled": {
+          "type": "boolean",
+          "defaultValue": "true",
+          "description": "If true and if cluster is configured then the object store (org.mule.runtime.api.store.ObjectStore) implementation of the runtime will be overwritten with the Mule EE cluster implementation"
+        }
+      },
+      "lockFactory": {
+        "description": "Configuration for Lock Factory implementation for clustering",
+        "type": "object",
+        "enabled": {
+          "type": "boolean",
+          "defaultValue": "true",
+          "description": "If true and if cluster is configured then the lock factory (org.mule.runtime.api.lock.LockFactory) implementation of the runtime will be overwritten with the Mule EE cluster implementation"
+        }
+      },
+      "timeSupplier": {
+        "description": "Configuration for Time Supplier implementation for clustering",
+        "type": "object",
+        "enabled": {
+          "type": "boolean",
+          "defaultValue": "true",
+          "description": "If true and if cluster is configured then the time supplier (org.mule.runtime.api.time.TimeSupplier) implementation of the runtime will be overwritten with the Mule EE cluster implementation"
+        }
+      },
+      "queueManager": {
+        "description": "Configuration for Queue Manager implementation for clustering",
+        "type": "object",
+        "enabled": {
+          "type": "boolean",
+          "defaultValue": "true",
+          "description": "If true and if cluster is configured then the queue manager (org.mule.runtime.core.api.util.queue.QueueManager) implementation of the runtime will be overwritten with the Mule EE cluster implementation"
+        }
+      },
+      "clusterService": {
+        "description": "Configuration for Cluster Service implementation for clustering",
+        "type": "object",
+        "enabled": {
+          "type": "boolean",
+          "defaultValue": "true",
+          "description": "If true and if cluster is configured then the cluster service (org.mule.runtime.api.cluster.ClusterService) implementation of the runtime will be overwritten with the Mule EE cluster implementation"
+        }
+      }
+    }
   }
+}
 }
