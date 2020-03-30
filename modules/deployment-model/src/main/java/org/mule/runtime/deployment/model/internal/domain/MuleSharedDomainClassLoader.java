@@ -11,6 +11,7 @@ import static org.mule.runtime.deployment.model.internal.domain.DomainClassLoade
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleConfDir;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
@@ -35,11 +36,33 @@ public class MuleSharedDomainClassLoader extends MuleDeployableArtifactClassLoad
 
   private static final Logger LOGGER = getLogger(MuleSharedDomainClassLoader.class);
 
+  private NativeLibraryFinder nativeLibraryFinder;
+
   public MuleSharedDomainClassLoader(ArtifactDescriptor artifactDescriptor, ClassLoader parent,
                                      ClassLoaderLookupPolicy lookupPolicy, List<URL> urls,
                                      List<ArtifactClassLoader> artifactPluginClassLoaders) {
+    this(artifactDescriptor, parent, lookupPolicy, urls, artifactPluginClassLoaders, null);
+  }
+
+  public MuleSharedDomainClassLoader(ArtifactDescriptor artifactDescriptor, ClassLoader parent,
+                                     ClassLoaderLookupPolicy lookupPolicy, List<URL> urls,
+                                     List<ArtifactClassLoader> artifactPluginClassLoaders,
+                                     NativeLibraryFinder nativeLibraryFinder) {
     super(getDomainId(artifactDescriptor.getName()), artifactDescriptor, urls.toArray(new URL[0]), parent, lookupPolicy,
           artifactPluginClassLoaders);
+    this.nativeLibraryFinder = nativeLibraryFinder;
+  }
+
+  @Override
+  protected String findLibrary(String name) {
+    if (nativeLibraryFinder == null) {
+      return super.findLibrary(name);
+    }
+    String libraryPath = super.findLibrary(name);
+
+    libraryPath = nativeLibraryFinder.findLibrary(name, libraryPath);
+
+    return libraryPath;
   }
 
   @Override
