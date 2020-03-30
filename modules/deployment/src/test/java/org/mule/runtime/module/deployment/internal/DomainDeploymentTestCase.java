@@ -48,6 +48,8 @@ import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
+import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
+import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
@@ -1104,7 +1106,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
     TestDomainFactory testDomainFactory =
-        TestDomainFactory.createDomainFactory(new DomainClassLoaderFactory(containerClassLoader.getClassLoader()),
+        TestDomainFactory.createDomainFactory(new DomainClassLoaderFactory(containerClassLoader.getClassLoader(),
+                                                                           getNativeLibraryFinderFactory()),
                                               containerClassLoader, serviceManager, moduleRepository,
                                               createDescriptorLoaderRepository());
     testDomainFactory.setFailOnStopApplication();
@@ -1126,7 +1129,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     addPackedDomainFromBuilder(emptyDomainFileBuilder);
 
     TestDomainFactory testDomainFactory =
-        TestDomainFactory.createDomainFactory(new DomainClassLoaderFactory(containerClassLoader.getClassLoader()),
+        TestDomainFactory.createDomainFactory(new DomainClassLoaderFactory(containerClassLoader.getClassLoader(),
+                                                                           getNativeLibraryFinderFactory()),
                                               containerClassLoader, serviceManager, moduleRepository,
                                               createDescriptorLoaderRepository());
     testDomainFactory.setFailOnDisposeApplication();
@@ -1850,6 +1854,10 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     } else {
       deploymentService.redeployDomain(id, deploymentProperties);
     }
+  }
+
+  private NativeLibraryFinderFactory getNativeLibraryFinderFactory() {
+    return new DefaultNativeLibraryFinderFactory();
   }
 
 }
