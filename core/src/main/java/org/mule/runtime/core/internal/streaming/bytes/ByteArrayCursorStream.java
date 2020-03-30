@@ -51,6 +51,12 @@ public class ByteArrayCursorStream extends AbstractCursorStream {
 
   @Override
   protected int doRead(byte[] b, int off, int len) throws IOException {
+    // According with {@link java.io.InputStream} javadoc
+    // "If len is zero, then no bytes are read and 0 is returned"
+    if (len == 0) {
+      return 0;
+    }
+
     final int position = toIntExact(getPosition());
     len = min(len, content.length - position);
 
