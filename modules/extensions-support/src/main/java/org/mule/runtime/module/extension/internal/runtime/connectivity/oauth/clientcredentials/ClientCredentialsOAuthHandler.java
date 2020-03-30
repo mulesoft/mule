@@ -45,9 +45,8 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
   }
 
   public ClientCredentialsOAuthDancer register(ClientCredentialsConfig config, List<ClientCredentialsListener> listeners) {
-    return dancers.computeIfAbsent(config.getOwnerConfigName(),
+    return dancers.computeIfAbsent(config.getConfigIdentifier(),
                                    (CheckedFunction<String, ClientCredentialsOAuthDancer>) k -> createDancer(config, listeners));
-
   }
 
   /**
@@ -56,7 +55,7 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
    * @param config a registered {@link ClientCredentialsConfig}
    */
   public void refreshToken(ClientCredentialsConfig config) {
-    ClientCredentialsOAuthDancer dancer = dancers.get(config.getOwnerConfigName());
+    ClientCredentialsOAuthDancer dancer = dancers.get(config.getConfigIdentifier());
 
     try {
       dancer.refreshToken().get();
@@ -76,7 +75,7 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
    * @return the {@link ResourceOwnerOAuthContext} for the given {@code config}.
    */
   public ResourceOwnerOAuthContext getOAuthContext(ClientCredentialsConfig config) {
-    ClientCredentialsOAuthDancer dancer = dancers.get(config.getOwnerConfigName());
+    ClientCredentialsOAuthDancer dancer = dancers.get(config.getConfigIdentifier());
     if (dancer == null) {
       throw new IllegalStateException(
                                       format("Client Credentials dancer for config '%s' not yet registered",
@@ -106,7 +105,7 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
    * @param config a registered {@link ClientCredentialsConfig}
    */
   public void invalidate(ClientCredentialsConfig config) {
-    ClientCredentialsOAuthDancer dancer = dancers.get(config.getOwnerConfigName());
+    ClientCredentialsOAuthDancer dancer = dancers.get(config.getConfigIdentifier());
     if (dancer == null) {
       return;
     }
