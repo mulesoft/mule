@@ -26,10 +26,8 @@ public class GlobalErrorHandler extends ErrorHandler {
   public ErrorHandler createLocalErrorHandler(Location flowLocation) {
     ErrorHandler local = new ErrorHandler();
     local.setName(this.name);
-    List<MessagingExceptionHandlerAcceptor> listeners =
-        this.getExceptionListeners().stream().map(exceptionListener -> (exceptionListener instanceof TemplateOnErrorHandler)
-            ? ((TemplateOnErrorHandler) exceptionListener).duplicateFor(flowLocation) : exceptionListener).collect(toList());
-    local.setExceptionListeners(listeners);
+    local.setExceptionListeners(this.getExceptionListeners());
+    local.setExceptionListenersLocation(flowLocation);
     return local;
   }
 }
