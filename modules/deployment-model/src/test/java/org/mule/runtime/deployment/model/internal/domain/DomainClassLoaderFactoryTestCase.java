@@ -18,8 +18,13 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleLibFolder;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory.getDomainId;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
+
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
+import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
+import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
 import java.io.File;
@@ -29,6 +34,9 @@ import org.junit.After;
 import org.junit.Test;
 
 public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
+
+  @Rule
+  public TemporaryFolder artifactLocation = new TemporaryFolder();
 
   public DomainClassLoaderFactoryTestCase() throws IOException {}
 
@@ -51,7 +59,7 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
     DomainDescriptor descriptor = getTestDescriptor(DEFAULT_DOMAIN_NAME);
 
     final String artifactId = getDomainId(DEFAULT_DOMAIN_NAME);
-    assertThat(new DomainClassLoaderFactory(getClass().getClassLoader())
+    assertThat(new DomainClassLoaderFactory(getClass().getClassLoader(), getNativeLibraryFinderFactory())
         .create(artifactId, containerClassLoader, descriptor, emptyList())
         .getArtifactId(), is(artifactId));
   }
@@ -64,9 +72,10 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
     descriptor.setRootFolder(createDomainDir(MULE_DOMAIN_FOLDER, domainName));
 
     final ArtifactClassLoader domainClassLoader =
-        new DomainClassLoaderFactory(getClass().getClassLoader()).create(null, containerClassLoader,
-                                                                         descriptor,
-                                                                         emptyList());
+        new DomainClassLoaderFactory(getClass().getClassLoader(), getNativeLibraryFinderFactory()).create(null,
+                                                                                                          containerClassLoader,
+                                                                                                          descriptor,
+                                                                                                          emptyList());
 
     assertThat(domainClassLoader.getClassLoader(), instanceOf(MuleSharedDomainClassLoader.class));
     assertThat(domainClassLoader.getArtifactId(), equalTo(artifactId));
@@ -77,8 +86,8 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
     DomainDescriptor descriptor = getTestDescriptor("someDomain");
     descriptor.setRootFolder(new File("unexistent"));
 
-    new DomainClassLoaderFactory(getClass().getClassLoader()).create(null, containerClassLoader,
-                                                                     descriptor, emptyList());
+    new DomainClassLoaderFactory(getClass().getClassLoader(), getNativeLibraryFinderFactory()).create(null, containerClassLoader,
+                                                                                                      descriptor, emptyList());
   }
 
   @Test
@@ -88,9 +97,10 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
     DomainDescriptor descriptor = getTestDescriptor(domainName);
     descriptor.setRootFolder(createDomainDir(MULE_DOMAIN_FOLDER, domainName));
     ArtifactClassLoader domainClassLoader =
-        new DomainClassLoaderFactory(getClass().getClassLoader()).create(null, containerClassLoader,
-                                                                         descriptor,
-                                                                         emptyList());
+        new DomainClassLoaderFactory(getClass().getClassLoader(), getNativeLibraryFinderFactory()).create(null,
+                                                                                                          containerClassLoader,
+                                                                                                          descriptor,
+                                                                                                          emptyList());
 
     assertThat(domainClassLoader.getClassLoader(), instanceOf(MuleSharedDomainClassLoader.class));
     assertThat(domainClassLoader.getArtifactId(), equalTo(artifactId));
@@ -101,7 +111,7 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
     final String domainName = "custom-domain";
     DomainDescriptor descriptor = getTestDescriptor(domainName);
     descriptor.setRootFolder(createDomainDir(MULE_DOMAIN_FOLDER, domainName));
-    DomainClassLoaderFactory factory = new DomainClassLoaderFactory(getClass().getClassLoader());
+    DomainClassLoaderFactory factory = new DomainClassLoaderFactory(getClass().getClassLoader(), getNativeLibraryFinderFactory());
 
     final ArtifactClassLoader firstDomainClassLoader = factory.create(null, containerClassLoader, descriptor, emptyList());
     final ArtifactClassLoader secondDomainClassLoader = factory.create(null, containerClassLoader, descriptor, emptyList());
@@ -114,7 +124,7 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
     final String domainName = "custom-domain";
     DomainDescriptor descriptor = getTestDescriptor(domainName);
     descriptor.setRootFolder(createDomainDir(MULE_DOMAIN_FOLDER, domainName));
-    DomainClassLoaderFactory factory = new DomainClassLoaderFactory(getClass().getClassLoader());
+    DomainClassLoaderFactory factory = new DomainClassLoaderFactory(getClass().getClassLoader(), getNativeLibraryFinderFactory());
 
     final ArtifactClassLoader firstDomainClassLoader = factory.create(null, containerClassLoader, descriptor, emptyList());
     firstDomainClassLoader.dispose();
@@ -128,7 +138,7 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
     final String domainName = "custom-domain";
     DomainDescriptor descriptor = getTestDescriptor(domainName);
     descriptor.setRootFolder(createDomainDir(MULE_DOMAIN_FOLDER, domainName));
-    DomainClassLoaderFactory factory = new DomainClassLoaderFactory(getClass().getClassLoader());
+    DomainClassLoaderFactory factory = new DomainClassLoaderFactory(getClass().getClassLoader(), getNativeLibraryFinderFactory());
 
     final ArtifactClassLoader firstDomainClassLoader = factory.create(null, containerClassLoader, descriptor, emptyList());
     assertThat(factory.create(null, containerClassLoader, descriptor, emptyList()), is(firstDomainClassLoader));
@@ -145,6 +155,11 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
   private DomainDescriptor getTestDescriptor(String name) {
     DomainDescriptor descriptor = new DomainDescriptor(name);
     descriptor.setRedeploymentEnabled(false);
+    descriptor.setArtifactLocation(artifactLocation.getRoot());
     return descriptor;
+  }
+
+  private NativeLibraryFinderFactory getNativeLibraryFinderFactory() {
+    return new DefaultNativeLibraryFinderFactory();
   }
 }
