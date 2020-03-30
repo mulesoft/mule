@@ -104,6 +104,7 @@ import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
+import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -981,7 +982,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected DefaultMuleDomain createDefaultDomain() {
     return new DefaultMuleDomain(new DomainDescriptor(DEFAULT_DOMAIN_NAME),
-                                 new DomainClassLoaderFactory(getClass().getClassLoader())
+                                 new DomainClassLoaderFactory(getClass().getClassLoader(), new DefaultNativeLibraryFinderFactory())
                                      .create("domain/" + DEFAULT_DOMAIN_NAME, containerClassLoader,
                                              new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()),
                                  artifactClassLoaderManager, serviceManager, emptyList(), extensionModelLoaderManager,
