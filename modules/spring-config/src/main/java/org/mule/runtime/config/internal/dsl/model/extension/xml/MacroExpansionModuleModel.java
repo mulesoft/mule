@@ -17,6 +17,7 @@ import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NA
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -88,6 +89,8 @@ public class MacroExpansionModuleModel {
    * Reserved prefix in a <module/> to define a reference an operation of the same module (no circular dependencies allowed)
    */
   public static final String TNS_PREFIX = "tns";
+
+  public static final String DEFAULT_GLOBAL_ELEMENTS = "_defaultGlobalElements";
 
   /**
    * Used when the <module/> contains global elements without <property/>ies to be expanded, thus the macro expansion will take
@@ -189,38 +192,51 @@ public class MacroExpansionModuleModel {
     List<ComponentModel> globalElements =
         extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).get().getGlobalElements();
 
+    ComponentModel configRefModel = new ComponentModel.Builder()
+        .setIdentifier(ComponentIdentifier.builder()
+            .namespaceUri(extensionModel.getXmlDslModel().getNamespace())
+            .namespace(extensionModel.getXmlDslModel().getPrefix())
+            .name(DEFAULT_GLOBAL_ELEMENTS).build())
+        .build();
+    configRefModel.setComponentLocation(fromSingleComponent(DEFAULT_GLOBAL_ELEMENTS));
+
     globalElements.forEach(globalElementComponenModel -> {
       final ComponentModel macroExpandedImplicitGlobalElement =
           copyGlobalElementComponentModel(globalElementComponenModel, defaultGlobalElementSuffix, moduleGlobalElementsNames,
                                           new HashMap<>());
       macroExpandedImplicitGlobalElement.setRoot(true);
       macroExpandedImplicitGlobalElement.setParent(rootComponentModel);
-      rootComponentModel.getInnerComponents().add(macroExpandedImplicitGlobalElement);
+
+      configRefModel.getInnerComponents().add(macroExpandedImplicitGlobalElement);
     });
+
+    rootComponentModel.getInnerComponents().add(configRefModel);
   }
 
   private void macroExpandGlobalElements(List<ComponentModel> moduleComponentModels, Set<String> moduleGlobalElementsNames) {
     // scenario where it will macro expand as many times as needed all the references of the smart connector configurations
     applicationModel.executeOnEveryMuleComponentTree(muleRootComponentModel -> {
-      for (ComponentModel configRefModel : muleRootComponentModel.getInnerComponents()) {
-        if (configRefModel.getIdentifier().getNamespace().equals(extensionModel.getXmlDslModel().getPrefix())) {
-          ((ComponentAst) configRefModel).getModel(ConfigurationModel.class)
-              .ifPresent(configurationModel -> {
-                Map<String, String> propertiesMap = ((ComponentAst) configRefModel).getParameters().stream()
-                    .filter(paramAst -> paramAst.getRawValue() != null)
-                    .collect(toMap(paramAst -> paramAst.getModel().getName(), paramAst -> paramAst.getRawValue()));
-                Map<String, String> connectionPropertiesMap =
-                    extractConnectionProperties((ComponentAst) configRefModel, configurationModel);
-                propertiesMap.putAll(connectionPropertiesMap);
-                final Map<String, String> literalsParameters = getLiteralParameters(propertiesMap, emptyMap());
-                List<ComponentModel> replacementGlobalElements =
-                    createGlobalElementsInstance(configRefModel, moduleComponentModels, moduleGlobalElementsNames,
-                                                 literalsParameters);
-                configRefModel.getInnerComponents().clear();
-                configRefModel.getInnerComponents().addAll(replacementGlobalElements);
-              });
-        }
-      }
+      muleRootComponentModel.getInnerComponents()
+          .stream()
+          .filter(configRefModel -> configRefModel.getIdentifier().getNamespace()
+              .equals(extensionModel.getXmlDslModel().getPrefix()))
+          .forEach(configRefModel -> {
+            ((ComponentAst) configRefModel).getModel(ConfigurationModel.class)
+                .ifPresent(configurationModel -> {
+                  Map<String, String> propertiesMap = ((ComponentAst) configRefModel).getParameters().stream()
+                      .filter(paramAst -> paramAst.getRawValue() != null)
+                      .collect(toMap(paramAst -> paramAst.getModel().getName(), paramAst -> paramAst.getRawValue()));
+                  Map<String, String> connectionPropertiesMap =
+                      extractConnectionProperties((ComponentAst) configRefModel, configurationModel);
+                  propertiesMap.putAll(connectionPropertiesMap);
+                  final Map<String, String> literalsParameters = getLiteralParameters(propertiesMap, emptyMap());
+                  List<ComponentModel> replacementGlobalElements =
+                      createGlobalElementsInstance(configRefModel, moduleComponentModels, moduleGlobalElementsNames,
+                                                   literalsParameters);
+                  configRefModel.getInnerComponents().clear();
+                  configRefModel.getInnerComponents().addAll(replacementGlobalElements);
+                });
+          });
     });
   }
 
