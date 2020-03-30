@@ -38,7 +38,10 @@ public class ModuleGlobalElementTestCase extends AbstractCeXmlExtensionMuleArtif
         // simple scenario consuming a global element
         {"flows/flows-using-module-global-element.xml", new String[] {"modules/module-global-element.xml"}},
         // default macro expansion global elements without an explicit 'config' element (module doesn't export properties)
-        {"flows/flows-using-module-global-element-default.xml", new String[] {"modules/module-global-element-default.xml"}}
+        {"flows/flows-using-module-global-element-default.xml", new String[] {"modules/module-global-element-default.xml"}},
+        // config with all default elements is still required
+        {"flows/flows-using-module-global-element-default-params.xml",
+            new String[] {"modules/module-global-element-default-params.xml"}}
     });
   }
 
