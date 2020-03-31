@@ -982,9 +982,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected DefaultMuleDomain createDefaultDomain() {
     return new DefaultMuleDomain(new DomainDescriptor(DEFAULT_DOMAIN_NAME),
-                                 new DomainClassLoaderFactory(getClass().getClassLoader(), new DefaultNativeLibraryFinderFactory())
-                                     .create("domain/" + DEFAULT_DOMAIN_NAME, containerClassLoader,
-                                             new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()),
+                                 new DomainClassLoaderFactory(getClass().getClassLoader(),
+                                                              new DefaultNativeLibraryFinderFactory())
+                                                                  .create("domain/" + DEFAULT_DOMAIN_NAME, containerClassLoader,
+                                                                          new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()),
                                  artifactClassLoaderManager, serviceManager, emptyList(), extensionModelLoaderManager,
                                  getRuntimeComponentBuildingDefinitionProvider());
   }
