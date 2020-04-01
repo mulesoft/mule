@@ -9,14 +9,8 @@ package org.mule.test.module.extension.source;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mule.test.heisenberg.extension.AsyncHeisenbergSource.completionCallback;
 
-import org.mule.tck.junit4.FlakinessDetectorTestRunner;
-import org.mule.tck.junit4.FlakyTest;
-import org.mule.test.runner.RunnerDelegateTo;
-
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class AsyncHeisenbergMessageSourceTestCase extends HeisenbergMessageSourceTestCase {

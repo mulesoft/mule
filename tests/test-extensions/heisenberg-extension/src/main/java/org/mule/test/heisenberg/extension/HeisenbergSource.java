@@ -150,7 +150,6 @@ public class HeisenbergSource extends Source<String, Object> {
 
   @Override
   public synchronized void onStart(SourceCallback<String, Object> sourceCallback) throws MuleException {
-
     checkArgument(heisenberg != null, "config not injected");
     HeisenbergExtension.sourceTimesStarted++;
     configName = refName;
@@ -175,7 +174,6 @@ public class HeisenbergSource extends Source<String, Object> {
         sourceCallback.handle(result, context);
       }
     }, 0, frequency, MILLISECONDS);
-
   }
 
   @OnSuccess
@@ -203,7 +201,6 @@ public class HeisenbergSource extends Source<String, Object> {
                                    @ParameterGroup(name = "Error Info", showInDsl = true) PersonalInfo infoError,
                                    @Optional boolean propagateError,
                                    NotificationEmitter notificationEmitter) {
-
     gatheredMoney = -1;
     receivedGroupOnSource = ricin != null && ricin.getNextDoor() != null && ricin.getNextDoor().getAddress() != null;
     receivedInlineOnError = infoError != null && infoError.getName() != null && !infoError.getName().equals(HEISENBERG);

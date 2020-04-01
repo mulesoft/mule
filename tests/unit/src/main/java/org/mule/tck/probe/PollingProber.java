@@ -84,7 +84,6 @@ public class PollingProber implements Prober {
       if (LOGGER.isTraceEnabled()) {
         logThreadDump();
       }
-      logThreadDump();
       throw new AssertionError(probe.describeFailure());
     }
   }
@@ -94,14 +93,10 @@ public class PollingProber implements Prober {
 
     while (true) {
       if (probe.isSatisfied()) {
-        LOGGER.error("Probe poll: Is Satisfied");
         return true;
       } else if (timeout.hasTimedOut()) {
-        LOGGER.error("Probe poll: hasTimedOut()");
         return false;
       } else {
-        LOGGER.error("Probe poll: " + probe.describeFailure());
-        LOGGER.error("Probe poll: Waiting " + pollDelayMillis);
         waitFor(pollDelayMillis);
       }
     }
