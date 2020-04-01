@@ -19,7 +19,6 @@ import org.mule.test.runner.RunnerDelegateTo;
 import org.junit.Ignore;
 import org.junit.Test;
 
-@RunnerDelegateTo(FlakinessDetectorTestRunner.class)
 public class AsyncHeisenbergMessageSourceTestCase extends HeisenbergMessageSourceTestCase {
 
   @Override
@@ -40,32 +39,16 @@ public class AsyncHeisenbergMessageSourceTestCase extends HeisenbergMessageSourc
   }
 
   @Test
-  @FlakyTest(times = 10)
   public void asyncSource() throws Exception {
     startFlow("source");
-
-    try {
-      assertSourceCompleted();
-      fail("Source should not have completed");
-    } catch (AssertionError e) {
-      assertThat(completionCallback, is(notNullValue()));
-      completionCallback.success();
-      assertSourceCompleted();
-    }
+    assertSourceCompleted();
+    assertThat(completionCallback, is(notNullValue()));
   }
 
   @Test
-  @FlakyTest(times = 10)
   public void asyncOnException() throws Exception {
     startFlow("sourceFailed");
-
-    try {
-      assertSourceFailed();
-      fail("Source should not have completed");
-    } catch (AssertionError e) {
-      assertThat(completionCallback, is(notNullValue()));
-      completionCallback.error(new Exception());
-      assertSourceFailed();
-    }
+    assertSourceFailed();
+    assertThat(completionCallback, is(notNullValue()));
   }
 }
