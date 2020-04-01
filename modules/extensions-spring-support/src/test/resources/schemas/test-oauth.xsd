@@ -409,22 +409,22 @@
                 <xs:complexContent>
                   <xs:extension base="mule:abstractExtensionType">
                     <xs:sequence></xs:sequence>
-                    <xs:attribute type="xs:string" use="required" name="clientId">
+                    <xs:attribute type="mule:expressionString" use="required" name="clientId">
                       <xs:annotation>
                         <xs:documentation>The OAuth client id as registered with the service provider</xs:documentation>
                       </xs:annotation>
                     </xs:attribute>
-                    <xs:attribute type="xs:string" use="required" name="clientSecret">
+                    <xs:attribute type="mule:expressionString" use="required" name="clientSecret">
                       <xs:annotation>
                         <xs:documentation>The OAuth client secret as registered with the service provider</xs:documentation>
                       </xs:annotation>
                     </xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" default="accessTokenUrl" name="tokenUrl">
+                    <xs:attribute type="mule:expressionString" use="optional" default="accessTokenUrl" name="tokenUrl">
                       <xs:annotation>
                         <xs:documentation>The service provider's token endpoint URL</xs:documentation>
                       </xs:annotation>
                     </xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" default="defaultScope" name="scopes">
+                    <xs:attribute type="mule:expressionString" use="optional" default="defaultScope" name="scopes">
                       <xs:annotation>
                         <xs:documentation>The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation</xs:documentation>
                       </xs:annotation>
