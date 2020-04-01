@@ -6520,7 +6520,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -6547,7 +6547,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -6574,7 +6574,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "defaultValue": "accessTokenUrl",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -6602,7 +6602,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "defaultValue": "defaultScope",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -9271,7 +9271,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -9298,7 +9298,7 @@
                   "required": true,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
                     "allowsInlineDefinition": false,
@@ -9325,7 +9325,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "defaultValue": "accessTokenUrl",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {
@@ -9353,7 +9353,7 @@
                   "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
-                  "expressionSupport": "NOT_SUPPORTED",
+                  "expressionSupport": "SUPPORTED",
                   "defaultValue": "defaultScope",
                   "role": "BEHAVIOUR",
                   "dslConfiguration": {

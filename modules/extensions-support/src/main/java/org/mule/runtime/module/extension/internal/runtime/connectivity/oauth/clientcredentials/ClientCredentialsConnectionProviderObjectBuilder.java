@@ -104,7 +104,7 @@ public class ClientCredentialsConnectionProviderObjectBuilder<C> extends BaseOAu
   }
 
   private Map<String, String> getClientCredentialsParams(ResolverSetResult result) {
-    return (Map<String, String>) result.get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME);
+    return (Map<String, String>) result.get(OAUTH_CLIENT_CREDENTIALS_GROUP_NAME);
   }
 
   private Map<String, String> getClientCredentialsParams(CoreEvent event) throws MuleException {
