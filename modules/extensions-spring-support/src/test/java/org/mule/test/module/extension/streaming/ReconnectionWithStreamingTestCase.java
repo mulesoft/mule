@@ -21,6 +21,7 @@ import static org.mule.test.petstore.extension.PetStoreOperations.operationExecu
 import static org.mule.test.petstore.extension.PetStoreOperations.shouldFailWithConnectionException;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -47,13 +48,28 @@ public class ReconnectionWithStreamingTestCase extends AbstractExtensionFunction
     CursorStreamProvider provider = mock(CursorStreamProvider.class);
     when(provider.openCursor()).thenReturn(cursorStream);
 
-    assertReconnection(cursorStream, provider);
+    assertReconnection("streamingReconnect", cursorStream, provider);
   }
 
   @Test
   public void standaloneCursorIsResetOnReconnection() throws Exception {
     CursorStream cursorStream = createMockCursor();
-    assertReconnection(cursorStream, cursorStream);
+    assertReconnection("streamingReconnect", cursorStream, cursorStream);
+  }
+
+  @Test
+  public void typedValueCursorIsResetOnReconnection() throws Exception {
+    CursorStream cursorStream = createMockCursor();
+    TypedValue<CursorStream> typedCursorStream = TypedValue.of(cursorStream);
+    assertReconnection("streamingTypedValueReconnect", cursorStream, cursorStream);
+  }
+
+  @Test
+  public void parameterGroupCursorsAreResetOnReconnection() throws Exception {
+    CursorStream ownerName = createMockCursor();
+    CursorStream ownerSignature = createMockCursor();;
+    TypedValue<CursorStream> typedCursorStream = TypedValue.of(cursorStream);
+    assertReconnection("streamingParameterGroupReconnect", cursorStream, cursorStream);
   }
 
   @Test
@@ -65,8 +81,8 @@ public class ReconnectionWithStreamingTestCase extends AbstractExtensionFunction
     assertThat(operationExecutionCounter.get(), greaterThanOrEqualTo(2));
   }
 
-  private void assertReconnection(CursorStream cursor, Object container) throws Exception {
-    CoreEvent response = flowRunner("streamingReconnect").withVariable("signature", container).run();
+  private void assertReconnection(String flow, CursorStream cursor, Object container) throws Exception {
+    CoreEvent response = flowRunner(flow).withVariable("signature", container).run();
     verify(cursor).seek(ORIGINAL_POSITION);
     verify(cursor, times(3)).read(any(byte[].class), anyInt(), anyInt());
 

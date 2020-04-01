@@ -22,6 +22,14 @@
         <petstore:get-pets config-ref="petstore" ownerName="jo" ownerSignature="#[vars.signature]"/>
     </flow>
 
+    <flow name="streamingTypedValueReconnect">
+        <petstore:get-pets-typed-value config-ref="petstore" ownerName="jo" ownerSignature="#[vars.signature]"/>
+    </flow>
+
+    <flow name="streamingParameterGroupReconnect">
+        <petstore:get-pets-typed-value config-ref="petstore" owner="#[payload]"/>
+    </flow>
+
     <flow name="streamingReconnectWithClosedStream">
         <petstore:get-streamed-signature signature="#[vars.signature]"/>
         <petstore:get-pets-with-intermitent-connection-problem-and-closing-stream config-ref="petstore" ownerName="jo"

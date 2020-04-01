@@ -14,6 +14,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.MetadataContext;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.SecurityProviderNotFoundException;
@@ -78,6 +79,25 @@ public class PetStoreOperations {
     if (ownerSignature != null) {
       ownerName += IOUtils.toString(ownerSignature);
     }
+
+    return client.getPets(ownerName, config);
+  }
+
+  public List<String> getPetsTypedValue(@Connection PetStoreClient client,
+                                        @Config PetStoreConnector config,
+                                        String ownerName,
+                                        TypedValue<InputStream> ownerSignature) {
+
+    ownerName += IOUtils.toString(ownerSignature.getValue());
+
+    return client.getPets(ownerName, config);
+  }
+
+  public List<String> getPetsParameterGroup(@Connection PetStoreClient client,
+                                        @Config PetStoreConnector config,
+                                        @ParameterGroup(name = "Owner") Owner owner) {
+
+    String ownerName = owner.getOwnerName() + IOUtils.toString(owner.getOwnerSignature().getValue());
 
     return client.getPets(ownerName, config);
   }
