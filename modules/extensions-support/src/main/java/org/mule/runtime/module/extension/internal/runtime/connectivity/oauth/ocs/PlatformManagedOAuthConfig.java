@@ -12,6 +12,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import static org.mule.runtime.core.api.util.StringUtils.sanitizeUrl;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_API_VERSION;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_ID;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_SECRET;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_ORG_ID;
@@ -42,6 +43,7 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
   private final String clientId;
   private final String clientSecret;
   private final String orgId;
+  private final String apiVersion;
   private final Charset encoding;
   private final PlatformManagedOAuthGrantType grantType;
   private final ExtensionModel extensionModel;
@@ -62,6 +64,7 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
                                           getProperty(configurationProperties, OCS_CLIENT_ID),
                                           getProperty(configurationProperties, OCS_CLIENT_SECRET),
                                           getProperty(configurationProperties, OCS_ORG_ID),
+                                          getProperty(configurationProperties, OCS_API_VERSION, false),
                                           UTF_8,
                                           grantType,
                                           extensionModel,
@@ -69,9 +72,18 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
                                           delegateGrantType);
   }
 
+  private static String getProperty(ConfigurationProperties configurationProperties, String key, boolean isRequired) {
+    if (isRequired) {
+      return configurationProperties.resolveStringProperty(key)
+          .orElseThrow(() -> new IllegalArgumentException(format("OCS property '%s' has not been set", key)));
+    } else {
+      return configurationProperties.resolveStringProperty(key)
+          .orElse(null);
+    }
+  }
+
   private static String getProperty(ConfigurationProperties configurationProperties, String key) {
-    return configurationProperties.resolveStringProperty(key)
-        .orElseThrow(() -> new IllegalArgumentException(format("OCS property '%s' has not been set", key)));
+    return getProperty(configurationProperties, key, true);
   }
 
   private static String resolvePlatformAuthUrl(ConfigurationProperties configurationProperties) {
@@ -86,6 +98,7 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
                                     String clientId,
                                     String clientSecret,
                                     String orgId,
+                                    String apiVersion,
                                     Charset encoding,
                                     PlatformManagedOAuthGrantType grantType,
                                     ExtensionModel extensionModel,
@@ -98,6 +111,7 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
     this.clientId = clientId;
     this.clientSecret = clientSecret;
     this.orgId = orgId;
+    this.apiVersion = apiVersion;
     this.encoding = encoding;
     this.grantType = grantType;
     this.extensionModel = extensionModel;
@@ -127,6 +141,10 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
 
   public String getOrgId() {
     return orgId;
+  }
+
+  public String getApiVersion() {
+    return apiVersion;
   }
 
   public Charset getEncoding() {

@@ -48,6 +48,14 @@ public interface OAuthPlatformManagedDancerBuilder extends OAuthDancerBuilder<Pl
   OAuthPlatformManagedDancerBuilder platformUrl(String platformUrl);
 
   /**
+   * Sets the platform API version to a specific one.
+   *
+   * @param apiVersion the platform API version
+   * @return {@code this} builder
+   */
+  OAuthPlatformManagedDancerBuilder apiVersion(String apiVersion);
+
+  /**
    * Adds the {@code listener}. Listeners will be invoked in the same order as they were added
    *
    * @param listener the {@link PlatformManagedOAuthStateListener} to be added
