@@ -63,7 +63,7 @@ REALDIR=`pwd`
 ######################################################################
 
 # Check if MULE_HOME is a syslink. In that case, set the real path.
-if ! [ -z "`readlink ${MULE_HOME}`" ] ; then
+if [ -n "$MULE_HOME" ] && [ -n "`readlink ${MULE_HOME}`" ] ; then
    MULE_HOME=`readlink ${MULE_HOME}`
 fi
 
