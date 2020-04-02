@@ -1996,20 +1996,6 @@
                         </group>
                     </groups>
                 </configuration>
-                <reportSets>
-                    <reportSet>
-                        <id>aggregate</id>
-                        <configuration>
-                            <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-                            <sourceFileIncludes>
-                                <include>**/org/mule/**/*api*/**/*.java</include>
-                            </sourceFileIncludes>
-                        </configuration>
-                        <reports>
-                            <report>aggregate</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
             </plugin>
         </plugins>
     </reporting>
