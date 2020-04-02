@@ -2004,9 +2004,6 @@
                             <sourceFileIncludes>
                                 <include>**/org/mule/**/*api*/**/*.java</include>
                             </sourceFileIncludes>
-                            <sourceFileExcludes>
-                                <sourceFileExclude>**/org/mule/modules/**/*.java</sourceFileExclude>
-                            </sourceFileExcludes>
                         </configuration>
                         <reports>
                             <report>aggregate</report>
