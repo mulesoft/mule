@@ -47,7 +47,6 @@ public class CompositeClassLoader extends ClassLoader {
   /**
    * Overrides the loadClass in order to support scenarios where a custom class loader is created in a plugin
    * and these calls to this method explicitly.
-   * We cannot resolve the class at this point as we should delegate to protected methods and it is no possible.
    *
    * @param name    The <a href="#name">binary name</a> of the class
    * @param resolve If <tt>true</tt> then resolve the class
@@ -59,7 +58,13 @@ public class CompositeClassLoader extends ClassLoader {
     ClassNotFoundException firstException = null;
     for (ClassLoader classLoader : delegates) {
       try {
-        return classLoader.loadClass(name);
+        Class<?> result = classLoader.loadClass(name);
+
+        if (resolve) {
+          resolveClass(result);
+        }
+
+        return result;
       } catch (ClassNotFoundException e) {
         firstException = e;
       }
