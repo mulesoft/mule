@@ -74,6 +74,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private String legacyCorrelationId;
   private MuleSession session;
   private SecurityContext securityContext;
+  private EventInternalContext flowProcessMediatorPhaseContext;
   private EventInternalContext sdkInternalContext;
   private EventInternalContext sourcePolicyContext;
   private EventInternalContext operationPolicyContext;
@@ -103,6 +104,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     this.originalVars = (CaseInsensitiveHashMap<String, TypedValue<?>>) event.getVariables();
     this.internalParameters = (Map<String, Object>) event.getInternalParameters();
+    flowProcessMediatorPhaseContext = copyOf(event.getFlowProcessMediatorPhaseContext());
     sdkInternalContext = copyOf(event.getSdkInternalContext());
     sourcePolicyContext = copyOf(event.getSourcePolicyContext());
     operationPolicyContext = copyOf(event.getOperationPolicyContext());
@@ -309,6 +311,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
                                              session,
                                              securityContext,
                                              itemSequenceInfo,
+                                             flowProcessMediatorPhaseContext,
                                              sdkInternalContext,
                                              sourcePolicyContext,
                                              operationPolicyContext,
@@ -376,6 +379,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final ItemSequenceInfo itemSequenceInfo;
 
     private transient Map<String, ?> internalParameters;
+    private transient EventInternalContext flowProcessMediatorPhaseContext;
     private transient EventInternalContext sdkInternalContext;
     private transient EventInternalContext sourcePolicyContext;
     private transient EventInternalContext operationPolicyContext;
@@ -392,6 +396,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.legacyCorrelationId = null;
       this.error = null;
       this.itemSequenceInfo = null;
+      this.flowProcessMediatorPhaseContext = null;
       this.sdkInternalContext = null;
       this.sourcePolicyContext = null;
       this.operationPolicyContext = null;
@@ -406,6 +411,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
                                         MuleSession session,
                                         SecurityContext securityContext,
                                         Optional<ItemSequenceInfo> itemSequenceInfo,
+                                        EventInternalContext flowProcessMediatorPhaseContext,
                                         EventInternalContext sdkInternalContext,
                                         EventInternalContext sourcePolicyContext,
                                         EventInternalContext operationPolicyContext,
@@ -420,6 +426,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.internalParameters = internalParameters;
 
       this.itemSequenceInfo = itemSequenceInfo.orElse(null);
+      this.flowProcessMediatorPhaseContext = flowProcessMediatorPhaseContext;
       this.sdkInternalContext = sdkInternalContext;
       this.sourcePolicyContext = sourcePolicyContext;
       this.operationPolicyContext = operationPolicyContext;
@@ -597,6 +604,19 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     @Override
     public Optional<ItemSequenceInfo> getItemSequenceInfo() {
       return ofNullable(itemSequenceInfo);
+    }
+
+    @Override
+    public EventInternalContext getFlowProcessMediatorPhaseContext() {
+      return flowProcessMediatorPhaseContext;
+    }
+
+    @Override
+    public void setFlowProcessMediatorPhaseContext(EventInternalContext flowProcessMediatorPhaseContext) {
+      if (this.flowProcessMediatorPhaseContext != null) {
+        throw new IllegalStateException("flowProcessMediatorPhaseContext was already set.");
+      }
+      this.flowProcessMediatorPhaseContext = flowProcessMediatorPhaseContext;
     }
 
     @Override

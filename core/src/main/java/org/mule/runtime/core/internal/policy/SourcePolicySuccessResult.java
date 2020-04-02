@@ -69,6 +69,6 @@ public class SourcePolicySuccessResult implements SourcePolicyResult {
    * @return the set of parameters to execute the function that sends the failure response.
    */
   public Function<CoreEvent, Map<String, Object>> createErrorResponseParameters() {
-    return event -> messageSourceResponseParametersProcessor.getFailedExecutionResponseParametersFunction().apply(event);
+    return event -> getMessageSourceResponseParametersProcessor().getFailedExecutionResponseParametersFunction().apply(event);
   }
 }

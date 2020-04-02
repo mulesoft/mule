@@ -46,6 +46,21 @@ public interface InternalEvent extends PrivilegedEvent {
   <T> T getInternalParameter(String key);
 
   /**
+   * @return a {@link EventInternalContext} with state from source-flow dispatch
+   * @since 4.4, 4.3.1
+   */
+  public EventInternalContext getFlowProcessMediatorPhaseContext();
+
+  /**
+   * Sets context related to the source-flow dispatch
+   * 
+   * @return a {@link EventInternalContext} with state from source-flow dispatch
+   * @param context an {@link EventInternalContext}
+   * @since 4.4, 4.3.1
+   */
+  public void setFlowProcessMediatorPhaseContext(EventInternalContext flowProcessMediatorPhaseContext);
+
+  /**
    * @return a {@link EventInternalContext} with state from the SDK
    * @since 4.3.0
    */

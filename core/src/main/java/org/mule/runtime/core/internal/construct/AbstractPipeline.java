@@ -11,6 +11,7 @@ import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.function.Function.identity;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
@@ -104,6 +105,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private final MessageSource source;
   private final List<Processor> processors;
   private MessageProcessorChain pipeline;
+
+  private volatile Consumer<Exception> errorRouterForSourceResponseError;
 
   private final ProcessingStrategyFactory processingStrategyFactory;
   private final ProcessingStrategy processingStrategy;
@@ -249,6 +252,28 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     completionCallbackScheduler = schedulerService.ioScheduler(muleContext.getSchedulerBaseConfig()
         .withMaxConcurrentTasks(1)
         .withName(getName() + ".flux.completionCallback"));
+  }
+
+  /**
+   * @param terminationCallbackFactory the callback that handles the routed error after it has been handled.
+   * @return an error router for errors that occur when sending a response back through the source.
+   *
+   * @since 4.4, 4.3.1
+   */
+  public Consumer<Exception> errorRouterForSourceResponseError(Function<Pipeline, Consumer<Exception>> terminationCallbackFactory) {
+    if (errorRouterForSourceResponseError == null) {
+      synchronized (this) {
+        if (errorRouterForSourceResponseError == null) {
+          final Consumer<Exception> terminationCallback = terminationCallbackFactory.apply(this);
+          errorRouterForSourceResponseError = getExceptionListener()
+              .router(identity(),
+                      event -> terminationCallback.accept((MessagingException) event.getError().get().getCause()),
+                      error -> terminationCallback.accept((MessagingException) error));
+        }
+      }
+    }
+
+    return errorRouterForSourceResponseError;
   }
 
   /**
@@ -527,6 +552,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doDispose() {
+    if (errorRouterForSourceResponseError != null) {
+      synchronized (this) {
+        if (errorRouterForSourceResponseError != null) {
+          disposeIfDisposable(errorRouterForSourceResponseError);
+        }
+      }
+    }
+
     if (completionCallbackScheduler != null) {
       completionCallbackScheduler.stop();
     }

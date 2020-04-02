@@ -37,6 +37,7 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Un
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.onCallback;
+import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
 import static org.mule.tck.junit4.matcher.EitherMatcher.leftMatches;
 import static org.mule.tck.junit4.matcher.EitherMatcher.rightMatches;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorType;
@@ -52,31 +53,34 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.internal.construct.AbstractFlowConstruct;
+import org.mule.runtime.core.internal.construct.AbstractPipeline;
 import org.mule.runtime.core.internal.construct.FlowBackPressureMaxConcurrencyExceededException;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.ErrorTypeBuilder;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SourcePolicy;
+import org.mule.runtime.core.internal.policy.SourcePolicyContext;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.matcher.EventMatcher;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -93,7 +97,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
   private static final ErrorType ERROR_FROM_FLOW =
       ErrorTypeBuilder.builder().parentErrorType(mock(ErrorType.class)).namespace("TEST").identifier("FLOW_FAILED").build();
 
-  private FlowConstruct flow;
+  private AbstractPipeline flow;
   private ExceptionRouter flowErrorHandlerRouter;
   private MessageProcessContext context;
   private SourceResultAdapter resultAdapter;
@@ -103,7 +107,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
   private SourcePolicy sourcePolicy;
   private SourcePolicySuccessResult successResult;
   private SourcePolicyFailureResult failureResult;
-  private CoreEvent event;
+  private final AtomicReference<CoreEvent> event = new AtomicReference<>();
   private MessagingException messagingException;
   private RuntimeException mockException;
 
@@ -123,14 +127,22 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
 
   @Before
   public void before() throws Exception {
-    event = mock(CoreEvent.class);
     mockException = mock(RuntimeException.class);
 
     policyManager = mock(PolicyManager.class);
     sourcePolicy = mock(SourcePolicy.class);
     when(policyManager.createSourcePolicyInstance(any(), any(), any(), any())).thenReturn(sourcePolicy);
+    when(policyManager.addSourcePointcutParametersIntoEvent(any(), any(), any())).thenAnswer(inv -> {
+      final PolicyPointcutParameters pointcutParams = mock(PolicyPointcutParameters.class);
+      final SourcePolicyContext sourcePolicyCtx = new SourcePolicyContext(pointcutParams);
+
+      final InternalEvent invEvent = inv.getArgument(2, InternalEvent.class);
+      invEvent.setSourcePolicyContext(sourcePolicyCtx);
+      event.set(inv.getArgument(2, InternalEvent.class));
+      return pointcutParams;
+    });
     successResult = mock(SourcePolicySuccessResult.class);
-    when(successResult.getResult()).then(invocation -> event);
+    when(successResult.getResult()).then(invocation -> event.get());
     when(successResult.getResponseParameters()).thenReturn(() -> emptyMap());
     when(successResult.createErrorResponseParameters()).thenReturn(event -> emptyMap());
     failureResult = mock(SourcePolicyFailureResult.class);
@@ -138,18 +150,22 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     when(failureResult.getResult()).then(invocation -> messagingException.getEvent());
     when(failureResult.getErrorResponseParameters()).thenReturn(() -> emptyMap());
     doAnswer(inv -> {
-      event = inv.getArgument(0);
+      CoreEvent event = inv.getArgument(0);
       CompletableCallback<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> callback = inv.getArgument(2);
+
+      from(event).configure(inv.getArgument(1), callback);
+
       callback.complete(right(successResult));
 
       return null;
     }).when(sourcePolicy).process(any(), any(), any());
 
-    flowProcessMediator = new FlowProcessMediator(policyManager);
+    notifier = mock(PhaseResultNotifier.class);
+    flowProcessMediator = new FlowProcessMediator(policyManager, notifier);
     initialiseIfNeeded(flowProcessMediator, muleContext);
     startIfNeeded(flowProcessMediator);
 
-    flow = mock(AbstractFlowConstruct.class, withSettings().extraInterfaces(Component.class));
+    flow = mock(AbstractPipeline.class, withSettings().extraInterfaces(Component.class));
     FlowExceptionHandler exceptionHandler = mock(FlowExceptionHandler.class);
 
     // Call routeError failure callback for success response sending error test cases
@@ -163,13 +179,20 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     when(exceptionHandler.router(any(Function.class), any(Consumer.class), propagateConsumerCaptor.capture()))
         .thenReturn(flowErrorHandlerRouter);
 
-    when(((AbstractFlowConstruct) flow).getExceptionListener()).thenReturn(exceptionHandler);
-    when(flow.getMuleContext()).thenReturn(muleContext);
-
-    context = mock(MessageProcessContext.class);
     final MessageSource source = mock(MessageSource.class);
     when(source.getRootContainerLocation()).thenReturn(Location.builder().globalName("root").build());
     when(source.getLocation()).thenReturn(mock(ComponentLocation.class));
+
+    when(flow.errorRouterForSourceResponseError(any())).thenAnswer(inv -> exceptionHandler
+        .router(Function.identity(),
+                event -> ((Consumer<Exception>) inv.getArgument(0, Function.class).apply(flow))
+                    .accept((Exception) event.getError().get().getCause()),
+                error -> ((Consumer<Exception>) inv.getArgument(0, Function.class).apply(flow)).accept((Exception) error)));
+    when(flow.getExceptionListener()).thenReturn(exceptionHandler);
+    when(flow.getSource()).thenReturn(source);
+    when(flow.getMuleContext()).thenReturn(muleContext);
+
+    context = mock(MessageProcessContext.class);
     when(context.getMessageSource()).thenReturn(source);
     when(context.getMessagingExceptionResolver()).thenReturn(new MessagingExceptionResolver(source));
     when(context.getTransactionConfig()).thenReturn(empty());
@@ -182,18 +205,17 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
 
     when(template.getSourceMessage()).thenReturn(resultAdapter);
     when(template.getNotificationFunctions()).thenReturn(emptyList());
+    when(template.getFailedExecutionResponseParametersFunction()).thenReturn(event -> emptyMap());
 
     doAnswer(onCallback(callback -> callback.complete(null))).when(template).sendResponseToClient(any(), any(), any());
 
     doAnswer(onCallback(callback -> callback.complete(null)))
         .when(template).sendFailureResponseToClient(any(), any(), any());
-
-    notifier = mock(PhaseResultNotifier.class);
   }
 
   @Test
   public void success() throws Exception {
-    flowProcessMediator.process(template, context, notifier);
+    flowProcessMediator.process(template, context);
 
     verifySuccess();
   }
@@ -203,7 +225,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     Reference<CompletableCallback<Void>> callbackReference = new Reference<>();
     doAnswer(onCallback(callbackReference::set)).when(template).sendResponseToClient(any(), any(), any());
 
-    flowProcessMediator.process(template, context, notifier);
+    flowProcessMediator.process(template, context);
 
     callbackReference.get().complete(null);
     verifySuccess();
@@ -213,7 +235,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
   public void successResponseParametersError() throws Exception {
     when(successResult.getResponseParameters()).thenReturn(failingParameterSupplier);
 
-    flowProcessMediator.process(template, context, notifier);
+    flowProcessMediator.process(template, context);
 
     verifyFlowErrorHandler(isErrorTypeSourceResponseGenerate());
     verify(template, never()).sendResponseToClient(any(), any(), any());
@@ -226,14 +248,13 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     verify(notifier, never()).phaseFailure(any());
 
     verify(flowErrorHandlerRouter).accept(argThat(hasCause(sameInstance(mockException))));
-    verify(flowErrorHandlerRouter).dispose();
   }
 
   @Test
   public void successResponseSendError() throws Exception {
     doAnswer(onCallback(callback -> callback.error(mockException))).when(template).sendResponseToClient(any(), any(), any());
 
-    flowProcessMediator.process(template, context, notifier);
+    flowProcessMediator.process(template, context);
 
     verifyFlowErrorHandler(isErrorTypeSourceResponseSend());
     verify(template).sendResponseToClient(any(), any(), any());
@@ -246,7 +267,6 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     verify(notifier, never()).phaseFailure(any());
 
     verify(flowErrorHandlerRouter).accept(argThat(hasCause(sameInstance(mockException))));
-    verify(flowErrorHandlerRouter).dispose();
   }
 
   @Test
@@ -254,8 +274,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     ConnectionException connectionException = new ConnectionException("Broken pipe");
     doAnswer(onCallback(callback -> callback.error(connectionException))).when(template).sendResponseToClient(any(), any(),
                                                                                                               any());
-
-    flowProcessMediator.process(template, context, notifier);
+    flowProcessMediator.process(template, context);
 
     verifyFlowErrorHandler(isErrorTypeSourceResponseSend());
     verify(template).sendResponseToClient(any(), any(), any());
@@ -268,16 +287,15 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     verify(notifier, never()).phaseFailure(any());
 
     verify(flowErrorHandlerRouter).accept(argThat(hasCause(sameInstance(connectionException))));
-    verify(flowErrorHandlerRouter).dispose();
   }
 
   @Test
   public void successResponseParameterAndErrorResponseParameterError() throws Exception {
     when(successResult.getResponseParameters()).thenReturn(failingParameterSupplier);
     when(successResult.getResponseParameters()).thenReturn(failingParameterSupplier);
-    when(successResult.createErrorResponseParameters()).thenReturn(failingParameterFunction);
+    when(template.getFailedExecutionResponseParametersFunction()).thenReturn(e -> failingParameterFunction.apply(e));
 
-    flowProcessMediator.process(template, context, notifier);
+    flowProcessMediator.process(template, context);
 
     verifyFlowErrorHandler(isErrorTypeSourceResponseGenerate());
     verify(template, never()).sendResponseToClient(any(), any(), any());
@@ -289,7 +307,6 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     verify(notifier).phaseFailure(argThat(instanceOf(mockException.getClass())));
 
     verify(flowErrorHandlerRouter).accept(argThat(hasCause(sameInstance(mockException))));
-    verify(flowErrorHandlerRouter).dispose();
   }
 
   @Test
@@ -299,7 +316,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     doAnswer(onCallback(callback -> callback.error(mockException)))
         .when(template).sendFailureResponseToClient(any(), any(), any());
 
-    flowProcessMediator.process(template, context, notifier);
+    flowProcessMediator.process(template, context);
 
     verifyFlowErrorHandler(isErrorTypeSourceResponseGenerate());
     verify(template, never()).sendResponseToClient(any(), any(), any());
@@ -311,14 +328,13 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     verify(notifier).phaseFailure(argThat(instanceOf(mockException.getClass())));
 
     verify(flowErrorHandlerRouter).accept(argThat(hasCause(sameInstance(mockException))));
-    verify(flowErrorHandlerRouter).dispose();
   }
 
   @Test
   public void failure() throws Exception {
     configureFailingFlow(mockException);
 
-    flowProcessMediator.process(template, context, notifier);
+    flowProcessMediator.process(template, context);
 
     verifyFlowError(isErrorTypeFlowFailure());
   }
@@ -327,7 +343,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
   public void failureInErrorHandler() throws Exception {
     configureErrorHandlingFailingFlow(mockException);
 
-    flowProcessMediator.process(template, context, notifier);
+    flowProcessMediator.process(template, context);
 
     verifyFlowError(isErrorTypeFlowFailure());
   }
@@ -343,7 +359,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
 
     configureFailingFlow(mockException);
 
-    flowProcessMediator.process(template, context, notifier);
+    flowProcessMediator.process(template, context);
 
     callbackReference.get().complete(null);
     verifyFlowError(isErrorTypeFlowFailure());
@@ -356,7 +372,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     configureFailingFlow(mockException);
     doAnswer(onCallback(callbackReference::set)).when(template).sendFailureResponseToClient(any(), any(), any());
 
-    flowProcessMediator.process(template, context, notifier);
+    flowProcessMediator.process(template, context);
 
     verify(template, never()).afterPhaseExecution(any());
 
@@ -373,9 +389,9 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     configureFailingFlow(mockException);
     when(failureResult.getErrorResponseParameters()).thenReturn(failingParameterSupplier);
 
-    flowProcessMediator.process(template, context, notifier);
+    flowProcessMediator.process(template, context);
 
-    verify(((AbstractFlowConstruct) flow).getExceptionListener(), never()).handleException(any(), any());
+    verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any());
     verify(template, never()).sendFailureResponseToClient(any(), any(), any());
     verify(template).afterPhaseExecution(argThat(leftMatches(withEventThat(isErrorTypeSourceErrorResponseGenerate()))));
@@ -389,9 +405,9 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     doAnswer(onCallback(callback -> callback.error(mockException))).when(template)
         .sendFailureResponseToClient(any(), any(), any());
 
-    flowProcessMediator.process(template, context, notifier);
+    flowProcessMediator.process(template, context);
 
-    verify(((AbstractFlowConstruct) flow).getExceptionListener(), never()).handleException(any(), any());
+    verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
     verify(template).afterPhaseExecution(argThat(leftMatches(withEventThat(isErrorTypeSourceErrorResponseSend()))));
@@ -406,9 +422,9 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
                                                   any(MessageSourceResponseParametersProcessor.class))).thenThrow(mockException);
     when(template.getFailedExecutionResponseParametersFunction()).thenReturn(coreEvent -> emptyMap());
 
-    flowProcessMediator.process(template, context, notifier);
+    flowProcessMediator.process(template, context);
 
-    verify(((AbstractFlowConstruct) flow).getExceptionListener(), never()).handleException(any(), any());
+    verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
     verify(notifier, never()).phaseSuccessfully();
@@ -424,14 +440,14 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
     doThrow(propagate(new FlowBackPressureMaxConcurrencyExceededException("flow", MAX_CONCURRENCY_EXCEEDED))).when(flow)
         .checkBackpressure(eventCaptor.capture());
 
-    flowProcessMediator.process(template, context, notifier);
+    flowProcessMediator.process(template, context);
 
     assertThat(((BaseEventContext) eventCaptor.getValue().getContext()).isTerminated(), is(true));
     verifyFlowError(isErrorTypeBackpressure());
   }
 
   private void verifySuccess() {
-    verify(((AbstractFlowConstruct) flow).getExceptionListener(), never()).handleException(any(), any());
+    verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template).sendResponseToClient(any(), any(), any());
     verify(template, never()).sendFailureResponseToClient(any(), any(), any());
     verify(template).afterPhaseExecution(argThat(rightMatches(Matchers.any(CoreEvent.class))));
@@ -441,7 +457,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
   }
 
   private void verifyFlowError(EventMatcher errorTypeMatcher) {
-    verify(((AbstractFlowConstruct) flow).getExceptionListener(), never()).handleException(any(), any());
+    verify(flow.getExceptionListener(), never()).handleException(any(), any());
     verify(template, never()).sendResponseToClient(any(), any(), any());
     verify(template).sendFailureResponseToClient(any(), any(), any());
     verify(template).afterPhaseExecution(argThat(leftMatches(withEventThat(errorTypeMatcher))));
