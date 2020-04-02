@@ -250,12 +250,12 @@
         <assembly.plugin.version>3.1.0</assembly.plugin.version>
         <jar.plugin.version>3.0.2</jar.plugin.version>
         <jxr.plugin.version>2.5</jxr.plugin.version>
-        <project.info.reports.plugin.version>2.9</project.info.reports.plugin.version>
+        <project.info.reports.plugin.version>3.0.0</project.info.reports.plugin.version>
         <rar.plugin.version>2.4</rar.plugin.version>
         <release.plugin.version>2.5.3</release.plugin.version>
-        <resources.plugin.version>3.0.2</resources.plugin.version>
+        <resources.plugin.version>3.1.0</resources.plugin.version>
         <site.plugin.version>3.8.2</site.plugin.version>
-        <source.plugin.version>3.0.1</source.plugin.version>
+        <source.plugin.version>3.1.0</source.plugin.version>
         <war.plugin.version>3.2.0</war.plugin.version>
         <shade.plugin.version>3.1.0</shade.plugin.version>
         <build.helper.maven.plugin.version>3.0.0</build.helper.maven.plugin.version>
@@ -264,7 +264,7 @@
         <antrun.plugin.version>1.8</antrun.plugin.version>
         <install.plugin.version>2.5.2</install.plugin.version>
         <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
-        <javaFormatter.plugin.version>1.9.0</javaFormatter.plugin.version>
+        <javaFormatter.plugin.version>2.0.1</javaFormatter.plugin.version>
         <license.maven.plugin.version>2.11</license.maven.plugin.version>
         <gpg.plugin.version>1.6</gpg.plugin.version>
         <gmavenPluginVersion>1.5</gmavenPluginVersion>
@@ -1433,7 +1433,7 @@
                     <version>${checkstyle.plugin.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>com.marvinformatics.formatter</groupId>
+                    <groupId>net.revelc.code.formatter</groupId>
                     <artifactId>formatter-maven-plugin</artifactId>
                     <version>${javaFormatter.plugin.version}</version>
                     <configuration>
