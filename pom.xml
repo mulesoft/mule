@@ -2006,7 +2006,6 @@
                             </sourceFileIncludes>
                             <sourceFileExcludes>
                                 <sourceFileExclude>**/org/mule/modules/**/*.java</sourceFileExclude>
-                                <sourceFileExclude>**/org/mule/module/**/*.java</sourceFileExclude>
                             </sourceFileExcludes>
                         </configuration>
                         <reports>
