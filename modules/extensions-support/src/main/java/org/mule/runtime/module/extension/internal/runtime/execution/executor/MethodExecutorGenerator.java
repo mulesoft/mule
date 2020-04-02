@@ -7,9 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.execution.executor;
 
 import static java.lang.Class.forName;
-import static java.lang.Math.abs;
 import static java.lang.String.format;
-import static java.lang.System.identityHashCode;
 import static java.util.Arrays.asList;
 import static net.bytebuddy.description.modifier.FieldManifestation.FINAL;
 import static net.bytebuddy.description.modifier.Visibility.PRIVATE;
@@ -68,7 +66,6 @@ public class MethodExecutorGenerator {
 
   private static final String TARGET_INSTANCE_FIELD_NAME = "__targetInstance";
   private final Map<String, Class<MethodExecutor>> executorClasses = new ConcurrentHashMap<>();
-  private final int instanceId = abs(identityHashCode(this));
 
   /**
    * Instantiates a dynamic {@link MethodExecutor} that executes the given {@code method}.
@@ -234,7 +231,7 @@ public class MethodExecutorGenerator {
   }
 
   private String getExecutorName(Method method) {
-    return method.getDeclaringClass().getName() + "$" + method.getName() + "$" + instanceId + "$MethodComponentExecutor";
+    return method.getDeclaringClass().getName() + "$" + method.getName() + "$MethodComponentExecutor";
   }
 
   private ArgumentLoader.Factory getArgumentLoaders(Method method) {
