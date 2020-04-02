@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.util;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+
 import org.mule.tck.classlaoder.TestClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -17,6 +18,7 @@ import org.mule.tck.util.EnumerationMatcher;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,6 +67,17 @@ public class CompositeClassLoaderTestCase extends AbstractMuleTestCase {
     CompositeClassLoader compositeApplicationClassLoader = new CompositeClassLoader(appClassLoader, pluginClassLoader);
 
     Class<?> aClass = compositeApplicationClassLoader.loadClass(CLASS_NAME);
+    assertThat(aClass, equalTo(PLUGIN_LOADED_CLASS));
+  }
+
+  @Test
+  public void loadsClassFromPluginNotDefineInAppButLoadedFromExtendedClassLoader() throws Exception {
+    pluginClassLoader.addClass(CLASS_NAME, PLUGIN_LOADED_CLASS);
+
+    CompositeClassLoader compositeApplicationClassLoader = new CompositeClassLoader(pluginClassLoader, appClassLoader);
+    ClassLoader extendedClassLoader = new URLClassLoader(new URL[0], compositeApplicationClassLoader);
+
+    Class<?> aClass = extendedClassLoader.loadClass(CLASS_NAME);
     assertThat(aClass, equalTo(PLUGIN_LOADED_CLASS));
   }
 
