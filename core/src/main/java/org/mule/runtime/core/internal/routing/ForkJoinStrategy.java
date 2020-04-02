@@ -29,7 +29,7 @@ import org.reactivestreams.Publisher;
  * <p>
  * While the result of this strategy is a single {@link CoreEvent} implementations are free to decide if the event should be
  * emitted only once all results are available, or if it emits the event immediately and then makes the results available via an
- * {@link java.util.Iterator} or {@link Publisher< InternalEvent >} payload. Implementations may also return the original
+ * {@link java.util.Iterator} or {@code Publisher<InternalEvent>} payload. Implementations may also return the original
  * {@link CoreEvent} therefore performing a simple join with no aggregation.
  *
  * @since 4.0

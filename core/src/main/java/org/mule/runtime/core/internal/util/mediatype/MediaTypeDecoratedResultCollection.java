@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 
 /**
- * {@link Collection<Result>} that decorates each of its delegate elements using a {@link PayloadMediaTypeResolver}
+ * {@code Collection<Result>} that decorates each of its delegate elements using a {@link PayloadMediaTypeResolver}
  *
  * This allows to avoid preemptive decoration of an entire collection of {@link Result}
  *

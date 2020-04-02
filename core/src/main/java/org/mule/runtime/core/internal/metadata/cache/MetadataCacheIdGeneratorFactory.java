@@ -27,7 +27,7 @@ public interface MetadataCacheIdGeneratorFactory<T> {
 
 
   /**
-   * @deprecated use {@link org.mule.runtime.core.internal.locator.ComponentLocator<C>}
+   * @deprecated use {@code org.mule.runtime.core.internal.locator.ComponentLocator<C>}
    * @param <C>
    */
   @FunctionalInterface

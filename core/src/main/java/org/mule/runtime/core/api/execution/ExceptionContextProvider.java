@@ -28,7 +28,7 @@ public interface ExceptionContextProvider {
    * @param notificationInfo
    * @return info entries to be added to the logged exception message
    *
-   * @deprecated Use {@link #putContextInfo(Map, EnrichedNotificationInfo, Component)} instead.
+   * @deprecated Use {@link #putContextInfo(MuleExceptionInfo, EnrichedNotificationInfo, Component)} instead.
    */
   @Deprecated
   Map<String, Object> getContextInfo(EnrichedNotificationInfo notificationInfo, Component lastProcessed);

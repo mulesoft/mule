@@ -31,7 +31,7 @@ import org.reactivestreams.Publisher;
  * <p>
  * This class enforces the scoping of variables between the actual behaviour and the policy that may be applied to it. To enforce
  * such scoping of variables it uses internal parameters so the last {@link CoreEvent} modified by the policy behaviour can be
- * stored and retrieve for later usages. It also uses {@link PolicyEventConverter} as a helper class to convert an
+ * stored and retrieve for later usages. It also uses {@code PolicyEventConverter} as a helper class to convert an
  * {@link CoreEvent} from the policy to the next operation {@link CoreEvent} or from the next operation result to the
  * {@link CoreEvent} that must continue the execution of the policy.
  * <p>

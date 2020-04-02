@@ -29,7 +29,7 @@ import java.util.Optional;
 public class SourcePolicyContext implements EventInternalContext<SourcePolicyContext> {
 
   /**
-   * Extracts an instance stored as an internal parameter in the given {@code result} under the {@link #SOURCE_POLICY_CONTEXT} key
+   * Extracts an instance stored as an internal parameter in the given {@code result} under the {@code SOURCE_POLICY_CONTEXT} key
    *
    * @param event
    * @return an {@link SourcePolicyContext} or {@code null} if none was set on the event

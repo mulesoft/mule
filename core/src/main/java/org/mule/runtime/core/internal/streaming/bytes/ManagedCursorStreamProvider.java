@@ -20,7 +20,10 @@ import org.mule.runtime.core.internal.streaming.MutableStreamingStatistics;
 public class ManagedCursorStreamProvider extends ManagedCursorProvider<CursorStream> implements CursorStreamProvider {
 
   /**
-   * {@inheritDoc}
+   * {@link ManagedCursorProvider} implementation for {@link CursorStreamProvider} instances
+   *
+   * @param delegate
+   * @param statistics
    */
   public ManagedCursorStreamProvider(CursorProvider<CursorStream> delegate, MutableStreamingStatistics statistics) {
     super(delegate, statistics);

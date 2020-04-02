@@ -39,7 +39,7 @@ public class EventInternalContextResolver<CTX> {
 
   /**
    * @param event gets the current context stored in the event
-   * @return
+   * @return a {@link CTX}
    */
   public CTX getCurrentContextFromEvent(CoreEvent event) {
     CTX currentContext = ((InternalEvent) event).getInternalParameter(internalParametersKey);

@@ -34,9 +34,9 @@ public class TransformationGraphLookupStrategy {
 
   /**
    * Looks for {@link Converter} to convert from the source to the target data types.
-   * All {@link Converter}s found will have a source that is compatible with {@param source}
+   * All {@link Converter}s found will have a source that is compatible with source parameter
    * (since if a converter can convert a super type, it should be able to convert any type that extends it)
-   * and a target such that {@param target} isCompatibleWith() the {@link Converter}'s one
+   * and a target such that target parameter isCompatibleWith() the {@link Converter}'s one
    * (since if we want a converter that returns an specific type, it should return exactly that type or any type that extends it.)
    *
    * @param source data type to be converted

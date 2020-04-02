@@ -140,9 +140,6 @@ public class RxUtils {
    *        downstream flux.
    * @param completionCallback how a completion event will be triggered on the downstream.
    * @param errorCallback how a cancellation event will be triggered on the downstream.
-   * @param completionTimeoutMillis how long to wait for pending items to finish processing before actually propagating the
-   *        completion or cancellation downstream.
-   * @param delayedExecutor the executor that will delay the completion or cancellation propagation when there are pending items
    * @return an enriched downstream where items and events will be triggered according to the rules defined for this method.
    */
   public static <T, U> Publisher<T> propagateCompletion(Publisher<U> upstream, Publisher<T> downstream,

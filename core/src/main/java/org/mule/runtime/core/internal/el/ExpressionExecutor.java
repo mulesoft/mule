@@ -21,16 +21,16 @@ public interface ExpressionExecutor<T extends ExpressionLanguageContext> {
    * 
    * @param expression
    * @param context
-   * @return
+   * @return an {@link Object}
    * @throws native expression language
    */
-  public Object execute(String expression, T context);
+  Object execute(String expression, T context);
 
   /**
    * Validate the expression
    * 
    * @param expression
    */
-  public void validate(String expression);
+  void validate(String expression);
 
 }

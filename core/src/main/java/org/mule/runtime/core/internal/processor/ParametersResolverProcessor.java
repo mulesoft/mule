@@ -37,9 +37,9 @@ public interface ParametersResolverProcessor<T extends ComponentModel> {
 
   /**
    * Perform the required cleanup a the parameters in an {@link ExecutionContext} resolved by calling
-   * {@link #resolveParameters(CoreEvent)}.
+   * {@link #resolveParameters(CoreEvent.Builder, BiConsumer)}.
    * <p>
-   * It is mandatory to call this when the parameters are no longer needed when using {@link #resolveParameters(CoreEvent)}.
+   * It is mandatory to call this when the parameters are no longer needed when using {@link #resolveParameters(CoreEvent.Builder, BiConsumer)}.
    *
    * @param executionContext the context that contains the resolved parameters
    */

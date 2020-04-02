@@ -80,7 +80,7 @@ public interface FlowConstructStatistics extends Statistics {
   long getTotalEventsReceived();
 
   /**
-   * @return  indicates if the statistic is enabled or not.
+   * @return indicates if the statistic is enabled or not.
    */
   void setEnabled(boolean b);
 

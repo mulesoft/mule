@@ -15,7 +15,6 @@ import reactor.core.publisher.MonoSink;
  * Utility class for using with {@link Mono#create(Consumer)}.
  *
  * @param <T> The type of values in the mono
- * @param <S>
  */
 public class MonoSinkRecorder<T> implements Consumer<MonoSink<T>> {
 

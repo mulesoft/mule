@@ -18,8 +18,8 @@ import org.mule.api.annotation.NoImplement;
 public interface ResourceReleaser {
 
   /**
-   * Attempts to release, during an {@link Artifact} undeployment, resources that were not explicitly released and could cause a
-   * memory leak.
+   * Attempts to release, during an {@link org.mule.runtime.module.artifact.api.Artifact} undeployment, resources that were not
+   * explicitly released and could cause a memory leak.
    */
   void release();
 }
