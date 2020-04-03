@@ -72,7 +72,7 @@ import reactor.core.publisher.Mono;
 public class MessageProcessors {
 
   public static final String WITHIN_PROCESS_TO_APPLY = "messageProcessors.withinProcessToApply";
-  private static final String WITHIN_PROCESS_WITH_CHILD_CONTEXT = "messageProcessors.withinProcessWithChildContext";
+  protected static final String WITHIN_PROCESS_WITH_CHILD_CONTEXT = "messageProcessors.withinProcessWithChildContext";
   private static final Logger LOGGER = LoggerFactory.getLogger(MessageProcessors.class);
 
   private MessageProcessors() {
@@ -483,7 +483,8 @@ public class MessageProcessors {
     return Flux.from(eventChildCtxPub)
         .compose(eventPub -> subscriberContext()
             .flatMapMany(ctx -> {
-              if (ctx.getOrDefault(WITHIN_PROCESS_WITH_CHILD_CONTEXT, false)) {
+              if (ctx.getOrDefault(WITHIN_PROCESS_WITH_CHILD_CONTEXT, false)
+                  || ctx.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
                 // This is a workaround for https://github.com/reactor/reactor-core/issues/1705
                 // If this processor is already wrapped in a Mono, there is no gain in using a Flux, and this way the issue
                 // mentioned above is avoided.
