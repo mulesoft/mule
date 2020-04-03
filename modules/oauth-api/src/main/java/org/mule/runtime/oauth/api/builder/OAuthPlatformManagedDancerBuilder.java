@@ -52,7 +52,7 @@ public interface OAuthPlatformManagedDancerBuilder extends OAuthDancerBuilder<Pl
    *
    * @param apiVersion the platform API version
    * @return {@code this} builder
-   * @since 4.3.1 4.4.0
+   * @since 4.4.0
    */
   default OAuthPlatformManagedDancerBuilder apiVersion(String apiVersion) {
     return this;
