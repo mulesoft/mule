@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.privileged.processor;
 
-import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
