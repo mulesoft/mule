@@ -7,8 +7,11 @@
 
 package org.mule.runtime.config.internal.dsl.model;
 
+import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
+import static org.mule.runtime.api.util.MuleSystemProperties.DEFAULT_SCHEDULER_FIXED_FREQUENCY;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.createNewInstance;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getMuleMessageTransformerBaseBuilder;
@@ -452,7 +455,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER)
         .withTypeDefinition(fromType(FixedFrequencyScheduler.class))
-        .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency").build())
+        .withSetterParameterDefinition("frequency", fromSimpleParameter("frequency")
+            .withDefaultValue(getDefaultSchedulerFixedFrequency())
+            .build())
         .withSetterParameterDefinition("startDelay", fromSimpleParameter("startDelay").build())
         .withSetterParameterDefinition("timeUnit", fromSimpleParameter("timeUnit").build()).build());
 
@@ -826,6 +831,17 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                        fromMultipleDefinitions(addAll(commonTransformerParameters, configurationAttributes))
                                            .build())
         .asPrototype();
+  }
+
+  private long getDefaultSchedulerFixedFrequency() {
+    String freq = getProperty(DEFAULT_SCHEDULER_FIXED_FREQUENCY, "1000");
+    try {
+      return Long.valueOf(freq);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException(
+          format("Invalid value for System Property %s. A long number was expected but '%s' found instead",
+                 DEFAULT_SCHEDULER_FIXED_FREQUENCY, freq));
+    }
   }
 
   private List<ComponentBuildingDefinition> getStreamingDefinitions() {
