@@ -1524,7 +1524,7 @@
     <xsd:complexType name="fixedSchedulerType">
         <xsd:complexContent>
             <xsd:extension base="abstractSchedulingStrategyType">
-                <xsd:attribute name="frequency" type="substitutableLong" default="1000">
+                <xsd:attribute name="frequency" type="substitutableLong">
                     <xsd:annotation>
                         <xsd:documentation>
                             Polling frequency in milliseconds. Default frequency is 1000ms (1s).
