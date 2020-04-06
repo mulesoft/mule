@@ -91,9 +91,8 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
   @Test
   @Issue("MULE-18264")
   @Description("The URLConnection used to read a resource located in filesystem should have cache enabled")
-  public void cacheOnTrueWhenLoadFromClasspath() throws Exception {
-    URL fileURL = spy(getResourceAsUrl("log4j2-test.xml", getClass()));
-
+  public void cacheOnTrueWhenLoadFromFilesystem() throws Exception {
+    URL fileURL = spy(temporaryFolder.newFile(RESOURCE_NAME).toURI().toURL());
     assertUrlConnectionState(fileURL, connection -> verify(connection, never()).setUseCaches(false));
   }
 
