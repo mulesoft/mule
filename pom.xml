@@ -186,7 +186,7 @@
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
         <greenmailVersion>1.5.0</greenmailVersion>
-        <groovyVersion>2.4.15</groovyVersion>
+        <groovyVersion>3.0.2</groovyVersion>
         <guavaVersion>25.1-jre</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <jacksonVersion>1.9.14-MULE-002</jacksonVersion>
@@ -934,117 +934,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy-all</artifactId>
-                <version>${groovyVersion}</version>
-                <classifier>indy</classifier>
-                <exclusions>
-                    <!--  Exclude openejb-loader as it is not needed and there are currently version inconsistancies in openejb-core pom-->
-                    <exclusion>
-                        <groupId>openejb</groupId>
-                        <artifactId>openejb-loader</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.ant</groupId>
-                        <artifactId>ant</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.ant</groupId>
-                        <artifactId>ant-junit</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.ant</groupId>
-                        <artifactId>ant-launcher</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>axion</groupId>
-                        <artifactId>axion</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>bsf</groupId>
-                        <artifactId>bsf</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.tonicsystems</groupId>
-                        <artifactId>jarjar</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-lang</groupId>
-                        <artifactId>commons-lang</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-primitives</groupId>
-                        <artifactId>commons-primitives</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>jmock</groupId>
-                        <artifactId>jmock</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>jmock</groupId>
-                        <artifactId>jmock-cglib</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>jsp-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>mx4j</groupId>
-                        <artifactId>mx4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>nekohtml</groupId>
-                        <artifactId>nekohtml</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>qdox</groupId>
-                        <artifactId>qdox</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>qdox</groupId>
-                        <artifactId>qdox</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>radeox</groupId>
-                        <artifactId>radeox</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>radeox</groupId>
-                        <artifactId>radeox-oro</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>regexp</groupId>
-                        <artifactId>regexp</artifactId>
-                    </exclusion>
-                    <!-- no XML -->
-                    <exclusion>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                    </exclusion>
-                    <!-- totally outdated and wrong too -->
-                    <exclusion>
-                        <groupId>xerces</groupId>
-                        <artifactId>xerces</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>xpp3</groupId>
-                        <artifactId>xpp3</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.thoughtworks.xstream</groupId>
-                        <artifactId>xstream</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
                 <groupId>tanukisoft</groupId>
                 <artifactId>wrapper</artifactId>
                 <version>${wrapperVersion}</version>
@@ -1663,7 +1552,7 @@
                         -->
                         <dependency>
                             <groupId>org.codehaus.groovy</groupId>
-                            <artifactId>groovy-all</artifactId>
+                            <artifactId>groovy</artifactId>
                             <version>${groovyVersion}</version>
                         </dependency>
                     </dependencies>
