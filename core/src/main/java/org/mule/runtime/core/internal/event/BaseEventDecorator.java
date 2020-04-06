@@ -162,13 +162,13 @@ abstract class BaseEventDecorator implements InternalEvent, DeserializationPostI
   }
 
   @Override
-  public EventInternalContext getFlowProcessMediatorPhaseContext() {
-    return event.getFlowProcessMediatorPhaseContext();
+  public <T extends EventInternalContext> EventInternalContext<T> getFlowProcessMediatorContext() {
+    return event.getFlowProcessMediatorContext();
   }
 
   @Override
-  public void setFlowProcessMediatorPhaseContext(EventInternalContext flowProcessMediatorPhaseContext) {
-    event.setFlowProcessMediatorPhaseContext(flowProcessMediatorPhaseContext);
+  public <T extends EventInternalContext> void setFlowProcessMediatorContext(EventInternalContext<T> flowProcessMediatorContext) {
+    event.setFlowProcessMediatorContext(flowProcessMediatorContext);
   }
 
   @Override

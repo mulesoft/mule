@@ -43,6 +43,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
+import org.mule.runtime.core.internal.execution.FlowProcessMediator.FlowProcessMediatorContext;
 import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalEvent.Builder;
@@ -74,7 +75,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private String legacyCorrelationId;
   private MuleSession session;
   private SecurityContext securityContext;
-  private EventInternalContext flowProcessMediatorPhaseContext;
+  private FlowProcessMediatorContext flowProcessMediatorContext;
   private EventInternalContext sdkInternalContext;
   private EventInternalContext sourcePolicyContext;
   private EventInternalContext operationPolicyContext;
@@ -104,7 +105,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     this.originalVars = (CaseInsensitiveHashMap<String, TypedValue<?>>) event.getVariables();
     this.internalParameters = (Map<String, Object>) event.getInternalParameters();
-    flowProcessMediatorPhaseContext = copyOf(event.getFlowProcessMediatorPhaseContext());
+    flowProcessMediatorContext = copyOf(event.getFlowProcessMediatorContext());
     sdkInternalContext = copyOf(event.getSdkInternalContext());
     sourcePolicyContext = copyOf(event.getSourcePolicyContext());
     operationPolicyContext = copyOf(event.getOperationPolicyContext());
@@ -311,7 +312,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
                                              session,
                                              securityContext,
                                              itemSequenceInfo,
-                                             flowProcessMediatorPhaseContext,
+                                             flowProcessMediatorContext,
                                              sdkInternalContext,
                                              sourcePolicyContext,
                                              operationPolicyContext,
@@ -379,7 +380,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final ItemSequenceInfo itemSequenceInfo;
 
     private transient Map<String, ?> internalParameters;
-    private transient EventInternalContext flowProcessMediatorPhaseContext;
+    private transient FlowProcessMediatorContext flowProcessMediatorContext;
     private transient EventInternalContext sdkInternalContext;
     private transient EventInternalContext sourcePolicyContext;
     private transient EventInternalContext operationPolicyContext;
@@ -396,7 +397,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.legacyCorrelationId = null;
       this.error = null;
       this.itemSequenceInfo = null;
-      this.flowProcessMediatorPhaseContext = null;
+      this.flowProcessMediatorContext = null;
       this.sdkInternalContext = null;
       this.sourcePolicyContext = null;
       this.operationPolicyContext = null;
@@ -411,7 +412,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
                                         MuleSession session,
                                         SecurityContext securityContext,
                                         Optional<ItemSequenceInfo> itemSequenceInfo,
-                                        EventInternalContext flowProcessMediatorPhaseContext,
+                                        FlowProcessMediatorContext flowProcessMediatorContext,
                                         EventInternalContext sdkInternalContext,
                                         EventInternalContext sourcePolicyContext,
                                         EventInternalContext operationPolicyContext,
@@ -426,7 +427,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       this.internalParameters = internalParameters;
 
       this.itemSequenceInfo = itemSequenceInfo.orElse(null);
-      this.flowProcessMediatorPhaseContext = flowProcessMediatorPhaseContext;
+      this.flowProcessMediatorContext = flowProcessMediatorContext;
       this.sdkInternalContext = sdkInternalContext;
       this.sourcePolicyContext = sourcePolicyContext;
       this.operationPolicyContext = operationPolicyContext;
@@ -607,16 +608,16 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     }
 
     @Override
-    public EventInternalContext getFlowProcessMediatorPhaseContext() {
-      return flowProcessMediatorPhaseContext;
+    public EventInternalContext getFlowProcessMediatorContext() {
+      return flowProcessMediatorContext;
     }
 
     @Override
-    public void setFlowProcessMediatorPhaseContext(EventInternalContext flowProcessMediatorPhaseContext) {
-      if (this.flowProcessMediatorPhaseContext != null) {
-        throw new IllegalStateException("flowProcessMediatorPhaseContext was already set.");
+    public void setFlowProcessMediatorContext(EventInternalContext flowProcessMediatorContext) {
+      if (this.flowProcessMediatorContext != null) {
+        throw new IllegalStateException("flowProcessMediatorContext was already set.");
       }
-      this.flowProcessMediatorPhaseContext = flowProcessMediatorPhaseContext;
+      this.flowProcessMediatorContext = (FlowProcessMediatorContext) flowProcessMediatorContext;
     }
 
     @Override
