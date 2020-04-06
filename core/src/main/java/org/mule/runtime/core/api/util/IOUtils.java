@@ -100,7 +100,7 @@ public class IOUtils {
       URLConnection urlConnection = url.openConnection();
       // It's necessary to disable connection caching when working with jar files
       // in order to avoid file leaks in windows environments
-      // see for example SE-15297
+      // see for example MULE-18264
       if (urlConnection instanceof JarURLConnection) {
         urlConnection.setUseCaches(false);
       }
