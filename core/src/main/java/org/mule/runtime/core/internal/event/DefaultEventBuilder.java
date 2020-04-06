@@ -43,7 +43,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
-import org.mule.runtime.core.internal.execution.FlowProcessMediator.FlowProcessMediatorContext;
 import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalEvent.Builder;
@@ -52,6 +51,7 @@ import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.MuleSession;
+import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
 import java.io.IOException;
@@ -608,16 +608,16 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     }
 
     @Override
-    public EventInternalContext getFlowProcessMediatorContext() {
+    public FlowProcessMediatorContext getFlowProcessMediatorContext() {
       return flowProcessMediatorContext;
     }
 
     @Override
-    public void setFlowProcessMediatorContext(EventInternalContext flowProcessMediatorContext) {
+    public void setFlowProcessMediatorContext(FlowProcessMediatorContext flowProcessMediatorContext) {
       if (this.flowProcessMediatorContext != null) {
         throw new IllegalStateException("flowProcessMediatorContext was already set.");
       }
-      this.flowProcessMediatorContext = (FlowProcessMediatorContext) flowProcessMediatorContext;
+      this.flowProcessMediatorContext = flowProcessMediatorContext;
     }
 
     @Override

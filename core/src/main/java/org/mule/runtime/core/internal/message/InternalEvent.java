@@ -18,6 +18,7 @@ import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext;
 
 import java.util.Map;
 import java.util.Optional;
@@ -46,19 +47,19 @@ public interface InternalEvent extends PrivilegedEvent {
   <T> T getInternalParameter(String key);
 
   /**
-   * @return a {@link EventInternalContext} with state from source-flow dispatch
+   * @return a {@link FlowProcessMediatorContext} with state from source-flow dispatch
    * @since 4.4, 4.3.1
    */
-  <T extends EventInternalContext> EventInternalContext<T> getFlowProcessMediatorContext();
+  FlowProcessMediatorContext getFlowProcessMediatorContext();
 
   /**
    * Sets context related to the source-flow dispatch
    *
-   * @return a {@link EventInternalContext} with state from source-flow dispatch
-   * @param context an {@link EventInternalContext}
+   * @return a {@link FlowProcessMediatorContext} with state from source-flow dispatch
+   * @param context an {@link FlowProcessMediatorContext}
    * @since 4.4, 4.3.1
    */
-  <T extends EventInternalContext> void setFlowProcessMediatorContext(EventInternalContext<T> flowProcessMediatorContext);
+  void setFlowProcessMediatorContext(FlowProcessMediatorContext flowProcessMediatorContext);
 
   /**
    * @return a {@link EventInternalContext} with state from the SDK
