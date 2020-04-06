@@ -24,6 +24,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_WITH_CHILD_CONTEXT;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContextDontPropagateErrors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
@@ -38,6 +39,7 @@ import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.event.EventContext;
@@ -71,11 +73,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscription;
 
 import io.qameta.allure.Issue;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SynchronousSink;
+import reactor.util.context.Context;
 
 @SmallTest
 public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
@@ -236,6 +240,28 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
     assertThat(((BaseEventContext) result.getContext()).isComplete(), is(true));
     assertThat(completed.get(), is(true));
+  }
+
+  @Test
+  public void processWrappedInAMonoAlwaysRecognizesItselfAsAProcessWithChildContext() {
+    AtomicBoolean completed = new AtomicBoolean();
+    ((BaseEventContext) (input.getContext())).onComplete((e, t) -> completed.set(true));
+
+    final CoreEvent result = from(MessageProcessors.process(input,
+                                                            pub -> Flux
+                                                                .from(applyWithChildContext(pub, eventPub -> Flux.from(eventPub)
+                                                                    .subscriberContext(ctx -> subscriberContextRecognizesChildContext(ctx)),
+                                                                                            Optional.empty()))))
+                                                                                                .block();
+
+    assertThat(((BaseEventContext) result.getContext()).isComplete(), is(true));
+    assertThat(completed.get(), is(true));
+  }
+
+
+  private Context subscriberContextRecognizesChildContext(Context ctx) {
+    assertThat(ctx.get(WITHIN_PROCESS_WITH_CHILD_CONTEXT), is(true));
+    return ctx;
   }
 
   @Test
