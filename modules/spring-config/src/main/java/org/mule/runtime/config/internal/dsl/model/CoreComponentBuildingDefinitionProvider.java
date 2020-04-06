@@ -839,8 +839,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
       return Long.valueOf(freq);
     } catch (NumberFormatException e) {
       throw new IllegalArgumentException(
-          format("Invalid value for System Property %s. A long number was expected but '%s' found instead",
-                 DEFAULT_SCHEDULER_FIXED_FREQUENCY, freq));
+                                         format("Invalid value for System Property %s. A long number was expected but '%s' found instead",
+                                                DEFAULT_SCHEDULER_FIXED_FREQUENCY, freq));
     }
   }
 
