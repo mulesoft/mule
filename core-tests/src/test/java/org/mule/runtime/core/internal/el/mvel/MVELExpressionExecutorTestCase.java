@@ -16,6 +16,8 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
+import org.mule.mvel2.asm.ClassWriter;
+import org.mule.mvel2.asm.Opcodes;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.internal.el.context.AbstractELTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -26,8 +28,6 @@ import java.io.Serializable;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
 
 @SmallTest
 public class MVELExpressionExecutorTestCase extends AbstractELTestCase {
