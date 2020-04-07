@@ -11,6 +11,7 @@ import static java.nio.charset.Charset.forName;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -50,13 +51,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
@@ -97,20 +98,24 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
   public void cacheOnFalseWhenLoadResourceFromJar() throws Exception {
     File jarFile = createDummyJar();
     URLClassLoader classLoader = new URLClassLoader(new URL[] {jarFile.toURI().toURL()});
-    URL fileURL = spy(classLoader.getResource(RESOURCE_NAME));
 
-    assertUrlConnectionState(fileURL, connection -> {
-      assertThat(connection.getUseCaches(), is(false));
-      verify(connection, atLeastOnce()).setUseCaches(false);
-    });
+    URLConnection connection = mockURLConnection(classLoader.getResource(RESOURCE_NAME));
+
+    assertThat(connection, is(instanceOf(JarURLConnection.class)));
+    assertInputStream(connection);
+    assertThat(connection.getUseCaches(), is(false));
+    verify(connection, atLeastOnce()).setUseCaches(false);
   }
+
 
   @Test
   @Issue("MULE-18264")
   @Description("The URLConnection used to read a resource located in filesystem should have cache enabled")
   public void cacheOnTrueWhenLoadFromFilesystem() throws Exception {
-    URL fileURL = spy(temporaryFolder.newFile(RESOURCE_NAME).toURI().toURL());
-    assertUrlConnectionState(fileURL, connection -> verify(connection, never()).setUseCaches(false));
+    URLConnection connection = mockURLConnection(temporaryFolder.newFile(RESOURCE_NAME).toURI().toURL());
+
+    assertInputStream(connection);
+    verify(connection, never()).setUseCaches(false);
   }
 
   @Test
@@ -205,22 +210,29 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
     }
   }
 
-  private void assertUrlConnectionState(URL fileURL, Consumer<URLConnection> assertions) throws Exception {
+  private URLConnection mockURLConnection(URL url) throws Exception {
     PowerMockito.spy(IOUtils.class);
     AtomicReference<URLConnection> connection = new AtomicReference<>();
-    when(IOUtils.class, "getResourceAsUrl", anyString(), any(Class.class), anyBoolean(), anyBoolean())
-        .thenReturn(fileURL);
 
-    when(fileURL.openConnection()).then(a -> {
-      connection.set(spy((URLConnection) a.callRealMethod()));
-      return connection.get();
+    url = spy(url);
+    when(IOUtils.class, "getResourceAsUrl", anyString(), any(Class.class), anyBoolean(), anyBoolean())
+        .thenReturn(url);
+
+    when(url.openConnection()).then(a -> {
+      URLConnection conn = spy((URLConnection) a.callRealMethod());
+      connection.set(conn);
+      return conn;
     });
 
-    InputStream is = getResourceAsStream(RESOURCE_NAME, getClass());
+    getResourceAsStream(RESOURCE_NAME, getClass());
 
-    assertNotNull(is);
+    return connection.get();
+  }
 
-    assertions.accept(connection.get());
+  private void assertInputStream(URLConnection connection) throws Exception {
+    try (InputStream is = connection.getInputStream()) {
+      assertNotNull(is);
+    }
   }
 
   private File createDummyJar() throws IOException {
