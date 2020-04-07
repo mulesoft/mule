@@ -13,6 +13,8 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
+import org.mule.mvel2.asm.ClassWriter;
+import org.mule.mvel2.asm.Opcodes;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.transformer.expression.ExpressionArgument;
@@ -20,8 +22,6 @@ import org.mule.runtime.core.internal.transformer.expression.ExpressionTransform
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
 
 import java.util.HashMap;
 import java.util.Map;
