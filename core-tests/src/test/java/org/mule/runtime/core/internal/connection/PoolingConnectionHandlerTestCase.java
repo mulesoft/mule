@@ -14,6 +14,9 @@ import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.tck.junit4.AbstractMuleTestCase;
