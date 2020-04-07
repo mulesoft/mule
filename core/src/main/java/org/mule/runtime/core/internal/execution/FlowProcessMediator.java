@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.execution;
 
-import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
@@ -81,6 +80,7 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +90,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
@@ -204,7 +205,9 @@ public class FlowProcessMediator implements Initialisable {
     }
   }
 
-  private void dispatch(CoreEvent event, SourcePolicy sourcePolicy, Pipeline flowConstruct, DefaultFlowProcessMediatorContext ctx) throws Exception {
+  private void dispatch(@Nonnull CoreEvent event, SourcePolicy sourcePolicy, Pipeline flowConstruct,
+                        DefaultFlowProcessMediatorContext ctx)
+      throws Exception {
     try {
       onMessageReceived(event, flowConstruct, ctx);
       flowConstruct.checkBackpressure(event);
@@ -222,7 +225,7 @@ public class FlowProcessMediator implements Initialisable {
                              public void error(Throwable e) {
                                dispatchResponse(flowConstruct, ctx,
                                                 left(new SourcePolicyFailureResult(new MessagingException(event, e),
-                                                                                   () -> emptyMap())));
+                                                                                   Collections::emptyMap)));
                              }
                            });
     } catch (Exception e) {

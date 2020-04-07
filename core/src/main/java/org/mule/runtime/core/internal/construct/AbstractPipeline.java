@@ -106,7 +106,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private final List<Processor> processors;
   private MessageProcessorChain pipeline;
 
-  private volatile Consumer<Exception> errorRouterForSourceResponseError;
+  private Consumer<Exception> errorRouterForSourceResponseError;
 
   private final ProcessingStrategyFactory processingStrategyFactory;
   private final ProcessingStrategy processingStrategy;
