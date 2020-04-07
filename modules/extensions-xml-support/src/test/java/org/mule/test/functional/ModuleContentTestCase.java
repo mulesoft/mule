@@ -14,6 +14,8 @@ import org.mule.runtime.core.api.event.CoreEvent;
 
 import org.junit.Test;
 
+import io.qameta.allure.Issue;
+
 public class ModuleContentTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Override
@@ -47,6 +49,15 @@ public class ModuleContentTestCase extends AbstractCeXmlExtensionMuleArtifactFun
     final Object value = muleEvent.getMessage().getPayload().getValue();
     assertThat(value, instanceOf(String.class));
     assertThat(value, is("smart connector primary"));
+  }
+
+  @Test
+  @Issue("MULE-18269")
+  public void testSetPayloadUsingPrimaryPayload() throws Exception {
+    final CoreEvent muleEvent = flowRunner("testSetPayloadUsingPrimaryPayload").withPayload("smart connector content").run();
+    final Object value = muleEvent.getMessage().getPayload().getValue();
+    assertThat(value, instanceOf(String.class));
+    assertThat(value, is("smart connector content"));
   }
 
   @Test
