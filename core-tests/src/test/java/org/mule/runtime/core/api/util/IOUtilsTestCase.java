@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.util;
 
 import static java.lang.Thread.currentThread;
 import static java.nio.charset.Charset.forName;
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertNotNull;
@@ -26,15 +27,19 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_BUFFER_SIZE;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
-import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+import static org.mule.tck.mockito.plugins.ConfigurableMockitoPluginSwitch.disablePlugins;
+import static org.mule.tck.mockito.plugins.ConfigurableMockitoPluginSwitch.enablePlugins;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.mockito.internal.creation.bytebuddy.InlineByteBuddyMockMaker;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -68,11 +73,23 @@ import sun.misc.Unsafe;
 @PowerMockIgnore("javax.management.*")
 public class IOUtilsTestCase extends AbstractMuleTestCase {
 
+  private static final List<String> POWER_MOCK_PLUGINS = asList("mock-maker-inline", InlineByteBuddyMockMaker.class.getName());
+
   private static final String JAR_NAME = "stuff.jar";
   private static final String RESOURCE_NAME = "SomeFile.xml";
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+  @BeforeClass
+  public static void setupInlineMockMaker() {
+    enablePlugins(POWER_MOCK_PLUGINS);
+  }
+
+  @AfterClass
+  public static void restoreInlineMockMaker() {
+    disablePlugins(POWER_MOCK_PLUGINS);
+  }
 
   @Test
   @Issue("MULE-18264")
@@ -213,4 +230,5 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
     }
     return jarFile;
   }
+
 }
