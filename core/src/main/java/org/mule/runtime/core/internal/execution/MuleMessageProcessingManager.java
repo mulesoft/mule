@@ -32,8 +32,8 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, I
   @Override
   public void initialise() throws InitialisationException {
     exceptionListener = muleContext.getExceptionListener();
-    mediator = new FlowProcessMediator(policyManager);
-    initialiseIfNeeded(mediator, true, muleContext);
+    mediator = new FlowProcessMediator(policyManager, this);
+    initialiseIfNeeded(mediator, muleContext);
   }
 
   @Override
@@ -44,7 +44,7 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, I
     ClassLoader executionClassLoader = messageProcessContext.getExecutionClassLoader();
     setContextClassLoader(currentThread, originalTCCL, executionClassLoader);
     try {
-      mediator.process(messageProcessTemplate, messageProcessContext, this);
+      mediator.process(messageProcessTemplate, messageProcessContext);
     } finally {
       setContextClassLoader(currentThread, executionClassLoader, originalTCCL);
     }
