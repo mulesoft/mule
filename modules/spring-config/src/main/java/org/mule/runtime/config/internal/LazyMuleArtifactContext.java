@@ -225,8 +225,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     initialize();
     this.graph = generateFor(applicationModel);
   }
-
-
+  
   @Override
   protected boolean isRuntimeMode() {
     return false;
