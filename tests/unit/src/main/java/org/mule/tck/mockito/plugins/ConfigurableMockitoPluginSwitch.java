@@ -24,7 +24,7 @@ import org.mockito.plugins.PluginSwitch;
  * 
  * @see PluginSwitch
  *
- * @since 4.4.0
+ * @since 4.4.0, 4.3.1
  */
 public class ConfigurableMockitoPluginSwitch implements PluginSwitch {
 
