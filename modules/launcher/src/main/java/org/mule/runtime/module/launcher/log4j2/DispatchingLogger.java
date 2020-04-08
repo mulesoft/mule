@@ -8,7 +8,6 @@ package org.mule.runtime.module.launcher.log4j2;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.Thread.currentThread;
-import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.module.launcher.log4j2.ArtifactAwareContextSelector.resolveLoggerContextClassLoader;
 import static org.reflections.ReflectionUtils.getAllMethods;
 import static org.reflections.ReflectionUtils.withName;
@@ -87,13 +86,13 @@ abstract class DispatchingLogger extends Logger {
     // Switch back the tccl for the cache lookup, to avoid caffeine internal threads to have a reference to an app classloader.
     Thread thread = Thread.currentThread();
     ClassLoader currentClassLoader = thread.getContextClassLoader();
-    setContextClassLoader(thread, currentClassLoader, getClass().getClassLoader());
+    thread.setContextClassLoader(getClass().getClassLoader());
     try {
       // we need to cache reference objects and do this double lookup to avoid cyclic resolutions of the same classloader
       // key which would result in an exception or a deadlock, depending on the cache implementation
       loggerReference = loggerCache.get(resolvedCtxClassLoader);
     } finally {
-      setContextClassLoader(thread, getClass().getClassLoader(), currentClassLoader);
+      thread.setContextClassLoader(currentClassLoader);
     }
 
     Logger logger = loggerReference.get();
