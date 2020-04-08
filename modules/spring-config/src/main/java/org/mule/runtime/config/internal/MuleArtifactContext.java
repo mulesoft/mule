@@ -155,7 +155,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   public static final String INNER_BEAN_PREFIX = "(inner bean)";
 
   protected final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry =
-      new ComponentBuildingDefinitionRegistry();
+          new ComponentBuildingDefinitionRegistry();
   private final OptionalObjectsController optionalObjectsController;
   private final Map<String, String> artifactProperties;
   private final ArtifactDeclaration artifactDeclaration;
@@ -173,7 +173,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     try {
       BeanDefinition beanDefinition = getBeanFactory().getBeanDefinition(componentName);
       return beanDefinition.isPrototype();
-    } catch (NoSuchBeanDefinitionException e) {
+    }
+    catch (NoSuchBeanDefinitionException e) {
       return false;
     }
   });
@@ -205,7 +206,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              Optional<ConfigurationProperties> parentConfigurationProperties,
                              boolean disableXmlValidations,
                              ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider)
-      throws BeansException {
+          throws BeansException {
     this(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
          parentConfigurationProperties, artifactProperties,
          artifactType, pluginsClassLoaders, disableXmlValidations,
@@ -233,19 +234,20 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     originalRegistry = ((MuleRegistryHelper) getMuleRegistry()).getDelegate();
 
     runtimeComponentBuildingDefinitionProvider.getComponentBuildingDefinitions()
-        .forEach(componentBuildingDefinitionRegistry::register);
+            .forEach(componentBuildingDefinitionRegistry::register);
 
     extensionManager = muleContext.getExtensionManager();
     getExtensionModelsComponentBuildingDefinitions(serviceRegistry, getExtensions())
-        .forEach(componentBuildingDefinitionRegistry::register);
+            .forEach(componentBuildingDefinitionRegistry::register);
 
     for (ClassLoader pluginArtifactClassLoader : pluginsClassLoaders) {
       getArtifactComponentBuildingDefinitions(serviceRegistry, pluginArtifactClassLoader)
-          .forEach(componentBuildingDefinitionRegistry::register);
+              .forEach(componentBuildingDefinitionRegistry::register);
     }
 
     this.beanDefinitionFactory =
-        new BeanDefinitionFactory(muleContext.getConfiguration().getId(), componentBuildingDefinitionRegistry);
+            new BeanDefinitionFactory(muleContext.getConfiguration().getId(), componentBuildingDefinitionRegistry,
+                                      muleContext.getErrorTypeRepository());
 
     this.applicationModel = createApplicationModel();
   }
@@ -266,7 +268,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private ApplicationModel createApplicationModel() {
     try {
       DefaultConfigurationPropertiesResolver propertyResolver =
-          new DefaultConfigurationPropertiesResolver(empty(), new EnvironmentPropertiesConfigurationProvider());
+              new DefaultConfigurationPropertiesResolver(empty(), new EnvironmentPropertiesConfigurationProvider());
       List<ConfigFile> configFiles = processXmlConfiguration(new XmlParsingConfiguration() {
 
         @Override
@@ -302,22 +304,24 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         @Override
         public List<XmlNamespaceInfoProvider> getXmlNamespaceInfoProvider() {
           return XmlNamespaceInfoProviderSupplier.createFromExtensionModels(getExtensions(), Optional.of(cl -> serviceRegistry
-              .lookupProviders(XmlNamespaceInfoProvider.class, cl).stream().collect(toList())));
+                  .lookupProviders(XmlNamespaceInfoProvider.class, cl).stream().collect(toList())));
         }
       });
 
       ArtifactConfig artifactConfig = new ArtifactConfig.Builder()
-          .setApplicationName(getArtifactName())
-          .addConfigFiles(configFiles).build();
+              .setApplicationName(getArtifactName())
+              .addConfigFiles(configFiles).build();
 
       ResourceProvider externalResourceProvider = new ClassLoaderResourceProvider(muleContext.getExecutionClassLoader());
       return new ApplicationModel(artifactConfig, artifactDeclaration, getExtensions(),
                                   artifactProperties, parentConfigurationProperties,
                                   of(componentBuildingDefinitionRegistry),
                                   externalResourceProvider, isRuntimeMode());
-    } catch (MuleRuntimeException e) {
+    }
+    catch (MuleRuntimeException e) {
       throw e;
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
   }
@@ -349,7 +353,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     addBeanPostProcessors(beanFactory,
                           new MuleContextPostProcessor(muleContext),
                           new PostRegistrationActionsPostProcessor((MuleRegistryHelper) muleContext
-                              .getRegistry(), beanFactory),
+                                  .getRegistry(), beanFactory),
                           new DiscardedOptionalBeanPostProcessor(optionalObjectsController,
                                                                  (DefaultListableBeanFactory) beanFactory),
                           new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState()),
@@ -365,8 +369,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   protected void prepareObjectProviders() {
     MuleArtifactObjectProvider muleArtifactObjectProvider = new MuleArtifactObjectProvider(this);
     ImmutableObjectProviderConfiguration providerConfiguration =
-        new ImmutableObjectProviderConfiguration(applicationModel.getConfigurationProperties(),
-                                                 muleArtifactObjectProvider);
+            new ImmutableObjectProviderConfiguration(applicationModel.getConfigurationProperties(),
+                                                     muleArtifactObjectProvider);
     for (ConfigurableObjectProvider objectProvider : objectProviders) {
       objectProvider.configure(providerConfiguration);
     }
@@ -419,10 +423,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       ConfigResource resource = resources[i];
       if (resource.getUrl() != null) {
         configResources[i] = new UrlResource(resource.getUrl());
-      } else {
+      }
+      else {
         try {
           configResources[i] = new ByteArrayResource(IOUtils.toByteArray(resource.getInputStream()), resource.getResourceName());
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
           throw new RuntimeException(e);
         }
       }
@@ -454,21 +460,21 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
 
     componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
-        .ifPresent(componentBuildingDefinition -> registerErrorMappings(componentModel, syntheticErrorNamespaces));
+            .ifPresent(componentBuildingDefinition -> registerErrorMappings(componentModel, syntheticErrorNamespaces));
   }
 
   private void registerErrorMappings(SpringComponentModel componentModel, Set<String> syntheticErrorNamespaces) {
     List<ComponentModel> errorMappingComponents = componentModel.getInnerComponents().stream()
-        .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER.equals(innerComponent.getIdentifier())).collect(toList());
+            .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER.equals(innerComponent.getIdentifier())).collect(toList());
     if (!errorMappingComponents.isEmpty()) {
       addAnnotation(ANNOTATION_ERROR_MAPPINGS, errorMappingComponents.stream().map(innerComponent -> {
         Map<String, String> parameters = innerComponent.getRawParameters();
         ComponentIdentifier source = parameters.containsKey(SOURCE_TYPE)
-            ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE)) : ANY;
+                                     ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE)) : ANY;
 
         ErrorType errorType = muleContext.getErrorTypeRepository()
-            .lookupErrorType(source)
-            .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source)));
+                .lookupErrorType(source)
+                .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source)));
 
         ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorType);
         ErrorType targetValue = resolveErrorType(parameters.get(TARGET_TYPE), syntheticErrorNamespaces, !disableXmlValidations);
@@ -498,7 +504,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     if (separator > 0) {
       namespace = representation.substring(0, separator).toUpperCase();
       identifier = representation.substring(separator + 1).toUpperCase();
-    } else {
+    }
+    else {
       namespace = CORE_ERROR_NS;
       identifier = representation.toUpperCase();
     }
@@ -509,19 +516,22 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     if (CORE_ERROR_NS.equals(namespace)) {
       if (checkErrorTypes) {
         return optionalErrorType
-            .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("There's no MULE error named '%s'.",
-                                                                                   identifier))));
+                .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("There's no MULE error named '%s'.",
+                                                                                       identifier))));
       }
       return optionalErrorType.orElse(null);
 
-    } else if (errorTypeRepository.getErrorNamespaces().contains(namespace) && !syntheticErrorNamespaces.contains(namespace)) {
+    }
+    else if (errorTypeRepository.getErrorNamespaces().contains(namespace) && !syntheticErrorNamespaces.contains(namespace)) {
       throw new MuleRuntimeException(createStaticMessage(format("Cannot use error type '%s:%s': namespace already exists.",
                                                                 namespace, identifier)));
-    } else if (syntheticErrorNamespaces.contains(namespace)) {
+    }
+    else if (syntheticErrorNamespaces.contains(namespace)) {
       if (optionalErrorType.isPresent()) {
         return optionalErrorType.get();
       }
-    } else {
+    }
+    else {
       syntheticErrorNamespaces.add(namespace);
     }
     return errorTypeRepository.addErrorType(errorIdentifier, errorTypeRepository.getAnyErrorType());
@@ -531,7 +541,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   public void destroy() {
     try {
       super.destroy();
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       for (ObjectProvider objectProvider : objectProviders) {
         disposeIfNeeded(objectProvider, LOGGER);
       }
@@ -553,20 +564,20 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     // This should only be done once at the initial application model creation, called from Spring
     List<Pair<ComponentModel, Optional<String>>> objectProvidersByName =
-        lookObjectProvidersComponentModels(applicationModel);
+            lookObjectProvidersComponentModels(applicationModel);
 
     Set<String> alwaysEnabledTopLevelComponents = applicationModel.topLevelComponentsStream()
-        .filter(cm -> this.componentBuildingDefinitionRegistry.getBuildingDefinition(cm.getIdentifier())
-            .map(buildingDefinition -> buildingDefinition.isAlwaysEnabled()).orElse(false))
-        .filter(cm -> cm.getComponentId().isPresent())
-        .map(cm -> cm.getComponentId().get())
-        .collect(toSet());
+            .filter(cm -> this.componentBuildingDefinitionRegistry.getBuildingDefinition(cm.getIdentifier())
+                    .map(buildingDefinition -> buildingDefinition.isAlwaysEnabled()).orElse(false))
+            .filter(cm -> cm.getComponentId().isPresent())
+            .map(cm -> cm.getComponentId().get())
+            .collect(toSet());
     Set<ComponentIdentifier> alwaysEnabledUnnamedTopLevelComponents = applicationModel.topLevelComponentsStream()
-        .filter(cm -> this.componentBuildingDefinitionRegistry.getBuildingDefinition(cm.getIdentifier())
-            .map(buildingDefinition -> buildingDefinition.isAlwaysEnabled()).orElse(false))
-        .filter(cm -> !cm.getComponentId().isPresent())
-        .map(cm -> cm.getIdentifier())
-        .collect(toSet());
+            .filter(cm -> this.componentBuildingDefinitionRegistry.getBuildingDefinition(cm.getIdentifier())
+                    .map(buildingDefinition -> buildingDefinition.isAlwaysEnabled()).orElse(false))
+            .filter(cm -> !cm.getComponentId().isPresent())
+            .map(cm -> cm.getIdentifier())
+            .collect(toSet());
     Set<String> alwaysEnabledGeneratedTopLevelComponentsName = new HashSet<>();
 
     List<Pair<String, ComponentAst>> createdComponentModels = new ArrayList<>();
@@ -581,59 +592,64 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
           createdComponentModels.add(new Pair<>(componentModel.getNameAttribute(), componentModel));
         }
         beanDefinitionFactory
-            .resolveComponentRecursively(componentModel, beanFactory,
-                                         (resolvedComponentModel, registry) -> {
-                                           SpringComponentModel resolvedSpringComponentModel =
-                                               (SpringComponentModel) resolvedComponentModel;
-                                           if (resolvedComponentModel.isRoot()) {
-                                             String nameAttribute = resolvedComponentModel.getNameAttribute();
-                                             if (resolvedComponentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER)) {
-                                               nameAttribute = OBJECT_MULE_CONFIGURATION;
-                                             } else if (nameAttribute == null) {
-                                               // This may be a configuration that does not requires a name.
-                                               nameAttribute = uniqueValue(resolvedSpringComponentModel.getBeanDefinition()
-                                                   .getBeanClassName());
+                .resolveComponentRecursively(componentModel, beanFactory,
+                                             (resolvedComponentModel, registry) -> {
+                                               SpringComponentModel resolvedSpringComponentModel =
+                                                       (SpringComponentModel) resolvedComponentModel;
+                                               if (resolvedComponentModel.isRoot()) {
+                                                 String nameAttribute = resolvedComponentModel.getNameAttribute();
+                                                 if (resolvedComponentModel.getIdentifier().equals(CONFIGURATION_IDENTIFIER)) {
+                                                   nameAttribute = OBJECT_MULE_CONFIGURATION;
+                                                 }
+                                                 else if (nameAttribute == null) {
+                                                   // This may be a configuration that does not requires a name.
+                                                   nameAttribute = uniqueValue(resolvedSpringComponentModel.getBeanDefinition()
+                                                                                       .getBeanClassName());
 
-                                               if (alwaysEnabledUnnamedTopLevelComponents
-                                                   .contains(resolvedSpringComponentModel.getIdentifier())) {
-                                                 alwaysEnabledGeneratedTopLevelComponentsName.add(nameAttribute);
-                                                 createdComponentModels
-                                                     .add(new Pair<>(nameAttribute, (ComponentAst) resolvedComponentModel));
-                                               } else if (resolvedSpringComponentModel.getType() != null
-                                                   && TransactionManagerFactory.class
-                                                       .isAssignableFrom(resolvedSpringComponentModel.getType())) {
-                                                 createdComponentModels
-                                                     .add(new Pair<>(nameAttribute, resolvedSpringComponentModel));
+                                                   if (alwaysEnabledUnnamedTopLevelComponents
+                                                           .contains(resolvedSpringComponentModel.getIdentifier())) {
+                                                     alwaysEnabledGeneratedTopLevelComponentsName.add(nameAttribute);
+                                                     createdComponentModels
+                                                             .add(new Pair<>(nameAttribute, (ComponentAst) resolvedComponentModel));
+                                                   }
+                                                   else if (resolvedSpringComponentModel.getType() != null
+                                                            && TransactionManagerFactory.class
+                                                                    .isAssignableFrom(resolvedSpringComponentModel.getType())) {
+                                                     createdComponentModels
+                                                             .add(new Pair<>(nameAttribute, resolvedSpringComponentModel));
+                                                   }
+                                                 }
+                                                 registry.registerBeanDefinition(nameAttribute,
+                                                                                 resolvedSpringComponentModel.getBeanDefinition());
+                                                 postProcessBeanDefinition(componentModel, registry, nameAttribute);
                                                }
-                                             }
-                                             registry.registerBeanDefinition(nameAttribute,
-                                                                             resolvedSpringComponentModel.getBeanDefinition());
-                                             postProcessBeanDefinition(componentModel, registry, nameAttribute);
-                                           }
-                                         }, null, componentLocator);
+                                             }, null, componentLocator);
 
         componentLocator.addComponentLocation(cm.getLocation());
       }
     });
 
     this.objectProviders
-        .addAll(objectProvidersByName.stream().map(pair -> (ConfigurableObjectProvider) pair.getFirst().getObjectInstance())
-            .collect(toList()));
+            .addAll(objectProvidersByName.stream().map(pair -> (ConfigurableObjectProvider) pair.getFirst().getObjectInstance())
+                            .collect(toList()));
     registerObjectFromObjectProviders(beanFactory);
 
     Set<String> objectProviderNames = objectProvidersByName.stream().map(Pair::getSecond).filter(Optional::isPresent)
-        .map(Optional::get).collect(toSet());
+            .map(Optional::get).collect(toSet());
 
     // Put object providers first, then always enabled components, then the rest
     createdComponentModels.sort(comparing(beanNameAndComponent -> {
       final String beanName = beanNameAndComponent.getFirst();
       if (objectProviderNames.contains(beanName)) {
         return 1;
-      } else if (alwaysEnabledGeneratedTopLevelComponentsName.contains(beanName)) {
+      }
+      else if (alwaysEnabledGeneratedTopLevelComponentsName.contains(beanName)) {
         return 2;
-      } else if (alwaysEnabledTopLevelComponents.contains(beanName)) {
+      }
+      else if (alwaysEnabledTopLevelComponents.contains(beanName)) {
         return 3;
-      } else {
+      }
+      else {
         return 4;
       }
     }));
@@ -660,7 +676,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
     Optional<ComponentModel> configurationOptional =
-        applicationModel.findComponentDefinitionModel(CONFIGURATION_IDENTIFIER);
+            applicationModel.findComponentDefinitionModel(CONFIGURATION_IDENTIFIER);
     if (configurationOptional.isPresent()) {
       return;
     }
@@ -718,7 +734,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   public boolean isRunning() {
     try {
       return super.isRunning();
-    } catch (IllegalStateException e) {
+    }
+    catch (IllegalStateException e) {
       return false;
     }
   }
@@ -761,7 +778,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     Class<?> beanClass = null;
     try {
       beanClass = currentThread().getContextClassLoader().loadClass(beanDefinition.getBeanClassName());
-    } catch (ClassNotFoundException e) {
+    }
+    catch (ClassNotFoundException e) {
       // Nothing to do, spring will break because of this eventually
     }
 
@@ -775,7 +793,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
 
     for (ConstructorArgumentValues.ValueHolder valueHolder : beanDefinition.getConstructorArgumentValues()
-        .getGenericArgumentValues()) {
+            .getGenericArgumentValues()) {
       processBeanValue(rootContainerName, valueHolder.getValue());
     }
   }
@@ -783,7 +801,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private void processBeanValue(String rootContainerName, Object value) {
     if (value instanceof BeanDefinition) {
       updateBeanDefinitionRootContainerName(rootContainerName, (BeanDefinition) value);
-    } else if (value instanceof ManagedList) {
+    }
+    else if (value instanceof ManagedList) {
       ManagedList managedList = (ManagedList) value;
       for (int i = 0; i < managedList.size(); i++) {
         Object itemValue = managedList.get(i);
@@ -791,7 +810,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
           updateBeanDefinitionRootContainerName(rootContainerName, (BeanDefinition) itemValue);
         }
       }
-    } else if (value instanceof ManagedMap) {
+    }
+    else if (value instanceof ManagedMap) {
       ManagedMap managedMap = (ManagedMap) value;
       managedMap.forEach((key, mapValue) -> processBeanValue(rootContainerName, mapValue));
     }
