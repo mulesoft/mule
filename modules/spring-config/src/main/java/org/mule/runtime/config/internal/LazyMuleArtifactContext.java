@@ -223,9 +223,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     }
 
     initialize();
+    //Graph should be generated after the initialize() method since the applicationModel will change by macro expanding XmlSdk components.
     this.graph = generateFor(applicationModel);
   }
-  
+
   @Override
   protected boolean isRuntimeMode() {
     return false;
