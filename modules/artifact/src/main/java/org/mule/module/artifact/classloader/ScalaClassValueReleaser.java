@@ -90,6 +90,10 @@ public class ScalaClassValueReleaser implements ResourceReleaser {
   }
 
   private WeakHashMap getClassValueMap() throws IllegalAccessException {
+    if (classValueMapField == null) {
+      return null;
+    }
+
     classValueMapField.setAccessible(true);
     try {
       return (WeakHashMap) classValueMapField.get(String.class);
