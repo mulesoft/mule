@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
+import org.mule.module.artifact.classloader.ScalaClassValueReleaser;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -95,12 +96,13 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private final Object localResourceLocatorLock = new Object();
   private volatile LocalResourceLocator localResourceLocator;
   private String resourceReleaserClassLocation = DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION;
-  private ResourceReleaser classLoaderReferenceReleaser;
+  private final ResourceReleaser classLoaderReferenceReleaser;
   private volatile boolean shouldReleaseJdbcReferences = false;
   private ResourceReleaser jdbcResourceReleaserInstance;
-  private ArtifactDescriptor artifactDescriptor;
+  private final ResourceReleaser scalaClassValueReleaserInstance;
+  private final ArtifactDescriptor artifactDescriptor;
   private final Object descriptorMappingLock = new Object();
-  private Map<BundleDescriptor, URLClassLoader> descriptorMapping = new HashMap<>();
+  private final Map<BundleDescriptor, URLClassLoader> descriptorMapping = new HashMap<>();
 
   /**
    * Constructs a new {@link MuleArtifactClassLoader} for the given URLs
@@ -120,6 +122,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     this.artifactDescriptor = artifactDescriptor;
 
     this.classLoaderReferenceReleaser = new ClassLoaderResourceReleaser(this);
+    this.scalaClassValueReleaserInstance = new ScalaClassValueReleaser();
   }
 
   @Override
@@ -309,6 +312,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   private void clearReferences() {
     classLoaderReferenceReleaser.release();
+    scalaClassValueReleaserInstance.release();
   }
 
   void reportPossibleLeak(Exception e, String artifactId) {
