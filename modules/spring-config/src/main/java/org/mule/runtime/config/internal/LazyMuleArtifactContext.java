@@ -164,8 +164,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     // Changes the component locator in order to allow accessing any component by location even when they are prototype
     this.componentLocator = new SpringConfigurationComponentLocator();
 
-    graph = generateFor(applicationModel);
-
     this.parentComponentModelInitializer = parentComponentModelInitializer;
 
     final CustomizationService customizationService = muleContext.getCustomizationService();
@@ -225,6 +223,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     }
 
     initialize();
+    //Graph should be generated after the initialize() method since the applicationModel will change by macro expanding XmlSdk components.
+    this.graph = generateFor(applicationModel);
   }
 
   @Override
