@@ -1,4 +1,18 @@
 {
+  "4.3.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext",
+          "package": "org.mule.runtime.core.privileged.event.context",
+          "classSimpleName": "FlowProcessMediatorContext",
+          "elementKind": "interface",
+          "justification": "Context required to process the response"
+        }
+      ]
+    }
+  }, 
   "4.3.0": {
     "revapi": {
       "ignore": [
