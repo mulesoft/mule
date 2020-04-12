@@ -22,7 +22,7 @@ public interface ValueProviderCacheIdGenerator<T> {
    * associated with the parameter in the given component.
    * @param containerComponent the component that holds the parameter
    * @param parameterName the name of the parameter which values are provided by a {@link org.mule.runtime.extension.api.values.ValueProvider}
-   * @return a {@link Optional<ValueProviderCacheId>} with the resolved id in case it's possible, {@link Optional#empty()} otherwise.
+   * @return a {@see Optional<ValueProviderCacheId>} with the resolved id in case it's possible, {@link Optional#empty()} otherwise.
    */
   Optional<ValueProviderCacheId> getIdForResolvedValues(T containerComponent, String parameterName);
 

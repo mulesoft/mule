@@ -268,7 +268,7 @@
         <license.maven.plugin.version>2.11</license.maven.plugin.version>
         <gpg.plugin.version>1.6</gpg.plugin.version>
         <gmavenPluginVersion>1.5</gmavenPluginVersion>
-        <javadocPluginVersion>3.1.1</javadocPluginVersion>
+        <javadocPluginVersion>3.2.0</javadocPluginVersion>
         <mavenCompilerVersion>3.7.0</mavenCompilerVersion>
         <eclipsePluginVersion>2.10</eclipsePluginVersion>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
@@ -1843,15 +1843,22 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>${javadocPluginVersion}</version>
+                <reportSets>
+                    <reportSet>
+                        <id>aggregate</id>
+                        <inherited>false</inherited>
+                        <reports>
+                            <report>aggregate-no-fork</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
                 <configuration>
                     <minmemory>128m</minmemory>
                     <maxmemory>512m</maxmemory>
                     <charset>ISO-8859-1</charset>
                     <encoding>ISO-8859-1</encoding>
                     <source>${javaVersion}</source>
-                    <configuration>
-                        <doclint>none</doclint>
-                    </configuration>
+                    <doclint>none</doclint>
                     <!-- Link to the external online JavaDoc -->
                     <links>
                         <link>http://docs.oracle.com/javase/7/docs/api/</link>

@@ -123,7 +123,7 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
    *
    * @param muleContext
    * @param transactionConfig
-   * @return
+   * @return <T>
    */
   public static <T> TransactionalExecutionTemplate<T> createScopeTransactionalExecutionTemplate(MuleContext muleContext,
                                                                                                 TransactionConfig transactionConfig) {

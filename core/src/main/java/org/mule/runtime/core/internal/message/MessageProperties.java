@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * Use to obtain message properties defined in two scopes, inbound and outbound.
  *
- * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
+ * @deprecated Transport infrastructure is deprecated. Use {@link org.mule.runtime.api.message.Message#getAttributes()} instead.
  */
 @Deprecated
 public interface MessageProperties {

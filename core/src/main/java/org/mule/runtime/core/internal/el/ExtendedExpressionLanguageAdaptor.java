@@ -29,7 +29,7 @@ public interface ExtendedExpressionLanguageAdaptor extends ExpressionLanguageAda
    * provided by the expression language implementation.
    *
    * This version of {@code evaluate} allows {@link CoreEvent} or {@link InternalMessage} mutation performed within the expression to
-   * be maintained post-evaluation via the use of a result {@link CoreEvent.Builder} which should be created
+   * be maintained post-evaluation via the use of a result {@code CoreEvent#Builder} which should be created
    * from the original event before being passed and then used to construct the post-evaluation event.
    *
    * @param expression the expression to be executed

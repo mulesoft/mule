@@ -25,7 +25,7 @@ public interface MuleContextFactory {
   /**
    * Creates a new MuleContext using the given configurationBuilder
    * 
-   * @param configurationBuilder
+   * @param configurationBuilders
    * @throws InitialisationException
    * @throws ConfigurationException
    */

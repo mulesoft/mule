@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 /**
- * {@link List<Result>} that decorates each of its delegate elements using a {@link PayloadMediaTypeResolver}
+ * {@code List<Result>} that decorates each of its delegate elements using a {@link PayloadMediaTypeResolver}
  * 
  * This allows to avoid preemptive decoration of an entire collection of {@link Result}
  * 

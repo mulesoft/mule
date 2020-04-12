@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * An implementation of {@link AbstractRegistryBootstrap} to populate instances of {@link SimpleRegistry}
  *
- * @deprecated as of 3.7.0. Try to use {@link org.mule.runtime.core.config.spring.SpringRegistryBootstrap} instead.
+ * @deprecated as of 3.7.0. Try to use {@see org.mule.runtime.core.config.spring.SpringRegistryBootstrap} instead.
  */
 @Deprecated
 public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap {

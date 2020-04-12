@@ -194,7 +194,7 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
   /**
    * Template method that allows implementations to define a default max concurrency.
    *
-   * @return
+   * @return an {@link Integer}
    */
   protected abstract int getDefaultMaxConcurrency();
 

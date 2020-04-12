@@ -18,7 +18,6 @@ import org.apache.commons.lang3.Validate;
  * estimated size
  * 
  * @author flbulgarelli
- * @param <T>
  */
 public final class IteratorMessageSequence extends AbstractMessageSequence {
 

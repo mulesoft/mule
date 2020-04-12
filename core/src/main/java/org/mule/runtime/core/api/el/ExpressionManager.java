@@ -159,7 +159,7 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * @param expression a single expression to be evaluated and transformed
    * @param event the {@link CoreEvent} to consider
    * @param componentLocation the location of the component where the event is being processed
-   * @return {@link true} if the expression evaluated to that or "true", false otherwise
+   * @return {@code true} if the expression evaluated to that or "true", false otherwise
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
   boolean evaluateBoolean(String expression, CoreEvent event, ComponentLocation componentLocation)
@@ -171,9 +171,9 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * @param expression a single expression to be evaluated and transformed
    * @param event the {@link CoreEvent} to consider
    * @param componentLocation the location of the component where the event is being processed
-   * @param nullReturnsTrue whether or not a {@link null} outcome should be considered a {@link true}
-   * @param nonBooleanReturnsTrue whether or not a non boolean outcome should be considered a {@link true}
-   * @return {@link true} if the expression evaluated to that, "true" or the above flags where considered, {@link false} otherwise
+   * @param nullReturnsTrue whether or not a {@code null} outcome should be considered a {@code true}
+   * @param nonBooleanReturnsTrue whether or not a non boolean outcome should be considered a {@code true}
+   * @return {@code true} if the expression evaluated to that, "true" or the above flags where considered, {@code false} otherwise
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
   boolean evaluateBoolean(String expression, CoreEvent event, ComponentLocation componentLocation, boolean nullReturnsTrue,
@@ -186,9 +186,9 @@ public interface ExpressionManager extends MuleExpressionLanguage {
    * @param expression a single expression to be evaluated and transformed
    * @param bindingCtx the {@link BindingContext} to consider
    * @param componentLocation the location of the component where the event is being processed
-   * @param nullReturnsTrue whether or not a {@link null} outcome should be considered a {@link true}
-   * @param nonBooleanReturnsTrue whether or not a non boolean outcome should be considered a {@link true}
-   * @return {@link true} if the expression evaluated to that, "true" or the above flags where considered, {@link false} otherwise
+   * @param nullReturnsTrue whether or not a {@code null} outcome should be considered a {@code true}
+   * @param nonBooleanReturnsTrue whether or not a non boolean outcome should be considered a {@code true}
+   * @return {@code true} if the expression evaluated to that, "true" or the above flags where considered, {@code false} otherwise
    * @throws ExpressionRuntimeException if a problem occurs evaluating the expression
    */
   boolean evaluateBoolean(String expression, BindingContext bindingCtx, ComponentLocation componentLocation,

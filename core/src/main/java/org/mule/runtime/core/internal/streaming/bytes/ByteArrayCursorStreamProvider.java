@@ -12,7 +12,7 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import java.io.Serializable;
 
 /**
- * A {@link CursorStreamProvider} which is backed by a fixed {@link byte[]}.
+ * A {@link CursorStreamProvider} which is backed by a fixed {@code byte[]}.
  * <p>
  * Notice that since the {@link #content} data is already fully loaded into memory, this kind of
  * defeats the purpose of the cursor provider. The purpose of this method is to provide a way to
