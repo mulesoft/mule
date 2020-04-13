@@ -26,8 +26,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -95,7 +97,14 @@ public class IOUtils {
     if (url == null) {
       return null;
     } else {
-      return url.openStream();
+      URLConnection urlConnection = url.openConnection();
+      // It's necessary to disable connection caching when working with jar files
+      // in order to avoid file leaks in windows environments
+      // see for example MULE-18264
+      if (urlConnection instanceof JarURLConnection) {
+        urlConnection.setUseCaches(false);
+      }
+      return urlConnection.getInputStream();
     }
   }
 
