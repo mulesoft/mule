@@ -93,16 +93,16 @@ public class BeanDefinitionFactory {
   public static final String CORE_ERROR_NS = CORE_PREFIX.toUpperCase();
 
   private final ImmutableSet<ComponentIdentifier> ignoredMuleCoreComponentIdentifiers =
-          ImmutableSet.<ComponentIdentifier>builder()
-                  .add(MULE_IDENTIFIER)
-                  .add(MULE_DOMAIN_IDENTIFIER)
-                  .add(MULE_EE_DOMAIN_IDENTIFIER)
-                  .add(ERROR_MAPPING_IDENTIFIER)
-                  .add(DESCRIPTION_IDENTIFIER)
-                  .add(ANNOTATIONS_ELEMENT_IDENTIFIER)
-                  .add(DOC_DESCRIPTION_IDENTIFIER)
-                  .add(GLOBAL_PROPERTY_IDENTIFIER)
-                  .build();
+      ImmutableSet.<ComponentIdentifier>builder()
+          .add(MULE_IDENTIFIER)
+          .add(MULE_DOMAIN_IDENTIFIER)
+          .add(MULE_EE_DOMAIN_IDENTIFIER)
+          .add(ERROR_MAPPING_IDENTIFIER)
+          .add(DESCRIPTION_IDENTIFIER)
+          .add(ANNOTATIONS_ELEMENT_IDENTIFIER)
+          .add(DOC_DESCRIPTION_IDENTIFIER)
+          .add(GLOBAL_PROPERTY_IDENTIFIER)
+          .build();
 
   private final Set<ComponentIdentifier> ignoredMuleExtensionComponentIdentifiers;
 
@@ -111,11 +111,11 @@ public class BeanDefinitionFactory {
    * them in the parsing API.
    */
   private final ImmutableSet<ComponentIdentifier> customBuildersComponentIdentifiers =
-          ImmutableSet.<ComponentIdentifier>builder()
-                  .add(MULE_PROPERTIES_IDENTIFIER)
-                  .add(MULE_PROPERTY_IDENTIFIER)
-                  .add(OBJECT_IDENTIFIER)
-                  .build();
+      ImmutableSet.<ComponentIdentifier>builder()
+          .add(MULE_PROPERTIES_IDENTIFIER)
+          .add(MULE_PROPERTY_IDENTIFIER)
+          .add(OBJECT_IDENTIFIER)
+          .build();
 
 
   private final String artifactId;
@@ -129,7 +129,8 @@ public class BeanDefinitionFactory {
    *                                            artifact.
    * @param errorTypeRepository
    */
-  public BeanDefinitionFactory(String artifactId, ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry, ErrorTypeRepository errorTypeRepository) {
+  public BeanDefinitionFactory(String artifactId, ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
+                               ErrorTypeRepository errorTypeRepository) {
     this.artifactId = artifactId;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.componentModelProcessor = buildComponentModelProcessorChainOfResponsability();
@@ -141,7 +142,7 @@ public class BeanDefinitionFactory {
 
   private void registerConfigurationPropertyProviders() {
     ServiceLoader<ConfigurationPropertiesProviderFactory> providerFactories =
-            java.util.ServiceLoader.load(ConfigurationPropertiesProviderFactory.class);
+        java.util.ServiceLoader.load(ConfigurationPropertiesProviderFactory.class);
     providerFactories.forEach(service -> {
       ignoredMuleExtensionComponentIdentifiers.add(service.getSupportedComponentIdentifier());
     });
@@ -149,7 +150,7 @@ public class BeanDefinitionFactory {
 
   public boolean isComponentIgnored(ComponentIdentifier identifier) {
     return ignoredMuleCoreComponentIdentifiers.contains(identifier) ||
-           ignoredMuleExtensionComponentIdentifiers.contains(identifier);
+        ignoredMuleExtensionComponentIdentifiers.contains(identifier);
   }
 
   /**
@@ -194,37 +195,40 @@ public class BeanDefinitionFactory {
     processMuleSecurityManager(componentModel, registry);
 
     componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
-            .ifPresent(componentBuildingDefinition -> {
-              if ((componentModel.getType() != null) && Component.class.isAssignableFrom(componentModel.getType())) {
-                addAnnotation(ANNOTATION_NAME, componentModel.getIdentifier(), componentModel);
-                // We need to use a mutable map since spring will resolve the properties placeholder present in the value if needed
-                // and it will be done by mutating the same map.
-                addAnnotation(ANNOTATION_PARAMETERS, new HashMap<>(componentModel.getRawParameters()), componentModel);
-                // add any error mappings if present
-                List<ComponentModel> errorMappingComponents = componentModel.getInnerComponents().stream()
-                        .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER.equals(innerComponent.getIdentifier())).collect(toList());
-                if (!errorMappingComponents.isEmpty()) {
-                  addAnnotation(ANNOTATION_ERROR_MAPPINGS, errorMappingComponents.stream().map(innerComponent -> {
-                    Map<String, String> parameters = innerComponent.getRawParameters();
-                    ComponentIdentifier source = parameters.containsKey(SOURCE_TYPE)
-                                                 ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE))
-                                                 : ANY;
+        .ifPresent(componentBuildingDefinition -> {
+          if ((componentModel.getType() != null) && Component.class.isAssignableFrom(componentModel.getType())) {
+            addAnnotation(ANNOTATION_NAME, componentModel.getIdentifier(), componentModel);
+            // We need to use a mutable map since spring will resolve the properties placeholder present in the value if needed
+            // and it will be done by mutating the same map.
+            addAnnotation(ANNOTATION_PARAMETERS, new HashMap<>(componentModel.getRawParameters()), componentModel);
+            // add any error mappings if present
+            List<ComponentModel> errorMappingComponents = componentModel.getInnerComponents().stream()
+                .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER.equals(innerComponent.getIdentifier())).collect(toList());
+            if (!errorMappingComponents.isEmpty()) {
+              addAnnotation(ANNOTATION_ERROR_MAPPINGS, errorMappingComponents.stream().map(innerComponent -> {
+                Map<String, String> parameters = innerComponent.getRawParameters();
+                ComponentIdentifier source = parameters.containsKey(SOURCE_TYPE)
+                    ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE))
+                    : ANY;
 
-                    ErrorType errorType = errorTypeRepository
-                            .lookupErrorType(source)
-                            .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source)));
+                ErrorType errorType = errorTypeRepository
+                    .lookupErrorType(source)
+                    .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source)));
 
-                    ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorType);
-                    ErrorType targetValue = errorTypeRepository.getErrorType(ComponentIdentifier.buildFromStringRepresentation(parameters.get(TARGET_TYPE))).orElseThrow(
-                            () -> new MuleRuntimeException(createStaticMessage("Could not find an errorType already registered for '%s'", componentModel.getIdentifier())));
-                    return new ErrorMapping(errorTypeMatcher, targetValue);
-                  }).collect(toList()), componentModel);
-                }
+                ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorType);
+                ErrorType targetValue = errorTypeRepository
+                    .getErrorType(ComponentIdentifier.buildFromStringRepresentation(parameters.get(TARGET_TYPE))).orElseThrow(
+                                                                                                                              () -> new MuleRuntimeException(createStaticMessage("Could not find an errorType already registered for '%s'",
+                                                                                                                                                                                 componentModel
+                                                                                                                                                                                     .getIdentifier())));
+                return new ErrorMapping(errorTypeMatcher, targetValue);
+              }).collect(toList()), componentModel);
+            }
 
-                componentLocator.addComponentLocation(componentModel.getComponentLocation());
-                addAnnotation(ANNOTATION_COMPONENT_CONFIG, componentModel, componentModel);
-              }
-            });
+            componentLocator.addComponentLocation(componentModel.getComponentLocation());
+            addAnnotation(ANNOTATION_COMPONENT_CONFIG, componentModel, componentModel);
+          }
+        });
 
     addAnnotation(LOCATION_KEY, componentModel.getComponentLocation(), componentModel);
     addAnnotation(REPRESENTATION_ANNOTATION_KEY, resolveProcessorRepresentation(artifactId,
@@ -249,22 +253,22 @@ public class BeanDefinitionFactory {
     StringBuilder stringBuilder = new StringBuilder();
 
     stringBuilder.append(processorPath.getLocation())
-            .append(" @ ")
-            .append(appId);
+        .append(" @ ")
+        .append(appId);
 
     String sourceFile = metadata.getFileName().orElse(null);
     if (sourceFile != null) {
       stringBuilder.append(":")
-              .append(sourceFile)
-              .append(":")
-              .append(metadata.getStartLine().orElse(-1));
+          .append(sourceFile)
+          .append(":")
+          .append(metadata.getStartLine().orElse(-1));
     }
 
     Object docName = metadata.getDocAttributes().get(NAME_ANNOTATION_KEY.getLocalPart());
     if (docName != null) {
       stringBuilder.append(" (")
-              .append(docName)
-              .append(")");
+          .append(docName)
+          .append(")");
     }
 
     return stringBuilder.toString();
@@ -308,12 +312,11 @@ public class BeanDefinitionFactory {
 
   private void resolveComponentBeanDefinition(SpringComponentModel componentModel) {
     Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
-            componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
+        componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
     if (buildingDefinitionOptional.isPresent() || customBuildersComponentIdentifiers.contains(componentModel.getIdentifier())) {
       this.componentModelProcessor.processRequest(new CreateBeanDefinitionRequest(componentModel,
                                                                                   buildingDefinitionOptional.orElse(null)));
-    }
-    else {
+    } else {
       processComponentWrapper(componentModel);
     }
   }
@@ -323,7 +326,7 @@ public class BeanDefinitionFactory {
       if (wrapperElementType.equals(SINGLE)) {
         if (componentModel.getInnerComponents().isEmpty()) {
           String location =
-                  componentModel.getComponentLocation() != null ? componentModel.getComponentLocation().getLocation() : "";
+              componentModel.getComponentLocation() != null ? componentModel.getComponentLocation().getLocation() : "";
           throw new IllegalStateException(format("Element [%s] located at [%s] does not have any child element declared, but one is required.",
                                                  componentModel.getIdentifier(), location));
         }
@@ -331,8 +334,7 @@ public class BeanDefinitionFactory {
         componentModel.setType(firstComponentModel.getType());
         componentModel.setBeanDefinition(firstComponentModel.getBeanDefinition());
         componentModel.setBeanReference(firstComponentModel.getBeanReference());
-      }
-      else {
+      } else {
         throw new IllegalStateException(format("Element %s does not have a building definition and it should since it's of type %s",
                                                componentModel.getIdentifier(), wrapperElementType));
       }
@@ -343,7 +345,7 @@ public class BeanDefinitionFactory {
     EagerObjectCreator eagerObjectCreator = new EagerObjectCreator();
     ObjectBeanDefinitionCreator objectBeanDefinitionCreator = new ObjectBeanDefinitionCreator();
     ExceptionStrategyRefBeanDefinitionCreator exceptionStrategyRefBeanDefinitionCreator =
-            new ExceptionStrategyRefBeanDefinitionCreator();
+        new ExceptionStrategyRefBeanDefinitionCreator();
     PropertiesMapBeanDefinitionCreator propertiesMapBeanDefinitionCreator = new PropertiesMapBeanDefinitionCreator();
     ReferenceBeanDefinitionCreator referenceBeanDefinitionCreator = new ReferenceBeanDefinitionCreator();
     SimpleTypeBeanDefinitionCreator simpleTypeBeanDefinitionCreator = new SimpleTypeBeanDefinitionCreator();
@@ -373,9 +375,9 @@ public class BeanDefinitionFactory {
    */
   public boolean hasDefinition(ComponentIdentifier componentIdentifier) {
     return isComponentIgnored(componentIdentifier)
-           || customBuildersComponentIdentifiers.contains(componentIdentifier)
-           || componentBuildingDefinitionRegistry.getBuildingDefinition(componentIdentifier).isPresent()
-           || componentBuildingDefinitionRegistry.getWrappedComponent(componentIdentifier).isPresent();
+        || customBuildersComponentIdentifiers.contains(componentIdentifier)
+        || componentBuildingDefinitionRegistry.getBuildingDefinition(componentIdentifier).isPresent()
+        || componentBuildingDefinitionRegistry.getWrappedComponent(componentIdentifier).isPresent();
   }
 
   /**
