@@ -186,8 +186,9 @@ public class FlowProcessMediator implements Initialisable {
             policyManager.createSourcePolicyInstance(messageSource, event, flowExecutionProcessor, template);
 
         final DefaultFlowProcessMediatorContext phaseContext = new DefaultFlowProcessMediatorContext(template,
-                                                           getTerminateConsumer(messageSource, template),
-                                                           responseCompletion);
+                                                                                                     getTerminateConsumer(messageSource,
+                                                                                                                          template),
+                                                                                                     responseCompletion);
         ((InternalEvent) event).setFlowProcessMediatorContext(phaseContext);
 
         dispatch(event, policy, flowConstruct, phaseContext);
@@ -390,7 +391,8 @@ public class FlowProcessMediator implements Initialisable {
     if (flowConstruct instanceof AbstractPipeline) {
       ((AbstractPipeline) flowConstruct).errorRouterForSourceResponseError(flow -> me -> {
         final InternalEvent event = (InternalEvent) ((MessagingException) me).getEvent();
-        final DefaultFlowProcessMediatorContext ctx = (DefaultFlowProcessMediatorContext) event.<DefaultFlowProcessMediatorContext>getFlowProcessMediatorContext();
+        final DefaultFlowProcessMediatorContext ctx =
+            (DefaultFlowProcessMediatorContext) event.<DefaultFlowProcessMediatorContext>getFlowProcessMediatorContext();
         sendErrorResponse((MessagingException) me,
                           from(event)
                               .getResponseParametersProcessor()
@@ -619,8 +621,8 @@ public class FlowProcessMediator implements Initialisable {
     private final CompletableFuture<Void> responseCompletion;
 
     private DefaultFlowProcessMediatorContext(FlowProcessTemplate template,
-                                       Consumer<Either<MessagingException, CoreEvent>> terminateConsumer,
-                                       CompletableFuture<Void> responseCompletion) {
+                                              Consumer<Either<MessagingException, CoreEvent>> terminateConsumer,
+                                              CompletableFuture<Void> responseCompletion) {
       this.template = template;
       this.terminateConsumer = terminateConsumer;
       this.responseCompletion = responseCompletion;
