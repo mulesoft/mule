@@ -8,6 +8,7 @@ package org.mule.runtime.extension.internal.config.dsl;
 
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -17,7 +18,6 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -32,15 +32,17 @@ class XmlSdkCompositeConfigurationInstance implements ConfigurationInstance {
 
   private final String name;
   private final ConfigurationModel model;
-  private final List<ConfigurationProvider> innerConfigProviders;
   private final Event event;
+  private final Registry registry;
 
-  public XmlSdkCompositeConfigurationInstance(String name, ConfigurationModel model,
-                                              List<ConfigurationProvider> innerConfigProviders, Event event) {
+  public XmlSdkCompositeConfigurationInstance(String name,
+                                              ConfigurationModel model,
+                                              Event event,
+                                              Registry registry) {
     this.name = name;
     this.model = model;
-    this.innerConfigProviders = innerConfigProviders;
     this.event = event;
+    this.registry = registry;
   }
 
   @Override
@@ -55,17 +57,11 @@ class XmlSdkCompositeConfigurationInstance implements ConfigurationInstance {
 
   @Override
   public Optional<ConnectionProvider> getConnectionProvider() {
-    final Optional<String> testConnectionGlobalElement = model.getConnectionProviderModel(MODULE_CONNECTION_GLOBAL_ELEMENT_NAME)
-        .flatMap(connProviderModel -> connProviderModel.getModelProperty(TestConnectionGlobalElementModelProperty.class))
-        .map(connTester -> connTester.getGlobalElementName() + "-" + getName());
-
-    return innerConfigProviders
-        .stream()
-        .filter(icp -> testConnectionGlobalElement.map(globalElementName -> globalElementName.equals(icp.getName())).orElse(true))
-        .map(icp -> icp.get(event).getConnectionProvider())
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .findFirst();
+    return model.getConnectionProviderModel(MODULE_CONNECTION_GLOBAL_ELEMENT_NAME)
+            .flatMap(connProviderModel -> connProviderModel.getModelProperty(TestConnectionGlobalElementModelProperty.class))
+            .map(connTester -> connTester.getGlobalElementName() + "-" + getName())
+            .flatMap(registry::<ConfigurationProvider>lookupByName)
+            .flatMap(cp -> cp.get(event).getConnectionProvider());
   }
 
   // No-op methods:

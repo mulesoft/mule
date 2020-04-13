@@ -19,6 +19,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -112,12 +113,11 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
               .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
               .withConstructorParameterDefinition(fromFixedValue(configurationModel).build())
               .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
+              .withConstructorParameterDefinition(fromReferenceObject(Registry.class).build())
               .withSetterParameterDefinition("parameters",
                                              fromMultipleDefinitions(paramsDefinitions
                                                  .toArray(new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
                                                      .build())
-              .withSetterParameterDefinition("innerConfigProviders",
-                                             fromChildCollectionConfiguration(ConfigurationProvider.class).build())
               .build());
         }
 
@@ -138,9 +138,8 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
             .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
             .withConstructorParameterDefinition(fromFixedValue(null).build())
             .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
+            .withConstructorParameterDefinition(fromReferenceObject(Registry.class).build())
             .withSetterParameterDefinition("parameters", fromFixedValue(null).build())
-            .withSetterParameterDefinition("innerConfigProviders",
-                                           fromChildCollectionConfiguration(ConfigurationProvider.class).build())
             .build());
       }
 
