@@ -72,6 +72,9 @@ class XmlSdkConfigurationProviderFactory extends AbstractExtensionObjectFactory<
   }
 
   public void setInnerConfigProviders(List<ConfigurationProvider> innerConfigProviders) {
+    //TODO: REMOVE THIS (MULE-17419)
+    //This is needed to reference actual configuration instances injected in the Registry instead of
+    //getting a new inner bean instance injected by Spring in this method
     this.innerConfigProviders = unmodifiableList(
             innerConfigProviders
                     .stream()
@@ -94,6 +97,7 @@ class XmlSdkConfigurationProviderFactory extends AbstractExtensionObjectFactory<
         .orElseThrow(() -> new RequiredParameterNotSetException("cannot create a configuration without a name"));
   }
 
+  //TODO: REMOVE THIS (MULE-17419)
   private class LazyGlobalConfigurationProvider implements ConfigurationProvider {
 
     private LazyValue<ConfigurationProvider> lazyProvider;
