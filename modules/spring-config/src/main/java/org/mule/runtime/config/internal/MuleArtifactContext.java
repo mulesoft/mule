@@ -25,7 +25,6 @@ import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
-import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.addAnnotation;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.updateAnnotationValue;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
@@ -40,14 +39,12 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
-import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationProcessor.processXmlConfiguration;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -83,8 +80,6 @@ import org.mule.runtime.config.internal.processor.PostRegistrationActionsPostPro
 import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
@@ -93,7 +88,6 @@ import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
@@ -112,7 +106,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -462,22 +455,17 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     List<ComponentModel> errorMappingComponents = componentModel.getInnerComponents().stream()
         .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER.equals(innerComponent.getIdentifier())).collect(toList());
     if (!errorMappingComponents.isEmpty()) {
-      addAnnotation(ANNOTATION_ERROR_MAPPINGS, errorMappingComponents.stream().map(innerComponent -> {
+      errorMappingComponents.stream().forEach(innerComponent -> {
         Map<String, String> parameters = innerComponent.getRawParameters();
         ComponentIdentifier source = parameters.containsKey(SOURCE_TYPE)
             ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE)) : ANY;
 
-        ErrorType errorType = muleContext.getErrorTypeRepository()
+        muleContext.getErrorTypeRepository()
             .lookupErrorType(source)
             .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source)));
 
-        ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorType);
-        ErrorType targetValue = resolveErrorType(parameters.get(TARGET_TYPE), syntheticErrorNamespaces, !disableXmlValidations);
-        if (targetValue == null) {
-          return targetValue;
-        }
-        return new ErrorMapping(errorTypeMatcher, targetValue);
-      }).filter(Objects::nonNull).collect(toList()), componentModel);
+        resolveErrorType(parameters.get(TARGET_TYPE), syntheticErrorNamespaces, !disableXmlValidations);
+      });
     }
   }
 
@@ -524,6 +512,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       }
     } else {
       syntheticErrorNamespaces.add(namespace);
+    }
+    if (logger.isDebugEnabled()) {
+      logger.debug(format("Registering errorType '%s'", errorIdentifier));
     }
     return errorTypeRepository.addErrorType(errorIdentifier, errorTypeRepository.getAnyErrorType());
   }

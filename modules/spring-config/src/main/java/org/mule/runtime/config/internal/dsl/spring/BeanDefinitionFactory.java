@@ -37,7 +37,6 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNO
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
 import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -57,6 +56,8 @@ import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
+import com.google.common.collect.ImmutableSet;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -68,7 +69,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-import com.google.common.collect.ImmutableSet;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -218,7 +218,7 @@ public class BeanDefinitionFactory {
                 ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorType);
                 ErrorType targetValue = errorTypeRepository
                     .getErrorType(ComponentIdentifier.buildFromStringRepresentation(parameters.get(TARGET_TYPE))).orElseThrow(
-                                                                                                                              () -> new MuleRuntimeException(createStaticMessage("Could not find an errorType already registered for '%s'",
+                                                                                                                              () -> new MuleRuntimeException(createStaticMessage("Could not find synthetic error '%s' in registry",
                                                                                                                                                                                  componentModel
                                                                                                                                                                                      .getIdentifier())));
                 return new ErrorMapping(errorTypeMatcher, targetValue);
