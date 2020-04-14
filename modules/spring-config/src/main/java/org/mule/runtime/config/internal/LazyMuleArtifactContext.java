@@ -221,7 +221,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     initialize();
     //Graph should be generated after the initialize() method since the applicationModel will change by macro expanding XmlSdk components.
-    this.graph = generateFor(applicationModel);
+    this.graph = generateFor(getApplicationModel());
   }
 
   @Override
@@ -368,7 +368,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       }
 
       Set<String> requestedLocations = locationOptional.map(location -> (Set<String>) newHashSet(location.toString()))
-          .orElseGet(() -> applicationModel.recursiveStream()
+          .orElseGet(() -> getApplicationModel().recursiveStream()
               .filter(basePredicate)
               .filter(comp -> comp.getLocation() != null)
               .map(comp -> comp.getLocation().getLocation())
@@ -467,7 +467,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       private Stream<ComponentAst> getDefaultGlobalElements() {
         // defaultGlobalElements from XML DSK components are not referenced from the app, so we need to initialize those if there
         // is any operation that may use it in the app.
-        return applicationModel.topLevelComponentsStream()
+        return getApplicationModel().topLevelComponentsStream()
             .filter(comp -> DEFAULT_GLOBAL_ELEMENTS.equals(comp.getIdentifier().getName())
                 && allNamespaces.contains(comp.getIdentifier().getNamespaceUri()))
             .flatMap(comp -> comp.directChildrenStream());
@@ -690,7 +690,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   @Override
   protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
-    applicationModel.recursiveStream()
+    getApplicationModel().recursiveStream()
         .filter(cm -> !beanDefinitionFactory.isComponentIgnored(cm.getIdentifier()))
         .forEach(cm -> componentLocator.addComponentLocation(cm.getLocation()));
   }

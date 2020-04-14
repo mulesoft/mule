@@ -157,7 +157,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final Optional<ConfigurationProperties> parentConfigurationProperties;
   private final DefaultRegistry serviceDiscoverer;
   private final DefaultResourceLocator resourceLocator;
-  protected final ApplicationModel applicationModel;
+  private final ApplicationModel applicationModel;
   private final MuleContextWithRegistry muleContext;
   private final ConfigResource[] artifactConfigResources;
   protected BeanDefinitionFactory beanDefinitionFactory;
@@ -250,7 +250,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   private void validateAllConfigElementHaveParsers() {
-    applicationModel.executeOnEveryComponentTree(componentModel -> {
+    applicationModel.recursiveStream().forEach(componentModel -> {
       if (!beanDefinitionFactory.hasDefinition(componentModel.getIdentifier())) {
         throw new RuntimeException(format("Invalid config '%s'. No definition parser found for that config",
                                           componentModel.getIdentifier()));
@@ -438,7 +438,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private void registerErrorTypes() {
     Set<String> syntheticErrorNamespaces = new HashSet<>();
 
-    applicationModel.executeOnEveryMuleComponentTree(cm -> {
+    applicationModel.recursiveStream().forEach(cm -> {
       SpringComponentModel componentModel = (SpringComponentModel) cm;
       resolveErrorTypes(componentModel, syntheticErrorNamespaces);
     });
@@ -823,6 +823,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   @Override
   public ClassLoader getExecutionClassLoader() {
     return muleContext.getExecutionClassLoader();
+  }
+
+  public ApplicationModel getApplicationModel() {
+    return applicationModel;
   }
 
 }

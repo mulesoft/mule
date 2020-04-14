@@ -21,13 +21,13 @@ import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.beans.Introspector;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Installer for mule artifacts inside the mule container directories.
@@ -47,8 +47,8 @@ public class ArtifactArchiveInstaller {
 
   /**
    * Installs an artifact in the mule container.
-   *
-   * Created the artifact directory and the anchor file related.
+   * <p>
+   * Creates the artifact directory and the anchor file related.
    *
    * @param artifactUri URI of the artifact to install. It must be present in the artifact directory as a zip file.
    * @return the location of the installed artifact.

@@ -123,22 +123,23 @@ public class MacroExpansionModuleModel {
   }
 
   private void expandOperations(Set<String> moduleGlobalElementsNames) {
-    applicationModel.executeOnEveryMuleComponentTree(containerComponentModel -> containerComponentModel.getInnerComponents()
-        .stream()
+    applicationModel.recursiveStream()
         .filter(operationRefModel -> operationRefModel.getIdentifier().getNamespace()
             .equals(extensionModel.getXmlDslModel().getPrefix()))
         .forEach(operationRefModel -> {
           operationRefModel.getModel(OperationModel.class)
               .ifPresent(operationModel -> {
-                final String containerName = calculateContainerRootName(containerComponentModel, operationModel);
+                final String containerName =
+                    calculateContainerRootName(((ComponentModel) operationRefModel).getParent(), operationModel);
                 final ComponentModel moduleOperationChain =
-                    createModuleOperationChain(operationRefModel, operationModel, moduleGlobalElementsNames, empty(),
+                    createModuleOperationChain((ComponentModel) operationRefModel, operationModel, moduleGlobalElementsNames,
+                                               empty(),
                                                containerName);
 
-                moduleOperationChain.getInnerComponents().forEach(inner -> inner.setParent(operationRefModel));
-                operationRefModel.getInnerComponents().addAll(moduleOperationChain.getInnerComponents());
+                moduleOperationChain.getInnerComponents().forEach(inner -> inner.setParent((ComponentModel) operationRefModel));
+                ((ComponentModel) operationRefModel).getInnerComponents().addAll(moduleOperationChain.getInnerComponents());
               });
-        }));
+        });
   }
 
   /**
@@ -187,7 +188,7 @@ public class MacroExpansionModuleModel {
   private void addDefaultGlobalElements(Set<String> moduleGlobalElementsNames) {
     // scenario where it will macro expand the default elements of a <module/>
     String defaultGlobalElementSuffix = defaultGlobalElementName().get();
-    ComponentModel rootComponentModel = applicationModel.getRootComponentModel();
+    // ComponentModel rootComponentModel = applicationModel.getRootComponentModel();
     List<ComponentModel> globalElements =
         extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class).get().getGlobalElements();
 
@@ -203,41 +204,40 @@ public class MacroExpansionModuleModel {
       final ComponentModel macroExpandedImplicitGlobalElement =
           copyGlobalElementComponentModel(globalElementComponenModel, defaultGlobalElementSuffix, moduleGlobalElementsNames,
                                           new HashMap<>());
-      macroExpandedImplicitGlobalElement.setRoot(true);
-      macroExpandedImplicitGlobalElement.setParent(rootComponentModel);
+      // macroExpandedImplicitGlobalElement.setRoot(true);
+      // macroExpandedImplicitGlobalElement.setParent(rootComponentModel);
 
       configRefModel.getInnerComponents().add(macroExpandedImplicitGlobalElement);
     });
 
-    rootComponentModel.getInnerComponents().add(configRefModel);
+    // rootComponentModel.getInnerComponents().add(configRefModel);
+    applicationModel.addMacroExpandedRoot(configRefModel);
   }
 
   private void macroExpandGlobalElements(List<ComponentModel> moduleComponentModels, Set<String> moduleGlobalElementsNames) {
     // scenario where it will macro expand as many times as needed all the references of the smart connector configurations
-    applicationModel.executeOnEveryMuleComponentTree(muleRootComponentModel -> {
-      muleRootComponentModel.getInnerComponents()
-          .stream()
-          .filter(configRefModel -> configRefModel.getIdentifier().getNamespace()
-              .equals(extensionModel.getXmlDslModel().getPrefix()))
-          .forEach(configRefModel -> {
-            ((ComponentAst) configRefModel).getModel(ConfigurationModel.class)
-                .ifPresent(configurationModel -> {
-                  Map<String, String> propertiesMap = ((ComponentAst) configRefModel).getParameters()
-                      .stream()
-                      .collect(toMap(paramAst -> paramAst.getModel().getName(),
-                                     paramAst -> paramAst.getValue().reduce(v -> v.toString(), v -> v.toString())));
-                  Map<String, String> connectionPropertiesMap =
-                      extractConnectionProperties((ComponentAst) configRefModel, configurationModel);
-                  propertiesMap.putAll(connectionPropertiesMap);
-                  final Map<String, String> literalsParameters = getLiteralParameters(propertiesMap, emptyMap());
-                  List<ComponentModel> replacementGlobalElements =
-                      createGlobalElementsInstance(configRefModel, moduleComponentModels, moduleGlobalElementsNames,
-                                                   literalsParameters);
-                  configRefModel.getInnerComponents().clear();
-                  configRefModel.getInnerComponents().addAll(replacementGlobalElements);
-                });
-          });
-    });
+    applicationModel.recursiveStream()
+        .filter(configRefModel -> configRefModel.getIdentifier().getNamespace()
+            .equals(extensionModel.getXmlDslModel().getPrefix()))
+        .forEach(configRefModel -> {
+          configRefModel.getModel(ConfigurationModel.class)
+              .ifPresent(configurationModel -> {
+                Map<String, String> propertiesMap = configRefModel.getParameters()
+                    .stream()
+                    .collect(toMap(paramAst -> paramAst.getModel().getName(),
+                                   paramAst -> paramAst.getValue().reduce(v -> v.toString(), v -> v.toString())));
+                Map<String, String> connectionPropertiesMap =
+                    extractConnectionProperties(configRefModel, configurationModel);
+                propertiesMap.putAll(connectionPropertiesMap);
+                final Map<String, String> literalsParameters = getLiteralParameters(propertiesMap, emptyMap());
+                List<ComponentModel> replacementGlobalElements =
+                    createGlobalElementsInstance((ComponentModel) configRefModel, moduleComponentModels,
+                                                 moduleGlobalElementsNames,
+                                                 literalsParameters);
+                ((ComponentModel) configRefModel).getInnerComponents().clear();
+                ((ComponentModel) configRefModel).getInnerComponents().addAll(replacementGlobalElements);
+              });
+        });
   }
 
   private Optional<ConfigurationModel> getConfigurationModel() {

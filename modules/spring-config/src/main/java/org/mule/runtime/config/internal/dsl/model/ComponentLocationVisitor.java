@@ -19,7 +19,6 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SUBFLOW_IDENTIFIER;
@@ -94,8 +93,7 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
   }
 
   public void accept(ComponentAst componentModel, List<ComponentAst> hierarchy) {
-    if (((ComponentModel) componentModel).getParent() == null) {
-      // do not process root element
+    if (((ComponentModel) componentModel).getComponentLocation() != null) {
       return;
     }
 

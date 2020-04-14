@@ -18,6 +18,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -110,7 +111,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -118,8 +118,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -128,6 +126,9 @@ import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.w3c.dom.Document;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 
 /**
  * Describes an {@link ExtensionModel} by scanning an XML provided in the constructor
@@ -529,7 +530,7 @@ public final class XmlExtensionLoaderDelegate {
                                                                  XmlDslModel xmlDslModel) {
     final Set<String> namespaceDependencies = getUsedNamespaces(moduleModel).stream()
         .filter(namespace -> !xmlDslModel.getNamespace().equals(namespace))
-        .collect(Collectors.toSet());
+        .collect(toSet());
     return new XmlExtensionModelProperty(namespaceDependencies);
   }
 

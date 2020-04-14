@@ -134,7 +134,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                            new ArrayList<>(getArtifactPluginDescriptors(descriptor)), true);
 
     // Refreshes the list of plugins on the descriptor with the resolved from domain and transitive plugin dependencies
-    Set resolvedArtifactPlugins = new LinkedHashSet<>();
+    Set<ArtifactPluginDescriptor> resolvedArtifactPlugins = new LinkedHashSet<>();
     resolvedArtifactPlugins.addAll(resolvedArtifactPluginDescriptors);
     descriptor.setPlugins(resolvedArtifactPlugins);
 
