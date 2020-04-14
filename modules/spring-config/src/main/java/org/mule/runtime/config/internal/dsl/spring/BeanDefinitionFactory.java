@@ -216,11 +216,7 @@ public class BeanDefinitionFactory {
                     .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source)));
 
                 ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorType);
-                ErrorType targetValue = errorTypeRepository
-                    .getErrorType(ComponentIdentifier.buildFromStringRepresentation(parameters.get(TARGET_TYPE))).orElseThrow(
-                                                                                                                              () -> new MuleRuntimeException(createStaticMessage("Could not find synthetic error '%s' in registry",
-                                                                                                                                                                                 componentModel
-                                                                                                                                                                                     .getIdentifier())));
+                ErrorType targetValue = resolveErrorType(parameters.get(TARGET_TYPE));
                 return new ErrorMapping(errorTypeMatcher, targetValue);
               }).collect(toList()), componentModel);
             }
@@ -238,6 +234,32 @@ public class BeanDefinitionFactory {
 
     BeanDefinition beanDefinition = componentModel.getBeanDefinition();
     return beanDefinition;
+  }
+
+  private ErrorType resolveErrorType(String representation) {
+    ComponentIdentifier errorIdentifier = parserErrorType(representation);
+    if (CORE_ERROR_NS.equals(errorIdentifier.getNamespace())) {
+      return errorTypeRepository.lookupErrorType(errorIdentifier)
+              .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("There's no MULE error named '%s'.",
+                                                                                     errorIdentifier.getName()))));
+    }
+    return errorTypeRepository.lookupErrorType(errorIdentifier)
+            .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find synthetic error '%s' in registry", errorIdentifier)));
+  }
+
+  public static ComponentIdentifier parserErrorType(String representation) {
+    int separator = representation.indexOf(":");
+    String namespace;
+    String identifier;
+    if (separator > 0) {
+      namespace = representation.substring(0, separator).toUpperCase();
+      identifier = representation.substring(separator + 1).toUpperCase();
+    } else {
+      namespace = CORE_ERROR_NS;
+      identifier = representation.toUpperCase();
+    }
+
+    return ComponentIdentifier.builder().namespace(namespace).name(identifier).build();
   }
 
   /**

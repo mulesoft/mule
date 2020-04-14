@@ -25,6 +25,7 @@ import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_SINGLETON_OBJECT;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
+import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.parserErrorType;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.updateAnnotationValue;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
@@ -332,6 +333,13 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   @Override
+  protected void prepareRefresh() {
+    super.prepareRefresh();
+    // As this is the only way we get this context initialized we will register the error types at this point
+    registerErrorTypes();
+  }
+
+  @Override
   protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
     super.prepareBeanFactory(beanFactory);
     beanFactory.setBeanExpressionResolver(null);
@@ -350,8 +358,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                           new ComponentLocatorCreatePostProcessor(componentLocator));
 
     beanFactory.registerSingleton(OBJECT_MULE_CONTEXT, muleContext);
-
-    registerErrorTypes();
 
     prepareObjectProviders();
   }
@@ -429,7 +435,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     createApplicationComponents(beanFactory, applicationModel, true);
   }
 
-  protected void registerErrorTypes() {
+  private void registerErrorTypes() {
     Set<String> syntheticErrorNamespaces = new HashSet<>();
 
     applicationModel.executeOnEveryMuleComponentTree(cm -> {
@@ -481,18 +487,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   private ErrorType resolveErrorType(String representation, Set<String> syntheticErrorNamespaces, boolean checkErrorTypes) {
-    int separator = representation.indexOf(":");
-    String namespace;
-    String identifier;
-    if (separator > 0) {
-      namespace = representation.substring(0, separator).toUpperCase();
-      identifier = representation.substring(separator + 1).toUpperCase();
-    } else {
-      namespace = CORE_ERROR_NS;
-      identifier = representation.toUpperCase();
-    }
-
-    ComponentIdentifier errorIdentifier = ComponentIdentifier.builder().namespace(namespace).name(identifier).build();
+    ComponentIdentifier errorIdentifier = parserErrorType(representation);
+    String namespace = errorIdentifier.getNamespace();
+    String identifier = errorIdentifier.getName();
     ErrorTypeRepository errorTypeRepository = muleContext.getErrorTypeRepository();
     Optional<ErrorType> optionalErrorType = errorTypeRepository.lookupErrorType(errorIdentifier);
     if (CORE_ERROR_NS.equals(namespace)) {
