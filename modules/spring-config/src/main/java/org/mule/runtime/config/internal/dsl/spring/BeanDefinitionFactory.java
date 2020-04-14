@@ -240,11 +240,12 @@ public class BeanDefinitionFactory {
     ComponentIdentifier errorIdentifier = parserErrorType(representation);
     if (CORE_ERROR_NS.equals(errorIdentifier.getNamespace())) {
       return errorTypeRepository.lookupErrorType(errorIdentifier)
-              .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("There's no MULE error named '%s'.",
-                                                                                     errorIdentifier.getName()))));
+          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("There's no MULE error named '%s'.",
+                                                                                 errorIdentifier.getName()))));
     }
     return errorTypeRepository.lookupErrorType(errorIdentifier)
-            .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find synthetic error '%s' in registry", errorIdentifier)));
+        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find synthetic error '%s' in registry",
+                                                                        errorIdentifier)));
   }
 
   public static ComponentIdentifier parserErrorType(String representation) {
