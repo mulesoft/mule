@@ -58,10 +58,10 @@ class XmlSdkCompositeConfigurationInstance implements ConfigurationInstance {
   @Override
   public Optional<ConnectionProvider> getConnectionProvider() {
     return model.getConnectionProviderModel(MODULE_CONNECTION_GLOBAL_ELEMENT_NAME)
-            .flatMap(connProviderModel -> connProviderModel.getModelProperty(TestConnectionGlobalElementModelProperty.class))
-            .map(connTester -> connTester.getGlobalElementName() + "-" + getName())
-            .flatMap(registry::<ConfigurationProvider>lookupByName)
-            .flatMap(cp -> cp.get(event).getConnectionProvider());
+        .flatMap(connProviderModel -> connProviderModel.getModelProperty(TestConnectionGlobalElementModelProperty.class))
+        .map(connTester -> connTester.getGlobalElementName() + "-" + getName())
+        .flatMap(registry::<ConfigurationProvider>lookupByName)
+        .flatMap(cp -> cp.get(event).getConnectionProvider());
   }
 
   // No-op methods:
