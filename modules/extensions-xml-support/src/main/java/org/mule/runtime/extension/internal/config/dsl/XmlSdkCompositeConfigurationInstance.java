@@ -57,28 +57,30 @@ class XmlSdkCompositeConfigurationInstance implements ConfigurationInstance {
 
   @Override
   public Optional<ConnectionProvider> getConnectionProvider() {
-    return model.getConnectionProviderModel(MODULE_CONNECTION_GLOBAL_ELEMENT_NAME)
-        .flatMap(connProviderModel -> connProviderModel.getModelProperty(TestConnectionGlobalElementModelProperty.class))
-        .map(connTester -> connTester.getGlobalElementName() + "-" + getName())
-        .flatMap(registry::<ConfigurationProvider>lookupByName)
-        .flatMap(cp -> cp.get(event).getConnectionProvider());
+    return getActualConfigurationInstance().flatMap(ConfigurationInstance::getConnectionProvider);
   }
-
-  // No-op methods:
 
   @Override
   public Object getValue() {
-    return null;
+    return getActualConfigurationInstance().map(ConfigurationInstance::getValue).orElse(null);
   }
 
   @Override
   public ConfigurationStats getStatistics() {
-    return null;
+    return getActualConfigurationInstance().map(ConfigurationInstance::getStatistics).orElse(null);
   }
 
   @Override
   public ConfigurationState getState() {
-    return null;
+    return getActualConfigurationInstance().map(ConfigurationInstance::getState).orElse(null);
+  }
+
+  private Optional<ConfigurationInstance> getActualConfigurationInstance() {
+    return model.getConnectionProviderModel(MODULE_CONNECTION_GLOBAL_ELEMENT_NAME)
+        .flatMap(connProviderModel -> connProviderModel.getModelProperty(TestConnectionGlobalElementModelProperty.class))
+        .map(connTester -> connTester.getGlobalElementName() + "-" + getName())
+        .flatMap(registry::<ConfigurationProvider>lookupByName)
+        .map(cp -> cp.get(event));
   }
 
 }
