@@ -23,6 +23,7 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.event.DefaultEventContext.setMaxDepth;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_COUNTER_VARIABLE;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAGE_VARIABLE;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
@@ -30,6 +31,7 @@ import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignabl
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
@@ -37,6 +39,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.event.EventContextDeepNestingException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -419,6 +422,51 @@ public class ForeachTestCase extends AbstractReactiveProcessorTestCase {
 
     assertThat(result.getMessage(), equalTo(input.getMessage()));
     assertThat(processedEvents, hasSize(0));
+  }
+
+  @Test
+  @Issue("MULE-18301")
+  @io.qameta.allure.Description("It should work ok when the number of nested ForEach is lower than EventContext#maxDepth")
+  public void nestManyForeachBelowLimit() throws Exception {
+    processNestedForeach(asList("bar", "zip"), 24, 25);
+
+    assertSimpleProcessedMessages();
+  }
+
+  @Test
+  @Issue("MULE-18301")
+  @io.qameta.allure.Description("It should get the correct exception when there are more nested ForEach than EventContext#maxDepth")
+  public void failWhenMaxDepthReached() throws Exception {
+    expectedException.expect(EventContextDeepNestingException.class);
+    expectedException.expectMessage("Too many child contexts nested.");
+
+    processNestedForeach(asList(asList("hallo")), 6, 5);
+  }
+
+  public void processNestedForeach(Object lastPayload, int nestedForeachDepth, int maxDepth) throws Exception {
+    try {
+      // noinspection deprecation
+      setMaxDepth(maxDepth);
+
+      foreach = createNestedForeach(lastPayload, nestedForeachDepth);
+
+      process(foreach, eventBuilder(muleContext).message(of(asList(1))).build());
+    } finally {
+      // noinspection deprecation
+      setMaxDepth(25);
+    }
+  }
+
+  private Foreach createNestedForeach(Object lastPayload, int depth) throws MuleException {
+    Processor listProcessor = event -> CoreEvent.builder(event).message(of(asList(1))).build();
+
+    Foreach root = createForeach(asList(e -> CoreEvent.builder(e).message(of(lastPayload)).build(), simpleForeach));
+    for (int i = 0; i < depth - 1; i++) {
+      root = createForeach(asList(listProcessor, root));
+    }
+    initialiseIfNeeded(root, muleContext);
+
+    return root;
   }
 
   private CoreEvent processInChain(Processor processor, CoreEvent event) throws Exception {
