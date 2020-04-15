@@ -56,7 +56,7 @@ abstract class AbstractEventContext implements BaseEventContext {
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventContext.class);
   private static final FlowExceptionHandler NULL_EXCEPTION_HANDLER = NullExceptionHandler.getInstance();
 
-  private static final int MAX_DEPTH = getInteger(BaseEventContext.class.getName() + ".maxDepth", 25);
+  private static int MAX_DEPTH = getInteger(BaseEventContext.class.getName() + ".maxDepth", 25);
 
   private final boolean debugLogEnabled = LOGGER.isDebugEnabled();
   private transient final List<BaseEventContext> childContexts = new ArrayList<>();
@@ -405,5 +405,21 @@ abstract class AbstractEventContext implements BaseEventContext {
 
   public Lock getChildContextsWriteLock() {
     return childContextsReadWriteLock.writeLock();
+  }
+
+  /**
+   * Sets the max depth allowed to nest instances of {@link org.mule.runtime.api.event.EventContext}. Be aware that this method is
+   * just for testing purposes. The maxDepth should be set only by using the proper System Property:
+   * 
+   * <pre>
+   * org.mule.runtime.core.privileged.event.BaseEventContext.maxDepth
+   * </pre>
+   * 
+   * @param maxDepth
+   *
+   * @deprecated Use only for testing
+   */
+  public static void setMaxDepth(int maxDepth) {
+    MAX_DEPTH = maxDepth;
   }
 }

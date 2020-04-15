@@ -33,6 +33,7 @@ import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.event.EventContextDeepNestingException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurer;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerIterator;
@@ -120,13 +121,22 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
                 return responseBuilder.build();
               })
               .onErrorMap(MessagingException.class, me -> {
-                // Restore variables in case of error also
-                CoreEvent.Builder exceptionEventBuilder = builder(me.getEvent());
-                restoreVariables(previousCounterVar, previousRootMessageVar, exceptionEventBuilder);
-                me.setProcessedEvent(exceptionEventBuilder.build());
+                restoreVariablesOnError(previousCounterVar, previousRootMessageVar, me);
+                return me;
+              })
+              .onErrorMap(EventContextDeepNestingException.class, ecd -> {
+                MessagingException me = new MessagingException(requestEvent, ecd);
+                restoreVariablesOnError(previousCounterVar, previousRootMessageVar, me);
                 return me;
               });
         });
+  }
+
+  private void restoreVariablesOnError(Object previousCounterVar, Object previousRootMessageVar, MessagingException me) {
+    // Restore variables in case of error also
+    Builder exceptionEventBuilder = builder(me.getEvent());
+    restoreVariables(previousCounterVar, previousRootMessageVar, exceptionEventBuilder);
+    me.setProcessedEvent(exceptionEventBuilder.build());
   }
 
   private void restoreVariables(Object previousCounterVar, Object previousRootMessageVar, Builder responseBuilder) {
