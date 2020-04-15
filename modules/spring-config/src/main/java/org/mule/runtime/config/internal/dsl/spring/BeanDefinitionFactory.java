@@ -249,7 +249,7 @@ public class BeanDefinitionFactory {
   }
 
   public static ComponentIdentifier parserErrorType(String representation) {
-    int separator = representation.indexOf(":");
+    int separator = representation.indexOf(':');
     String namespace;
     String identifier;
     if (separator > 0) {

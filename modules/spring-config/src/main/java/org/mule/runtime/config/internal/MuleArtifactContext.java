@@ -466,9 +466,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         ComponentIdentifier source = parameters.containsKey(SOURCE_TYPE)
             ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE)) : ANY;
 
-        muleContext.getErrorTypeRepository()
-            .lookupErrorType(source)
-            .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source)));
+        if (!muleContext.getErrorTypeRepository().lookupErrorType(source).isPresent()) {
+          throw new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source));
+        }
 
         resolveErrorType(parameters.get(TARGET_TYPE), syntheticErrorNamespaces, !disableXmlValidations);
       });
