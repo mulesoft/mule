@@ -12,6 +12,7 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.TestConnectionGlobalElementModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -34,6 +35,7 @@ class XmlSdkCompositeConfigurationInstance implements ConfigurationInstance {
   private final ConfigurationModel model;
   private final Event event;
   private final Registry registry;
+  private final LazyValue<Optional<ConfigurationInstance>> actualConfigurationInstance;
 
   public XmlSdkCompositeConfigurationInstance(String name,
                                               ConfigurationModel model,
@@ -43,6 +45,14 @@ class XmlSdkCompositeConfigurationInstance implements ConfigurationInstance {
     this.model = model;
     this.event = event;
     this.registry = registry;
+    this.actualConfigurationInstance = new LazyValue<>(
+                                                       () -> model
+                                                           .getConnectionProviderModel(MODULE_CONNECTION_GLOBAL_ELEMENT_NAME)
+                                                           .flatMap(connProviderModel -> connProviderModel
+                                                               .getModelProperty(TestConnectionGlobalElementModelProperty.class))
+                                                           .map(connTester -> connTester.getGlobalElementName() + "-" + getName())
+                                                           .flatMap(registry::<ConfigurationProvider>lookupByName)
+                                                           .map(cp -> cp.get(event)));
   }
 
   @Override
@@ -57,30 +67,22 @@ class XmlSdkCompositeConfigurationInstance implements ConfigurationInstance {
 
   @Override
   public Optional<ConnectionProvider> getConnectionProvider() {
-    return getActualConfigurationInstance().flatMap(ConfigurationInstance::getConnectionProvider);
+    return actualConfigurationInstance.get().flatMap(ConfigurationInstance::getConnectionProvider);
   }
 
   @Override
   public Object getValue() {
-    return getActualConfigurationInstance().map(ConfigurationInstance::getValue).orElse(null);
+    return actualConfigurationInstance.get().map(ConfigurationInstance::getValue).orElse(null);
   }
 
   @Override
   public ConfigurationStats getStatistics() {
-    return getActualConfigurationInstance().map(ConfigurationInstance::getStatistics).orElse(null);
+    return actualConfigurationInstance.get().map(ConfigurationInstance::getStatistics).orElse(null);
   }
 
   @Override
   public ConfigurationState getState() {
-    return getActualConfigurationInstance().map(ConfigurationInstance::getState).orElse(null);
-  }
-
-  private Optional<ConfigurationInstance> getActualConfigurationInstance() {
-    return model.getConnectionProviderModel(MODULE_CONNECTION_GLOBAL_ELEMENT_NAME)
-        .flatMap(connProviderModel -> connProviderModel.getModelProperty(TestConnectionGlobalElementModelProperty.class))
-        .map(connTester -> connTester.getGlobalElementName() + "-" + getName())
-        .flatMap(registry::<ConfigurationProvider>lookupByName)
-        .map(cp -> cp.get(event));
+    return actualConfigurationInstance.get().map(ConfigurationInstance::getState).orElse(null);
   }
 
 }
