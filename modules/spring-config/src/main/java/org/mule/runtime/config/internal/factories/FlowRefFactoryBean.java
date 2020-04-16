@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContextDontPropagateErrors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -443,7 +444,9 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
             .onErrorMap(MessagingException.class, getMessagingExceptionMapper()), componentLocation);
       } else {
         // If the resolved target is not a flow, it should be a subflow
-        return Mono.just(event).transform(resolvedTarget);
+        return Mono.just(event).transform(resolvedTarget)
+            // This is needed for all cases because of the way that flow-ref invokes flows dynamically
+            .subscriberContext(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true));
       }
     }
 
