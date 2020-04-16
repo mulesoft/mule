@@ -7,9 +7,12 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.REPRESENTATION_ANNOTATION_KEY;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_DOMAIN_IDENTIFIER;
@@ -28,27 +31,37 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPE
 import static org.mule.runtime.config.internal.model.ApplicationModel.OBJECT_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.SECURITY_MANAGER_IDENTIFIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_PARAMETERS;
+import static org.mule.runtime.core.internal.exception.ErrorMapping.ANNOTATION_ERROR_MAPPINGS;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.functional.Either;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
 import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
+import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
+import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
+import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+
+import com.google.common.collect.ImmutableSet;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -60,8 +73,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.w3c.dom.Element;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * The {@code BeanDefinitionFactory} is the one that knows how to convert a {@code ComponentModel} to an actual
@@ -111,16 +122,20 @@ public class BeanDefinitionFactory {
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
   private final BeanDefinitionCreator componentModelProcessor;
   private final ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
+  private final ErrorTypeRepository errorTypeRepository;
 
   /**
    * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the
-   *        artifact.
+   *                                            artifact.
+   * @param errorTypeRepository
    */
-  public BeanDefinitionFactory(String artifactId, ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry) {
+  public BeanDefinitionFactory(String artifactId, ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
+                               ErrorTypeRepository errorTypeRepository) {
     this.artifactId = artifactId;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.componentModelProcessor = buildComponentModelProcessorChainOfResponsability();
     this.ignoredMuleExtensionComponentIdentifiers = new HashSet<>();
+    this.errorTypeRepository = errorTypeRepository;
 
     registerConfigurationPropertyProviders();
   }
@@ -141,12 +156,12 @@ public class BeanDefinitionFactory {
   /**
    * Creates a {@code BeanDefinition} by traversing the {@code ComponentModel} and its children.
    *
-   * @param componentModel the component model from which we want to create the bean definition.
-   * @param registry the bean registry since it may be required to get other bean definitions to create this one or to register
-   *        the bean definition.
+   * @param componentModel              the component model from which we want to create the bean definition.
+   * @param registry                    the bean registry since it may be required to get other bean definitions to create this one or to register
+   *                                    the bean definition.
    * @param componentModelPostProcessor a function to post process the bean definition.
-   * @param oldParsingMechanism a function to execute the old parsing mechanism if required by children {@code ComponentModel}s
-   * @param componentLocator where the locations of any {@link Component}'s locations must be registered
+   * @param oldParsingMechanism         a function to execute the old parsing mechanism if required by children {@code ComponentModel}s
+   * @param componentLocator            where the locations of any {@link Component}'s locations must be registered
    * @return the {@code BeanDefinition} of the component model.
    */
   public BeanDefinition resolveComponentRecursively(SpringComponentModel componentModel, BeanDefinitionRegistry registry,
@@ -186,6 +201,26 @@ public class BeanDefinitionFactory {
             // We need to use a mutable map since spring will resolve the properties placeholder present in the value if needed
             // and it will be done by mutating the same map.
             addAnnotation(ANNOTATION_PARAMETERS, new HashMap<>(componentModel.getRawParameters()), componentModel);
+            // add any error mappings if present
+            List<ComponentModel> errorMappingComponents = componentModel.getInnerComponents().stream()
+                .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER.equals(innerComponent.getIdentifier())).collect(toList());
+            if (!errorMappingComponents.isEmpty()) {
+              addAnnotation(ANNOTATION_ERROR_MAPPINGS, errorMappingComponents.stream().map(innerComponent -> {
+                Map<String, String> parameters = innerComponent.getRawParameters();
+                ComponentIdentifier source = parameters.containsKey(SOURCE_TYPE)
+                    ? buildFromStringRepresentation(parameters.get(SOURCE_TYPE))
+                    : ANY;
+
+                ErrorType errorType = errorTypeRepository
+                    .lookupErrorType(source)
+                    .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find error '%s'.", source)));
+
+                ErrorTypeMatcher errorTypeMatcher = new SingleErrorTypeMatcher(errorType);
+                ErrorType targetValue = resolveErrorType(parameters.get(TARGET_TYPE));
+                return new ErrorMapping(errorTypeMatcher, targetValue);
+              }).collect(toList()), componentModel);
+            }
+
             componentLocator.addComponentLocation(componentModel.getComponentLocation());
             addAnnotation(ANNOTATION_COMPONENT_CONFIG, componentModel, componentModel);
           }
@@ -199,6 +234,33 @@ public class BeanDefinitionFactory {
 
     BeanDefinition beanDefinition = componentModel.getBeanDefinition();
     return beanDefinition;
+  }
+
+  private ErrorType resolveErrorType(String representation) {
+    ComponentIdentifier errorIdentifier = parserErrorType(representation);
+    if (CORE_ERROR_NS.equals(errorIdentifier.getNamespace())) {
+      return errorTypeRepository.lookupErrorType(errorIdentifier)
+          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("There's no MULE error named '%s'.",
+                                                                                 errorIdentifier.getName()))));
+    }
+    return errorTypeRepository.lookupErrorType(errorIdentifier)
+        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find synthetic error '%s' in registry",
+                                                                        errorIdentifier)));
+  }
+
+  public static ComponentIdentifier parserErrorType(String representation) {
+    int separator = representation.indexOf(':');
+    String namespace;
+    String identifier;
+    if (separator > 0) {
+      namespace = representation.substring(0, separator).toUpperCase();
+      identifier = representation.substring(separator + 1).toUpperCase();
+    } else {
+      namespace = CORE_ERROR_NS;
+      identifier = representation.toUpperCase();
+    }
+
+    return ComponentIdentifier.builder().namespace(namespace).name(identifier).build();
   }
 
   /**
@@ -332,7 +394,7 @@ public class BeanDefinitionFactory {
    *
    * @param componentIdentifier a {@code ComponentModel} identifier.
    * @return true if there's a {@code ComponentBuildingDefinition} for the specified configuration identifier, false if there's
-   *         not.
+   * not.
    */
   public boolean hasDefinition(ComponentIdentifier componentIdentifier) {
     return isComponentIgnored(componentIdentifier)
