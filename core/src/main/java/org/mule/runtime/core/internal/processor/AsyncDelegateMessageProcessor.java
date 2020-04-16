@@ -65,7 +65,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
@@ -121,11 +120,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   @Override
   public void initialise() throws InitialisationException {
     Component rootContainer = getFromAnnotatedObject(componentLocator, this).orElse(null);
-    if (rootContainer != null && !Objects.equals(rootContainer.getLocation().getLocation(),
-                                                 this.getLocation().getRootContainerName())) {
-      // This is for the case of the async inside a sub-flow
-      processingStrategy = defaultProcessingStrategy().create(getMuleContext(), getLocation().getLocation());
-    } else if (rootContainer instanceof Pipeline) {
+    if (rootContainer instanceof Pipeline) {
       if (maxConcurrency != null) {
         ProcessingStrategyFactory flowPsFactory = ((Pipeline) rootContainer).getProcessingStrategyFactory();
 
