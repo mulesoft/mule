@@ -118,7 +118,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
         }
 
         ParameterMap resolvedHeaders = resolveParams(event, HttpParamType.HEADER);
-        if (muleContext != null && !muleContext.isStarted())
+        if (shouldIncludeConnectionClose(muleContext))
         {
             resolvedHeaders.remove(CONNECTION);
             resolvedHeaders.put(CONNECTION, CLOSE);
@@ -272,6 +272,11 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
 
         httpResponseBuilder.setEntity(httpEntity);
         return httpResponseBuilder.build();
+    }
+
+    private static boolean shouldIncludeConnectionClose(MuleContext muleContext)
+    {
+        return muleContext != null && (!muleContext.isStarted() || muleContext.isStopping() || muleContext.isStopped());
     }
 
     private boolean supportsTransferEncoding(MuleEvent event)
