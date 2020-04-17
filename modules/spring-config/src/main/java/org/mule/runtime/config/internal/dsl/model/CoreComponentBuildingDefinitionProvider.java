@@ -534,6 +534,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                        fromChildConfiguration(DynamicConfigExpiration.class).build())
         .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(Object.class).build())
         .withRegistrationName(OBJECT_MULE_CONFIGURATION)
+        .alwaysEnabled(true)
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("dynamic-config-expiration")
