@@ -60,7 +60,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
   }
 
   private boolean isVerboseLogging() {
-    return LOGGER.isDebugEnabled() || verboseLogging;
+    return verboseLogging || LOGGER.isDebugEnabled();
   }
 
   @Override

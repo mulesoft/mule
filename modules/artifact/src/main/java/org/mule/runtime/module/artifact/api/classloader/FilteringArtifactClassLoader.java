@@ -80,7 +80,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
   }
 
   private boolean isVerboseLogging() {
-    return LOGGER.isDebugEnabled() || verboseLogging;
+    return verboseLogging || LOGGER.isDebugEnabled();
   }
 
   /**
