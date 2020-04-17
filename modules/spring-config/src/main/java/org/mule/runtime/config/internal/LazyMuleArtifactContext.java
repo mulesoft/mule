@@ -34,7 +34,6 @@ import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -406,9 +405,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       objectProviders.clear();
       resetMuleSecurityManager();
 
-      // Force initialization of configuration component...
-      resetMuleConfiguration();
-
       List<Pair<String, ComponentAst>> applicationComponents =
           createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
 
@@ -634,19 +630,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         getMuleRegistry().registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
       } catch (RegistrationException e) {
         throw new MuleRuntimeException(createStaticMessage("Couldn't register a new instance of Mule security manager in the registry"),
-                                       e);
-      }
-    }
-  }
-
-  private void resetMuleConfiguration() {
-    // Always unregister first the default configuration from Mule.
-    try {
-      getMuleRegistry().unregisterObject(OBJECT_MULE_CONFIGURATION);
-    } catch (Exception e) {
-      // NoSuchBeanDefinitionException can be ignored
-      if (!hasCause(e, NoSuchBeanDefinitionException.class)) {
-        throw new MuleRuntimeException(createStaticMessage("Error while unregistering Mule configuration"),
                                        e);
       }
     }
