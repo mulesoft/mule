@@ -76,11 +76,11 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     this.filter = filter;
     this.exportedServices = exportedServices;
 
-    verboseLogging = LOGGER.isDebugEnabled() || isVerboseLoggingEnabled();
+    verboseLogging = valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
   }
 
-  private boolean isVerboseLoggingEnabled() {
-    return LOGGER.isInfoEnabled() && valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
+  private boolean isVerboseLogging() {
+    return LOGGER.isDebugEnabled() || verboseLogging;
   }
 
   /**
@@ -110,13 +110,13 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
       Optional<ExportedService> exportedService = getExportedServiceStream(name).findFirst();
 
       if (exportedService.isPresent()) {
-        if (verboseLogging) {
+        if (isVerboseLogging()) {
           logClassloadingTrace(format("Service resource '%s' found in classloader for '%s': '%s", name, getArtifactId(),
                                       exportedService.get()));
         }
         return exportedService.get().getResource();
       } else {
-        if (verboseLogging) {
+        if (isVerboseLogging()) {
           logClassloadingTrace(format("Service resource '%s' not found in classloader for '%s'.", name, getArtifactId()));
         }
         return null;
@@ -125,7 +125,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
       if (filter.exportsResource(name)) {
         return getResourceFromDelegate(artifactClassLoader, name);
       } else {
-        if (verboseLogging) {
+        if (isVerboseLogging()) {
           logClassloadingTrace(format("Resource '%s' not found in classloader for '%s'.", name, getArtifactId()));
           logClassloadingTrace(format("Filter applied for resource '%s': %s", name, getArtifactId()));
         }
@@ -144,7 +144,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     if (isServiceResource(name)) {
       List<URL> exportedServiceProviders = getExportedServiceStream(name).map(s -> s.getResource()).collect(Collectors.toList());
 
-      if (verboseLogging) {
+      if (isVerboseLogging()) {
         if (exportedServiceProviders.isEmpty()) {
           logClassloadingTrace(format("Service resource '%s' not found in classloader for '%s'.", name, getArtifactId()));
         } else {
@@ -157,7 +157,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     } else if (filter.exportsResource(name)) {
       return getResourcesFromDelegate(artifactClassLoader, name);
     } else {
-      if (verboseLogging) {
+      if (isVerboseLogging()) {
         logClassloadingTrace(format("Resources '%s' not found in classloader for '%s'.", name, getArtifactId()));
         logClassloadingTrace(format("Filter applied for resources '%s': %s", name, getArtifactId()));
       }
