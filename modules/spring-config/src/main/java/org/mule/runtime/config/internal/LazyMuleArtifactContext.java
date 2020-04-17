@@ -29,7 +29,6 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.resolveOrphanComponents;
 import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.generateFor;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
@@ -429,9 +428,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           }).orElse(false);
     };
 
-    final Predicate<? super ComponentAst> configPredicate = componentModel -> componentModel.getIdentifier()
-        .equals(CONFIGURATION_IDENTIFIER);
-
     final Predicate<? super ComponentAst> alwaysEnabledPredicate =
         componentModel -> componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
             .map(ComponentBuildingDefinition::isAlwaysEnabled).orElse(false);
@@ -441,7 +437,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     final ArtifactAst predicatedModel = graph.minimalArtifactFor(basePredicate
         .or(txManagerPredicate)
-        .or(configPredicate)
         .or(alwaysEnabledPredicate)
         .or(languageConstructPredicate));
 
