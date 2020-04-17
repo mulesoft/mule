@@ -178,7 +178,7 @@
         <commonsPool2Version>2.6.2</commonsPool2Version>
         <commonsMath3Version>3.6.1</commonsMath3Version>
         <derbyVersion>10.13.1.1</derbyVersion>
-        <dom4jVersion>2.1.1</dom4jVersion>
+        <dom4jVersion>2.1.3</dom4jVersion>
         <eaioUuidVersion>3.4.2-MULE-001</eaioUuidVersion>
         <fastUtilVersion>8.1.1</fastUtilVersion>
         <everitJsonSchemaVersion>1.5.1</everitJsonSchemaVersion>
