@@ -7,8 +7,9 @@
 package org.mule.runtime.config.api.dsl.model.metadata.types;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.config.api.dsl.model.DslElementModel;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.extension.api.property.ResolverInformation;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
@@ -16,7 +17,7 @@ import org.mule.runtime.extension.api.property.TypeResolversInformationModelProp
 import java.util.Optional;
 
 /**
- * Implementation of {@link MetadataResolutionTypeInformation} that describes Output Types from a {@link DslElementModel}
+ * Implementation of {@link MetadataResolutionTypeInformation} that describes Output Types from a {@link ComponentAst}
  *
  * @since 4.2.0
  */
@@ -26,10 +27,9 @@ public class KeysMetadataResolutionTypeInformation extends AbstractMetadataResol
   private static final MetadataCacheId COMPONENT_TYPE_METADATA_CACHE_ID =
       new MetadataCacheId(TYPE_IDENTIFIER.hashCode(), TYPE_IDENTIFIER);
 
-  public KeysMetadataResolutionTypeInformation(DslElementModel<?> component) {
+  public KeysMetadataResolutionTypeInformation(ComponentAst component) {
     super(component, (typeResolversInformationModelProperty -> getResolverInformation(typeResolversInformationModelProperty)));
-    checkArgument(component.getModel() != null, "Cannot generate an Metadata Keys Cache Key for a 'null' component");
-    checkArgument(component.getModel() instanceof ParameterizedModel,
+    checkArgument(component.getModel(ParameterizedModel.class).isPresent(),
                   "Cannot generate an Metadata Keys Cache Key for a component with no parameters");
   }
 

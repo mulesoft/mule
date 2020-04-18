@@ -34,6 +34,7 @@ import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newPar
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -56,9 +57,7 @@ import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.config.api.dsl.model.DslElementModel;
-import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
-import org.mule.runtime.config.api.dsl.model.metadata.DslElementBasedValueProviderCacheIdGenerator;
+import org.mule.runtime.config.api.dsl.model.metadata.ComponentAstBasedValueProviderCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
@@ -69,8 +68,6 @@ import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import com.google.common.collect.ImmutableSet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,9 +84,11 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.slf4j.Logger;
 
-public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleTestCase {
+import com.google.common.collect.ImmutableSet;
 
-  private static final Logger LOGGER = getLogger(DslModelValueProviderCacheIdGeneratorTestCase.class);
+public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractMuleTestCase {
+
+  private static final Logger LOGGER = getLogger(ComponentAstValueProviderCacheIdGeneratorTestCase.class);
 
   protected static final String NAMESPACE = "vp-mockns";
   protected static final String NAMESPACE_URI = "http://www.mulesoft.org/schema/mule/vp-mockns";
@@ -454,13 +453,10 @@ public class DslModelValueProviderCacheIdGeneratorTestCase extends AbstractMuleT
                                                       String parameterName)
       throws Exception {
     ApplicationModel app = loadApplicationModel(appDeclaration);
-    DslElementModelFactory dslFactory = DslElementModelFactory.getDefault(dslContext);
     Locator locator = new Locator(app);
-    ComponentLocator<DslElementModel<?>> dslLocator = l -> locator.get(l).map(c -> dslFactory.create(c).orElse(null));
-    ValueProviderCacheIdGenerator cacheIdGenerator = new DslElementBasedValueProviderCacheIdGenerator(dslLocator);
+    ValueProviderCacheIdGenerator cacheIdGenerator = new ComponentAstBasedValueProviderCacheIdGenerator(locator);
     ComponentAst component = getComponentAst(app, location);
-    DslElementModel<?> element = DslElementModelFactory.getDefault(dslContext).create(component).get();
-    return cacheIdGenerator.getIdForResolvedValues(element, parameterName);
+    return cacheIdGenerator.getIdForResolvedValues(component, parameterName);
   }
 
   private String collectLog(ValueProviderCacheId valueProviderCacheId, int level) {
