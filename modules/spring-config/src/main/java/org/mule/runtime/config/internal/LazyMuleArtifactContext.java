@@ -348,18 +348,14 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       predicateOptional
           .ifPresent(predicate -> componentModelsToBuildMinimalModel
               .addAll(minimalApplicationModelGenerator.getComponentModels(
-                                                                          componentModel -> predicate.test(componentModel)
-                                                                              || muleConfigurationComponentPredicate
-                                                                                  .test(componentModel))));
+                                                                          componentModel -> predicate.test(componentModel))));
       locationOptional
           .ifPresent(location -> componentModelsToBuildMinimalModel
               .addAll(minimalApplicationModelGenerator.getComponentModels(
                                                                           componentModel -> (componentModel
                                                                               .getComponentLocation() != null
                                                                               && componentModel.getComponentLocation()
-                                                                                  .getLocation().equals(location.toString()))
-                                                                              || muleConfigurationComponentPredicate
-                                                                                  .test(componentModel))));
+                                                                                  .getLocation().equals(location.toString())))));
 
       if (locationOptional.isPresent() &&
           !(locationOptional.flatMap(loc -> dependencyResolver.findRequiredComponentModel(loc)).isPresent())) {
