@@ -9,11 +9,12 @@ package org.mule.tck;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.toList;
-import static org.mockito.Mockito.mock;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
+
+import org.slf4j.Logger;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -27,18 +28,16 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.slf4j.Logger;
-
 public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Scheduler {
 
   private static final Logger LOGGER = getLogger(SimpleUnitTestSupportLifecycleSchedulerDecorator.class);
 
-  private final String name;
-  private final Scheduler decorated;
-  private final SimpleUnitTestSupportSchedulerService ownerService;
+  private String name;
+  private Scheduler decorated;
+  private SimpleUnitTestSupportSchedulerService ownerService;
   private boolean stopped;
 
-  private final Collection<ScheduledFuture> recurrentTasks = new LinkedList<>();
+  private Collection<ScheduledFuture> recurrentTasks = new LinkedList<>();
 
   public SimpleUnitTestSupportLifecycleSchedulerDecorator(String name, Scheduler decorated,
                                                           SimpleUnitTestSupportSchedulerService ownerService) {
@@ -88,12 +87,16 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
 
   @Override
   public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression) {
-    return mock(ScheduledFuture.class);
+    ScheduledFuture<?> recurrentTask = decorated.scheduleWithCronExpression(wrap(command), cronExpression);
+    recurrentTasks.add(recurrentTask);
+    return recurrentTask;
   }
 
   @Override
   public ScheduledFuture<?> scheduleWithCronExpression(Runnable command, String cronExpression, TimeZone timeZone) {
-    return mock(ScheduledFuture.class);
+    ScheduledFuture<?> recurrentTask = decorated.scheduleWithCronExpression(wrap(command), cronExpression, timeZone);
+    recurrentTasks.add(recurrentTask);
+    return recurrentTask;
   }
 
   @Override
