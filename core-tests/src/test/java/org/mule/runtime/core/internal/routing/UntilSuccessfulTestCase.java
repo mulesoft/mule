@@ -15,6 +15,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
@@ -22,9 +23,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
+import static org.mule.runtime.core.internal.routing.UntilSuccessfulRouter.RETRY_CTX_INTERNAL_PARAM_KEY;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
@@ -41,6 +44,7 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.processor.ContextPropagationChecker;
@@ -48,6 +52,7 @@ import org.mule.tck.processor.ContextPropagationChecker;
 import java.io.ByteArrayInputStream;
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.After;
 import org.junit.Rule;
@@ -56,6 +61,8 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import reactor.core.publisher.Flux;
 
 @RunWith(Parameterized.class)
 public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
@@ -94,7 +101,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Parameters(name = "tx: {0}")
   public static Collection<Boolean> modeParameters() {
-    return asList(new Boolean[] {Boolean.TRUE, Boolean.FALSE});
+    return asList(Boolean.TRUE, Boolean.FALSE);
   }
 
   @Rule
@@ -361,6 +368,39 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.start();
 
     assertContextPropagation(eventBuilder(muleContext).message(of("1")).build(), untilSuccessful, contextPropagationChecker);
+  }
+
+  @Test
+  public void routerFluxesLifecycle() throws MuleException {
+    untilSuccessful.initialise();
+
+    final FluxSinkRecorder<CoreEvent> emitter = new FluxSinkRecorder<>();
+    final ProcessingStrategy ps = mock(ProcessingStrategy.class);
+
+    AtomicReference<CoreEvent> innerEventRef = new AtomicReference<>();
+
+    when(ps.configureInternalPublisher(any())).thenAnswer(inv -> {
+      Flux<CoreEvent> innerFlux = inv.getArgument(0);
+      return innerFlux.doOnNext(innerEventRef::set);
+    });
+
+    final UntilSuccessfulRouter router = new UntilSuccessfulRouter(flow, emitter.flux(), e -> e, ps,
+                                                                   muleContext.getExpressionManager(), null, null,
+                                                                   "1", MILLIS_BETWEEN_RETRIES);
+    // Assert that the inner flux was registered in the ps.
+    verify(ps).configureInternalPublisher(any());
+
+    final Flux<CoreEvent> downstreamPublisher = Flux.from(router.getDownstreamPublisher());
+    final Runnable completableConsumer = mock(Runnable.class);
+    downstreamPublisher.subscribe(null, null, completableConsumer);
+
+    emitter.next(testEvent());
+    assertThat("Event peeked in the innerFlux does not have the retry context.",
+               ((InternalEvent) innerEventRef.get()).getInternalParameters(), hasKey(RETRY_CTX_INTERNAL_PARAM_KEY));
+
+    emitter.complete();
+    // Verify that completion reached downstream
+    verify(completableConsumer).run();
   }
 
   protected void assertNoRetryContextAfterScopeExecutions(int expectedExecutions) throws MuleException {
