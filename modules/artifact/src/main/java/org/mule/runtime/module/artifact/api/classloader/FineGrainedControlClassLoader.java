@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoInstantiate;
@@ -56,11 +58,11 @@ public class FineGrainedControlClassLoader extends URLClassLoader
     super(urls, parent, new NonCachingURLStreamHandlerFactory());
     checkArgument(lookupPolicy != null, "Lookup policy cannot be null");
     this.lookupPolicy = lookupPolicy;
-    verboseLogging = LOGGER.isDebugEnabled() || isVerboseLoggingEnabled();
+    verboseLogging = valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
   }
 
-  private boolean isVerboseLoggingEnabled() {
-    return LOGGER.isInfoEnabled() && valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
+  private boolean isVerboseLogging() {
+    return verboseLogging || LOGGER.isDebugEnabled();
   }
 
   @Override
@@ -76,7 +78,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
       throw new NullPointerException(format("Unable to find a lookup strategy for '%s' from %s", name, this));
     }
 
-    if (verboseLogging) {
+    if (isVerboseLogging()) {
       logLoadingClass(name, lookupStrategy, "Loading class '%s' with '%s' on '%s'", this);
     }
 
@@ -102,7 +104,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
       throw new CompositeClassNotFoundException(name, lookupStrategy, exceptions);
     }
 
-    if (verboseLogging) {
+    if (isVerboseLogging()) {
       logLoadedClass(name, result);
     }
 

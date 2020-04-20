@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.module.artifact.api.classloader.exception;
 
+import static org.mule.runtime.api.exception.MuleException.MULE_VERBOSE_EXCEPTIONS;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
+
+import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.lang.System.lineSeparator;
-import static org.mule.runtime.api.exception.MuleException.isVerboseExceptions;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 
 import org.mule.api.annotation.NoInstantiate;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
 
@@ -32,9 +33,9 @@ public final class NotExportedClassException extends ClassNotFoundException {
 
   private static final long serialVersionUID = 2510347069070514569L;
 
-  private String className;
-  private String artifactName;
-  private ClassLoaderFilter filter;
+  private final String className;
+  private final String artifactName;
+  private final ClassLoaderFilter filter;
 
   /**
    * Builds the exception.
@@ -82,7 +83,9 @@ public final class NotExportedClassException extends ClassNotFoundException {
 
   @Override
   public synchronized Throwable fillInStackTrace() {
-    if (isVerboseExceptions()) {
+    // This might happen during logger initialization,
+    // so the implementation from MuleException cannot be used since it requires a logger.
+    if (getBoolean(MULE_VERBOSE_EXCEPTIONS)) {
       return super.fillInStackTrace();
     } else {
       return this;
