@@ -47,12 +47,14 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     registerAsParallelCapable();
   }
 
-  private static final Logger logger = LoggerFactory.getLogger(FilteringArtifactClassLoader.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(FilteringArtifactClassLoader.class);
 
   private final ArtifactClassLoader artifactClassLoader;
   private final ClassLoaderFilter filter;
   private final List<ExportedService> exportedServices;
   private static final String SERVICE_PREFIX = "META-INF/services/";
+
+  private final boolean verboseLogging;
 
   /**
    * Creates a new filtering classLoader
@@ -73,6 +75,12 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     this.artifactClassLoader = artifactClassLoader;
     this.filter = filter;
     this.exportedServices = exportedServices;
+
+    verboseLogging = valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
+  }
+
+  private boolean isVerboseLogging() {
+    return verboseLogging || LOGGER.isDebugEnabled();
   }
 
   /**
@@ -102,19 +110,25 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
       Optional<ExportedService> exportedService = getExportedServiceStream(name).findFirst();
 
       if (exportedService.isPresent()) {
-        logClassloadingTrace(format("Service resource '%s' found in classloader for '%s': '%s", name, getArtifactId(),
-                                    exportedService.get()));
+        if (isVerboseLogging()) {
+          logClassloadingTrace(format("Service resource '%s' found in classloader for '%s': '%s", name, getArtifactId(),
+                                      exportedService.get()));
+        }
         return exportedService.get().getResource();
       } else {
-        logClassloadingTrace(format("Service resource '%s' not found in classloader for '%s'.", name, getArtifactId()));
+        if (isVerboseLogging()) {
+          logClassloadingTrace(format("Service resource '%s' not found in classloader for '%s'.", name, getArtifactId()));
+        }
         return null;
       }
     } else {
       if (filter.exportsResource(name)) {
         return getResourceFromDelegate(artifactClassLoader, name);
       } else {
-        logClassloadingTrace(format("Resource '%s' not found in classloader for '%s'.", name, getArtifactId()));
-        logClassloadingTrace(format("Filter applied for resource '%s': %s", name, getArtifactId()));
+        if (isVerboseLogging()) {
+          logClassloadingTrace(format("Resource '%s' not found in classloader for '%s'.", name, getArtifactId()));
+          logClassloadingTrace(format("Filter applied for resource '%s': %s", name, getArtifactId()));
+        }
 
         return null;
       }
@@ -130,19 +144,23 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     if (isServiceResource(name)) {
       List<URL> exportedServiceProviders = getExportedServiceStream(name).map(s -> s.getResource()).collect(Collectors.toList());
 
-      if (exportedServiceProviders.isEmpty()) {
-        logClassloadingTrace(format("Service resource '%s' not found in classloader for '%s'.", name, getArtifactId()));
-      } else {
+      if (isVerboseLogging()) {
+        if (exportedServiceProviders.isEmpty()) {
+          logClassloadingTrace(format("Service resource '%s' not found in classloader for '%s'.", name, getArtifactId()));
+        } else {
 
-        logClassloadingTrace(format("Service resources '%s' found in classloader for '%s': '%s", name, getArtifactId(),
-                                    exportedServiceProviders));
+          logClassloadingTrace(format("Service resources '%s' found in classloader for '%s': '%s", name, getArtifactId(),
+                                      exportedServiceProviders));
+        }
       }
       return new EnumerationAdapter<>(exportedServiceProviders);
     } else if (filter.exportsResource(name)) {
       return getResourcesFromDelegate(artifactClassLoader, name);
     } else {
-      logClassloadingTrace(format("Resources '%s' not found in classloader for '%s'.", name, getArtifactId()));
-      logClassloadingTrace(format("Filter applied for resources '%s': %s", name, getArtifactId()));
+      if (isVerboseLogging()) {
+        logClassloadingTrace(format("Resources '%s' not found in classloader for '%s'.", name, getArtifactId()));
+        logClassloadingTrace(format("Filter applied for resources '%s': %s", name, getArtifactId()));
+      }
       return new EnumerationAdapter<>(emptyList());
     }
   }
@@ -162,15 +180,11 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
   }
 
   private void logClassloadingTrace(String message) {
-    if (isVerboseClassLoading()) {
-      logger.info(message);
-    } else if (logger.isTraceEnabled()) {
-      logger.trace(message);
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace(message);
+    } else {
+      LOGGER.info(message);
     }
-  }
-
-  private Boolean isVerboseClassLoading() {
-    return valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
   }
 
   protected Enumeration<URL> getResourcesFromDelegate(ArtifactClassLoader artifactClassLoader, String name) throws IOException {
