@@ -7,8 +7,10 @@
 
 package org.mule.runtime.module.artifact.api.classloader.exception;
 
+import static org.mule.runtime.api.exception.MuleException.MULE_VERBOSE_EXCEPTIONS;
+
+import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
-import static org.mule.runtime.api.exception.MuleException.isVerboseExceptions;
 
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
@@ -22,8 +24,8 @@ public final class ClassNotFoundInRegionException extends ClassNotFoundException
 
   private static final long serialVersionUID = -2800293812538208279L;
 
-  private String className;
-  private String regionName;
+  private final String className;
+  private final String regionName;
   private String artifactName;
 
   /**
@@ -77,7 +79,9 @@ public final class ClassNotFoundInRegionException extends ClassNotFoundException
 
   @Override
   public synchronized Throwable fillInStackTrace() {
-    if (isVerboseExceptions()) {
+    // This might happen during logger initialization,
+    // so the implementation from MuleException cannot be used since it requires a logger.
+    if (getBoolean(MULE_VERBOSE_EXCEPTIONS)) {
       return super.fillInStackTrace();
     } else {
       return this;
