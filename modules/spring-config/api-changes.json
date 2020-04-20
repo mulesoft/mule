@@ -2,6 +2,24 @@
   "4.2.2": {
     "revapi": {
       "ignore": [
+         {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.config.api.dsl.CoreDslConstants.ASYNC_ELEMENT",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "CoreDslConstants",
+          "fieldName": "ASYNC_ELEMENT",
+          "elementKind": "field",
+          "justification": "MULE-16987"
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.config.api.dsl.CoreDslConstants.ASYNC_IDENTIFIER",
+          "package": "org.mule.runtime.config.api.dsl",
+          "classSimpleName": "CoreDslConstants",
+          "fieldName": "ASYNC_IDENTIFIER",
+          "elementKind": "field",
+          "justification": "MULE-16987"
+        },
         {
           "code": "java.field.addedStaticField",
           "new": "field org.mule.runtime.config.api.dsl.CoreDslConstants.CHOICE_ELEMENT",
