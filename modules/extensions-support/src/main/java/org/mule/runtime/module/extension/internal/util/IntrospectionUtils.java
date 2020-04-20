@@ -108,7 +108,6 @@ import org.mule.runtime.module.extension.internal.loader.java.MuleExtensionAnnot
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectedFieldModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.RequireNameField;
@@ -149,13 +148,14 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ResolvableType;
 import org.springframework.util.ConcurrentReferenceHashMap;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -412,6 +412,7 @@ public final class IntrospectionUtils {
   private static ArrayType getListOfMessageType(Type returnType, MetadataType outputType, MetadataType attributesOutputType) {
     return typeBuilder().arrayType()
         .of(new MessageMetadataTypeBuilder()
+            .with(new ClassInformationAnnotation(Message.class))
             .payload(outputType)
             .attributes(attributesOutputType)
             .build())

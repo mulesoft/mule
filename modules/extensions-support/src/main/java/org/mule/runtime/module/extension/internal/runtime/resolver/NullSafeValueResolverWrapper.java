@@ -21,7 +21,6 @@ import static org.mule.runtime.module.extension.internal.runtime.resolver.Resolv
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAlias;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
 
-import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -29,6 +28,7 @@ import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.utils.MetadataTypeUtils;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -43,11 +43,11 @@ import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultR
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.Field;
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ValueResolver} wrapper which generates and returns default instances if the {@link #delegate} returns {@code null}.
@@ -139,11 +139,13 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
             NullSafe nullSafe = field.getAnnotation(NullSafe.class);
             if (nullSafe != null) {
               MetadataType nullSafeType;
-              if (Object.class.equals(nullSafe.defaultImplementingType())) {
+              final Class<?> nullSafeClass = nullSafe.defaultImplementingType();
+              if (Object.class.equals(nullSafeClass)) {
                 nullSafeType = objectField.getValue();
               } else {
                 nullSafeType = new BaseTypeBuilder(JAVA).objectType()
-                    .with(new TypeIdAnnotation(nullSafe.defaultImplementingType().getName()))
+                    .id(nullSafeClass.getName())
+                    .with(new ClassInformationAnnotation(nullSafeClass))
                     .build();
               }
 
