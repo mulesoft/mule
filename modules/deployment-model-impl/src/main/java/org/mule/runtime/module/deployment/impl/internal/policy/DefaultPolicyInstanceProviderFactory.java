@@ -56,7 +56,9 @@ public class DefaultPolicyInstanceProviderFactory implements PolicyInstanceProvi
   public ApplicationPolicyInstance create(Application application, PolicyTemplate policyTemplate,
                                           PolicyParametrization parametrization) {
     return new DefaultApplicationPolicyInstance(application, policyTemplate, parametrization, serviceRepository,
-                                                classLoaderRepository, policyTemplate.getArtifactPlugins(),
+                                                classLoaderRepository,
+                                                policyTemplate.getArtifactPlugins(),
+                                                policyTemplate.getOwnArtifactPlugins(),
                                                 extensionModelLoaderRepository, null,
                                                 runtimeComponentBuildingDefinitionProvider);
   }
