@@ -1816,21 +1816,47 @@
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                         <!-- Custom Entries -->
-                        <manifestEntries>
-                            <More-Info>For more information go to ${productUrl}</More-Info>
-                            <Support>Get commercial support: ${project.organization.url}/support</Support>
-                            <Description>Mule Runtime and Integration Platform</Description>
-                            <License>CPAL v1.0 http://www.mulesoft.com/CPAL/</License>
-                            <Vendor-Url>${project.organization.url}</Vendor-Url>
-                            <Product-Url>${productUrl}</Product-Url>
-                            <Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date>
-                            <!-- include repository revision from buildnumber plugin -->
-                            <Build-Revision>${buildNumber}</Build-Revision>
-                            <Build-Date>${timestamp}</Build-Date>
-                            <Dev-List-Email>${dev.list}</Dev-List-Email>
-                            <Supported-Jdks>[${javaVersion}.0,12)</Supported-Jdks>
-                            <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12)</Recommended-Jdks>
-                        </manifestEntries>
+                            <manifestSections>
+                                <manifestSection>
+                                    <name>Product info</name>
+                                    <manifestEntries>
+                                        <More-Info>For more information go to ${productUrl}</More-Info>
+                                        <Support>Get commercial support: ${project.organization.url}/support</Support>
+                                        <Description>Mule Runtime and Integration Platform</Description>
+                                        <License>CPAL v1.0 http://www.mulesoft.com/CPAL/</License>
+                                        <Vendor-Url>${project.organization.url}</Vendor-Url>
+                                        <Product-Url>${productUrl}</Product-Url>
+                                        <Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date>
+                                    </manifestEntries>
+                                </manifestSection>
+                                <manifestSection>
+                                    <name>Repository revision</name>
+                                    <manifestEntries>
+                                        <!-- include repository revision from buildnumber plugin -->
+                                        <Build-Revision>${buildNumber}</Build-Revision>
+                                        <Build-Date>${timestamp}</Build-Date>
+                                        <Dev-List-Email>${dev.list}</Dev-List-Email>
+                                        <Supported-Jdks>[${javaVersion}.0,12)</Supported-Jdks>
+                                        <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12)</Recommended-Jdks>
+                                    </manifestEntries>
+                                </manifestSection>
+                                <manifestSection>
+                                    <name>Git info</name>
+                                    <manifestEntries>
+                                        <Git-tags>${git.tags}</Git-tags>
+                                        <Git-branch>${git.branch}</Git-branch>
+                                        <Git-remote-origin-url>${git.remote.origin.url}</Git-remote-origin-url>
+                                        <Git-commit-id>${git.commit.id}</Git-commit-id>
+                                        <Git-commit-id-abbrev>${git.commit.id.abbrev}</Git-commit-id-abbrev>
+                                        <Git-commit-id-describe>${git.commit.id.describe}</Git-commit-id-describe>
+                                        <Git-commit-user-name>${git.commit.user.name}</Git-commit-user-name>
+                                        <Git-commit-user-email>${git.commit.user.email}</Git-commit-user-email>
+                                        <Git-commit-time>${git.commit.time}</Git-commit-time>
+                                        <Git-build-time>${git.build.time}</Git-build-time>
+                                        <Git-build-version>${git.build.version}</Git-build-version>
+                                    </manifestEntries>
+                                </manifestSection>
+                            </manifestSections>
                     </archive>
                 </configuration>
             </plugin>
@@ -1850,6 +1876,19 @@
                         <goals>
                             <goal>jar-no-fork</goal>
                             <goal>test-jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>4.0.0</version>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <goals>
+                            <goal>revision</goal>
                         </goals>
                     </execution>
                 </executions>
