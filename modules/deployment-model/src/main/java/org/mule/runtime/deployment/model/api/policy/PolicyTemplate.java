@@ -27,7 +27,12 @@ public interface PolicyTemplate extends Artifact<PolicyTemplateDescriptor> {
   void dispose();
 
   /**
-   * @return plugins deployed inside the policy template
+   * @return plugins deployed only inside the policy template
    */
   List<ArtifactPlugin> getArtifactPlugins();
+
+  /**
+   * @return plugins the policy depends on
+   */
+  List<ArtifactPlugin> getOwnArtifactPlugins();
 }
