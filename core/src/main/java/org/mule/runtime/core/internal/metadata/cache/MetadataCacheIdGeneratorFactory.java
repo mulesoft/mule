@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.metadata.cache;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
-
+import org.mule.runtime.core.internal.locator.ComponentLocator;
 
 /**
  * Factory definition to create {@link MetadataCacheIdGenerator}s isolated from the application context in which it will be used.
@@ -23,15 +23,6 @@ public interface MetadataCacheIdGeneratorFactory<T> {
    * @param locator a {@link ComponentLocator} that allows the generator to locate any component in the current context.
    * @return a new {@link MetadataCacheIdGenerator} valid for the given context.
    */
-  MetadataCacheIdGenerator<T> create(DslResolvingContext context, ComponentLocator<T> locator);
+  MetadataCacheIdGenerator<T> create(ComponentLocator<T> locator);
 
-
-  /**
-   * @deprecated use {@code org.mule.runtime.core.internal.locator.ComponentLocator<C>}
-   * @param <C>
-   */
-  @FunctionalInterface
-  @Deprecated
-  interface ComponentLocator<C> extends org.mule.runtime.core.internal.locator.ComponentLocator<C> {
-  }
 }

@@ -31,7 +31,6 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -64,6 +63,7 @@ import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.core.internal.exception.ErrorMappingsAware;
+import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.metadata.MuleMetadataService;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
@@ -571,12 +571,11 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   private void setCacheIdGenerator() {
-    DslResolvingContext context = DslResolvingContext.getDefault(extensionManager.getExtensions());
-    MetadataCacheIdGeneratorFactory.ComponentLocator<ComponentAst> configLocator = location -> componentLocator
+    ComponentLocator<ComponentAst> configLocator = location -> componentLocator
         .find(location)
         .map(component -> (ComponentAst) component.getAnnotation(ANNOTATION_COMPONENT_CONFIG));
 
-    this.cacheIdGenerator = cacheIdGeneratorFactory.create(context, configLocator);
+    this.cacheIdGenerator = cacheIdGeneratorFactory.create(configLocator);
   }
 
   protected abstract ParameterValueResolver getParameterValueResolver();
