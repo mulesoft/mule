@@ -40,6 +40,11 @@ import java.util.Optional;
 
 import com.google.common.base.Objects;
 
+/**
+ * A {@link ComponentAst} based implementation of a {@link ValueProviderCacheIdGenerator}
+ *
+ * @since 4.4
+ */
 public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProviderCacheIdGenerator<ComponentAst> {
 
   private final ComponentLocator<ComponentAst> locator;
@@ -154,7 +159,6 @@ public class ComponentAstBasedValueProviderCacheIdGenerator implements ValueProv
   private Optional<ValueProviderCacheId> resolveIdForInjectedElement(ComponentAst injectedElement) {
     return injectedElement.getModel(EnrichableModel.class)
         .flatMap(enrichableModel -> {
-          // TODO: MULE-17761 - Check if this is correct
           List<String> parametersRequiredForMetadata =
               enrichableModel
                   .getModelProperty(RequiredForMetadataModelProperty.class)

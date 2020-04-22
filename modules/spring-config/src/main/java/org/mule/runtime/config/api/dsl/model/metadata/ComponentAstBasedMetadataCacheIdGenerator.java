@@ -56,7 +56,7 @@ import java.util.stream.Stream;
 /**
  * A {@link ComponentAst} based implementation of a {@link MetadataCacheIdGenerator}
  *
- * @since 4.1.4, 4.2.0
+ * @since 4.4
  */
 public class ComponentAstBasedMetadataCacheIdGenerator implements MetadataCacheIdGenerator<ComponentAst> {
 
