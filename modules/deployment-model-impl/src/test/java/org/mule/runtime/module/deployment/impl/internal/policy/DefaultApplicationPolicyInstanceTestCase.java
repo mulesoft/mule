@@ -20,10 +20,6 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.service.ServiceRepository;
@@ -36,6 +32,10 @@ import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.extension.internal.loader.ExtensionModelLoaderRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Ignore;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 import io.qameta.allure.Issue;
 
@@ -63,7 +63,8 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
     DefaultApplicationPolicyInstance applicationPolicyInstance =
         new DefaultApplicationPolicyInstance(application, policyTemplate,
                                              parameterization, mock(ServiceRepository.class),
-                                             mock(ClassLoaderRepository.class), emptyList(),
+                                             mock(ClassLoaderRepository.class),
+                                             emptyList(), emptyList(),
                                              mock(ExtensionModelLoaderRepository.class),
                                              muleContextListener,
                                              getRuntimeComponentBuildingDefinitionProvider());
