@@ -13,10 +13,10 @@
                     <on-error-continue type="COLLIDING_NS:POLICY_ERROR">
                         <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
             
-                        <test-policy:execute-next/>
                     </on-error-continue>
                 </error-handler>
             </try>
+            <test-policy:execute-next/>
         </test-policy:operation>
     </test-policy:proxy>
 </mule>
