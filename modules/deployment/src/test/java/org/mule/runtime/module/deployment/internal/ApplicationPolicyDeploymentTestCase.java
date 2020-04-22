@@ -66,6 +66,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
 
 /**
@@ -84,14 +85,14 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   private static final String FOO_POLICY_NAME = "fooPolicy";
 
   private static File simpleExtensionJarFile;
+  private static File withErrorDeclarationExtensionJarFile;
   // Policy artifact file builders
   private final PolicyFileBuilder fooPolicyFileBuilder =
       new PolicyFileBuilder(FOO_POLICY_NAME).describedBy(new MulePolicyModel.MulePolicyModelBuilder()
           .setMinMuleVersion(MIN_MULE_VERSION)
           .setName(FOO_POLICY_NAME)
           .setRequiredProduct(MULE)
-          .withBundleDescriptorLoader(
-                                      createBundleDescriptorLoader(FOO_POLICY_NAME,
+          .withBundleDescriptorLoader(createBundleDescriptorLoader(FOO_POLICY_NAME,
                                                                    MULE_POLICY_CLASSIFIER,
                                                                    PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
           .withClassLoaderModelDescriptorLoader(
@@ -108,6 +109,12 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
         new CompilerUtils.ExtensionCompiler().compiling(getResourceFile("/org/foo/simple/SimpleExtension.java"),
                                                         getResourceFile("/org/foo/simple/SimpleOperation.java"))
             .compile("mule-module-simple-4.0-SNAPSHOT.jar", "1.0.0");
+
+    withErrorDeclarationExtensionJarFile =
+        new CompilerUtils.ExtensionCompiler()
+            .compiling(getResourceFile("/org/foo/withErrorDeclaration/WithErrorDeclarationExtension.java"),
+                       getResourceFile("/org/foo/withErrorDeclaration/WithErrorDeclarationOperation.java"))
+            .compile("mule-module-with-error-declaration-4.0-SNAPSHOT.jar", "1.0.0");
   }
 
   @Test
@@ -502,6 +509,33 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  @Issue("MULE-18284")
+  @Description("An app and policy depending on a same extension, the policy can handle errors from the extension")
+  public void appliesPolicyAndAppWithSameExtensionDeclaringError() throws Exception {
+    ArtifactPluginFileBuilder withErrorDeclarationExtensionPlugin = createWithErrorDeclarationExtensionPlugin();
+
+    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder
+        .dependingOn(withErrorDeclarationExtensionPlugin).getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder =
+        createExtensionApplicationWithServices("app-with-error-declaration-extension.xml", withErrorDeclarationExtensionPlugin);
+
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder
+        .dependingOn(withErrorDeclarationExtensionPlugin).getArtifactId(),
+                            new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
+                                                      getResourceFile("/policy-with-error-declaration-extension.xml"),
+                                                      emptyList()));
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(1));
+  }
+
+  @Test
   public void redeployPolicyWithSecurityManagerDefined() throws Exception {
     ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
 
@@ -599,10 +633,25 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .build());
     mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
-        .addProperty("type", "org.foo.hello.SimpleExtension")
+        .addProperty("type", "org.foo.simple.SimpleExtension")
         .addProperty("version", "1.0.0");
     return new ArtifactPluginFileBuilder("simpleExtensionPlugin")
         .dependingOn(new JarFileBuilder("simpleExtension", simpleExtensionJarFile))
+        .describedBy(mulePluginModelBuilder.build());
+  }
+
+  private ArtifactPluginFileBuilder createWithErrorDeclarationExtensionPlugin() {
+    MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName("withErrorDeclarationExtensionPlugin").setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("withErrorDeclarationExtensionPlugin", MULE_EXTENSION_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
+        .build());
+    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
+        .addProperty("type", "org.foo.withErrorDeclaration.WithErrorDeclarationExtension")
+        .addProperty("version", "1.0.0");
+    return new ArtifactPluginFileBuilder("withErrorDeclarationExtensionPlugin")
+        .dependingOn(new JarFileBuilder("withErrorDeclarationExtension", withErrorDeclarationExtensionJarFile))
         .describedBy(mulePluginModelBuilder.build());
   }
 
