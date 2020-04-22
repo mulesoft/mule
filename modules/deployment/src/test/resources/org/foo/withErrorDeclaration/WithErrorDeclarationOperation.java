@@ -5,19 +5,20 @@
  * LICENSE.txt file.
  */
 
-package org.foo.simple;
+package org.foo.withErrorDeclaration;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 
-public class SimpleOperation {
+public class WithErrorDeclarationOperation {
 
-  public SimpleOperation() {}
+  public WithErrorDeclarationOperation() {}
 
   @MediaType(value = TEXT_PLAIN, strict = false)
-  public String printMessage(@Config SimpleExtension config) {
-    System.out.println("Simple extension says: " + config.getMessage());
+  public String printMessage(@Config WithErrorDeclarationExtension config) {
+    System.out.println("WithErrorDeclaration extension says: " + config.getMessage());
     return config.getMessage();
   }
 }
