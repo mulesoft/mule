@@ -25,7 +25,6 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_REF_IDENTIFIER;
@@ -119,9 +118,10 @@ import java.util.stream.Stream;
 
 import javax.xml.namespace.QName;
 
+import org.slf4j.Logger;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.slf4j.Logger;
 
 /**
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
@@ -146,7 +146,6 @@ public class ApplicationModel implements ArtifactAst {
   public static final String MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE = "maxRedeliveryAttempts";
   public static final String WHEN_CHOICE_ES_ATTRIBUTE = "when";
   public static final String TYPE_ES_ATTRIBUTE = "type";
-  public static final String EXCEPTION_STRATEGY_REFERENCE_ELEMENT = "exception-strategy";
   public static final String PROPERTY_ELEMENT = "property";
   public static final String NAME_ATTRIBUTE = "name";
   public static final String REFERENCE_ATTRIBUTE = "ref";
@@ -173,9 +172,6 @@ public class ApplicationModel implements ArtifactAst {
   public static final String OBJECT_ELEMENT = "object";
 
 
-  public static final ComponentIdentifier EXCEPTION_STRATEGY_REFERENCE_IDENTIFIER =
-      builder().namespace(CORE_PREFIX).name(EXCEPTION_STRATEGY_REFERENCE_ELEMENT)
-          .build();
   public static final ComponentIdentifier ERROR_MAPPING_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(ERROR_MAPPING).build();
   public static final ComponentIdentifier ON_ERROR_IDENTIFIER =
@@ -842,7 +838,6 @@ public class ApplicationModel implements ArtifactAst {
     validateNameHasValidCharacters();
     validateFlowRefPointsToExistingFlow();
     validateErrorMappings();
-    validateExceptionStrategyWhenAttributeIsOnlyPresentInsideChoice();
     validateErrorHandlerStructure();
     validateParameterAndChildForSameAttributeAreNotDefinedTogether();
     if (componentBuildingDefinitionRegistry.isPresent()) {
@@ -1039,19 +1034,6 @@ public class ApplicationModel implements ArtifactAst {
     } else {
       return onErrorModel;
     }
-  }
-
-  private void validateExceptionStrategyWhenAttributeIsOnlyPresentInsideChoice() {
-    executeOnEveryMuleComponentTree(component -> {
-      if (component.getIdentifier().getName().endsWith(EXCEPTION_STRATEGY_REFERENCE_ELEMENT)) {
-        if (component.getRawParameters().get(WHEN_CHOICE_ES_ATTRIBUTE) != null
-            && !component.getParent().getIdentifier().getName().equals(ERROR_HANDLER)
-            && !component.getParent().getIdentifier().getName().equals(MULE_ROOT_ELEMENT)) {
-          throw new MuleRuntimeException(
-                                         createStaticMessage("Only handlers within an error-handler can have when attribute specified"));
-        }
-      }
-    });
   }
 
   private void validateNamedTopLevelElementsHaveName(ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry)
