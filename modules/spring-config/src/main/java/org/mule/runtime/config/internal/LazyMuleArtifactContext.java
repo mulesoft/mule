@@ -29,13 +29,11 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.resolveOrphanComponents;
 import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.generateFor;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -407,9 +405,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       objectProviders.clear();
       resetMuleSecurityManager();
 
-      // Force initialization of configuration component...
-      resetMuleConfiguration();
-
       List<Pair<String, ComponentAst>> applicationComponents =
           createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
 
@@ -429,9 +424,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           }).orElse(false);
     };
 
-    final Predicate<? super ComponentAst> configPredicate = componentModel -> componentModel.getIdentifier()
-        .equals(CONFIGURATION_IDENTIFIER);
-
     final Predicate<? super ComponentAst> alwaysEnabledPredicate =
         componentModel -> componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
             .map(ComponentBuildingDefinition::isAlwaysEnabled).orElse(false);
@@ -441,7 +433,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     final ArtifactAst predicatedModel = graph.minimalArtifactFor(basePredicate
         .or(txManagerPredicate)
-        .or(configPredicate)
         .or(alwaysEnabledPredicate)
         .or(languageConstructPredicate));
 
@@ -639,19 +630,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         getMuleRegistry().registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager());
       } catch (RegistrationException e) {
         throw new MuleRuntimeException(createStaticMessage("Couldn't register a new instance of Mule security manager in the registry"),
-                                       e);
-      }
-    }
-  }
-
-  private void resetMuleConfiguration() {
-    // Always unregister first the default configuration from Mule.
-    try {
-      getMuleRegistry().unregisterObject(OBJECT_MULE_CONFIGURATION);
-    } catch (Exception e) {
-      // NoSuchBeanDefinitionException can be ignored
-      if (!hasCause(e, NoSuchBeanDefinitionException.class)) {
-        throw new MuleRuntimeException(createStaticMessage("Error while unregistering Mule configuration"),
                                        e);
       }
     }

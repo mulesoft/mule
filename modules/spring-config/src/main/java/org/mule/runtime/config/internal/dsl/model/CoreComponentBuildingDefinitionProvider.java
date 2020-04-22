@@ -484,6 +484,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition(INHERIT_ITERABLE_REPEATABILITY,
                                        fromSimpleParameter(INHERIT_ITERABLE_REPEATABILITY).build())
         .withRegistrationName(OBJECT_MULE_CONFIGURATION)
+        .alwaysEnabled(true)
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("dynamic-config-expiration")
