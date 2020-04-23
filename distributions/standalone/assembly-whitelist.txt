@@ -380,9 +380,9 @@
 /mule-standalone-${productVersion}/lib/opt/options-1.4.jar
 /mule-standalone-${productVersion}/lib/opt/oro-2.0.8.jar
 /mule-standalone-${productVersion}/lib/opt/osgi-resource-locator-1.0.1.jar
-/mule-standalone-${productVersion}/lib/opt/parser-interface-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/opt/parser-interface-impl-v1-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/opt/parser-interface-impl-v2-${productVersion}.jar
+/mule-standalone-${productVersion}/lib/opt/parser-interface-3.8.7.jar
+/mule-standalone-${productVersion}/lib/opt/parser-interface-impl-v1-3.8.7.jar
+/mule-standalone-${productVersion}/lib/opt/parser-interface-impl-v2-3.8.7.jar
 /mule-standalone-${productVersion}/lib/opt/quartz-2.2.1.jar
 /mule-standalone-${productVersion}/lib/opt/raml-parser-0.8.24.jar
 /mule-standalone-${productVersion}/lib/opt/raml-parser-2-1.0.22.jar
