@@ -50,7 +50,6 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeHandlerManagerFactory;
@@ -112,10 +111,10 @@ public class ExtensionModelHelper {
   }
 
   /**
-   * Find a {@link DslElementModel} for a given {@link ComponentModel}
+   * Find a {@link ComponentType} for a given {@link ComponentModel}
    *
    * @param componentIdentifier the identifier to use for the search.
-   * @return the {@link DslElementModel} associated with the configuration or an {@link Optional#empty()} if there isn't one.
+   * @return the {@link ComponentType} associated with the configuration or an {@link Optional#empty()} if there isn't one.
    */
   public ComponentType findComponentType(ComponentIdentifier componentIdentifier) {
     return findComponentModel(componentIdentifier)

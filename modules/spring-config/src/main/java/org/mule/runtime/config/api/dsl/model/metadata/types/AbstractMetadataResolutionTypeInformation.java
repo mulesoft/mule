@@ -9,7 +9,7 @@ package org.mule.runtime.config.api.dsl.model.metadata.types;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.meta.model.EnrichableModel;
-import org.mule.runtime.config.api.dsl.model.DslElementModel;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.extension.api.property.ResolverInformation;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 
@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * Abstract implementation of {@link MetadataResolutionTypeInformation} that is based on a {@link DslElementModel}
+ * Abstract implementation of {@link MetadataResolutionTypeInformation} that is based on a {@link ComponentAst}
  *
  * @since 4.2.0
  */
@@ -26,17 +26,18 @@ public abstract class AbstractMetadataResolutionTypeInformation implements Metad
   private String resolverCategory;
   private String resolverName;
 
-  public AbstractMetadataResolutionTypeInformation(DslElementModel<?> component,
+  public AbstractMetadataResolutionTypeInformation(ComponentAst component,
                                                    Function<TypeResolversInformationModelProperty, Optional<ResolverInformation>> getResolverInformationFromModelProperty) {
-    if (component.getModel() instanceof EnrichableModel) {
-      Optional<TypeResolversInformationModelProperty> typeResolversInformationModelProperty =
-          ((EnrichableModel) component.getModel()).getModelProperty(TypeResolversInformationModelProperty.class);
-      if (typeResolversInformationModelProperty.isPresent()) {
-        resolverName = getResolverInformationFromModelProperty.apply(typeResolversInformationModelProperty.get())
-            .map(resolverInformation -> resolverInformation.getResolverName()).orElse(null);
-        resolverCategory = typeResolversInformationModelProperty.get().getCategoryName();
-      }
-    }
+    component.getModel(EnrichableModel.class)
+        .ifPresent(em -> {
+          Optional<TypeResolversInformationModelProperty> typeResolversInformationModelProperty =
+              em.getModelProperty(TypeResolversInformationModelProperty.class);
+          if (typeResolversInformationModelProperty.isPresent()) {
+            resolverName = getResolverInformationFromModelProperty.apply(typeResolversInformationModelProperty.get())
+                .map(resolverInformation -> resolverInformation.getResolverName()).orElse(null);
+            resolverCategory = typeResolversInformationModelProperty.get().getCategoryName();
+          }
+        });
   }
 
   /**
