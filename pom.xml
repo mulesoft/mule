@@ -1681,7 +1681,7 @@
 
                     <executions>
                         <execution>
-                            <phase>verify</phase>
+                            <phase>package</phase>
                             <goals>
                                 <goal>verify</goal>
                             </goals>
