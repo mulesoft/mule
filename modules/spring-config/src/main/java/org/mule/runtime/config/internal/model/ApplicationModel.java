@@ -1055,7 +1055,7 @@ public class ApplicationModel implements ArtifactAst {
         }));
   }
 
-  public void addMacroExpandedRoot(ComponentModel root) {
+  public void addRootComponentModel(ComponentModel root) {
     root.getInnerComponents().forEach(ige -> {
       ige.setRoot(true);
       ige.setParent(root);

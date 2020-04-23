@@ -434,8 +434,8 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
     app.recursiveStream().forEach(c -> {
       if (c.getLocation().getLocation().equals(location)) {
         componentAst.set(c);
-                                                                }
-                                                              });
+      }
+    });
     return componentAst.get();
   }
 
