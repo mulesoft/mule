@@ -46,6 +46,7 @@ import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationProcessor.proc
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -570,7 +571,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
           createdComponentModels.add(new Pair<>(componentModel.getNameAttribute(), componentModel));
         }
         beanDefinitionFactory
-            .resolveComponentRecursively(componentModel, beanFactory,
+            .resolveComponentRecursively(null, componentModel, beanFactory,
                                          (resolvedComponentModel, registry) -> {
                                            SpringComponentModel resolvedSpringComponentModel =
                                                (SpringComponentModel) resolvedComponentModel;

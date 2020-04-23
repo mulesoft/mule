@@ -37,7 +37,7 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator {
         managedMap = createManagedMapFromEntries(componentModel);
       } else {
         managedMap = new ManagedMap<>();
-        ComponentModel parentComponentModel = componentModel.getParent();
+        ComponentModel parentComponentModel = createBeanDefinitionRequest.getParentComponentModel();
         parentComponentModel.getInnerComponents()
             .stream()
             .filter(childComponentModel -> childComponentModel.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))

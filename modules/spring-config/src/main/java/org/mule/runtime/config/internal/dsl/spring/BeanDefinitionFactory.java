@@ -157,6 +157,7 @@ public class BeanDefinitionFactory {
   /**
    * Creates a {@code BeanDefinition} by traversing the {@code ComponentModel} and its children.
    *
+   * @param parentComponentModel        the container of the component model from which we want to create the bean definition.
    * @param componentModel              the component model from which we want to create the bean definition.
    * @param registry                    the bean registry since it may be required to get other bean definitions to create this one or to register
    *                                    the bean definition.
@@ -165,21 +166,24 @@ public class BeanDefinitionFactory {
    * @param componentLocator            where the locations of any {@link Component}'s locations must be registered
    * @return the {@code BeanDefinition} of the component model.
    */
-  public BeanDefinition resolveComponentRecursively(SpringComponentModel componentModel, BeanDefinitionRegistry registry,
+  public BeanDefinition resolveComponentRecursively(SpringComponentModel parentComponentModel,
+                                                    SpringComponentModel componentModel,
+                                                    BeanDefinitionRegistry registry,
                                                     BiConsumer<ComponentModel, BeanDefinitionRegistry> componentModelPostProcessor,
                                                     BiFunction<Element, BeanDefinition, Either<BeanDefinition, BeanReference>> oldParsingMechanism,
                                                     SpringConfigurationComponentLocator componentLocator) {
     List<ComponentModel> innerComponents = componentModel.getInnerComponents();
     if (!innerComponents.isEmpty()) {
       for (ComponentModel innerComponent : innerComponents) {
-        resolveComponentRecursively((SpringComponentModel) innerComponent, registry,
+        resolveComponentRecursively(componentModel, (SpringComponentModel) innerComponent, registry,
                                     componentModelPostProcessor, oldParsingMechanism, componentLocator);
       }
     }
-    return resolveComponent(componentModel, registry, componentModelPostProcessor, componentLocator);
+    return resolveComponent(parentComponentModel, componentModel, registry, componentModelPostProcessor, componentLocator);
   }
 
-  private BeanDefinition resolveComponent(SpringComponentModel componentModel,
+  private BeanDefinition resolveComponent(SpringComponentModel parentComponentModel,
+                                          SpringComponentModel componentModel,
                                           BeanDefinitionRegistry registry,
                                           BiConsumer<ComponentModel, BeanDefinitionRegistry> componentDefinitionModelProcessor,
                                           SpringConfigurationComponentLocator componentLocator) {
@@ -187,7 +191,7 @@ public class BeanDefinitionFactory {
       return null;
     }
 
-    resolveComponentBeanDefinition(componentModel);
+    resolveComponentBeanDefinition(parentComponentModel, componentModel);
     componentDefinitionModelProcessor.accept(componentModel, registry);
 
     // TODO MULE-9638: Once we migrate all core definitions we need to define a mechanism for customizing
@@ -334,11 +338,11 @@ public class BeanDefinitionFactory {
   }
 
 
-  private void resolveComponentBeanDefinition(SpringComponentModel componentModel) {
+  private void resolveComponentBeanDefinition(SpringComponentModel parentComponentModel, SpringComponentModel componentModel) {
     Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
         componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
     if (buildingDefinitionOptional.isPresent() || customBuildersComponentIdentifiers.contains(componentModel.getIdentifier())) {
-      this.componentModelProcessor.processRequest(new CreateBeanDefinitionRequest(componentModel,
+      this.componentModelProcessor.processRequest(new CreateBeanDefinitionRequest(parentComponentModel, componentModel,
                                                                                   buildingDefinitionOptional.orElse(null)));
     } else {
       processComponentWrapper(componentModel);

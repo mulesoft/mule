@@ -17,19 +17,26 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
  */
 public class CreateBeanDefinitionRequest {
 
+  private final SpringComponentModel parentComponentModel;
   private final SpringComponentModel componentModel;
   private final ComponentBuildingDefinition componentBuildingDefinition;
 
   /**
+   * @param parentComponentModel the container element of the holder for the configuration attributes defined by the user
    * @param componentModel the holder for the configuration attributes defined by the user
    * @param componentBuildingDefinition the definition to build the domain object that will represent the configuration on runtime
    */
-  public CreateBeanDefinitionRequest(SpringComponentModel componentModel,
+  public CreateBeanDefinitionRequest(SpringComponentModel parentComponentModel,
+                                     SpringComponentModel componentModel,
                                      ComponentBuildingDefinition componentBuildingDefinition) {
+    this.parentComponentModel = parentComponentModel;
     this.componentModel = componentModel;
     this.componentBuildingDefinition = componentBuildingDefinition;
   }
 
+  public SpringComponentModel getParentComponentModel() {
+    return parentComponentModel;
+  }
 
   public SpringComponentModel getComponentModel() {
     return componentModel;
