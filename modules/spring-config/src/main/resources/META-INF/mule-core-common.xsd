@@ -86,7 +86,7 @@
             <xsd:element ref="abstract-connector"/>
             <xsd:element ref="abstract-shared-connector"/>
             <xsd:element ref="abstract-global-endpoint"/>
-            <xsd:element ref="abstract-exception-strategy"/>
+            <xsd:element ref="abstract-error-handler"/>
             <xsd:element ref="abstract-on-error"/>
             <xsd:element ref="abstract-flow-construct" />
             <xsd:element ref="flow" />
@@ -581,7 +581,7 @@
             <xsd:extension base="abstractMessageProcessorType">
                 <xsd:sequence>
                     <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" maxOccurs="unbounded"/>
-                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                    <xsd:element ref="abstract-error-handler" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="transactionalAction" type="transactionalActionType" default="INDIFFERENT"/>
                 <xsd:attribute name="transactionType" type="transactionType" default="LOCAL"/>
@@ -959,7 +959,7 @@
         </xsd:restriction>
     </xsd:simpleType>
 
-    <xsd:element name="abstract-exception-strategy" abstract="true" type="exceptionStrategyType">
+    <xsd:element name="abstract-error-handler" abstract="true" type="exceptionStrategyType">
         <xsd:annotation>
             <xsd:documentation>
                 A placeholder for an exception strategy element. Exception strategies define how Mule should react to errors.
@@ -1114,7 +1114,7 @@
                 <xsd:attribute name="name" type="substitutableName" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Name of the exception strategy that will be used in ref attribute of 'exception-strategy' element
+                            Name of the error handler that will be used in ref attribute of 'on-error-*' elements
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -1321,7 +1321,7 @@
                         <xsd:group ref="messageProcessorOrMixedContentMessageProcessor"/>
                     </xsd:choice>
                     <xsd:choice minOccurs="0" maxOccurs="1">
-                        <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                        <xsd:element ref="abstract-error-handler" minOccurs="0"/>
                     </xsd:choice>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="nonBlankString" use="required">
@@ -2100,7 +2100,7 @@
     <!--==============================================================-->
 
     <xsd:element name="error-handler" type="errorHandlerType"
-                 substitutionGroup="abstract-exception-strategy">
+                 substitutionGroup="abstract-error-handler">
         <xsd:annotation>
             <xsd:documentation>
                 Allows the definition of internal selective handlers. It will route the error to the first handler that matches it. If there's no match, then a default error handler will be executed.
