@@ -246,7 +246,7 @@
         <xstreamVersion>1.4.10</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
 
-        <muleCommonVersion>3.9.4</muleCommonVersion>
+        <muleCommonVersion>3.8.7</muleCommonVersion>
     </properties>
 
     <dependencies>
