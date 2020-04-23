@@ -6,9 +6,12 @@
  */
 package org.mule.transport.http.functional;
 
+import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import org.mule.api.MuleException;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -38,28 +41,55 @@ public class HttpServerStopTestCase extends FunctionalTestCase
     @Test
     public void closeClientConnectionsWhenServerIsStopped() throws IOException, MuleException
     {
-        try (Socket clientSocket = new Socket("localhost", dynamicPort.getNumber()))
+        try (Socket idlePersistentConnection = generateIdlePersistentConnection())
         {
-            assertThat(clientSocket.isConnected(), is(true));
-
-            sendRequest(clientSocket);
-            assertResponse(getResponse(clientSocket), true);
-
-            sendRequest(clientSocket);
-            assertResponse(getResponse(clientSocket), true);
-
             muleContext.stop();
             muleContext.start();
 
-            sendRequest(clientSocket);
-            assertResponse(getResponse(clientSocket), false);
+            sendRequest(idlePersistentConnection, "/path");
+            assertResponse(getResponse(idlePersistentConnection), false);
         }
     }
 
-    private void sendRequest(Socket socket) throws IOException
+    @Test
+    public void closeIdleConnectionsWhenServerIsStoppedWhileThereIsAnInflightRequest() throws IOException, MuleException
+    {
+        try (Socket idlePersistentConnection = generateIdlePersistentConnection())
+        {
+            try (Socket slowRequestConnection = new Socket("localhost", dynamicPort.getNumber()))
+            {
+                sendRequest(slowRequestConnection, "/slow");
+
+                muleContext.stop();
+
+                String slowRequestResponse = getResponse(slowRequestConnection);
+                assertResponse(slowRequestResponse, true);
+                assertThat(slowRequestResponse, containsString("Connection: close"));
+
+                sendRequest(idlePersistentConnection, "/path");
+                assertResponse(getResponse(idlePersistentConnection), false);
+            }
+        }
+    }
+
+    private Socket generateIdlePersistentConnection() throws IOException
+    {
+        Socket socket = new Socket("localhost", dynamicPort.getNumber());
+        assertThat(socket.isConnected(), is(true));
+
+        sendRequest(socket, "/path");
+        assertResponse(getResponse(socket), true);
+
+        sendRequest(socket, "/path");
+        assertResponse(getResponse(socket), true);
+
+        return socket;
+    }
+
+    private void sendRequest(Socket socket, String endpoint) throws IOException
     {
         PrintWriter writer = new PrintWriter(socket.getOutputStream());
-        writer.println("GET /path " + HttpVersion.HTTP_1_1);
+        writer.println(format("GET %s %s", endpoint, HttpVersion.HTTP_1_1));
         writer.println("Host: www.example.com");
         writer.println("");
         writer.flush();
@@ -86,6 +116,10 @@ public class HttpServerStopTestCase extends FunctionalTestCase
     private void assertResponse(String response, boolean shouldBeValid)
     {
         assertThat(isEmpty(response), is(!shouldBeValid));
+        if (shouldBeValid)
+        {
+            assertThat(response, containsString("HTTP/1.1 200"));
+        }
     }
 
 }
