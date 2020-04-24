@@ -126,25 +126,25 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements I
   public void initialise() throws InitialisationException {
     flowName = componentLocation.getRootContainerName();
     inflightIdsObjectStore = objectStoreManager.getOrCreateObjectStore(formatKey(INFLIGHT_IDS_OS_NAME_SUFFIX),
-            unmanagedTransient());
+                                                                       unmanagedTransient());
 
     recentlyProcessedIds = objectStoreManager.getOrCreateObjectStore(formatKey(RECENTLY_PROCESSED_IDS_OS_NAME_SUFFIX),
-            unmanagedPersistent());
+                                                                     unmanagedPersistent());
 
     idsOnUpdatedWatermark = objectStoreManager.getOrCreateObjectStore(formatKey(IDS_ON_UPDATED_WATERMARK_OS_NAME_SUFFIX),
-            unmanagedPersistent());
+                                                                      unmanagedPersistent());
 
     watermarkObjectStore = objectStoreManager.getOrCreateObjectStore(formatKey(WATERMARK_OS_NAME_SUFFIX),
-            unmanagedPersistent());
+                                                                     unmanagedPersistent());
 
     postReconnectionExecutor = createScheduler("postReconnectionExecutor");
   }
 
   private org.mule.runtime.api.scheduler.Scheduler createScheduler(String name) {
     return schedulerService.customScheduler(SchedulerConfig.config()
-            .withMaxConcurrentTasks(1)
-            .withWaitAllowed(true)
-            .withName(formatKey(name)));
+        .withMaxConcurrentTasks(1)
+        .withWaitAllowed(true)
+        .withName(formatKey(name)));
   }
 
   @Override
@@ -155,12 +155,12 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements I
 
     stopRequested.set(false);
 
-    if(reconnection.get()){
+    if (reconnection.get()) {
       postReconnectionExecutor.schedule(pollAction, 0, TimeUnit.SECONDS);
       reconnection.set(false);
     }
 
-    if(!scheduled.get()) {
+    if (!scheduled.get()) {
       executor = createScheduler("executor");
       scheduler.schedule(executor, pollAction);
       scheduled.set(true);
@@ -175,7 +175,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements I
   public void onStop() {
     stopRequested.set(true);
 
-    if(!reconnection.get()) {
+    if (!reconnection.get()) {
       shutdownScheduler();
       scheduled.set(false);
     }
@@ -189,7 +189,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements I
 
   @Override
   public void dispose() {
-    if(scheduled.get()){
+    if (scheduled.get()) {
       shutdownScheduler();
     }
     postReconnectionExecutor.stop();
@@ -220,7 +220,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements I
     }
 
     withWatermarkLock(() -> {
-      DefaultPollContext pollContext = new DefaultPollContext(sourceCallbackReference.get(), getCurrentWatermark(), getUpdatedWatermark());
+      DefaultPollContext pollContext =
+          new DefaultPollContext(sourceCallbackReference.get(), getCurrentWatermark(), getUpdatedWatermark());
       try {
         delegate.poll(pollContext);
         pollContext.getUpdatedWatermark()
