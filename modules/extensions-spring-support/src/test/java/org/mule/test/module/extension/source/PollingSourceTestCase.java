@@ -153,8 +153,8 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   private void assertStartedPolls(int polls) {
     check(5000, 200, () -> {
-        assertThat(STARTED_POLLS, is(polls));
-        return true;
+      assertThat(STARTED_POLLS, is(polls));
+      return true;
     });
   }
 
