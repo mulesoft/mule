@@ -32,6 +32,11 @@ import org.junit.Test;
 
 public class HttpServerStopTestCase extends FunctionalTestCase
 {
+
+    public static final int POLL_TIMEOUT_MILLIS = 300;
+    public static final int POLL_DELAY_MILLIS = 50;
+    public static final String SLOW_PROCESSING_ENDPOINT = "/slow";
+    public static final String FAST_PROCESSING_ENDPOINT = "/path";
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("listener.port");
 
@@ -58,7 +63,7 @@ public class HttpServerStopTestCase extends FunctionalTestCase
             muleContext.stop();
             muleContext.start();
 
-            sendRequest(idlePersistentConnection, "/path");
+            sendRequest(idlePersistentConnection, FAST_PROCESSING_ENDPOINT);
             assertResponse(getResponse(idlePersistentConnection), false);
         }
     }
@@ -69,7 +74,7 @@ public class HttpServerStopTestCase extends FunctionalTestCase
         Thread stopper = new MuleContextStopper();
         try (Socket slowRequestConnection = new Socket("localhost", dynamicPort.getNumber()))
         {
-            sendRequest(slowRequestConnection, "/slow");
+            sendRequest(slowRequestConnection, SLOW_PROCESSING_ENDPOINT);
 
             // Give some time to the listener to parse the request and start an event, and stop mule in parallel.
             sleep(100);
@@ -94,14 +99,14 @@ public class HttpServerStopTestCase extends FunctionalTestCase
         {
             try (Socket slowRequestConnection = new Socket("localhost", dynamicPort.getNumber()))
             {
-                sendRequest(slowRequestConnection, "/slow");
+                sendRequest(slowRequestConnection, SLOW_PROCESSING_ENDPOINT);
 
                 // Give some time to the listener to parse the request and start an event, and stop mule in parallel.
                 sleep(100);
                 stopper.start();
 
                 // The first connection is closed before the second finishes processing.
-                new PollingProber(300, 50).check(new ConnectionClosedProbe(idlePersistentConnection));
+                new PollingProber(POLL_TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new ConnectionClosedProbe(idlePersistentConnection));
             }
         }
         finally
@@ -115,10 +120,10 @@ public class HttpServerStopTestCase extends FunctionalTestCase
         Socket socket = new Socket("localhost", dynamicPort.getNumber());
         assertThat(socket.isConnected(), is(true));
 
-        sendRequest(socket, "/path");
+        sendRequest(socket, FAST_PROCESSING_ENDPOINT);
         assertResponse(getResponse(socket), true);
 
-        sendRequest(socket, "/path");
+        sendRequest(socket, FAST_PROCESSING_ENDPOINT);
         assertResponse(getResponse(socket), true);
 
         return socket;
@@ -190,7 +195,7 @@ public class HttpServerStopTestCase extends FunctionalTestCase
         {
             try
             {
-                sendRequest(connection, "/path");
+                sendRequest(connection, FAST_PROCESSING_ENDPOINT);
                 return isEmpty(getResponse(connection));
             }
             catch (IOException e)
