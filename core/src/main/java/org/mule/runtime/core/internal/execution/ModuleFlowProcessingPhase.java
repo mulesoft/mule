@@ -37,7 +37,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.SourceRemoteConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -332,7 +332,7 @@ public class ModuleFlowProcessingPhase
     CoreEvent event = messagingException.getEvent();
     try {
       // When broken pipe happens there's not need to send failure response to client
-      if (!containsType(messagingException, ConnectionException.class)) {
+      if (!containsType(messagingException, SourceRemoteConnectionException.class)) {
         return from(ctx.template
             .sendFailureResponseToClient(messagingException, errorParameters.apply(event)))
                 .onErrorMap(e -> new SourceErrorException(builder(event)
