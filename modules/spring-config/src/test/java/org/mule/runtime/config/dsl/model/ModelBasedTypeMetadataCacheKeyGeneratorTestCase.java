@@ -32,7 +32,6 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.metadata.ModelBasedMetadataCacheIdGeneratorFactory;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.internal.model.ApplicationModel;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
@@ -558,24 +557,24 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
 
   private static class Locator implements ComponentLocator<ComponentAst> {
 
-    private final Map<Location, ComponentModel> components = new HashMap<>();
+    private final Map<Location, ComponentAst> components = new HashMap<>();
 
     Locator(ApplicationModel app) {
-      app.getRootComponentModel().getInnerComponents().forEach(this::addComponent);
+      app.topLevelComponentsStream().forEach(this::addComponent);
     }
 
     @Override
     public Optional<ComponentAst> get(Location location) {
-      return Optional.ofNullable(components.get(location)).map(cm -> (ComponentAst) cm);
+      return Optional.ofNullable(components.get(location)).map(cm -> cm);
     }
 
-    private Location getLocation(ComponentModel component) {
-      return Location.builderFromStringRepresentation(component.getComponentLocation().getLocation()).build();
+    private Location getLocation(ComponentAst component) {
+      return Location.builderFromStringRepresentation(component.getLocation().getLocation()).build();
     }
 
-    private void addComponent(ComponentModel component) {
+    private void addComponent(ComponentAst component) {
       components.put(getLocation(component), component);
-      component.getInnerComponents().forEach(this::addComponent);
+      component.directChildrenStream().forEach(this::addComponent);
     }
 
   }

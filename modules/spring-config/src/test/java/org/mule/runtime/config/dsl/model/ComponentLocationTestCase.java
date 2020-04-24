@@ -12,25 +12,25 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.internal.model.ApplicationModel;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
-
-import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableSet;
 
 public class ComponentLocationTestCase extends AbstractDslModelTestCase {
 
@@ -51,19 +51,15 @@ public class ComponentLocationTestCase extends AbstractDslModelTestCase {
   @Test
   public void validateConnectionLocation() throws Exception {
     ApplicationModel applicationModel = loadApplicationModel(buildAppDeclaration());
-    ComponentModel root = applicationModel.getRootComponentModel();
-    assertThat(root.getComponentLocation(), is(nullValue()));
 
-    ComponentModel config = root.getInnerComponents().get(0);
+    ComponentAst config = applicationModel.topLevelComponentsStream().findFirst().get();
     assertThat(config.getModel(ConfigurationModel.class), is(not(empty())));
-    assertThat(config.getComponentLocation().getLocation(), equalTo(CONFIG_NAME));
+    assertThat(config.getLocation().getLocation(), equalTo(CONFIG_NAME));
 
-    ComponentModel connection = config.getInnerComponents().get(0);
+    ComponentAst connection = config.directChildrenStream().findFirst().get();
     assertThat(connection.getModel(ConnectionProviderModel.class), is(not(empty())));
-    assertThat(connection.getComponentLocation().getLocation(), equalTo(CONFIG_NAME + "/connection"));
+    assertThat(connection.getLocation().getLocation(), equalTo(CONFIG_NAME + "/connection"));
   }
-
-
 
   protected ApplicationModel loadApplicationModel(ArtifactDeclaration declaration) throws Exception {
     return new ApplicationModel(new ArtifactConfig.Builder().build(),

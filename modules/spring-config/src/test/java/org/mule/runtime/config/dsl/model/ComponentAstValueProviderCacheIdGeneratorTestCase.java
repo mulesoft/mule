@@ -60,7 +60,6 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.metadata.ComponentAstBasedValueProviderCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.internal.model.ApplicationModel;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
@@ -112,7 +111,7 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
 
   private static final String MY_FLOW = "myFlow";
   private static final String MY_CONFIG = "myConfig";
-  private static final String MY_CONNECTION = MY_CONFIG + "/connection"; //Not a valid location, hack to reuse helper function.
+  private static final String MY_CONNECTION = MY_CONFIG + "/connection"; // Not a valid location, hack to reuse helper function.
   private static final String SOURCE_LOCATION = MY_FLOW + "/source";
   private static final String OPERATION_LOCATION = MY_FLOW + "/processors/0";
 
@@ -432,12 +431,11 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
 
   private ComponentAst getComponentAst(ApplicationModel app, String location) {
     Reference<ComponentAst> componentAst = new Reference<>();
-    app.getRootComponentModel().executedOnEveryInnerComponent(
-                                                              c -> {
-                                                                if (c.getComponentLocation().getLocation().equals(location)) {
-                                                                  componentAst.set((ComponentAst) c);
-                                                                }
-                                                              });
+    app.recursiveStream().forEach(c -> {
+      if (c.getLocation().getLocation().equals(location)) {
+        componentAst.set(c);
+      }
+    });
     return componentAst.get();
   }
 
@@ -510,7 +508,7 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
                  .findAny()
                  .map(fp -> {
                    parameterConsumer.accept(fp);
-                   return EMPTY; //Needed to avoid exception
+                   return EMPTY; // Needed to avoid exception
                  })
                  .orElseThrow(() -> new RuntimeException("Could not find parameter to modify")))
         .orElseThrow(() -> new RuntimeException("Location not found"));
@@ -791,24 +789,24 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
 
   private static class Locator implements ComponentLocator<ComponentAst> {
 
-    private final Map<Location, ComponentModel> components = new HashMap<>();
+    private final Map<Location, ComponentAst> components = new HashMap<>();
 
     Locator(ApplicationModel app) {
-      app.getRootComponentModel().getInnerComponents().forEach(this::addComponent);
+      app.topLevelComponentsStream().forEach(this::addComponent);
     }
 
     @Override
     public Optional<ComponentAst> get(Location location) {
-      return Optional.ofNullable(components.get(location)).map(cm -> (ComponentAst) cm);
+      return Optional.ofNullable(components.get(location)).map(cm -> cm);
     }
 
-    private Location getLocation(ComponentModel component) {
-      return Location.builderFromStringRepresentation(component.getComponentLocation().getLocation()).build();
+    private Location getLocation(ComponentAst component) {
+      return Location.builderFromStringRepresentation(component.getLocation().getLocation()).build();
     }
 
-    private void addComponent(ComponentModel component) {
+    private void addComponent(ComponentAst component) {
       components.put(getLocation(component), component);
-      component.getInnerComponents().forEach(this::addComponent);
+      component.directChildrenStream().forEach(this::addComponent);
     }
   }
 

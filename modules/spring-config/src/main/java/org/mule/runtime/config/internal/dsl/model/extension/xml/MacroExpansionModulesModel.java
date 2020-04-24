@@ -20,10 +20,10 @@ import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import javax.xml.XMLConstants;
@@ -73,37 +73,49 @@ public class MacroExpansionModulesModel {
    * the global elements if there are at least one {@link ExtensionModel} to macro expand.
    */
   public void expand(Runnable postProcess) {
-    if (sortedExtensions.isEmpty()) {
-      postProcess.run();
-      return;
-    }
+    boolean hasMacroExpansionExtension = false;
 
-    for (ExtensionModel sortedExtension : sortedExtensions) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(format("macro expanding '%s' connector, xmlns:%s=\"%s\"",
-                            sortedExtension.getName(),
-                            sortedExtension.getXmlDslModel().getPrefix(),
-                            sortedExtension.getXmlDslModel().getNamespace()));
+    for (ExtensionModel extensionModel : sortedExtensions) {
+      if (extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent()) {
+        hasMacroExpansionExtension = true;
+
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(format("macro expanding '%s' connector, xmlns:%s=\"%s\"",
+                              extensionModel.getName(),
+                              extensionModel.getXmlDslModel().getPrefix(),
+                              extensionModel.getXmlDslModel().getNamespace()));
+        }
+        new MacroExpansionModuleModel(applicationModel, extensionModel).expand();
+        postProcess.run();
       }
-      new MacroExpansionModuleModel(applicationModel, sortedExtension).expand();
-      postProcess.run();
     }
-    if (LOGGER.isDebugEnabled()) {
-      // only log the macro expanded app if there are smart connectors in it
-      boolean hasMacroExpansionExtension = sortedExtensions.stream()
-          .anyMatch(extensionModel -> extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent());
-      if (hasMacroExpansionExtension) {
-        applicationModel.executeOnlyOnMuleRoot(rootComponentModel -> {
-          final StringBuilder buf = new StringBuilder(1024);
 
-          buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_DELIMITER);
-          buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_SECTION_DELIMITER);
-          buf.append("Filename: ").append(rootComponentModel.getConfigFileName().orElse("<unnamed>"));
-          buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_SECTION_DELIMITER);
-          buf.append(toXml(rootComponentModel));
-          buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_DELIMITER);
-          LOGGER.debug(buf.toString());
+    if (hasMacroExpansionExtension) {
+      if (LOGGER.isDebugEnabled()) {
+        // only log the macro expanded app if there are smart connectors in it
+        final StringBuilder buf = new StringBuilder(1024);
+        buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_DELIMITER);
+
+        AtomicReference<String> lastFile = new AtomicReference<>();
+
+        applicationModel.topLevelComponentsStream().forEach(comp -> {
+          final String fileName = comp.getMetadata().getFileName().orElse("<unnamed>");
+
+          if (!fileName.equals(lastFile.get())) {
+            if (lastFile.get() != null) {
+              buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_SECTION_DELIMITER);
+            }
+            buf.append("Filename: ").append(fileName);
+            buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_SECTION_DELIMITER);
+
+            lastFile.set(fileName);
+          }
+
+          buf.append(toXml((ComponentModel) comp)).append(lineSeparator());
         });
+
+        buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_DELIMITER);
+        LOGGER.debug(buf.toString());
       }
     }
   }
@@ -131,9 +143,11 @@ public class MacroExpansionModulesModel {
 
     // we first check there are at least one extension to macro expand
     if (!allExtensionsByNamespace.isEmpty()) {
-      Set<String> extensionsUsedInApp = new HashSet<>();
-      applicationModel.executeOnEveryMuleComponentTree(rootComponentModel -> extensionsUsedInApp
-          .addAll(getDirectExpandableNamespaceDependencies(rootComponentModel, allExtensionsByNamespace.keySet())));
+      Set<String> extensionsUsedInApp = applicationModel.recursiveStream()
+          .map(comp -> comp.getIdentifier().getNamespaceUri())
+          .filter(ns -> allExtensionsByNamespace.keySet().contains(ns))
+          .collect(toSet());
+
       // then we assure there are at least one of those extensions being used by the app
       if (!extensionsUsedInApp.isEmpty()) {
         // generation of the DAG and then the topological iterator.
@@ -172,21 +186,6 @@ public class MacroExpansionModulesModel {
                                                                extensionModel.getName(),
                                                                extensionModel.getXmlDslModel().getNamespace())))
         .getNamespacesDependencies();
-  }
-
-  /**
-   * Given a root element of an XML (this is for you Kraan), look for all the used namespaces to which will intersect with the
-   * current namespaces of those {@link ExtensionModel}s that must be macro expanded.
-   *
-   * @param rootComponentModel XML to look for namespace dependencies that *must* be macro expanded.
-   * @param namespacesExtensions collection of namespaces from {@link ExtensionModel} that are macro expendables.
-   * @return a collection of used namespaces in the current {@code rootComponentModel} that *must* be macro expanded.
-   */
-  private Set<String> getDirectExpandableNamespaceDependencies(ComponentModel rootComponentModel,
-                                                               Set<String> namespacesExtensions) {
-    return getUsedNamespaces(rootComponentModel).stream()
-        .filter(namespacesExtensions::contains)
-        .collect(toSet());
   }
 
   /**
