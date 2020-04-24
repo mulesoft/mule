@@ -44,6 +44,8 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.SourceRemoteConnectionException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -227,7 +229,7 @@ public class ModuleFlowProcessingPhaseTestCase extends AbstractMuleTestCase {
 
   @Test
   public void avoidSendFailureResponseToClientWhenConnectionExceptionOccurs() throws Exception {
-    when(template.sendResponseToClient(any(), any())).thenReturn(error(new ConnectionException("Broken pipe")));
+    when(template.sendResponseToClient(any(), any())).thenReturn(error(new SourceRemoteConnectionException("Broken pipe")));
 
     moduleFlowProcessingPhase.runPhase(template, context, notifier);
 
