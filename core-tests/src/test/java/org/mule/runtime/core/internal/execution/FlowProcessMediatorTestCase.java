@@ -49,6 +49,7 @@ import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.SourceConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.message.ErrorType;
@@ -271,7 +272,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void avoidSendFailureResponseToClientWhenConnectionExceptionOccurs() throws Exception {
-    ConnectionException connectionException = new ConnectionException("Broken pipe");
+    ConnectionException connectionException = new SourceConnectionException("Broken pipe");
     doAnswer(onCallback(callback -> callback.error(connectionException))).when(template).sendResponseToClient(any(), any(),
                                                                                                               any());
     flowProcessMediator.process(template, context);
