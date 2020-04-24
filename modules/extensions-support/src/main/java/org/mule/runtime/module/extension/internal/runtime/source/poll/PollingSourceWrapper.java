@@ -32,13 +32,16 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
-import org.mule.runtime.api.store.ObjectStoreSettings;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
@@ -57,6 +60,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Consumer;
@@ -75,7 +79,7 @@ import org.slf4j.Logger;
  *
  * @since 4.1
  */
-public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
+public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(PollingSourceWrapper.class);
   private static final String ITEM_RELEASER_CTX_VAR = "itemReleaser";
@@ -103,7 +107,14 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   private ComponentLocation componentLocation;
   private String flowName;
   private final AtomicBoolean stopRequested = new AtomicBoolean(false);
+  private final AtomicBoolean reconnection = new AtomicBoolean(false);
+  private final AtomicBoolean scheduled = new AtomicBoolean(false);
+
   private org.mule.runtime.api.scheduler.Scheduler executor;
+  private org.mule.runtime.api.scheduler.Scheduler postReconnectionExecutor;
+
+  private final Reference<SourceCallback<T, A>> sourceCallbackReference = new Reference<>();
+  private Runnable pollAction = () -> poll();
 
   public PollingSourceWrapper(PollingSource<T, A> delegate, Scheduler scheduler) {
     super(delegate);
@@ -112,28 +123,48 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   }
 
   @Override
-  public void onStart(SourceCallback<T, A> sourceCallback) throws MuleException {
-    delegate.onStart(sourceCallback);
+  public void initialise() throws InitialisationException {
     flowName = componentLocation.getRootContainerName();
     inflightIdsObjectStore = objectStoreManager.getOrCreateObjectStore(formatKey(INFLIGHT_IDS_OS_NAME_SUFFIX),
-                                                                       unmanagedTransient());
+            unmanagedTransient());
 
     recentlyProcessedIds = objectStoreManager.getOrCreateObjectStore(formatKey(RECENTLY_PROCESSED_IDS_OS_NAME_SUFFIX),
-                                                                     unmanagedPersistent());
+            unmanagedPersistent());
 
     idsOnUpdatedWatermark = objectStoreManager.getOrCreateObjectStore(formatKey(IDS_ON_UPDATED_WATERMARK_OS_NAME_SUFFIX),
-                                                                      unmanagedPersistent());
+            unmanagedPersistent());
 
     watermarkObjectStore = objectStoreManager.getOrCreateObjectStore(formatKey(WATERMARK_OS_NAME_SUFFIX),
-                                                                     unmanagedPersistent());
+            unmanagedPersistent());
 
-    executor = schedulerService.customScheduler(SchedulerConfig.config()
-        .withMaxConcurrentTasks(1)
-        .withWaitAllowed(true)
-        .withName(formatKey("executor")));
+    postReconnectionExecutor = createScheduler("postReconnectionExecutor");
+  }
+
+  private org.mule.runtime.api.scheduler.Scheduler createScheduler(String name) {
+    return schedulerService.customScheduler(SchedulerConfig.config()
+            .withMaxConcurrentTasks(1)
+            .withWaitAllowed(true)
+            .withName(formatKey(name)));
+  }
+
+  @Override
+  public void onStart(SourceCallback<T, A> sourceCallback) throws MuleException {
+    sourceCallbackReference.set(sourceCallback);
+
+    delegate.onStart(sourceCallback);
 
     stopRequested.set(false);
-    scheduler.schedule(executor, () -> poll(sourceCallback));
+
+    if(reconnection.get()){
+      postReconnectionExecutor.schedule(pollAction, 0, TimeUnit.SECONDS);
+      reconnection.set(false);
+    }
+
+    if(!scheduled.get()) {
+      executor = createScheduler("executor");
+      scheduler.schedule(executor, pollAction);
+      scheduled.set(true);
+    }
   }
 
   private String formatKey(String key) {
@@ -143,12 +174,25 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   @Override
   public void onStop() {
     stopRequested.set(true);
-    shutdownScheduler();
+
+    if(!reconnection.get()) {
+      shutdownScheduler();
+      scheduled.set(false);
+    }
     try {
       delegate.onStop();
     } catch (Throwable t) {
       LOGGER.error(format("Found error while stopping source at location '%s'. %s", flowName, t.getMessage()), t);
     }
+  }
+
+
+  @Override
+  public void dispose() {
+    if(scheduled.get()){
+      shutdownScheduler();
+    }
+    postReconnectionExecutor.stop();
   }
 
   @Override
@@ -170,13 +214,13 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
     callback.complete(null);
   }
 
-  private void poll(SourceCallback<T, A> sourceCallback) {
+  private void poll() {
     if (isRequestedToStop()) {
       return;
     }
 
     withWatermarkLock(() -> {
-      DefaultPollContext pollContext = new DefaultPollContext(sourceCallback, getCurrentWatermark(), getUpdatedWatermark());
+      DefaultPollContext pollContext = new DefaultPollContext(sourceCallbackReference.get(), getCurrentWatermark(), getUpdatedWatermark());
       try {
         delegate.poll(pollContext);
         pollContext.getUpdatedWatermark()
@@ -264,6 +308,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
 
     @Override
     public void onConnectionException(ConnectionException e) {
+      reconnection.set(true);
       sourceCallback.onConnectionException(e);
     }
 

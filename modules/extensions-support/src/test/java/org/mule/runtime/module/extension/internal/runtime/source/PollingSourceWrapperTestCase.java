@@ -74,6 +74,7 @@ public class PollingSourceWrapperTestCase {
 
   @Test
   public void waterMarkingStoresGetCreatedOnStart() throws MuleException {
+    pollingSourceWrapper.initialise();
     pollingSourceWrapper.onStart(callbackMock);
     assertPersistentStoreIsCreated(EXPECTED_WATERMARK_OS, DEFAULT_EXPIRATION_INTERVAL);
     assertPersistentStoreIsCreated(EXPECTED_RECENT_IDS_OS, DEFAULT_EXPIRATION_INTERVAL);
@@ -82,6 +83,7 @@ public class PollingSourceWrapperTestCase {
 
   @Test
   public void idempotencyStoreGetsCreatedOnStart() throws MuleException {
+    pollingSourceWrapper.initialise();
     pollingSourceWrapper.onStart(callbackMock);
     assertTransientStoreIsCreated(EXPECTED_INFLIGHT_IDS_OS, DEFAULT_EXPIRATION_INTERVAL);
   }

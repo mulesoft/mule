@@ -332,7 +332,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     synchronized (started) {
       if (started.get()) {
         stopSource();
-        disposeSource();
         startSource(true);
       } else {
         LOGGER.warn(format("Message source '%s' on flow '%s' is stopped. Not doing restart", getLocation().getRootContainerName(),
