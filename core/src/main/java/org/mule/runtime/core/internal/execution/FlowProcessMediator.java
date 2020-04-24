@@ -39,7 +39,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.SourceRemoteConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -431,7 +431,7 @@ public class FlowProcessMediator implements Initialisable {
     CoreEvent event = messagingException.getEvent();
 
     try {
-      if (!containsType(messagingException, ConnectionException.class)) {
+      if (!containsType(messagingException, SourceRemoteConnectionException.class)) {
         ctx.template.sendFailureResponseToClient(messagingException, errorParameters.apply(event),
                                                  new CompletableCallback<Void>() {
 
