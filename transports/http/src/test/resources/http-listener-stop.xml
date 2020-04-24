@@ -2,8 +2,10 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 
     <http:listener-config name="httpConfig" host="localhost" port="${listener.port}" />
@@ -11,6 +13,19 @@
     <flow name="testFlow">
         <http:listener config-ref="httpConfig" path="/path" />
         <echo-component />
+    </flow>
+
+    <flow name="slowFlow">
+        <http:listener config-ref="httpConfig" path="/slow" />
+        <scripting:component>
+            <scripting:script engine="groovy">
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Thread.sleep(1000);
+                }
+            </scripting:script>
+        </scripting:component>
     </flow>
 
 </mule>

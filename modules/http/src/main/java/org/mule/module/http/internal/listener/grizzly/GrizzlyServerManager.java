@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
-import org.glassfish.grizzly.IOEvent;
 import org.glassfish.grizzly.Transport;
 import org.glassfish.grizzly.TransportProbe;
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
@@ -137,7 +136,6 @@ public class GrizzlyServerManager implements HttpServerManager
                     }
                     try
                     {
-                        idleTimeoutDelayedExecutor.wait();
                         idleTimeoutDelayedExecutor.notify();
                         idleTimeoutDelayedExecutor.wait();
                     }

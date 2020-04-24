@@ -6,12 +6,17 @@
  */
 package org.mule.transport.http.functional;
 
+import static java.lang.String.format;
+import static java.lang.Thread.sleep;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import org.mule.api.MuleException;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,11 +26,17 @@ import java.io.StringWriter;
 import java.net.Socket;
 
 import org.apache.commons.httpclient.HttpVersion;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class HttpServerStopTestCase extends FunctionalTestCase
 {
+
+    public static final int POLL_TIMEOUT_MILLIS = 300;
+    public static final int POLL_DELAY_MILLIS = 50;
+    public static final String SLOW_PROCESSING_ENDPOINT = "/slow";
+    public static final String FAST_PROCESSING_ENDPOINT = "/path";
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("listener.port");
 
@@ -35,31 +46,93 @@ public class HttpServerStopTestCase extends FunctionalTestCase
         return "http-listener-stop.xml";
     }
 
-    @Test
-    public void closeClientConnectionsWhenServerIsStopped() throws IOException, MuleException
+    @After
+    public void startMuleContextIfStopped() throws MuleException
     {
-        try (Socket clientSocket = new Socket("localhost", dynamicPort.getNumber()))
+        if (muleContext.isStopped())
         {
-            assertThat(clientSocket.isConnected(), is(true));
-
-            sendRequest(clientSocket);
-            assertResponse(getResponse(clientSocket), true);
-
-            sendRequest(clientSocket);
-            assertResponse(getResponse(clientSocket), true);
-
-            muleContext.stop();
             muleContext.start();
-
-            sendRequest(clientSocket);
-            assertResponse(getResponse(clientSocket), false);
         }
     }
 
-    private void sendRequest(Socket socket) throws IOException
+    @Test
+    public void closeClientConnectionsWhenServerIsStopped() throws IOException, MuleException
+    {
+        try (Socket idlePersistentConnection = generateIdlePersistentConnection())
+        {
+            muleContext.stop();
+            muleContext.start();
+
+            sendRequest(idlePersistentConnection, FAST_PROCESSING_ENDPOINT);
+            assertResponse(getResponse(idlePersistentConnection), false);
+        }
+    }
+
+    @Test
+    public void requestInflightDuringShutdownIsRespondedIncludingConnectionCloseHeader() throws IOException, InterruptedException, MuleException
+    {
+        Thread stopper = new MuleContextStopper();
+        try (Socket slowRequestConnection = new Socket("localhost", dynamicPort.getNumber()))
+        {
+            sendRequest(slowRequestConnection, SLOW_PROCESSING_ENDPOINT);
+
+            // Give some time to the listener to parse the request and start an event, and stop mule in parallel.
+            sleep(100);
+            stopper.start();
+
+            // Response is ok, but connection close header is added.
+            String slowRequestResponse = getResponse(slowRequestConnection);
+            assertResponse(slowRequestResponse, true);
+            assertThat(slowRequestResponse, containsString("Connection: close"));
+        }
+        finally
+        {
+            stopper.join();
+        }
+    }
+
+    @Test
+    public void closeIdleConnectionsWhenServerIsStoppedWhileThereIsAnInflightRequest() throws IOException, MuleException, InterruptedException
+    {
+        Thread stopper = new MuleContextStopper();
+        try (Socket idlePersistentConnection = generateIdlePersistentConnection())
+        {
+            try (Socket slowRequestConnection = new Socket("localhost", dynamicPort.getNumber()))
+            {
+                sendRequest(slowRequestConnection, SLOW_PROCESSING_ENDPOINT);
+
+                // Give some time to the listener to parse the request and start an event, and stop mule in parallel.
+                sleep(100);
+                stopper.start();
+
+                // The first connection is closed before the second finishes processing.
+                new PollingProber(POLL_TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new ConnectionClosedProbe(idlePersistentConnection));
+            }
+        }
+        finally
+        {
+            stopper.join();
+        }
+    }
+
+    private Socket generateIdlePersistentConnection() throws IOException
+    {
+        Socket socket = new Socket("localhost", dynamicPort.getNumber());
+        assertThat(socket.isConnected(), is(true));
+
+        sendRequest(socket, FAST_PROCESSING_ENDPOINT);
+        assertResponse(getResponse(socket), true);
+
+        sendRequest(socket, FAST_PROCESSING_ENDPOINT);
+        assertResponse(getResponse(socket), true);
+
+        return socket;
+    }
+
+    private void sendRequest(Socket socket, String endpoint) throws IOException
     {
         PrintWriter writer = new PrintWriter(socket.getOutputStream());
-        writer.println("GET /path " + HttpVersion.HTTP_1_1);
+        writer.println(format("GET %s %s", endpoint, HttpVersion.HTTP_1_1));
         writer.println("Host: www.example.com");
         writer.println("");
         writer.flush();
@@ -86,6 +159,56 @@ public class HttpServerStopTestCase extends FunctionalTestCase
     private void assertResponse(String response, boolean shouldBeValid)
     {
         assertThat(isEmpty(response), is(!shouldBeValid));
+        if (shouldBeValid)
+        {
+            assertThat(response, containsString("HTTP/1.1 200"));
+        }
+    }
+
+    private static class MuleContextStopper extends Thread {
+
+        @Override
+        public void run()
+        {
+            try
+            {
+                muleContext.stop();
+            }
+            catch (MuleException e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class ConnectionClosedProbe implements Probe
+    {
+
+        Socket connection;
+
+        ConnectionClosedProbe(Socket connection)
+        {
+            this.connection = connection;
+        }
+
+        public boolean isSatisfied()
+        {
+            try
+            {
+                sendRequest(connection, FAST_PROCESSING_ENDPOINT);
+                return isEmpty(getResponse(connection));
+            }
+            catch (IOException e)
+            {
+                return true;
+            }
+        }
+
+        @Override
+        public String describeFailure()
+        {
+            return "An old persistent connection is returning non-empty responses";
+        }
     }
 
 }
