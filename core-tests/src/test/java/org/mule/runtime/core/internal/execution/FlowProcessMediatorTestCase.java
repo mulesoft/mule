@@ -27,7 +27,6 @@ import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.SOURCE_ERROR_RESPONSE_GENERATE;
@@ -273,7 +272,7 @@ public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void avoidSendFailureResponseToClientWhenConnectionExceptionOccurs() throws Exception {
-    SourceRemoteConnectionException connectionException = new SourceRemoteConnectionException(createStaticMessage("Broken pipe"));
+    SourceRemoteConnectionException connectionException = new SourceRemoteConnectionException("Broken pipe");
     doAnswer(onCallback(callback -> callback.error(connectionException))).when(template).sendResponseToClient(any(), any(),
                                                                                                               any());
     flowProcessMediator.process(template, context);
