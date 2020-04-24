@@ -30,6 +30,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -49,11 +50,13 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.UUID;
+import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
+import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -171,7 +174,7 @@ public class MuleContextUtils {
 
     StreamingManager streamingManager = mock(StreamingManager.class, RETURNS_DEEP_STUBS);
     try {
-      MuleRegistry registry = mock(MuleRegistry.class, withSettings().lenient());
+      MuleRegistry registry = mock(MuleRegistryHelper.class, withSettings().lenient());
       when(muleContext.getRegistry()).thenReturn(registry);
       ComponentInitialStateManager componentInitialStateManager =
           mock(ComponentInitialStateManager.class, withSettings().lenient());
@@ -220,6 +223,8 @@ public class MuleContextUtils {
         mock(ConfigurationComponentLocator.class, withSettings().lenient());
     when(configurationComponentLocator.find(any(Location.class))).thenReturn(empty());
     when(configurationComponentLocator.find(any(ComponentIdentifier.class))).thenReturn(emptyList());
+
+    when(muleContext.getCustomizationService()).thenReturn(mock(CustomizationService.class, withSettings().extraInterfaces(CustomServiceRegistry.class)));
 
     try {
       when(registry.lookupObject(NotificationListenerRegistry.class)).thenReturn(notificationListenerRegistry);

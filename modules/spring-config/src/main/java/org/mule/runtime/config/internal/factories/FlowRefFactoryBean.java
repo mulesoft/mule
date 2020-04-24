@@ -206,8 +206,8 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       try {
         BeanDefinition processorBeanDefinition = muleArtifactContext.getBeanFactory().getBeanDefinition(name);
         if (processorBeanDefinition.isPrototype()) {
-          // Synchronization between all FlowRefFactoryBean instances is needed to prevent root container inconsistencies
-          // (otherwise two FlowRefFactoryBean instances could mutate and instantiate the same prototype bean in parallel)
+          // Application level synchronization between all FlowRefFactoryBean instances is needed
+          // (otherwise two FlowRefFactoryBean instances could try mutate and instantiate the same prototype bean in parallel)
           synchronized (applicationContext) {
             updateBeanDefinitionRootContainerName(getRootContainerLocation().toString(), processorBeanDefinition);
             return (Component) applicationContext.getBean(name);
