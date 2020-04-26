@@ -18,15 +18,16 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.CoreDslConstants;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.model.ApplicationModel;
-import org.mule.runtime.config.internal.model.ComponentModel;
-import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+
+import java.util.Optional;
 
 /**
  * {@link ExtensionModelValidator} which applies to {@link ExtensionModel}s which are XML based, as those that contain usages of
@@ -70,45 +71,44 @@ public class CorrectPrefixesValidator implements ExtensionModelValidator {
    * @param componentModel XML element to validate, or its child elements.
    * @param problemsReporter gatherer of errors
    */
-  private void searchAndValidate(String namespace, OperationModel operationModel, ComponentModel componentModel,
+  private void searchAndValidate(String namespace, OperationModel operationModel, ComponentAst componentModel,
                                  ProblemsReporter problemsReporter) {
     if (componentModel.getIdentifier().equals(RAISE_ERROR_IDENTIFIER)) {
       validateRaiseError(namespace, operationModel, componentModel, problemsReporter);
     } else if (componentModel.getIdentifier().equals(ERROR_MAPPING_IDENTIFIER)) {
       validateErrorMapping(namespace, operationModel, componentModel, problemsReporter);
     }
-    for (ComponentModel childComponentModel : componentModel.getInnerComponents()) {
-      searchAndValidate(namespace, operationModel, childComponentModel, problemsReporter);
-    }
+    componentModel.directChildrenStream()
+        .forEach(childComponentModel -> searchAndValidate(namespace, operationModel, childComponentModel, problemsReporter));
   }
 
-  private void validateRaiseError(String moduleNamespace, OperationModel operationModel, ComponentModel raiseErrorComponentModel,
+  private void validateRaiseError(String moduleNamespace, OperationModel operationModel, ComponentAst raiseErrorComponentModel,
                                   ProblemsReporter problemsReporter) {
     genericValidation(moduleNamespace, operationModel, raiseErrorComponentModel, problemsReporter, TYPE_RAISE_ERROR_ATTRIBUTE,
                       RAISE_ERROR_IDENTIFIER);
   }
 
   private void validateErrorMapping(String moduleNamespace, OperationModel operationModel,
-                                    ComponentModel errorMappingComponentModel,
+                                    ComponentAst errorMappingComponentModel,
                                     ProblemsReporter problemsReporter) {
     genericValidation(moduleNamespace, operationModel, errorMappingComponentModel, problemsReporter, TARGET_TYPE,
                       ERROR_MAPPING_IDENTIFIER);
   }
 
-  private void genericValidation(String moduleNamespace, OperationModel operationModel, ComponentModel elementComponentModel,
+  private void genericValidation(String moduleNamespace, OperationModel operationModel, ComponentAst elementComponentModel,
                                  ProblemsReporter problemsReporter, String attributeToValidate,
                                  ComponentIdentifier workingIdentifier) {
-    final String stringRepresentation = elementComponentModel.getRawParameters().get(attributeToValidate);
-    if (StringUtils.isBlank(stringRepresentation)) {
+    final Optional<String> stringRepresentation = elementComponentModel.getRawParameterValue(attributeToValidate);
+    if (!stringRepresentation.isPresent()) {
       problemsReporter.addError(new Problem(operationModel, format(
                                                                    EMPTY_TYPE_FORMAT_MESSAGE,
                                                                    workingIdentifier.toString(),
                                                                    attributeToValidate,
                                                                    operationModel.getName())));
     } else {
-      int separator = stringRepresentation.indexOf(SEPARATOR);
+      int separator = stringRepresentation.get().indexOf(SEPARATOR);
       if (separator > 0) {
-        String namespace = stringRepresentation.substring(0, separator).toUpperCase();
+        String namespace = stringRepresentation.get().substring(0, separator).toUpperCase();
         if (!moduleNamespace.toUpperCase().equals(namespace)) {
           problemsReporter.addError(new Problem(operationModel, format(
                                                                        WRONG_VALUE_FORMAT_MESSAGE,

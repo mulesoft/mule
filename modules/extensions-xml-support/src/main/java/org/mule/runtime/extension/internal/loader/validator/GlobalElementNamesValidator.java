@@ -8,9 +8,10 @@ package org.mule.runtime.extension.internal.loader.validator;
 
 import static java.lang.String.format;
 import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
@@ -35,13 +36,13 @@ public class GlobalElementNamesValidator implements ExtensionModelValidator {
 
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
-    Map<String, ComponentModel> existingObjectsWithName = new HashMap<>();
+    Map<String, ComponentAst> existingObjectsWithName = new HashMap<>();
     extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class)
         .ifPresent(globalElementComponentModelModelProperty -> {
           globalElementComponentModelModelProperty.getGlobalElements().stream()
-              .filter(componentModel -> componentModel.getNameAttribute() != null)
+              .filter(componentModel -> componentModel.getComponentId().isPresent())
               .forEach(componentModel -> {
-                String nameAttributeValue = componentModel.getNameAttribute();
+                String nameAttributeValue = componentModel.getComponentId().get();
                 validateDuplicatedGlobalElements(extensionModel, componentModel, nameAttributeValue,
                                                  existingObjectsWithName, problemsReporter);
                 validateNotReservedCharacterInName(extensionModel, nameAttributeValue, problemsReporter);
@@ -60,8 +61,8 @@ public class GlobalElementNamesValidator implements ExtensionModelValidator {
     }
   }
 
-  private void validateDuplicatedGlobalElements(ExtensionModel extensionModel, ComponentModel componentModel,
-                                                String nameAttributeValue, Map<String, ComponentModel> existingObjectsWithName,
+  private void validateDuplicatedGlobalElements(ExtensionModel extensionModel, ComponentAst componentModel,
+                                                String nameAttributeValue, Map<String, ComponentAst> existingObjectsWithName,
                                                 ProblemsReporter problemsReporter) {
     if (existingObjectsWithName.containsKey(nameAttributeValue)) {
       problemsReporter.addError(new Problem(extensionModel, format(

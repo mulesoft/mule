@@ -14,7 +14,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObje
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.privileged.transformer.TransformerUtils.checkTransformerReturnClass;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -140,7 +140,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
         eventCtx = create(flowConstruct,
                           getLocation() != null
                               ? getLocation()
-                              : fromSingleComponent("AbstractMessageTransformer"));
+                              : from("AbstractMessageTransformer"));
         event = createTransformationEvent(message, eventCtx);
       }
 
