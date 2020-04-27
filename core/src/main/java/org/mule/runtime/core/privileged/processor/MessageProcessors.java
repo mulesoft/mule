@@ -491,12 +491,12 @@ public class MessageProcessors {
 
                     .map(childContextResponseMapper())
                     .distinct(event -> (BaseEventContext) event.getContext(), () -> seenContexts)
-                    .map(eventChildCtx -> {
+                    .doOnNext(eventChildCtx -> {
                       if (inflightEvents.decrementAndGet() == 0 && deferredCompletion.compareAndSet(true, false)) {
                         errorSwitchSinkSinkRef.complete();
                       }
-                      return toParentContext(eventChildCtx);
-                    });
+                    })
+                    .map(MessageProcessors::toParentContext);
               }
             }));
   }
