@@ -32,7 +32,7 @@ public class MvelCompiledExpressionWhenNoCachingInEnricherTestCase extends Funct
     }
 
     @Test
-    public void dataTypesCorrectlyPropagated() throws Exception
+    public void melCacheDoesNotMisunderstandBeanPropertiesAsVariables() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
 
