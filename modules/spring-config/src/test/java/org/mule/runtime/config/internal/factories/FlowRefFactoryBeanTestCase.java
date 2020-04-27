@@ -7,19 +7,30 @@
 package org.mule.runtime.config.internal.factories;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.*;
+
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -90,8 +101,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   public ExpectedException expectedException = ExpectedException.none();
 
   private static final MockSettings INITIALIZABLE_MESSAGE_PROCESSOR =
-      withSettings().extraInterfaces(Component.class, Processor.class, Initialisable.class, Disposable.class,
-                                     Startable.class, Stoppable.class);
+          withSettings().extraInterfaces(Component.class, Processor.class, Initialisable.class, Disposable.class,
+                  Startable.class, Stoppable.class);
   private static final String STATIC_REFERENCED_FLOW = "staticReferencedFlow";
   private static final String DYNAMIC_REFERENCED_FLOW = "dynamicReferencedFlow";
   private static final String PARSED_DYNAMIC_REFERENCED_FLOW = "parsedDynamicReferencedFlow";
@@ -194,7 +205,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
 
   @Test
   public void dynamicFlowRefSubFlow() throws Exception {
-    FlowRefFactoryBean flowRefFactoryBean = createDynamicFlowRefFactoryBean(targetSubFlow, targetSubFlowChainBuilder, applicationContext);
+    FlowRefFactoryBean flowRefFactoryBean =
+            createDynamicFlowRefFactoryBean(targetSubFlow, targetSubFlowChainBuilder, applicationContext);
 
     // Inner MessageProcessor is used to resolve MP in runtime
     assertNotSame(targetSubFlow, getFlowRefProcessor(flowRefFactoryBean));
@@ -218,7 +230,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     MuleContextAware targetMuleContextAware = mock(MuleContextAware.class, INITIALIZABLE_MESSAGE_PROCESSOR);
     when(((Processor) targetMuleContextAware).apply(any(Publisher.class))).thenReturn(just(result));
 
-    FlowRefFactoryBean flowRefFactoryBean = createDynamicFlowRefFactoryBean((Processor) targetMuleContextAware, null, applicationContext);
+    FlowRefFactoryBean flowRefFactoryBean =
+            createDynamicFlowRefFactoryBean((Processor) targetMuleContextAware, null, applicationContext);
     assertSame(result.getMessage(), getFlowRefProcessor(flowRefFactoryBean).process(event).getMessage());
 
     verify(targetMuleContextAware).setMuleContext(mockMuleContext);
@@ -231,10 +244,10 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     Processor targetSubFlowConstructAware = (Processor) mock(Object.class, INITIALIZABLE_MESSAGE_PROCESSOR);
     when(targetSubFlowConstructAware.apply(any(Publisher.class))).thenReturn(just(result));
     Processor targetMuleContextAwareAware =
-        (Processor) mock(MuleContextAware.class, INITIALIZABLE_MESSAGE_PROCESSOR);
+            (Processor) mock(MuleContextAware.class, INITIALIZABLE_MESSAGE_PROCESSOR);
 
     when(targetMuleContextAwareAware.apply(any(Publisher.class)))
-        .thenAnswer(invocationOnMock -> invocationOnMock.getArguments()[0]);
+            .thenAnswer(invocationOnMock -> invocationOnMock.getArguments()[0]);
     when(targetSubFlowConstructAware.apply(any())).thenAnswer(successAnswer());
 
     MessageProcessorChain targetSubFlowChain = mock(MessageProcessorChain.class, INITIALIZABLE_MESSAGE_PROCESSOR);
@@ -260,8 +273,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   @Test
   public void dynamicFlowRefDoesNotExist() throws Exception {
     doReturn(new TypedValue<>("other", STRING)).when(expressionManager).evaluate(eq(DYNAMIC_NON_EXISTANT), eq(DataType.STRING),
-                                                                                 eq(NULL_BINDING_CONTEXT), any(CoreEvent.class),
-                                                                                 any(ComponentLocation.class), eq(true));
+            eq(NULL_BINDING_CONTEXT), any(CoreEvent.class),
+            any(ComponentLocation.class), eq(true));
 
     expectedException.expect(instanceOf(RoutePathNotFoundException.class));
     getFlowRefProcessor(createFlowRefFactoryBean(DYNAMIC_NON_EXISTANT, "flow", applicationContext)).process(testEvent());
@@ -285,24 +298,27 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
       return subFlowProcessor;
     }).getBeanDefinition();
     BeanDefinition subFlowBeanDefinition = genericBeanDefinition(new ObjectFactoryClassRepository()
-        .getObjectFactoryClass(subFlowComponentBuildingDefinition, SubflowMessageProcessorChainFactoryBean.class, Object.class, () -> true, empty()))
-      .addPropertyValue("name", PARSED_DYNAMIC_REFERENCED_FLOW)
-      .addPropertyValue("messageProcessors", subFlowProcessorBeanDefinition)
-      .setScope(BeanDefinition.SCOPE_PROTOTYPE)
-      .getBeanDefinition();
+            .getObjectFactoryClass(subFlowComponentBuildingDefinition, SubflowMessageProcessorChainFactoryBean.class, Object.class,
+                    () -> true, empty()))
+            .addPropertyValue("name", PARSED_DYNAMIC_REFERENCED_FLOW)
+            .addPropertyValue("messageProcessors", subFlowProcessorBeanDefinition)
+            .setScope(BeanDefinition.SCOPE_PROTOTYPE)
+            .getBeanDefinition();
     beanFactory.registerBeanDefinition(PARSED_DYNAMIC_REFERENCED_FLOW, subFlowBeanDefinition);
     //Additional flow and processing strategy (needed to generate a concurrent subflow instantiation)
     Flow concurrentCallerFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);
     ProcessingStrategy concurrentCallerFlowProcessingStrategy = mock(ProcessingStrategy.class);
     when(locator.find(Location.builder().globalName("concurrentFlow").build())).thenReturn(of(concurrentCallerFlow));
     when(concurrentCallerFlow.getProcessingStrategy()).thenReturn(concurrentCallerFlowProcessingStrategy);
-    when(concurrentCallerFlowProcessingStrategy.onProcessor(any())).thenAnswer(invocationOnMock -> invocationOnMock.getArguments()[0]);
+    when(concurrentCallerFlowProcessingStrategy.onProcessor(any()))
+            .thenAnswer(invocationOnMock -> invocationOnMock.getArguments()[0]);
     // Two flowRef dynamically pointing to the same subFlow
     FlowRefFactoryBean flowRefFactoryBean = createFlowRefFactoryBean(DYNAMIC_REFERENCED_FLOW, "flow", muleArtifactContext);
-    FlowRefFactoryBean parallelFlowRefFactoryBean = createFlowRefFactoryBean(DYNAMIC_REFERENCED_FLOW, "concurrentFlow", muleArtifactContext);
+    FlowRefFactoryBean parallelFlowRefFactoryBean =
+            createFlowRefFactoryBean(DYNAMIC_REFERENCED_FLOW, "concurrentFlow", muleArtifactContext);
     // Events are sent to both flowRefs in parallel in order to trigger a concurrent subflow instantiation
     Thread flowEvents = new Thread(() -> {
-        sendEventsThroughFlowRef(flowRefFactoryBean);
+      sendEventsThroughFlowRef(flowRefFactoryBean);
     }, "Flow Events");
     Thread parallelFlowEvents = new Thread(() -> {
       sendEventsThroughFlowRef(parallelFlowRefFactoryBean);
@@ -331,55 +347,58 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   }
 
   private MuleArtifactContext createMuleArtifactContextStub(DefaultListableBeanFactory mockedBeanFactory) {
-    MuleArtifactContext muleArtifactContext = new MuleArtifactContext(mockMuleContext, new ConfigResource[0], new ArtifactDeclaration(),
-            mock(OptionalObjectsController.class), new HashMap<>(), ArtifactType.APP, new ArrayList<>(),
-            Optional.empty(), true, mock(CoreComponentBuildingDefinitionProvider.class)) {
+    MuleArtifactContext muleArtifactContext =
+            new MuleArtifactContext(mockMuleContext, new ConfigResource[0], new ArtifactDeclaration(),
+                    mock(OptionalObjectsController.class), new HashMap<>(), ArtifactType.APP, new ArrayList<>(),
+                    Optional.empty(), true, mock(CoreComponentBuildingDefinitionProvider.class)) {
 
-      @Override
-      protected DefaultListableBeanFactory createBeanFactory() {
-        return mockedBeanFactory;
-      }
+              @Override
+              protected DefaultListableBeanFactory createBeanFactory() {
+                return mockedBeanFactory;
+              }
 
-      @Override
-      protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
-        // Bean factory is mocked, so no bean registering here
-      }
+              @Override
+              protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
+                // Bean factory is mocked, so no bean registering here
+              }
 
-      @Override
-      protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
-        // Bean factory is mocked, so no bean registering here
-      }
+              @Override
+              protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+                // Bean factory is mocked, so no bean registering here
+              }
 
-      @Override
-      protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
-        // Bean factory is mocked, so no bean registering here
-      }
+              @Override
+              protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+                // Bean factory is mocked, so no bean registering here
+              }
 
-      @Override
-      protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
-        // Bean factory is mocked, so no bean invocation here
-      }
+              @Override
+              protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+                // Bean factory is mocked, so no bean invocation here
+              }
 
-      @Override
-      protected void registerListeners() {
-        // Bean factory is mocked, so no bean registering here
-      }
+              @Override
+              protected void registerListeners() {
+                // Bean factory is mocked, so no bean registering here
+              }
 
-      @Override
-      protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
-        // Bean factory is mocked, so no bean registering here
-      }
+              @Override
+              protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
+                // Bean factory is mocked, so no bean registering here
+              }
 
-      @Override
-      protected void finishRefresh() {
-        // Bean factory is mocked, so no nothing to do here
-      }
-    };
+              @Override
+              protected void finishRefresh() {
+                // Bean factory is mocked, so no nothing to do here
+              }
+            };
     muleArtifactContext.refresh();
     return muleArtifactContext;
   }
 
-  private FlowRefFactoryBean createFlowRefFactoryBean(String referencedFlowName, String flowRefLocation, ApplicationContext applicationContext) throws Exception {
+  private FlowRefFactoryBean createFlowRefFactoryBean(String referencedFlowName, String flowRefLocation,
+                                                      ApplicationContext applicationContext)
+          throws Exception {
     FlowRefFactoryBean flowRefFactoryBean = new FlowRefFactoryBean();
     flowRefFactoryBean.setName(referencedFlowName);
     flowRefFactoryBean.setAnnotations(singletonMap(LOCATION_KEY, DefaultComponentLocation.from("flow")));
@@ -389,7 +408,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   }
 
   private FlowRefFactoryBean createStaticFlowRefFactoryBean(Processor target, Object targetBuilder)
-      throws Exception {
+          throws Exception {
     doReturn(false).when(expressionManager).isExpression(anyString());
     if (targetBuilder != null) {
       when(applicationContext.getBean(eq(STATIC_REFERENCED_FLOW))).thenReturn(targetBuilder);
@@ -399,8 +418,9 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     return createFlowRefFactoryBean(STATIC_REFERENCED_FLOW, "flow", applicationContext);
   }
 
-  private FlowRefFactoryBean createDynamicFlowRefFactoryBean(Processor target, Object targetBuilder, ApplicationContext applicationContext)
-      throws Exception {
+  private FlowRefFactoryBean createDynamicFlowRefFactoryBean(Processor target, Object targetBuilder,
+                                                             ApplicationContext applicationContext)
+          throws Exception {
     if (targetBuilder != null) {
       doReturn(targetBuilder).when(applicationContext).getBean(eq(PARSED_DYNAMIC_REFERENCED_FLOW));
     } else {
@@ -412,22 +432,22 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   private Answer<?> successAnswer() {
     return invocation -> {
       return from(invocation.getArgument(0))
-          .cast(CoreEvent.class)
-          .doOnNext(event -> ((BaseEventContext) event.getContext())
-              .success(CoreEvent.builder(event).message(result.getMessage()).variables(result.getVariables()).build()))
-          .map(event -> CoreEvent.builder(event).message(result.getMessage()).variables(result.getVariables()).build());
+              .cast(CoreEvent.class)
+              .doOnNext(event -> ((BaseEventContext) event.getContext())
+                      .success(CoreEvent.builder(event).message(result.getMessage()).variables(result.getVariables()).build()))
+              .map(event -> CoreEvent.builder(event).message(result.getMessage()).variables(result.getVariables()).build());
     };
   }
 
   private void verifyProcess(FlowRefFactoryBean flowRefFactoryBean, Processor target, ApplicationContext applicationContext)
-      throws Exception {
+          throws Exception {
     sendEventsThroughFlowRef(flowRefFactoryBean);
     verify(applicationContext).getBean(anyString());
     verify(target, times(2)).apply(any(Publisher.class));
   }
 
   private void verifyLifecycle(Processor target, int lifecycleRounds)
-      throws Exception {
+          throws Exception {
     verify((Initialisable) target, times(lifecycleRounds)).initialise();
 
     verify(targetSubFlow, times(lifecycleRounds)).initialise();
