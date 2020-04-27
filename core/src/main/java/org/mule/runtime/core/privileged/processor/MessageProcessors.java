@@ -51,6 +51,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -463,11 +465,14 @@ public class MessageProcessors {
                 FluxSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
                 Set<BaseEventContext> seenContexts = newSetFromMap(new WeakHashMap<BaseEventContext, Boolean>());
 
+                AtomicInteger inflightEvents = new AtomicInteger(0);
+                AtomicBoolean deferredCompletion = new AtomicBoolean(false);
                 return Flux.from(eventChildCtxPub)
                     .doOnNext(eventChildCtx -> {
                       childContextResponseHandler(eventChildCtx,
                                                   new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef),
                                                   completeParentIfEmpty);
+                      inflightEvents.incrementAndGet();
                     })
                     .transform(processor)
                     .doOnNext(completeSuccessIfNeeded())
@@ -475,12 +480,23 @@ public class MessageProcessors {
 
                     // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
                     // it will be cancelled, ignoring the onErrorcontinue of the parent Flux.
-                    .doOnComplete(() -> errorSwitchSinkSinkRef.complete())
+                    .doOnComplete(() -> {
+                      if (inflightEvents.get() == 0) {
+                        errorSwitchSinkSinkRef.complete();
+                      } else {
+                        deferredCompletion.set(true);
+                      }
+                    })
                     .mergeWith(errorSwitchSinkSinkRef.flux())
 
                     .map(childContextResponseMapper())
                     .distinct(event -> (BaseEventContext) event.getContext(), () -> seenContexts)
-                    .map(MessageProcessors::toParentContext);
+                    .map(eventChildCtx -> {
+                      if (inflightEvents.decrementAndGet() == 0 && deferredCompletion.compareAndSet(true, false)) {
+                        errorSwitchSinkSinkRef.complete();
+                      }
+                      return toParentContext(eventChildCtx);
+                    });
               }
             }));
   }
