@@ -10,6 +10,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
@@ -20,10 +21,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Test message processor to keep count of number of invocations.
  */
-public class InvocationCountMessageProcessor extends AbstractComponent implements Processor, Initialisable {
+public class InvocationCountMessageProcessor extends AbstractComponent implements Processor, Initialisable, Startable {
 
   private static Map<String, AtomicInteger> invocationCountPerMessageProcessor = new HashMap<>();
-  private final AtomicInteger invocationCount = new AtomicInteger();
+  private AtomicInteger invocationCount;
   private String name;
 
 
@@ -39,8 +40,12 @@ public class InvocationCountMessageProcessor extends AbstractComponent implement
 
   @Override
   public void initialise() throws InitialisationException {
+    this.invocationCount = invocationCountPerMessageProcessor.computeIfAbsent(this.name, k -> new AtomicInteger(0));
+  }
+
+  @Override
+  public void start() throws MuleException {
     this.invocationCount.set(0);
-    this.invocationCountPerMessageProcessor.put(this.name, this.invocationCount);
   }
 
   /**
@@ -55,4 +60,5 @@ public class InvocationCountMessageProcessor extends AbstractComponent implement
     }
     return count.get();
   }
+
 }
