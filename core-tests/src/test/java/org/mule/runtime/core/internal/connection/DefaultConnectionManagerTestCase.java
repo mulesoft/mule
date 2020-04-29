@@ -119,8 +119,16 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
     connectionManager.bind(config, connectionProvider);
   }
 
+  @Test(expected = IllegalStateException.class)
   public void bindWithStoppedMuleContext() throws Exception {
     when(muleContext.isStopped()).thenReturn(true);
+    connectionManager.bind(config, connectionProvider);
+  }
+
+  @Test
+  public void bindWithStartingMuleContext() throws Exception {
+    when(muleContext.isStopped()).thenReturn(true);
+    when(muleContext.isStarting()).thenReturn(true);
     connectionManager.bind(config, connectionProvider);
     ConnectionHandler<Banana> connectionHandler = connectionManager.getConnection(config);
     assertThat(connectionHandler.getConnection(), is(sameInstance(connection)));
