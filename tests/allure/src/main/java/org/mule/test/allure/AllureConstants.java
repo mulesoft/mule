@@ -508,6 +508,18 @@ public interface AllureConstants {
 
   }
 
+  interface SpringConfiguration {
+
+    String SPRING_CONFIGURATION = "Spring configuration";
+
+    interface ComponentFactories {
+
+      String COMPONENT_FACTORIES = "Component factories story";
+
+    }
+
+  }
+
   interface ConfigurationProperties {
 
     String CONFIGURATION_PROPERTIES = "Configuration properties";
