@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_DOMAIN_ROOT_ELEMENT;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.internal.model.ApplicationModel.POLICY_ROOT_ELEMENT;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
@@ -20,7 +22,6 @@ import org.mule.runtime.internal.dsl.DslConstants;
 
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 /**
  * Class used to read xml files from {@link ConfigLine}s, unifying knowledge on how to properly read the files returning the
@@ -36,7 +37,7 @@ public class ComponentModelReader {
     this.configurationPropertiesResolver = configurationPropertiesResolver;
   }
 
-  public ComponentModel extractComponentDefinitionModel(ConfigLine configLine, String configFileName) {
+  public ComponentAst extractComponentDefinitionModel(ConfigLine configLine, String configFileName) {
 
     String namespace = configLine.getNamespace() == null ? CORE_PREFIX : configLine.getNamespace();
     String namespaceUri = configLine.getNamespaceUri() == null ? DslConstants.CORE_NAMESPACE : configLine.getNamespaceUri();
@@ -62,19 +63,16 @@ public class ComponentModelReader {
                            simpleConfigAttribute.isValueFromSchema());
     }
 
-    List<ComponentModel> componentModels = configLine.getChildren().stream()
+    List<ComponentAst> componentModels = configLine.getChildren().stream()
         .map(childConfigLine -> extractComponentDefinitionModel(childConfigLine, configFileName))
-        .collect(Collectors.toList());
-    componentModels.stream().forEach(componentDefinitionModel -> builder.addChildComponentModel(componentDefinitionModel));
+        .collect(toList());
+    componentModels.stream()
+        .forEach(componentDefinitionModel -> builder.addChildComponentModel((ComponentModel) componentDefinitionModel));
     ConfigLine parent = configLine.getParent();
     if (parent != null && isConfigurationTopComponent(parent)) {
       builder.markAsRootComponent();
     }
-    ComponentModel componentModel = builder.build();
-    for (ComponentModel innerComponentModel : componentModel.getInnerComponents()) {
-      innerComponentModel.setParent(componentModel);
-    }
-    return componentModel;
+    return builder.build();
   }
 
   private String resolveValueIfIsPlaceHolder(String value) {

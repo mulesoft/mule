@@ -10,6 +10,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
@@ -52,13 +53,14 @@ class ComponentConfigurationBuilder<T> {
   private final ComponentModel componentModel;
   private final ComponentBuildingDefinition<T> componentBuildingDefinition;
 
-  public ComponentConfigurationBuilder(ComponentModel componentModel, ComponentBuildingDefinition<T> componentBuildingDefinition,
+  public ComponentConfigurationBuilder(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                                       ComponentAst componentModel, ComponentBuildingDefinition<T> componentBuildingDefinition,
                                        BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
-    this.componentModel = componentModel;
+    this.componentModel = (ComponentModel) componentModel;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.beanDefinitionBuilderHelper = beanDefinitionBuilderHelper;
-    this.simpleParameters = new HashMap<>(componentModel.getRawParameters());
-    this.complexParameters = collectComplexParametersWithTypes(componentModel);
+    this.simpleParameters = new HashMap<>(((ComponentModel) componentModel).getRawParameters());
+    this.complexParameters = collectComplexParametersWithTypes(springComponentModels, componentModel);
   }
 
   public void processConfiguration() {
@@ -73,16 +75,18 @@ class ComponentConfigurationBuilder<T> {
     }
   }
 
-  private List<ComponentValue> collectComplexParametersWithTypes(ComponentModel componentModel) {
+  private List<ComponentValue> collectComplexParametersWithTypes(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                                                                 ComponentAst componentModel) {
     /*
      * TODO: MULE-9638 This ugly code is required since we need to get the object type from the bean definition. This code will go
      * away one we remove the old parsing method.
      */
-    return componentModel.getInnerComponents().stream()
-        .map(model -> {
+    return componentModel.directChildrenStream()
+        .map(springComponentModels::get)
+        .filter(springModel -> springModel != null)
+        .map(springModel -> {
           // When it comes from old model it does not have the type set
-          Class<?> beanDefinitionType = model.getType();
-          final SpringComponentModel springModel = (SpringComponentModel) model;
+          Class<?> beanDefinitionType = springModel.getType();
           if (beanDefinitionType == null) {
             if (springModel.getBeanDefinition() == null) {
               // Some component do not have a bean definition since the element parsing is ignored. i.e: annotations
@@ -102,10 +106,13 @@ class ComponentConfigurationBuilder<T> {
               }
             }
           }
-          Object bean =
-              springModel.getBeanDefinition() != null ? springModel.getBeanDefinition() : springModel.getBeanReference();
-          return new ComponentValue(model, beanDefinitionType, bean);
-        }).filter(beanDefinitionTypePair -> beanDefinitionTypePair != null).collect(toList());
+          Object bean = springModel.getBeanDefinition() != null
+              ? springModel.getBeanDefinition()
+              : springModel.getBeanReference();
+          return new ComponentValue(springModel.getComponent(), beanDefinitionType, bean);
+        })
+        .filter(beanDefinitionTypePair -> beanDefinitionTypePair != null)
+        .collect(toList());
   }
 
   private ConfigurableAttributeDefinitionVisitor constructorVisitor() {

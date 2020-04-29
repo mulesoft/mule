@@ -29,6 +29,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
@@ -98,55 +99,55 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
   }
 
   @Override
-  public boolean handleRequest(CreateBeanDefinitionRequest request) {
-    SpringComponentModel componentModel = request.getComponentModel();
+  public boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                               CreateBeanDefinitionRequest request) {
+    ObjectTypeVisitor objectTypeVisitor = request.retrieveTypeVisitor();
     ComponentBuildingDefinition buildingDefinition = request.getComponentBuildingDefinition();
-    componentModel.setType(retrieveComponentType(componentModel, buildingDefinition));
-    BeanDefinitionBuilder beanDefinitionBuilder = createBeanDefinitionBuilder(componentModel, buildingDefinition);
-    processAnnotations(componentModel, beanDefinitionBuilder);
-    processComponentDefinitionModel(componentModel, buildingDefinition, beanDefinitionBuilder);
+    request.getSpringComponentModel().setType(objectTypeVisitor.getType());
+    BeanDefinitionBuilder beanDefinitionBuilder =
+        createBeanDefinitionBuilder(objectTypeVisitor, request.getSpringComponentModel(), buildingDefinition);
+    processAnnotations(request.getSpringComponentModel(), beanDefinitionBuilder);
+    processComponentDefinitionModel(springComponentModels, request, buildingDefinition, beanDefinitionBuilder);
     return true;
   }
 
-  private BeanDefinitionBuilder createBeanDefinitionBuilder(SpringComponentModel componentModel,
+  private BeanDefinitionBuilder createBeanDefinitionBuilder(final ObjectTypeVisitor objectTypeVisitor,
+                                                            SpringComponentModel componentModel,
                                                             ComponentBuildingDefinition buildingDefinition) {
     BeanDefinitionBuilder beanDefinitionBuilder;
     if (buildingDefinition.getObjectFactoryType() != null) {
-      beanDefinitionBuilder = createBeanDefinitionBuilderFromObjectFactory(componentModel, buildingDefinition);
+      beanDefinitionBuilder = createBeanDefinitionBuilderFromObjectFactory(objectTypeVisitor, componentModel, buildingDefinition);
     } else {
       beanDefinitionBuilder = genericBeanDefinition(componentModel.getType());
     }
     return beanDefinitionBuilder;
   }
 
-  private void processNestedAnnotations(ComponentModel componentModel, Map<QName, Object> previousAnnotations) {
-    componentModel.getInnerComponents().stream()
+  private void processNestedAnnotations(ComponentAst componentModel, Map<QName, Object> previousAnnotations) {
+    componentModel.directChildrenStream()
         .filter(cdm -> cdm.getIdentifier().equals(ANNOTATIONS_ELEMENT_IDENTIFIER))
         .findFirst()
-        .ifPresent(annotationsCdm -> annotationsCdm.getInnerComponents().forEach(
-                                                                                 annotationCdm -> previousAnnotations
-                                                                                     .put(new QName(annotationCdm.getIdentifier()
-                                                                                         .getNamespaceUri(),
-                                                                                                    annotationCdm
-                                                                                                        .getIdentifier()
-                                                                                                        .getName()),
-                                                                                          annotationCdm.getTextContent())));
+        .ifPresent(annotationsCdm -> annotationsCdm.directChildrenStream()
+            .forEach(annotationCdm -> previousAnnotations
+                .put(new QName(annotationCdm.getIdentifier().getNamespaceUri(),
+                               annotationCdm.getIdentifier().getName()),
+                     ((ComponentModel) annotationCdm).getTextContent())));
   }
 
-  private void processAnnotations(ComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder) {
+  private void processAnnotations(SpringComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder) {
     if (Component.class.isAssignableFrom(componentModel.getType())
         // ValueResolver end up generating pojos from the extension whose class is enhanced to have annotations
         || ValueResolver.class.isAssignableFrom(componentModel.getType())) {
       Map<QName, Object> annotations =
-          processMetadataAnnotationsHelper(beanDefinitionBuilder, componentModel);
-      processNestedAnnotations(componentModel, annotations);
+          processMetadataAnnotationsHelper(beanDefinitionBuilder, componentModel.getComponent());
+      processNestedAnnotations(componentModel.getComponent(), annotations);
       if (!annotations.isEmpty()) {
         beanDefinitionBuilder.addPropertyValue(ANNOTATIONS_PROPERTY_NAME, annotations);
       }
     }
   }
 
-  private Map<QName, Object> processMetadataAnnotationsHelper(BeanDefinitionBuilder builder, ComponentModel componentModel) {
+  private Map<QName, Object> processMetadataAnnotationsHelper(BeanDefinitionBuilder builder, ComponentAst componentModel) {
     Map<QName, Object> annotations = new HashMap<>();
     if (componentModel == null) {
       return annotations;
@@ -178,22 +179,15 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
         .collect(toMap(e -> QName.valueOf(e.getKey()), e -> e.getValue())));
   }
 
-  private Class<?> retrieveComponentType(final ComponentModel componentModel,
-                                         ComponentBuildingDefinition componentBuildingDefinition) {
-    ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
-    componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
-    return objectTypeVisitor.getType();
-  }
-
-  private BeanDefinitionBuilder createBeanDefinitionBuilderFromObjectFactory(final SpringComponentModel componentModel,
+  private BeanDefinitionBuilder createBeanDefinitionBuilderFromObjectFactory(final ObjectTypeVisitor objectTypeVisitor,
+                                                                             final SpringComponentModel componentModel,
                                                                              final ComponentBuildingDefinition componentBuildingDefinition) {
-    ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
     componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
     Class<?> objectFactoryType = componentBuildingDefinition.getObjectFactoryType();
 
     Optional<Consumer<Object>> instanceCustomizationFunctionOptional;
 
-    Map<String, Object> customProperties = getTransformerCustomProperties(componentModel);
+    Map<String, Object> customProperties = getTransformerCustomProperties(componentModel.getComponent());
     if (customProperties.isEmpty()) {
       instanceCustomizationFunctionOptional = empty();
     } else {
@@ -216,21 +210,24 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     }
   }
 
-  private Map<String, Object> getTransformerCustomProperties(ComponentModel componentModel) {
+  private Map<String, Object> getTransformerCustomProperties(ComponentAst componentModel) {
     ComponentIdentifier identifier = componentModel.getIdentifier();
     if (!identifier.equals(CUSTOM_TRANSFORMER_IDENTIFIER)) {
       return emptyMap();
     }
-    return componentModel.getInnerComponents().stream()
+    return componentModel.directChildrenStream()
         .filter(innerComponent -> innerComponent.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))
-        .map(springComponent -> getPropertyValueFromPropertyComponent(springComponent))
+        .map(springComponent -> getPropertyValueFromPropertyComponent((ComponentModel) springComponent))
         .collect(toMap(propValue -> propValue.getFirst(), propValue -> propValue.getSecond()));
   }
 
-  private void processComponentDefinitionModel(final SpringComponentModel componentModel,
+  private void processComponentDefinitionModel(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                                               final CreateBeanDefinitionRequest request,
                                                ComponentBuildingDefinition componentBuildingDefinition,
                                                final BeanDefinitionBuilder beanDefinitionBuilder) {
-    processObjectConstructionParameters(componentModel, componentBuildingDefinition,
+    final ComponentAst componentModel = request.getComponentModel();
+
+    processObjectConstructionParameters(springComponentModels, componentModel, componentBuildingDefinition,
                                         new BeanDefinitionBuilderHelper(beanDefinitionBuilder));
     processMuleProperties(componentModel, beanDefinitionBuilder, beanDefinitionPostProcessor);
     if (componentBuildingDefinition.isPrototype()) {
@@ -239,14 +236,12 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     AbstractBeanDefinition originalBeanDefinition = beanDefinitionBuilder.getBeanDefinition();
     AbstractBeanDefinition wrappedBeanDefinition = adaptBeanDefinition(originalBeanDefinition);
     if (originalBeanDefinition != wrappedBeanDefinition) {
-      componentModel.setType(wrappedBeanDefinition.getBeanClass());
+      request.getSpringComponentModel().setType(wrappedBeanDefinition.getBeanClass());
     }
-    final SpringPostProcessorIocHelper iocHelper =
-        new SpringPostProcessorIocHelper(objectFactoryClassRepository, wrappedBeanDefinition);
-    componentModel.setBeanDefinition(iocHelper.getBeanDefinition());
+    request.getSpringComponentModel().setBeanDefinition(wrappedBeanDefinition);
   }
 
-  static void processMuleProperties(ComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder,
+  static void processMuleProperties(ComponentAst componentModel, BeanDefinitionBuilder beanDefinitionBuilder,
                                     BeanDefinitionPostProcessor beanDefinitionPostProcessor) {
     // for now we skip custom-transformer since requires injection by the object factory.
     if (genericPropertiesCustomProcessingIdentifiers.contains(componentModel.getIdentifier())
@@ -254,15 +249,14 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
             .contains(componentModel.getIdentifier()))) {
       return;
     }
-    componentModel.getInnerComponents()
-        .stream()
+    componentModel.directChildrenStream()
         .filter(innerComponent -> {
           ComponentIdentifier identifier = innerComponent.getIdentifier();
           return identifier.equals(MULE_PROPERTY_IDENTIFIER)
               || identifier.equals(MULE_PROPERTIES_IDENTIFIER);
         })
         .forEach(propertyComponentModel -> {
-          Pair<String, Object> propertyValue = getPropertyValueFromPropertyComponent(propertyComponentModel);
+          Pair<String, Object> propertyValue = getPropertyValueFromPropertyComponent((ComponentModel) propertyComponentModel);
           beanDefinitionBuilder.addPropertyValue(propertyValue.getFirst(), propertyValue.getSecond());
         });
   }
@@ -276,11 +270,13 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     return propertyValues;
   }
 
-  private void processObjectConstructionParameters(final ComponentModel componentModel,
+  private void processObjectConstructionParameters(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                                                   final ComponentAst componentModel,
                                                    final ComponentBuildingDefinition componentBuildingDefinition,
                                                    final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
-    new ComponentConfigurationBuilder(componentModel, componentBuildingDefinition, beanDefinitionBuilderHelper)
-        .processConfiguration();
+    new ComponentConfigurationBuilder(springComponentModels, componentModel, componentBuildingDefinition,
+                                      beanDefinitionBuilderHelper)
+                                          .processConfiguration();
 
   }
 
@@ -307,9 +303,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
           .getBeanDefinition();
       return (AbstractBeanDefinition) newBeanDefinition;
     } else {
-      final SpringPostProcessorIocHelper iocHelper =
-          new SpringPostProcessorIocHelper(objectFactoryClassRepository, originalBeanDefinition);
-      return iocHelper.getBeanDefinition();
+      return originalBeanDefinition;
     }
   }
 

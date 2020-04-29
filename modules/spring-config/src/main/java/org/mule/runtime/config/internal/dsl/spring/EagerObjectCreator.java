@@ -12,10 +12,13 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
+import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.SetterAttributeDefinition;
 
@@ -42,16 +45,17 @@ class EagerObjectCreator extends BeanDefinitionCreator {
           .build();
 
   @Override
-  boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {
-    SpringComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
-    Class<?> type = componentModel.getType();
+  boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                        CreateBeanDefinitionRequest createBeanDefinitionRequest) {
+    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
+    Class<ConfigurableObjectProvider> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
     if (type == null) {
       return false;
     }
     Optional<Class<?>> foundClass = earlyCreationObjectTypes.stream().filter(clazz -> clazz.isAssignableFrom(type)).findAny();
     return foundClass.map(clazz -> {
       ComponentBuildingDefinition componentBuildingDefinition = createBeanDefinitionRequest.getComponentBuildingDefinition();
-      Object instance;
+      ConfigurableObjectProvider instance;
       try {
         instance = type.newInstance();
       } catch (Exception e) {
@@ -64,7 +68,7 @@ class EagerObjectCreator extends BeanDefinitionCreator {
 
           @Override
           public void onUndefinedSimpleParameters() {
-            Map<String, String> parameters = componentModel.getRawParameters();
+            Map<String, String> parameters = ((ComponentModel) componentModel).getRawParameters();
             String attributeName = setterAttributeDefinition.getAttributeName();
             try {
               setProperty(instance, attributeName, parameters);
@@ -80,8 +84,8 @@ class EagerObjectCreator extends BeanDefinitionCreator {
           }
         });
       });
-      componentModel.setObjectInstance(instance);
-      componentModel.setBeanDefinition(rootBeanDefinition(ConstantFactoryBean.class)
+      createBeanDefinitionRequest.getSpringComponentModel().setObjectInstance(instance);
+      createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(rootBeanDefinition(ConstantFactoryBean.class)
           .addConstructorArgValue(instance).getBeanDefinition());
       return true;
     }).orElse(false);
