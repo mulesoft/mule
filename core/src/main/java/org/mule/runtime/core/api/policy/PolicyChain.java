@@ -34,6 +34,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.List;
@@ -94,8 +95,16 @@ public class PolicyChain extends AbstractComponent
     this.processingStrategy = processingStrategy;
   }
 
+  // Keep an active sink while the policy chain is active to avoid premature stopping of the Schedulers in the PS when the policy
+  // executes within a Mono
+  // (ref: AbstractReactorStreamProcessingStrategy#stopSchedulersIfNeeded)
+  private FluxSinkRecorder chainActiveSink;
+
   @Override
   public void start() throws MuleException {
+    chainActiveSink = new FluxSinkRecorder();
+    processingStrategy.registerInternalSink(chainActiveSink.flux(), flowStackEntryName);
+
     if (processorChain != null) {
       processorChain.start();
     }
@@ -113,6 +122,8 @@ public class PolicyChain extends AbstractComponent
     if (processorChain != null) {
       processorChain.stop();
     }
+
+    chainActiveSink.complete();
   }
 
   @Override
