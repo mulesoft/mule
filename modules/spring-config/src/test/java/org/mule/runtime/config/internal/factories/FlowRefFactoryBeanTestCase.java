@@ -39,6 +39,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.FlowReferenceStory.FLOW_REFERENCE;
@@ -93,13 +94,13 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.MockSettings;
 import org.mockito.stubbing.Answer;
-import org.mule.test.allure.AllureConstants;
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import reactor.core.Disposable;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -465,7 +466,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
       throws Exception {
     FlowRefFactoryBean flowRefFactoryBean = new FlowRefFactoryBean();
     flowRefFactoryBean.setName(referencedFlowName);
-    flowRefFactoryBean.setAnnotations(singletonMap(LOCATION_KEY, DefaultComponentLocation.from("flow")));
+    flowRefFactoryBean.setAnnotations(singletonMap(LOCATION_KEY, from(flowRefLocation)));
     flowRefFactoryBean.setApplicationContext(applicationContext);
     mockMuleContext.getInjector().inject(flowRefFactoryBean);
     return flowRefFactoryBean;
@@ -495,7 +496,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
 
   private Answer<?> successAnswer() {
     return invocation -> {
-      return from(invocation.getArgument(0))
+      return Mono.from(invocation.getArgument(0))
           .cast(CoreEvent.class)
           .doOnNext(event -> ((BaseEventContext) event.getContext())
               .success(CoreEvent.builder(event).message(result.getMessage()).variables(result.getVariables()).build()))
