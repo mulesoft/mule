@@ -43,6 +43,7 @@ import org.mule.metadata.api.model.SimpleType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -62,7 +63,6 @@ import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper.Extension
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -114,7 +114,7 @@ public abstract class ComponentModel {
   private ComponentModel parent;
   private final List<ComponentModel> innerComponents = new ArrayList<>();
   private String textContent;
-  private DefaultComponentLocation componentLocation;
+  private ComponentLocation componentLocation;
   private TypedComponentIdentifier.ComponentType componentType;
   private org.mule.runtime.api.meta.model.ComponentModel componentModel;
   private NestableElementModel nestableElementModel;
@@ -855,14 +855,14 @@ public abstract class ComponentModel {
   /**
    * @param componentLocation the location of the component in the configuration.
    */
-  public void setComponentLocation(DefaultComponentLocation componentLocation) {
+  public void setComponentLocation(ComponentLocation componentLocation) {
     this.componentLocation = componentLocation;
   }
 
   /**
    * @return the location of the component in the configuration.
    */
-  public DefaultComponentLocation getComponentLocation() {
+  public ComponentLocation getComponentLocation() {
     return componentLocation;
   }
 

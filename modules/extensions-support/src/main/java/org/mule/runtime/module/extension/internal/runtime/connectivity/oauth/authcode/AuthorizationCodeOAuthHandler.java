@@ -16,7 +16,7 @@ import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 import static reactor.core.publisher.Mono.from;
 
@@ -32,6 +32,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.util.LazyLookup;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthCodeRequest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
@@ -45,8 +46,8 @@ import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdap
 import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
 import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
 import org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext;
-import org.mule.runtime.oauth.api.listener.AuthorizationCodeListener;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
+import org.mule.runtime.oauth.api.listener.AuthorizationCodeListener;
 import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.net.MalformedURLException;
@@ -275,7 +276,7 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
   }
 
   private CoreEvent createEvent(Object payload, OAuthConfig config, Flow flow) {
-    return CoreEvent.builder(create(flow, fromSingleComponent(config.getOwnerConfigName())))
+    return CoreEvent.builder(create(flow, from(config.getOwnerConfigName())))
         .message(Message.builder().value(payload).build()).build();
   }
 

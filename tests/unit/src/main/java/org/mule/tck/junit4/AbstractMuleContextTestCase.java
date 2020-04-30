@@ -24,12 +24,13 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextI
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -61,8 +62,6 @@ import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.TriggerableMessageSource;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -81,6 +80,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Extends {@link AbstractMuleTestCase} providing access to a {@link MuleContext} instance and tools for manage it.
@@ -565,7 +566,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   }
 
   protected static Map<QName, Object> getFlowComponentLocationAnnotations(String rootComponentName) {
-    return ImmutableMap.<QName, Object>builder().put(LOCATION_KEY, fromSingleComponent(rootComponentName)).build();
+    return ImmutableMap.<QName, Object>builder().put(LOCATION_KEY, from(rootComponentName)).build();
   }
 
 }

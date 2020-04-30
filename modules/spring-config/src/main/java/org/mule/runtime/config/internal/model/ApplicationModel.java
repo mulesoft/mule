@@ -337,14 +337,15 @@ public class ApplicationModel implements ArtifactAst {
     topLevelComponentsStream()
         .forEach(componentModel -> ((ComponentModel) componentModel).resolveTypedComponentIdentifier(extensionModelHelper,
                                                                                                      runtimeMode));
-    final ComponentLocationVisitor clv = new ComponentLocationVisitor();
-    recursiveStreamWithHierarchy().forEach(clv);
+    recursiveStreamWithHierarchy().forEach(new ComponentLocationVisitor());
   }
 
   public void macroExpandXmlSdkComponents(Set<ExtensionModel> extensionModels) {
     expandModules(extensionModels, () -> {
       // TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart connectors
       // connectors and crafted declared extension models)
+
+      // TODO MULE-17419 (AST) Remove these 2 actions
       resolveComponentTypes();
       topLevelComponentsStream()
           .forEach(componentModel -> ((ComponentModel) componentModel).resolveTypedComponentIdentifier(extensionModelHelper,
@@ -352,9 +353,6 @@ public class ApplicationModel implements ArtifactAst {
 
       // Have to index again the component models with macro expanded ones
       indexComponentModels();
-
-      final ComponentLocationVisitor clv = new ComponentLocationVisitor();
-      recursiveStreamWithHierarchy().forEach(clv);
     });
   }
 
@@ -1131,9 +1129,9 @@ public class ApplicationModel implements ArtifactAst {
 
     topLevelComponentsStream().forEach(cm -> {
       final List<ComponentAst> currentContext = new ArrayList<>();
-      currentContext.add(cm);
 
       ret.add(new Pair<>(cm, new ArrayList<>(currentContext)));
+      currentContext.add(cm);
 
       recursiveStreamWithHierarchy(ret, cm, currentContext);
     });
@@ -1147,12 +1145,11 @@ public class ApplicationModel implements ArtifactAst {
       final List<ComponentAst> currentContextI = new ArrayList<>(currentContext);
 
       ret.add(new Pair<>(cmi, new ArrayList<>(currentContextI)));
-
       currentContextI.add(cmi);
+
       recursiveStreamWithHierarchy(ret, cmi, currentContextI);
     });
   }
-
 
   @Override
   public Spliterator<ComponentAst> recursiveSpliterator() {

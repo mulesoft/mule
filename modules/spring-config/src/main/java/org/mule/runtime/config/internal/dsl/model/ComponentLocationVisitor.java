@@ -8,14 +8,12 @@ package org.mule.runtime.config.internal.dsl.model;
 
 import static java.lang.Math.max;
 import static java.lang.String.valueOf;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
@@ -40,10 +38,8 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.REDELIVERY
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper;
@@ -80,6 +76,8 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
   private static final ComponentIdentifier CHOICE_WHEN_COMPONENT_IDENTIFIER = buildFromStringRepresentation("mule:when");
   private static final ComponentIdentifier CHOICE_OTHERWISE_COMPONENT_IDENTIFIER =
       buildFromStringRepresentation("mule:otherwise");
+  private static final ComponentIdentifier MODULE_BODY_IDENTIFIER =
+      ComponentIdentifier.builder().namespace("module").name("body").build();
 
   /**
    * For every {@link ComponentModel} in the configuration, sets the {@link DefaultComponentLocation} associated within an
@@ -93,7 +91,7 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
   }
 
   public void accept(ComponentAst componentModel, List<ComponentAst> hierarchy) {
-    if (((ComponentModel) componentModel).getComponentLocation() != null) {
+    if (componentModel.getLocation() != null) {
       return;
     }
 
@@ -102,7 +100,7 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
         of(builder().identifier(componentModel.getIdentifier()).type(componentModel.getComponentType())
             .build());
 
-    if (((ComponentModel) componentModel).isRoot()) {
+    if (hierarchy.isEmpty()) {
       String componentModelNameAttribute = componentModel.getComponentId().orElse(null);
       ImmutableList<DefaultLocationPart> parts =
           ImmutableList.<DefaultLocationPart>builder()
@@ -171,17 +169,13 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
                                                          componentModel.getMetadata().getStartColumn());
         }
       } else if (isProcessor(componentModel)) {
-        if (isModuleOperation(parentComponentModel)) {
-          componentLocation = processModuleOperationChildren(componentModel, hierarchy, typedComponentIdentifier);
-        } else {
-          componentLocation = parentComponentLocation
-              .appendProcessorsPart()
-              .appendLocationPart(findProcessorPath(componentModel, hierarchy),
-                                  typedComponentIdentifier,
-                                  componentModel.getMetadata().getFileName(),
-                                  componentModel.getMetadata().getStartLine(),
-                                  componentModel.getMetadata().getStartColumn());
-        }
+        componentLocation = parentComponentLocation
+            .appendProcessorsPart()
+            .appendLocationPart(findProcessorPath(componentModel, hierarchy),
+                                typedComponentIdentifier,
+                                componentModel.getMetadata().getFileName(),
+                                componentModel.getMetadata().getStartLine(),
+                                componentModel.getMetadata().getStartColumn());
       } else if (isConnection(componentModel)) {
         componentLocation = parentComponentLocation.appendConnectionPart(typedComponentIdentifier,
                                                                          componentModel.getMetadata().getFileName(),
@@ -205,6 +199,22 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
                                                          componentModel.getMetadata().getStartColumn());
         }
       }
+    } else if (componentModel.getIdentifier().equals(MODULE_BODY_IDENTIFIER)) {
+      ComponentAst parentComponentModel = hierarchy.get(hierarchy.size() - 1);
+
+      String componentModelNameAttribute = parentComponentModel.getComponentId().orElse(null);
+      ImmutableList<DefaultLocationPart> parts =
+          ImmutableList.<DefaultLocationPart>builder()
+              .add(new DefaultLocationPart(componentModelNameAttribute,
+                                           typedComponentIdentifier,
+                                           componentModel.getMetadata().getFileName(),
+                                           componentModel.getMetadata().getStartLine(),
+                                           componentModel.getMetadata().getStartColumn()))
+
+              .build();
+      componentLocation = new DefaultComponentLocation(ofNullable(componentModelNameAttribute), parts)
+          .appendProcessorsPart();
+
     } else {
       ComponentAst parentComponentModel = hierarchy.get(hierarchy.size() - 1);
       DefaultComponentLocation parentComponentLocation = (DefaultComponentLocation) parentComponentModel.getLocation();
@@ -252,10 +262,6 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
         || identifier.equals(MUNIT_BEFORE_TEST_IDENTIFIER)
         || identifier.equals(MUNIT_AFTER_SUITE_IDENTIFIER)
         || identifier.equals(MUNIT_AFTER_TEST_IDENTIFIER);
-  }
-
-  private boolean isModuleOperation(ComponentAst componentModel) {
-    return componentModel.getModel(OperationModel.class).isPresent();
   }
 
   private boolean parentComponentIsRouter(ComponentAst componentModel, List<ComponentAst> hierarchy) {
@@ -324,44 +330,6 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
                                                      componentModel.getMetadata().getStartColumn());
     }
     return componentLocation;
-  }
-
-  private Optional<TypedComponentIdentifier> getModuleOperationTypeComponentIdentifier(ComponentAst componentModel) {
-    final ComponentIdentifier originalIdentifier =
-        componentModel.getIdentifier();
-
-    final String namespace = originalIdentifier.getNamespace();
-    final String operationName = originalIdentifier.getName();
-
-    final ComponentIdentifier operationIdentifier =
-        ComponentIdentifier.builder().namespace(namespace).name(operationName).build();
-    return of(builder().identifier(operationIdentifier).type(OPERATION).build());
-  }
-
-  /**
-   * It rewrites the history for those macro expanded operations that are not direct children from a flow, which means the
-   * returned {@link ComponentLocation} are mapped to the new operation rather the original flow.
-   *
-   * @param componentModel           source to generate the new {@link ComponentLocation}, it also relies on the provided {@code hierarchy}
-   * @param hierarchy                the ancestors of {@code componentModel}
-   * @param operationTypedIdentifier identifier of the current operation
-   * @return a fictitious {@link ComponentLocation}
-   */
-  private DefaultComponentLocation processModuleOperationChildren(ComponentAst componentModel, List<ComponentAst> hierarchy,
-                                                                  Optional<TypedComponentIdentifier> operationTypedIdentifier) {
-    final Optional<TypedComponentIdentifier> parentOperationTypedIdentifier =
-        getModuleOperationTypeComponentIdentifier(hierarchy.get(hierarchy.size() - 1));
-    final String operationName = parentOperationTypedIdentifier.get().getIdentifier().getName();
-    return new DefaultComponentLocation(of(operationName), emptyList())
-        .appendLocationPart(operationName, parentOperationTypedIdentifier,
-                            componentModel.getMetadata().getFileName(),
-                            componentModel.getMetadata().getStartLine(),
-                            componentModel.getMetadata().getStartColumn())
-        .appendLocationPart(PROCESSORS_PART_NAME, empty(), empty(), OptionalInt.empty(), OptionalInt.empty())
-        .appendLocationPart(findProcessorPath(componentModel, hierarchy), operationTypedIdentifier,
-                            componentModel.getMetadata().getFileName(),
-                            componentModel.getMetadata().getStartLine(),
-                            componentModel.getMetadata().getStartColumn());
   }
 
   private DefaultComponentLocation processErrorHandlerComponent(ComponentAst componentModel,

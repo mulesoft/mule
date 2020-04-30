@@ -9,7 +9,8 @@ package org.mule.test.tck;
 import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertFalse;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+
 import org.mule.functional.api.component.ResponseAssertionMessageProcessor;
 import org.mule.functional.api.component.TestNonBlockingProcessor;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -39,7 +40,7 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
     ResponseAssertionMessageProcessor asp = createAssertionMessageProcessor();
     asp.setListener(testNonBlockingProcessor);
     asp.setExpressionManager(expressionManager);
-    asp.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
+    asp.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
     asp.setExpression(TRUE_EXPRESSION);
     asp.setResponseExpression(TRUE_EXPRESSION);
     asp.setCount(1);
@@ -58,7 +59,7 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
     ResponseAssertionMessageProcessor asp = createAssertionMessageProcessor();
     asp.setListener(testNonBlockingProcessor);
     asp.setExpressionManager(expressionManager);
-    asp.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
+    asp.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
     asp.setExpression(TRUE_EXPRESSION);
     asp.setResponseExpression(TRUE_EXPRESSION);
     asp.setCount(1);

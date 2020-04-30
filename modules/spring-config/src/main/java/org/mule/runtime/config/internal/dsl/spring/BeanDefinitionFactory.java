@@ -40,6 +40,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.functional.Either;
@@ -55,7 +56,6 @@ import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.exception.ErrorMapping;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
-import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -226,14 +226,14 @@ public class BeanDefinitionFactory {
               }).collect(toList()), componentModel);
             }
 
-            componentLocator.addComponentLocation(componentModel.getComponentLocation());
+            componentLocator.addComponentLocation(componentModel.getLocation());
             addAnnotation(ANNOTATION_COMPONENT_CONFIG, componentModel, componentModel);
           }
         });
 
-    addAnnotation(LOCATION_KEY, componentModel.getComponentLocation(), componentModel);
+    addAnnotation(LOCATION_KEY, componentModel.getLocation(), componentModel);
     addAnnotation(REPRESENTATION_ANNOTATION_KEY, resolveProcessorRepresentation(artifactId,
-                                                                                componentModel.getComponentLocation(),
+                                                                                componentModel.getLocation(),
                                                                                 componentModel.getMetadata()),
                   componentModel);
 
@@ -276,7 +276,7 @@ public class BeanDefinitionFactory {
    * @param element
    * @return
    */
-  public static String resolveProcessorRepresentation(String appId, DefaultComponentLocation processorPath,
+  public static String resolveProcessorRepresentation(String appId, ComponentLocation processorPath,
                                                       ComponentMetadataAst metadata) {
     StringBuilder stringBuilder = new StringBuilder();
 
@@ -354,7 +354,7 @@ public class BeanDefinitionFactory {
       if (wrapperElementType.equals(SINGLE)) {
         if (componentModel.getInnerComponents().isEmpty()) {
           String location =
-              componentModel.getComponentLocation() != null ? componentModel.getComponentLocation().getLocation() : "";
+              componentModel.getLocation() != null ? componentModel.getLocation().getLocation() : "";
           throw new IllegalStateException(format("Element [%s] located at [%s] does not have any child element declared, but one is required.",
                                                  componentModel.getIdentifier(), location));
         }

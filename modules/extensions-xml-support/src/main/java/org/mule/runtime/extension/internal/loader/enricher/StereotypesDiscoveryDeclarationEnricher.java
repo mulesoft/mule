@@ -32,7 +32,6 @@ import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.property.OperationComponentModelModelProperty;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
@@ -45,6 +44,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 
 /**
@@ -98,11 +98,11 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
         protected void onOperation(OperationDeclaration declaration) {
           declaration.getModelProperty(OperationComponentModelModelProperty.class)
               .ifPresent(modelProperty -> {
-                ComponentModel bodyComponentModel = modelProperty.getBodyComponentModel();
+                ComponentAst bodyComponentModel = modelProperty.getBodyComponentModel();
 
                 declaration.getAllParameters().stream()
                     .filter(parameterDeclaration -> parameterDeclaration.getType() instanceof StringType)
-                    .forEach(parameterDeclaration -> traverseProperty(bodyComponentModel.getInnerComponents(),
+                    .forEach(parameterDeclaration -> traverseProperty(bodyComponentModel.directChildrenStream(),
                                                                       parameterDeclaration));
               });
 
@@ -115,7 +115,7 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
                                  List<ParameterDeclaration> allParameters) {
       globalElementModelProperty.ifPresent(modelProperty -> allParameters.stream()
           .filter(parameterDeclaration -> parameterDeclaration.getType() instanceof StringType)
-          .forEach(parameterDeclaration -> traverseProperty(globalElementModelProperty.get().getGlobalElements(),
+          .forEach(parameterDeclaration -> traverseProperty(globalElementModelProperty.get().getGlobalElements().stream(),
                                                             parameterDeclaration)));
     }
 
@@ -131,13 +131,14 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
      * @param parameterDeclaration parameter used to look up in the elements' usages, and the one that will hold the
      *                             stereotypes if found.
      */
-    private void traverseProperty(List<ComponentModel> componentModels,
+    private void traverseProperty(Stream<ComponentAst> componentModels,
                                   ParameterDeclaration parameterDeclaration) {
       final List<List<StereotypeModel>> allowedStereotypeModels = new ArrayList<>();
       componentModels.forEach(componentModel -> {
         allowedStereotypeModels.add(findStereotypes(componentModel, parameterDeclaration));
-        componentModel.executedOnEveryInnerComponent(innerComponentModel -> allowedStereotypeModels
-            .add(findStereotypes(innerComponentModel, parameterDeclaration)));
+        componentModel.recursiveStream()
+            .forEach(innerComponentModel -> allowedStereotypeModels
+                .add(findStereotypes(innerComponentModel, parameterDeclaration)));
       });
 
       allowedStereotypeModels.stream()
@@ -149,14 +150,14 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
           }).ifPresent(parameterDeclaration::setAllowedStereotypeModels);
     }
 
-    private List<StereotypeModel> findStereotypes(ComponentModel componentModel, ParameterDeclaration propertyDeclaration) {
+    private List<StereotypeModel> findStereotypes(ComponentAst componentModel, ParameterDeclaration propertyDeclaration) {
       final String expectedPropertyReference = ExpressionManager.DEFAULT_EXPRESSION_PREFIX + BindingContextUtils.VARS + "."
           + propertyDeclaration.getName() + ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
       if (!componentModel.getModel(ParameterizedModel.class).isPresent()) {
         return emptyList();
       }
 
-      return ((ComponentAst) componentModel).getParameters().stream()
+      return componentModel.getParameters().stream()
           .filter(paramAst -> expectedPropertyReference.equals(paramAst.getRawValue()))
           .map(paramAst -> paramAst.getModel().getName())
           .map(attributeName -> findStereotypes(componentModel.getIdentifier(), attributeName))

@@ -15,9 +15,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.el.ValidationResult.success;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.runtime.api.el.ValidationResult.success;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import org.mule.functional.api.component.AssertionMessageProcessor;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -185,7 +185,7 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
   public AssertionMessageProcessor baseAssertionMP() {
     AssertionMessageProcessor asp = createAssertionMessageProcessor();
     asp.setExpressionManager(expressionManager);
-    asp.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent("flow")));
+    asp.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
     return asp;
   }
 
