@@ -10,10 +10,14 @@ import static java.lang.Integer.MIN_VALUE;
 
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.api.streaming.object.CursorIterator;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class IdentifiableCursorProviderDecorator<T extends Cursor> extends CursorProviderDecorator<T>
+public abstract class IdentifiableCursorProviderDecorator<T extends Cursor> extends CursorProviderDecorator<T>
     implements IdentifiableCursorProvider<T> {
 
   private static final transient AtomicInteger ID_GENERATOR = new AtomicInteger(MIN_VALUE);
@@ -22,9 +26,12 @@ public class IdentifiableCursorProviderDecorator<T extends Cursor> extends Curso
 
   public static <T extends Cursor> IdentifiableCursorProviderDecorator<T> of(CursorProvider<T> cursorProvider) {
     final CursorProvider<T> root = cursorProvider;
+    Integer id = null;
     do {
       if (cursorProvider instanceof IdentifiableCursorProvider) {
-        return new IdentifiableCursorProviderDecorator<>(root, ((IdentifiableCursorProvider<T>) cursorProvider).getId());
+        id = ((IdentifiableCursorProvider<T>) cursorProvider).getId();
+        cursorProvider = CursorUtils.unwrap(cursorProvider);
+        break;
       }
 
       if (cursorProvider instanceof CursorProviderDecorator) {
@@ -32,7 +39,19 @@ public class IdentifiableCursorProviderDecorator<T extends Cursor> extends Curso
       }
     } while (cursorProvider instanceof CursorProviderDecorator);
 
-    return new IdentifiableCursorProviderDecorator<>(root, ID_GENERATOR.incrementAndGet());
+    if (id == null) {
+      id = ID_GENERATOR.incrementAndGet();
+    }
+
+    if (cursorProvider instanceof CursorStreamProvider) {
+      return (IdentifiableCursorProviderDecorator<T>) new IdentifiableCursorStreamProviderDecorator(
+                                                                                                    (CursorStreamProvider) root,
+                                                                                                    id);
+    } else {
+      return (IdentifiableCursorProviderDecorator<T>) new IdentifiableCursorIteratorProviderDecorator(
+                                                                                                      (CursorIteratorProvider) root,
+                                                                                                      id);
+    }
   }
 
   private IdentifiableCursorProviderDecorator(CursorProvider<T> delegate, int id) {
@@ -43,5 +62,22 @@ public class IdentifiableCursorProviderDecorator<T extends Cursor> extends Curso
   @Override
   public int getId() {
     return id;
+  }
+
+  private static class IdentifiableCursorStreamProviderDecorator extends IdentifiableCursorProviderDecorator<CursorStream>
+      implements CursorStreamProvider {
+
+    public IdentifiableCursorStreamProviderDecorator(CursorStreamProvider delegate, int id) {
+      super(delegate, id);
+    }
+  }
+
+
+  private static class IdentifiableCursorIteratorProviderDecorator extends IdentifiableCursorProviderDecorator<CursorIterator>
+      implements CursorIteratorProvider {
+
+    public IdentifiableCursorIteratorProviderDecorator(CursorIteratorProvider delegate, int id) {
+      super(delegate, id);
+    }
   }
 }
