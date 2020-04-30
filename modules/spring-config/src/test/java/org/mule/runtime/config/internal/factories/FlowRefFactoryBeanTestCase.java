@@ -40,6 +40,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextI
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.FlowReferenceStory.FLOW_REFERENCE;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -297,8 +299,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   }
 
   @Test()
-  @Feature(AllureConstants.SpringConfiguration.SPRING_CONFIGURATION)
-  @Story(AllureConstants.SpringConfiguration.ComponentFactories.COMPONENT_FACTORIES)
+  @Feature(CORE_COMPONENTS)
+  @Story(FLOW_REFERENCE)
   public void concurrentDynamicSubFlowInstantiation() throws Exception {
     // MuleArtifactContext stubbing
     DefaultListableBeanFactory beanFactory = new ObjectProviderAwareBeanFactory(null);
