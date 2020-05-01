@@ -52,6 +52,7 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
+import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -166,7 +167,7 @@ public class MuleContextUtils {
 
     StreamingManager streamingManager = mock(StreamingManager.class, RETURNS_DEEP_STUBS);
     try {
-      MuleRegistry registry = mock(MuleRegistry.class, withSettings().lenient());
+      MuleRegistry registry = mock(MuleRegistryHelper.class, withSettings().lenient());
       when(muleContext.getRegistry()).thenReturn(registry);
       ComponentInitialStateManager componentInitialStateManager =
           mock(ComponentInitialStateManager.class, withSettings().lenient());
