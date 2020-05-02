@@ -139,8 +139,6 @@ public class MacroExpansionModuleModel {
                         createModuleOperationChain(operationRefModel, operationModel, moduleGlobalElementsNames,
                                                    empty(), rootElement.getComponentId().orElse(null));
 
-                    moduleOperationChain.getInnerComponents()
-                        .forEach(inner -> inner.setParent((ComponentModel) operationRefModel));
                     ((ComponentModel) operationRefModel).getInnerComponents().addAll(moduleOperationChain.getInnerComponents());
                   });
             }));
@@ -247,12 +245,9 @@ public class MacroExpansionModuleModel {
                                       lastGlobalLocationPart.getLine(),
                                       lastGlobalLocationPart.getColumn());
 
-          final ComponentModel macroExpandedGlobalElement =
-              copyGlobalElementComponentModel(globalElementModel, configRefModel.getComponentId().orElse(null),
-                                              moduleGlobalElementsNames,
-                                              literalsParameters, singletonList(newLocBase));
-          macroExpandedGlobalElement.setRoot(true);
-          return macroExpandedGlobalElement;
+          return copyGlobalElementComponentModel(globalElementModel, configRefModel.getComponentId().orElse(null),
+                                                 moduleGlobalElementsNames,
+                                                 literalsParameters, singletonList(newLocBase));
         }).collect(toList());
 
   }
@@ -338,10 +333,6 @@ public class MacroExpansionModuleModel {
     processorChainBuilder.addCustomAttribute(ORIGINAL_IDENTIFIER, operationRefModel.getIdentifier());
 
     ComponentModel processorChainModel = processorChainBuilder.build();
-    for (ComponentModel processorChainModelChild : processorChainModel.getInnerComponents()) {
-      processorChainModelChild.setParent(processorChainModel);
-    }
-
     processorChainModel.setComponentModel(operationModel);
     processorChainModel.setComponentType(operationRefModel.getComponentType());
 
@@ -601,9 +592,6 @@ public class MacroExpansionModuleModel {
     componentModelOrigin.getMetadata().getStartColumn().ifPresent(operationReplacementModel::setStartColumn);
     componentModelOrigin.getMetadata().getSourceCode().ifPresent(operationReplacementModel::setSourceCode);
     ComponentModel componentModel = operationReplacementModel.build();
-    for (ComponentModel child : componentModel.getInnerComponents()) {
-      child.setParent(componentModel);
-    }
     componentModel.setComponentLocation(componentModelOrigin.getComponentLocation());
     return componentModel;
   }

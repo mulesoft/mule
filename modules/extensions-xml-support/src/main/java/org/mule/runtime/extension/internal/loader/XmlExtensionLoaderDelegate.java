@@ -436,7 +436,6 @@ public final class XmlExtensionLoaderDelegate {
     }
 
     moduleModel.resolveTypedComponentIdentifier(extensionModelHelper, true);
-    moduleModel.setRoot(true);
 
     final String name = moduleModel.getRawParameters().get(MODULE_NAME);
     final String version = "4.0.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel

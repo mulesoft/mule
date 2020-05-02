@@ -750,32 +750,25 @@ public class ApplicationModel implements ArtifactAst {
           .map(e -> e.get().getConfiguration())
           .forEach(config -> config
               .ifPresent(c -> {
-                ComponentModel componentModel = convertComponentConfiguration(c, true);
+                ComponentModel componentModel = convertComponentConfiguration(c);
                 muleComponentModels.add(componentModel);
               }));
     }
   }
 
-  private ComponentModel convertComponentConfiguration(ComponentConfiguration componentConfiguration, boolean isRoot) {
+  private ComponentModel convertComponentConfiguration(ComponentConfiguration componentConfiguration) {
     ComponentModel.Builder builder = new ComponentModel.Builder()
         .setIdentifier(componentConfiguration.getIdentifier());
-    if (isRoot) {
-      builder.markAsRootComponent();
-    }
     for (Map.Entry<String, String> parameter : componentConfiguration.getParameters().entrySet()) {
       builder.addParameter(parameter.getKey(), parameter.getValue(), false);
     }
     for (ComponentConfiguration childComponentConfiguration : componentConfiguration.getNestedComponents()) {
-      builder.addChildComponentModel(convertComponentConfiguration(childComponentConfiguration, false));
+      builder.addChildComponentModel(convertComponentConfiguration(childComponentConfiguration));
     }
 
     componentConfiguration.getValue().ifPresent(builder::setTextContent);
 
-    ComponentModel componentModel = builder.build();
-    for (ComponentModel childComponent : componentModel.getInnerComponents()) {
-      childComponent.setParent(componentModel);
-    }
-    return componentModel;
+    return builder.build();
   }
 
 
@@ -1066,11 +1059,6 @@ public class ApplicationModel implements ArtifactAst {
   }
 
   public void addRootComponentModel(ComponentModel root) {
-    root.getInnerComponents().forEach(ige -> {
-      ige.setRoot(true);
-      ige.setParent(root);
-    });
-
     muleComponentModels.add(root);
   }
 
