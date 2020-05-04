@@ -40,6 +40,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore.SHARED_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
+
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.custom.CustomizationService;
@@ -416,7 +417,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   private ArtifactAst buildMinimalApplicationModel(final Predicate<ComponentAst> basePredicate) {
     final Predicate<? super ComponentAst> txManagerPredicate = componentModel -> {
-      final ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor((ComponentModel) componentModel);
+      final ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
       return componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
           .map(componentBuildingDefinition -> {
             componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
@@ -481,11 +482,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    * flow is not.
    */
   @Override
-  protected List<Pair<String, ComponentAst>> createApplicationComponents(DefaultListableBeanFactory beanFactory,
-                                                                         ArtifactAst minimalAppModel,
-                                                                         boolean mustBeRoot) {
+  protected List<Pair<String, ComponentAst>> doCreateApplicationComponents(DefaultListableBeanFactory beanFactory,
+                                                                           ArtifactAst minimalAppModel,
+                                                                           boolean mustBeRoot,
+                                                                           Map<ComponentAst, SpringComponentModel> springComponentModels) {
     final List<Pair<String, ComponentAst>> applicationComponents =
-        super.createApplicationComponents(beanFactory, minimalAppModel, mustBeRoot);
+        super.doCreateApplicationComponents(beanFactory, minimalAppModel, mustBeRoot, springComponentModels);
 
     final Set<ComponentAst> orphanComponents = resolveOrphanComponents(minimalAppModel);
     LOGGER.debug("orphanComponents found: {}", orphanComponents.toString());
@@ -499,24 +501,26 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           LOGGER.debug("Registering orphan named component '{}'...", nameAttribute);
 
           applicationComponents.add(0, new Pair<>(nameAttribute, cm));
-          final BeanDefinition beanDef = ((SpringComponentModel) cm).getBeanDefinition();
+          final SpringComponentModel springCompModel = springComponentModels.get(cm);
+          final BeanDefinition beanDef = springCompModel.getBeanDefinition();
           if (beanDef != null) {
             beanFactory.registerBeanDefinition(cm.getComponentId().get(), beanDef);
-            postProcessBeanDefinition((SpringComponentModel) cm, beanFactory, cm.getComponentId().get());
+            postProcessBeanDefinition(springCompModel, beanFactory, cm.getComponentId().get());
           }
         });
 
     // Handle orphan components without name, rely on the location.
     orphanComponents.stream()
         .forEach(cm -> {
-          final BeanDefinition beanDef = ((SpringComponentModel) cm).getBeanDefinition();
+          final SpringComponentModel springCompModel = springComponentModels.get(cm);
+          final BeanDefinition beanDef = springCompModel.getBeanDefinition();
           if (beanDef != null) {
             final String beanName = cm.getComponentId().orElse(uniqueValue(beanDef.getBeanClassName()));
 
             LOGGER.debug("Registering orphan un-named component '{}'...", beanName);
             applicationComponents.add(new Pair<>(beanName, cm));
             beanFactory.registerBeanDefinition(beanName, beanDef);
-            postProcessBeanDefinition((SpringComponentModel) cm, beanFactory, beanName);
+            postProcessBeanDefinition(springCompModel, beanFactory, beanName);
           }
         });
 

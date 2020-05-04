@@ -12,7 +12,9 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -20,16 +22,21 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINE_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_PROPAGATE_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.resolveComponentType;
 import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapterWithSterotype;
 import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createParameterizedTypeModelAdapter;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.util.StringUtils.trim;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
+import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -43,8 +50,10 @@ import org.mule.metadata.api.model.SimpleType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
@@ -60,7 +69,7 @@ import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper.ExtensionWalkerModelDelegate;
-import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
@@ -69,16 +78,21 @@ import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Spliterator;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import javax.xml.namespace.QName;
 
@@ -102,13 +116,16 @@ import com.google.common.collect.Multimap;
  *
  * @since 4.0
  */
-public abstract class ComponentModel {
+public class ComponentModel implements ComponentAst {
 
   public static String COMPONENT_MODEL_KEY = "ComponentModel";
 
   private boolean root = false;
   private ComponentIdentifier identifier;
+  private String componentId;
   private final Map<String, String> parameters = new HashMap<>();
+  private final Map<String, ComponentParameterAst> parameterAsts = new HashMap<>();
+  private final AtomicBoolean parameterAstsPopulated = new AtomicBoolean(false);
   private final Set<String> schemaValueParameter = new HashSet<>();
   // TODO MULE-9638 This must go away from component model once it's immutable.
   private ComponentModel parent;
@@ -124,7 +141,6 @@ public abstract class ComponentModel {
 
   private ComponentMetadataAst componentMetadata;
 
-  private Object objectInstance;
   private Class<?> type;
 
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
@@ -159,6 +175,7 @@ public abstract class ComponentModel {
   /**
    * @return the configuration identifier.
    */
+  @Override
   public ComponentIdentifier getIdentifier() {
     return identifier;
   }
@@ -206,14 +223,6 @@ public abstract class ComponentModel {
   }
 
   /**
-   * @param parameterName name of the configuration parameter.
-   * @param value         value contained by the configuration parameter.
-   */
-  public void setParameter(ParameterModel parameterModel, ComponentParameterAst value) {
-    this.parameters.put(parameterModel.getName(), value.getRawValue());
-  }
-
-  /**
    * @return the type of the object to be created when processing this {@code ComponentModel}.
    */
   public Class<?> getType() {
@@ -227,6 +236,222 @@ public abstract class ComponentModel {
     this.type = type;
   }
 
+  @Override
+  public ComponentLocation getLocation() {
+    return getComponentLocation();
+  }
+
+  @Override
+  public Optional<String> getComponentId() {
+    if (getType() != null && MuleConfiguration.class.isAssignableFrom(getType())) {
+      return of(OBJECT_MULE_CONFIGURATION);
+    } else if (getModel(ConstructModel.class)
+        .map(cm -> cm.getName().equals("object"))
+        .orElse(getIdentifier().equals(ON_ERROR_CONTINE_IDENTIFIER)
+            || getIdentifier().equals(ON_ERROR_PROPAGATE_IDENTIFIER))) {
+      return ofNullable(getRawParameters().get(NAME_ATTRIBUTE_NAME));
+    } else if (getModel(ParameterizedModel.class).isPresent()) {
+      populateParameterAsts();
+      return ofNullable(componentId);
+    } else {
+      // fallback for dsl elements that do not have an extension model declaration
+      return ofNullable(getRawParameters().get(NAME_ATTRIBUTE_NAME));
+    }
+  }
+
+  @Override
+  public Optional<String> getRawParameterValue(String paramName) {
+    if (paramName.equals(BODY_RAW_PARAM_NAME)) {
+      return ofNullable(getTextContent());
+    } else {
+      return ofNullable(getRawParameters().get(paramName));
+    }
+  }
+
+  /**
+   * @param parameterName name of the configuration parameter.
+   * @param value value contained by the configuration parameter.
+   */
+  public void setParameter(ParameterModel parameterModel, ComponentParameterAst value) {
+    parameterAstsPopulated.set(false);
+
+    this.parameters.put(parameterModel.getName(), value.getRawValue());
+    this.parameterAsts.put(parameterModel.getName(), value);
+  }
+
+  /**
+   * @param paramName the name of the parameter to get AST for.
+   * @return the AST of the parameter if present, or {@link Optional#empty()} if not present.
+   */
+  @Override
+  public ComponentParameterAst getParameter(String paramName) {
+    populateParameterAsts();
+    return parameterAsts.get(paramName);
+  }
+
+  @Override
+  public Collection<ComponentParameterAst> getParameters() {
+    populateParameterAsts();
+    return parameterAsts.values()
+        .stream()
+        .filter(param -> param.getValue().getValue().isPresent())
+        .collect(toSet());
+  }
+
+  private void populateParameterAsts() {
+    if (!parameterAstsPopulated.compareAndSet(false, true)) {
+      return;
+    }
+
+    if (!getModel(ParameterizedModel.class).isPresent()) {
+      throw new IllegalStateException("Model for '" + this.toString() + "' (a '"
+          + getModel(NamedObject.class).map(NamedObject::getName) + ")' is not parameterizable.");
+    }
+
+    getModel(ParameterizedModel.class)
+        .ifPresent(parameterizedModel -> parameterizedModel.getAllParameterModels().forEach(paramModel -> {
+          final ComponentParameterAst computedParam = parameterAsts.computeIfAbsent(paramModel
+              .getName(), paramNameKey -> findParameterModel(paramNameKey)
+                  .map(foundParamModel -> getRawParameterValue(paramNameKey)
+                      .map(rawParamValue -> new DefaultComponentParameterAst(rawParamValue, () -> foundParamModel))
+                      .orElseGet(() -> new DefaultComponentParameterAst(null, () -> foundParamModel)))
+                  .orElseThrow(() -> {
+                    // Try to provide as much troubleshooting information as possible
+                    final String msgPrefix = format("Wanted paramName '%s' from object '%s'.", paramNameKey,
+                                                    getModel(NamedObject.class)
+                                                        .map(NamedObject::getName)
+                                                        .orElse("(null)"));
+
+                    if (!getModel(ParameterizedModel.class).isPresent()) {
+                      return new NoSuchElementException(msgPrefix + " The model is not parameterizable.");
+                    } else {
+                      final List<String> availableParams = getModel(ParameterizedModel.class).get().getAllParameterModels()
+                          .stream()
+                          .map(NamedObject::getName)
+                          .collect(toList());
+                      return new NoSuchElementException(msgPrefix + " Available: " + availableParams);
+                    }
+                  }));
+
+          if (paramModel.isComponentId()) {
+            componentId = (String) computedParam.getValue().getRight();
+          }
+        }));
+  }
+
+  private Optional<ParameterModel> findParameterModel(String paramName) {
+    // For sources, we need to account for the case where parameters in the callbacks may have colliding names.
+    // This logic ensures that the parameter fetching logic is consistent with the logic that handles this scenario in previous
+    // implementations.
+    Optional<ParameterModel> parameterModel = getModel(SourceModel.class)
+        .flatMap(sourceModel -> {
+          if (sourceModel.getErrorCallback().isPresent()) {
+            final Optional<ParameterModel> findFirst = sourceModel.getErrorCallback().get().getAllParameterModels()
+                .stream()
+                .filter(pm -> pm.getName().equals(paramName))
+                .findFirst();
+
+            if (findFirst.isPresent()) {
+              return findFirst;
+            }
+          }
+
+          if (sourceModel.getSuccessCallback().isPresent()) {
+            return sourceModel.getSuccessCallback().get().getAllParameterModels()
+                .stream()
+                .filter(pm -> pm.getName().equals(paramName))
+                .findFirst();
+          }
+
+          return empty();
+        });
+
+    if (!parameterModel.isPresent()) {
+      parameterModel = getModel(ParameterizedModel.class)
+          .flatMap(parameterizedModel -> parameterizedModel.getAllParameterModels()
+              .stream()
+              .filter(pm -> pm.getName().equals(paramName))
+              .findFirst());
+    }
+
+    return parameterModel;
+  }
+
+  @Override
+  public Stream<ComponentAst> recursiveStream() {
+    return StreamSupport.stream(recursiveSpliterator(), false);
+  }
+
+  @Override
+  public Spliterator<ComponentAst> recursiveSpliterator() {
+    return new Spliterator<ComponentAst>() {
+
+      private boolean rootProcessed = false;
+
+      private Spliterator<ComponentAst> currentChildSpliterator;
+
+      private Spliterator<ComponentAst> innerSpliterator;
+
+      @Override
+      public boolean tryAdvance(Consumer<? super ComponentAst> action) {
+        if (!rootProcessed) {
+          rootProcessed = true;
+          action.accept(ComponentModel.this);
+          return true;
+        }
+
+        trySplit();
+
+        if (currentChildSpliterator != null) {
+          if (currentChildSpliterator.tryAdvance(action)) {
+            return true;
+          } else {
+            currentChildSpliterator = null;
+            return tryAdvance(action);
+          }
+        } else {
+          if (innerSpliterator.tryAdvance(cm -> currentChildSpliterator = cm.recursiveSpliterator())) {
+            return tryAdvance(action);
+          } else {
+            return false;
+          }
+        }
+      }
+
+      @Override
+      public Spliterator<ComponentAst> trySplit() {
+        if (innerSpliterator == null) {
+          innerSpliterator = directChildrenStream().spliterator();
+        }
+        return null;
+      }
+
+      @Override
+      public long estimateSize() {
+        return 1 + directChildrenStream()
+            .mapToLong(inner -> inner.recursiveSpliterator().estimateSize())
+            .sum();
+      }
+
+      @Override
+      public int characteristics() {
+        return ORDERED | DISTINCT | SIZED | NONNULL | IMMUTABLE | SUBSIZED;
+      }
+
+    };
+  }
+
+  @Override
+  public Stream<ComponentAst> directChildrenStream() {
+    return getInnerComponents().stream().map(cm -> (ComponentAst) cm);
+  }
+
+  @Override
+  public Spliterator<ComponentAst> directChildrenSpliterator() {
+    return directChildrenStream().spliterator();
+  }
+
+
   /**
    * @param componentType the {@link org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType} of the object to be
    *                      created when processing this {@code ComponentModel}.
@@ -235,10 +460,12 @@ public abstract class ComponentModel {
     this.componentType = componentType;
   }
 
+  @Override
   public TypedComponentIdentifier.ComponentType getComponentType() {
     return componentType != null ? componentType : TypedComponentIdentifier.ComponentType.UNKNOWN;
   }
 
+  @Override
   public <M> Optional<M> getModel(Class<M> modelClass) {
     if (componentModel != null) {
       if (modelClass.isAssignableFrom(componentModel.getClass())) {
@@ -339,7 +566,7 @@ public abstract class ComponentModel {
             .flatMap(g -> g.getParameterModels().stream())
             .collect(toList());
 
-        handleNestedParameters(ComponentModel.this, ((ComponentAst) ComponentModel.this).directChildrenStream()
+        handleNestedParameters(ComponentModel.this, ComponentModel.this.directChildrenStream()
             .filter(childComp -> childComp != ComponentModel.this),
                                nestedComponents, extensionModelHelper,
                                model,
@@ -356,7 +583,10 @@ public abstract class ComponentModel {
           .ifPresent(this::setMetadataTypeModelAdapter);
     }
 
-    setComponentType(resolveComponentType((ComponentAst) this, extensionModelHelper));
+    final ComponentType resolvedComponentType = resolveComponentType(this, extensionModelHelper);
+    if (resolvedComponentType != UNKNOWN || getComponentType() == null) {
+      setComponentType(resolvedComponentType);
+    }
   }
 
   private ParameterGroupModel addInlineGroup(DslElementSyntax elementDsl,
@@ -371,7 +601,7 @@ public abstract class ComponentModel {
 
           ComponentModel groupComponent = getSingleComponentModel(nestedComponents, groupIdentifier);
           if (groupComponent != null) {
-            handleNestedParameters(this, ((ComponentAst) groupComponent).directChildrenStream()
+            handleNestedParameters(this, groupComponent.directChildrenStream()
                 .filter(childComp -> childComp != groupComponent), getNestedComponents(groupComponent), extensionModelHelper,
                                    new ParameterizedModel() {
 
@@ -437,8 +667,9 @@ public abstract class ComponentModel {
   private void handleNestedParametersWithoutPopulatingObjectTypes(ComponentModel componentModel,
                                                                   ExtensionModelHelper extensionModelHelper,
                                                                   ParameterizedModel model) {
-    ((ComponentAst) componentModel)
-        .recursiveStream().forEach(childComp -> extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
+    componentModel
+        .recursiveStream()
+        .forEach(childComp -> extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
             // do not handle the callback parameters from the sources
             .filter(paramModel -> {
               if (model instanceof SourceModel) {
@@ -820,7 +1051,7 @@ public abstract class ComponentModel {
   @Deprecated
   public String getNameAttribute() {
     if (this instanceof ComponentAst) {
-      return ((ComponentAst) this).getComponentId()
+      return getComponentId()
           .orElseGet(() -> parameters.get(ApplicationModel.NAME_ATTRIBUTE));
     } else {
       return parameters.get(ApplicationModel.NAME_ATTRIBUTE);
@@ -864,24 +1095,6 @@ public abstract class ComponentModel {
    */
   public ComponentLocation getComponentLocation() {
     return componentLocation;
-  }
-
-  /**
-   * @return the object instance already created for this model
-   */
-  public Object getObjectInstance() {
-    return objectInstance;
-  }
-
-  /**
-   * Setter used for components that should be created eagerly without going through spring. This is the case of models
-   * contributing to IoC {@link org.mule.runtime.api.ioc.ObjectProvider} interface that require to be created before the
-   * application components so they can be referenced.
-   *
-   * @param objectInstance the object instance created from this model.
-   */
-  public void setObjectInstance(Object objectInstance) {
-    this.objectInstance = objectInstance;
   }
 
   /**
@@ -929,6 +1142,7 @@ public abstract class ComponentModel {
     return componentMetadata.getSourceCode().orElse(null);
   }
 
+  @Override
   public ComponentMetadataAst getMetadata() {
     return componentMetadata;
   }
@@ -938,7 +1152,7 @@ public abstract class ComponentModel {
    */
   public static class Builder {
 
-    private final ComponentModel model = new SpringComponentModel();
+    private final ComponentModel model = new ComponentModel();
     private ComponentModel root;
 
     private final org.mule.runtime.ast.api.ComponentMetadataAst.Builder metadataBuilder = ComponentMetadataAst.builder();
@@ -1097,25 +1311,6 @@ public abstract class ComponentModel {
     }
 
     /**
-     * Given the following root component it will merge its customAttributes, parameters and schemaValueParameters to the root
-     * component model.
-     *
-     * @param otherRootComponentModel another component model created as root to be merged.
-     * @return the builder.
-     */
-    public Builder merge(ComponentModel otherRootComponentModel) {
-      ((ComponentAst) otherRootComponentModel).getMetadata().getParserAttributes()
-          .forEach((k, v) -> this.metadataBuilder.putParserAttribute(k, v));
-      ((ComponentAst) otherRootComponentModel).getMetadata().getDocAttributes()
-          .forEach((k, v) -> this.metadataBuilder.putDocAttribute(k, v));
-      this.root.parameters.putAll(otherRootComponentModel.parameters);
-      this.root.schemaValueParameter.addAll(otherRootComponentModel.schemaValueParameter);
-
-      this.root.innerComponents.addAll(otherRootComponentModel.innerComponents);
-      return this;
-    }
-
-    /**
      * @return a {@code ComponentModel} created based on the supplied parameters.
      */
     public ComponentModel build() {
@@ -1164,6 +1359,12 @@ public abstract class ComponentModel {
     result = 31 * result + identifier.hashCode();
     result = 31 * result + parameters.hashCode();
     return result;
+  }
+
+  @Override
+  public String toString() {
+    return getComponentId().map(n -> "" + n + "(" + getIdentifier().toString() + ")").orElse(getIdentifier().toString())
+        + (getLocation() != null ? (" @ " + getLocation().getLocation()) : "");
   }
 
 }

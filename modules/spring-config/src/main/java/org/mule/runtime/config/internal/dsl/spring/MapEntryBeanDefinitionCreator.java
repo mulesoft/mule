@@ -11,6 +11,7 @@ import static org.mule.runtime.dsl.api.component.DslSimpleType.SIMPLE_TYPE_VALUE
 import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -18,6 +19,7 @@ import org.mule.runtime.dsl.api.component.MapEntry;
 import org.mule.runtime.dsl.api.component.TypeDefinition.MapEntryType;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -54,64 +56,67 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator {
   private static final String ENTRY_TYPE_VALUE_REF_PARAMETER_NAME = "value-ref";
 
   @Override
-  boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {
-    ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(createBeanDefinitionRequest.getComponentModel());
-    createBeanDefinitionRequest.getComponentBuildingDefinition().getTypeDefinition().visit(objectTypeVisitor);
+  boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                        CreateBeanDefinitionRequest createBeanDefinitionRequest) {
+    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
+    ObjectTypeVisitor objectTypeVisitor = createBeanDefinitionRequest.retrieveTypeVisitor();
     Class<?> type = objectTypeVisitor.getType();
     if (!(MapEntryType.class.isAssignableFrom(type))) {
       return false;
     }
-    SpringComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
     ComponentBuildingDefinition componentBuildingDefinition = createBeanDefinitionRequest.getComponentBuildingDefinition();
-    componentModel.setType(type);
-    final Object key = componentModel.getRawParameters().get(ENTRY_TYPE_KEY_PARAMETER_NAME);
+    createBeanDefinitionRequest.getSpringComponentModel().setType(type);
+    final Object key = componentModel.getRawParameterValue(ENTRY_TYPE_KEY_PARAMETER_NAME).orElse(null);
     Object keyBeanDefinition = getConvertibleBeanDefinition(objectTypeVisitor.getMapEntryType().get().getKeyType(), key,
                                                             componentBuildingDefinition.getKeyTypeConverter());
 
 
-    Object value = null;
-    // MULE-11984: Check that generated map entries are not empty
-    if (componentModel.getRawParameters().get(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME) != null) {
-      value = new RuntimeBeanReference(componentModel.getRawParameters().get(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME));
-    } else {
-      value = getValue(objectTypeVisitor, componentModel, componentBuildingDefinition);
-    }
+    Object value =
+        // MULE-11984: Check that generated map entries are not empty
+        componentModel.getRawParameterValue(ENTRY_TYPE_VALUE_REF_PARAMETER_NAME)
+            .map(paramName -> (Object) new RuntimeBeanReference(paramName))
+            .orElseGet(() -> getValue(springComponentModels, objectTypeVisitor, componentModel, componentBuildingDefinition));
 
     AbstractBeanDefinition beanDefinition = genericBeanDefinition(MapEntry.class).addConstructorArgValue(keyBeanDefinition)
         .addConstructorArgValue(value).getBeanDefinition();
 
-    componentModel.setBeanDefinition(beanDefinition);
+    createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(beanDefinition);
     return true;
-
   }
 
-  private Object getValue(ObjectTypeVisitor objectTypeVisitor, SpringComponentModel componentModel,
+  private Object getValue(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                          ObjectTypeVisitor objectTypeVisitor, ComponentAst componentModel,
                           ComponentBuildingDefinition componentBuildingDefinition) {
     Object value;
     Class valueType = objectTypeVisitor.getMapEntryType().get().getValueType();
-    if (isSimpleType(valueType) || componentModel.getInnerComponents().isEmpty()) {
+    if (isSimpleType(valueType) || componentModel.directChildrenStream().count() == 0) {
       value = getConvertibleBeanDefinition(objectTypeVisitor.getMapEntryType().get().getValueType(),
-                                           componentModel.getRawParameters().get(SIMPLE_TYPE_VALUE_PARAMETER_NAME),
+                                           componentModel.getRawParameterValue(SIMPLE_TYPE_VALUE_PARAMETER_NAME).orElse(null),
                                            componentBuildingDefinition.getTypeConverter());
     } else if (List.class.isAssignableFrom(objectTypeVisitor.getMapEntryType().get().getValueType())) {
-      if (componentModel.getInnerComponents().isEmpty()) {
-        String valueParameter = componentModel.getRawParameters().get(SIMPLE_TYPE_VALUE_PARAMETER_NAME);
+      if (componentModel.directChildrenStream().count() == 0) {
+        String valueParameter = componentModel.getRawParameterValue(SIMPLE_TYPE_VALUE_PARAMETER_NAME).orElse(null);
         value = getConvertibleBeanDefinition(valueType, valueParameter, componentBuildingDefinition.getTypeConverter());
       } else {
-        ManagedList<Object> managedList = componentModel
-            .getInnerComponents().stream()
-            .map(childComponent -> ((SpringComponentModel) childComponent).getBeanDefinition() != null
-                ? ((SpringComponentModel) childComponent).getBeanDefinition()
-                : ((SpringComponentModel) childComponent).getBeanReference())
+        ManagedList<Object> managedList = componentModel.directChildrenStream()
+            .map(springComponentModels::get)
+            .map(childSpringComponent -> childSpringComponent.getBeanDefinition() != null
+                ? childSpringComponent.getBeanDefinition()
+                : childSpringComponent.getBeanReference())
             .collect(toCollection(ManagedList::new));
 
         value = genericBeanDefinition(ObjectTypeVisitor.DEFAULT_COLLECTION_TYPE).addConstructorArgValue(managedList)
             .getBeanDefinition();
       }
     } else {
-      SpringComponentModel childComponentModel = (SpringComponentModel) componentModel.getInnerComponents().get(0);
-      BeanDefinition beanDefinition = childComponentModel.getBeanDefinition();
-      value = beanDefinition != null ? beanDefinition : childComponentModel.getBeanReference();
+      value = componentModel.directChildrenStream()
+          .findFirst()
+          .map(springComponentModels::get)
+          .map(childSpringComponent -> {
+            BeanDefinition beanDefinition = childSpringComponent.getBeanDefinition();
+            return beanDefinition != null ? beanDefinition : childSpringComponent.getBeanReference();
+          })
+          .orElse(null);
     }
     return value;
   }

@@ -15,8 +15,11 @@ import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
+
+import java.util.Map;
 
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -34,26 +37,27 @@ class ObjectBeanDefinitionCreator extends BeanDefinitionCreator {
   private static final String CLASS_PARAMETER = "class";
 
   @Override
-  boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {
-    SpringComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
+  boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                        CreateBeanDefinitionRequest createBeanDefinitionRequest) {
+    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
     if (!componentModel.getIdentifier().equals(buildFromStringRepresentation("mule:object"))) {
       return false;
     }
-    String refParameterValue = componentModel.getRawParameters().get(REF_PARAMETER);
-    String classParameterValue = componentModel.getRawParameters().get(CLASS_PARAMETER);
+    String refParameterValue = componentModel.getRawParameterValue(REF_PARAMETER).orElse(null);
+    String classParameterValue = componentModel.getRawParameterValue(CLASS_PARAMETER).orElse(null);
     if (refParameterValue != null && classParameterValue != null) {
       throw new RuntimeConfigurationException(createStaticMessage(format("Object cannot contain both '%s' and '%s' parameters. Offending resource is '%s'",
                                                                          REF_PARAMETER, CLASS_PARAMETER,
-                                                                         componentModel.getComponentLocation())));
+                                                                         componentModel.getLocation())));
     }
     if (refParameterValue == null && classParameterValue == null) {
       throw new RuntimeConfigurationException(createStaticMessage(format("Object must contain '%s' or '%s' parameter. Offending resource is '%s'",
                                                                          REF_PARAMETER, CLASS_PARAMETER,
-                                                                         componentModel.getComponentLocation())));
+                                                                         componentModel.getLocation())));
     }
 
     if (refParameterValue != null) {
-      componentModel.setBeanReference(new RuntimeBeanReference(refParameterValue));
+      createBeanDefinitionRequest.getSpringComponentModel().setBeanReference(new RuntimeBeanReference(refParameterValue));
     }
     if (classParameterValue != null) {
       BeanDefinitionBuilder beanDefinitionBuilder;
@@ -66,7 +70,7 @@ class ObjectBeanDefinitionCreator extends BeanDefinitionCreator {
 
       beanDefinitionBuilder = rootBeanDefinition(addAnnotationsToClass(classParameter));
       processMuleProperties(componentModel, beanDefinitionBuilder, null);
-      componentModel.setBeanDefinition(beanDefinitionBuilder.getBeanDefinition());
+      createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(beanDefinitionBuilder.getBeanDefinition());
     }
     return true;
   }

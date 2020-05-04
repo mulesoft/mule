@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ERROR_HANDLER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ON_ERROR;
@@ -24,19 +22,13 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.config.internal.dsl.model.ComponentLocationVisitor;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
-import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
@@ -64,51 +56,48 @@ public class ComponentModelHelper {
             : componentModel.getIdentifier());
   }
 
-  public static boolean isAnnotatedObject(ComponentModel componentModel) {
-    return isOfType(componentModel, Component.class)
+  public static boolean isAnnotatedObject(SpringComponentModel springComponentModel) {
+    return isOfType(springComponentModel, Component.class)
         // ValueResolver end up generating pojos from the extension whose class is enhanced to have annotations
-        || isOfType(componentModel, ValueResolver.class);
+        || isOfType(springComponentModel, ValueResolver.class);
   }
 
   public static boolean isProcessor(ComponentAst componentModel) {
     if (componentModel.getIdentifier().equals(REDELIVERY_POLICY_IDENTIFIER)) {
       return false;
     }
-    return isOfType((ComponentModel) componentModel, Processor.class)
-        || isOfType((ComponentModel) componentModel, InterceptingMessageProcessor.class)
-        || componentModel.getComponentType().equals(OPERATION)
+    return componentModel.getComponentType().equals(OPERATION)
         || componentModel.getComponentType().equals(ROUTER)
         || componentModel.getComponentType().equals(SCOPE);
   }
 
   public static boolean isMessageSource(ComponentAst componentModel) {
-    return isOfType((ComponentModel) componentModel, MessageSource.class)
-        || componentModel.getComponentType().equals(SOURCE);
+    return componentModel.getComponentType().equals(SOURCE);
   }
 
   public static boolean isErrorHandler(ComponentAst componentModel) {
-    return isOfType((ComponentModel) componentModel, ErrorHandler.class)
-        || componentModel.getComponentType().equals(ERROR_HANDLER);
+    return componentModel.getComponentType().equals(ERROR_HANDLER);
   }
 
   public static boolean isTemplateOnErrorHandler(ComponentAst componentModel) {
     return componentModel.getComponentType().equals(ON_ERROR);
   }
 
-  private static boolean isOfType(ComponentModel componentModel, Class type) {
-    Class<?> componentModelType = componentModel.getType();
+  private static boolean isOfType(SpringComponentModel springComponentModel, Class type) {
+    Class<?> componentModelType = springComponentModel.getType();
     if (componentModelType == null) {
       return false;
     }
     return CommonBeanDefinitionCreator.areMatchingTypes(type, componentModelType);
   }
 
-  public static void addAnnotation(QName annotationKey, Object annotationValue, SpringComponentModel componentModel) {
+  public static void addAnnotation(QName annotationKey, Object annotationValue, SpringComponentModel springComponentModel) {
     // TODO MULE-10970 - remove condition once everything is AnnotatedObject.
-    if (!ComponentModelHelper.isAnnotatedObject(componentModel) && !componentModel.getIdentifier().getName().equals("flow-ref")) {
+    if (!ComponentModelHelper.isAnnotatedObject(springComponentModel)
+        && !springComponentModel.getComponent().getIdentifier().getName().equals("flow-ref")) {
       return;
     }
-    BeanDefinition beanDefinition = componentModel.getBeanDefinition();
+    BeanDefinition beanDefinition = springComponentModel.getBeanDefinition();
     if (beanDefinition == null) {
       // This is the case of components that are references
       return;
@@ -130,24 +119,7 @@ public class ComponentModelHelper {
     annotations.put(annotationKey, annotationValue);
   }
 
-  public static <T> Optional<T> getAnnotation(QName annotationKey, SpringComponentModel componentModel) {
-    if (componentModel.getBeanDefinition() == null) {
-      return empty();
-    }
-    PropertyValue propertyValue =
-        componentModel.getBeanDefinition().getPropertyValues().getPropertyValue(ANNOTATIONS_PROPERTY_NAME);
-    Map<QName, Object> annotations;
-    if (propertyValue == null) {
-      return empty();
-    } else {
-      annotations = (Map<QName, Object>) propertyValue.getValue();
-      return ofNullable((T) annotations.get(annotationKey));
-    }
-  }
-
   public static boolean isRouter(ComponentAst componentModel) {
-    return ComponentLocationVisitor.BATCH_JOB_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier())
-        || ComponentLocationVisitor.BATCH_PROCESSS_RECORDS_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier())
-        || componentModel.getComponentType().equals(ROUTER);
+    return componentModel.getComponentType().equals(ROUTER);
   }
 }

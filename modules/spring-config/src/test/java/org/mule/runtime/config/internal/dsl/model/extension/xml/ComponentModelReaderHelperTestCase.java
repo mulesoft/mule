@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.model.extension.xml;
 
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
@@ -14,17 +15,19 @@ import static org.custommonkey.xmlunit.XMLUnit.setIgnoreAttributeOrder;
 import static org.custommonkey.xmlunit.XMLUnit.setIgnoreComments;
 import static org.custommonkey.xmlunit.XMLUnit.setIgnoreWhitespace;
 import static org.custommonkey.xmlunit.XMLUnit.setNormalizeWhitespace;
-import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.ComponentModelReaderHelper.PASSWORD_MASK;
-import org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader;
+import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
+
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
+import org.mule.runtime.config.internal.dsl.xml.XmlNamespaceInfoProviderSupplier;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
+import org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader;
 import org.mule.runtime.dsl.internal.xml.parser.XmlApplicationParser;
-import org.mule.runtime.config.internal.dsl.xml.XmlNamespaceInfoProviderSupplier;
 
 import java.io.InputStream;
 import java.util.List;
@@ -128,14 +131,14 @@ public class ComponentModelReaderHelperTestCase {
         "    </flow>" +
         "\n" +
         "</mule>";
-    String applicationXml = String.format(format, "Sanchez", "Smith");
-    String expectedXml = String.format(format, PASSWORD_MASK, PASSWORD_MASK);
+    String applicationXml = format(format, "Sanchez", "Smith");
+    String expectedXml = format(format, PASSWORD_MASK, PASSWORD_MASK);
     compareXML(applicationXml, expectedXml);
   }
 
   private void compareXML(String inputXml, String expectedXml) throws Exception {
-    ComponentModel componentModel = getComponentModel(inputXml);
-    String actualXml = ComponentModelReaderHelper.toXml(componentModel);
+    ComponentAst componentModel = getComponentModel(inputXml);
+    String actualXml = ComponentModelReaderHelper.toXml((ComponentModel) componentModel);
 
     setNormalizeWhitespace(true);
     setIgnoreWhitespace(true);
@@ -157,7 +160,7 @@ public class ComponentModelReaderHelperTestCase {
     }
   }
 
-  private ComponentModel getComponentModel(String applicationXml) {
+  private ComponentAst getComponentModel(String applicationXml) {
     String filename = "file-app-config-name.xml";
     InputStream inputStream = toInputStream(applicationXml, UTF_8);
     XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader = noValidationDocumentLoader();
