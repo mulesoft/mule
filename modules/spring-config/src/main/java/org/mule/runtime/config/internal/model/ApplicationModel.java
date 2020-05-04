@@ -603,8 +603,6 @@ public class ApplicationModel implements ArtifactAst {
             ((ComponentModel) componentModel).setComponentType(ROUTER);
           } else
 
-          // if (areMatchingTypes(ErrorHandler.class, type)) {
-          // ((ComponentModel) componentModel).setComponentType(ERROR_HANDLER);
           if (CommonBeanDefinitionCreator.areMatchingTypes(MessageSource.class, type)) {
             ((ComponentModel) componentModel).setComponentType(SOURCE);
           } else if (CommonBeanDefinitionCreator.areMatchingTypes(Processor.class, type)) {
