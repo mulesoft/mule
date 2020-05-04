@@ -8,6 +8,7 @@
 package org.mule.runtime.core.internal.util.store;
 
 import static java.lang.String.format;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.Collections.unmodifiableList;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -251,6 +252,15 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
     }
   }
 
+  private void createInnerDirectories(File file) {
+    File parentFile = file.getParentFile();
+    if (parentFile.exists()) {
+      return;
+    }
+    createInnerDirectories(parentFile);
+    parentFile.mkdir();
+  }
+
   private void moveToCorruptedFilesFolder(File file) throws IOException {
     Path workingDirectory = (new File(muleContext.getConfiguration().getWorkingDirectory()))
         .toPath().normalize();
@@ -261,7 +271,8 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
       corruptedDir.mkdir();
     }
     File corruptedFile = new File(corruptedDir.getAbsolutePath() + File.separator + relativePath.toString());
-    Files.move(file.toPath(), corruptedFile.getParentFile().toPath());
+    createInnerDirectories(corruptedFile);
+    Files.move(file.toPath(), corruptedFile.toPath(), REPLACE_EXISTING);
   }
 
   private void loadStoredKeysAndFileNames() throws ObjectStoreException {
