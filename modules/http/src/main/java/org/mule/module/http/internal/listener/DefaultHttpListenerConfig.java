@@ -320,11 +320,11 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject implement
 
     public void stopServer()
     {
-        server.stop();
         if (server instanceof GrizzlyServer)
         {
-            ((GrizzlyServer) server).cleanIdleConnections();
+            ((GrizzlyServer) server).setCleanIdleConnections(true);
         }
+        server.stop();
     }
 
     private String listenerUrl()

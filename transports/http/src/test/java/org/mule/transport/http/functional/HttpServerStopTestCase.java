@@ -7,7 +7,6 @@
 package org.mule.transport.http.functional;
 
 import static java.lang.String.format;
-import static java.lang.Thread.sleep;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -29,14 +28,16 @@ import org.apache.commons.httpclient.HttpVersion;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpServerStopTestCase extends FunctionalTestCase
 {
+    private static final int POLL_TIMEOUT_MILLIS = 300;
+    private static final int POLL_DELAY_MILLIS = 50;
+    private static final String SLOW_PROCESSING_ENDPOINT = "/slow";
+    private static final String FAST_PROCESSING_ENDPOINT = "/path";
 
-    public static final int POLL_TIMEOUT_MILLIS = 300;
-    public static final int POLL_DELAY_MILLIS = 50;
-    public static final String SLOW_PROCESSING_ENDPOINT = "/slow";
-    public static final String FAST_PROCESSING_ENDPOINT = "/path";
     @Rule
     public DynamicPort dynamicPort = new DynamicPort("listener.port");
 
@@ -69,15 +70,14 @@ public class HttpServerStopTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void requestInflightDuringShutdownIsRespondedIncludingConnectionCloseHeader() throws IOException, InterruptedException, MuleException
+    public void requestInflightDuringShutdownIsRespondedIncludingConnectionCloseHeader() throws IOException, InterruptedException
     {
         Thread stopper = new MuleContextStopper();
         try (Socket slowRequestConnection = new Socket("localhost", dynamicPort.getNumber()))
         {
             sendRequest(slowRequestConnection, SLOW_PROCESSING_ENDPOINT);
 
-            // Give some time to the listener to parse the request and start an event, and stop mule in parallel.
-            sleep(100);
+            // Stop mule in parallel.
             stopper.start();
 
             // Response is ok, but connection close header is added.
@@ -92,7 +92,7 @@ public class HttpServerStopTestCase extends FunctionalTestCase
     }
 
     @Test
-    public void closeIdleConnectionsWhenServerIsStoppedWhileThereIsAnInflightRequest() throws IOException, MuleException, InterruptedException
+    public void closeIdleConnectionsWhenServerIsStoppedWhileThereIsAnInflightRequest() throws IOException, InterruptedException
     {
         Thread stopper = new MuleContextStopper();
         try (Socket idlePersistentConnection = generateIdlePersistentConnection())
@@ -101,8 +101,7 @@ public class HttpServerStopTestCase extends FunctionalTestCase
             {
                 sendRequest(slowRequestConnection, SLOW_PROCESSING_ENDPOINT);
 
-                // Give some time to the listener to parse the request and start an event, and stop mule in parallel.
-                sleep(100);
+                // Stop mule in parallel.
                 stopper.start();
 
                 // The first connection is closed before the second finishes processing.
@@ -166,7 +165,6 @@ public class HttpServerStopTestCase extends FunctionalTestCase
     }
 
     private static class MuleContextStopper extends Thread {
-
         @Override
         public void run()
         {
