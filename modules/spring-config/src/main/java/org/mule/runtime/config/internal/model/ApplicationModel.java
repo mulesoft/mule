@@ -601,9 +601,7 @@ public class ApplicationModel implements ArtifactAst {
           if (ComponentLocationVisitor.BATCH_JOB_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier())
               || ComponentLocationVisitor.BATCH_PROCESSS_RECORDS_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier())) {
             ((ComponentModel) componentModel).setComponentType(ROUTER);
-          } else
-
-          if (CommonBeanDefinitionCreator.areMatchingTypes(MessageSource.class, type)) {
+          } else if (CommonBeanDefinitionCreator.areMatchingTypes(MessageSource.class, type)) {
             ((ComponentModel) componentModel).setComponentType(SOURCE);
           } else if (CommonBeanDefinitionCreator.areMatchingTypes(Processor.class, type)) {
             ((ComponentModel) componentModel).setComponentType(OPERATION);

@@ -52,9 +52,7 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
 
       final String value = componentModel.getTextContent() != null
           ? componentModel.getTextContent()
-          : (parameters.values().isEmpty()
-              ? null
-              : parameters.values().iterator().next());
+          : parameters.values().stream().findFirst().orElse(null);
       if (value == null) {
         throw new MuleRuntimeException(createStaticMessage("Parameter at %s:%s must provide a non-empty value",
                                                            componentModel.getMetadata().getFileName()

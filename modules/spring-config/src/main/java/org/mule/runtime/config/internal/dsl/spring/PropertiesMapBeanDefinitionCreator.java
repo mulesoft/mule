@@ -69,7 +69,7 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator {
     Object value = resolveValue(componentModel.getRawParameterValue(VALUE_ATTRIBUTE).orElse(null),
                                 componentModel.getRawParameterValue(VALUE_REF_ATTRIBUTE).orElse(null));
     if (value == null) {
-      value = resolveValueFromChild(componentModel.directChildrenStream().findFirst().get());
+      value = resolveValueFromChild(componentModel.directChildrenStream().findFirst().orElse(null));
     }
     managedMap.put(key, value);
   }

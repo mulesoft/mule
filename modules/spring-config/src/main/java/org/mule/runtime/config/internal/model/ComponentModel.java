@@ -318,14 +318,17 @@ public class ComponentModel implements ComponentAst {
                   .orElseThrow(() -> {
                     // Try to provide as much troubleshooting information as possible
                     final String msgPrefix = format("Wanted paramName '%s' from object '%s'.", paramNameKey,
-                                                    getModel(NamedObject.class).map(n -> n.getName()).orElse("(null)"));
+                                                    getModel(NamedObject.class)
+                                                        .map(NamedObject::getName)
+                                                        .orElse("(null)"));
 
                     if (!getModel(ParameterizedModel.class).isPresent()) {
                       return new NoSuchElementException(msgPrefix + " The model is not parameterizable.");
                     } else {
                       final List<String> availableParams = getModel(ParameterizedModel.class).get().getAllParameterModels()
                           .stream()
-                          .map(pm -> pm.getName()).collect(toList());
+                          .map(NamedObject::getName)
+                          .collect(toList());
                       return new NoSuchElementException(msgPrefix + " Available: " + availableParams);
                     }
                   }));
@@ -407,9 +410,7 @@ public class ComponentModel implements ComponentAst {
             return tryAdvance(action);
           }
         } else {
-          if (innerSpliterator.tryAdvance(cm -> {
-            currentChildSpliterator = cm.recursiveSpliterator();
-          })) {
+          if (innerSpliterator.tryAdvance(cm -> currentChildSpliterator = cm.recursiveSpliterator())) {
             return tryAdvance(action);
           } else {
             return false;
@@ -565,7 +566,7 @@ public class ComponentModel implements ComponentAst {
             .flatMap(g -> g.getParameterModels().stream())
             .collect(toList());
 
-        handleNestedParameters(ComponentModel.this, ((ComponentAst) ComponentModel.this).directChildrenStream()
+        handleNestedParameters(ComponentModel.this, ComponentModel.this.directChildrenStream()
             .filter(childComp -> childComp != ComponentModel.this),
                                nestedComponents, extensionModelHelper,
                                model,
@@ -600,7 +601,7 @@ public class ComponentModel implements ComponentAst {
 
           ComponentModel groupComponent = getSingleComponentModel(nestedComponents, groupIdentifier);
           if (groupComponent != null) {
-            handleNestedParameters(this, ((ComponentAst) groupComponent).directChildrenStream()
+            handleNestedParameters(this, groupComponent.directChildrenStream()
                 .filter(childComp -> childComp != groupComponent), getNestedComponents(groupComponent), extensionModelHelper,
                                    new ParameterizedModel() {
 
@@ -666,8 +667,9 @@ public class ComponentModel implements ComponentAst {
   private void handleNestedParametersWithoutPopulatingObjectTypes(ComponentModel componentModel,
                                                                   ExtensionModelHelper extensionModelHelper,
                                                                   ParameterizedModel model) {
-    ((ComponentAst) componentModel)
-        .recursiveStream().forEach(childComp -> extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
+    componentModel
+        .recursiveStream()
+        .forEach(childComp -> extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
             // do not handle the callback parameters from the sources
             .filter(paramModel -> {
               if (model instanceof SourceModel) {
@@ -1049,7 +1051,7 @@ public class ComponentModel implements ComponentAst {
   @Deprecated
   public String getNameAttribute() {
     if (this instanceof ComponentAst) {
-      return ((ComponentAst) this).getComponentId()
+      return getComponentId()
           .orElseGet(() -> parameters.get(ApplicationModel.NAME_ATTRIBUTE));
     } else {
       return parameters.get(ApplicationModel.NAME_ATTRIBUTE);
@@ -1305,25 +1307,6 @@ public class ComponentModel implements ComponentAst {
     public Builder setSourceCode(String sourceCode) {
       checkIsNotBuildingFromRootComponentModel("sourceCode");
       this.metadataBuilder.setSourceCode(sourceCode);
-      return this;
-    }
-
-    /**
-     * Given the following root component it will merge its customAttributes, parameters and schemaValueParameters to the root
-     * component model.
-     *
-     * @param otherRootComponentModel another component model created as root to be merged.
-     * @return the builder.
-     */
-    public Builder merge(ComponentModel otherRootComponentModel) {
-      ((ComponentAst) otherRootComponentModel).getMetadata().getParserAttributes()
-          .forEach((k, v) -> this.metadataBuilder.putParserAttribute(k, v));
-      ((ComponentAst) otherRootComponentModel).getMetadata().getDocAttributes()
-          .forEach((k, v) -> this.metadataBuilder.putDocAttribute(k, v));
-      this.root.parameters.putAll(otherRootComponentModel.parameters);
-      this.root.schemaValueParameter.addAll(otherRootComponentModel.schemaValueParameter);
-
-      this.root.innerComponents.addAll(otherRootComponentModel.innerComponents);
       return this;
     }
 

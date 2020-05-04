@@ -66,7 +66,7 @@ public class PropertyComponentUtils {
         }
         propertiesMap.put(mapEntry.getRawParameters().get(PROPERTY_NAME_MULE_PROPERTY_ATTRIBUTE), value);
       });
-      propertyValue = new Pair<>(propertyComponentModel.getNameAttribute(), propertiesMap);
+      propertyValue = new Pair<>(propertyComponentModel.getComponentId().orElse(null), propertiesMap);
     } else {
       throw new MuleRuntimeException(createStaticMessage("Unrecognized property model identifier: "
           + propertyComponentModel.getInnerComponents().get(0).getIdentifier()));
