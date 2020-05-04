@@ -30,6 +30,7 @@ import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpa
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel.getUsedNamespaces;
 import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PROPERTY;
+import static org.mule.runtime.config.internal.model.type.ApplicationModelTypeUtils.resolveMetadataTypes;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
@@ -427,23 +428,25 @@ public final class XmlExtensionLoaderDelegate {
 
   private void loadModuleExtension(ExtensionDeclarer declarer, URL resource, Document moduleDocument,
                                    ExtensionModelHelper extensionModelHelper, boolean comesFromTNS) {
-    final ComponentModel moduleModel =
-        (ComponentModel) getModuleComponentModel(resource, moduleDocument, extensionModelHelper.getExtensionsModels());
+    ComponentAst moduleModel =
+        getModuleComponentModel(resource, moduleDocument, extensionModelHelper.getExtensionsModels());
     if (!moduleModel.getIdentifier().equals(MODULE_IDENTIFIER)) {
       throw new MuleRuntimeException(createStaticMessage(format("The root element of a module must be '%s', but found '%s'",
                                                                 MODULE_IDENTIFIER.toString(),
                                                                 moduleModel.getIdentifier().toString())));
     }
 
-    moduleModel.resolveTypedComponentIdentifier(extensionModelHelper, true);
+    resolveMetadataTypes(extensionModelHelper, moduleModel.recursiveStream());
+    ((ComponentModel) moduleModel).resolveTypedComponentIdentifier(extensionModelHelper, true);
+    recursiveStreamWithHierarchy(moduleModel).forEach(new ComponentLocationVisitor());
 
-    final String name = moduleModel.getRawParameters().get(MODULE_NAME);
+    final String name = moduleModel.getRawParameterValue(MODULE_NAME).orElse(null);
     final String version = "4.0.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
-    final String category = moduleModel.getRawParameters().get(CATEGORY);
-    final String vendor = moduleModel.getRawParameters().get(VENDOR);
+    final String category = moduleModel.getRawParameterValue(CATEGORY).orElse(null);
+    final String vendor = moduleModel.getRawParameterValue(VENDOR).orElse(null);
     final XmlDslModel xmlDslModel = getXmlDslModel(moduleModel, name, version);
     final String description = getDescription(moduleModel);
-    final String xmlnsTnsValue = moduleModel.getRawParameters().get(XMLNS_TNS);
+    final String xmlnsTnsValue = moduleModel.getRawParameterValue(XMLNS_TNS).orElse(null);
     if (xmlnsTnsValue != null && !xmlDslModel.getNamespace().equals(xmlnsTnsValue)) {
       throw new MuleRuntimeException(createStaticMessage(format("The %s attribute value of the module must be '%s', but found '%s'",
                                                                 XMLNS_TNS,
@@ -453,7 +456,7 @@ public final class XmlExtensionLoaderDelegate {
     resourcesPaths.stream().forEach(declarer::withResource);
 
     fillDeclarer(declarer, name, version, category, vendor, xmlDslModel, description);
-    declarer.withModelProperty(getXmlExtensionModelProperty(moduleModel, xmlDslModel));
+    declarer.withModelProperty(getXmlExtensionModelProperty((ComponentModel) moduleModel, xmlDslModel));
 
     Graph<String, DefaultEdge> directedGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
     // loading public operations
@@ -535,11 +538,10 @@ public final class XmlExtensionLoaderDelegate {
   private void enrichModuleModel(final ComponentAst moduleModel, ExtensionModel result,
                                  ExtensionModelHelper extensionModelHelper) {
     // TODO MULE-17419 (AST) Set all models, not just for operations (routers/scopes are missing here for sure)
-    moduleModel.recursiveStream().forEach(comp -> result.getOperationModel(comp.getIdentifier().getName())
-        .ifPresent(model -> ((ComponentModel) comp).setComponentModel(model)));
-
-    final ComponentLocationVisitor clv = new ComponentLocationVisitor();
-    recursiveStreamWithHierarchy(moduleModel).forEach(clv);
+    moduleModel.recursiveStream()
+        .filter(comp -> TNS_PREFIX.equals(comp.getIdentifier().getNamespace()))
+        .forEach(comp -> result.getOperationModel(comp.getIdentifier().getName())
+            .ifPresent(model -> ((ComponentModel) comp).setComponentModel(model)));
   }
 
   private ExtensionModel createExtensionModel(ExtensionDeclarer declarer) {
@@ -576,9 +578,9 @@ public final class XmlExtensionLoaderDelegate {
     return new XmlExtensionModelProperty(namespaceDependencies);
   }
 
-  private XmlDslModel getXmlDslModel(ComponentModel moduleModel, String name, String version) {
-    final Optional<String> prefix = ofNullable(moduleModel.getRawParameters().get(MODULE_PREFIX_ATTRIBUTE));
-    final Optional<String> namespace = ofNullable(moduleModel.getRawParameters().get(MODULE_NAMESPACE_ATTRIBUTE));
+  private XmlDslModel getXmlDslModel(ComponentAst moduleModel, String name, String version) {
+    final Optional<String> prefix = moduleModel.getRawParameterValue(MODULE_PREFIX_ATTRIBUTE);
+    final Optional<String> namespace = moduleModel.getRawParameterValue(MODULE_NAMESPACE_ATTRIBUTE);
     return createXmlLanguageModel(prefix, namespace, name, version);
   }
 

@@ -368,11 +368,14 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   }
 
   /**
-   * Configure the nested {@link Processor}'s that error handling and transactional behaviour should be applied to.
+   * Configure the nested {@link Processor}'s of the XML SDK operation.
    *
    * @param processors
    */
   public void setMessageProcessors(List<Processor> processors) {
+    if (processors.isEmpty()) {
+      throw new IllegalArgumentException("'processors' cannot be empty.");
+    }
     this.processors = processors;
   }
 
