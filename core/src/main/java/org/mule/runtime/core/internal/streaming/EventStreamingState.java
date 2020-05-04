@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
+import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
+
 import java.lang.ref.WeakReference;
 
 import com.github.benmanes.caffeine.cache.Cache;
@@ -38,7 +40,7 @@ public class EventStreamingState {
     // managed decorator from that previous iteration has been collected, which causes the weak reference to yield
     // a null value. In which case we simply track it again.
     if (managedProvider == null) {
-      synchronized (provider.getDelegate()) {
+      synchronized (unwrap(provider)) {
         managedProvider = getOrAddManagedProvider(id, provider, ghostBuster);
         if (managedProvider == null) {
           providers.invalidate(id);

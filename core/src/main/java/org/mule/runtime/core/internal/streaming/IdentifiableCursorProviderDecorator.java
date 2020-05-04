@@ -17,6 +17,17 @@ import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * A decorator that turns any {@link CursorProvider} into an {@link IdentifiableCursorProvider}.
+ * <p>
+ * If the decoratee is already an {@link IdentifiableCursorProvider} or ({@link CursorProviderDecorator} of one), then this
+ * decorator will yield the same id as the input identifiable provider. If this is not the case, an ID will be generaetd.
+ * <p>
+ * Instances are to be created through the {@link #of(CursorProvider)} factory method.
+ *
+ * @param <T> the generic {@link Cursor} type as defined in {@link CursorProvider}
+ * @since 4.3.0 - 4.2.3
+ */
 public abstract class IdentifiableCursorProviderDecorator<T extends Cursor> extends CursorProviderDecorator<T>
     implements IdentifiableCursorProvider<T> {
 
@@ -24,13 +35,24 @@ public abstract class IdentifiableCursorProviderDecorator<T extends Cursor> exte
 
   private final int id;
 
+  /**
+   * Creates a new decorator for the given {@code cursorProvider}.
+   * <p>
+   * If the {@code cursorProvider} is already an {@link IdentifiableCursorProvider}, then the returned decorator will yield the
+   * same id as the input {@code cursorProvider}. If {@code cursorProvider} is a {@link CursorProviderDecorator}, then the
+   * {@link CursorProviderDecorator#getDelegate()} will be recursively be tested to find if any delegate in the chain is
+   * identifiable. If such delegate is found, then the same {@code id} will be reused. Otherwise, one will be generated.
+   *
+   * @param cursorProvider the decoratee
+   * @param <T>            the generic {@link Cursor} type
+   * @return a new decorator.
+   */
   public static <T extends Cursor> IdentifiableCursorProviderDecorator<T> of(CursorProvider<T> cursorProvider) {
     final CursorProvider<T> root = cursorProvider;
     Integer id = null;
     do {
       if (cursorProvider instanceof IdentifiableCursorProvider) {
         id = ((IdentifiableCursorProvider<T>) cursorProvider).getId();
-        cursorProvider = CursorUtils.unwrap(cursorProvider);
         break;
       }
 

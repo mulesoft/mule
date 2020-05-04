@@ -12,6 +12,16 @@ import org.mule.runtime.api.streaming.CursorProvider;
 
 import java.util.Optional;
 
+/**
+ * Base class for applying the decorator pattern over instances of a {@link CursorProvider}.
+ * <p>
+ * All decorators <b>MUST</b> extend this class so that the framework can leeverate the {@link #getDelegate()} method in order
+ * to traverse the decorators chain in order to asses if certain behaviors are already applied or to reach the originally wrapped
+ * instance.
+ *
+ * @param <T> the generic {@link Cursor} type as defined in {@link CursorProvider}
+ * @since 4.3.0 - 4.2.3
+ */
 public abstract class CursorProviderDecorator<T extends Cursor> implements CursorProvider<T> {
 
   protected final CursorProvider<T> delegate;
@@ -20,6 +30,9 @@ public abstract class CursorProviderDecorator<T extends Cursor> implements Curso
     this.delegate = delegate;
   }
 
+  /**
+   * @return The wrapped instance. Might actually be another {@link CursorProviderDecorator}
+   */
   public CursorProvider<T> getDelegate() {
     return delegate;
   }
