@@ -112,8 +112,9 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
             isWithinSourcePolicy(me.getFailingComponent().getLocation())) {
           return policyEventMapper.fromPolicyNext(event);
         } else {
-          return policyEventMapper.onFlowError(policyEventMapper.fromPolicyNext(event), getPolicyId(),
-                                               SourcePolicyContext.from(event).getParametersTransformer());
+          return policyEventMapper.fromPolicyNext(policyEventMapper.onFlowError(event, getPolicyId(),
+                                                                                SourcePolicyContext.from(event)
+                                                                                    .getParametersTransformer()));
         }
       }, notificationHelper, getLocation());
     } else {
