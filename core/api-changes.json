@@ -2,6 +2,24 @@
   "4.1.5": {
     "revapi": {
       "ignore": [
+       {
+         "code": "java.method.added",
+         "new": "method boolean org.mule.runtime.core.api.util.SystemUtils::isAdoptOpenJDK()",
+         "package": "org.mule.runtime.core.api.util",
+         "classSimpleName": "SystemUtils",
+         "methodName": "isAdoptOpenJDK",
+         "elementKind": "method",
+         "justification": "cherry-pick"
+       },
+       {
+         "code": "java.method.added",
+         "new": "method boolean org.mule.runtime.core.api.util.SystemUtils::isOpenJDK()",
+         "package": "org.mule.runtime.core.api.util",
+         "classSimpleName": "SystemUtils",
+         "methodName": "isOpenJDK",
+         "elementKind": "method",
+         "justification": "cherry-pick"
+        },
         {
           "code": "java.method.added",
           "new": "method void org.mule.runtime.core.api.streaming.DefaultStreamingManager::manage(java.io.Closeable, org.mule.runtime.api.event.EventContext)",
