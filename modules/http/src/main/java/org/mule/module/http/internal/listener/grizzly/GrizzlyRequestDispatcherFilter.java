@@ -86,15 +86,6 @@ public class GrizzlyRequestDispatcherFilter extends BaseFilter
             return ctx.getStopAction();
         }
 
-        // handle the case when the server is already shutdown
-        Object serverConnection = ctx.getConnection().getAttributes().getAttribute("Server Connection");
-        if (serverConnection instanceof TCPNIOServerConnection) {
-            if (!((TCPNIOServerConnection) serverConnection).isOpen()) {
-                ctx.getConnection().closeSilently();
-                return ctx.getStopAction();
-            }
-        }
-
         // Handle Expect Continue
         if (request.requiresAcknowledgement())
         {
