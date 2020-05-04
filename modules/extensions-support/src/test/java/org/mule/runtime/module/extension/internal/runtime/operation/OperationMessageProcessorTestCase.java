@@ -17,6 +17,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
@@ -411,6 +412,17 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     verify(mockPolicyManager).createOperationPolicy(eq(messageProcessor), same(event), any(OperationParametersProcessor.class));
     verify(mockOperationPolicy).process(same(event), any(OperationExecutionFunction.class), any(), any(), any());
+  }
+
+  @Test
+  public void executeWithPolicyReturnsOperationResultOnTarget() {
+    fail("implenet");
+    // Assert return delegate only once
+  }
+
+  @Test
+  public void executeReturnsOperationResultButKeepsAttributes() {
+    fail("implenet");
   }
 
   @Test

@@ -10,8 +10,10 @@ import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -60,12 +62,15 @@ import static reactor.core.publisher.Mono.subscriberContext;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.el.CompiledExpression;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -152,7 +157,6 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
@@ -196,6 +200,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected final ResolverSet resolverSet;
   protected final String target;
   protected final String targetValue;
+
   protected final RetryPolicyTemplate retryPolicyTemplate;
 
   private Optional<TransactionConfig> transactionConfig;
@@ -226,6 +231,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected ExecutionMediator executionMediator;
   protected CompletableComponentExecutor componentExecutor;
   protected ReturnDelegate returnDelegate;
+  protected ReturnDelegate valueReturnDelegate;
+  protected CompiledExpression targetValueCompiledExpression;
   protected PolicyManager policyManager;
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
@@ -411,8 +418,54 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       if (location != null) {
         ((DefaultFlowCallStack) event.getFlowCallStack())
             .pushCurrentProcessorPath(resolvedProcessorRepresentation);
+
+        Function<CoreEvent, CoreEvent> resultMapper = isTargetWithPolicies(event) ? (policyResult) -> {
+          if (returnDelegate instanceof PayloadTargetReturnDelegate) {
+            return CoreEvent.builder(event)
+                .addVariable(target, policyResult.getMessage().getPayload())
+                .build();
+          } else {
+            try (ExpressionLanguageSession session =
+                expressionManager.openSession(getTargetBindingContext(policyResult.getMessage()))) {
+              return CoreEvent.builder(event)
+                  .addVariable(target, session.evaluate(targetValueCompiledExpression))
+                  .build();
+            }
+          }
+        } : identity();
+
+        ExecutorCallback effectiveCallback = new ExecutorCallback() {
+
+          @Override
+          public void complete(Object o) {
+            try {
+              CoreEvent policyResult = resultMapper.apply((CoreEvent) o);
+              executorCallback.complete(policyResult);
+            } catch (Throwable t) {
+              // WTF should I do here??
+              executorCallback.error(t);
+            }
+          }
+
+          @Override
+          public void error(Throwable throwable) {
+            //            if (throwable instanceof MessagingException) {
+            //              CoreEvent event = ((MessagingException) throwable).getEvent();
+            //              try {
+            //                CoreEvent newEvent = resultMapper.apply(event);
+            //                throwable = new MessagingException(newEvent, ((MessagingException) throwable));
+            //              } catch (Throwable t) {
+            //                // WTF should I do here??
+            //                // executorCallback.error(t);
+            //              }
+            //            }
+
+            executorCallback.error(throwable);
+          }
+        };
+
         sdkInternalContext.getPolicyToApply(location, eventId)
-            .process(event, operationExecutionFunction, () -> resolutionResult, location, executorCallback);
+            .process(event, operationExecutionFunction, () -> resolutionResult, location, effectiveCallback);
       } else {
         // If this operation has no component location then it is internal. Don't apply policies on internal operations.
         operationExecutionFunction.execute(resolutionResult, event, executorCallback);
@@ -443,7 +496,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
   }
 
-  private ExecutorCallback mapped(ExecutorCallback callback, ExecutionContextAdapter<T> operationContext) {
+  private ExecutorCallback mapped(ExecutorCallback callback, ExecutionContextAdapter<T> operationContext,
+                                  ReturnDelegate returnDelegate) {
     return new ExecutorCallback() {
 
       @Override
@@ -502,6 +556,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         throw new InitialisationException(createStaticMessage("Could not resolve transactional configuration"), e, this);
       }
       returnDelegate = createReturnDelegate();
+      valueReturnDelegate = getValueReturnDelegate();
+      targetValueCompiledExpression = expressionManager.compile(targetValue, getTargetBindingContext(Message.of("")));
       initialiseIfNeeded(resolverSet, muleContext);
       componentExecutor = createComponentExecutor();
       executionMediator = createExecutionMediator();
@@ -602,7 +658,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
                 from(event)
                     .getOperationExecutionParams(getLocation(), event.getContext().getId())
-                    .getCallback().error(((EventProcessingException) t).getCause());
+                    .getCallback().error(t.getCause());
               })));
     },
                                                 getRuntime().availableProcessors());
@@ -663,7 +719,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                                 currentScheduler);
     }
 
-    executeOperation(operationContext, mapped(callbackSupplier.get(), operationContext));
+    executeOperation(operationContext, mapped(callbackSupplier.get(),
+                                              operationContext,
+                                              isTargetWithPolicies(event) ? valueReturnDelegate : returnDelegate));
+  }
+
+  private boolean isTargetWithPolicies(CoreEvent event) {
+    return !SdkInternalContext.from(event).isNoPolicyOperation(getLocation(), event.getContext().getId()) && !isBlank(target);
   }
 
   private void initRetryPolicyResolver() {
@@ -683,8 +745,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private RetryPolicyTemplate fetchRetryPolicyTemplate(Optional<ConfigurationInstance> configuration) {
     RetryPolicyTemplate delegate = null;
     if (retryPolicyTemplate != null) {
-      delegate = configuration
-          .map(config -> config.getConnectionProvider().orElse(null))
+      delegate = configuration.flatMap(ConfigurationInstance::getConnectionProvider)
           .map(provider -> connectionManager.getReconnectionConfigFor(provider).getRetryPolicyTemplate(retryPolicyTemplate))
           .orElse(retryPolicyTemplate);
     }

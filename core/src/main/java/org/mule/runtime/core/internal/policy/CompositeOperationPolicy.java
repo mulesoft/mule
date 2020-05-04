@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
@@ -106,11 +107,10 @@ public class CompositeOperationPolicy
         .removalListener((String key, FluxSinkSupplier<CoreEvent> value, RemovalCause cause) -> {
           value.dispose();
         })
-        .build(componentLocation -> {
-          return new TransactionAwareFluxSinkSupplier<>(factory,
-                                                        new RoundRobinFluxSinkSupplier<>(getRuntime().availableProcessors(),
-                                                                                         factory));
-        });
+        .build(componentLocation -> new TransactionAwareFluxSinkSupplier<>(factory,
+                                                                           new RoundRobinFluxSinkSupplier<>(getRuntime()
+                                                                               .availableProcessors(),
+                                                                                                            factory)));
   }
 
   private static final class OperationWithPoliciesFluxObjectFactory implements Supplier<FluxSink<CoreEvent>> {
@@ -248,7 +248,36 @@ public class CompositeOperationPolicy
 
     policySink.next(operationEventForPolicy(operationEvent,
                                             operationExecutionFunction,
-                                            parametersProcessor, callback));
+                                            parametersProcessor,
+                                            new CompositeOperationPolicyExecutorCallback(callback)));
+  }
+
+  private static final class CompositeOperationPolicyExecutorCallback implements ExecutorCallback {
+
+    private final ExecutorCallback callback;
+
+    public CompositeOperationPolicyExecutorCallback(ExecutorCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void complete(Object o) {
+      callback.complete(o);
+    }
+
+    @Override
+    public void error(Throwable throwable) {
+      if (throwable instanceof MessagingException) {
+        CoreEvent event = ((MessagingException) throwable).getEvent();
+        OperationPolicyContext context = OperationPolicyContext.from(event);
+        // Restore original event if chain failed before or during operation
+        if (!event.equals(context.getOriginalEvent()) && context.getNextOperationResponse() == null) {
+          throwable = new MessagingException(context.getOriginalEvent(), ((MessagingException) throwable));
+        }
+      }
+
+      callback.error(throwable);
+    }
   }
 
   private CoreEvent operationEventForPolicy(CoreEvent operationEvent, OperationExecutionFunction operationExecutionFunction,
@@ -256,12 +285,16 @@ public class CompositeOperationPolicy
     OperationPolicyContext ctx = new OperationPolicyContext(parametersProcessor,
                                                             operationExecutionFunction,
                                                             callback);
+
+    ctx.setOriginalEvent(operationEvent);
+    ((InternalEvent) operationEvent).setOperationPolicyContext(ctx);
+
     if (getParametersTransformer().isPresent()) {
       operationEvent = InternalEvent.builder(operationEvent)
           .message(getParametersTransformer().get().fromParametersToMessage(parametersProcessor.getOperationParameters()))
           .build();
     }
-    ((InternalEvent) operationEvent).setOperationPolicyContext(ctx);
+
     return operationEvent;
   }
 
