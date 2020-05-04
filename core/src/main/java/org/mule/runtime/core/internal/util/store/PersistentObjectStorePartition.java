@@ -272,7 +272,7 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
     }
     File corruptedFile = new File(corruptedDir.getAbsolutePath() + File.separator + relativePath.toString());
     createInnerDirectories(corruptedFile);
-    Files.move(file.toPath(), corruptedFile.getParentFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
+    Files.move(file.toPath(), corruptedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
   }
 
   private void loadStoredKeysAndFileNames() throws ObjectStoreException {
