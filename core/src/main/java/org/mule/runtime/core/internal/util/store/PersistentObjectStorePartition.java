@@ -8,6 +8,7 @@
 package org.mule.runtime.core.internal.util.store;
 
 import static java.lang.String.format;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.Collections.unmodifiableList;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -41,7 +42,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -272,7 +272,7 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
     }
     File corruptedFile = new File(corruptedDir.getAbsolutePath() + File.separator + relativePath.toString());
     createInnerDirectories(corruptedFile);
-    Files.move(file.toPath(), corruptedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    Files.move(file.toPath(), corruptedFile.toPath(), REPLACE_EXISTING);
   }
 
   private void loadStoredKeysAndFileNames() throws ObjectStoreException {
