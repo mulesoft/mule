@@ -6,6 +6,7 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
+import static java.lang.Thread.currentThread;
 import org.mule.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.module.http.internal.listener.RequestHandlerManager;
 import org.mule.module.http.internal.listener.Server;
@@ -28,6 +29,10 @@ public class GrizzlyServer implements Server
     private TCPNIOServerConnection serverConnection;
     private boolean stopped = true;
     private boolean stopping;
+    private boolean shouldCleanIdleConnectionsOnStop;
+
+    private final Object openConnectionsSync = new Object();
+    private int openConnections = 0;
 
     public GrizzlyServer(ServerAddress serverAddress, TCPNIOTransport transport, HttpListenerRegistry listenerRegistry)
     {
@@ -45,6 +50,22 @@ public class GrizzlyServer implements Server
             public void onAcceptEvent(Connection serverConnection, Connection clientConnection)
             {
                 clientConnection.getAttributes().setAttribute("Server Connection", serverConnection);
+                synchronized (openConnectionsSync) {
+                    openConnections += 1;
+                }
+                clientConnection.getMonitoringConfig().addProbes(new ConnectionProbe.Adapter()
+                {
+                    @Override
+                    public void onCloseEvent(Connection connection)
+                    {
+                        synchronized (openConnectionsSync) {
+                            openConnections -= 1;
+                            if (openConnections == 0) {
+                                openConnectionsSync.notifyAll();
+                            }
+                        }
+                    }
+                });
             }
         });
         serverConnection = transport.bind(serverAddress.getIp(), serverAddress.getPort());
@@ -58,6 +79,20 @@ public class GrizzlyServer implements Server
         try
         {
             transport.unbind(serverConnection);
+            if (shouldCleanIdleConnectionsOnStop)
+            {
+                transport.setKeepAlive(false);
+
+                synchronized (openConnectionsSync) {
+                    if (openConnections != 0) {
+                        openConnectionsSync.wait(2000);
+                    }
+                }
+            }
+        }
+        catch (InterruptedException e)
+        {
+            currentThread().interrupt();
         }
         finally
         {
@@ -90,8 +125,8 @@ public class GrizzlyServer implements Server
         return this.listenerRegistry.addRequestHandler(this, requestHandler, listenerRequestMatcher);
     }
 
-    public void cleanIdleConnections()
+    public void setCleanIdleConnections(boolean value)
     {
-        transport.setKeepAlive(false);
+        shouldCleanIdleConnectionsOnStop = value;
     }
 }
