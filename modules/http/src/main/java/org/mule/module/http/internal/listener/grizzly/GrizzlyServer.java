@@ -125,8 +125,8 @@ public class GrizzlyServer implements Server
         return this.listenerRegistry.addRequestHandler(this, requestHandler, listenerRequestMatcher);
     }
 
-    public void setCleanIdleConnections()
+    public void setCleanIdleConnections(boolean value)
     {
-        shouldCleanIdleConnectionsOnStop = true;
+        shouldCleanIdleConnectionsOnStop = value;
     }
 }

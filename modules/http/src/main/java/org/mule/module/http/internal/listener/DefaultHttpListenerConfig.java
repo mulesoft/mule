@@ -322,7 +322,7 @@ public class DefaultHttpListenerConfig extends AbstractAnnotatedObject implement
     {
         if (server instanceof GrizzlyServer)
         {
-            ((GrizzlyServer) server).setCleanIdleConnections();
+            ((GrizzlyServer) server).setCleanIdleConnections(true);
         }
         server.stop();
     }
