@@ -63,7 +63,6 @@ import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
 import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
@@ -325,10 +324,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   @Override
   public void initializeComponents(ComponentLocationFilter filter, boolean applyStartPhase) {
-    applyLifecycle(createComponents(of(o -> {
-      ComponentModel componentModel = (ComponentModel) o;
-      if (componentModel.getComponentLocation() != null) {
-        return filter.accept(componentModel.getComponentLocation());
+    applyLifecycle(createComponents(of(componentModel -> {
+      if (componentModel.getLocation() != null) {
+        return filter.accept(componentModel.getLocation());
       }
       return false;
     }), empty(), applyStartPhase, getParentComponentModelInitializerAdapter(applyStartPhase)), applyStartPhase);

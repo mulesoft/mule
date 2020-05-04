@@ -8,8 +8,11 @@ package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
@@ -20,7 +23,6 @@ import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.SetterAttributeDefinition;
 import org.mule.runtime.dsl.api.component.TypeConverter;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -50,23 +52,19 @@ class ComponentConfigurationBuilder<T> {
   private final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper;
   private final ObjectReferencePopulator objectReferencePopulator = new ObjectReferencePopulator();
   private final List<ComponentValue> complexParameters;
-  private final Map<String, Object> simpleParameters;
-  private final ComponentModel componentModel;
+  private final ComponentAst componentModel;
   private final ComponentBuildingDefinition<T> componentBuildingDefinition;
 
   public ComponentConfigurationBuilder(Map<ComponentAst, SpringComponentModel> springComponentModels,
                                        ComponentAst componentModel, ComponentBuildingDefinition<T> componentBuildingDefinition,
                                        BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
-    this.componentModel = (ComponentModel) componentModel;
+    this.componentModel = componentModel;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.beanDefinitionBuilderHelper = beanDefinitionBuilderHelper;
-    this.simpleParameters = new HashMap<>(((ComponentModel) componentModel).getRawParameters());
     this.complexParameters = collectComplexParametersWithTypes(springComponentModels, componentModel);
   }
 
   public void processConfiguration() {
-    componentBuildingDefinition.getIgnoredConfigurationParameters().stream().forEach(simpleParameters::remove);
-
     for (SetterAttributeDefinition setterAttributeDefinition : componentBuildingDefinition.getSetterParameterDefinitions()) {
       AttributeDefinition attributeDefinition = setterAttributeDefinition.getAttributeDefinition();
       attributeDefinition.accept(setterVisitor(setterAttributeDefinition.getAttributeName(), attributeDefinition));
@@ -284,20 +282,18 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onReferenceSimpleParameter(final String configAttributeName) {
-      String reference = (String) simpleParameters.get(configAttributeName);
-      if (reference != null) {
-        this.value = new RuntimeBeanReference(reference);
+      if (!componentBuildingDefinition.getIgnoredConfigurationParameters().contains(configAttributeName)) {
+        componentModel.getRawParameterValue(configAttributeName)
+            .ifPresent(reference -> this.value = new RuntimeBeanReference(reference));
       }
-      simpleParameters.remove(configAttributeName);
     }
 
     @Override
     public void onSoftReferenceSimpleParameter(String softReference) {
-      String reference = (String) simpleParameters.get(softReference);
-      if (reference != null) {
-        this.value = reference;
+      if (!componentBuildingDefinition.getIgnoredConfigurationParameters().contains(softReference)) {
+        componentModel.getRawParameterValue(softReference)
+            .ifPresent(reference -> this.value = reference);
       }
-      simpleParameters.remove(softReference);
     }
 
     @Override
@@ -312,13 +308,16 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter) {
-      Object parameterValue = simpleParameters.get(parameterName);
-      simpleParameters.remove(parameterName);
-      parameterValue = ofNullable(parameterValue).orElse(defaultValue);
-      if (parameterValue != null) {
-        parameterValue = typeConverter.isPresent() ? typeConverter.get().convert(parameterValue) : parameterValue;
+      if (!componentBuildingDefinition.getIgnoredConfigurationParameters().contains(parameterName)) {
+        Object parameterValue = componentModel.getRawParameterValue(parameterName)
+            .map(v -> (Object) v)
+            .orElse(defaultValue);
+
+        if (parameterValue != null) {
+          parameterValue = typeConverter.isPresent() ? typeConverter.get().convert(parameterValue) : parameterValue;
+        }
+        this.value = parameterValue;
       }
-      this.value = parameterValue;
     }
 
     @Override
@@ -329,7 +328,13 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onUndefinedSimpleParameters() {
-      this.value = simpleParameters;
+      this.value = componentModel.getModel(ParameterizedModel.class)
+          .map(pm -> componentModel.getParameters().stream()
+              .filter(param -> !componentBuildingDefinition.getIgnoredConfigurationParameters()
+                  .contains(param.getModel().getName()))
+              .filter(param -> param.getRawValue() != null)
+              .collect(toMap(param -> param.getModel().getName(), param -> param.getRawValue())))
+          .orElse(null);
     }
 
     @Override
@@ -389,7 +394,7 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onValueFromTextContent() {
-      this.value = componentModel.getTextContent();
+      this.value = componentModel.getRawParameterValue(BODY_RAW_PARAM_NAME).orElse(null);
     }
 
     @Override

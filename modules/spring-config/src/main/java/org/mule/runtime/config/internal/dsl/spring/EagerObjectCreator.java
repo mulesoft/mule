@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.beanutils.BeanUtils.setProperty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
@@ -14,11 +15,11 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ro
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.SetterAttributeDefinition;
 
@@ -68,7 +69,12 @@ class EagerObjectCreator extends BeanDefinitionCreator {
 
           @Override
           public void onUndefinedSimpleParameters() {
-            Map<String, String> parameters = ((ComponentModel) componentModel).getRawParameters();
+            Map<String, String> parameters = componentModel.getModel(ParameterizedModel.class)
+                .map(pm -> componentModel.getParameters().stream()
+                    .filter(param -> param.getRawValue() != null)
+                    .collect(toMap(param -> param.getModel().getName(), param -> param.getRawValue())))
+                .orElse(null);
+
             String attributeName = setterAttributeDefinition.getAttributeName();
             try {
               setProperty(instance, attributeName, parameters);

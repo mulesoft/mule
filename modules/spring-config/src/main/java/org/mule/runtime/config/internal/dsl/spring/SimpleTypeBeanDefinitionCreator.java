@@ -7,12 +7,12 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.dsl.api.component.DslSimpleType.isSimpleType;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.TypeConverter;
 
 import java.util.Map;
@@ -37,22 +37,20 @@ class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
                         CreateBeanDefinitionRequest createBeanDefinitionRequest) {
     Class<?> type = createBeanDefinitionRequest.retrieveTypeVisitor().getType();
     if (isSimpleType(type)) {
-      ComponentModel componentModel = (ComponentModel) createBeanDefinitionRequest.getComponentModel();
+      ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
       createBeanDefinitionRequest.getSpringComponentModel().setType(type);
-      Map<String, String> parameters = componentModel.getRawParameters();
 
-      if (parameters.size() >= 2) {
-        // Component model has more than one parameter when it's supposed to have at most one parameter
-        return false;
-      }
-      if (componentModel.getTextContent() != null && !componentModel.getRawParameters().isEmpty()) {
+      final Optional<String> textContent = componentModel.getRawParameterValue(BODY_RAW_PARAM_NAME);
+      final Optional<String> valueParam = componentModel.getRawParameterValue("value");
+
+      if (textContent.isPresent() && valueParam.isPresent()) {
         // Component model has both a parameter and an inner content
         return false;
       }
 
-      final String value = componentModel.getTextContent() != null
-          ? componentModel.getTextContent()
-          : parameters.values().stream().findFirst().orElse(null);
+      String value = textContent
+          .orElseGet(() -> valueParam.orElse(null));
+
       if (value == null) {
         throw new MuleRuntimeException(createStaticMessage("Parameter at %s:%s must provide a non-empty value",
                                                            componentModel.getMetadata().getFileName()

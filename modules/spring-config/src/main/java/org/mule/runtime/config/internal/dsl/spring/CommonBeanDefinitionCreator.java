@@ -13,6 +13,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.beanutils.BeanUtils.copyProperty;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
+import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SPRING_PROTOTYPE_OBJECT;
 import static org.mule.runtime.config.internal.dsl.spring.PropertyComponentUtils.getPropertyValueFromPropertyComponent;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
@@ -131,7 +132,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
             .forEach(annotationCdm -> previousAnnotations
                 .put(new QName(annotationCdm.getIdentifier().getNamespaceUri(),
                                annotationCdm.getIdentifier().getName()),
-                     ((ComponentModel) annotationCdm).getTextContent())));
+                     annotationCdm.getRawParameterValue(BODY_RAW_PARAM_NAME).orElse(null))));
   }
 
   private void processAnnotations(SpringComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder) {
@@ -217,7 +218,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     }
     return componentModel.directChildrenStream()
         .filter(innerComponent -> innerComponent.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))
-        .map(springComponent -> getPropertyValueFromPropertyComponent((ComponentModel) springComponent))
+        .map(springComponent -> getPropertyValueFromPropertyComponent(springComponent))
         .collect(toMap(propValue -> propValue.getFirst(), propValue -> propValue.getSecond()));
   }
 
@@ -256,7 +257,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
               || identifier.equals(MULE_PROPERTIES_IDENTIFIER);
         })
         .forEach(propertyComponentModel -> {
-          Pair<String, Object> propertyValue = getPropertyValueFromPropertyComponent((ComponentModel) propertyComponentModel);
+          Pair<String, Object> propertyValue = getPropertyValueFromPropertyComponent(propertyComponentModel);
           beanDefinitionBuilder.addPropertyValue(propertyValue.getFirst(), propertyValue.getSecond());
         });
   }
