@@ -18,7 +18,10 @@ import org.mule.runtime.api.i18n.I18nMessage;
 public class MaxStreamingMemoryExceededException extends MuleRuntimeException {
 
   /**
-   * {@inheritDoc}
+   * Indicates that all the memory that was assigned for streaming operations has already been
+   * consumed
+   *
+   * @param message
    */
   public MaxStreamingMemoryExceededException(I18nMessage message) {
     super(message);

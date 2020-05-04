@@ -34,7 +34,7 @@ public interface ObjectStreamingManager {
   CursorIteratorProviderFactory getNullCursorProviderFactory();
 
   /**
-   * @return The default implementation of {@Link CursorIteratorProviderFactory}
+   * @return The default implementation of {@link CursorIteratorProviderFactory}
    */
   CursorIteratorProviderFactory getDefaultCursorProviderFactory();
 }

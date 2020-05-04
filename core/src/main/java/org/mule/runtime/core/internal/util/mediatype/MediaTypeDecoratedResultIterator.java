@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 /**
- * {@link Iterator<Result>} that decorates each of its delegate elements using a {@link PayloadMediaTypeResolver}
+ * {@code Iterator<Result>} that decorates each of its delegate elements using a {@link PayloadMediaTypeResolver}
  *
  * This allows to avoid preemptive decoration of an entire collection of {@link Result}
  *

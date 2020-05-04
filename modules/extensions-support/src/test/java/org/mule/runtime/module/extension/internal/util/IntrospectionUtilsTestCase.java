@@ -95,13 +95,14 @@ import java.util.function.Function;
 
 import javax.annotation.processing.ProcessingEnvironment;
 
-import com.google.testing.compile.CompilationRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.springframework.core.ResolvableType;
+
+import com.google.testing.compile.CompilationRule;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -117,12 +118,12 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   private List<FruitBasket> baskets;
 
 
-  private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   @Rule
   public CompilationRule compilationRule = new CompilationRule();
 
-  private ReflectionCache reflectionCache = new ReflectionCache();
+  private final ReflectionCache reflectionCache = new ReflectionCache();
 
   @Parameterized.Parameter
   public String mode;
@@ -327,7 +328,9 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
         .objectType()
         .with(new ClassInformationAnnotation(Map.class));
 
-    objectTypeBuilder.openWith().objectType().id(dateClass.getName());
+    objectTypeBuilder.openWith().objectType()
+        .id(dateClass.getName())
+        .with(new ClassInformationAnnotation(dateClass));
 
     MapDataType dataType = (MapDataType) toDataType(objectTypeBuilder.build());
 

@@ -746,6 +746,18 @@
                       "CANCER",
                       "DEAD"
                     ]
+                  },
+                  "classInformation": {
+                    "classname": "org.mule.test.heisenberg.extension.model.HealthStatus",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [],
+                    "parent": "java.lang.Enum",
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 }
               },
@@ -785,6 +797,18 @@
                       "CANCER",
                       "DEAD"
                     ]
+                  },
+                  "classInformation": {
+                    "classname": "org.mule.test.heisenberg.extension.model.HealthStatus",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [],
+                    "parent": "java.lang.Enum",
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 }
               },
@@ -900,6 +924,18 @@
                         "CANCER",
                         "DEAD"
                       ]
+                    },
+                    "classInformation": {
+                      "classname": "org.mule.test.heisenberg.extension.model.HealthStatus",
+                      "hasDefaultConstructor": false,
+                      "isInterface": false,
+                      "isInstantiable": false,
+                      "isAbstract": false,
+                      "isFinal": true,
+                      "implementedInterfaces": [],
+                      "parent": "java.lang.Enum",
+                      "genericTypes": [],
+                      "isMap": false
                     }
                   }
                 }
@@ -959,6 +995,18 @@
                 "type": "Object",
                 "annotations": {
                   "typeId": "org.mule.runtime.extension.api.runtime.ExpirationPolicy",
+                  "classInformation": {
+                    "classname": "org.mule.runtime.extension.api.runtime.ExpirationPolicy",
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
                   "description": {
                     "value": "Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit."
                   },
@@ -1330,7 +1378,24 @@
                 "format": "java",
                 "type": "DateTime",
                 "annotations": {
-                  "typeId": "java.time.LocalDateTime"
+                  "typeId": "java.time.LocalDateTime",
+                  "classInformation": {
+                    "classname": "java.time.LocalDateTime",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.time.temporal.Temporal",
+                      "java.time.temporal.TemporalAdjuster",
+                      "java.time.chrono.ChronoLocalDateTime",
+                      "java.io.Serializable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
                 }
               },
               "hasDynamicType": false,
@@ -1361,7 +1426,23 @@
                 "format": "java",
                 "type": "Date",
                 "annotations": {
-                  "typeId": "java.util.Date"
+                  "typeId": "java.util.Date",
+                  "classInformation": {
+                    "classname": "java.util.Date",
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": true,
+                    "isAbstract": false,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.io.Serializable",
+                      "java.lang.Cloneable",
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
                 }
               },
               "hasDynamicType": false,
@@ -1392,7 +1473,23 @@
                 "format": "java",
                 "type": "DateTime",
                 "annotations": {
-                  "typeId": "java.util.Calendar"
+                  "typeId": "java.util.Calendar",
+                  "classInformation": {
+                    "classname": "java.util.Calendar",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.io.Serializable",
+                      "java.lang.Cloneable",
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
                 }
               },
               "hasDynamicType": false,
@@ -1426,7 +1523,23 @@
                 "format": "java",
                 "type": "DateTime",
                 "annotations": {
-                  "typeId": "java.util.Calendar"
+                  "typeId": "java.util.Calendar",
+                  "classInformation": {
+                    "classname": "java.util.Calendar",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.io.Serializable",
+                      "java.lang.Cloneable",
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
                 }
               },
               "hasDynamicType": false,
@@ -1562,6 +1675,18 @@
                       "GOATIE",
                       "MUSTACHE"
                     ]
+                  },
+                  "classInformation": {
+                    "classname": "org.mule.test.heisenberg.extension.model.BarberPreferences.BEARD_KIND",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [],
+                    "parent": "java.lang.Enum",
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 }
               },
@@ -1746,7 +1871,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -2107,7 +2244,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -2256,7 +2405,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -2861,7 +3022,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -3437,7 +3610,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -3946,7 +4131,21 @@
               "item": {
                 "type": "Object",
                 "annotations": {
-                  "typeId": "org.mule.runtime.api.message.Message"
+                  "typeId": "org.mule.runtime.api.message.Message",
+                  "classInformation": {
+                    "classname": "org.mule.runtime.api.message.Message",
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.io.Serializable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
                 },
                 "fields": [
                   {
@@ -4037,7 +4236,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -4212,7 +4423,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -4372,7 +4595,21 @@
               "item": {
                 "type": "Object",
                 "annotations": {
-                  "typeId": "org.mule.runtime.api.message.Message"
+                  "typeId": "org.mule.runtime.api.message.Message",
+                  "classInformation": {
+                    "classname": "org.mule.runtime.api.message.Message",
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.io.Serializable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
                 },
                 "fields": [
                   {
@@ -4530,7 +4767,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -4708,7 +4957,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -5053,7 +5314,21 @@
               "item": {
                 "type": "Object",
                 "annotations": {
-                  "typeId": "org.mule.runtime.api.message.Message"
+                  "typeId": "org.mule.runtime.api.message.Message",
+                  "classInformation": {
+                    "classname": "org.mule.runtime.api.message.Message",
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.io.Serializable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
                 },
                 "fields": [
                   {
@@ -5112,7 +5387,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -5685,7 +5972,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -5844,7 +6143,21 @@
               "item": {
                 "type": "Object",
                 "annotations": {
-                  "typeId": "org.mule.runtime.api.message.Message"
+                  "typeId": "org.mule.runtime.api.message.Message",
+                  "classInformation": {
+                    "classname": "org.mule.runtime.api.message.Message",
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.io.Serializable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
                 },
                 "fields": [
                   {
@@ -6002,7 +6315,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -6510,7 +6835,21 @@
               "item": {
                 "type": "Object",
                 "annotations": {
-                  "typeId": "org.mule.runtime.api.message.Message"
+                  "typeId": "org.mule.runtime.api.message.Message",
+                  "classInformation": {
+                    "classname": "org.mule.runtime.api.message.Message",
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.io.Serializable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
                 },
                 "fields": [
                   {
@@ -6670,7 +7009,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -7214,7 +7565,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -7747,7 +8110,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -8093,7 +8468,21 @@
               "item": {
                 "type": "Object",
                 "annotations": {
-                  "typeId": "org.mule.runtime.api.message.Message"
+                  "typeId": "org.mule.runtime.api.message.Message",
+                  "classInformation": {
+                    "classname": "org.mule.runtime.api.message.Message",
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.io.Serializable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
                 },
                 "fields": [
                   {
@@ -8203,7 +8592,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -8437,7 +8838,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -8690,7 +9103,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -9105,7 +9530,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -9666,7 +10103,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -10224,7 +10673,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -10624,7 +11085,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -11222,6 +11695,18 @@
                           "GOATIE",
                           "MUSTACHE"
                         ]
+                      },
+                      "classInformation": {
+                        "classname": "org.mule.test.heisenberg.extension.model.BarberPreferences.BEARD_KIND",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "java.lang.Enum",
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -11552,6 +12037,18 @@
                     "type": "Object",
                     "annotations": {
                       "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.api.tls.TlsContextFactory",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      },
                       "typeAlias": {
                         "value": "Tls"
                       },
@@ -12109,6 +12606,18 @@
                           "GOATIE",
                           "MUSTACHE"
                         ]
+                      },
+                      "classInformation": {
+                        "classname": "org.mule.test.heisenberg.extension.model.BarberPreferences.BEARD_KIND",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "java.lang.Enum",
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -12747,7 +13256,24 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.time.LocalDateTime"
+                        "typeId": "java.time.LocalDateTime",
+                        "classInformation": {
+                          "classname": "java.time.LocalDateTime",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.time.temporal.Temporal",
+                            "java.time.temporal.TemporalAdjuster",
+                            "java.time.chrono.ChronoLocalDateTime",
+                            "java.io.Serializable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -12778,7 +13304,23 @@
                       "format": "java",
                       "type": "Date",
                       "annotations": {
-                        "typeId": "java.util.Date"
+                        "typeId": "java.util.Date",
+                        "classInformation": {
+                          "classname": "java.util.Date",
+                          "hasDefaultConstructor": true,
+                          "isInterface": false,
+                          "isInstantiable": true,
+                          "isAbstract": false,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable",
+                            "java.lang.Cloneable",
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -12809,7 +13351,23 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.util.Calendar"
+                        "typeId": "java.util.Calendar",
+                        "classInformation": {
+                          "classname": "java.util.Calendar",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable",
+                            "java.lang.Cloneable",
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -12843,7 +13401,23 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.util.Calendar"
+                        "typeId": "java.util.Calendar",
+                        "classInformation": {
+                          "classname": "java.util.Calendar",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable",
+                            "java.lang.Cloneable",
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -13278,7 +13852,24 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.time.LocalDateTime"
+                        "typeId": "java.time.LocalDateTime",
+                        "classInformation": {
+                          "classname": "java.time.LocalDateTime",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.time.temporal.Temporal",
+                            "java.time.temporal.TemporalAdjuster",
+                            "java.time.chrono.ChronoLocalDateTime",
+                            "java.io.Serializable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -13309,7 +13900,23 @@
                       "format": "java",
                       "type": "Date",
                       "annotations": {
-                        "typeId": "java.util.Date"
+                        "typeId": "java.util.Date",
+                        "classInformation": {
+                          "classname": "java.util.Date",
+                          "hasDefaultConstructor": true,
+                          "isInterface": false,
+                          "isInstantiable": true,
+                          "isAbstract": false,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable",
+                            "java.lang.Cloneable",
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -13340,7 +13947,23 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.util.Calendar"
+                        "typeId": "java.util.Calendar",
+                        "classInformation": {
+                          "classname": "java.util.Calendar",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable",
+                            "java.lang.Cloneable",
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -13374,7 +13997,23 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.util.Calendar"
+                        "typeId": "java.util.Calendar",
+                        "classInformation": {
+                          "classname": "java.util.Calendar",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable",
+                            "java.lang.Cloneable",
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -13791,7 +14430,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -14765,7 +15416,24 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.time.LocalDateTime"
+                        "typeId": "java.time.LocalDateTime",
+                        "classInformation": {
+                          "classname": "java.time.LocalDateTime",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.time.temporal.Temporal",
+                            "java.time.temporal.TemporalAdjuster",
+                            "java.time.chrono.ChronoLocalDateTime",
+                            "java.io.Serializable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -14796,7 +15464,23 @@
                       "format": "java",
                       "type": "Date",
                       "annotations": {
-                        "typeId": "java.util.Date"
+                        "typeId": "java.util.Date",
+                        "classInformation": {
+                          "classname": "java.util.Date",
+                          "hasDefaultConstructor": true,
+                          "isInterface": false,
+                          "isInstantiable": true,
+                          "isAbstract": false,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable",
+                            "java.lang.Cloneable",
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -14827,7 +15511,23 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.util.Calendar"
+                        "typeId": "java.util.Calendar",
+                        "classInformation": {
+                          "classname": "java.util.Calendar",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable",
+                            "java.lang.Cloneable",
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -14861,7 +15561,23 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.util.Calendar"
+                        "typeId": "java.util.Calendar",
+                        "classInformation": {
+                          "classname": "java.util.Calendar",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable",
+                            "java.lang.Cloneable",
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -15296,7 +16012,24 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.time.LocalDateTime"
+                        "typeId": "java.time.LocalDateTime",
+                        "classInformation": {
+                          "classname": "java.time.LocalDateTime",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.time.temporal.Temporal",
+                            "java.time.temporal.TemporalAdjuster",
+                            "java.time.chrono.ChronoLocalDateTime",
+                            "java.io.Serializable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -15327,7 +16060,23 @@
                       "format": "java",
                       "type": "Date",
                       "annotations": {
-                        "typeId": "java.util.Date"
+                        "typeId": "java.util.Date",
+                        "classInformation": {
+                          "classname": "java.util.Date",
+                          "hasDefaultConstructor": true,
+                          "isInterface": false,
+                          "isInstantiable": true,
+                          "isAbstract": false,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable",
+                            "java.lang.Cloneable",
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -15358,7 +16107,23 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.util.Calendar"
+                        "typeId": "java.util.Calendar",
+                        "classInformation": {
+                          "classname": "java.util.Calendar",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable",
+                            "java.lang.Cloneable",
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -15392,7 +16157,23 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.util.Calendar"
+                        "typeId": "java.util.Calendar",
+                        "classInformation": {
+                          "classname": "java.util.Calendar",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable",
+                            "java.lang.Cloneable",
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -15818,7 +16599,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -15894,6 +16687,18 @@
                           "FAIL",
                           "DROP"
                         ]
+                      },
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.source.BackPressureMode",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [],
+                        "parent": "java.lang.Enum",
+                        "genericTypes": [],
+                        "isMap": false
                       }
                     }
                   },
@@ -16830,7 +17635,24 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.time.LocalDateTime"
+                        "typeId": "java.time.LocalDateTime",
+                        "classInformation": {
+                          "classname": "java.time.LocalDateTime",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.time.temporal.Temporal",
+                            "java.time.temporal.TemporalAdjuster",
+                            "java.time.chrono.ChronoLocalDateTime",
+                            "java.io.Serializable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -16861,7 +17683,23 @@
                       "format": "java",
                       "type": "Date",
                       "annotations": {
-                        "typeId": "java.util.Date"
+                        "typeId": "java.util.Date",
+                        "classInformation": {
+                          "classname": "java.util.Date",
+                          "hasDefaultConstructor": true,
+                          "isInterface": false,
+                          "isInstantiable": true,
+                          "isAbstract": false,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable",
+                            "java.lang.Cloneable",
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -16892,7 +17730,23 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.util.Calendar"
+                        "typeId": "java.util.Calendar",
+                        "classInformation": {
+                          "classname": "java.util.Calendar",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable",
+                            "java.lang.Cloneable",
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -16926,7 +17780,23 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.util.Calendar"
+                        "typeId": "java.util.Calendar",
+                        "classInformation": {
+                          "classname": "java.util.Calendar",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable",
+                            "java.lang.Cloneable",
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -17361,7 +18231,24 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.time.LocalDateTime"
+                        "typeId": "java.time.LocalDateTime",
+                        "classInformation": {
+                          "classname": "java.time.LocalDateTime",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": false,
+                          "isFinal": true,
+                          "implementedInterfaces": [
+                            "java.time.temporal.Temporal",
+                            "java.time.temporal.TemporalAdjuster",
+                            "java.time.chrono.ChronoLocalDateTime",
+                            "java.io.Serializable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -17392,7 +18279,23 @@
                       "format": "java",
                       "type": "Date",
                       "annotations": {
-                        "typeId": "java.util.Date"
+                        "typeId": "java.util.Date",
+                        "classInformation": {
+                          "classname": "java.util.Date",
+                          "hasDefaultConstructor": true,
+                          "isInterface": false,
+                          "isInstantiable": true,
+                          "isAbstract": false,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable",
+                            "java.lang.Cloneable",
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -17423,7 +18326,23 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.util.Calendar"
+                        "typeId": "java.util.Calendar",
+                        "classInformation": {
+                          "classname": "java.util.Calendar",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable",
+                            "java.lang.Cloneable",
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -17457,7 +18376,23 @@
                       "format": "java",
                       "type": "DateTime",
                       "annotations": {
-                        "typeId": "java.util.Calendar"
+                        "typeId": "java.util.Calendar",
+                        "classInformation": {
+                          "classname": "java.util.Calendar",
+                          "hasDefaultConstructor": false,
+                          "isInterface": false,
+                          "isInstantiable": false,
+                          "isAbstract": true,
+                          "isFinal": false,
+                          "implementedInterfaces": [
+                            "java.io.Serializable",
+                            "java.lang.Cloneable",
+                            "java.lang.Comparable"
+                          ],
+                          "parent": "",
+                          "genericTypes": [],
+                          "isMap": false
+                        }
                       }
                     },
                     "hasDynamicType": false,
@@ -17909,7 +18844,19 @@
                     "format": "java",
                     "type": "Object",
                     "annotations": {
-                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider"
+                      "typeId": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                      "classInformation": {
+                        "classname": "org.mule.runtime.extension.api.runtime.config.ConfigurationProvider",
+                        "hasDefaultConstructor": false,
+                        "isInterface": true,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     },
                     "fields": []
                   },
@@ -18733,7 +19680,24 @@
                 "format": "java",
                 "type": "DateTime",
                 "annotations": {
-                  "typeId": "java.time.LocalDateTime"
+                  "typeId": "java.time.LocalDateTime",
+                  "classInformation": {
+                    "classname": "java.time.LocalDateTime",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.time.temporal.Temporal",
+                      "java.time.temporal.TemporalAdjuster",
+                      "java.time.chrono.ChronoLocalDateTime",
+                      "java.io.Serializable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
                 }
               },
               "hasDynamicType": false,
@@ -18764,7 +19728,23 @@
                 "format": "java",
                 "type": "Date",
                 "annotations": {
-                  "typeId": "java.util.Date"
+                  "typeId": "java.util.Date",
+                  "classInformation": {
+                    "classname": "java.util.Date",
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": true,
+                    "isAbstract": false,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.io.Serializable",
+                      "java.lang.Cloneable",
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
                 }
               },
               "hasDynamicType": false,
@@ -18795,7 +19775,23 @@
                 "format": "java",
                 "type": "DateTime",
                 "annotations": {
-                  "typeId": "java.util.Calendar"
+                  "typeId": "java.util.Calendar",
+                  "classInformation": {
+                    "classname": "java.util.Calendar",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.io.Serializable",
+                      "java.lang.Cloneable",
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
                 }
               },
               "hasDynamicType": false,
@@ -18829,7 +19825,23 @@
                 "format": "java",
                 "type": "DateTime",
                 "annotations": {
-                  "typeId": "java.util.Calendar"
+                  "typeId": "java.util.Calendar",
+                  "classInformation": {
+                    "classname": "java.util.Calendar",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.io.Serializable",
+                      "java.lang.Cloneable",
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
                 }
               },
               "hasDynamicType": false,
@@ -20381,6 +21393,18 @@
                       "GOATIE",
                       "MUSTACHE"
                     ]
+                  },
+                  "classInformation": {
+                    "classname": "org.mule.test.heisenberg.extension.model.BarberPreferences.BEARD_KIND",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [],
+                    "parent": "java.lang.Enum",
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 }
               },
@@ -20468,6 +21492,18 @@
                       "GOATIE",
                       "MUSTACHE"
                     ]
+                  },
+                  "classInformation": {
+                    "classname": "org.mule.test.heisenberg.extension.model.BarberPreferences.BEARD_KIND",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [],
+                    "parent": "java.lang.Enum",
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 }
               },
@@ -23435,6 +24471,18 @@
                       "GOATIE",
                       "MUSTACHE"
                     ]
+                  },
+                  "classInformation": {
+                    "classname": "org.mule.test.heisenberg.extension.model.BarberPreferences.BEARD_KIND",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [],
+                    "parent": "java.lang.Enum",
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 }
               },
@@ -23679,7 +24727,24 @@
                 "format": "java",
                 "type": "DateTime",
                 "annotations": {
-                  "typeId": "java.time.LocalDateTime"
+                  "typeId": "java.time.LocalDateTime",
+                  "classInformation": {
+                    "classname": "java.time.LocalDateTime",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [
+                      "java.time.temporal.Temporal",
+                      "java.time.temporal.TemporalAdjuster",
+                      "java.time.chrono.ChronoLocalDateTime",
+                      "java.io.Serializable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
                 }
               },
               "hasDynamicType": false,
@@ -23710,7 +24775,23 @@
                 "format": "java",
                 "type": "Date",
                 "annotations": {
-                  "typeId": "java.util.Date"
+                  "typeId": "java.util.Date",
+                  "classInformation": {
+                    "classname": "java.util.Date",
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": true,
+                    "isAbstract": false,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.io.Serializable",
+                      "java.lang.Cloneable",
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
                 }
               },
               "hasDynamicType": false,
@@ -23741,7 +24822,23 @@
                 "format": "java",
                 "type": "DateTime",
                 "annotations": {
-                  "typeId": "java.util.Calendar"
+                  "typeId": "java.util.Calendar",
+                  "classInformation": {
+                    "classname": "java.util.Calendar",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.io.Serializable",
+                      "java.lang.Cloneable",
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
                 }
               },
               "hasDynamicType": false,
@@ -23775,7 +24872,23 @@
                 "format": "java",
                 "type": "DateTime",
                 "annotations": {
-                  "typeId": "java.util.Calendar"
+                  "typeId": "java.util.Calendar",
+                  "classInformation": {
+                    "classname": "java.util.Calendar",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [
+                      "java.io.Serializable",
+                      "java.lang.Cloneable",
+                      "java.lang.Comparable"
+                    ],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
                 }
               },
               "hasDynamicType": false,
@@ -23985,6 +25098,18 @@
                   "CANCER",
                   "DEAD"
                 ]
+              },
+              "classInformation": {
+                "classname": "org.mule.test.heisenberg.extension.model.HealthStatus",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": false,
+                "isFinal": true,
+                "implementedInterfaces": [],
+                "parent": "java.lang.Enum",
+                "genericTypes": [],
+                "isMap": false
               }
             }
           },
@@ -24052,6 +25177,18 @@
                         "CANCER",
                         "DEAD"
                       ]
+                    },
+                    "classInformation": {
+                      "classname": "org.mule.test.heisenberg.extension.model.HealthStatus",
+                      "hasDefaultConstructor": false,
+                      "isInterface": false,
+                      "isInstantiable": false,
+                      "isAbstract": false,
+                      "isFinal": true,
+                      "implementedInterfaces": [],
+                      "parent": "java.lang.Enum",
+                      "genericTypes": [],
+                      "isMap": false
                     }
                   }
                 },
@@ -25580,6 +26717,18 @@
                       "FIRE_WEAPON",
                       "MELEE_WEAPON"
                     ]
+                  },
+                  "classInformation": {
+                    "classname": "org.mule.test.heisenberg.extension.model.types.WeaponType",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [],
+                    "parent": "java.lang.Enum",
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 }
               },
@@ -31007,6 +32156,18 @@
                       "GOATIE",
                       "MUSTACHE"
                     ]
+                  },
+                  "classInformation": {
+                    "classname": "org.mule.test.heisenberg.extension.model.BarberPreferences.BEARD_KIND",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [],
+                    "parent": "java.lang.Enum",
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 }
               },
@@ -31337,6 +32498,18 @@
                 "type": "Object",
                 "annotations": {
                   "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
+                  "classInformation": {
+                    "classname": "org.mule.runtime.api.tls.TlsContextFactory",
+                    "hasDefaultConstructor": false,
+                    "isInterface": true,
+                    "isInstantiable": false,
+                    "isAbstract": true,
+                    "isFinal": false,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  },
                   "typeAlias": {
                     "value": "Tls"
                   },
@@ -31894,6 +33067,18 @@
                       "GOATIE",
                       "MUSTACHE"
                     ]
+                  },
+                  "classInformation": {
+                    "classname": "org.mule.test.heisenberg.extension.model.BarberPreferences.BEARD_KIND",
+                    "hasDefaultConstructor": false,
+                    "isInterface": false,
+                    "isInstantiable": false,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [],
+                    "parent": "java.lang.Enum",
+                    "genericTypes": [],
+                    "isMap": false
                   }
                 }
               },
@@ -32196,7 +33381,21 @@
           "item": {
             "type": "Object",
             "annotations": {
-              "typeId": "org.mule.runtime.api.message.Message"
+              "typeId": "org.mule.runtime.api.message.Message",
+              "classInformation": {
+                "classname": "org.mule.runtime.api.message.Message",
+                "hasDefaultConstructor": false,
+                "isInterface": true,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": false,
+                "implementedInterfaces": [
+                  "java.io.Serializable"
+                ],
+                "parent": "",
+                "genericTypes": [],
+                "isMap": false
+              }
             },
             "fields": [
               {
@@ -32749,6 +33948,18 @@
             "type": "Object",
             "annotations": {
               "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
+              "classInformation": {
+                "classname": "org.mule.runtime.api.tls.TlsContextFactory",
+                "hasDefaultConstructor": false,
+                "isInterface": true,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": false,
+                "implementedInterfaces": [],
+                "parent": "",
+                "genericTypes": [],
+                "isMap": false
+              },
               "typeAlias": {
                 "value": "Tls"
               },
@@ -33352,7 +34563,24 @@
                   "model": {
                     "type": "DateTime",
                     "annotations": {
-                      "typeId": "java.time.LocalDateTime"
+                      "typeId": "java.time.LocalDateTime",
+                      "classInformation": {
+                        "classname": "java.time.LocalDateTime",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": false,
+                        "isFinal": true,
+                        "implementedInterfaces": [
+                          "java.time.temporal.Temporal",
+                          "java.time.temporal.TemporalAdjuster",
+                          "java.time.chrono.ChronoLocalDateTime",
+                          "java.io.Serializable"
+                        ],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     }
                   },
                   "annotations": {
@@ -33377,7 +34605,23 @@
                   "model": {
                     "type": "Date",
                     "annotations": {
-                      "typeId": "java.util.Date"
+                      "typeId": "java.util.Date",
+                      "classInformation": {
+                        "classname": "java.util.Date",
+                        "hasDefaultConstructor": true,
+                        "isInterface": false,
+                        "isInstantiable": true,
+                        "isAbstract": false,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.io.Serializable",
+                          "java.lang.Cloneable",
+                          "java.lang.Comparable"
+                        ],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     }
                   },
                   "annotations": {
@@ -33402,7 +34646,23 @@
                   "model": {
                     "type": "DateTime",
                     "annotations": {
-                      "typeId": "java.util.Calendar"
+                      "typeId": "java.util.Calendar",
+                      "classInformation": {
+                        "classname": "java.util.Calendar",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.io.Serializable",
+                          "java.lang.Cloneable",
+                          "java.lang.Comparable"
+                        ],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     }
                   },
                   "annotations": {
@@ -33432,7 +34692,23 @@
                   "model": {
                     "type": "DateTime",
                     "annotations": {
-                      "typeId": "java.util.Calendar"
+                      "typeId": "java.util.Calendar",
+                      "classInformation": {
+                        "classname": "java.util.Calendar",
+                        "hasDefaultConstructor": false,
+                        "isInterface": false,
+                        "isInstantiable": false,
+                        "isAbstract": true,
+                        "isFinal": false,
+                        "implementedInterfaces": [
+                          "java.io.Serializable",
+                          "java.lang.Cloneable",
+                          "java.lang.Comparable"
+                        ],
+                        "parent": "",
+                        "genericTypes": [],
+                        "isMap": false
+                      }
                     }
                   },
                   "annotations": {
@@ -34333,7 +35609,24 @@
                 "model": {
                   "type": "DateTime",
                   "annotations": {
-                    "typeId": "java.time.LocalDateTime"
+                    "typeId": "java.time.LocalDateTime",
+                    "classInformation": {
+                      "classname": "java.time.LocalDateTime",
+                      "hasDefaultConstructor": false,
+                      "isInterface": false,
+                      "isInstantiable": false,
+                      "isAbstract": false,
+                      "isFinal": true,
+                      "implementedInterfaces": [
+                        "java.time.temporal.Temporal",
+                        "java.time.temporal.TemporalAdjuster",
+                        "java.time.chrono.ChronoLocalDateTime",
+                        "java.io.Serializable"
+                      ],
+                      "parent": "",
+                      "genericTypes": [],
+                      "isMap": false
+                    }
                   }
                 },
                 "annotations": {
@@ -34358,7 +35651,23 @@
                 "model": {
                   "type": "Date",
                   "annotations": {
-                    "typeId": "java.util.Date"
+                    "typeId": "java.util.Date",
+                    "classInformation": {
+                      "classname": "java.util.Date",
+                      "hasDefaultConstructor": true,
+                      "isInterface": false,
+                      "isInstantiable": true,
+                      "isAbstract": false,
+                      "isFinal": false,
+                      "implementedInterfaces": [
+                        "java.io.Serializable",
+                        "java.lang.Cloneable",
+                        "java.lang.Comparable"
+                      ],
+                      "parent": "",
+                      "genericTypes": [],
+                      "isMap": false
+                    }
                   }
                 },
                 "annotations": {
@@ -34383,7 +35692,23 @@
                 "model": {
                   "type": "DateTime",
                   "annotations": {
-                    "typeId": "java.util.Calendar"
+                    "typeId": "java.util.Calendar",
+                    "classInformation": {
+                      "classname": "java.util.Calendar",
+                      "hasDefaultConstructor": false,
+                      "isInterface": false,
+                      "isInstantiable": false,
+                      "isAbstract": true,
+                      "isFinal": false,
+                      "implementedInterfaces": [
+                        "java.io.Serializable",
+                        "java.lang.Cloneable",
+                        "java.lang.Comparable"
+                      ],
+                      "parent": "",
+                      "genericTypes": [],
+                      "isMap": false
+                    }
                   }
                 },
                 "annotations": {
@@ -34413,7 +35738,23 @@
                 "model": {
                   "type": "DateTime",
                   "annotations": {
-                    "typeId": "java.util.Calendar"
+                    "typeId": "java.util.Calendar",
+                    "classInformation": {
+                      "classname": "java.util.Calendar",
+                      "hasDefaultConstructor": false,
+                      "isInterface": false,
+                      "isInstantiable": false,
+                      "isAbstract": true,
+                      "isFinal": false,
+                      "implementedInterfaces": [
+                        "java.io.Serializable",
+                        "java.lang.Cloneable",
+                        "java.lang.Comparable"
+                      ],
+                      "parent": "",
+                      "genericTypes": [],
+                      "isMap": false
+                    }
                   }
                 },
                 "annotations": {
@@ -34864,6 +36205,18 @@
                   "CANCER",
                   "DEAD"
                 ]
+              },
+              "classInformation": {
+                "classname": "org.mule.test.heisenberg.extension.model.HealthStatus",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": false,
+                "isFinal": true,
+                "implementedInterfaces": [],
+                "parent": "java.lang.Enum",
+                "genericTypes": [],
+                "isMap": false
               }
             }
           },
@@ -34890,6 +36243,18 @@
                   "CANCER",
                   "DEAD"
                 ]
+              },
+              "classInformation": {
+                "classname": "org.mule.test.heisenberg.extension.model.HealthStatus",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": false,
+                "isFinal": true,
+                "implementedInterfaces": [],
+                "parent": "java.lang.Enum",
+                "genericTypes": [],
+                "isMap": false
               }
             }
           },
@@ -34972,6 +36337,18 @@
                     "CANCER",
                     "DEAD"
                   ]
+                },
+                "classInformation": {
+                  "classname": "org.mule.test.heisenberg.extension.model.HealthStatus",
+                  "hasDefaultConstructor": false,
+                  "isInterface": false,
+                  "isInstantiable": false,
+                  "isAbstract": false,
+                  "isFinal": true,
+                  "implementedInterfaces": [],
+                  "parent": "java.lang.Enum",
+                  "genericTypes": [],
+                  "isMap": false
                 }
               }
             }
@@ -35039,6 +36416,18 @@
                         "GOATIE",
                         "MUSTACHE"
                       ]
+                    },
+                    "classInformation": {
+                      "classname": "org.mule.test.heisenberg.extension.model.BarberPreferences.BEARD_KIND",
+                      "hasDefaultConstructor": false,
+                      "isInterface": false,
+                      "isInstantiable": false,
+                      "isAbstract": false,
+                      "isFinal": true,
+                      "implementedInterfaces": [],
+                      "parent": "java.lang.Enum",
+                      "genericTypes": [],
+                      "isMap": false
                     }
                   }
                 },
@@ -35239,6 +36628,18 @@
                   "GOATIE",
                   "MUSTACHE"
                 ]
+              },
+              "classInformation": {
+                "classname": "org.mule.test.heisenberg.extension.model.BarberPreferences.BEARD_KIND",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": false,
+                "isFinal": true,
+                "implementedInterfaces": [],
+                "parent": "java.lang.Enum",
+                "genericTypes": [],
+                "isMap": false
               }
             }
           },
@@ -37011,7 +38412,24 @@
           "model": {
             "type": "DateTime",
             "annotations": {
-              "typeId": "java.time.LocalDateTime"
+              "typeId": "java.time.LocalDateTime",
+              "classInformation": {
+                "classname": "java.time.LocalDateTime",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": false,
+                "isFinal": true,
+                "implementedInterfaces": [
+                  "java.time.temporal.Temporal",
+                  "java.time.temporal.TemporalAdjuster",
+                  "java.time.chrono.ChronoLocalDateTime",
+                  "java.io.Serializable"
+                ],
+                "parent": "",
+                "genericTypes": [],
+                "isMap": false
+              }
             }
           },
           "annotations": {
@@ -37036,7 +38454,23 @@
           "model": {
             "type": "Date",
             "annotations": {
-              "typeId": "java.util.Date"
+              "typeId": "java.util.Date",
+              "classInformation": {
+                "classname": "java.util.Date",
+                "hasDefaultConstructor": true,
+                "isInterface": false,
+                "isInstantiable": true,
+                "isAbstract": false,
+                "isFinal": false,
+                "implementedInterfaces": [
+                  "java.io.Serializable",
+                  "java.lang.Cloneable",
+                  "java.lang.Comparable"
+                ],
+                "parent": "",
+                "genericTypes": [],
+                "isMap": false
+              }
             }
           },
           "annotations": {
@@ -37061,7 +38495,23 @@
           "model": {
             "type": "DateTime",
             "annotations": {
-              "typeId": "java.util.Calendar"
+              "typeId": "java.util.Calendar",
+              "classInformation": {
+                "classname": "java.util.Calendar",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": false,
+                "implementedInterfaces": [
+                  "java.io.Serializable",
+                  "java.lang.Cloneable",
+                  "java.lang.Comparable"
+                ],
+                "parent": "",
+                "genericTypes": [],
+                "isMap": false
+              }
             }
           },
           "annotations": {
@@ -37091,7 +38541,23 @@
           "model": {
             "type": "DateTime",
             "annotations": {
-              "typeId": "java.util.Calendar"
+              "typeId": "java.util.Calendar",
+              "classInformation": {
+                "classname": "java.util.Calendar",
+                "hasDefaultConstructor": false,
+                "isInterface": false,
+                "isInstantiable": false,
+                "isAbstract": true,
+                "isFinal": false,
+                "implementedInterfaces": [
+                  "java.io.Serializable",
+                  "java.lang.Cloneable",
+                  "java.lang.Comparable"
+                ],
+                "parent": "",
+                "genericTypes": [],
+                "isMap": false
+              }
             }
           },
           "annotations": {

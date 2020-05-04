@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Represents a simple route with the {@link Processor} it leads to.
  *
- * @Since 4.3.0
+ * @since 4.3.0
  */
 public class ProcessorRoute extends AbstractComponent implements MuleContextAware, Lifecycle {
 

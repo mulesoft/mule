@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.foo.hello;
+package org.foo.simple;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import org.mule.runtime.extension.api.annotation.param.Config;

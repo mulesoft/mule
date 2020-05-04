@@ -8,7 +8,8 @@ package org.mule.runtime.core.internal.retry;
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
-import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;

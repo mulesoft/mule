@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.processor.Processor;
  * Represents a route with the {@link Processor} it leads to, along with an expression that should be true for the route to be
  * taken.
  *
- * @Since 4.3.0
+ * @since 4.3.0
  */
 public class ProcessorExpressionRoute extends ProcessorRoute {
 

@@ -18,6 +18,8 @@ import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookup
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinder;
+import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
@@ -40,16 +42,21 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
   protected static final Logger logger = LoggerFactory.getLogger(DomainClassLoaderFactory.class);
 
   private final ClassLoader containerClassLoader;
+  private final NativeLibraryFinderFactory nativeLibraryFinderFactory;
   private Map<String, ArtifactClassLoader> domainArtifactClassLoaders = new HashMap<>();
 
   /**
    * Creates a new instance
    *
    * @param containerClassLoader parent classLoader of the created instance. Can be null.
+   * @param nativeLibraryFinderFactory creates {@link NativeLibraryFinder} for the created module
+   *
    */
-  public DomainClassLoaderFactory(ClassLoader containerClassLoader) {
+  public DomainClassLoaderFactory(ClassLoader containerClassLoader, NativeLibraryFinderFactory nativeLibraryFinderFactory) {
     checkArgument(containerClassLoader != null, "parentClassLoader cannot be null");
+    checkArgument(nativeLibraryFinderFactory != null, "nativeLibraryFinderFactory cannot be null");
     this.containerClassLoader = containerClassLoader;
+    this.nativeLibraryFinderFactory = nativeLibraryFinderFactory;
   }
 
   /**
@@ -77,7 +84,9 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
           if (descriptor.getName().equals(DEFAULT_DOMAIN_NAME)) {
             domainClassLoader = getDefaultDomainClassLoader(parent, parent.getClassLoaderLookupPolicy());
           } else {
-            domainClassLoader = getCustomDomainClassLoader(parent, descriptor, artifactClassLoaders);
+            NativeLibraryFinder nativeLibraryFinder =
+                nativeLibraryFinderFactory.create(descriptor.getDataFolderName(), descriptor.getClassLoaderModel().getUrls());
+            domainClassLoader = getCustomDomainClassLoader(parent, descriptor, artifactClassLoaders, nativeLibraryFinder);
           }
 
           domainClassLoader.addShutdownListener(() -> {
@@ -95,14 +104,15 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
   }
 
   private ArtifactClassLoader getCustomDomainClassLoader(ArtifactClassLoader parent, DomainDescriptor domain,
-                                                         List<ArtifactClassLoader> artifactClassLoaders) {
+                                                         List<ArtifactClassLoader> artifactClassLoaders,
+                                                         NativeLibraryFinder nativeLibraryFinder) {
     validateDomain(domain);
 
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = getApplicationClassLoaderLookupPolicy(parent, domain);
 
     ArtifactClassLoader classLoader =
         new MuleSharedDomainClassLoader(domain, parent.getClassLoader(), classLoaderLookupPolicy, Arrays
-            .asList(domain.getClassLoaderModel().getUrls()), artifactClassLoaders);
+            .asList(domain.getClassLoaderModel().getUrls()), artifactClassLoaders, nativeLibraryFinder);
 
     return classLoader;
   }

@@ -106,7 +106,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     /**
      * @param key
      * @param value
-     * @return
+     * @return a {@link Builder}
      * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
@@ -116,7 +116,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
      * @param key
      * @param value
      * @param mediaType
-     * @return
+     * @return a {@link Builder}
      * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
@@ -126,7 +126,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
      * @param key
      * @param value
      * @param dataType
-     * @return
+     * @return a {@link Builder}
      * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
@@ -135,7 +135,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     /**
      * @param key
      * @param value
-     * @return
+     * @return a {@link Builder}
      * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
@@ -145,7 +145,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
      * @param key
      * @param value
      * @param mediaType
-     * @return
+     * @return a {@link Builder}
      * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
@@ -163,7 +163,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
 
     /**
      * @param key
-     * @return
+     * @return a {@link Builder}
      * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
@@ -171,7 +171,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
 
     /**
      * @param key
-     * @return
+     * @return a {@link Builder}
      * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
@@ -180,7 +180,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     /**
      * @param key
      * @param value
-     * @return
+     * @return a {@link Builder}
      * @deprecated Transport infrastructure is deprecated. 
      */
     @Deprecated
@@ -189,7 +189,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     /**
      * @param key
      * @param value
-     * @return
+     * @return a {@link Builder}
      * @deprecated Transport infrastructure is deprecated. 
      */
     @Deprecated
@@ -197,7 +197,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
 
     /**
      * @param key
-     * @return
+     * @return a {@link Builder}
      * @deprecated Transport infrastructure is deprecated. 
      */
     @Deprecated
@@ -205,7 +205,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
 
     /**
      * @param key
-     * @return
+     * @return a {@link Builder}
      * @deprecated Transport infrastructure is deprecated. 
      */
     @Deprecated
@@ -213,7 +213,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
 
     /**
      * @param inboundProperties
-     * @return
+     * @return a {@link Builder}
      * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
@@ -221,7 +221,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
 
     /**
      * @param outboundProperties
-     * @return
+     * @return a {@link Builder}
      * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
      */
     @Deprecated
@@ -229,7 +229,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
 
     /**
      * @param inboundAttachments
-     * @return
+     * @return a {@link Builder}
      * @deprecated Transport infrastructure is deprecated. 
      */
     @Deprecated
@@ -237,7 +237,7 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
 
     /**
      * @param outbundAttachments
-     * @return
+     * @return a {@link Builder}
      * @deprecated Transport infrastructure is deprecated. 
      */
     @Deprecated

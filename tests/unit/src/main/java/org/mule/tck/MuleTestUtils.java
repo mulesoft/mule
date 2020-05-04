@@ -20,7 +20,7 @@ import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
@@ -101,7 +101,7 @@ public final class MuleTestUtils {
       flowBuilder.source(source);
     }
     final Flow flow = flowBuilder.build();
-    flow.setAnnotations(singletonMap(LOCATION_KEY, fromSingleComponent(flowName)));
+    flow.setAnnotations(singletonMap(LOCATION_KEY, from(flowName)));
     return flow;
   }
 

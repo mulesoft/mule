@@ -17,6 +17,7 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
@@ -79,6 +80,7 @@ public class BackPressureDeclarationEnricher extends AbstractAnnotatedDeclaratio
     MetadataType type = BaseTypeBuilder.create(JAVA).stringType()
         .id(format("%s-%s-backPressureStrategy", extensionDeclaration.getName(), sourceDeclaration.getName()))
         .with(new EnumAnnotation<>(property.getSupportedModes().stream().map(BackPressureMode::name).toArray(String[]::new)))
+        .with(new ClassInformationAnnotation(BackPressureMode.class))
         .build();
 
     parameter.setType(type, false);

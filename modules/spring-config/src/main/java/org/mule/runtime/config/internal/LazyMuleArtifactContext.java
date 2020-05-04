@@ -29,19 +29,17 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.resolveOrphanComponents;
 import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.generateFor;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
+import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore.SHARED_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
-
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.config.custom.CustomizationService;
@@ -96,7 +94,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Spliterator;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,14 +135,14 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
    * registry implementation to wraps the spring ApplicationContext
    *
-   * @param muleContext                                the {@link MuleContext} that own this context
-   * @param artifactDeclaration                        the mule configuration defined programmatically
-   * @param optionalObjectsController                  the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
-   *                                                   org.mule.runtime.config.internal.SpringRegistry
+   * @param muleContext the {@link MuleContext} that own this context
+   * @param artifactDeclaration the mule configuration defined programmatically
+   * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
+   *        org.mule.runtime.config.internal.SpringRegistry
    * @param parentConfigurationProperties
-   * @param disableXmlValidations                      {@code true} when loading XML configs it will not apply validations.
+   * @param disableXmlValidations {@code true} when loading XML configs it will not apply validations.
    * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
-   *                                                   {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
+   *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
    * @since 4.0
    */
   public LazyMuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
@@ -160,8 +160,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     // Changes the component locator in order to allow accessing any component by location even when they are prototype
     this.componentLocator = new SpringConfigurationComponentLocator();
-
-    graph = generateFor(applicationModel);
 
     this.parentComponentModelInitializer = parentComponentModelInitializer;
 
@@ -222,6 +220,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     }
 
     initialize();
+    //Graph should be generated after the initialize() method since the applicationModel will change by macro expanding XmlSdk components.
+    this.graph = generateFor(getApplicationModel());
   }
 
   @Override
@@ -357,30 +357,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           predicateOptional.orElseGet(() -> comp -> comp.getLocation() != null &&
               comp.getLocation().getLocation().equals(locationOptional.get().toString()));
 
-      final Predicate<? super ComponentAst> txManagerPredicate = componentModel -> {
-        final ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor((ComponentModel) componentModel);
-        return componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
-            .map(componentBuildingDefinition -> {
-              componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
-              return TransactionManagerFactory.class.isAssignableFrom(objectTypeVisitor.getType());
-            }).orElse(false);
-      };
-
-      final Predicate<? super ComponentAst> configPredicate = componentModel -> componentModel.getIdentifier()
-          .equals(CONFIGURATION_IDENTIFIER);
-
-      final Predicate<? super ComponentAst> alwaysEnabledPredicate =
-          componentModel -> componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
-              .map(ComponentBuildingDefinition::isAlwaysEnabled).orElse(false);
-
-      final Predicate<? super ComponentAst> languageConstructPredicate =
-          componentModel -> beanDefinitionFactory.isLanguageConstructComponent(componentModel.getIdentifier());
-
-      final ArtifactAst minimalApplicationModel = graph.minimalArtifactFor(basePredicate
-          .or(txManagerPredicate)
-          .or(configPredicate)
-          .or(alwaysEnabledPredicate)
-          .or(languageConstructPredicate));
+      final ArtifactAst minimalApplicationModel = buildMinimalApplicationModel(basePredicate);
 
       if (locationOptional.map(loc -> minimalApplicationModel.recursiveStream()
           .noneMatch(comp -> comp.getLocation() != null
@@ -391,7 +368,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       }
 
       Set<String> requestedLocations = locationOptional.map(location -> (Set<String>) newHashSet(location.toString()))
-          .orElseGet(() -> applicationModel.recursiveStream()
+          .orElseGet(() -> getApplicationModel().recursiveStream()
               .filter(basePredicate)
               .filter(comp -> comp.getLocation() != null)
               .map(comp -> comp.getLocation().getLocation())
@@ -428,9 +405,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       objectProviders.clear();
       resetMuleSecurityManager();
 
-      // Force initialization of configuration component...
-      resetMuleConfiguration();
-
       List<Pair<String, ComponentAst>> applicationComponents =
           createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
 
@@ -438,6 +412,67 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
       return createBeans(applicationComponents);
     });
+  }
+
+  private ArtifactAst buildMinimalApplicationModel(final Predicate<ComponentAst> basePredicate) {
+    final Predicate<? super ComponentAst> txManagerPredicate = componentModel -> {
+      final ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor((ComponentModel) componentModel);
+      return componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
+          .map(componentBuildingDefinition -> {
+            componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
+            return TransactionManagerFactory.class.isAssignableFrom(objectTypeVisitor.getType());
+          }).orElse(false);
+    };
+
+    final Predicate<? super ComponentAst> alwaysEnabledPredicate =
+        componentModel -> componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
+            .map(ComponentBuildingDefinition::isAlwaysEnabled).orElse(false);
+
+    final Predicate<? super ComponentAst> languageConstructPredicate =
+        componentModel -> beanDefinitionFactory.isLanguageConstructComponent(componentModel.getIdentifier());
+
+    final ArtifactAst predicatedModel = graph.minimalArtifactFor(basePredicate
+        .or(txManagerPredicate)
+        .or(alwaysEnabledPredicate)
+        .or(languageConstructPredicate));
+
+    final Set<String> allNamespaces = predicatedModel.recursiveStream()
+        .map(comp -> comp.getIdentifier().getNamespaceUri())
+        .collect(toSet());
+
+    return new ArtifactAst() {
+
+      @Override
+      public Stream<ComponentAst> topLevelComponentsStream() {
+        return Stream.concat(getDefaultGlobalElements(), predicatedModel.topLevelComponentsStream());
+      }
+
+      @Override
+      public Spliterator<ComponentAst> topLevelComponentsSpliterator() {
+        return Stream.concat(getDefaultGlobalElements(), predicatedModel.topLevelComponentsStream()).spliterator();
+      }
+
+      @Override
+      public Stream<ComponentAst> recursiveStream() {
+        return Stream.concat(getDefaultGlobalElements()
+            .flatMap(comp -> comp.recursiveStream()), predicatedModel.recursiveStream());
+      }
+
+      @Override
+      public Spliterator<ComponentAst> recursiveSpliterator() {
+        return Stream.concat(getDefaultGlobalElements()
+            .flatMap(comp -> comp.recursiveStream()), predicatedModel.recursiveStream()).spliterator();
+      }
+
+      private Stream<ComponentAst> getDefaultGlobalElements() {
+        // defaultGlobalElements from XML DSK components are not referenced from the app, so we need to initialize those if there
+        // is any operation that may use it in the app.
+        return getApplicationModel().topLevelComponentsStream()
+            .filter(comp -> DEFAULT_GLOBAL_ELEMENTS.equals(comp.getIdentifier().getName())
+                && allNamespaces.contains(comp.getIdentifier().getNamespaceUri()))
+            .flatMap(comp -> comp.directChildrenStream());
+      }
+    };
   }
 
   /**
@@ -534,7 +569,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       componentNames.put(object, component);
     });
 
-    //TODO: Once is implemented MULE-17778 we should use graph to get the order for disposing beans
+    // TODO: Once is implemented MULE-17778 we should use graph to get the order for disposing beans
     trackingPostProcessor.stopTracking();
     trackingPostProcessor.intersection(objects.keySet().stream().map(pair -> pair.getFirst()).collect(toList()));
 
@@ -600,19 +635,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     }
   }
 
-  private void resetMuleConfiguration() {
-    // Always unregister first the default configuration from Mule.
-    try {
-      getMuleRegistry().unregisterObject(OBJECT_MULE_CONFIGURATION);
-    } catch (Exception e) {
-      // NoSuchBeanDefinitionException can be ignored
-      if (!hasCause(e, NoSuchBeanDefinitionException.class)) {
-        throw new MuleRuntimeException(createStaticMessage("Error while unregistering Mule configuration"),
-                                       e);
-      }
-    }
-  }
-
   @Override
   protected void prepareObjectProviders() {
     // Do not prepare object providers at this point. No components are going to be created yet. This will be done when creating
@@ -668,7 +690,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   @Override
   protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
-    applicationModel.recursiveStream()
+    getApplicationModel().recursiveStream()
         .filter(cm -> !beanDefinitionFactory.isComponentIgnored(cm.getIdentifier()))
         .forEach(cm -> componentLocator.addComponentLocation(cm.getLocation()));
   }

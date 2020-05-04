@@ -178,7 +178,7 @@
         <commonsPool2Version>2.6.2</commonsPool2Version>
         <commonsMath3Version>3.6.1</commonsMath3Version>
         <derbyVersion>10.13.1.1</derbyVersion>
-        <dom4jVersion>2.1.1</dom4jVersion>
+        <dom4jVersion>2.1.3</dom4jVersion>
         <eaioUuidVersion>3.4.2-MULE-001</eaioUuidVersion>
         <fastUtilVersion>8.1.1</fastUtilVersion>
         <everitJsonSchemaVersion>1.5.1</everitJsonSchemaVersion>
@@ -186,7 +186,7 @@
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
         <greenmailVersion>1.5.0</greenmailVersion>
-        <groovyVersion>2.4.15</groovyVersion>
+        <groovyVersion>3.0.2</groovyVersion>
         <guavaVersion>25.1-jre</guavaVersion>
         <hamcrestVersion>1.3</hamcrestVersion>
         <jacksonVersion>1.9.14-MULE-002</jacksonVersion>
@@ -215,13 +215,13 @@
         <typesafeConfigVersion>1.3.1</typesafeConfigVersion>
         <saxonVersion>9.9.1-1</saxonVersion>
         <slf4jVersion>1.7.30</slf4jVersion>
-        <snakeYamlVersion>1.23</snakeYamlVersion>
+        <snakeYamlVersion>1.26</snakeYamlVersion>
         <springVersion>5.1.6.RELEASE</springVersion>
         <sshCoreVersion>1.4.0</sshCoreVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <testFtpServerVersion>1.0.6</testFtpServerVersion>
         <unirestVersion>1.4.9</unirestVersion>
-        <weaveVersion>2.3.0-SNAPSHOT</weaveVersion>
+        <weaveVersion>2.3.1-SNAPSHOT</weaveVersion>
         <woodstoxVersion>4.4.1</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
@@ -250,12 +250,12 @@
         <assembly.plugin.version>3.1.0</assembly.plugin.version>
         <jar.plugin.version>3.0.2</jar.plugin.version>
         <jxr.plugin.version>2.5</jxr.plugin.version>
-        <project.info.reports.plugin.version>2.9</project.info.reports.plugin.version>
+        <project.info.reports.plugin.version>3.0.0</project.info.reports.plugin.version>
         <rar.plugin.version>2.4</rar.plugin.version>
         <release.plugin.version>2.5.3</release.plugin.version>
-        <resources.plugin.version>3.0.2</resources.plugin.version>
+        <resources.plugin.version>3.1.0</resources.plugin.version>
         <site.plugin.version>3.8.2</site.plugin.version>
-        <source.plugin.version>3.0.1</source.plugin.version>
+        <source.plugin.version>3.1.0</source.plugin.version>
         <war.plugin.version>3.2.0</war.plugin.version>
         <shade.plugin.version>3.1.0</shade.plugin.version>
         <build.helper.maven.plugin.version>3.0.0</build.helper.maven.plugin.version>
@@ -264,11 +264,11 @@
         <antrun.plugin.version>1.8</antrun.plugin.version>
         <install.plugin.version>2.5.2</install.plugin.version>
         <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
-        <javaFormatter.plugin.version>1.9.0</javaFormatter.plugin.version>
+        <javaFormatter.plugin.version>2.0.1</javaFormatter.plugin.version>
         <license.maven.plugin.version>2.11</license.maven.plugin.version>
         <gpg.plugin.version>1.6</gpg.plugin.version>
         <gmavenPluginVersion>1.5</gmavenPluginVersion>
-        <javadocPluginVersion>3.1.1</javadocPluginVersion>
+        <javadocPluginVersion>3.2.0</javadocPluginVersion>
         <mavenCompilerVersion>3.7.0</mavenCompilerVersion>
         <eclipsePluginVersion>2.10</eclipsePluginVersion>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
@@ -281,7 +281,7 @@
         <mule.extensions.maven.plugin.version>1.4.0-SNAPSHOT</mule.extensions.maven.plugin.version>
         <mule.app.plugins.maven.plugin.version>1.4.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
-        <mule.classloader.model.version>3.4.0-SNAPSHOT</mule.classloader.model.version>
+        <mule.classloader.model.version>3.5.0-SNAPSHOT</mule.classloader.model.version>
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
 
         <!-- v1.1.0 has an issue with Optional dependencies, whenjbpmVersion resolving the graph it overrides the optionality of a transitive
@@ -298,7 +298,7 @@
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>validate</formatterGoal>
-        <oldMuleArtifactVersion>4.3.0-SNAPSHOT</oldMuleArtifactVersion>
+        <oldMuleArtifactVersion>4.3.0</oldMuleArtifactVersion>
         
         <surefire.args.base>-Dfile.encoding=UTF-8 -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'</surefire.args.base>
         <surefire.args>${surefire.args.base}</surefire.args>
@@ -934,117 +934,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy-all</artifactId>
-                <version>${groovyVersion}</version>
-                <classifier>indy</classifier>
-                <exclusions>
-                    <!--  Exclude openejb-loader as it is not needed and there are currently version inconsistancies in openejb-core pom-->
-                    <exclusion>
-                        <groupId>openejb</groupId>
-                        <artifactId>openejb-loader</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.ant</groupId>
-                        <artifactId>ant</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.ant</groupId>
-                        <artifactId>ant-junit</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.ant</groupId>
-                        <artifactId>ant-launcher</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>axion</groupId>
-                        <artifactId>axion</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>bsf</groupId>
-                        <artifactId>bsf</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.tonicsystems</groupId>
-                        <artifactId>jarjar</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-lang</groupId>
-                        <artifactId>commons-lang</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-primitives</groupId>
-                        <artifactId>commons-primitives</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>jmock</groupId>
-                        <artifactId>jmock</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>jmock</groupId>
-                        <artifactId>jmock-cglib</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>jsp-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>mx4j</groupId>
-                        <artifactId>mx4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>nekohtml</groupId>
-                        <artifactId>nekohtml</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>qdox</groupId>
-                        <artifactId>qdox</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>qdox</groupId>
-                        <artifactId>qdox</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>radeox</groupId>
-                        <artifactId>radeox</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>radeox</groupId>
-                        <artifactId>radeox-oro</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>regexp</groupId>
-                        <artifactId>regexp</artifactId>
-                    </exclusion>
-                    <!-- no XML -->
-                    <exclusion>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                    </exclusion>
-                    <!-- totally outdated and wrong too -->
-                    <exclusion>
-                        <groupId>xerces</groupId>
-                        <artifactId>xerces</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>xpp3</groupId>
-                        <artifactId>xpp3</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.thoughtworks.xstream</groupId>
-                        <artifactId>xstream</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
                 <groupId>tanukisoft</groupId>
                 <artifactId>wrapper</artifactId>
                 <version>${wrapperVersion}</version>
@@ -1433,7 +1322,7 @@
                     <version>${checkstyle.plugin.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>com.marvinformatics.formatter</groupId>
+                    <groupId>net.revelc.code.formatter</groupId>
                     <artifactId>formatter-maven-plugin</artifactId>
                     <version>${javaFormatter.plugin.version}</version>
                     <configuration>
@@ -1663,7 +1552,7 @@
                         -->
                         <dependency>
                             <groupId>org.codehaus.groovy</groupId>
-                            <artifactId>groovy-all</artifactId>
+                            <artifactId>groovy</artifactId>
                             <version>${groovyVersion}</version>
                         </dependency>
                     </dependencies>
@@ -1802,7 +1691,7 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.marvinformatics.formatter</groupId>
+                <groupId>net.revelc.code.formatter</groupId>
                 <artifactId>formatter-maven-plugin</artifactId>
             </plugin>
             <plugin>
@@ -1954,15 +1843,22 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>${javadocPluginVersion}</version>
+                <reportSets>
+                    <reportSet>
+                        <id>aggregate</id>
+                        <inherited>false</inherited>
+                        <reports>
+                            <report>aggregate-no-fork</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
                 <configuration>
                     <minmemory>128m</minmemory>
                     <maxmemory>512m</maxmemory>
                     <charset>ISO-8859-1</charset>
                     <encoding>ISO-8859-1</encoding>
                     <source>${javaVersion}</source>
-                    <configuration>
-                        <doclint>none</doclint>
-                    </configuration>
+                    <doclint>none</doclint>
                     <!-- Link to the external online JavaDoc -->
                     <links>
                         <link>http://docs.oracle.com/javase/7/docs/api/</link>

@@ -97,7 +97,8 @@
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
+            <artifactId>groovy</artifactId>
+            <classifier>indy</classifier>
             <version>${groovyVersion}</version>
         </dependency>
         <dependency>

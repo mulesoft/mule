@@ -26,6 +26,10 @@
         </module-content:set-payload-using-primary-parameter>
     </flow>
 
+    <flow name="testSetPayloadUsingPrimaryPayload">
+        <module-content:set-payload-using-primary-parameter/>
+    </flow>
+
     <flow name="testSetPayloadUsingContentAndPrimaryAndSimpleParameter">
         <module-content:set-payload-using-content-and-primary-and-simple-parameter parameter1="value from attribute">
             <module-content:content>#['smart' ++ ' connector content']</module-content:content>

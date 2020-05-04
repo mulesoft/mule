@@ -29,7 +29,6 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -58,12 +57,11 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.metadata.ModelBasedMetadataCacheIdGeneratorFactory;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.internal.model.ApplicationModel;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
+import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
@@ -81,8 +79,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -90,6 +86,9 @@ import org.mockito.internal.creation.MockSettingsImpl;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslModelTestCase {
@@ -107,7 +106,6 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
   public static final String MY_GLOBAL_TEMPLATE = "myGlobalTemplate";
 
   private Set<ExtensionModel> extensions;
-  private DslResolvingContext dslResolvingContext;
   private ElementDeclarer declarer;
 
   @Before
@@ -117,7 +115,6 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
         .add(mockExtension)
         .build();
 
-    dslResolvingContext = DslResolvingContext.getDefault(extensions);
     declarer = ElementDeclarer.forExtension(EXTENSION_NAME);
     mockSimpleMetadataKeyId(operation);
     mockSimpleMetadataKeyId(anotherOperation);
@@ -130,20 +127,20 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
 
     MetadataCacheIdGenerator<ComponentAst> generator = createGenerator(applicationModel);
 
-    applicationModel.getRootComponentModel().getInnerComponents()
-        .forEach(component -> hashByLocation.put(component.getComponentLocation().getLocation(),
-                                                 generator.getIdForComponentMetadata((ComponentAst) component).get()));
+    applicationModel.topLevelComponentsStream()
+        .forEach(component -> hashByLocation.put(component.getLocation().getLocation(),
+                                                 generator.getIdForComponentMetadata(component).get()));
 
     LOGGER.debug(hashByLocation.toString());
 
     ApplicationModel reload = loadApplicationModel(getBaseApp());
     MetadataCacheIdGenerator<ComponentAst> otherGenerator = createGenerator(reload);
 
-    reload.getRootComponentModel().getInnerComponents()
+    reload.topLevelComponentsStream()
         .forEach(component -> {
-          String location = component.getComponentLocation().getLocation();
+          String location = component.getLocation().getLocation();
           MetadataCacheId previousHash = hashByLocation.get(location);
-          assertThat(previousHash, is(otherGenerator.getIdForComponentMetadata((ComponentAst) component).get()));
+          assertThat(previousHash, is(otherGenerator.getIdForComponentMetadata(component).get()));
         });
   }
 
@@ -924,29 +921,29 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractDslMode
   }
 
   private MetadataCacheIdGenerator<ComponentAst> createGenerator(ApplicationModel app) {
-    return new ModelBasedMetadataCacheIdGeneratorFactory().create(dslResolvingContext, new Locator(app));
+    return new ModelBasedMetadataCacheIdGeneratorFactory().create(new Locator(app));
   }
 
-  private static class Locator implements MetadataCacheIdGeneratorFactory.ComponentLocator<ComponentAst> {
+  private static class Locator implements ComponentLocator<ComponentAst> {
 
-    private final Map<Location, ComponentModel> components = new HashMap<>();
+    private final Map<Location, ComponentAst> components = new HashMap<>();
 
     Locator(ApplicationModel app) {
-      app.getRootComponentModel().getInnerComponents().forEach(this::addComponent);
+      app.topLevelComponentsStream().forEach(this::addComponent);
     }
 
     @Override
     public Optional<ComponentAst> get(Location location) {
-      return Optional.ofNullable(components.get(location)).map(cm -> (ComponentAst) cm);
+      return Optional.ofNullable(components.get(location)).map(cm -> cm);
     }
 
-    private Location getLocation(ComponentModel component) {
-      return Location.builderFromStringRepresentation(component.getComponentLocation().getLocation()).build();
+    private Location getLocation(ComponentAst component) {
+      return Location.builderFromStringRepresentation(component.getLocation().getLocation()).build();
     }
 
-    private void addComponent(ComponentModel component) {
+    private void addComponent(ComponentAst component) {
       components.put(getLocation(component), component);
-      component.getInnerComponents().forEach(this::addComponent);
+      component.directChildrenStream().forEach(this::addComponent);
     }
 
   }

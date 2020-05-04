@@ -156,7 +156,7 @@ public class Exceptions {
    * wrapped in a instance of {@link DefaultMuleException}.
    *
    * @param throwable
-   * @return
+   * @return a {@link MuleException}
    * @throws MuleException
    */
   public static MuleException rxExceptionToMuleException(Throwable throwable)

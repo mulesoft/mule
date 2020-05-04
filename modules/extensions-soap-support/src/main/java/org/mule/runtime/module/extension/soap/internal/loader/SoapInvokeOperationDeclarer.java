@@ -20,6 +20,7 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -167,6 +168,7 @@ public class SoapInvokeOperationDeclarer {
             .id(InputStream.class.getName())
             .with(new TypedValueTypeAnnotation()))
         .with(new TypeIdAnnotation(Map.class.getName()))
+        .with(new ClassInformationAnnotation(Map.class))
         .build();
 
     message.withOptionalParameter(BODY_PARAM).ofDynamicType(binaryType)
@@ -197,6 +199,7 @@ public class SoapInvokeOperationDeclarer {
         .ofType(TYPE_BUILDER.objectType()
             .openWith(loader.load(String.class))
             .with(new TypeIdAnnotation(Map.class.getName()))
+            .with(new ClassInformationAnnotation(Map.class))
             .build())
         .withDsl(ParameterDslConfiguration.getDefaultInstance())
         .withLayout(LayoutModel.builder().order(2).tabName(TRANSPORT).build())

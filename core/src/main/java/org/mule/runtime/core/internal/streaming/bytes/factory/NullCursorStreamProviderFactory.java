@@ -27,7 +27,8 @@ import java.io.InputStream;
 public class NullCursorStreamProviderFactory extends AbstractCursorStreamProviderFactory {
 
   /**
-   * {@inheritDoc}
+   * Implementation of {@link AbstractCursorStreamProviderFactory} which always returns
+   * the original stream without creating any provider
    */
   public NullCursorStreamProviderFactory(ByteBufferManager bufferManager, StreamingManager streamingManager) {
     super(bufferManager, streamingManager);

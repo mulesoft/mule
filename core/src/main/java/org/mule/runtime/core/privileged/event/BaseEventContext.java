@@ -50,7 +50,7 @@ public interface BaseEventContext extends EventContext {
    * Complete this {@link BaseEventContext} unsuccessfully with an error.
    *
    * @param throwable the throwable.
-   * @return {@link Publisher<Void>} that completes when error processing is complete.
+   * @return {@code Publisher<Void>} that completes when error processing is complete.
    */
   Publisher<Void> error(Throwable throwable);
 

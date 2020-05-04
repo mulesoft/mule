@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.resolveProcessorRepresentation;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -21,7 +21,7 @@ public class BeanDefinitionFactoryRepresentationTestCase extends AbstractMuleTes
 
   @Test
   public void withFailingProcessorNoPathResolver() {
-    assertThat(resolveProcessorRepresentation("BeanDefinitionFactoryRepresentationTestCase", fromSingleComponent("Mock@1"),
+    assertThat(resolveProcessorRepresentation("BeanDefinitionFactoryRepresentationTestCase", from("Mock@1"),
                                               ComponentMetadataAst.builder()
                                                   .setFileName("unknown")
                                                   .build()),
@@ -31,7 +31,7 @@ public class BeanDefinitionFactoryRepresentationTestCase extends AbstractMuleTes
   @Test
   public void withFailingProcessorPathResolver() {
     assertThat(resolveProcessorRepresentation("BeanDefinitionFactoryRepresentationTestCase",
-                                              fromSingleComponent("flow/processor"),
+                                              from("flow/processor"),
                                               ComponentMetadataAst.builder()
                                                   .setFileName("muleApp.xml")
                                                   .setStartLine(10)
@@ -41,7 +41,7 @@ public class BeanDefinitionFactoryRepresentationTestCase extends AbstractMuleTes
 
   @Test
   public void withFailingProcessorNotPathResolver() {
-    assertThat(resolveProcessorRepresentation("BeanDefinitionFactoryRepresentationTestCase", fromSingleComponent("Mock@1"),
+    assertThat(resolveProcessorRepresentation("BeanDefinitionFactoryRepresentationTestCase", from("Mock@1"),
                                               ComponentMetadataAst.builder()
                                                   .setFileName("unknown")
                                                   .build()),
@@ -50,7 +50,7 @@ public class BeanDefinitionFactoryRepresentationTestCase extends AbstractMuleTes
 
   @Test
   public void withAnnotatedFailingProcessorNoPathResolver() {
-    assertThat(resolveProcessorRepresentation("BeanDefinitionFactoryRepresentationTestCase", fromSingleComponent("Mock@1"),
+    assertThat(resolveProcessorRepresentation("BeanDefinitionFactoryRepresentationTestCase", from("Mock@1"),
                                               ComponentMetadataAst.builder()
                                                   .setFileName("muleApp.xml")
                                                   .setStartLine(10)
@@ -62,7 +62,7 @@ public class BeanDefinitionFactoryRepresentationTestCase extends AbstractMuleTes
   @Test
   public void withAnnotatedFailingProcessorPathResolver() {
     assertThat(resolveProcessorRepresentation("BeanDefinitionFactoryRepresentationTestCase",
-                                              fromSingleComponent("flow/processor"),
+                                              from("flow/processor"),
                                               ComponentMetadataAst.builder()
                                                   .setFileName("muleApp.xml")
                                                   .setStartLine(10)
@@ -73,7 +73,7 @@ public class BeanDefinitionFactoryRepresentationTestCase extends AbstractMuleTes
 
   @Test
   public void withAnnotatedFailingProcessorNotPathResolver() {
-    assertThat(resolveProcessorRepresentation("BeanDefinitionFactoryRepresentationTestCase", fromSingleComponent("Mock@1"),
+    assertThat(resolveProcessorRepresentation("BeanDefinitionFactoryRepresentationTestCase", from("Mock@1"),
                                               ComponentMetadataAst.builder()
                                                   .setFileName("muleApp.xml")
                                                   .setStartLine(10)

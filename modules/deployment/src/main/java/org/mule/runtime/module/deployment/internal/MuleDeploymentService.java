@@ -21,6 +21,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PR
 import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.DEPLOYMENT_APPLICATION_PROPERTY;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.service.Service;
@@ -82,8 +83,8 @@ public class MuleDeploymentService implements DeploymentService {
   private final CompositeDeploymentListener domainBundleDeploymentListener = new CompositeDeploymentListener();
   private final ArchiveDeployer<Domain> domainDeployer;
   private final DeploymentDirectoryWatcher deploymentDirectoryWatcher;
-  private DefaultArchiveDeployer<Application> applicationDeployer;
-  private DomainBundleArchiveDeployer domainBundleDeployer;
+  private final DefaultArchiveDeployer<Application> applicationDeployer;
+  private final DomainBundleArchiveDeployer domainBundleDeployer;
 
   public MuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
                                Supplier<SchedulerService> schedulerServiceSupplier) {
@@ -340,7 +341,7 @@ public class MuleDeploymentService implements DeploymentService {
         if (fileName.endsWith(".jar")) {
           archiveDeployer.deployPackagedArtifact(artifactArchiveUri, deploymentProperties);
         } else {
-          if (!artifactLocation.getParent().equals(artifactDeploymentFolder)) {
+          if (!artifactLocation.getParent().equals(artifactDeploymentFolder.getPath())) {
             try {
               copyDirectory(artifactLocation, new File(artifactDeploymentFolder, fileName));
             } catch (IOException e) {

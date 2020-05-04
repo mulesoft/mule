@@ -22,7 +22,6 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MUL
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
@@ -33,11 +32,10 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.metadata.ModelBasedMetadataCacheIdGeneratorFactory;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.internal.model.ApplicationModel;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
+import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
-import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -66,7 +64,6 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
   private static final String ANOTHER_OPERATION_LOCATION = MY_OTHER_FLOW + "/processors/0";
 
   private Set<ExtensionModel> extensions;
-  private DslResolvingContext dslResolvingContext;
   private ElementDeclarer declarer;
 
   @Before
@@ -76,7 +73,6 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
         .add(mockExtension)
         .build();
 
-    dslResolvingContext = DslResolvingContext.getDefault(extensions);
     declarer = ElementDeclarer.forExtension(EXTENSION_NAME);
   }
 
@@ -385,7 +381,6 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
         .add(mockExtension)
         .add(newExtensionModel)
         .build();
-    dslResolvingContext = DslResolvingContext.getDefault(extensions);
 
     ElementDeclarer newElementDeclarer = forExtension(newExtensionModelName);
 
@@ -557,29 +552,29 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractDsl
   }
 
   private MetadataCacheIdGenerator<ComponentAst> createGenerator(ApplicationModel app) {
-    return new ModelBasedMetadataCacheIdGeneratorFactory().create(dslResolvingContext, new Locator(app));
+    return new ModelBasedMetadataCacheIdGeneratorFactory().create(new Locator(app));
   }
 
-  private static class Locator implements MetadataCacheIdGeneratorFactory.ComponentLocator<ComponentAst> {
+  private static class Locator implements ComponentLocator<ComponentAst> {
 
-    private final Map<Location, ComponentModel> components = new HashMap<>();
+    private final Map<Location, ComponentAst> components = new HashMap<>();
 
     Locator(ApplicationModel app) {
-      app.getRootComponentModel().getInnerComponents().forEach(this::addComponent);
+      app.topLevelComponentsStream().forEach(this::addComponent);
     }
 
     @Override
     public Optional<ComponentAst> get(Location location) {
-      return Optional.ofNullable(components.get(location)).map(cm -> (ComponentAst) cm);
+      return Optional.ofNullable(components.get(location)).map(cm -> cm);
     }
 
-    private Location getLocation(ComponentModel component) {
-      return Location.builderFromStringRepresentation(component.getComponentLocation().getLocation()).build();
+    private Location getLocation(ComponentAst component) {
+      return Location.builderFromStringRepresentation(component.getLocation().getLocation()).build();
     }
 
-    private void addComponent(ComponentModel component) {
+    private void addComponent(ComponentAst component) {
       components.put(getLocation(component), component);
-      component.getInnerComponents().forEach(this::addComponent);
+      component.directChildrenStream().forEach(this::addComponent);
     }
 
   }

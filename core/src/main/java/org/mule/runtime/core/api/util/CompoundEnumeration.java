@@ -47,7 +47,7 @@ public class CompoundEnumeration<E> implements Enumeration<E> {
 
   /**
    * Returns the next element in the {@link CompoundEnumeration}
-   * @return
+   * @return <E>
    */
   public E nextElement() {
     if (!this.next()) {

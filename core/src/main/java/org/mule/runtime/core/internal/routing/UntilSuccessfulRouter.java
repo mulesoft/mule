@@ -28,12 +28,13 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.internal.exception.SuppressedMuleException;
 
 import java.util.HashMap;
@@ -54,7 +55,7 @@ import reactor.util.context.Context;
 
 /**
  * Router with {@link UntilSuccessful} retry logic.
- *
+ * <p>
  * The retrial chain isolation is implemented using two {@link reactor.core.publisher.FluxSink}s, one for the entry inside the
  * retrial chain, and another for publishing successful events, or exhaustion errors.
  *
@@ -62,9 +63,9 @@ import reactor.util.context.Context;
  */
 class UntilSuccessfulRouter {
 
-  private final Logger LOGGER = getLogger(UntilSuccessfulRouter.class);
+  private static final Logger LOGGER = getLogger(UntilSuccessfulRouter.class);
 
-  private static final String RETRY_CTX_INTERNAL_PARAM_KEY = "untilSuccessful.router.retryContext";
+  static final String RETRY_CTX_INTERNAL_PARAM_KEY = "untilSuccessful.router.retryContext";
   private static final String UNTIL_SUCCESSFUL_MSG_PREFIX =
       "'until-successful' retries exhausted. Last exception message was: %s";
   private final EventInternalContextResolver<Map<String, RetryContext>> retryContextResolver;
@@ -93,8 +94,9 @@ class UntilSuccessfulRouter {
   private final AtomicInteger inflightEvents = new AtomicInteger(0);
   private final AtomicBoolean completeDeferred = new AtomicBoolean(false);
 
-  UntilSuccessfulRouter(Component owner, Publisher<CoreEvent> publisher, MessageProcessorChain nestedChain,
-                        ExtendedExpressionManager expressionManager, Predicate<CoreEvent> shouldRetry, Scheduler delayScheduler,
+  UntilSuccessfulRouter(Component owner, Publisher<CoreEvent> publisher, Processor nestedChain,
+                        ProcessingStrategy processingStrategy, ExtendedExpressionManager expressionManager,
+                        Predicate<CoreEvent> shouldRetry, Scheduler delayScheduler,
                         String maxRetries, String millisBetweenRetries) {
     this.owner = owner;
     this.shouldRetry = shouldRetry;
@@ -120,7 +122,7 @@ class UntilSuccessfulRouter {
         });
 
     // Inner chain. Contains all retrial and error handling logic.
-    innerFlux = innerRecorder.flux()
+    innerFlux = Flux.from(processingStrategy.configureInternalPublisher(innerRecorder.flux()))
         // Assume: resolver.currentContextForEvent(publishedEvent) is current context
         .transform(innerPublisher -> applyWithChildContext(innerPublisher, nestedChain,
                                                            Optional.of(owner.getLocation())))
@@ -326,6 +328,8 @@ class UntilSuccessfulRouter {
    * Wrap all exceptions caused in {@link RetryContext} initialization, so that they can be propagated outside of the innerFlux.
    */
   static class RetryContextInitializationException extends RuntimeException {
+
+    private static final long serialVersionUID = -399718600886069735L;
 
     public RetryContextInitializationException(Throwable cause) {
       super(cause);

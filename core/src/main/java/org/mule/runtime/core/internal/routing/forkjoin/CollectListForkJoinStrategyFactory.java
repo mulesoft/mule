@@ -35,7 +35,7 @@ import javax.xml.namespace.QName;
  * <li>Performs parallel execution of route pairs subject to {@code maxConcurrency}.
  * <li>Merges variables using a last-wins strategy.
  * <li>Waits for the completion of all routes before emitting a result event, with an optional timeout.
- * <li>Collects results into a result {@link CoreEvent} with a {@link List<org.mule.runtime.api.message.Message>} payload.
+ * <li>Collects results into a result {@link CoreEvent} with a {@link List} collection that contains {@link org.mule.runtime.api.message.Message} in the payload.
  * <li>Will processor all routes, regardless of errors, and propagating a composite exception where there were one or more errors.
  * </ul>
  */

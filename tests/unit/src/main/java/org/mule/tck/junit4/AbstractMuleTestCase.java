@@ -9,11 +9,13 @@ package org.mule.tck.junit4;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.lang.Thread.getAllStackTraces;
+import static java.util.Collections.singletonMap;
 import static java.util.Collections.sort;
 import static java.util.Optional.empty;
 import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STREAMING_STATISTICS;
@@ -22,9 +24,10 @@ import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.api.util.SystemUtils.parsePropertyDefinitions;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -35,9 +38,9 @@ import org.mule.tck.junit4.rule.WarningTimeout;
 import org.mule.tck.report.ThreadDumpOnTimeOut;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalInt;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -51,7 +54,6 @@ import org.junit.rules.RuleChain;
 import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 
 /**
@@ -63,7 +65,7 @@ public abstract class AbstractMuleTestCase {
   public static final String TEST_PAYLOAD = "test";
   public static final String TEST_CONNECTOR = "test";
 
-  public static final ComponentLocation TEST_CONNECTOR_LOCATION = fromSingleComponent(TEST_CONNECTOR);
+  public static final ComponentLocation TEST_CONNECTOR_LOCATION = from(TEST_CONNECTOR);
 
   public static final int DEFAULT_TEST_TIMEOUT_SECS = 60;
 
@@ -93,9 +95,9 @@ public abstract class AbstractMuleTestCase {
   /**
    * Should be set to a string message describing any prerequisites not met.
    */
-  private boolean offline = "true".equalsIgnoreCase(System.getProperty("org.mule.offline"));
+  private final boolean offline = "true".equalsIgnoreCase(System.getProperty("org.mule.offline"));
 
-  private int testTimeoutSecs = getTimeoutSystemProperty();
+  private final int testTimeoutSecs = getTimeoutSystemProperty();
 
   @Rule
   public TestName name = new TestName();
@@ -355,9 +357,10 @@ public abstract class AbstractMuleTestCase {
    */
   protected void addMockComponentLocation(Component component) {
     ComponentLocation componentLocation = mock(ComponentLocation.class, RETURNS_DEEP_STUBS);
-    Mockito.when(componentLocation.getLineInFile()).thenReturn(empty());
-    Mockito.when(componentLocation.getFileName()).thenReturn(empty());
-    component.setAnnotations(Collections.singletonMap(LOCATION_KEY, componentLocation));
+    when(componentLocation.getLineInFile()).thenReturn(empty());
+    when(componentLocation.getLine()).thenReturn(OptionalInt.empty());
+    when(componentLocation.getFileName()).thenReturn(empty());
+    component.setAnnotations(singletonMap(LOCATION_KEY, componentLocation));
   }
 
   private static final transient String THREAD_RESULT_LINE = StringUtils.repeat('-', 80);

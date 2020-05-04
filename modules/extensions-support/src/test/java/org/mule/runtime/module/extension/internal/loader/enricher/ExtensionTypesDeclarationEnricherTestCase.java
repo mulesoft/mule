@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.declaration.type.annotation.InfrastructureTypeAnnotation;
@@ -25,21 +26,19 @@ import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.drugs.Drug;
 import org.mule.test.heisenberg.extension.model.drugs.DrugBatch;
-import org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes;
 import org.mule.test.heisenberg.extension.model.drugs.Meta;
+import org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import io.qameta.allure.Description;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+
+import io.qameta.allure.Description;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class ExtensionTypesDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
   private ExtensionModel extensionModel;

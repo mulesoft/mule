@@ -9,7 +9,7 @@ package org.mule.runtime.config.api.dsl.model.metadata.types;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.config.api.dsl.model.DslElementModel;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.extension.api.property.ResolverInformation;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.property.TypeResolversInformationModelProp
 import java.util.Optional;
 
 /**
- * Implementation of {@link MetadataResolutionTypeInformation} that describes Input Types from a {@link DslElementModel}
+ * Implementation of {@link MetadataResolutionTypeInformation} that describes Input Types from a {@link ComponentAst}
  *
  * @since 4.2.0
  */
@@ -26,13 +26,12 @@ public class InputMetadataResolutionTypeInformation extends AbstractMetadataReso
   public static final String TYPE_IDENTIFIER = "Input";
   private final MetadataCacheId componentTypeMetadataCacheId;
 
-  public InputMetadataResolutionTypeInformation(DslElementModel<?> component, String parameterName) {
+  public InputMetadataResolutionTypeInformation(ComponentAst component, String parameterName) {
     super(component, (typeResolversInformationModelProperty -> getResolverInformation(typeResolversInformationModelProperty,
                                                                                       parameterName)));
-    checkArgument(component.getModel() != null, "Cannot generate an Input Cache Key for a 'null' component");
-    checkArgument(component.getModel() instanceof ParameterizedModel,
+    checkArgument(component.getModel(ParameterizedModel.class).isPresent(),
                   "Cannot generate an Input Cache Key for a component with no parameters");
-    checkArgument(((ParameterizedModel) component.getModel()).getAllParameterModels().stream()
+    checkArgument(component.getModel(ParameterizedModel.class).get().getAllParameterModels().stream()
         .anyMatch(parameterModel -> parameterModel.getName().equals(parameterName)),
                   "Cannot generate an Input Cache Key for the component since it does not have a parameter named "
                       + parameterName);

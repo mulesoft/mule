@@ -15,7 +15,7 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import java.io.IOException;
 
 /**
- * A {@link CursorStream} which is backed by a fixed {@link byte[]}.
+ * A {@link CursorStream} which is backed by a fixed {@code byte[]}.
  * <p>
  * Notice that since the {@link #content} data is already fully loaded into memory, this kind of
  * defeats the purpose of the cursor provider. The purpose of this method is to provide a way to
@@ -51,6 +51,12 @@ public class ByteArrayCursorStream extends AbstractCursorStream {
 
   @Override
   protected int doRead(byte[] b, int off, int len) throws IOException {
+    // According with {@link java.io.InputStream} javadoc
+    // "If len is zero, then no bytes are read and 0 is returned"
+    if (len == 0) {
+      return 0;
+    }
+
     final int position = toIntExact(getPosition());
     len = min(len, content.length - position);
 

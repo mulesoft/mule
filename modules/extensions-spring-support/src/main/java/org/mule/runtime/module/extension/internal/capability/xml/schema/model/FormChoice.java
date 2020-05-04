@@ -41,9 +41,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlEnum
 public enum FormChoice {
 
-  @XmlEnumValue("qualified")
-  QUALIFIED("qualified"), @XmlEnumValue("unqualified")
-  UNQUALIFIED("unqualified");
+  @XmlEnumValue("qualified") QUALIFIED("qualified"), @XmlEnumValue("unqualified") UNQUALIFIED("unqualified");
 
   private final String value;
 

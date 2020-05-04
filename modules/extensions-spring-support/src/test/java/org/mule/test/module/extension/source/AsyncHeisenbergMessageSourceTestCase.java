@@ -9,7 +9,6 @@ package org.mule.test.module.extension.source;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mule.test.heisenberg.extension.AsyncHeisenbergSource.completionCallback;
 
 import org.junit.Ignore;
@@ -38,28 +37,14 @@ public class AsyncHeisenbergMessageSourceTestCase extends HeisenbergMessageSourc
   @Test
   public void asyncSource() throws Exception {
     startFlow("source");
-
-    try {
-      assertSourceCompleted();
-      fail("Source should not have completed");
-    } catch (AssertionError e) {
-      assertThat(completionCallback, is(notNullValue()));
-      completionCallback.success();
-      assertSourceCompleted();
-    }
+    assertSourceCompleted();
+    assertThat(completionCallback, is(notNullValue()));
   }
 
   @Test
   public void asyncOnException() throws Exception {
     startFlow("sourceFailed");
-
-    try {
-      assertSourceFailed();
-      fail("Source should not have completed");
-    } catch (AssertionError e) {
-      assertThat(completionCallback, is(notNullValue()));
-      completionCallback.error(new Exception());
-      assertSourceFailed();
-    }
+    assertSourceFailed();
+    assertThat(completionCallback, is(notNullValue()));
   }
 }

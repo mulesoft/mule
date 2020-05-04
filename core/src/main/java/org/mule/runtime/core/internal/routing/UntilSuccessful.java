@@ -9,8 +9,11 @@ package org.mule.runtime.core.internal.routing;
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.createDefaultProcessingStrategyFactory;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+
+import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -20,11 +23,13 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.routing.UntilSuccessfulRouter.RetryContextInitializationException;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
@@ -46,12 +51,16 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   @Inject
   private ExtendedExpressionManager expressionManager;
 
+  @Inject
+  private ConfigurationComponentLocator componentLocator;
+
   private String maxRetries = DEFAULT_RETRIES;
   private String millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
   private MessageProcessorChain nestedChain;
   private Predicate<CoreEvent> shouldRetry;
   private Scheduler timer;
   private List<Processor> processors;
+  private ProcessingStrategy processingStrategy;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -66,6 +75,12 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
     timer = schedulerService.cpuLightScheduler();
     shouldRetry = event -> event.getError().isPresent();
+
+    final Optional<ProcessingStrategy> processingStrategyFromRootContainer =
+        getProcessingStrategy(componentLocator, getRootContainerLocation());
+
+    processingStrategy = processingStrategyFromRootContainer
+        .orElseGet(() -> createDefaultProcessingStrategyFactory().create(muleContext, getLocation().getLocation() + ".ps"));
   }
 
   @Override
@@ -93,8 +108,9 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
   @Override
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-    return new UntilSuccessfulRouter(this, publisher, nestedChain, expressionManager, shouldRetry, timer, maxRetries,
-                                     millisBetweenRetries).getDownstreamPublisher();
+    return new UntilSuccessfulRouter(this, publisher, nestedChain, processingStrategy, expressionManager, shouldRetry, timer,
+                                     maxRetries, millisBetweenRetries)
+                                         .getDownstreamPublisher();
   }
 
 

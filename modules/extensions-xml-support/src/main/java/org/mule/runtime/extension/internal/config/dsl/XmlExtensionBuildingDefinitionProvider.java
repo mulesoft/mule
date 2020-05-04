@@ -8,6 +8,7 @@ package org.mule.runtime.extension.internal.config.dsl;
 
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
@@ -18,6 +19,7 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -45,11 +47,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A {@link ComponentBuildingDefinitionProvider} which makes all definitions of extensions done with the XML SDK be declared by
  * the same definitions of the XML SDK.
- * 
+ *
  * @since 4.3
  */
 public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuildingDefinitionProvider {
@@ -91,11 +94,15 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
                   .ifPresent(opModel -> addModuleOperationChainParser(tnsDefinitionBuilder, dslSyntaxResolver,
                                                                       extensionModel, opModel))));
 
+      AtomicBoolean configPresent = new AtomicBoolean(false);
+
       new IdempotentExtensionWalker() {
 
         @SuppressWarnings("unchecked")
         @Override
         public void onConfiguration(ConfigurationModel configurationModel) {
+          configPresent.set(true);
+
           List<KeyAttributeDefinitionPair> paramsDefinitions =
               processParametersDefinitions(definitionBuilder, dslSyntaxResolver, configurationModel);
 
@@ -106,12 +113,11 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
               .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
               .withConstructorParameterDefinition(fromFixedValue(configurationModel).build())
               .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
+              .withConstructorParameterDefinition(fromReferenceObject(Registry.class).build())
               .withSetterParameterDefinition("parameters",
                                              fromMultipleDefinitions(paramsDefinitions
                                                  .toArray(new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
                                                      .build())
-              .withSetterParameterDefinition("innerConfigProviders",
-                                             fromChildCollectionConfiguration(ConfigurationProvider.class).build())
               .build());
         }
 
@@ -123,6 +129,20 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
           addModuleOperationChainParser(tnsDefinitionBuilder, dslSyntaxResolver, extensionModel, model);
         }
       }.walk(extensionModel);
+
+      if (!configPresent.get()) {
+        definitions.add(definitionBuilder
+            .withIdentifier(DEFAULT_GLOBAL_ELEMENTS)
+            .withTypeDefinition(fromType(ConfigurationProvider.class))
+            .withObjectFactoryType(XmlSdkConfigurationProviderFactory.class)
+            .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
+            .withConstructorParameterDefinition(fromFixedValue(null).build())
+            .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
+            .withConstructorParameterDefinition(fromReferenceObject(Registry.class).build())
+            .withSetterParameterDefinition("parameters", fromFixedValue(null).build())
+            .build());
+      }
+
     }
   }
 

@@ -11,9 +11,10 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;
 import static org.openjdk.jmh.annotations.Scope.Benchmark;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
@@ -50,7 +51,7 @@ public class AbstractBenchmark {
   public static final String PAYLOAD;
   public static final String KEY = "key";
   public static final String VALUE = "value";
-  public static final ComponentLocation CONNECTOR_LOCATION = fromSingleComponent(CONNECTOR_NAME);
+  public static final ComponentLocation CONNECTOR_LOCATION = from(CONNECTOR_NAME);
 
   static {
     try {

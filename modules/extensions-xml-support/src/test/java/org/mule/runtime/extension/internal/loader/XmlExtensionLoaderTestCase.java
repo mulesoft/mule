@@ -75,6 +75,7 @@ import java.util.Set;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -85,12 +86,9 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
   private final boolean validateXml;
 
-  @Parameterized.Parameters(name = "Validate XML: {0}")
-  public static List<Object[]> parameters() {
-    return asList(new Object[][] {
-        {false},
-        {true}
-    });
+  @Parameters(name = "Validate XML: {0}")
+  public static List<Boolean> parameters() {
+    return asList(false, true);
   }
 
   /**
@@ -123,7 +121,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     Optional<OperationComponentModelModelProperty> modelProperty =
         operationModel.getModelProperty(OperationComponentModelModelProperty.class);
     assertThat(modelProperty.isPresent(), is(true));
-    assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(1));
+    assertThat(modelProperty.get().getBodyComponentModel().directChildrenStream().count(), is(1L));
 
     assertThat(operationModel.getOutput().getType().getMetadataFormat(), is(MetadataFormat.JAVA));
     assertThat(operationModel.getOutput().getType(), instanceOf(StringType.class));
@@ -163,7 +161,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     Optional<OperationComponentModelModelProperty> modelProperty =
         operationModel.get().getModelProperty(OperationComponentModelModelProperty.class);
     assertThat(modelProperty.isPresent(), is(true));
-    assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(1));
+    assertThat(modelProperty.get().getBodyComponentModel().directChildrenStream().count(), is(1L));
   }
 
   @Test
@@ -197,7 +195,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     Optional<OperationComponentModelModelProperty> modelProperty =
         operationModel.get().getModelProperty(OperationComponentModelModelProperty.class);
     assertThat(modelProperty.isPresent(), is(true));
-    assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(1));
+    assertThat(modelProperty.get().getBodyComponentModel().directChildrenStream().count(), is(1L));
   }
 
   @Test
@@ -230,7 +228,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     Optional<OperationComponentModelModelProperty> modelProperty =
         operation.getModelProperty(OperationComponentModelModelProperty.class);
     assertThat(modelProperty.isPresent(), is(true));
-    assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(1));
+    assertThat(modelProperty.get().getBodyComponentModel().directChildrenStream().count(), is(1L));
   }
 
   @Test
@@ -275,7 +273,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     Optional<OperationComponentModelModelProperty> modelProperty =
         operation.getModelProperty(OperationComponentModelModelProperty.class);
     assertThat(modelProperty.isPresent(), is(true));
-    assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(1));
+    assertThat(modelProperty.get().getBodyComponentModel().directChildrenStream().count(), is(1L));
   }
 
   @Test
@@ -392,7 +390,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     Optional<OperationComponentModelModelProperty> modelProperty =
         operationModel.getModelProperty(OperationComponentModelModelProperty.class);
     assertThat(modelProperty.isPresent(), is(true));
-    assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(2));
+    assertThat(modelProperty.get().getBodyComponentModel().directChildrenStream().count(), is(2L));
   }
 
   @Test
@@ -433,7 +431,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
       Optional<OperationComponentModelModelProperty> modelProperty =
           operationModel.getModelProperty(OperationComponentModelModelProperty.class);
       assertThat(modelProperty.isPresent(), is(true));
-      assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(1));
+      assertThat(modelProperty.get().getBodyComponentModel().directChildrenStream().count(), is(1L));
 
       assertThat(operationModel.getOutput().getType().getMetadataFormat(), is(MetadataFormat.JAVA));
       assertThat(operationModel.getOutput().getType(), instanceOf(VoidType.class));
@@ -514,7 +512,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     Optional<OperationComponentModelModelProperty> modelProperty =
         doSomethingOp.get().getModelProperty(OperationComponentModelModelProperty.class);
     assertThat(modelProperty.isPresent(), is(true));
-    assertThat(modelProperty.get().getBodyComponentModel().getInnerComponents().size(), is(2));
+    assertThat(modelProperty.get().getBodyComponentModel().directChildrenStream().count(), is(2L));
 
     Optional<OperationModel> callFlowOp = configurationModel.getOperationModel("call-flow");
     assertThat(callFlowOp.isPresent(), is(true));

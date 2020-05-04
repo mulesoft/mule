@@ -134,7 +134,7 @@ public class MessagingException extends EventProcessingException {
   }
 
   /**
-   * @deprecated use {@link #getEvent().getMessage()} instead
+   * @deprecated use {@link CoreEvent#getMessage()} instead
    */
   @Deprecated
   public Message getMuleMessage() {

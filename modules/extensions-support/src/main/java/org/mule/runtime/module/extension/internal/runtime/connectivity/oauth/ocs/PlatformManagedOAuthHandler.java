@@ -142,6 +142,7 @@ public class PlatformManagedOAuthHandler extends OAuthHandler<PlatformManagedOAu
         .connectionUri(config.getConnectionUri())
         .platformUrl(config.getServiceUrl())
         .organizationId(config.getOrgId())
+        .apiVersion(config.getApiVersion())
         .name(config.getOwnerConfigName())
         .tokenUrl(config.getPlatformAuthUrl())
         .encoding(config.getEncoding())

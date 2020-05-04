@@ -24,7 +24,7 @@ public interface EventBuilderConfigurer {
   void configure(Builder builder);
 
   /**
-   * Notifies that the processing of the target {@link CoreEvent} of the {@link #configure(Builder) configured} {@link Builder} is
+   * Notifies that the processing of the target {@link CoreEvent} of the {@link #configure(Builder)} configured {@link Builder} is
    * complete.
    *
    * @since 4.2

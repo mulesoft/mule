@@ -28,6 +28,7 @@ import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.MuleSession;
+import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
 import java.nio.charset.Charset;
@@ -159,6 +160,16 @@ abstract class BaseEventDecorator implements InternalEvent, DeserializationPostI
   @Override
   public <T> T getInternalParameter(String key) {
     return event.getInternalParameter(key);
+  }
+
+  @Override
+  public FlowProcessMediatorContext getFlowProcessMediatorContext() {
+    return event.getFlowProcessMediatorContext();
+  }
+
+  @Override
+  public void setFlowProcessMediatorContext(FlowProcessMediatorContext flowProcessMediatorContext) {
+    event.setFlowProcessMediatorContext(flowProcessMediatorContext);
   }
 
   @Override

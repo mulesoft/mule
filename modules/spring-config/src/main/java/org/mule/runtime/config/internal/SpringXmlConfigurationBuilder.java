@@ -246,7 +246,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
     } else {
       registry = new SpringRegistry(applicationContext, muleContext,
-                                    new ConfigurationDependencyResolver(muleArtifactContext.applicationModel),
+                                    new ConfigurationDependencyResolver(muleArtifactContext.getApplicationModel()),
                                     ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
 
       ((MuleContextWithRegistry) muleContext).setRegistry(registry);
@@ -261,7 +261,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     if (applicationContext instanceof ConfigurableApplicationContext) {
       ((ConfigurableApplicationContext) applicationContext).setParent(parentContext);
       registry = new SpringRegistry(applicationContext, muleContext,
-                                    new ConfigurationDependencyResolver(muleArtifactContext.applicationModel),
+                                    new ConfigurationDependencyResolver(muleArtifactContext.getApplicationModel()),
                                     ((DefaultMuleContext) muleContext).getLifecycleInterceptor());
     } else {
       throw new ConfigurationException(createStaticMessage("Cannot set a parent context if the ApplicationContext does not implement ConfigurableApplicationContext"));

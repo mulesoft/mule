@@ -132,7 +132,7 @@ public interface Flow extends ExecutableComponent, Lifecycle, Pipeline, Processo
      * concurrency.
      *
      * @param maxConcurrency
-     * @return
+     * @return an {@link Builder}
      */
     Builder maxConcurrency(int maxConcurrency);
 
