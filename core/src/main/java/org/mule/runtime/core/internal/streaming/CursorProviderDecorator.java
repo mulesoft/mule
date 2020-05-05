@@ -6,11 +6,8 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
-
-import java.util.Optional;
 
 /**
  * Base class for applying the decorator pattern over instances of a {@link CursorProvider}.
@@ -55,11 +52,6 @@ public abstract class CursorProviderDecorator<T extends Cursor> implements Curso
   @Override
   public boolean isClosed() {
     return delegate.isClosed();
-  }
-
-  @Override
-  public Optional<ComponentLocation> getOriginatingLocation() {
-    return delegate.getOriginatingLocation();
   }
 
   @Override
