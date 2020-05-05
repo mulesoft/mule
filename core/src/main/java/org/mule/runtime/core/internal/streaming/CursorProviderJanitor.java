@@ -97,7 +97,7 @@ public class CursorProviderJanitor {
       }
 
       cursor.release();
-      if (openCursorsCount.decrementAndGet() == 0 && provider.isClosed()) {
+      if (openCursorsCount.decrementAndGet() == 0 && provider != null && provider.isClosed()) {
         releaseResources();
       }
     } catch (Exception e) {
