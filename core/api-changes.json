@@ -126,8 +126,6 @@
           "classSimpleName": "MessageProcessors",
           "methodName": "map",
           "elementKind": "method",
-          "justification":  "cherry-pick"
-        },
           "justification": "Need to set Component Location (since addition of TransactionAdapter)."
         },
         {
