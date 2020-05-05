@@ -8,9 +8,6 @@ package org.mule.runtime.config.internal.dsl.model;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_DOMAIN_ROOT_ELEMENT;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_ROOT_ELEMENT;
-import static org.mule.runtime.config.internal.model.ApplicationModel.POLICY_ROOT_ELEMENT;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.runtime.ast.api.ComponentAst;
@@ -68,10 +65,6 @@ public class ComponentModelReader {
         .collect(toList());
     componentModels.stream()
         .forEach(componentDefinitionModel -> builder.addChildComponentModel((ComponentModel) componentDefinitionModel));
-    ConfigLine parent = configLine.getParent();
-    if (parent != null && isConfigurationTopComponent(parent)) {
-      builder.markAsRootComponent();
-    }
     return builder.build();
   }
 
@@ -80,8 +73,4 @@ public class ComponentModelReader {
     return resolvedValue instanceof String ? (String) resolvedValue : (resolvedValue != null ? resolvedValue.toString() : null);
   }
 
-  private boolean isConfigurationTopComponent(ConfigLine parent) {
-    return (parent.getIdentifier().equals(MULE_ROOT_ELEMENT) || parent.getIdentifier().equals(MULE_DOMAIN_ROOT_ELEMENT) ||
-        parent.getIdentifier().equals(POLICY_ROOT_ELEMENT));
-  }
 }

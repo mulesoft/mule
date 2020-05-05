@@ -120,7 +120,6 @@ public class ComponentModel implements ComponentAst {
 
   public static String COMPONENT_MODEL_KEY = "ComponentModel";
 
-  private boolean root = false;
   private ComponentIdentifier identifier;
   private String componentId;
   private final Map<String, String> parameters = new HashMap<>();
@@ -128,7 +127,6 @@ public class ComponentModel implements ComponentAst {
   private final AtomicBoolean parameterAstsPopulated = new AtomicBoolean(false);
   private final Set<String> schemaValueParameter = new HashSet<>();
   // TODO MULE-9638 This must go away from component model once it's immutable.
-  private ComponentModel parent;
   private final List<ComponentModel> innerComponents = new ArrayList<>();
   private String textContent;
   private ComponentLocation componentLocation;
@@ -206,20 +204,6 @@ public class ComponentModel implements ComponentAst {
         .forEach((k, v) -> attrs.put("{" + NS_MULE_DOCUMENTATION + "}" + k, v));
 
     return attrs;
-  }
-
-  /**
-   * @return true if the {@code ComponentModel} is a top level configuration element, false otherwise.
-   */
-  public boolean isRoot() {
-    return root;
-  }
-
-  /**
-   * Marked as true if it's a top level configuration.
-   */
-  public void setRoot(boolean root) {
-    this.root = root;
   }
 
   /**
@@ -1065,17 +1049,6 @@ public class ComponentModel implements ComponentAst {
     return Router.class.isAssignableFrom(type);
   }
 
-  public void setParent(ComponentModel parent) {
-    this.parent = parent;
-  }
-
-  /**
-   * @return the parent component model in the configuration.
-   */
-  public ComponentModel getParent() {
-    return parent;
-  }
-
   /**
    * @return content of the configuration element.
    */
@@ -1177,7 +1150,6 @@ public class ComponentModel implements ComponentAst {
      * @return the builder.
      */
     public Builder setIdentifier(ComponentIdentifier identifier) {
-      checkIsNotBuildingFromRootComponentModel("identifier");
       this.model.identifier = identifier;
       return this;
     }
@@ -1189,7 +1161,6 @@ public class ComponentModel implements ComponentAst {
      * @return the builder.
      */
     public Builder addParameter(String parameterName, String value, boolean valueFromSchema) {
-      checkIsNotBuildingFromRootComponentModel("parameters");
       this.model.parameters.put(parameterName, value);
       if (valueFromSchema) {
         this.model.schemaValueParameter.add(parameterName);
@@ -1204,9 +1175,7 @@ public class ComponentModel implements ComponentAst {
      * @return the builder.
      */
     public Builder addChildComponentModel(ComponentModel componentModel) {
-      checkIsNotBuildingFromRootComponentModel("innerComponents");
       this.model.innerComponents.add(componentModel);
-      componentModel.setParent(model);
       return this;
     }
 
@@ -1217,19 +1186,7 @@ public class ComponentModel implements ComponentAst {
      * @return the builder.
      */
     public Builder setTextContent(String textContent) {
-      checkIsNotBuildingFromRootComponentModel("textComponent");
       this.model.textContent = textContent;
-      return this;
-    }
-
-    /**
-     * When invoked the created {@code ComponentModel} will be marked us a top level configuration.
-     *
-     * @return the builder.
-     */
-    public Builder markAsRootComponent() {
-      checkIsNotBuildingFromRootComponentModel("root");
-      this.model.root = true;
       return this;
     }
 
@@ -1242,7 +1199,6 @@ public class ComponentModel implements ComponentAst {
      * @return the builder.
      */
     public Builder addCustomAttribute(String name, Object value) {
-      checkIsNotBuildingFromRootComponentModel("customAttributes");
       return addCustomAttribute(QName.valueOf(name), value);
     }
 
@@ -1255,7 +1211,6 @@ public class ComponentModel implements ComponentAst {
      * @return the builder.
      */
     public Builder addCustomAttribute(final QName qname, Object value) {
-      checkIsNotBuildingFromRootComponentModel("customAttributes");
       if (isEmpty(qname.getNamespaceURI()) || NS_MULE_PARSER_METADATA.equals(qname.getNamespaceURI())) {
         this.metadataBuilder.putParserAttribute(qname.getLocalPart(), value);
       } else {
@@ -1273,7 +1228,6 @@ public class ComponentModel implements ComponentAst {
      * @return the builder.
      */
     public Builder setConfigFileName(String configFileName) {
-      checkIsNotBuildingFromRootComponentModel("configFileName");
       this.metadataBuilder.setFileName(configFileName);
       return this;
     }
@@ -1283,7 +1237,6 @@ public class ComponentModel implements ComponentAst {
      * @return the builder.
      */
     public Builder setLineNumber(int lineNumber) {
-      checkIsNotBuildingFromRootComponentModel("lineNumber");
       this.metadataBuilder.setStartLine(lineNumber);
       this.metadataBuilder.setEndLine(lineNumber);
       return this;
@@ -1294,7 +1247,6 @@ public class ComponentModel implements ComponentAst {
      * @return the builder.
      */
     public Builder setStartColumn(int startColumn) {
-      checkIsNotBuildingFromRootComponentModel("startColumn");
       this.metadataBuilder.setStartColumn(startColumn);
       this.metadataBuilder.setEndColumn(startColumn);
       return this;
@@ -1305,7 +1257,6 @@ public class ComponentModel implements ComponentAst {
      * @return the builder.
      */
     public Builder setSourceCode(String sourceCode) {
-      checkIsNotBuildingFromRootComponentModel("sourceCode");
       this.metadataBuilder.setSourceCode(sourceCode);
       return this;
     }
@@ -1322,11 +1273,6 @@ public class ComponentModel implements ComponentAst {
       return model;
     }
 
-    private void checkIsNotBuildingFromRootComponentModel(String parameter) {
-      checkState(root == null,
-                 format("%s cannot be modified when builder has been constructed from a root component", parameter));
-    }
-
   }
 
   @Override
@@ -1340,9 +1286,6 @@ public class ComponentModel implements ComponentAst {
 
     ComponentModel that = (ComponentModel) o;
 
-    if (root != that.root) {
-      return false;
-    }
     if (!Objects.equals(componentLocation, that.componentLocation)) {
       return false;
     }
@@ -1354,8 +1297,7 @@ public class ComponentModel implements ComponentAst {
 
   @Override
   public int hashCode() {
-    int result = (root ? 1 : 0);
-    result = 31 * result + Objects.hashCode(componentLocation);
+    int result = Objects.hashCode(componentLocation);
     result = 31 * result + identifier.hashCode();
     result = 31 * result + parameters.hashCode();
     return result;
