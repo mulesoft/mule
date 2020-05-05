@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.core.internal.streaming.IdentifiableCursorProvider;
 import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
 import org.mule.runtime.core.internal.streaming.MutableStreamingStatistics;
 
@@ -22,7 +22,8 @@ public class ManagedCursorStreamProvider extends ManagedCursorProvider<CursorStr
   /**
    * {@inheritDoc}
    */
-  public ManagedCursorStreamProvider(CursorProvider<CursorStream> delegate, MutableStreamingStatistics statistics) {
+  public ManagedCursorStreamProvider(IdentifiableCursorProvider<CursorStream> delegate,
+                                     MutableStreamingStatistics statistics) {
     super(delegate, statistics);
   }
 
