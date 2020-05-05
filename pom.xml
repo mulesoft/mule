@@ -238,7 +238,7 @@
         <muleMavenClientTest>1.4.2</muleMavenClientTest>
         <mulePolicyApiVersion>1.2.1</mulePolicyApiVersion>
         <muleApiVersion>1.2.2-HF-SNAPSHOT</muleApiVersion>
-        <muleMetadataModelVersion>1.2.2</muleMetadataModelVersion>
+        <muleMetadataModelVersion>1.2.2-HF-SNAPSHOT</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <!-- Test Extensions -->
