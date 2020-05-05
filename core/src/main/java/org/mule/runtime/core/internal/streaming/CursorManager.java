@@ -16,7 +16,6 @@ import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
-import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.object.ManagedCursorIteratorProvider;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -64,7 +63,7 @@ public class CursorManager {
    * @param ownerContext the root context of the event that created the provider
    * @return a {@link CursorProvider}
    */
-  public CursorProvider manage(final CursorProvider provider, DefaultEventContext ownerContext) {
+  public CursorProvider manage(final CursorProvider provider, BaseEventContext ownerContext) {
     CursorProvider innerDelegate = unwrap(provider);
     IdentifiableCursorProvider identifiable = IdentifiableCursorProviderDecorator.of(provider);
 
