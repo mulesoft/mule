@@ -13,6 +13,8 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
 import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
+import org.mule.runtime.core.internal.streaming.CursorManager;
+import org.mule.runtime.core.internal.streaming.IdentifiableCursorProviderDecorator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.Iterator;
@@ -44,7 +46,7 @@ public abstract class AbstractCursorIteratorProviderFactory implements CursorIte
 
     Object value = resolve(iterator, eventContext);
     if (value instanceof CursorProvider) {
-      value = streamingManager.manage((CursorProvider) value, eventContext);
+      value = streamingManager.manage(IdentifiableCursorProviderDecorator.of((CursorProvider) value), eventContext);
     }
 
     return value;
