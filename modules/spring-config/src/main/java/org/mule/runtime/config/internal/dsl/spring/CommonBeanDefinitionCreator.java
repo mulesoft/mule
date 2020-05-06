@@ -218,7 +218,7 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     }
     return componentModel.directChildrenStream()
         .filter(innerComponent -> innerComponent.getIdentifier().equals(MULE_PROPERTY_IDENTIFIER))
-        .map(springComponent -> getPropertyValueFromPropertyComponent(springComponent))
+        .map(PropertyComponentUtils::getPropertyValueFromPropertyComponent)
         .collect(toMap(propValue -> propValue.getFirst(), propValue -> propValue.getSecond()));
   }
 

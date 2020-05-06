@@ -62,6 +62,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -206,21 +207,8 @@ public class BeanDefinitionFactory {
 
                   final Map<String, String> rawParams = new HashMap<>();
                   componentModel.getMetadata().getDocAttributes().entrySet().stream()
-                      .forEach(docAttr -> {
-                        String key;
-                        final QName qName = QName.valueOf(docAttr.getKey());
-
-                        // The doc: prefix is hardcoded here to maintain compatibility of interceptio api use cases where the doc
-                        // parameters are queried with this prefix
-                        if (NS_MULE_DOCUMENTATION.equals(qName.getNamespaceURI())) {
-                          key = "doc:" + qName.getLocalPart();
-                        } else if (StringUtils.isEmpty(qName.getNamespaceURI())) {
-                          key = "doc:" + docAttr.getKey();
-                        } else {
-                          return;
-                        }
-                        rawParams.put(key, docAttr.getValue());
-                      });
+                      .forEach(docAttr -> buildRawParamKeyForDocAttribute(docAttr)
+                          .ifPresent(key -> rawParams.put(key, docAttr.getValue())));
 
                   addAnnotation(ANNOTATION_PARAMETERS,
                                 componentModel.getModel(ParameterizedModel.class)
@@ -273,6 +261,20 @@ public class BeanDefinitionFactory {
                                                                                           .getMetadata()),
                         springComponentModel);
         });
+  }
+
+  private Optional<String> buildRawParamKeyForDocAttribute(Entry<String, String> docAttr) {
+    final QName qName = QName.valueOf(docAttr.getKey());
+
+    // The doc: prefix is hard-coded here to maintain compatibility of interception api use cases where the doc
+    // parameters are queried with this prefix
+    if (NS_MULE_DOCUMENTATION.equals(qName.getNamespaceURI())) {
+      return of("doc:" + qName.getLocalPart());
+    } else if (StringUtils.isEmpty(qName.getNamespaceURI())) {
+      return of("doc:" + docAttr.getKey());
+    } else {
+      return Optional.empty();
+    }
   }
 
   private ErrorType resolveErrorType(String representation) {

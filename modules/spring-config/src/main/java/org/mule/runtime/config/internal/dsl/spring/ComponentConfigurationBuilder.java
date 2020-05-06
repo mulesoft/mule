@@ -14,6 +14,7 @@ import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCr
 
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
@@ -333,7 +334,7 @@ class ComponentConfigurationBuilder<T> {
               .filter(param -> !componentBuildingDefinition.getIgnoredConfigurationParameters()
                   .contains(param.getModel().getName()))
               .filter(param -> param.getRawValue() != null)
-              .collect(toMap(param -> param.getModel().getName(), param -> param.getRawValue())))
+              .collect(toMap(param -> param.getModel().getName(), ComponentParameterAst::getRawValue)))
           .orElse(null);
     }
 

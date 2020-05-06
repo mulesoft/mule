@@ -17,6 +17,7 @@ import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
@@ -72,7 +73,7 @@ class EagerObjectCreator extends BeanDefinitionCreator {
             Map<String, String> parameters = componentModel.getModel(ParameterizedModel.class)
                 .map(pm -> componentModel.getParameters().stream()
                     .filter(param -> param.getRawValue() != null)
-                    .collect(toMap(param -> param.getModel().getName(), param -> param.getRawValue())))
+                    .collect(toMap(param -> param.getModel().getName(), ComponentParameterAst::getRawValue)))
                 .orElse(null);
 
             String attributeName = setterAttributeDefinition.getAttributeName();
