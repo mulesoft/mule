@@ -73,7 +73,6 @@ import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.dsl.xml.XmlNamespaceInfoProviderSupplier;
 import org.mule.runtime.config.internal.editors.MulePropertyEditorRegistrar;
 import org.mule.runtime.config.internal.model.ApplicationModel;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.processor.ComponentLocatorCreatePostProcessor;
 import org.mule.runtime.config.internal.processor.DiscardedOptionalBeanPostProcessor;
 import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
@@ -682,7 +681,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   @Override
   protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
-    Optional<ComponentModel> configurationOptional =
+    Optional<ComponentAst> configurationOptional =
         applicationModel.findComponentDefinitionModel(CONFIGURATION_IDENTIFIER);
     if (configurationOptional.isPresent()) {
       return;

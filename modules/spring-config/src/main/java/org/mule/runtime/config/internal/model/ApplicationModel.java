@@ -790,9 +790,8 @@ public class ApplicationModel implements ArtifactAst {
     return new GlobalPropertyConfigurationPropertiesProvider(globalProperties);
   }
 
-  public Optional<ComponentModel> findComponentDefinitionModel(ComponentIdentifier componentIdentifier) {
+  public Optional<ComponentAst> findComponentDefinitionModel(ComponentIdentifier componentIdentifier) {
     return topLevelComponentsStream()
-        .map(cm -> (ComponentModel) cm)
         .filter(componentModel -> componentModel.getIdentifier().equals(componentIdentifier)).findFirst();
   }
 
