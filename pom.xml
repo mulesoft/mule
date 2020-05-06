@@ -245,6 +245,8 @@
         <xmlSecurityVersion>1.5.8</xmlSecurityVersion>
         <xstreamVersion>1.4.10</xstreamVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
+
+        <muleCommonVersion>3.9.2</muleCommonVersion>
     </properties>
 
     <dependencies>
