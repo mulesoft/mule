@@ -23,11 +23,11 @@ import org.mule.runtime.config.internal.ModuleDelegatingEntityResolver;
 import org.mule.runtime.config.internal.dsl.model.ComponentModelReader;
 import org.mule.runtime.config.internal.dsl.model.config.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.dsl.xml.XmlNamespaceInfoProviderSupplier;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
 import org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader;
 import org.mule.runtime.dsl.internal.xml.parser.XmlApplicationParser;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.InputStream;
 import java.util.List;
@@ -40,8 +40,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
-
-public class ComponentModelReaderHelperTestCase {
+public class ComponentModelReaderHelperTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testSimpleApp() throws Exception {
@@ -138,7 +137,7 @@ public class ComponentModelReaderHelperTestCase {
 
   private void compareXML(String inputXml, String expectedXml) throws Exception {
     ComponentAst componentModel = getComponentModel(inputXml);
-    String actualXml = ComponentModelReaderHelper.toXml((ComponentModel) componentModel);
+    String actualXml = ComponentModelReaderHelper.toXml(componentModel);
 
     setNormalizeWhitespace(true);
     setIgnoreWhitespace(true);

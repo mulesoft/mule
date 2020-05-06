@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.REPRESENTATION_ANNOTATION_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -44,13 +45,13 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
 import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
@@ -61,11 +62,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.xml.namespace.QName;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
@@ -199,10 +204,24 @@ public class BeanDefinitionFactory {
                   addAnnotation(ANNOTATION_NAME, componentModel.getIdentifier(), springComponentModel);
                   // We need to use a mutable map since spring will resolve the properties placeholder present in the value if
                   // needed and it will be done by mutating the same map.
+
+                  final Map<String, String> rawParams = new HashMap<>();
+                  componentModel.getMetadata().getDocAttributes().entrySet().stream()
+                      .forEach(docAttr -> buildRawParamKeyForDocAttribute(docAttr)
+                          .ifPresent(key -> rawParams.put(key, docAttr.getValue())));
+
                   addAnnotation(ANNOTATION_PARAMETERS,
-                                new HashMap<>(((ComponentModel) componentModel)
-                                    .getRawParameters()),
+                                componentModel.getModel(ParameterizedModel.class)
+                                    .map(pm -> {
+                                      componentModel.getParameters().stream()
+                                          .filter(param -> param.getRawValue() != null)
+                                          .forEach(param -> rawParams.put(param.getModel().getName(), param.getRawValue()));
+
+                                      return rawParams;
+                                    })
+                                    .orElse(rawParams),
                                 springComponentModel);
+
                   // add any error mappings if present
                   List<ComponentAst> errorMappingComponents = componentModel.directChildrenStream()
                       .filter(innerComponent -> ERROR_MAPPING_IDENTIFIER
@@ -242,6 +261,20 @@ public class BeanDefinitionFactory {
                                                                                           .getMetadata()),
                         springComponentModel);
         });
+  }
+
+  private Optional<String> buildRawParamKeyForDocAttribute(Entry<String, String> docAttr) {
+    final QName qName = QName.valueOf(docAttr.getKey());
+
+    // The doc: prefix is hard-coded here to maintain compatibility of interception api use cases where the doc
+    // parameters are queried with this prefix
+    if (NS_MULE_DOCUMENTATION.equals(qName.getNamespaceURI())) {
+      return of("doc:" + qName.getLocalPart());
+    } else if (StringUtils.isEmpty(qName.getNamespaceURI())) {
+      return of("doc:" + docAttr.getKey());
+    } else {
+      return Optional.empty();
+    }
   }
 
   private ErrorType resolveErrorType(String representation) {
@@ -351,7 +384,7 @@ public class BeanDefinitionFactory {
     if (buildingDefinitionOptional.isPresent() || customBuildersComponentIdentifiers.contains(componentModel.getIdentifier())) {
       final CreateBeanDefinitionRequest request = new CreateBeanDefinitionRequest(parentComponentModel, componentModel,
                                                                                   buildingDefinitionOptional.orElse(null));
-      request.getSpringComponentModel().setType(((ComponentModel) componentModel).getType());
+      request.getSpringComponentModel().setType(request.retrieveTypeVisitor().getType());
       this.componentModelProcessor.processRequest(springComponentModels, request);
       return of(request.getSpringComponentModel());
     } else {

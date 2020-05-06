@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTIES_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.VALUE_ATTRIBUTE;
@@ -17,7 +18,6 @@ import static org.springframework.beans.factory.xml.BeanDefinitionParserDelegate
 
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.model.ComponentModel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -88,7 +88,7 @@ class PropertiesMapBeanDefinitionCreator extends BeanDefinitionCreator {
     ManagedList<Object> managedList = new ManagedList<>();
     componentModel.directChildrenStream().forEach(childComponent -> {
       if (childComponent.getIdentifier().getName().equals(VALUE_ATTRIBUTE)) {
-        managedList.add(((ComponentModel) childComponent).getTextContent());
+        managedList.add(childComponent.getRawParameterValue(BODY_RAW_PARAM_NAME).orElse(null));
       } else {
         managedList.add(new RuntimeBeanReference(childComponent.getRawParameterValue(BEAN_REF_ATTRIBUTE).orElse(null)));
       }

@@ -73,7 +73,6 @@ import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.dsl.xml.XmlNamespaceInfoProviderSupplier;
 import org.mule.runtime.config.internal.editors.MulePropertyEditorRegistrar;
 import org.mule.runtime.config.internal.model.ApplicationModel;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.config.internal.processor.ComponentLocatorCreatePostProcessor;
 import org.mule.runtime.config.internal.processor.DiscardedOptionalBeanPostProcessor;
 import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
@@ -382,15 +381,16 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     ((ObjectProviderAwareBeanFactory) beanFactory).setObjectProviders(objectProviders);
   }
 
-  private List<Pair<ComponentModel, Optional<String>>> lookObjectProvidersComponentModels(ArtifactAst applicationModel) {
-    List<Pair<ComponentModel, Optional<String>>> objectProviders = new ArrayList<>();
-    applicationModel.topLevelComponentsStream().forEach(componentModel -> {
-      if (((ComponentModel) componentModel).getType() != null
-          && ConfigurableObjectProvider.class.isAssignableFrom(((ComponentModel) componentModel).getType())) {
-        objectProviders.add(new Pair<>((ComponentModel) componentModel, componentModel.getComponentId()));
-      }
-    });
-    return objectProviders;
+  private List<Pair<ComponentAst, Optional<String>>> lookObjectProvidersComponentModels(ArtifactAst applicationModel,
+                                                                                        Map<ComponentAst, SpringComponentModel> springComponentModels) {
+    return applicationModel.topLevelComponentsStream()
+        .filter(componentModel -> {
+          final SpringComponentModel springModel = springComponentModels.get(componentModel);
+          return springModel != null && springModel.getType() != null
+              && ConfigurableObjectProvider.class.isAssignableFrom(springModel.getType());
+        })
+        .map(componentModel -> new Pair<>(componentModel, componentModel.getComponentId()))
+        .collect(toList());
   }
 
   private void registerEditors(ConfigurableListableBeanFactory beanFactory) {
@@ -547,10 +547,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   protected List<Pair<String, ComponentAst>> doCreateApplicationComponents(DefaultListableBeanFactory beanFactory,
                                                                            ArtifactAst applicationModel, boolean mustBeRoot,
                                                                            Map<ComponentAst, SpringComponentModel> springComponentModels) {
-    // This should only be done once at the initial application model creation, called from Spring
-    List<Pair<ComponentModel, Optional<String>>> objectProvidersByName =
-        lookObjectProvidersComponentModels(applicationModel);
-
     Set<String> alwaysEnabledTopLevelComponents = applicationModel.topLevelComponentsStream()
         .filter(cm -> this.componentBuildingDefinitionRegistry.getBuildingDefinition(cm.getIdentifier())
             .map(buildingDefinition -> buildingDefinition.isAlwaysEnabled()).orElse(false))
@@ -585,6 +581,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         .forEach(resolvedComponentModel -> registerRootSpringBean(beanFactory, alwaysEnabledUnnamedTopLevelComponents,
                                                                   alwaysEnabledGeneratedTopLevelComponentsName,
                                                                   createdComponentModels, resolvedComponentModel));
+
+    // This should only be done once at the initial application model creation, called from Spring
+    List<Pair<ComponentAst, Optional<String>>> objectProvidersByName =
+        lookObjectProvidersComponentModels(applicationModel, springComponentModels);
 
     objectProvidersByName.stream()
         .map(pair -> springComponentModels.get(pair.getFirst()).getObjectInstance())
@@ -681,7 +681,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   @Override
   protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
-    Optional<ComponentModel> configurationOptional =
+    Optional<ComponentAst> configurationOptional =
         applicationModel.findComponentDefinitionModel(CONFIGURATION_IDENTIFIER);
     if (configurationOptional.isPresent()) {
       return;

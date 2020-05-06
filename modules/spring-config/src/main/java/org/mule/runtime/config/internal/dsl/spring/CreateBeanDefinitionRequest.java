@@ -44,7 +44,13 @@ public class CreateBeanDefinitionRequest {
 
     this.typeVisitorRetriever = new LazyValue<>(() -> {
       ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
-      componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
+
+      if (componentBuildingDefinition != null) {
+        componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
+      } else {
+        objectTypeVisitor.onType(Object.class);
+      }
+
       return objectTypeVisitor;
     });
   }
