@@ -27,6 +27,7 @@ import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
 import org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader;
 import org.mule.runtime.dsl.internal.xml.parser.XmlApplicationParser;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.InputStream;
 import java.util.List;
@@ -39,7 +40,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
-public class ComponentModelReaderHelperTestCase {
+public class ComponentModelReaderHelperTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testSimpleApp() throws Exception {
