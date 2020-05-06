@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.privileged.processor;
 
+import static java.util.Collections.singletonList;
+import static java.util.concurrent.ConcurrentHashMap.newKeySet;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -20,6 +22,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
@@ -31,6 +34,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextBlocking;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
+import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
@@ -38,12 +42,15 @@ import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
@@ -53,7 +60,10 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
@@ -66,6 +76,7 @@ import org.reactivestreams.Publisher;
 
 import io.qameta.allure.Issue;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SynchronousSink;
 
@@ -83,6 +94,12 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   private CoreEvent response;
   private Flow flow;
   private Publisher<CoreEvent> responsePublisher;
+  static private Set<Object> droppedNexts;
+
+  static {
+    droppedNexts = newKeySet();
+    Hooks.onNextDropped(dropped -> droppedNexts.add(dropped));
+  }
 
   @Before
   public void setup() throws MuleException {
@@ -438,6 +455,50 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     nestedChildContextsApplyProcess(false, completeWithErrorContinue(), completeWithErrorPropagate());
   }
 
+  @Test
+  public void applyWithinApplyWithinApplyErrorWithChainErrorHandling() {
+    nestedChildContextsApplyApplyApply(false, completeWithErrorContinue());
+  }
+
+  @Test
+  public void propagateErrorFlux() throws MuleException {
+    List<String> results = new ArrayList<>();
+    AtomicBoolean completeWithError = new AtomicBoolean(false);
+
+    final NullPointerException expected = new NullPointerException();
+
+    DefaultEventBuilder builder = getEventBuilder();
+    builder.message(Message.of("Hello"));
+
+    Flux.<CoreEvent>create(sink -> {
+      sink.next(builder.build());
+      sink.error(expected);
+    }).transform(ep -> {
+      final FluxSinkRecorder<CoreEvent> emitter = new FluxSinkRecorder<>();
+      return applyWithChildContext(ep, innerPub -> transfromer(emitter, innerPub), Optional.empty());
+    })
+        .subscribe(s -> results.add(s.getMessage().getPayload().getValue().toString()),
+                   e -> completeWithError.set(true));
+
+    probe(() -> {
+      return completeWithError.get();
+    });
+  }
+
+  private Publisher<CoreEvent> transfromer(final FluxSinkRecorder<CoreEvent> emitter, Publisher<CoreEvent> pub) {
+    Flux<CoreEvent> transformedPub = Flux.from(pub);
+    try {
+      final DefaultEventBuilder builder = getEventBuilder();
+      return transformedPub.doOnNext(s -> {
+        builder.message(Message.of(s.getMessage().getPayload().getValue() + " world"));
+        emitter.next(builder.build());
+      });
+    } catch (MuleException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
   private void nestedChildContextsApplyProcess(boolean exceptionExpected, BiConsumer<Throwable, Object> outerErrorConsumer,
                                                BiConsumer<Throwable, Object> innerErrorConsumer) {
     final NullPointerException expected = new NullPointerException();
@@ -456,6 +517,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
                                                                 .onErrorContinue(outerErrorConsumer),
                                                             Optional.empty()))
         .block();
+
+    assertThat(droppedNexts.isEmpty(), is(true));
   }
 
   private void nestedChildContextsApplyApply(boolean exceptionExpected, BiConsumer<Throwable, Object> outerErrorConsumer,
@@ -475,6 +538,22 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
                                                                 .onErrorContinue(outerErrorConsumer),
                                                             Optional.empty()))
         .block();
+
+    assertThat(droppedNexts.isEmpty(), is(true));
+  }
+
+  private void nestedChildContextsApplyApplyApply(boolean exceptionExpected, BiConsumer<Throwable, Object> innerErrorConsumer) {
+    final NullPointerException expected = new NullPointerException();
+
+    if (exceptionExpected) {
+      thrown.expect(hasRootCause(sameInstance(expected)));
+    }
+
+    just(input).transform(inputPub -> applyWithChildContext(inputPub, innerChain(innerErrorConsumer, expected), Optional.empty()))
+        .block();
+
+
+    assertThat(droppedNexts.isEmpty(), is(true));
   }
 
   private void nestedChildContextsProcessApply(boolean exceptionExpected, BiConsumer<Throwable, Object> outerErrorConsumer,
@@ -493,6 +572,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
                                      .onErrorContinue(outerErrorConsumer),
                                  newChildContext(input, Optional.empty())))
                                      .block();
+
+    assertThat(droppedNexts.isEmpty(), is(true));
   }
 
   private void nestedChildContextsProcessProcess(boolean exceptionExpected, BiConsumer<Throwable, Object> outerErrorConsumer,
@@ -512,6 +593,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
                                      .onErrorContinue(outerErrorConsumer),
                                  newChildContext(input, Optional.empty())))
                                      .block();
+
+    assertThat(droppedNexts.isEmpty(), is(true));
   }
 
   private ReactiveProcessor innerChain(BiConsumer<Throwable, Object> innerErrorConsumer, final NullPointerException expected) {
