@@ -33,6 +33,7 @@ public class PetAdoptionSource extends PollingSource<String, Void> {
   public static int FAILED_ADOPTION_COUNT;
   public static int COMPLETED_POLLS;
   public static int REJECTED_ADOPTIONS;
+  public static int STARTED_POLLS;
   protected List<String> pets;
 
   @Parameter
@@ -72,6 +73,7 @@ public class PetAdoptionSource extends PollingSource<String, Void> {
 
   @Override
   public void poll(PollContext<String, Void> pollContext) {
+    STARTED_POLLS++;
     pollContext.setWatermarkComparator(naturalOrder());
     pets.stream()
         .map(p -> Result.<String, Void>builder().output(p).build())
@@ -94,6 +96,6 @@ public class PetAdoptionSource extends PollingSource<String, Void> {
   }
 
   private synchronized void resetCounters() {
-    ADOPTED_PET_COUNT = FAILED_ADOPTION_COUNT = COMPLETED_POLLS = REJECTED_ADOPTIONS = 0;
+    ADOPTED_PET_COUNT = FAILED_ADOPTION_COUNT = COMPLETED_POLLS = REJECTED_ADOPTIONS = STARTED_POLLS = 0;
   }
 }

@@ -196,13 +196,14 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
-  private void startSource(boolean restarting) throws MuleException {
+  private void startSource(boolean restarting, Map<String, Object> restartingContext) throws MuleException {
     try {
       // When restarting, async must be forced
       if (restarting && !retryPolicyTemplate.isAsync()) {
-        new AsynchronousRetryTemplate(retryPolicyTemplate).execute(new StartSourceCallback(restarting), retryScheduler);
+        new AsynchronousRetryTemplate(retryPolicyTemplate).execute(new StartSourceCallback(restarting, restartingContext),
+                                                                   retryScheduler);
       } else {
-        retryPolicyTemplate.execute(new StartSourceCallback(restarting), retryScheduler);
+        retryPolicyTemplate.execute(new StartSourceCallback(restarting, restartingContext), retryScheduler);
       }
     } catch (Throwable e) {
       if (e instanceof MuleException) {
@@ -214,7 +215,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void startSource() throws MuleException {
-    startSource(false);
+    startSource(false, null);
   }
 
   private RetryPolicyTemplate createRetryPolicyTemplate(RetryPolicyTemplate customTemplate) {
@@ -225,6 +226,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void stopSource() throws MuleException {
+    stopSource(false);
+  }
+
+  private Map<String, Object> stopSource(boolean restarting) throws MuleException {
     if (sourceAdapter != null) {
       final String sourceName = sourceAdapter.getName();
 
@@ -233,6 +238,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         initialiserEvent = getInitialiserEvent(muleContext);
         try {
           stopUsingConfiguration(initialiserEvent);
+          return restarting ? sourceAdapter.beginRestart() : null;
         } finally {
           sourceAdapter.stop();
           if (usesDynamicConfiguration()) {
@@ -250,6 +256,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         }
       }
     }
+    return null;
   }
 
   /**
@@ -331,9 +338,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private void restart() throws MuleException {
     synchronized (started) {
       if (started.get()) {
-        stopSource();
+        Map<String, Object> restartingContext = stopSource(true);
         disposeSource();
-        startSource(true);
+        startSource(true, restartingContext);
       } else {
         LOGGER.warn(format("Message source '%s' on flow '%s' is stopped. Not doing restart", getLocation().getRootContainerName(),
                            getLocation().getRootContainerName()));
@@ -509,9 +516,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private class StartSourceCallback implements RetryCallback {
 
     boolean restarting;
+    Map restartingContext;
 
-    StartSourceCallback(boolean restarting) {
+    StartSourceCallback(boolean restarting, Map restartingContext) {
       this.restarting = restarting;
+      this.restartingContext = restartingContext;
     }
 
     @Override
@@ -519,6 +528,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       try {
         createSource(restarting);
         initialiseIfNeeded(sourceAdapter);
+        if (restarting) {
+          sourceAdapter.finishRestart(restartingContext);
+        }
         sourceAdapter.start();
         reconnecting.set(false);
       } catch (Exception e) {

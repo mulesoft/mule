@@ -6,29 +6,36 @@
  */
 package org.mule.test.module.extension.source;
 
+import static java.lang.Thread.sleep;
 import static java.util.stream.Collectors.toList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.test.petstore.extension.NumberPetAdoptionSource.ALL_NUMBERS;
 import static org.mule.test.petstore.extension.PetAdoptionSource.ALL_PETS;
 import static org.mule.test.petstore.extension.PetAdoptionSource.FAILED_ADOPTION_COUNT;
+import static org.mule.test.petstore.extension.PetAdoptionSource.STARTED_POLLS;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.PetAdoptionSource;
+import org.mule.test.petstore.extension.PetFailingPollingSource;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import io.qameta.allure.Description;
+import org.junit.Before;
 import org.junit.Test;
 
 public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static final List<CoreEvent> ADOPTION_EVENTS = new LinkedList<>();
-
 
   public static class AdoptionProcessor implements Processor {
 
@@ -49,6 +56,12 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
   @Override
   protected String getConfigFile() {
     return "polling-source-config.xml";
+  }
+
+  @Before
+  public void resetCounters() throws Exception {
+    PetFailingPollingSource.STARTED_POLLS = 0;
+    STARTED_POLLS = 0;
   }
 
   @Test
@@ -122,6 +135,37 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
     assertAllPetsAdopted();
   }
 
+  @Description("This test reflects a behavior that we must preserve, when a polling source is stopped and started the scheduler must be rescheduled.")
+  @Test
+  public void whenSourceIsStopAndStartedSchedulerIsReset() throws Exception {
+    startFlow("longFrequencyPoll");
+    assertStartedPolls(1);
+    stopFlow("longFrequencyPoll");
+    sleep(1000);
+    startFlow("longFrequencyPoll");
+    assertStartedPolls(1);
+  }
+
+  @Test
+  public void sourceRetriggersImmediatlyOnReconnection() throws Exception {
+    startFlow("failingLongFrequencyPoll");
+    assertPetFailingSourcePolls(2);
+  }
+
+  private void assertStartedPolls(int polls) {
+    check(5000, 200, () -> {
+      assertThat(STARTED_POLLS, is(polls));
+      return true;
+    });
+  }
+
+  private void assertPetFailingSourcePolls(int polls) {
+    check(5000, 200, () -> {
+      assertThat(PetFailingPollingSource.STARTED_POLLS, is(polls));
+      return true;
+    });
+  }
+
   private void assertIdempotentAdoptions() {
     checkNot(5000, 100, () -> {
       synchronized (ADOPTION_EVENTS) {
@@ -133,6 +177,9 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
   private void assertAllPetsAdopted() {
     check(5000, 200, () -> {
       synchronized (ADOPTION_EVENTS) {
+        System.out.println(ADOPTION_EVENTS.size());
+        System.out
+            .println(ADOPTION_EVENTS.stream().map(e -> e.getMessage().getPayload().getValue().toString()).collect(toList()));
         return ADOPTION_EVENTS.size() >= ALL_PETS.size() &&
             ADOPTION_EVENTS.stream().map(e -> e.getMessage().getPayload().getValue().toString()).collect(toList())
                 .containsAll(ALL_PETS);
@@ -152,5 +199,9 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
   private void startFlow(String flowName) throws Exception {
     ((Startable) getFlowConstruct(flowName)).start();
+  }
+
+  private void stopFlow(String flowName) throws Exception {
+    ((Stoppable) getFlowConstruct(flowName)).stop();
   }
 }

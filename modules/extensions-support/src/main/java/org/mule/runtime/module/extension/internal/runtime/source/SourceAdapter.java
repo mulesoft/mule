@@ -77,6 +77,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper;
+import org.mule.runtime.module.extension.internal.runtime.source.poll.Restartable;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 
 import java.lang.annotation.Annotation;
@@ -102,7 +103,7 @@ import org.slf4j.Logger;
  *
  * @since 4.0
  */
-public class SourceAdapter implements Lifecycle {
+public class SourceAdapter implements Lifecycle, Restartable {
 
   private static final Logger LOGGER = getLogger(SourceAdapter.class);
 
@@ -268,6 +269,21 @@ public class SourceAdapter implements Lifecycle {
   public void dispose() {
     disposeIfNeeded(source, LOGGER);
     initialised = false;
+  }
+
+  @Override
+  public Map<String, Object> beginRestart() {
+    if (source instanceof Restartable) {
+      return ((Restartable) source).beginRestart();
+    }
+    return null;
+  }
+
+  @Override
+  public void finishRestart(Map<String, Object> restartingContext) {
+    if (source instanceof Restartable) {
+      ((Restartable) source).finishRestart(restartingContext);
+    }
   }
 
 

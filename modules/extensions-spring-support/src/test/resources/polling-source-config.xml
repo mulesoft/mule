@@ -68,7 +68,7 @@
                 <fixed-frequency frequency="1000"/>
             </scheduling-strategy>
         </petstore:pet-adoption-source>
-        <raise-error type="TEST:EXPECTED"/>
+        <test:processor throwException="true"/>
     </flow>
 
     <petstore:config name="petstore" cashierName="jim">
@@ -82,6 +82,24 @@
         <petstore:pet-failing-source config-ref="petstore" failAtPoll="3" adoptionLimit="7">
             <scheduling-strategy>
                 <fixed-frequency frequency="200" startDelay="3500"/>
+            </scheduling-strategy>
+        </petstore:pet-failing-source>
+        <flow-ref name="adopt"/>
+    </flow>
+
+    <flow name="longFrequencyPoll" initialState="stopped">
+        <petstore:pet-adoption-source>
+            <scheduling-strategy>
+                <fixed-frequency startDelay="200" frequency="100000"/>
+            </scheduling-strategy>
+        </petstore:pet-adoption-source>
+        <flow-ref name="adopt"/>
+    </flow>
+
+    <flow name="failingLongFrequencyPoll" initialState="stopped">
+        <petstore:pet-failing-source config-ref="petstore" failAtPoll="1">
+            <scheduling-strategy>
+                <fixed-frequency startDelay="500" frequency="100000"/>
             </scheduling-strategy>
         </petstore:pet-failing-source>
         <flow-ref name="adopt"/>

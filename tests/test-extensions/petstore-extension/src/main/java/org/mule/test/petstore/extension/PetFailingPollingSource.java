@@ -34,7 +34,7 @@ public class PetFailingPollingSource extends PollingSource<String, Void> {
   public static final List<String> ALL_PETS =
       asList("Grumpy Cat", "Colonel Meow", "Skipped Cat", "Silvester", "Lil bub", "Macri", "Pappo");
   protected List<String> pets;
-  private static Integer numberOfPolls = 0;
+  public static Integer STARTED_POLLS = 0;
   public static ExecutorService executor;
 
   @Connection
@@ -58,12 +58,13 @@ public class PetFailingPollingSource extends PollingSource<String, Void> {
 
   @Override
   public void poll(PollContext<String, Void> pollContext) {
-    numberOfPolls++;
-    if (numberOfPolls == failAtPoll) {
+    System.out.println("STARTED POOLS **************:  " + STARTED_POLLS);
+    STARTED_POLLS++;
+    if (STARTED_POLLS == failAtPoll) {
       pollContext.onConnectionException(new ConnectionException("Polling Fail"));
-    } else if (numberOfPolls - 1 <= adoptionLimit) {
+    } else if (STARTED_POLLS - 1 <= adoptionLimit) {
       pollContext.accept(item -> {
-        String pet = ALL_PETS.get((numberOfPolls - 1) % 7);
+        String pet = ALL_PETS.get((STARTED_POLLS - 1) % 7);
         item.setResult(Result.<String, Void>builder().output(pet).build());
       });
     }

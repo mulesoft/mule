@@ -39,7 +39,6 @@ import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
-import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -54,6 +53,7 @@ import org.mule.runtime.module.extension.internal.runtime.source.SourceWrapper;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -75,12 +75,14 @@ import org.slf4j.Logger;
  *
  * @since 4.1
  */
-public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
+public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements Restartable {
 
   private static final Logger LOGGER = getLogger(PollingSourceWrapper.class);
   private static final String ITEM_RELEASER_CTX_VAR = "itemReleaser";
   private static final String UPDATE_PROCESSED_LOCK = "OSClearing";
   private static final String INFLIGHT_IDS_OS_NAME_SUFFIX = "inflight-ids";
+  private static final String POLLING_SOURCE_EXECUTOR_KEY = "Polling source executor";
+  private static final String RUNNABLE_KEY = "Runnable";
 
   private final PollingSource<T, A> delegate;
   private final SchedulingStrategy scheduler;
@@ -104,6 +106,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   private String flowName;
   private final AtomicBoolean stopRequested = new AtomicBoolean(false);
   private org.mule.runtime.api.scheduler.Scheduler executor;
+  private AtomicBoolean restarting = new AtomicBoolean(false);
+  private DelegateRunnable delegateRunnable;
 
   public PollingSourceWrapper(PollingSource<T, A> delegate, SchedulingStrategy scheduler) {
     super(delegate);
@@ -133,7 +137,13 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
         .withName(formatKey("executor")));
 
     stopRequested.set(false);
-    scheduler.schedule(executor, () -> poll(sourceCallback));
+    if (delegateRunnable == null) {
+      delegateRunnable = new DelegateRunnable(() -> poll(sourceCallback));
+      scheduler.schedule(executor, delegateRunnable);
+    } else {
+      delegateRunnable.setDelegate(() -> poll(sourceCallback));
+      poll(sourceCallback);
+    }
   }
 
   private String formatKey(String key) {
@@ -143,7 +153,10 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   @Override
   public void onStop() {
     stopRequested.set(true);
-    shutdownScheduler();
+    if (!restarting.get()) {
+      shutdownScheduler();
+      delegateRunnable = null;
+    }
     try {
       delegate.onStop();
     } catch (Throwable t) {
@@ -202,6 +215,25 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
     }
 
     return comparator.compare(w1, w2);
+  }
+
+  @Override
+  public Map<String, Object> beginRestart() {
+    Map<String, Object> restartingContext = new HashMap<>();
+
+    restarting.set(true);
+
+    restartingContext.put(POLLING_SOURCE_EXECUTOR_KEY, executor);
+    restartingContext.put(RUNNABLE_KEY, delegateRunnable);
+    return restartingContext;
+  }
+
+  @Override
+  public void finishRestart(Map<String, Object> restartingContext) {
+    restarting.set(true);
+
+    executor = (org.mule.runtime.api.scheduler.Scheduler) restartingContext.get(POLLING_SOURCE_EXECUTOR_KEY);
+    delegateRunnable = (DelegateRunnable) restartingContext.get(RUNNABLE_KEY);
   }
 
   private class DefaultPollContext implements PollContext<T, A> {
@@ -594,6 +626,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   private void shutdownScheduler() {
     if (executor != null) {
       executor.stop();
+      executor = null;
     }
   }
 
@@ -613,6 +646,24 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
       } catch (ObjectStoreException e) {
         LOGGER.error(format("Could not untrack item '%s' in source at flow '%s'. %s", id, flowName, e.getMessage()), e);
       }
+    }
+  }
+
+  private class DelegateRunnable implements Runnable {
+
+    Runnable delegate;
+
+    public DelegateRunnable(Runnable delegate) {
+      this.delegate = delegate;
+    }
+
+    @Override
+    public void run() {
+      delegate.run();
+    }
+
+    public void setDelegate(Runnable delegate) {
+      this.delegate = delegate;
     }
   }
 }
