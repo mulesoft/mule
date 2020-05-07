@@ -7,7 +7,6 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
-import static java.lang.System.identityHashCode;
 import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
@@ -41,10 +40,23 @@ import org.springframework.beans.factory.SmartFactoryBean;
  */
 public class ObjectFactoryClassRepository {
 
-  private final static LoadingCache<ClassLoaderCacheKey, ClassLoader> COMPOSITE_CL_CACHE = newBuilder()
+  //This only works because the cache uses an identity hashCode() and equals() for keys when they are configured as weak.
+  //(check com.github.benmanes.caffeine.cache.Caffeine.weakKeys javadoc)
+  //If that is not the case, this will never work because we want to compare class loaders by instance.
+  //The idea for this cache is to avoid the creation of multiple CompositeClassLoader s instances for the same delegates.
+  //That is because CGLIB enhancer uses that classloader to define the enhanced class and every new instance loads
+  //the same defined class over and over again, causing metaspace OOM in some scenarios.
+  private final static LoadingCache<ClassLoader, ClassLoader> COMPOSITE_CL_CACHE = newBuilder()
       .weakKeys()
       .weakValues()
-      .build(new ClassLoaderCacheLoader());
+      .build(new CacheLoader<ClassLoader, ClassLoader>() {
+
+        @Nullable
+        @Override
+        public ClassLoader load(@NonNull ClassLoader key) throws Exception {
+          return new CompositeClassLoader(ObjectFactoryClassRepository.class.getClassLoader(), key);
+        }
+      });
 
   /**
    * Retrieves a {@link Class} for the {@link ObjectFactory} defined by the {@code objectFactoryType} parameter. Once acquired the
@@ -85,7 +97,7 @@ public class ObjectFactoryClassRepository {
     if (SmartFactoryBean.class.getClassLoader() != objectFactoryType.getClassLoader()) {
       // CGLIB needs access to both the spring interface and the extended factory class.
       // If the factory class is defined in a plugin, its classloader has to be passed.
-      enhancer.setClassLoader(COMPOSITE_CL_CACHE.get(new ClassLoaderCacheKey(objectFactoryType.getClassLoader())));
+      enhancer.setClassLoader(COMPOSITE_CL_CACHE.get(objectFactoryType.getClassLoader()));
     }
 
     // The use of the CGLIB cache is turned off when a post creation function is passed as argument in order to
@@ -127,36 +139,4 @@ public class ObjectFactoryClassRepository {
     });
     return factoryBeanClass;
   }
-
-  private static class ClassLoaderCacheKey {
-
-    private final ClassLoader classLoader;
-
-    private ClassLoaderCacheKey(ClassLoader classLoader) {
-      this.classLoader = classLoader;
-    }
-
-    @Override
-    public int hashCode() {
-      return identityHashCode(this.classLoader);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (!(obj instanceof ClassLoaderCacheKey)) {
-        return false;
-      }
-      return this.classLoader == ((ClassLoaderCacheKey) obj).classLoader;
-    }
-  }
-
-  private static class ClassLoaderCacheLoader implements CacheLoader<ClassLoaderCacheKey, ClassLoader> {
-
-    @Nullable
-    @Override
-    public ClassLoader load(@NonNull ClassLoaderCacheKey classLoaderCacheKey) throws Exception {
-      return new CompositeClassLoader(ObjectFactoryClassRepository.class.getClassLoader(), classLoaderCacheKey.classLoader);
-    }
-  }
-
 }
