@@ -16,7 +16,7 @@
     <description>Includes the Mule server with all of its modules and transports.</description>
 
     <properties>
-        <apikit.version>${project.version}</apikit.version>
+        <apikit.version>3.9.2</apikit.version>
     </properties>
 
     <build>
