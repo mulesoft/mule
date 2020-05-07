@@ -6,11 +6,16 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
+import static java.lang.System.identityHashCode;
 import static net.sf.cglib.proxy.Enhancer.registerStaticCallbacks;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectTypeProvider;
+
+import com.github.benmanes.caffeine.cache.CacheLoader;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -19,6 +24,8 @@ import java.util.function.Supplier;
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.SmartFactoryBean;
 
 /**
@@ -34,16 +41,21 @@ import org.springframework.beans.factory.SmartFactoryBean;
  */
 public class ObjectFactoryClassRepository {
 
+  private final static LoadingCache<ClassLoaderCacheKey, ClassLoader> COMPOSITE_CL_CACHE = newBuilder()
+      .weakKeys()
+      .weakValues()
+      .build(new ClassLoaderCacheLoader());
+
   /**
    * Retrieves a {@link Class} for the {@link ObjectFactory} defined by the {@code objectFactoryType} parameter. Once acquired the
    * {@code Class} instance should not be reused for another {@link ComponentBuildingDefinition}.
    *
-   * @param componentBuildingDefinition the definition on how to build the component
-   * @param objectFactoryType the {@link ObjectFactory} of the component
-   * @param createdObjectType the type of object created by the {@code ObjectFactory}
-   * @param isLazyInitFunction function that defines if the object created by the component can be created lazily
+   * @param componentBuildingDefinition          the definition on how to build the component
+   * @param objectFactoryType                    the {@link ObjectFactory} of the component
+   * @param createdObjectType                    the type of object created by the {@code ObjectFactory}
+   * @param isLazyInitFunction                   function that defines if the object created by the component can be created lazily
    * @param instancePostCreationFunctionOptional function to do custom processing of the created instance by the {@code ObjectFactory}.
-   *        When there's no need for post processing this value must be {@link Optional#empty()}
+   *                                             When there's no need for post processing this value must be {@link Optional#empty()}
    * @return the {@code FactoryBean} class to be used by spring for the provided configuration.
    */
   public Class<ObjectFactory> getObjectFactoryClass(ComponentBuildingDefinition componentBuildingDefinition,
@@ -73,8 +85,7 @@ public class ObjectFactoryClassRepository {
     if (SmartFactoryBean.class.getClassLoader() != objectFactoryType.getClassLoader()) {
       // CGLIB needs access to both the spring interface and the extended factory class.
       // If the factory class is defined in a plugin, its classloader has to be passed.
-      enhancer.setClassLoader(new CompositeClassLoader(ObjectFactoryClassRepository.class.getClassLoader(),
-                                                       objectFactoryType.getClassLoader()));
+      enhancer.setClassLoader(COMPOSITE_CL_CACHE.get(new ClassLoaderCacheKey(objectFactoryType.getClassLoader())));
     }
 
     // The use of the CGLIB cache is turned off when a post creation function is passed as argument in order to
@@ -115,6 +126,37 @@ public class ObjectFactoryClassRepository {
         }
     });
     return factoryBeanClass;
+  }
+
+  private static class ClassLoaderCacheKey {
+
+    private final ClassLoader classLoader;
+
+    private ClassLoaderCacheKey(ClassLoader classLoader) {
+      this.classLoader = classLoader;
+    }
+
+    @Override
+    public int hashCode() {
+      return identityHashCode(this.classLoader);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (!(obj instanceof ClassLoaderCacheKey)) {
+        return false;
+      }
+      return this.classLoader == ((ClassLoaderCacheKey) obj).classLoader;
+    }
+  }
+
+  private static class ClassLoaderCacheLoader implements CacheLoader<ClassLoaderCacheKey, ClassLoader> {
+
+    @Nullable
+    @Override
+    public ClassLoader load(@NonNull ClassLoaderCacheKey classLoaderCacheKey) throws Exception {
+      return new CompositeClassLoader(ObjectFactoryClassRepository.class.getClassLoader(), classLoaderCacheKey.classLoader);
+    }
   }
 
 }
