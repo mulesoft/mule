@@ -137,12 +137,12 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
         .withName(formatKey("executor")));
 
     stopRequested.set(false);
-    if (delegateRunnable == null) {
-      delegateRunnable = new DelegateRunnable(() -> poll(sourceCallback));
-      scheduler.schedule(executor, delegateRunnable);
-    } else {
+    if (restarting.compareAndSet(true, false)) {
       delegateRunnable.setDelegate(() -> poll(sourceCallback));
       poll(sourceCallback);
+    } else {
+      delegateRunnable = new DelegateRunnable(() -> poll(sourceCallback));
+      scheduler.schedule(executor, delegateRunnable);
     }
   }
 
