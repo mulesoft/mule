@@ -41,22 +41,15 @@ import org.springframework.beans.factory.SmartFactoryBean;
 public class ObjectFactoryClassRepository {
 
   //This only works because the cache uses an identity hashCode() and equals() for keys when they are configured as weak.
-  //(check com.github.benmanes.caffeine.cache.Caffeine.weakKeys javadoc)
+  //(check com.github.benmanes.caffeine.cache.Caffeine.weakKeys javadoc).
   //If that is not the case, this will never work because we want to compare class loaders by instance.
-  //The idea for this cache is to avoid the creation of multiple CompositeClassLoader s instances for the same delegates.
-  //That is because CGLIB enhancer uses that classloader to define the enhanced class and every new instance loads
+  //The idea for this cache is to avoid the creation of multiple CompositeClassLoader instances with the same delegates.
+  //That is because CGLIB enhancer uses the composite class loader to define the enhanced class and every new instance loads
   //the same defined class over and over again, causing metaspace OOM in some scenarios.
   private final static LoadingCache<ClassLoader, ClassLoader> COMPOSITE_CL_CACHE = newBuilder()
       .weakKeys()
       .weakValues()
-      .build(new CacheLoader<ClassLoader, ClassLoader>() {
-
-        @Nullable
-        @Override
-        public ClassLoader load(@NonNull ClassLoader key) throws Exception {
-          return new CompositeClassLoader(ObjectFactoryClassRepository.class.getClassLoader(), key);
-        }
-      });
+      .build(cl -> new CompositeClassLoader(ObjectFactoryClassRepository.class.getClassLoader(), cl));
 
   /**
    * Retrieves a {@link Class} for the {@link ObjectFactory} defined by the {@code objectFactoryType} parameter. Once acquired the
