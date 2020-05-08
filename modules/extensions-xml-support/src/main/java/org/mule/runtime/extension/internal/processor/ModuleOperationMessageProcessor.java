@@ -162,7 +162,9 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
 
     for (ParameterModel parameterModel : parameterModels) {
       final String parameterName = parameterModel.getName();
-      if (parameters.containsKey(parameterName)) {
+      if (parameterName.equals("target") || parameterName.equals("targetValue")) {
+        // nothing to do, these are not forwarded to the event for the inner chain
+      } else if (parameters.containsKey(parameterName)) {
         final String xmlValue = parameters.get(parameterName).trim();
         result.put(parameterName, new Pair<>(xmlValue, parameterModel.getType()));
       } else if (PRIMARY_CONTENT.equals(parameterModel.getRole())) {
