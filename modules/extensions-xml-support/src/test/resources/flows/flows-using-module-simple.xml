@@ -54,7 +54,7 @@
     </flow>
 
     <flow name="testSetPayloadHardcodedFlowWithTargetValueUsesPayload">
-        <simple-prefix:set-payload-hardcoded-value target="target-variable" targetValue="#[payload splitBy(' ')[0]]" />
+        <simple-prefix:set-payload-hardcoded-value target="target-variable" targetValue="#[(payload splitBy(' '))[0]]" />
     </flow>
 
     <flow name="testSetPayloadHardcodedFlowWithTargetOverridingAnExistingVariable">

@@ -54,7 +54,7 @@
     </flow>
 
     <flow name="testSetPayloadHardcodedFlowWithTargetValueUsesPayload">
-        <module-simple-proxy:set-payload-hardcoded-value target="target-variable" targetValue="#[payload splitBy(' ')[0]]" />
+        <module-simple-proxy:set-payload-hardcoded-value target="target-variable" targetValue="#[(payload splitBy(' '))[0]]" />
     </flow>
 
     <flow name="testSetPayloadHardcodedFlowWithTargetOverridingAnExistingVariable">

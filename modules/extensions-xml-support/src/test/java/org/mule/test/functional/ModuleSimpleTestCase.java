@@ -141,15 +141,13 @@ public class ModuleSimpleTestCase extends AbstractCeXmlExtensionMuleArtifactFunc
   }
 
   @Test
-  @Issue("MULE-")
+  @Issue("MULE-18397")
   public void testSetPayloadHardcodedFlowWithTargetValueUsesPayload() throws Exception {
     CoreEvent event = flowRunner("testSetPayloadHardcodedFlowWithTargetValueUsesPayload").run();
     assertThat(event.getMessage().getPayload().getValue(), nullValue());
     final TypedValue<?> targetVariable = event.getVariables().get("target-variable");
     assertThat(targetVariable, notNullValue());
-    assertThat(targetVariable.getValue(), instanceOf(Message.class));
-    Message targetMessage = (Message) targetVariable.getValue();
-    assertThat(targetMessage.getPayload().getValue(), is("hardcoded"));
+    assertThat(targetVariable.getValue(), is("hardcoded"));
   }
 
   @Test
