@@ -250,7 +250,7 @@
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <!-- Test Extensions -->
-        <muleMetadataExtensionTestVersion>4.1.6</muleMetadataExtensionTestVersion>
+        <muleMetadataExtensionTestVersion>4.1.6-HF-SNAPSHOT</muleMetadataExtensionTestVersion>
         <muleVeganExtensionTestVersion>4.1.6</muleVeganExtensionTestVersion>
         <muleHeisenbergExtensionTestVersion>4.1.6</muleHeisenbergExtensionTestVersion>
         <muleMarvelExtensionTestVersion>4.1.6</muleMarvelExtensionTestVersion>
