@@ -53,6 +53,10 @@
         <simple-prefix:set-payload-hardcoded-value target="target-variable" targetValue="#[message]" />
     </flow>
 
+    <flow name="testSetPayloadHardcodedFlowWithTargetValueUsesPayload">
+        <simple-prefix:set-payload-hardcoded-value target="target-variable" targetValue="#[payload splitBy(' ')[0]]" />
+    </flow>
+
     <flow name="testSetPayloadHardcodedFlowWithTargetOverridingAnExistingVariable">
         <set-variable variableName="existing-variable" value="fixed value that should not be read after the following MP"/>
         <simple-prefix:set-payload-hardcoded-value target="existing-variable" targetValue="#[message]" />
