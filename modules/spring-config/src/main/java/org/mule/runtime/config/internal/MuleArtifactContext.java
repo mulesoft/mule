@@ -18,6 +18,7 @@ import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
@@ -564,15 +565,20 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     List<Pair<String, ComponentAst>> createdComponentModels = new ArrayList<>();
 
     final Set<ComponentAst> rootComponents = resolveRootComponents(applicationModel);
-    applicationModel.recursiveStream()
-        .filter(cm -> !mustBeRoot || rootComponents.contains(cm))
-        .filter(cm -> !beanDefinitionFactory.isComponentIgnored(cm.getIdentifier()))
+
+    recursiveStreamWithHierarchy(applicationModel)
+        .filter(cm -> !mustBeRoot || rootComponents.contains(cm.getFirst()))
+        .filter(cm -> !beanDefinitionFactory.isComponentIgnored(cm.getFirst().getIdentifier()))
         .forEach(cm -> {
-          cm.getComponentId().ifPresent(componentName -> createdComponentModels.add(new Pair<>(componentName, cm)));
+          cm.getFirst().getComponentId()
+              .ifPresent(componentName -> createdComponentModels.add(new Pair<>(componentName, cm.getFirst())));
 
-          beanDefinitionFactory.resolveComponentRecursively(springComponentModels, null, cm, beanFactory, componentLocator);
+          beanDefinitionFactory.resolveComponentRecursively(springComponentModels,
+                                                            cm.getSecond().isEmpty() ? null
+                                                                : cm.getSecond().get(cm.getSecond().size() - 1),
+                                                            cm.getFirst(), beanFactory, componentLocator);
 
-          componentLocator.addComponentLocation(cm.getLocation());
+          componentLocator.addComponentLocation(cm.getFirst().getLocation());
         });
 
 
