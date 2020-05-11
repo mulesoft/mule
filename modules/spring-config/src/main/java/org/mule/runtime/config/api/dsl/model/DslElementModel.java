@@ -7,16 +7,21 @@
 package org.mule.runtime.config.api.dsl.model;
 
 import static com.google.common.collect.ImmutableList.copyOf;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
+import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
 import java.util.LinkedHashSet;
@@ -37,6 +42,8 @@ import java.util.function.Function;
  * @since 4.0
  */
 public class DslElementModel<T> {
+
+  public static String COMPONENT_AST_KEY = "ComponentAst";
 
   private final T model;
   private final String value;
@@ -84,18 +91,21 @@ public class DslElementModel<T> {
    *         provided.
    */
   public Optional<ComponentIdentifier> getIdentifier() {
-    return Optional.ofNullable(identifier);
+    return ofNullable(identifier);
   }
 
   /**
    * @return the {@link ComponentConfiguration} associated to {@code this} {@link DslElementModel element}, if one was provided.
+   *
+   * @deprecated Use {@link #getComponentModel()} instead.
    */
+  @Deprecated
   public Optional<ComponentConfiguration> getConfiguration() {
-    return Optional.ofNullable(configuration);
+    return ofNullable(configuration);
   }
 
   public Optional<ComponentAst> getComponentModel() {
-    return configuration.getProperty(ComponentModel.COMPONENT_MODEL_KEY).map(cm -> (ComponentAst) cm);
+    return configuration == null ? empty() : configuration.getProperty(COMPONENT_AST_KEY).map(cm -> (ComponentAst) cm);
   }
 
   /**
@@ -103,7 +113,7 @@ public class DslElementModel<T> {
    *         attribute or that of a text child element.
    */
   public Optional<String> getValue() {
-    return Optional.ofNullable(value);
+    return ofNullable(value);
   }
 
   /**
@@ -143,7 +153,7 @@ public class DslElementModel<T> {
   public <E> Optional<DslElementModel<E>> findElement(String modelName) {
     if (dsl.getAttributeName().equals(modelName) ||
         (model instanceof NamedObject && ((NamedObject) model).getName().equals(modelName))) {
-      return Optional.of((DslElementModel<E>) this);
+      return of((DslElementModel<E>) this);
     }
 
     return find(e -> e.findElement(modelName));
@@ -199,14 +209,37 @@ public class DslElementModel<T> {
       return this;
     }
 
+    /**
+     * @deprecated Use {@link #withConfig(ComponentAst)} instead.
+     */
+    @Deprecated
     public Builder<M> withConfig(ComponentConfiguration element) {
       this.configuration = element;
       return this;
     }
 
     public Builder<M> withConfig(ComponentAst element) {
-      this.configuration = ((ComponentModel) element).getConfiguration();
+      this.configuration = element != null ? from(element) : null;
       return this;
+    }
+
+    private ComponentConfiguration from(ComponentAst element) {
+      InternalComponentConfiguration.Builder builder = InternalComponentConfiguration.builder()
+          .withIdentifier(element.getIdentifier())
+          .withValue(element.getRawParameterValue(BODY_RAW_PARAM_NAME).orElse(null));
+
+      element.getModel(ParameterizedModel.class)
+          .ifPresent(pm -> element.getParameters()
+              .stream()
+              .filter(param -> param.getRawValue() != null)
+              .forEach(param -> builder.withParameter(param.getModel().getName(), param.getRawValue())));
+
+      element.directChildrenStream().forEach(i -> builder.withNestedComponent(from(i)));
+      element.getMetadata().getParserAttributes().forEach(builder::withProperty);
+      builder.withComponentLocation(element.getLocation());
+      builder.withProperty(COMPONENT_AST_KEY, element);
+
+      return builder.build();
     }
 
     public Builder<M> withValue(String value) {

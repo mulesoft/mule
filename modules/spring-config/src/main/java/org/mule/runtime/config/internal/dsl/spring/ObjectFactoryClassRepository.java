@@ -44,7 +44,7 @@ public class ObjectFactoryClassRepository {
   //The idea for this cache is to avoid the creation of multiple CompositeClassLoader instances with the same delegates.
   //That is because CGLIB enhancer uses the composite class loader to define the enhanced class and every new instance loads
   //the same defined class over and over again, causing metaspace OOM in some scenarios.
-  private final static LoadingCache<ClassLoader, ClassLoader> COMPOSITE_CL_CACHE = newBuilder()
+  private static final LoadingCache<ClassLoader, ClassLoader> COMPOSITE_CL_CACHE = newBuilder()
       .weakKeys()
       .weakValues()
       .build(cl -> new CompositeClassLoader(ObjectFactoryClassRepository.class.getClassLoader(), cl));

@@ -74,7 +74,10 @@ public interface DslElementModelFactory {
    *         on the {@link ExtensionModel extensions} provided as resolution context, or {@link Optional#empty} if no
    *         {@link DslElementModel} could be created for the given {@code applicationElement} with the current extensions
    *         context.
+   * 
+   * @deprecated Use {@link #create(ComponentAst)} instead.
    */
+  @Deprecated
   <T> Optional<DslElementModel<T>> create(ComponentConfiguration componentConfiguration);
 
   /**

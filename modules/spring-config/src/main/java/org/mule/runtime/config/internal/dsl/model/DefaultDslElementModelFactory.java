@@ -14,7 +14,6 @@ import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 
@@ -30,6 +29,7 @@ public class DefaultDslElementModelFactory implements DslElementModelFactory {
 
   private final DeclarationBasedElementModelFactory declarationBasedDelegate;
   private final ConfigurationBasedElementModelFactory configurationBasedDelegate;
+  private final ComponentAstBasedElementModelFactory componentAstBasedDelegate;
 
   public DefaultDslElementModelFactory(DslResolvingContext context) {
     final Map<ExtensionModel, DslSyntaxResolver> resolvers = context.getExtensions().stream()
@@ -37,6 +37,7 @@ public class DefaultDslElementModelFactory implements DslElementModelFactory {
 
     this.declarationBasedDelegate = new DeclarationBasedElementModelFactory(context, resolvers);
     this.configurationBasedDelegate = new ConfigurationBasedElementModelFactory(resolvers);
+    this.componentAstBasedDelegate = new ComponentAstBasedElementModelFactory(resolvers);
   }
 
   /**
@@ -47,9 +48,6 @@ public class DefaultDslElementModelFactory implements DslElementModelFactory {
     return declarationBasedDelegate.create(componentDeclaration);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public <T> Optional<DslElementModel<T>> create(ComponentConfiguration configuration) {
     return configurationBasedDelegate.create(configuration);
@@ -57,6 +55,6 @@ public class DefaultDslElementModelFactory implements DslElementModelFactory {
 
   @Override
   public <T> Optional<DslElementModel<T>> create(ComponentAst componentModel) {
-    return create(((ComponentModel) componentModel).getConfiguration());
+    return componentAstBasedDelegate.create(componentModel);
   }
 }

@@ -448,22 +448,6 @@ public class ComponentModel implements ComponentAst {
     return this.schemaValueParameter.contains(parameterName);
   }
 
-  // TODO MULE-11355: Make the ComponentModel haven an ComponentConfiguration internally
-  @Deprecated
-  public ComponentConfiguration getConfiguration() {
-    InternalComponentConfiguration.Builder builder = InternalComponentConfiguration.builder()
-        .withIdentifier(this.getIdentifier())
-        .withValue(textContent);
-
-    parameters.entrySet().forEach(e -> builder.withParameter(e.getKey(), e.getValue()));
-    innerComponents.forEach(i -> builder.withNestedComponent(i.getConfiguration()));
-    getMetadata().getParserAttributes().forEach(builder::withProperty);
-    builder.withComponentLocation(this.componentLocation);
-    builder.withProperty(COMPONENT_MODEL_KEY, this);
-
-    return builder.build();
-  }
-
   /**
    * Executes the task on every inner component associated to this componentModel.
    *
