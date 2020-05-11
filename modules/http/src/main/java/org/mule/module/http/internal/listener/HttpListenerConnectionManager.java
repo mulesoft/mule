@@ -7,6 +7,7 @@
 package org.mule.module.http.internal.listener;
 
 
+import static java.lang.Long.valueOf;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.context.MuleContextAware;
@@ -21,6 +22,7 @@ import org.mule.transport.tcp.DefaultTcpServerSocketProperties;
 import org.mule.transport.tcp.TcpServerSocketProperties;
 import org.mule.util.concurrent.ThreadNameHelper;
 
+import com.google.common.base.Supplier;
 import com.google.common.collect.Iterables;
 
 import java.io.IOException;
@@ -56,7 +58,14 @@ public class HttpListenerConnectionManager implements Initialisable, Disposable,
         String threadNamePrefix = ThreadNameHelper.getPrefix(muleContext) + LISTENER_THREAD_NAME_PREFIX;
         try
         {
-            httpServerManager = new GrizzlyServerManager(threadNamePrefix, httpListenerRegistry, tcpServerSocketProperties);
+            httpServerManager = new GrizzlyServerManager(threadNamePrefix, httpListenerRegistry, tcpServerSocketProperties, new Supplier<Long>()
+            {
+                @Override
+                public Long get()
+                {
+                    return valueOf(muleContext.getConfiguration().getShutdownTimeout());
+                }
+            });
         }
         catch (IOException e)
         {
