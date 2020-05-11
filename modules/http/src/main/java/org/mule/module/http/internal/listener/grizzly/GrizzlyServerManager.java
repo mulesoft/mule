@@ -10,7 +10,6 @@ import static java.lang.Integer.valueOf;
 import static java.lang.System.getProperty;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.glassfish.grizzly.Transport.State.STARTED;
 import static org.glassfish.grizzly.http.HttpCodecFilter.DEFAULT_MAX_HTTP_PACKET_HEADER_SIZE;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.module.http.api.HttpConstants.HttpProperties.GRIZZLY_MEMORY_MANAGER_SYSTEM_PROPERTY;
@@ -27,13 +26,13 @@ import org.mule.transport.ssl.api.TlsContextFactory;
 import org.mule.transport.tcp.TcpServerSocketProperties;
 import org.mule.util.concurrent.NamedThreadFactory;
 
+import com.google.common.base.Supplier;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
-import org.glassfish.grizzly.Transport;
-import org.glassfish.grizzly.TransportProbe;
 import org.glassfish.grizzly.filterchain.FilterChainBuilder;
 import org.glassfish.grizzly.filterchain.TransportFilter;
 import org.glassfish.grizzly.http.HttpServerFilter;
@@ -75,10 +74,13 @@ public class GrizzlyServerManager implements HttpServerManager
     private final DelayedExecutor idleTimeoutDelayedExecutor;
     private boolean transportStarted;
     private int serverTimeout;
+    private Supplier<Long> shutdownTimeout;
 
-    public GrizzlyServerManager(String threadNamePrefix, HttpListenerRegistry httpListenerRegistry, TcpServerSocketProperties serverSocketProperties) throws IOException
+    public GrizzlyServerManager(String threadNamePrefix, HttpListenerRegistry httpListenerRegistry, TcpServerSocketProperties serverSocketProperties,
+                                Supplier<Long> shutdownTimeout) throws IOException
     {
         this.httpListenerRegistry = httpListenerRegistry;
+        this.shutdownTimeout = shutdownTimeout;
         requestHandlerFilter = new GrizzlyRequestDispatcherFilter(httpListenerRegistry);
         timeoutFilterDelegate = new GrizzlyAddressDelegateFilter<>();
         sslFilterDelegate = new GrizzlyAddressDelegateFilter<>();
@@ -121,31 +123,6 @@ public class GrizzlyServerManager implements HttpServerManager
         {
             transport.setMemoryManager(new HeapMemoryManager());
         }
-
-        transport.getMonitoringConfig().addProbes(new TransportProbe.Adapter()
-        {
-
-            @Override
-            public void onConfigChangeEvent(Transport transport)
-            {
-                synchronized (idleTimeoutDelayedExecutor)
-                {
-                    if (transport.getState().getState() != STARTED)
-                    {
-                        return;
-                    }
-                    try
-                    {
-                        idleTimeoutDelayedExecutor.notify();
-                        idleTimeoutDelayedExecutor.wait();
-                    }
-                    catch (InterruptedException e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
     }
 
     private void configureServerSocketProperties(TCPNIOTransportBuilder transportBuilder, TcpServerSocketProperties serverSocketProperties)
@@ -236,7 +213,7 @@ public class GrizzlyServerManager implements HttpServerManager
         sslFilterDelegate.addFilterForAddress(serverAddress, createSslFilter(tlsContextFactory));
         httpServerFilterDelegate.addFilterForAddress(serverAddress, createHttpServerFilter(usePersistentConnections, connectionIdleTimeout));
         executorProvider.addExecutor(serverAddress, workManagerSource);
-        final GrizzlyServer grizzlyServer = new GrizzlyServer(serverAddress, transport, httpListenerRegistry);
+        final GrizzlyServer grizzlyServer = new GrizzlyServer(serverAddress, transport, httpListenerRegistry, shutdownTimeout);
         servers.put(serverAddress, grizzlyServer);
         return grizzlyServer;
     }
@@ -255,7 +232,7 @@ public class GrizzlyServerManager implements HttpServerManager
         addTimeoutFilter(serverAddress, usePersistentConnections, connectionIdleTimeout);
         httpServerFilterDelegate.addFilterForAddress(serverAddress, createHttpServerFilter(usePersistentConnections, connectionIdleTimeout));
         executorProvider.addExecutor(serverAddress, workManagerSource);
-        final GrizzlyServer grizzlyServer = new GrizzlyServer(serverAddress, transport, httpListenerRegistry);
+        final GrizzlyServer grizzlyServer = new GrizzlyServer(serverAddress, transport, httpListenerRegistry, shutdownTimeout);
         servers.put(serverAddress, grizzlyServer);
         return grizzlyServer;
     }

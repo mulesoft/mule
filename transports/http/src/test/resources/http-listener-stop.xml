@@ -11,7 +11,7 @@
     <http:listener-config name="httpConfig" host="localhost" port="${listener.port}" />
 
     <flow name="testFlow">
-        <http:listener config-ref="httpConfig" path="/path" />
+        <http:listener config-ref="httpConfig" path="/fast" />
         <echo-component />
     </flow>
 
