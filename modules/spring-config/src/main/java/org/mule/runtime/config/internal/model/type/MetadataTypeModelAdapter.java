@@ -19,6 +19,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
@@ -201,6 +202,12 @@ public class MetadataTypeModelAdapter implements ParameterizedModel {
 
   private static class ObjectFieldTypeAsParameterModelAdapter implements ParameterModel {
 
+    private static final ParameterDslConfiguration DSL_CONFIG = ParameterDslConfiguration.builder()
+        .allowsInlineDefinition(true)
+        .allowsReferences(false)
+        .allowTopLevelDefinition(false)
+        .build();
+
     private final ObjectFieldType wrappedFieldType;
     private final LayoutModel layoutModel;
 
@@ -289,12 +296,14 @@ public class MetadataTypeModelAdapter implements ParameterizedModel {
 
     @Override
     public ParameterDslConfiguration getDslConfiguration() {
-      return null;
+      return DSL_CONFIG;
     }
 
     @Override
     public ParameterRole getRole() {
-      return BEHAVIOUR;
+      return getLayoutModel()
+          .map(layoutModel -> layoutModel.isText() ? CONTENT : BEHAVIOUR)
+          .orElse(BEHAVIOUR);
     }
 
     @Override
