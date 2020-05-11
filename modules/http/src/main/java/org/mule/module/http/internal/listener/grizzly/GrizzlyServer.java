@@ -110,6 +110,7 @@ public class GrizzlyServer implements Server
                     while (openConnections != 0 && remainingMillis > 0)
                     {
                         openConnectionsSync.wait(min(remainingMillis, 50));
+                        remainingMillis = NANOSECONDS.toMillis(stopNanos - nanoTime());
                     }
                     if (openConnections != 0) {
                         LOGGER.warn("There are still {} open connections on server stop.", openConnections);
