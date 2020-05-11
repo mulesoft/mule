@@ -6,7 +6,11 @@
  */
 package org.mule.module.http.internal.listener.grizzly;
 
+import static java.lang.Math.min;
+import static java.lang.System.nanoTime;
 import static java.lang.Thread.currentThread;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import org.mule.module.http.internal.listener.HttpListenerRegistry;
 import org.mule.module.http.internal.listener.RequestHandlerManager;
 import org.mule.module.http.internal.listener.Server;
@@ -14,31 +18,40 @@ import org.mule.module.http.internal.listener.ServerAddress;
 import org.mule.module.http.internal.listener.async.RequestHandler;
 import org.mule.module.http.internal.listener.matcher.ListenerRequestMatcher;
 
+import com.google.common.base.Supplier;
+
 import java.io.IOException;
 
 import org.glassfish.grizzly.Connection;
 import org.glassfish.grizzly.ConnectionProbe;
 import org.glassfish.grizzly.nio.transport.TCPNIOServerConnection;
 import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GrizzlyServer implements Server
 {
+    private Logger LOGGER = LoggerFactory.getLogger(GrizzlyServer.class);
+
     private final TCPNIOTransport transport;
     private final ServerAddress serverAddress;
     private final HttpListenerRegistry listenerRegistry;
+    private final Supplier<Long> shutdownTimeoutSupplier;
     private TCPNIOServerConnection serverConnection;
     private boolean stopped = true;
     private boolean stopping;
-    private boolean shouldCleanIdleConnectionsOnStop;
+    private boolean shouldWaitConnectionsOnStop;
 
     private final Object openConnectionsSync = new Object();
-    private int openConnections = 0;
+    private volatile int openConnections = 0;
 
-    public GrizzlyServer(ServerAddress serverAddress, TCPNIOTransport transport, HttpListenerRegistry listenerRegistry)
+    public GrizzlyServer(ServerAddress serverAddress, TCPNIOTransport transport, HttpListenerRegistry listenerRegistry,
+                         Supplier<Long> shutdownTimeout)
     {
         this.serverAddress = serverAddress;
         this.transport = transport;
         this.listenerRegistry = listenerRegistry;
+        this.shutdownTimeoutSupplier = shutdownTimeout;
     }
 
     @Override
@@ -49,8 +62,8 @@ public class GrizzlyServer implements Server
             @Override
             public void onAcceptEvent(Connection serverConnection, Connection clientConnection)
             {
-                clientConnection.getAttributes().setAttribute("Server Connection", serverConnection);
-                synchronized (openConnectionsSync) {
+                synchronized (openConnectionsSync)
+                {
                     openConnections += 1;
                 }
                 clientConnection.getMonitoringConfig().addProbes(new ConnectionProbe.Adapter()
@@ -58,9 +71,11 @@ public class GrizzlyServer implements Server
                     @Override
                     public void onCloseEvent(Connection connection)
                     {
-                        synchronized (openConnectionsSync) {
+                        synchronized (openConnectionsSync)
+                        {
                             openConnections -= 1;
-                            if (openConnections == 0) {
+                            if (openConnections == 0)
+                            {
                                 openConnectionsSync.notifyAll();
                             }
                         }
@@ -75,17 +90,30 @@ public class GrizzlyServer implements Server
     @Override
     public synchronized void stop()
     {
+        if (stopped)
+        {
+            return;
+        }
         stopping = true;
+
+        Long shutdownTimeout = shutdownTimeoutSupplier.get();
+        final long stopNanos = nanoTime() + MILLISECONDS.toNanos(shutdownTimeout);
+
         try
         {
             transport.unbind(serverConnection);
-            if (shouldCleanIdleConnectionsOnStop)
+            if (shouldWaitConnectionsOnStop && shutdownTimeout != 0)
             {
-                transport.setKeepAlive(false);
-
-                synchronized (openConnectionsSync) {
+                synchronized (openConnectionsSync)
+                {
+                    long remainingMillis = NANOSECONDS.toMillis(stopNanos - nanoTime());
+                    while (openConnections != 0 && remainingMillis > 0)
+                    {
+                        openConnectionsSync.wait(min(remainingMillis, 50));
+                        remainingMillis = NANOSECONDS.toMillis(stopNanos - nanoTime());
+                    }
                     if (openConnections != 0) {
-                        openConnectionsSync.wait(2000);
+                        LOGGER.warn("There are still {} open connections on server stop.", openConnections);
                     }
                 }
             }
@@ -125,8 +153,8 @@ public class GrizzlyServer implements Server
         return this.listenerRegistry.addRequestHandler(this, requestHandler, listenerRequestMatcher);
     }
 
-    public void setCleanIdleConnections(boolean value)
+    public void setWaitConnectionsOnStop(boolean value)
     {
-        shouldCleanIdleConnectionsOnStop = value;
+        shouldWaitConnectionsOnStop = value;
     }
 }
