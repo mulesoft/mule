@@ -27,6 +27,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_REF_IDENTIFIER;
@@ -58,7 +59,6 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -343,7 +343,7 @@ public class ApplicationModel implements ArtifactAst {
     topLevelComponentsStream()
         .forEach(componentModel -> ((ComponentModel) componentModel).resolveTypedComponentIdentifier(extensionModelHelper,
                                                                                                      runtimeMode));
-    recursiveStreamWithHierarchy().forEach(new ComponentLocationVisitor());
+    recursiveStreamWithHierarchy(this).forEach(new ComponentLocationVisitor());
   }
 
   public void macroExpandXmlSdkComponents(Set<ExtensionModel> extensionModels) {
@@ -1121,33 +1121,6 @@ public class ApplicationModel implements ArtifactAst {
   public Stream<ComponentAst> recursiveStream() {
     return topLevelComponentsStream()
         .flatMap(cm -> cm.recursiveStream());
-  }
-
-  public Stream<Pair<ComponentAst, List<ComponentAst>>> recursiveStreamWithHierarchy() {
-    final List<Pair<ComponentAst, List<ComponentAst>>> ret = new ArrayList<>();
-
-    topLevelComponentsStream().forEach(cm -> {
-      final List<ComponentAst> currentContext = new ArrayList<>();
-
-      ret.add(new Pair<>(cm, new ArrayList<>(currentContext)));
-      currentContext.add(cm);
-
-      recursiveStreamWithHierarchy(ret, cm, currentContext);
-    });
-
-    return ret.stream();
-  }
-
-  private void recursiveStreamWithHierarchy(final List<Pair<ComponentAst, List<ComponentAst>>> ret, ComponentAst cm,
-                                            final List<ComponentAst> currentContext) {
-    cm.directChildrenStream().forEach(cmi -> {
-      final List<ComponentAst> currentContextI = new ArrayList<>(currentContext);
-
-      ret.add(new Pair<>(cmi, new ArrayList<>(currentContextI)));
-      currentContextI.add(cmi);
-
-      recursiveStreamWithHierarchy(ret, cmi, currentContextI);
-    });
   }
 
   @Override
