@@ -30,12 +30,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+/**
+ * Provides utilities to obtain the models/types for the elements of a mule config.
+ *
+ * @since 4.4
+ */
 public final class ApplicationModelTypeUtils {
 
   private ApplicationModelTypeUtils() {
     // Nothing to do
   }
-
 
   public static void resolveMetadataTypes(ExtensionModelHelper extensionModelHelper, Stream<ComponentAst> components) {
     // Use ExtensionModel to register top level and subTypes elements
@@ -52,7 +56,7 @@ public final class ApplicationModelTypeUtils {
             .setMetadataTypeModelAdapter(registry.get(componentModel.getIdentifier())));
   }
 
-  public static void registerTopLevelParameter(MetadataType parameterType, ReflectionCache reflectionCache,
+  private static void registerTopLevelParameter(MetadataType parameterType, ReflectionCache reflectionCache,
                                                Map<ComponentIdentifier, MetadataTypeModelAdapter> registry,
                                                ExtensionModel extensionModel, ExtensionModelHelper extensionModelHelper) {
     Optional<DslElementSyntax> dslElement = extensionModelHelper.resolveDslElementModel(parameterType, extensionModel);

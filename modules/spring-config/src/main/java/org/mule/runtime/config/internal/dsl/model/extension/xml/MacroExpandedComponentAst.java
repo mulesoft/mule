@@ -26,10 +26,12 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 /**
+ * Decorates a {@link ComponentAst} that represents an element defined in an Xml Sdk 1 connector so that its macro-expansion
+ * occurs when it is being processed.
  *
  * @since 4.4
  */
-public class MacroExpandedComponentAst extends BaseComponentAstDecorator {
+class MacroExpandedComponentAst extends BaseComponentAstDecorator {
 
   private final ComponentLocation location;
   private final Set<String> moduleGlobalElementsNames;

@@ -373,9 +373,6 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
    * @param processors
    */
   public void setMessageProcessors(List<Processor> processors) {
-    if (processors.isEmpty()) {
-      throw new IllegalArgumentException("'processors' cannot be empty.");
-    }
     this.processors = processors;
   }
 

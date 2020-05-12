@@ -260,6 +260,7 @@ public class ApplicationModel implements ArtifactAst {
   private PropertiesResolverConfigurationProperties configurationProperties;
   private final ResourceProvider externalResourceProvider;
   private final ExtensionModelHelper extensionModelHelper;
+  // TODO MULE-17197 (AST) use ComponentAst for these 2 maps
   private final Map<String, ComponentModel> namedComponentModels = new HashMap<>();
   private final Map<String, ComponentModel> namedTopLevelComponentModels = new HashMap<>();
   private boolean runtimeMode = true;
@@ -378,11 +379,11 @@ public class ApplicationModel implements ArtifactAst {
     final ArtifactAst previousAst = ast;
     ast = new MacroExpansionModulesModel(previousAst, extensionModels).expand();
 
-    // TODO lalal
-    // if (ast != previousAst) {
-    // // Have to index again the component models with macro expanded ones
-    // indexComponentModels();
-    // }
+    if (ast != previousAst) {
+      // Have to index again the component models with macro expanded ones
+      // TODO MULE-17197 (AST) uncomment this
+      // indexComponentModels();
+    }
   }
 
   private void indexComponentModels() {
