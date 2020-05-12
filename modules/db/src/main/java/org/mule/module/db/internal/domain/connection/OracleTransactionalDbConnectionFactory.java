@@ -16,7 +16,7 @@ import org.mule.module.db.internal.resolver.param.GenericParamTypeResolverFactor
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
 
 import javax.sql.DataSource;
 

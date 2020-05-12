@@ -22,7 +22,7 @@ import java.sql.SQLException;
 import java.sql.Struct;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
 
 import static java.util.Map.Entry;
 import static org.mule.module.db.internal.domain.connection.oracle.OracleConnectionUtils.getOwnerFrom;
