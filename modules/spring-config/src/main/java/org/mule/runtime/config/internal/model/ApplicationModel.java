@@ -260,10 +260,8 @@ public class ApplicationModel implements ArtifactAst {
   private PropertiesResolverConfigurationProperties configurationProperties;
   private final ResourceProvider externalResourceProvider;
   private final ExtensionModelHelper extensionModelHelper;
-  // TODO MULE-17197 (AST) use ComponentAst for these 2 maps
-  private final Map<String, ComponentModel> namedComponentModels = new HashMap<>();
+  // TODO MULE-17197 (AST) use ComponentAst for this map
   private final Map<String, ComponentModel> namedTopLevelComponentModels = new HashMap<>();
-  private boolean runtimeMode = true;
 
   /**
    * Creates an {code ApplicationModel} from a {@link ArtifactConfig}.
@@ -319,7 +317,6 @@ public class ApplicationModel implements ArtifactAst {
                           boolean runtimeMode)
       throws Exception {
 
-    this.runtimeMode = runtimeMode;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.externalResourceProvider = externalResourceProvider;
     createConfigurationAttributeResolver(artifactConfig, parentConfigurationProperties, deploymentProperties);
@@ -376,28 +373,13 @@ public class ApplicationModel implements ArtifactAst {
    * @param postProcess a closure to be executed after the macroexpansion of an extension.
    */
   public void macroExpandXmlSdkComponents(Set<ExtensionModel> extensionModels) {
-    final ArtifactAst previousAst = ast;
-    ast = new MacroExpansionModulesModel(previousAst, extensionModels).expand();
-
-    if (ast != previousAst) {
-      // Have to index again the component models with macro expanded ones
-      // TODO MULE-17197 (AST) uncomment this
-      // indexComponentModels();
-    }
+    ast = new MacroExpansionModulesModel(ast, extensionModels).expand();
   }
 
   private void indexComponentModels() {
-    recursiveStream().forEach(componentModel -> {
-      componentModel.getComponentId().ifPresent(name -> {
-        namedComponentModels.put(name, (ComponentModel) componentModel);
-      });
-    });
-
-    topLevelComponentsStream().forEach(componentModel -> {
-      componentModel.getComponentId().ifPresent(name -> {
-        namedTopLevelComponentModels.put(name, (ComponentModel) componentModel);
-      });
-    });
+    topLevelComponentsStream()
+        .forEach(componentModel -> componentModel.getComponentId()
+            .ifPresent(name -> namedTopLevelComponentModels.put(name, (ComponentModel) componentModel)));
   }
 
   private void createConfigurationAttributeResolver(ArtifactConfig artifactConfig,
@@ -1013,20 +995,6 @@ public class ApplicationModel implements ArtifactAst {
    */
   public Optional<ComponentModel> findTopLevelNamedComponent(String name) {
     return ofNullable(namedTopLevelComponentModels.getOrDefault(name, null));
-  }
-
-  /**
-   * Find a named component.
-   *
-   * @param name the expected value for the name attribute configuration.
-   * @return the component if present, if not, an empty {@link Optional}
-   */
-  public Optional<ComponentModel> findNamedElement(String name) {
-    final Optional<ComponentModel> topLevelNamedComponent = findTopLevelNamedComponent(name);
-    if (topLevelNamedComponent.isPresent()) {
-      return topLevelNamedComponent;
-    }
-    return ofNullable(namedComponentModels.getOrDefault(name, null));
   }
 
   /**
