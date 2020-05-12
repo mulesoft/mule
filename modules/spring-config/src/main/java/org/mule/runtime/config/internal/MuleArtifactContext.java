@@ -328,7 +328,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   public void initialize() {
-    applicationModel.macroExpandXmlSdkComponents(getExtensions());
+    applicationModel.prepareAstForRuntime(getExtensions());
     validateAllConfigElementHaveParsers();
   }
 

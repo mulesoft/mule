@@ -31,7 +31,10 @@ import reactor.core.publisher.Mono;
  * Abstract implementation that provides the infrastructure for intercepting message processors. It doesn't implement
  * InterceptingMessageProcessor itself, to let individual subclasses make that decision \. This simply provides an implementation
  * of setNext and holds the next message processor as an attribute.
+ * 
+ * @deprecated This is kept just because it is in a `privileged` package.
  */
+@Deprecated
 public abstract class AbstractInterceptingMessageProcessorBase extends AbstractComponent
     implements Processor, MuleContextAware {
 

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.processor;
+package org.mule.runtime.core.internal.processor;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
@@ -38,6 +39,7 @@ import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
 
@@ -55,15 +57,13 @@ import javax.inject.Named;
 
 import org.slf4j.Logger;
 
+import reactor.core.publisher.Mono;
+
 /**
  * Implement a retry policy for Mule. This is similar to JMS retry policies that will redeliver a message a maximum number of
  * times. If this maximum is exceeded, fails with an exception.
- *
- * @deprecated This is kept just because it is in a `privileged` package.
- *             {@link org.mule.runtime.core.internal.processor.IdempotentRedeliveryPolicy} must be used instead.
  */
 @NoExtend
-@Deprecated
 public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
   private static final String EXPRESSION_RUNTIME_EXCEPTION_WARN_MSG =
@@ -234,7 +234,8 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       }
 
       try {
-        CoreEvent returnEvent = processNext(event);
+        CoreEvent returnEvent =
+            processToApply(event, nestedChain, false, Mono.from(((BaseEventContext) event.getContext()).getResponsePublisher()));
         counter = findCounter(messageId);
         if (counter != null) {
           resetCounter(messageId);
