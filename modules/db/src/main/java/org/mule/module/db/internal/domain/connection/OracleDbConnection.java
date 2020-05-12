@@ -42,6 +42,7 @@ public class OracleDbConnection extends DefaultDbConnection
 
     private Method createArrayMethod;
     private boolean initialized;
+    private Map<String, Map<Integer, ResolvedDbType>> resolvedDbTypesCache= new HashMap<>();
 
     /**
      * {@inheritDoc}
@@ -49,6 +50,13 @@ public class OracleDbConnection extends DefaultDbConnection
     public OracleDbConnection(Connection delegate, TransactionalAction transactionalAction, DefaultDbConnectionReleaser connectionReleaseListener, ParamTypeResolverFactory paramTypeResolverFactory)
     {
         super(delegate, transactionalAction, connectionReleaseListener, paramTypeResolverFactory);
+    }
+
+    public OracleDbConnection(Connection delegate, TransactionalAction transactionalAction, DefaultDbConnectionReleaser connectionReleaseListener, ParamTypeResolverFactory paramTypeResolverFactory,Map<String, Map<Integer, ResolvedDbType>>
+            resolvedDbTypesCache)
+    {
+        super(delegate, transactionalAction, connectionReleaseListener, paramTypeResolverFactory);
+        this.resolvedDbTypesCache =resolvedDbTypesCache;
     }
 
     @Override
@@ -107,6 +115,7 @@ public class OracleDbConnection extends DefaultDbConnection
     @Override
     protected void resolveLobs(String typeName, Object[] attributes, TypeResolver typeResolver) throws SQLException
     {
+
         Map<Integer, ResolvedDbType> dataTypes = getLobFieldsDataTypeInfo(typeResolver.resolveType(typeName));
 
         if (dataTypes.keySet().isEmpty())
@@ -131,6 +140,20 @@ public class OracleDbConnection extends DefaultDbConnection
     @Override
     protected Map<Integer, ResolvedDbType> getLobFieldsDataTypeInfo(String typeName) throws SQLException
     {
+
+        if(this.resolvedDbTypesCache.containsKey(typeName)){
+            if(logger.isDebugEnabled()) {
+                logger.info("Returning chached LobFieldsDataTypeInfo");
+            }
+            return resolvedDbTypesCache.get(typeName);
+        }
+        if(logger.isDebugEnabled()){
+            logger.info("Obtaining LobFieldsDataTypeInfo");
+        }
+        synchronized (this){
+            if(this.resolvedDbTypesCache.containsKey(typeName)){
+                return resolvedDbTypesCache.get(typeName);
+            }
         Map<Integer, ResolvedDbType> dataTypes = new HashMap<>();
 
         String owner = getOwnerFrom(typeName);
@@ -154,8 +177,10 @@ public class OracleDbConnection extends DefaultDbConnection
                     dataTypes.put(resultSet.getInt(ATTR_NO_PARAM), resolvedDbType);
                 }
             }
-
+            resolvedDbTypesCache.put(typeName,dataTypes);
             return dataTypes;
+        }
+
         }
     }
 }
