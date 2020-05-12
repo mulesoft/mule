@@ -320,6 +320,10 @@
                     <groupId>org.apache.tika</groupId>
                     <artifactId>tika-core</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -727,12 +731,22 @@
                         <groupId>mx4j</groupId>
                         <artifactId>mx4j-impl</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>jackson-databind</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-junit4</artifactId>
                 <version>${allureJunitVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>jackson-databind</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.tika</groupId>
