@@ -227,6 +227,7 @@
         <xaPoolVersion>1.5.0</xaPoolVersion>
         <allureJunitVersion>2.8.1</allureJunitVersion>
         <allureReportVersion>2.8.1</allureReportVersion>
+        <tikaVersion>1.24.1</tikaVersion>
         <muleMvelVersion>2.1.9-MULE-020</muleMvelVersion>
 
         <!-- Mule Snapshot Dependencies -->
@@ -313,6 +314,17 @@
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-junit4</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.tika</groupId>
+                    <artifactId>tika-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -721,6 +733,11 @@
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-junit4</artifactId>
                 <version>${allureJunitVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-core</artifactId>
+                <version>${tikaVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
