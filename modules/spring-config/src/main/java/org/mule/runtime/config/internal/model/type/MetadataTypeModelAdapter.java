@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.model;
+package org.mule.runtime.config.internal.model.type;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -48,17 +48,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-class MetadataTypeModelAdapter implements ParameterizedModel {
+public class MetadataTypeModelAdapter implements ParameterizedModel {
 
-  static Optional<MetadataTypeModelAdapter> createMetadataTypeModelAdapterWithSterotype(MetadataType type,
-                                                                                        ExtensionModelHelper extensionModelHelper) {
+  public static Optional<MetadataTypeModelAdapter> createMetadataTypeModelAdapterWithSterotype(MetadataType type,
+                                                                                               ExtensionModelHelper extensionModelHelper) {
     return type.getAnnotation(StereotypeTypeAnnotation.class)
         .flatMap(sta -> sta.getAllowedStereotypes().stream().findFirst())
         .map(st -> new MetadataTypeModelAdapterWithStereotype(type, st, extensionModelHelper));
   }
 
-  static MetadataTypeModelAdapter createParameterizedTypeModelAdapter(MetadataType type,
-                                                                      ExtensionModelHelper extensionModelHelper) {
+  public static MetadataTypeModelAdapter createParameterizedTypeModelAdapter(MetadataType type,
+                                                                             ExtensionModelHelper extensionModelHelper) {
     return new MetadataTypeModelAdapter(type, extensionModelHelper);
   }
 

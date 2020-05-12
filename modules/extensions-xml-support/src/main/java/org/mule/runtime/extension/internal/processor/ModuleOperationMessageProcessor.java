@@ -368,7 +368,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   }
 
   /**
-   * Configure the nested {@link Processor}'s that error handling and transactional behaviour should be applied to.
+   * Configure the nested {@link Processor}'s of the XML SDK operation.
    *
    * @param processors
    */

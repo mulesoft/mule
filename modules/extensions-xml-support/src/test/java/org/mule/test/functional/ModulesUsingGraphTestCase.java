@@ -63,13 +63,10 @@ public class ModulesUsingGraphTestCase extends AbstractCeXmlExtensionMuleArtifac
 
   @Parameterized.Parameters(name = "{index}: Running permutation modules {0} ")
   public static Collection<Object[]> data() {
-    // some permutations of the presented graph, it's important to make them shuffle enough to be sure the namespaces are order
-    // correctly.
+    // The extensions are loaded in correct order according to their dependencies, so it is pointless to test with impossible
+    // permutations.
     return asList(getParameters("w", "x", "y", "z", "a", "b", "c"),
-                  getParameters("a", "b", "c", "w", "x", "y", "z"),
-                  getParameters("y", "z", "c", "b", "a", "w", "x"),
-                  getParameters("w", "z", "a", "b", "x", "c", "y"),
-                  getParameters("b", "w", "x", "z", "c", "a", "y"));
+                  getParameters("w", "z", "a", "b", "x", "c", "y"));
   }
 
   private static Object[] getParameters(String... modules) {
