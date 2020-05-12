@@ -57,8 +57,8 @@ public final class ApplicationModelTypeUtils {
   }
 
   private static void registerTopLevelParameter(MetadataType parameterType, ReflectionCache reflectionCache,
-                                               Map<ComponentIdentifier, MetadataTypeModelAdapter> registry,
-                                               ExtensionModel extensionModel, ExtensionModelHelper extensionModelHelper) {
+                                                Map<ComponentIdentifier, MetadataTypeModelAdapter> registry,
+                                                ExtensionModel extensionModel, ExtensionModelHelper extensionModelHelper) {
     Optional<DslElementSyntax> dslElement = extensionModelHelper.resolveDslElementModel(parameterType, extensionModel);
     if (!dslElement.isPresent() ||
         registry.containsKey(builder().name(dslElement.get().getElementName()).namespace(dslElement.get().getPrefix()).build())) {
