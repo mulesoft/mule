@@ -42,7 +42,7 @@ public class OracleDbConnection extends DefaultDbConnection
 
     private Method createArrayMethod;
     private boolean initialized;
-    private Map<String, Map<Integer, ResolvedDbType>> resolvedDbTypesCache= new HashMap<>();
+    private Map<String, Map<Integer, ResolvedDbType>> resolvedDbTypesCache;
 
     /**
      * {@inheritDoc}
@@ -52,11 +52,11 @@ public class OracleDbConnection extends DefaultDbConnection
         super(delegate, transactionalAction, connectionReleaseListener, paramTypeResolverFactory);
     }
 
-    public OracleDbConnection(Connection delegate, TransactionalAction transactionalAction, DefaultDbConnectionReleaser connectionReleaseListener, ParamTypeResolverFactory paramTypeResolverFactory,Map<String, Map<Integer, ResolvedDbType>>
-            resolvedDbTypesCache)
+    public OracleDbConnection(Connection delegate, TransactionalAction transactionalAction, DefaultDbConnectionReleaser connectionReleaseListener, ParamTypeResolverFactory paramTypeResolverFactory, Map<String, Map<Integer, ResolvedDbType>>
+        resolvedDbTypesCache)
     {
         super(delegate, transactionalAction, connectionReleaseListener, paramTypeResolverFactory);
-        this.resolvedDbTypesCache =resolvedDbTypesCache;
+        this.resolvedDbTypesCache = resolvedDbTypesCache;
     }
 
     @Override
@@ -133,7 +133,7 @@ public class OracleDbConnection extends DefaultDbConnection
             // It has to be taken into account that the data type depends on JDBC, so the
             // driver is the unit responsible for the mapping and we do not have that information
             // in the DB catalog. We resolve the lobs depending on the name only.
-            typeResolver.resolveLobs(attributes, index-1, dataType.getName());
+            typeResolver.resolveLobs(attributes, index - 1, dataType.getName());
         }
     }
 
@@ -141,45 +141,50 @@ public class OracleDbConnection extends DefaultDbConnection
     protected Map<Integer, ResolvedDbType> getLobFieldsDataTypeInfo(String typeName) throws SQLException
     {
 
-        if(this.resolvedDbTypesCache.containsKey(typeName)){
-            if(logger.isDebugEnabled()) {
+        if (this.resolvedDbTypesCache.containsKey(typeName))
+        {
+            if (logger.isDebugEnabled())
+            {
                 logger.info("Returning chached LobFieldsDataTypeInfo");
             }
             return resolvedDbTypesCache.get(typeName);
         }
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled())
+        {
             logger.info("Obtaining LobFieldsDataTypeInfo");
         }
-        synchronized (this){
-            if(this.resolvedDbTypesCache.containsKey(typeName)){
+        synchronized (resolvedDbTypesCache)
+        {
+            if (this.resolvedDbTypesCache.containsKey(typeName))
+            {
                 return resolvedDbTypesCache.get(typeName);
             }
-        Map<Integer, ResolvedDbType> dataTypes = new HashMap<>();
+            Map<Integer, ResolvedDbType> dataTypes = new HashMap<>();
 
-        String owner = getOwnerFrom(typeName);
-        String type = getTypeSimpleName(typeName);
+            String owner = getOwnerFrom(typeName);
+            String type = getTypeSimpleName(typeName);
 
-        String query = QUERY_TYPE_ATTRS + (owner != null ? QUERY_OWNER_CONDITION : "");
+            String query = QUERY_TYPE_ATTRS + (owner != null ? QUERY_OWNER_CONDITION : "");
 
-        try (PreparedStatement ps = this.prepareStatement(query))
-        {
-            ps.setString(1, type);
-            if (owner != null)
+            try (PreparedStatement ps = this.prepareStatement(query))
             {
-                ps.setString(2, owner);
-            }
-
-            try (ResultSet resultSet = ps.executeQuery())
-            {
-                while (resultSet.next())
+                ps.setString(1, type);
+                if (owner != null)
                 {
-                    ResolvedDbType resolvedDbType = new ResolvedDbType(UNKNOWN_DATA_TYPE, resultSet.getString(ATTR_TYPE_NAME_PARAM));
-                    dataTypes.put(resultSet.getInt(ATTR_NO_PARAM), resolvedDbType);
+                    ps.setString(2, owner);
                 }
+
+                try (ResultSet resultSet = ps.executeQuery())
+                {
+                    while (resultSet.next())
+                    {
+                        ResolvedDbType resolvedDbType = new ResolvedDbType(UNKNOWN_DATA_TYPE, resultSet.getString(ATTR_TYPE_NAME_PARAM));
+                        dataTypes.put(resultSet.getInt(ATTR_NO_PARAM), resolvedDbType);
+                    }
+                }
+                resolvedDbTypesCache.put(typeName, dataTypes);
+                return dataTypes;
             }
-            resolvedDbTypesCache.put(typeName,dataTypes);
-            return dataTypes;
-        }
 
         }
     }
