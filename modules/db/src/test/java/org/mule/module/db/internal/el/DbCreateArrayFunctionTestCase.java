@@ -16,6 +16,7 @@ import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
 import org.mule.module.db.internal.domain.connection.DefaultDbConnection;
 import org.mule.module.db.internal.domain.connection.DefaultDbConnectionReleaser;
 import org.mule.module.db.internal.domain.connection.OracleDbConnection;
+import org.mule.module.db.internal.domain.type.ResolvedDbType;
 import org.mule.module.db.internal.resolver.param.ParamTypeResolverFactory;
 import org.mule.tck.size.SmallTest;
 
@@ -26,6 +27,8 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -53,7 +56,7 @@ public class DbCreateArrayFunctionTestCase extends AbstractDbCreateFunctionTestC
     public void createsDbArrayFromJavaArray() throws Exception
     {
         Object[] structValue = {"foo", "bar"};
-        Object[] params = new Object[] {DB_CONFIG_NAME, TYPE_NAME, structValue};
+        Object[] params = new Object[]{DB_CONFIG_NAME, TYPE_NAME, structValue};
 
         DbConnection dbConnection = createDbConnection(true);
 
@@ -69,7 +72,7 @@ public class DbCreateArrayFunctionTestCase extends AbstractDbCreateFunctionTestC
     public void createsDbArrayFromList() throws Exception
     {
         Object[] structValues = {"foo", "bar"};
-        Object[] params = new Object[] {DB_CONFIG_NAME, TYPE_NAME, Arrays.asList(structValues)};
+        Object[] params = new Object[]{DB_CONFIG_NAME, TYPE_NAME, Arrays.asList(structValues)};
 
         DbConnection dbConnection = createDbConnection(true);
 
@@ -109,8 +112,8 @@ public class DbCreateArrayFunctionTestCase extends AbstractDbCreateFunctionTestC
         testThroughOracleQuery(connection, params, BLOB_DB_TYPE.getName(), typeName);
 
         verify(connection).createArrayOf(typeName, params);
-        assertThat(((Object[]) params[0])[0], Matchers.<Object> equalTo(blob));
-        assertThat(((Object[]) params[1])[0], Matchers.<Object> equalTo(blob));
+        assertThat(((Object[]) params[0])[0], Matchers.<Object>equalTo(blob));
+        assertThat(((Object[]) params[1])[0], Matchers.<Object>equalTo(blob));
     }
 
     @Test
@@ -141,8 +144,8 @@ public class DbCreateArrayFunctionTestCase extends AbstractDbCreateFunctionTestC
         testThroughOracleQuery(connection, params, CLOB_DB_TYPE.getName(), typeName);
 
         verify(connection).createArrayOf(typeName, params);
-        assertThat(((Object[]) params[0])[0], Matchers.<Object> equalTo(clob));
-        assertThat(((Object[]) params[1])[0], Matchers.<Object> equalTo(clob));
+        assertThat(((Object[]) params[0])[0], Matchers.<Object>equalTo(clob));
+        assertThat(((Object[]) params[1])[0], Matchers.<Object>equalTo(clob));
     }
 
     private void testThroughOracleQuery(Connection delegate, Object[] structValues, String dataTypeName, String udtName) throws Exception
@@ -173,7 +176,7 @@ public class DbCreateArrayFunctionTestCase extends AbstractDbCreateFunctionTestC
         DbConnectionFactory connectionFactory = mock(DbConnectionFactory.class);
         DefaultDbConnectionReleaser releaser = new DefaultDbConnectionReleaser(connectionFactory);
         ParamTypeResolverFactory paramTypeResolverFactory = mock(ParamTypeResolverFactory.class);
-        OracleDbConnection defaultDbConnection = new OracleDbConnection(delegate, ALWAYS_JOIN, releaser, paramTypeResolverFactory);
+        OracleDbConnection defaultDbConnection = new OracleDbConnection(delegate, ALWAYS_JOIN, releaser, paramTypeResolverFactory, new ConcurrentHashMap<String, Map<Integer, ResolvedDbType>>());
 
         defaultDbConnection.createArrayOf(udtName, structValues);
         defaultDbConnection.close();
@@ -205,8 +208,8 @@ public class DbCreateArrayFunctionTestCase extends AbstractDbCreateFunctionTestC
         defaultDbConnection.close();
 
         verify(connection).createArrayOf(TYPE_NAME, params);
-        assertThat(((Object[]) params[0])[0], Matchers.<Object> equalTo(clob));
-        assertThat(((Object[]) params[1])[0], Matchers.<Object> equalTo(clob));
+        assertThat(((Object[]) params[0])[0], Matchers.<Object>equalTo(clob));
+        assertThat(((Object[]) params[1])[0], Matchers.<Object>equalTo(clob));
     }
 
     @Test
@@ -223,14 +226,14 @@ public class DbCreateArrayFunctionTestCase extends AbstractDbCreateFunctionTestC
         Array array = mock(Array.class);
         when(connection.createArrayOf(TYPE_NAME, params)).thenReturn(array);
 
-        DefaultDbConnection defaultDbConnection = testThroughMetadata(connection, params, BLOB_DB_TYPE.getId(),  BLOB_DB_TYPE.getName());
+        DefaultDbConnection defaultDbConnection = testThroughMetadata(connection, params, BLOB_DB_TYPE.getId(), BLOB_DB_TYPE.getName());
 
         defaultDbConnection.createArrayOf(TYPE_NAME, params);
         defaultDbConnection.close();
 
         verify(connection).createArrayOf(TYPE_NAME, params);
-        assertThat(((Object[]) params[0])[0], Matchers.<Object> equalTo(blob));
-        assertThat(((Object[]) params[1])[0], Matchers.<Object> equalTo(blob));
+        assertThat(((Object[]) params[0])[0], Matchers.<Object>equalTo(blob));
+        assertThat(((Object[]) params[1])[0], Matchers.<Object>equalTo(blob));
     }
 
     protected DefaultDbConnection testThroughMetadata(Connection delegate, Object[] structValues, int dataType, String dataTypeName) throws Exception

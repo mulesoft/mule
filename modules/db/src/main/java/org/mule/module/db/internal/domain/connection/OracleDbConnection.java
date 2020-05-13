@@ -44,14 +44,6 @@ public class OracleDbConnection extends DefaultDbConnection
     private boolean initialized;
     private Map<String, Map<Integer, ResolvedDbType>> resolvedDbTypesCache;
 
-    /**
-     * {@inheritDoc}
-     */
-    public OracleDbConnection(Connection delegate, TransactionalAction transactionalAction, DefaultDbConnectionReleaser connectionReleaseListener, ParamTypeResolverFactory paramTypeResolverFactory)
-    {
-        super(delegate, transactionalAction, connectionReleaseListener, paramTypeResolverFactory);
-    }
-
     public OracleDbConnection(Connection delegate, TransactionalAction transactionalAction, DefaultDbConnectionReleaser connectionReleaseListener, ParamTypeResolverFactory paramTypeResolverFactory, Map<String, Map<Integer, ResolvedDbType>>
         resolvedDbTypesCache)
     {
