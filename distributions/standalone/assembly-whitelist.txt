@@ -119,7 +119,7 @@
 # /lib/mule
 #
 /mule-standalone-${productVersion}/lib/mule
-/mule-standalone-${productVersion}/lib/mule/mule-common-${productVersion}.jar
+/mule-standalone-${productVersion}/lib/mule/mule-common-3.8.5.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}-tests.jar
 /mule-standalone-${productVersion}/lib/mule/mule-core-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-extensions-annotations-1.0.0-alpha-1.jar
