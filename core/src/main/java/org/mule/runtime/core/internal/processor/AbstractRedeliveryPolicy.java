@@ -13,7 +13,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.getPr
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
@@ -62,10 +61,5 @@ public abstract class AbstractRedeliveryPolicy extends AbstractMessageProcessorO
   @Override
   protected List<Processor> getOwnedMessageProcessors() {
     return singletonList(nestedChain);
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    super.setMuleContext(context);
   }
 }

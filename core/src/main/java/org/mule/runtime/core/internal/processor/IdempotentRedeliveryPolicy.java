@@ -119,6 +119,11 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
+    initialiseExpression();
+    initialiseStore();
+  }
+
+  private void initialiseExpression() throws InitialisationException {
     if (useSecureHash && idExpression != null) {
       useSecureHash = false;
       if (LOGGER.isWarnEnabled()) {
@@ -143,15 +148,17 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       idExpression = format(SECURE_HASH_EXPR_FORMAT, messageDigestAlgorithm);
     }
 
+    if (idExpression != null) {
+      compiledIdExpresion = compile(idExpression, expressionManager);
+    }
+  }
+
+  private void initialiseStore() throws InitialisationException {
     idrId = format("%s-%s-%s", muleContext.getConfiguration().getId(), getLocation().getRootContainerName(), "idr");
     if (store != null && privateStore != null) {
       throw new InitialisationException(
                                         createStaticMessage("Ambiguous definition of object store, both reference and private were configured"),
                                         this);
-    }
-
-    if (idExpression != null) {
-      compiledIdExpresion = compile(idExpression, expressionManager);
     }
 
     if (store == null) {
@@ -177,6 +184,10 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   @Override
   public void dispose() {
     super.dispose();
+    disposeStore();
+  }
+
+  private void disposeStore() {
     if (store != null) {
       try {
         store.close();
@@ -241,15 +252,12 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
           resetCounter(messageId);
         }
         return returnEvent;
+      } catch (MessagingException ex) {
+        incrementCounter(messageId, ex);
+        throw ex;
       } catch (Exception ex) {
-        if (ex instanceof MessagingException) {
-          incrementCounter(messageId, (MessagingException) ex);
-          throw ex;
-        } else {
-          MessagingException me = createMessagingException(event, ex);
-          incrementCounter(messageId, me);
-          throw ex;
-        }
+        incrementCounter(messageId, createMessagingException(event, ex));
+        throw ex;
       }
     } finally {
       lock.unlock();
@@ -288,7 +296,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       store.remove(messageId);
     }
     counter.counter.incrementAndGet();
-    counter.errors.add(ex.getEvent().getError().get());
+    ex.getEvent().getError().ifPresent(counter.errors::add);
     store.store(messageId, counter);
     return counter;
   }
