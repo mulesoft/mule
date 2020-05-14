@@ -262,7 +262,6 @@ public class ApplicationModel implements ArtifactAst {
   private ArtifactAst originalAst;
   private PropertiesResolverConfigurationProperties configurationProperties;
   private final ResourceProvider externalResourceProvider;
-  // TODO MULE-17197 (AST) use ComponentAst for this map
   private final Map<String, ComponentAst> namedTopLevelComponentModels = new HashMap<>();
 
   /**
