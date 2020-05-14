@@ -16,6 +16,7 @@ import org.mule.module.db.internal.domain.connection.DbConnectionFactory;
 import org.mule.module.db.internal.domain.connection.DefaultDbConnection;
 import org.mule.module.db.internal.domain.connection.DefaultDbConnectionReleaser;
 import org.mule.module.db.internal.domain.connection.OracleDbConnection;
+import org.mule.module.db.internal.domain.type.ResolvedDbType;
 import org.mule.module.db.internal.resolver.param.ParamTypeResolverFactory;
 import org.mule.tck.size.SmallTest;
 
@@ -25,6 +26,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Struct;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -48,7 +51,7 @@ public class DbCreateStructFunctionTestCase extends AbstractDbCreateFunctionTest
     public void createsStructFromArray() throws Exception
     {
         Object[] structValues = {"foo", "bar"};
-        Object[] params = new Object[] {DB_CONFIG_NAME, TYPE_NAME, structValues};
+        Object[] params = new Object[]{DB_CONFIG_NAME, TYPE_NAME, structValues};
 
         DbConnection dbConnection = createDbConnection(true);
 
@@ -64,7 +67,7 @@ public class DbCreateStructFunctionTestCase extends AbstractDbCreateFunctionTest
     public void createsStructFromList() throws Exception
     {
         Object[] structValues = {"foo", "bar"};
-        Object[] params = new Object[] {DB_CONFIG_NAME, TYPE_NAME, Arrays.asList(structValues)};
+        Object[] params = new Object[]{DB_CONFIG_NAME, TYPE_NAME, Arrays.asList(structValues)};
 
         DbConnection dbConnection = createDbConnection(true);
 
@@ -75,7 +78,7 @@ public class DbCreateStructFunctionTestCase extends AbstractDbCreateFunctionTest
 
         assertThat(result, Matchers.<Object>equalTo(struct));
     }
-    
+
     @Test
     public void createStructResolvingBlobInDefaultDbConnection() throws Exception
     {
@@ -92,7 +95,7 @@ public class DbCreateStructFunctionTestCase extends AbstractDbCreateFunctionTest
         verify(delegate).createStruct(TYPE_NAME, structValues);
         assertThat(structValues[0], Matchers.<Object>equalTo(blob));
     }
-    
+
     @Test
     public void createStructResolvingClobInDefaultDbConnection() throws Exception
     {
@@ -109,7 +112,7 @@ public class DbCreateStructFunctionTestCase extends AbstractDbCreateFunctionTest
         verify(delegate).createStruct(TYPE_NAME, structValues);
         assertThat(structValues[0], Matchers.<Object>equalTo(clob));
     }
-    
+
     @Test
     public void createStructResolvingBlobInOracleDbUsingUDTSimpleName() throws Exception
     {
@@ -142,7 +145,7 @@ public class DbCreateStructFunctionTestCase extends AbstractDbCreateFunctionTest
         when(delegate.createBlob()).thenReturn(blob);
         testThroughOracleQuery(delegate, structValues, BLOB_DB_TYPE.getName(), typeName);
         verify(delegate).createStruct(typeName, structValues);
-        assertThat(structValues[0], Matchers.<Object> equalTo(blob));
+        assertThat(structValues[0], Matchers.<Object>equalTo(blob));
     }
 
     public void createStructResolvingClobAndClobInOracleDb(String typeName) throws Exception
@@ -153,7 +156,7 @@ public class DbCreateStructFunctionTestCase extends AbstractDbCreateFunctionTest
         when(delegate.createClob()).thenReturn(clob);
         testThroughOracleQuery(delegate, structValues, CLOB_DB_TYPE.getName(), typeName);
         verify(delegate).createStruct(typeName, structValues);
-        assertThat(structValues[0], Matchers.<Object> equalTo(clob));
+        assertThat(structValues[0], Matchers.<Object>equalTo(clob));
     }
 
     private void testThroughOracleQuery(Connection delegate, Object[] structValues, String dataTypeName, String udtName) throws Exception
@@ -180,7 +183,7 @@ public class DbCreateStructFunctionTestCase extends AbstractDbCreateFunctionTest
         DbConnectionFactory connectionFactory = mock(DbConnectionFactory.class);
         DefaultDbConnectionReleaser releaser = new DefaultDbConnectionReleaser(connectionFactory);
         ParamTypeResolverFactory paramTypeResolverFactory = mock(ParamTypeResolverFactory.class);
-        OracleDbConnection defaultDbConnection = new OracleDbConnection(delegate, ALWAYS_JOIN, releaser, paramTypeResolverFactory);
+        OracleDbConnection defaultDbConnection = new OracleDbConnection(delegate, ALWAYS_JOIN, releaser, paramTypeResolverFactory, new ConcurrentHashMap<String, Map<Integer, ResolvedDbType>>());
         defaultDbConnection.createStruct(udtName, structValues);
         defaultDbConnection.close();
 
