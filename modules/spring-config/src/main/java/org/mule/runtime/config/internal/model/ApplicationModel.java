@@ -263,7 +263,7 @@ public class ApplicationModel implements ArtifactAst {
   private PropertiesResolverConfigurationProperties configurationProperties;
   private final ResourceProvider externalResourceProvider;
   // TODO MULE-17197 (AST) use ComponentAst for this map
-  private final Map<String, ComponentModel> namedTopLevelComponentModels = new HashMap<>();
+  private final Map<String, ComponentAst> namedTopLevelComponentModels = new HashMap<>();
 
   /**
    * Creates an {code ApplicationModel} from a {@link ArtifactConfig}.
@@ -367,7 +367,7 @@ public class ApplicationModel implements ArtifactAst {
   private void indexComponentModels(ArtifactAst originalAst) {
     originalAst.topLevelComponentsStream()
         .forEach(componentModel -> componentModel.getComponentId()
-            .ifPresent(name -> namedTopLevelComponentModels.put(name, (ComponentModel) componentModel)));
+            .ifPresent(name -> namedTopLevelComponentModels.put(name, componentModel)));
   }
 
   /**
@@ -799,7 +799,7 @@ public class ApplicationModel implements ArtifactAst {
       if (componentModel.getIdentifier().equals(FLOW_REF_IDENTIFIER)) {
         String nameAttribute = componentModel.getComponentId().orElse(null);
         if (nameAttribute != null && !nameAttribute.startsWith(DEFAULT_EXPRESSION_PREFIX)) {
-          Optional<ComponentModel> referencedFlow = findTopLevelNamedComponent(nameAttribute);
+          Optional<ComponentAst> referencedFlow = findTopLevelNamedComponent(nameAttribute);
           referencedFlow
               .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("flow-ref at %s:%s is pointing to %s which does not exist",
                                                                               componentModel.getMetadata().getFileName()
@@ -957,16 +957,16 @@ public class ApplicationModel implements ArtifactAst {
   private void validateOnErrorsHaveTypeOrWhenAttribute(ComponentModel component) {
     List<ComponentModel> innerComponents = component.getInnerComponents();
     for (int i = 0; i < innerComponents.size() - 1; i++) {
-      ComponentModel componentModel = getOnErrorComponentModel(innerComponents.get(i));
-      Map<String, String> parameters = componentModel.getRawParameters();
-      if (parameters.get(WHEN_CHOICE_ES_ATTRIBUTE) == null && parameters.get(TYPE_ES_ATTRIBUTE) == null) {
+      ComponentAst componentModel = getOnErrorComponentModel(innerComponents.get(i));
+      if (!componentModel.getRawParameterValue(WHEN_CHOICE_ES_ATTRIBUTE).isPresent()
+          && !componentModel.getRawParameterValue(TYPE_ES_ATTRIBUTE).isPresent()) {
         throw new MuleRuntimeException(createStaticMessage(
                                                            "Every handler (except for the last one) within an 'error-handler' must specify a 'when' or 'type' attribute."));
       }
     }
   }
 
-  private ComponentModel getOnErrorComponentModel(ComponentModel onErrorModel) {
+  private ComponentAst getOnErrorComponentModel(ComponentModel onErrorModel) {
     if (ON_ERROR_IDENTIFIER.equals(onErrorModel.getIdentifier())) {
       String sharedOnErrorName = onErrorModel.getRawParameters().get(REFERENCE_ATTRIBUTE);
       return findTopLevelNamedComponent(sharedOnErrorName).orElseThrow(
@@ -1035,7 +1035,7 @@ public class ApplicationModel implements ArtifactAst {
    * @param name the expected value for the name attribute configuration.
    * @return the component if present, if not, an empty {@link Optional}
    */
-  public Optional<ComponentModel> findTopLevelNamedComponent(String name) {
+  public Optional<ComponentAst> findTopLevelNamedComponent(String name) {
     return ofNullable(namedTopLevelComponentModels.getOrDefault(name, null));
   }
 
