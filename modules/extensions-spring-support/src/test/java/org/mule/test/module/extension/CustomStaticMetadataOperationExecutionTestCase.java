@@ -13,6 +13,8 @@ import static org.mule.test.metadata.extension.CustomStaticMetadataOperations.CS
 import static org.mule.test.metadata.extension.CustomStaticMetadataOperations.JSON_VALUE;
 import static org.mule.test.metadata.extension.CustomStaticMetadataOperations.XML_VALUE;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.Flow;
@@ -23,8 +25,6 @@ import javax.inject.Inject;
 
 import java.io.IOException;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -86,9 +86,9 @@ public class CustomStaticMetadataOperationExecutionTestCase extends AbstractExte
     onErrorCustomType.start();
     probe(5000, 20, () -> {
       if (CustomStaticMetadataSource.onErrorResult != null) {
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode payloadTree = mapper.readTree(CustomStaticMetadataSource.onErrorResult);
-        JsonNode expectedTree = mapper.readTree(JSON_VALUE);
+        JsonParser parser = new JsonParser();
+        JsonElement payloadTree = parser.parse(CustomStaticMetadataSource.onErrorResult);
+        JsonElement expectedTree = parser.parse(JSON_VALUE);
         return payloadTree.equals(expectedTree);
       } else {
         return false;
@@ -123,9 +123,9 @@ public class CustomStaticMetadataOperationExecutionTestCase extends AbstractExte
   }
 
   private void assertEqualJsons(String payload, String expected) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    JsonNode payloadTree = mapper.readTree(payload);
-    JsonNode expectedTree = mapper.readTree(expected);
+    JsonParser parser = new JsonParser();
+    JsonElement payloadTree = parser.parse(payload);
+    JsonElement expectedTree = parser.parse(expected);
     assertThat(payloadTree, is(expectedTree));
   }
 }
