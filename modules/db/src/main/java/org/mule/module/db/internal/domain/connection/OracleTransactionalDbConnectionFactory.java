@@ -10,9 +10,12 @@ package org.mule.module.db.internal.domain.connection;
 import org.mule.module.db.internal.domain.transaction.DbTransactionManager;
 import org.mule.module.db.internal.domain.transaction.TransactionalAction;
 import org.mule.module.db.internal.domain.type.DbTypeManager;
+import org.mule.module.db.internal.domain.type.ResolvedDbType;
 import org.mule.module.db.internal.resolver.param.GenericParamTypeResolverFactory;
 
 import java.sql.Connection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
@@ -22,6 +25,7 @@ import javax.sql.DataSource;
  */
 public class OracleTransactionalDbConnectionFactory extends TransactionalDbConnectionFactory
 {
+    Map<String, Map<Integer, ResolvedDbType>> resolvedDbTypesCache = new ConcurrentHashMap<>();
 
     /**
      * {@inheritDoc}
@@ -34,6 +38,6 @@ public class OracleTransactionalDbConnectionFactory extends TransactionalDbConne
     @Override
     protected DbConnection doCreateDbConnection(Connection connection, TransactionalAction transactionalAction)
     {
-        return new OracleDbConnection(connection, transactionalAction, new DefaultDbConnectionReleaser(this), new GenericParamTypeResolverFactory(dbTypeManager));
+        return new OracleDbConnection(connection, transactionalAction, new DefaultDbConnectionReleaser(this), new GenericParamTypeResolverFactory(dbTypeManager), resolvedDbTypesCache);
     }
 }
