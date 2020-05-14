@@ -33,7 +33,6 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.MUNIT_AFTE
 import static org.mule.runtime.config.internal.model.ApplicationModel.MUNIT_BEFORE_SUITE_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MUNIT_BEFORE_TEST_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.MUNIT_TEST_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.REDELIVERY_POLICY_IDENTIFIER;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -112,15 +111,7 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
               .build();
       componentLocation = new DefaultComponentLocation(ofNullable(componentModelNameAttribute), parts);
     } else if (existsWithinRootContainer(componentModel, hierarchy)) {
-      ComponentAst parentComponentModel;
-      if (componentModel.getIdentifier().equals(REDELIVERY_POLICY_IDENTIFIER)) {
-        parentComponentModel = hierarchy.get(hierarchy.size() - 1)
-            .directChildrenStream()
-            .findFirst()
-            .orElse(hierarchy.get(hierarchy.size() - 1));
-      } else {
-        parentComponentModel = hierarchy.get(hierarchy.size() - 1);
-      }
+      ComponentAst parentComponentModel = hierarchy.get(hierarchy.size() - 1);
 
       DefaultComponentLocation parentComponentLocation = (DefaultComponentLocation) parentComponentModel.getLocation();
       if (isHttpProxyPart(componentModel)) {
@@ -277,7 +268,6 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
     // we just lookup the position of the component model within the children
     return valueOf(max(0, hierarchy.get(hierarchy.size() - 1)
         .directChildrenStream()
-        .filter(c -> !(c.getIdentifier().equals(REDELIVERY_POLICY_IDENTIFIER)))
         .collect(toList()).indexOf(componentModel)));
   }
 

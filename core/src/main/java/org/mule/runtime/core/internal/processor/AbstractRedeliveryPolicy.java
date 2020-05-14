@@ -4,30 +4,34 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.processor;
+package org.mule.runtime.core.internal.processor;
 
+import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.initialisationFailure;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 
 import org.mule.api.annotation.NoExtend;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.exception.NullExceptionHandler;
+import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.privileged.processor.Scope;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+
+import java.util.List;
 
 /**
  * Implement a redelivery policy for Mule. This is similar to JMS retry policies that will redeliver a message a maximum number of
  * times. If this maximum is exceeded, the message is sent to a dead letter queue, Here, if the processing of the messages fails
  * too often, the message is sent to the failedMessageProcessor MP, whence success is force to be returned, to allow the message
  * to be considered "consumed".
- *
- * @deprecated This is kept just because it is in a `privileged` package.
  */
 @NoExtend
-@Deprecated
-public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessageProcessor
-    implements Processor, Lifecycle, MuleContextAware {
+public abstract class AbstractRedeliveryPolicy extends AbstractMessageProcessorOwner implements Scope {
+
+  private List<Processor> processors;
+  protected MessageProcessorChain nestedChain;
 
   protected int maxRedeliveryCount;
   public static final int REDELIVERY_FAIL_ON_FIRST = 0;
@@ -37,16 +41,10 @@ public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessa
     if (maxRedeliveryCount < 0) {
       throw new InitialisationException(initialisationFailure("maxRedeliveryCount must be positive"), this);
     }
+    this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, getRootContainerLocation()), processors,
+                                                         NullExceptionHandler.getInstance());
+    super.initialise();
   }
-
-  @Override
-  public void start() throws MuleException {}
-
-  @Override
-  public void stop() throws MuleException {}
-
-  @Override
-  public void dispose() {}
 
   public int getMaxRedeliveryCount() {
     return maxRedeliveryCount;
@@ -56,8 +54,12 @@ public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessa
     this.maxRedeliveryCount = maxRedeliveryCount;
   }
 
+  public void setMessageProcessors(List<Processor> processors) {
+    this.processors = processors;
+  }
+
   @Override
-  public void setMuleContext(MuleContext context) {
-    super.setMuleContext(context);
+  protected List<Processor> getOwnedMessageProcessors() {
+    return singletonList(nestedChain);
   }
 }
