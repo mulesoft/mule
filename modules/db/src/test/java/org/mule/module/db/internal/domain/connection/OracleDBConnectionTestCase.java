@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.mule.module.db.internal.domain.type.ResolvedDbType;
 import org.mule.module.db.internal.resolver.param.ParamTypeResolverFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import java.sql.Clob;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.Map;
@@ -21,12 +21,13 @@ import static org.mule.module.db.internal.domain.transaction.TransactionalAction
 
 public class OracleDBConnectionTestCase extends AbstractMuleTestCase
 {
-    private final String TYPE_NAME="TYPE_NAME";
-    private final String OTHER_TYPE_NAME="OTHER_TYPE";
+    private final String TYPE_NAME = "TYPE_NAME";
+    private final String OTHER_TYPE_NAME = "OTHER_TYPE";
 
 
     @Test
-    public void lobResolutionPerformance() throws Exception{
+    public void lobResolutionPerformance() throws Exception
+    {
 
         Map<String, Map<Integer, ResolvedDbType>> dbTypeCache = new ConcurrentHashMap<>();
         Object[] structValues = {"clob", "foo"};
@@ -55,20 +56,20 @@ public class OracleDBConnectionTestCase extends AbstractMuleTestCase
         DbConnection defaultDbConnection = connectionFactory.createConnection(ALWAYS_JOIN);
         defaultDbConnection.createArrayOf(TYPE_NAME, params);
         defaultDbConnection.close();
-        assertThat(dbTypeCache.containsKey(TYPE_NAME),is(true));
+        assertThat(dbTypeCache.containsKey(TYPE_NAME), is(true));
         verify(preparedStatement, times(2)).executeQuery();
 
         DbConnection anotherDbConnection = connectionFactory.createConnection(ALWAYS_JOIN);
 
         defaultDbConnection.createArrayOf(OTHER_TYPE_NAME, params2);
         defaultDbConnection.close();
-        assertThat(dbTypeCache.containsKey(OTHER_TYPE_NAME),is(true));
+        assertThat(dbTypeCache.containsKey(OTHER_TYPE_NAME), is(true));
         verify(preparedStatement, times(4)).executeQuery();
 
         DbConnection oneMoreDbConnection = connectionFactory.createConnection(ALWAYS_JOIN);
         defaultDbConnection.createArrayOf(OTHER_TYPE_NAME, params);
         defaultDbConnection.close();
-        assertThat(dbTypeCache.containsKey(OTHER_TYPE_NAME),is(true));
+        assertThat(dbTypeCache.containsKey(OTHER_TYPE_NAME), is(true));
         verify(preparedStatement, times(5)).executeQuery();
 
     }
