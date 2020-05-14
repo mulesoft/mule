@@ -15,14 +15,17 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
+import static reactor.core.publisher.Mono.first;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.util.context.Context.empty;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
@@ -273,15 +276,19 @@ class UntilSuccessfulRouter {
 
   private Function<Throwable, Throwable> getThrowableFunction(CoreEvent event) {
     return throwable -> {
-      Throwable cause = getMessagingExceptionCause(throwable);
       CoreEvent exceptionEvent = event;
+      Throwable retryPolicyExhaustionCause = getMessagingExceptionCause(throwable);
+      Optional<MuleException> firstMuleCause = extractOfType(retryPolicyExhaustionCause, MuleException.class);
+      if (firstMuleCause.isPresent()) {
+        retryPolicyExhaustionCause = new SuppressedMuleException(retryPolicyExhaustionCause, firstMuleCause.get());
+      }
       if (throwable instanceof MessagingException) {
         exceptionEvent = ((MessagingException) throwable).getEvent();
       }
       return new MessagingException(exceptionEvent,
                                     new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX,
-                                                                                          cause.getMessage()),
-                                                                      new SuppressedMuleException(cause), owner),
+                                            retryPolicyExhaustionCause.getMessage()),
+                                                                      retryPolicyExhaustionCause, owner),
                                     owner);
     };
   }

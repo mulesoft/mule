@@ -8,16 +8,16 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionReader;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsNamespace;
 
-import org.mule.runtime.api.exception.ErrorTypeRepository;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.exception.TypedException;
+import org.mule.runtime.api.exception.*;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import org.mule.runtime.internal.exception.SuppressedMuleException;
 
 /**
  * Handler of {@link ModuleException ModuleExceptions}, which given a {@link Throwable} checks whether the exceptions is
@@ -97,7 +98,6 @@ public class ModuleExceptionHandler {
     return new TypedException(getExceptionCause(exception), errorTypeCache.get(errorDefinition).apply(exception));
   }
 
-
   private boolean isAllowedError(ErrorType errorType) {
     return allowedErrorTypes
         .stream()
@@ -120,7 +120,22 @@ public class ModuleExceptionHandler {
           ? throwable.getCause()
           : new MuleRuntimeException(createStaticMessage(throwable.getMessage()));
     } else {
-      return throwable;
+      return suppressMessagingException(throwable);
     }
+  }
+
+  private Throwable suppressMessagingException(Throwable throwable) {
+    Throwable cause = throwable;
+    while (cause != null && !(cause instanceof SuppressedMuleException)) {
+      if (cause instanceof MessagingException) {
+        return new SuppressedMuleException(throwable, (MessagingException) cause);
+      }
+      cause = getExceptionReader(cause).getCause(cause);
+      // Address some misbehaving exceptions, avoid endless loop
+      if (throwable == cause) {
+        break;
+      }
+    }
+    return throwable;
   }
 }
