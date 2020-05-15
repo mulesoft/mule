@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static reactor.core.publisher.Mono.error;
@@ -31,7 +32,6 @@ import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 
-import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -110,12 +110,14 @@ public class NoSourcePolicyTestCase extends AbstractMuleTestCase {
     Either<SourcePolicyFailureResult, SourcePolicySuccessResult> result =
         from(noSourcePolicy.process(initialEvent, respParametersProcessor)).block();
 
+    verify(initialEvent.getContext()).error(result.getLeft().getMessagingException());
+
     assertThat(result.getRight(), nullValue());
-    assertThat(result.getLeft().getMessagingException().getEvent().getMessage(), Is.is(initialEvent.getMessage()));
-    assertThat(result.getLeft().getMessagingException().getEvent().getContext(), Is.is(initialEvent.getContext()));
+    assertThat(result.getLeft().getMessagingException().getEvent().getMessage(), is(initialEvent.getMessage()));
+    assertThat(result.getLeft().getMessagingException().getEvent().getContext(), is(initialEvent.getContext()));
     assertThat(result.getLeft().getMessagingException().getEvent().getSecurityContext(),
-               Is.is(initialEvent.getSecurityContext()));
-    assertThat(result.getLeft().getMessagingException().getEvent().getError(), not(Is.is(empty())));
+               is(initialEvent.getSecurityContext()));
+    assertThat(result.getLeft().getMessagingException().getEvent().getError(), not(is(empty())));
     assertThat(result.getLeft().getErrorResponseParameters().get(), is(errorParameters));
   }
 
