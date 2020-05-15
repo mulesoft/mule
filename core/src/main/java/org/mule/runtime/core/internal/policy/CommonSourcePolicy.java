@@ -87,8 +87,6 @@ class CommonSourcePolicy {
                   ? (() -> sourcePolicyParametersTransformer.get().fromMessageToErrorResponseParameters(sourceEvent.getMessage()))
                   : (() -> respParamProcessor.getFailedExecutionResponseParametersFunction().apply(sourceEvent));
 
-              ((BaseEventContext) sourceEvent.getContext()).error(me);
-
               SourcePolicyFailureResult result = new SourcePolicyFailureResult(me, errorParameters);
               return left(result);
             });

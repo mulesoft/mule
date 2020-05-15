@@ -265,8 +265,6 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
 
     compositeSourcePolicy.dispose();
 
-    final Publisher<CoreEvent> responsePublisher = ((BaseEventContext) initialEvent.getContext()).getResponsePublisher();
-
     Either<SourcePolicyFailureResult, SourcePolicySuccessResult> sourcePolicyResult =
         from(compositeSourcePolicy.process(initialEvent, sourceParametersProcessor)).block();
 
@@ -278,9 +276,6 @@ public class CompositeSourcePolicyTestCase extends AbstractCompositePolicyTestCa
                is(initialEvent.getSecurityContext()));
     assertThat(sourcePolicyResult.getLeft().getMessagingException().getEvent().getError(), not(is(empty())));
     assertThat(sourcePolicyResult.getLeft().getErrorResponseParameters().get(), is(errorParameters));
-
-    expectedException.expectCause(is(sourcePolicyResult.getLeft().getMessagingException()));
-    from(responsePublisher).block();
   }
 
   public static final class InvocationsRecordingCompositeSourcePolicy extends CompositeSourcePolicy {
