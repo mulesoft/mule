@@ -15,15 +15,11 @@ import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static reactor.core.publisher.Mono.create;
 import static reactor.core.publisher.Mono.just;
 
-import org.mule.runtime.api.exception.ErrorTypeRepository;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.util.concurrent.FunctionalReadWriteLock;
-import org.mule.runtime.core.internal.exception.DefaultErrorTypeRepository;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.RoundRobinFluxSinkSupplier;
@@ -51,7 +47,6 @@ class CommonSourcePolicy {
   private final AtomicBoolean disposed;
   private final FunctionalReadWriteLock readWriteLock;
   private final Optional<SourcePolicyParametersTransformer> sourcePolicyParametersTransformer;
-  private final DefaultErrorTypeRepository errorTypeRepository;
 
   CommonSourcePolicy(Supplier<FluxSink<CoreEvent>> sinkFactory) {
     this(sinkFactory, empty());
@@ -65,7 +60,6 @@ class CommonSourcePolicy {
     this.sourcePolicyParametersTransformer = sourcePolicyParametersTransformer;
     this.readWriteLock = FunctionalReadWriteLock.readWriteLock();
     this.disposed = new AtomicBoolean(false);
-    this.errorTypeRepository = new DefaultErrorTypeRepository();
   }
 
   public Publisher<Either<SourcePolicyFailureResult, SourcePolicySuccessResult>> process(CoreEvent sourceEvent,
@@ -80,8 +74,6 @@ class CommonSourcePolicy {
         return just(sourceEvent)
             .map(event -> {
               MessagingException me = new MessagingException(createStaticMessage("Source policy already disposed"), sourceEvent);
-              me.setProcessedEvent(CoreEvent.builder(sourceEvent)
-                  .error(ErrorBuilder.builder(me).errorType(errorTypeRepository.getAnyErrorType()).build()).build());
 
               Supplier<Map<String, Object>> errorParameters = sourcePolicyParametersTransformer.isPresent()
                   ? (() -> sourcePolicyParametersTransformer.get().fromMessageToErrorResponseParameters(sourceEvent.getMessage()))
