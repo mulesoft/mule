@@ -26,7 +26,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.google.common.collect.ImmutableMap;
@@ -111,7 +110,7 @@ public class NoSourcePolicyTestCase extends AbstractMuleTestCase {
     Either<SourcePolicyFailureResult, SourcePolicySuccessResult> result =
         from(noSourcePolicy.process(initialEvent, respParametersProcessor)).block();
 
-    verify((BaseEventContext) (initialEvent.getContext())).error(result.getLeft().getMessagingException());
+    verify(initialEvent.getContext()).error(result.getLeft().getMessagingException());
 
     assertThat(result.getRight(), nullValue());
     assertThat(result.getLeft().getMessagingException().getEvent().getMessage(), is(initialEvent.getMessage()));
