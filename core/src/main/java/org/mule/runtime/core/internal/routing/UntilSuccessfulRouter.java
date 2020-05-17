@@ -287,7 +287,8 @@ class UntilSuccessfulRouter {
       }
       return new MessagingException(exceptionEvent,
                                     new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX,
-                                            retryPolicyExhaustionCause.getMessage()),
+                                                                                          retryPolicyExhaustionCause
+                                                                                              .getMessage()),
                                                                       retryPolicyExhaustionCause, owner),
                                     owner);
     };
