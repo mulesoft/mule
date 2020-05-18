@@ -208,38 +208,36 @@ public final class ApplicationModelTypeUtils {
                                              ExtensionModelHelper extensionModelHelper,
                                              ParameterizedModel model, Predicate<ParameterModel> parameterModelFilter) {
     childrenComponentModels
-        .forEach(childComp -> {
-          extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
-              .filter(parameterModelFilter::test)
-              // do not handle the callback parameters from the sources
-              .filter(paramModel -> {
-                if (model instanceof SourceModel) {
-                  return !(((SourceModel) model).getSuccessCallback()
-                      .map(sc -> sc.getAllParameterModels().contains(paramModel))
-                      .orElse(false) ||
-                      ((SourceModel) model).getErrorCallback()
-                          .map(ec -> ec.getAllParameterModels().contains(paramModel))
-                          .orElse(false));
-                } else {
-                  return true;
-                }
-              }).filter(paramModel -> paramModel.getDslConfiguration().allowsInlineDefinition())
-              .ifPresent(paramModel -> {
-                if (paramModel.getExpressionSupport() == NOT_SUPPORTED
-                    || childComp.directChildrenStream().findFirst().isPresent()) {
-                  enrichComponentModels(componentModel, nestedComponents,
-                                        of(extensionModelHelper.resolveDslElementModel(paramModel,
-                                                                                       componentModel
-                                                                                           .getIdentifier())),
-                                        paramModel, extensionModelHelper);
-                } else {
-                  componentModel.setParameter(paramModel,
-                                              new DefaultComponentParameterAst(trim(((ComponentModel) childComp)
-                                                  .getTextContent()),
-                                                                               () -> paramModel, childComp.getMetadata()));
-                }
-              });
-        });
+        .forEach(childComp -> extensionModelHelper.findParameterModel(childComp.getIdentifier(), model)
+            .filter(parameterModelFilter::test)
+            // do not handle the callback parameters from the sources
+            .filter(paramModel -> {
+              if (model instanceof SourceModel) {
+                return !(((SourceModel) model).getSuccessCallback()
+                    .map(sc -> sc.getAllParameterModels().contains(paramModel))
+                    .orElse(false) ||
+                    ((SourceModel) model).getErrorCallback()
+                        .map(ec -> ec.getAllParameterModels().contains(paramModel))
+                        .orElse(false));
+              } else {
+                return true;
+              }
+            }).filter(paramModel -> paramModel.getDslConfiguration().allowsInlineDefinition())
+            .ifPresent(paramModel -> {
+              if (paramModel.getExpressionSupport() == NOT_SUPPORTED
+                  || childComp.directChildrenStream().findFirst().isPresent()) {
+                enrichComponentModels(componentModel, nestedComponents,
+                                      of(extensionModelHelper.resolveDslElementModel(paramModel,
+                                                                                     componentModel
+                                                                                         .getIdentifier())),
+                                      paramModel, extensionModelHelper);
+              } else {
+                componentModel.setParameter(paramModel,
+                                            new DefaultComponentParameterAst(trim(((ComponentModel) childComp)
+                                                .getTextContent()),
+                                                                             () -> paramModel, childComp.getMetadata()));
+              }
+            }));
   }
 
   private static void handleNestedParametersWithoutPopulatingObjectTypes(ComponentModel componentModel,
@@ -544,11 +542,8 @@ public final class ApplicationModelTypeUtils {
                       .ifPresent(subTypeTypeId -> {
                         typesDslMap.put(subTypeTypeId, entrySet.getValue());
                         objectTypeByTypeId.put(subTypeTypeId, entrySet.getKey());
-                        entrySet.getValue().ifPresent(dslElementSyntax -> {
-                          getIdentifier(dslElementSyntax).ifPresent(subTypeIdentifier -> {
-                            itemIdentifiers.put(subTypeIdentifier, subTypeTypeId);
-                          });
-                        });
+                        entrySet.getValue().ifPresent(dslElementSyntax -> getIdentifier(dslElementSyntax)
+                            .ifPresent(subTypeIdentifier -> itemIdentifiers.put(subTypeIdentifier, subTypeTypeId)));
                       }));
 
               getTypeId(itemType).ifPresent(itemTypeId -> {
@@ -573,11 +568,10 @@ public final class ApplicationModelTypeUtils {
                       createParameterizedTypeModelAdapter(objectTypeByTypeId.get(typeId), extensionModelHelper);
                   itemComponent.setMetadataTypeModelAdapter(parameterizedModel);
 
-                  parameterizedModel.getAllParameterModels().stream().forEach(nestedParameter -> {
-                    enrichComponentModels(itemComponent, getNestedComponents(itemComponent),
-                                          subTypeDsl.getContainedElement(nestedParameter.getName()),
-                                          nestedParameter, extensionModelHelper);
-                  });
+                  parameterizedModel.getAllParameterModels().stream()
+                      .forEach(nestedParameter -> enrichComponentModels(itemComponent, getNestedComponents(itemComponent),
+                                                                        subTypeDsl.getContainedElement(nestedParameter.getName()),
+                                                                        nestedParameter, extensionModelHelper));
 
                 });
               });

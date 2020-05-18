@@ -50,7 +50,7 @@ public final class InfrastructureTypeMapping {
 
   public static final String TLS_NAMESPACE_URI = "http://www.mulesoft.org/schema/mule/tls";
 
-  private static Map<Class<?>, InfrastructureType> MAPPING = ImmutableMap.<Class<?>, InfrastructureType>builder()
+  private static final Map<Class<?>, InfrastructureType> MAPPING = ImmutableMap.<Class<?>, InfrastructureType>builder()
       .put(TlsContextFactory.class, new InfrastructureType(TLS_PARAMETER_NAME, 8))
       .put(SourceTransactionalAction.class, new InfrastructureType(TRANSACTIONAL_ACTION_PARAMETER_NAME, 6))
       .put(OperationTransactionalAction.class, new InfrastructureType(TRANSACTIONAL_ACTION_PARAMETER_NAME, 7))
@@ -58,7 +58,7 @@ public final class InfrastructureTypeMapping {
       .put(Scheduler.class, new InfrastructureType(SCHEDULING_STRATEGY_PARAMETER_NAME, 10))
       .build();
 
-  private static Map<Type, InfrastructureType> TYPE_MAPPING = MAPPING.entrySet()
+  private static final Map<Type, InfrastructureType> TYPE_MAPPING = MAPPING.entrySet()
       .stream()
       .collect(toImmutableMap(entry -> new TypeWrapper(entry.getKey(),
                                                        new DefaultExtensionsTypeLoaderFactory()
@@ -73,7 +73,7 @@ public final class InfrastructureTypeMapping {
         .findFirst();
   }
 
-  private static Map<String, QNameModelProperty> QNAMES = ImmutableMap.<String, QNameModelProperty>builder()
+  private static final Map<String, QNameModelProperty> QNAMES = ImmutableMap.<String, QNameModelProperty>builder()
       .put(SCHEDULING_STRATEGY_PARAMETER_NAME,
            new QNameModelProperty(new QName(CORE_NAMESPACE, SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER, CORE_PREFIX)))
       .put(TLS_PARAMETER_NAME,
@@ -94,7 +94,7 @@ public final class InfrastructureTypeMapping {
                                             TLS_PREFIX)))
       .build();
 
-  private static Map<ComponentIdentifier, Class<?>> IDENTIFIER_TYPE_MAPPING = MAPPING.entrySet()
+  private static final Map<ComponentIdentifier, Class<?>> IDENTIFIER_TYPE_MAPPING = MAPPING.entrySet()
       .stream()
       .filter(entry -> getQName(entry.getValue().getName()).isPresent())
       .collect(toImmutableMap(entry -> {
@@ -107,7 +107,7 @@ public final class InfrastructureTypeMapping {
       },
                               Map.Entry::getKey));
 
-  private static Map<String, ParameterDslConfiguration> DSL_CONFIGURATIONS =
+  private static final Map<String, ParameterDslConfiguration> DSL_CONFIGURATIONS =
       ImmutableMap.<String, ParameterDslConfiguration>builder()
           .put(SCHEDULING_STRATEGY_PARAMETER_NAME,
                ParameterDslConfiguration.builder()
