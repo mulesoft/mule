@@ -255,7 +255,7 @@
         <muleHeisenbergExtensionTestVersion>4.1.6-20200518</muleHeisenbergExtensionTestVersion>
         <muleMarvelExtensionTestVersion>4.1.6-20200518</muleMarvelExtensionTestVersion>
         <mulePetstoreExtensionTestVersion>4.1.6-20200518</mulePetstoreExtensionTestVersion>
-        <muleSubtypesExtensionTestVersion>4.1.6-HF-SNAPSHOT</muleSubtypesExtensionTestVersion>
+        <muleSubtypesExtensionTestVersion>4.1.6-20200518</muleSubtypesExtensionTestVersion>
 
         <!--Maven plugins versions-->
         <dependency.plugin.version>3.0.2</dependency.plugin.version>
