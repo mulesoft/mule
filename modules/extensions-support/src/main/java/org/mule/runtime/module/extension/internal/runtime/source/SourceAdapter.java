@@ -77,6 +77,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper;
+import org.mule.runtime.module.extension.internal.runtime.source.poll.RestartContext;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.Restartable;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 
@@ -272,17 +273,17 @@ public class SourceAdapter implements Lifecycle, Restartable {
   }
 
   @Override
-  public Map<String, Object> beginRestart() {
+  public RestartContext getRestartContext() {
     if (source instanceof Restartable) {
-      return ((Restartable) source).beginRestart();
+      return ((Restartable) source).getRestartContext();
     }
     return null;
   }
 
   @Override
-  public void finishRestart(Map<String, Object> restartingContext) {
+  public void restart(RestartContext restartContext) {
     if (source instanceof Restartable) {
-      ((Restartable) source).finishRestart(restartingContext);
+      ((Restartable) source).restart(restartContext);
     }
   }
 

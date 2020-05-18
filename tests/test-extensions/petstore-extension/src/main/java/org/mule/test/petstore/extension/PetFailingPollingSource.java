@@ -58,7 +58,6 @@ public class PetFailingPollingSource extends PollingSource<String, Void> {
 
   @Override
   public void poll(PollContext<String, Void> pollContext) {
-    System.out.println("STARTED POOLS **************:  " + STARTED_POLLS);
     STARTED_POLLS++;
     if (STARTED_POLLS == failAtPoll) {
       pollContext.onConnectionException(new ConnectionException("Polling Fail"));

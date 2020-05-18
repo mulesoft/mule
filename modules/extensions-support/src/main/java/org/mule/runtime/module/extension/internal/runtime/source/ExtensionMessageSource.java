@@ -81,6 +81,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedPa
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.internal.runtime.source.poll.RestartContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Map;
@@ -196,14 +197,14 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
-  private void startSource(boolean restarting, Map<String, Object> restartingContext) throws MuleException {
+  private void startSource(boolean restarting, RestartContext restartContext) throws MuleException {
     try {
       // When restarting, async must be forced
       if (restarting && !retryPolicyTemplate.isAsync()) {
-        new AsynchronousRetryTemplate(retryPolicyTemplate).execute(new StartSourceCallback(restarting, restartingContext),
+        new AsynchronousRetryTemplate(retryPolicyTemplate).execute(new StartSourceCallback(restarting, restartContext),
                                                                    retryScheduler);
       } else {
-        retryPolicyTemplate.execute(new StartSourceCallback(restarting, restartingContext), retryScheduler);
+        retryPolicyTemplate.execute(new StartSourceCallback(restarting, restartContext), retryScheduler);
       }
     } catch (Throwable e) {
       if (e instanceof MuleException) {
@@ -229,7 +230,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     stopSource(false);
   }
 
-  private Map<String, Object> stopSource(boolean restarting) throws MuleException {
+  private RestartContext stopSource(boolean restarting) throws MuleException {
     if (sourceAdapter != null) {
       final String sourceName = sourceAdapter.getName();
 
@@ -238,7 +239,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         initialiserEvent = getInitialiserEvent(muleContext);
         try {
           stopUsingConfiguration(initialiserEvent);
-          return restarting ? sourceAdapter.beginRestart() : null;
+          return restarting ? sourceAdapter.getRestartContext() : null;
         } finally {
           sourceAdapter.stop();
           if (usesDynamicConfiguration()) {
@@ -338,9 +339,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private void restart() throws MuleException {
     synchronized (started) {
       if (started.get()) {
-        Map<String, Object> restartingContext = stopSource(true);
+        RestartContext restartContext = stopSource(true);
         disposeSource();
-        startSource(true, restartingContext);
+        startSource(true, restartContext);
       } else {
         LOGGER.warn(format("Message source '%s' on flow '%s' is stopped. Not doing restart", getLocation().getRootContainerName(),
                            getLocation().getRootContainerName()));
@@ -516,11 +517,11 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private class StartSourceCallback implements RetryCallback {
 
     boolean restarting;
-    Map restartingContext;
+    RestartContext restartContext;
 
-    StartSourceCallback(boolean restarting, Map restartingContext) {
+    StartSourceCallback(boolean restarting, RestartContext restartContext) {
       this.restarting = restarting;
-      this.restartingContext = restartingContext;
+      this.restartContext = restartContext;
     }
 
     @Override
@@ -529,7 +530,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         createSource(restarting);
         initialiseIfNeeded(sourceAdapter);
         if (restarting) {
-          sourceAdapter.finishRestart(restartingContext);
+          sourceAdapter.restart(restartContext);
         }
         sourceAdapter.start();
         reconnecting.set(false);

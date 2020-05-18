@@ -131,16 +131,15 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
     watermarkObjectStore = objectStoreManager.getOrCreateObjectStore(formatKey(WATERMARK_OS_NAME_SUFFIX),
                                                                      unmanagedPersistent());
 
-    executor = schedulerService.customScheduler(SchedulerConfig.config()
-        .withMaxConcurrentTasks(1)
-        .withWaitAllowed(true)
-        .withName(formatKey("executor")));
-
     stopRequested.set(false);
     if (restarting.compareAndSet(true, false)) {
       delegateRunnable.setDelegate(() -> poll(sourceCallback));
       poll(sourceCallback);
     } else {
+      executor = schedulerService.customScheduler(SchedulerConfig.config()
+          .withMaxConcurrentTasks(1)
+          .withWaitAllowed(true)
+          .withName(formatKey("executor")));
       delegateRunnable = new DelegateRunnable(() -> poll(sourceCallback));
       scheduler.schedule(executor, delegateRunnable);
     }
@@ -218,22 +217,18 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
   }
 
   @Override
-  public Map<String, Object> beginRestart() {
-    Map<String, Object> restartingContext = new HashMap<>();
-
+  public RestartContext getRestartContext() {
     restarting.set(true);
-
-    restartingContext.put(POLLING_SOURCE_EXECUTOR_KEY, executor);
-    restartingContext.put(RUNNABLE_KEY, delegateRunnable);
-    return restartingContext;
+    delegateRunnable.setDelegate(null);
+    return new RestartContext(executor, delegateRunnable);
   }
 
   @Override
-  public void finishRestart(Map<String, Object> restartingContext) {
+  public void restart(RestartContext restartContext) {
     restarting.set(true);
 
-    executor = (org.mule.runtime.api.scheduler.Scheduler) restartingContext.get(POLLING_SOURCE_EXECUTOR_KEY);
-    delegateRunnable = (DelegateRunnable) restartingContext.get(RUNNABLE_KEY);
+    executor = restartContext.getExecutor();
+    delegateRunnable = restartContext.getDelegateRunnable();
   }
 
   private class DefaultPollContext implements PollContext<T, A> {
@@ -646,24 +641,6 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       } catch (ObjectStoreException e) {
         LOGGER.error(format("Could not untrack item '%s' in source at flow '%s'. %s", id, flowName, e.getMessage()), e);
       }
-    }
-  }
-
-  private class DelegateRunnable implements Runnable {
-
-    Runnable delegate;
-
-    public DelegateRunnable(Runnable delegate) {
-      this.delegate = delegate;
-    }
-
-    @Override
-    public void run() {
-      delegate.run();
-    }
-
-    public void setDelegate(Runnable delegate) {
-      this.delegate = delegate;
     }
   }
 }
