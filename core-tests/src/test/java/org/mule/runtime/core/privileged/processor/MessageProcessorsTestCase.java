@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.privileged.processor;
 
-import static java.util.Collections.singletonList;
 import static java.util.concurrent.ConcurrentHashMap.newKeySet;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -22,7 +21,6 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
@@ -42,7 +40,6 @@ import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.Reference;

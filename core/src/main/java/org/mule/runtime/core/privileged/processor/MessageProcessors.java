@@ -35,6 +35,7 @@ import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorderToReactorSinkAdapter;
@@ -462,44 +463,66 @@ public class MessageProcessors {
 
                 return eventPub.flatMap(event -> internalProcessWithChildContext(event, processor, completeParentIfEmpty));
               } else {
+                Set<BaseEventContext> seenContexts = newSetFromMap(new WeakHashMap<>());
+
                 FluxSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
-                Set<BaseEventContext> seenContexts = newSetFromMap(new WeakHashMap<BaseEventContext, Boolean>());
+                Flux<CoreEvent> upstream = Flux.from(eventChildCtxPub)
+                    .doOnNext(eventChildCtx -> childContextResponseHandler(eventChildCtx,
+                                                                           new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef),
+                                                                           completeParentIfEmpty));
 
-                AtomicInteger inflightEvents = new AtomicInteger(0);
-                AtomicBoolean deferredCompletion = new AtomicBoolean(false);
-                return Flux.from(eventChildCtxPub)
-                    .doOnNext(eventChildCtx -> {
-                      childContextResponseHandler(eventChildCtx,
-                                                  new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef),
-                                                  completeParentIfEmpty);
-                      inflightEvents.incrementAndGet();
-                    })
-                    .transform(processor)
-                    .doOnNext(completeSuccessIfNeeded())
-                    .map(event -> right(MessagingException.class, event))
+                Function<Publisher<Either<MessagingException, CoreEvent>>, Publisher<CoreEvent>> postDoOnCompleteTransformer =
+                    pub -> (Publisher<CoreEvent>) Flux.from(pub)
+                        .mergeWith(errorSwitchSinkSinkRef.flux())
+                        .map(childContextResponseMapper())
+                        .distinct(event -> (BaseEventContext) event.getContext(), () -> seenContexts);
 
-                    // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
-                    // it will be cancelled, ignoring the onErrorcontinue of the parent Flux.
-                    .doOnComplete(() -> {
-                      if (inflightEvents.get() == 0) {
-                        errorSwitchSinkSinkRef.complete();
-                      } else {
-                        deferredCompletion.set(true);
-                      }
-                    })
-                    .mergeWith(errorSwitchSinkSinkRef.flux())
-
-                    .map(childContextResponseMapper())
-                    .distinct(event -> (BaseEventContext) event.getContext(), () -> seenContexts)
-                    .doOnNext(eventChildCtx -> {
-                      if (inflightEvents.decrementAndGet() == 0 && deferredCompletion.compareAndSet(true, false)) {
-                        errorSwitchSinkSinkRef.complete();
-                      }
-                    })
-                    .map(MessageProcessors::toParentContext);
+                return applyWaitingInflightEvents(upstream,
+                                                  processor,
+                                                  pub -> Flux.from(pub)
+                                                      .doOnNext(completeSuccessIfNeeded())
+                                                      .map(event -> right(MessagingException.class, event)),
+                                                  errorSwitchSinkSinkRef::complete,
+                                                  postDoOnCompleteTransformer).map(MessageProcessors::toParentContext);
               }
             }));
   }
+
+  private static <T, U> Flux<T> applyWaitingInflightEvents(Publisher<T> upstream,
+                                                           Function<Publisher<T>, Publisher<T>> processor,
+                                                           Function<Publisher<T>, Publisher<Either<U, T>>> postProcessorTransformer,
+                                                           CheckedRunnable completer,
+                                                           Function<Publisher<Either<U, T>>, Publisher<T>> postDoOnCompleteTransformer) {
+    final AtomicInteger inflightEvents = new AtomicInteger(0);
+    final AtomicBoolean deferredCompletion = new AtomicBoolean(false);
+
+    return Flux.from(upstream)
+        .doOnNext(eventChildCtx -> {
+          inflightEvents.incrementAndGet();
+        })
+        .transform(processor)
+
+        .compose(postProcessorTransformer)
+
+        // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
+        // it will be cancelled, ignoring the onErrorContinue of the parent Flux.
+        .doOnComplete(() -> {
+          if (inflightEvents.get() > 0) {
+            deferredCompletion.set(true);
+          } else {
+            completer.run();
+          }
+        })
+
+        .transform(postDoOnCompleteTransformer)
+
+        .doOnNext(eventChildCtx -> {
+          if (inflightEvents.decrementAndGet() == 0 && deferredCompletion.compareAndSet(true, false)) {
+            completer.run();
+          }
+        });
+  }
+
 
   private static void childContextResponseHandler(CoreEvent eventChildCtx,
                                                   SinkRecorderToReactorSinkAdapter<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef,
