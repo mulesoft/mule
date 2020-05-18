@@ -31,6 +31,7 @@ import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpa
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel.getUsedNamespaces;
 import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PROPERTY;
 import static org.mule.runtime.config.internal.model.type.ApplicationModelTypeUtils.resolveMetadataTypes;
+import static org.mule.runtime.config.internal.model.type.ApplicationModelTypeUtils.resolveTypedComponentIdentifier;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
@@ -437,7 +438,8 @@ public final class XmlExtensionLoaderDelegate {
     }
 
     resolveMetadataTypes(extensionModelHelper, moduleModel.recursiveStream());
-    ((ComponentModel) moduleModel).resolveTypedComponentIdentifier(extensionModelHelper, true);
+    moduleModel.recursiveStream()
+        .forEach(componentModel -> resolveTypedComponentIdentifier((ComponentModel) componentModel, extensionModelHelper, true));
     recursiveStreamWithHierarchy(moduleModel).forEach(new ComponentLocationVisitor());
 
     final String name = moduleModel.getRawParameterValue(MODULE_NAME).orElse(null);

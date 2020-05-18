@@ -8,7 +8,6 @@ package org.mule.runtime.config.internal.model;
 
 import static com.google.common.base.Joiner.on;
 import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
@@ -35,6 +34,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_REF_IDENTIFI
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
 import static org.mule.runtime.config.internal.model.type.ApplicationModelTypeUtils.resolveMetadataTypes;
+import static org.mule.runtime.config.internal.model.type.ApplicationModelTypeUtils.resolveTypedComponentIdentifier;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -79,7 +79,6 @@ import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationProper
 import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.MapConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
-import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator;
@@ -87,7 +86,6 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
@@ -352,15 +350,14 @@ public class ApplicationModel implements ArtifactAst {
     this.ast = originalAst;
 
     validateModel(componentBuildingDefinitionRegistry);
+    ExtensionModelHelper extensionModelHelper = new ExtensionModelHelper(extensionModels);
+    resolveMetadataTypes(extensionModelHelper, ast.recursiveStream());
+    ast.recursiveStream().forEach(componentModel -> resolveTypedComponentIdentifier((ComponentModel) componentModel,
+                                                                                    extensionModelHelper, runtimeMode));
     // TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart connectors
     // and crafted declared extension models)
-    resolveComponentTypes();
-    ExtensionModelHelper extensionModelHelper = new ExtensionModelHelper(extensionModels);
-    resolveMetadataTypes(extensionModelHelper, recursiveStream());
-    topLevelComponentsStream()
-        .forEach(componentModel -> ((ComponentModel) componentModel).resolveTypedComponentIdentifier(extensionModelHelper,
-                                                                                                     runtimeMode));
-    recursiveStreamWithHierarchy(this).forEach(new ComponentLocationVisitor());
+    resolveMissingComponentTypes(ast.recursiveStream());
+    recursiveStreamWithHierarchy(ast).forEach(new ComponentLocationVisitor());
   }
 
   private void indexComponentModels(ArtifactAst originalAst) {
@@ -599,45 +596,32 @@ public class ApplicationModel implements ArtifactAst {
   /**
    * Resolves the types of each component model when possible.
    */
-  public void resolveComponentTypes() {
+  public void resolveMissingComponentTypes(Stream<ComponentAst> components) {
     // TODO MULE-13894 enable this once changes are completed and no componentBuildingDefinition is needed
     // checkState(componentBuildingDefinitionRegistry.isPresent(),
     // "ApplicationModel was created without a " + ComponentBuildingDefinitionProvider.class.getName());
-    componentBuildingDefinitionRegistry.ifPresent(buildingDefinitionRegistry -> {
-      recursiveStream().forEach(componentModel -> {
-        Optional<ComponentBuildingDefinition<?>> buildingDefinition =
-            buildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
-        buildingDefinition.map(definition -> {
-          ObjectTypeVisitor typeDefinitionVisitor = new ObjectTypeVisitor(componentModel);
-          definition.getTypeDefinition().visit(typeDefinitionVisitor);
-          // We still have components without extension models
-          final Class<?> type = typeDefinitionVisitor.getType();
-          ((ComponentModel) componentModel).setType(type);
+    componentBuildingDefinitionRegistry
+        .ifPresent(buildingDefinitionRegistry -> components
+            .filter(componentModel -> componentModel.getComponentType() == UNKNOWN
+                || componentModel.getComponentType() == null)
+            .forEach(componentModel -> buildingDefinitionRegistry
+                .getBuildingDefinition(componentModel.getIdentifier())
+                .ifPresent(definition -> {
+                  ObjectTypeVisitor typeDefinitionVisitor = new ObjectTypeVisitor(componentModel);
+                  definition.getTypeDefinition().visit(typeDefinitionVisitor);
+                  // We still have components without extension models
+                  final Class<?> type = typeDefinitionVisitor.getType();
 
-          if (ComponentLocationVisitor.BATCH_JOB_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier())
-              || ComponentLocationVisitor.BATCH_PROCESSS_RECORDS_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier())) {
-            ((ComponentModel) componentModel).setComponentType(ROUTER);
-          } else if (CommonBeanDefinitionCreator.areMatchingTypes(MessageSource.class, type)) {
-            ((ComponentModel) componentModel).setComponentType(SOURCE);
-          } else if (CommonBeanDefinitionCreator.areMatchingTypes(Processor.class, type)) {
-            ((ComponentModel) componentModel).setComponentType(OPERATION);
-          }
-
-          return definition;
-        }).orElseGet(() -> {
-          String classParameter = ((ComponentModel) componentModel).getRawParameters().get(CLASS_ATTRIBUTE);
-          if (classParameter != null) {
-            try {
-              ((ComponentModel) componentModel)
-                  .setType(ClassUtils.loadClass(classParameter, currentThread().getContextClassLoader()));
-            } catch (ClassNotFoundException e) {
-              throw new RuntimeConfigurationException(createStaticMessage(e.getMessage()), e);
-            }
-          }
-          return null;
-        });
-      });
-    });
+                  if (ComponentLocationVisitor.BATCH_JOB_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier())
+                      || ComponentLocationVisitor.BATCH_PROCESSS_RECORDS_COMPONENT_IDENTIFIER
+                          .equals(componentModel.getIdentifier())) {
+                    ((ComponentModel) componentModel).setComponentType(ROUTER);
+                  } else if (CommonBeanDefinitionCreator.areMatchingTypes(MessageSource.class, type)) {
+                    ((ComponentModel) componentModel).setComponentType(SOURCE);
+                  } else if (CommonBeanDefinitionCreator.areMatchingTypes(Processor.class, type)) {
+                    ((ComponentModel) componentModel).setComponentType(OPERATION);
+                  }
+                })));
   }
 
   /**
