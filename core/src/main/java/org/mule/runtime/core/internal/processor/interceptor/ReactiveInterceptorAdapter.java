@@ -176,7 +176,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter
   }
 
   private boolean isInterceptable(Processor component) {
-    return ((Component) component).getLocation() != null;
+    return component instanceof Component && ((Component) component).getLocation() != null;
   }
 
   @Override
