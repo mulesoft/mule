@@ -93,7 +93,7 @@
                 <fixed-frequency startDelay="200" frequency="100000"/>
             </scheduling-strategy>
         </petstore:pet-adoption-source>
-        <flow-ref name="adopt"/>
+        <logger level="INFO" message="#[payload]"/>
     </flow>
 
     <flow name="failingLongFrequencyPoll" initialState="stopped">
@@ -102,7 +102,7 @@
                 <fixed-frequency startDelay="500" frequency="100000"/>
             </scheduling-strategy>
         </petstore:pet-failing-source>
-        <flow-ref name="adopt"/>
+        <logger level="INFO" message="#[payload]"/>
     </flow>
 
     <flow name="adopt">
