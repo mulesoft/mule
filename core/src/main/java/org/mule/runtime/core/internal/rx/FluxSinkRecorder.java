@@ -31,12 +31,11 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
   }
 
   @Override
-  public void accept(FluxSink<T> fluxSink) {
+  public synchronized void accept(FluxSink<T> fluxSink) {
     FluxSinkRecorderDelegate<T> previousDelegate = this.delegate;
-    synchronized (this) {
-      delegate = new DirectDelegate<>(fluxSink);
-      previousDelegate.accept(fluxSink);
-    }
+    delegate = new DirectDelegate<>(fluxSink);
+    previousDelegate.accept(fluxSink);
+
   }
 
   public synchronized FluxSink<T> getFluxSink() {
@@ -76,25 +75,22 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
 
     @Override
     public void accept(FluxSink<T> fluxSink) {
-      synchronized (this) {
-        this.fluxSink = fluxSink;
-      }
+      this.fluxSink = fluxSink;
       bufferedEvents.forEach(e -> e.run());
     }
 
     @Override
-    public synchronized FluxSink<T> getFluxSink() {
+    public FluxSink<T> getFluxSink() {
       return fluxSink;
     }
 
     @Override
     public void next(T response) {
       boolean present = true;
-      synchronized (this) {
-        if (fluxSink == null) {
-          present = false;
-          bufferedEvents.add(() -> fluxSink.next(response));
-        }
+
+      if (fluxSink == null) {
+        present = false;
+        bufferedEvents.add(() -> fluxSink.next(response));
       }
 
       if (present) {
@@ -105,11 +101,10 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
     @Override
     public void error(Throwable error) {
       boolean present = true;
-      synchronized (this) {
-        if (fluxSink == null) {
-          present = false;
-          bufferedEvents.add(() -> fluxSink.error(error));
-        }
+
+      if (fluxSink == null) {
+        present = false;
+        bufferedEvents.add(() -> fluxSink.error(error));
       }
 
       if (present) {
@@ -120,13 +115,12 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
     @Override
     public void complete() {
       boolean present = true;
-      synchronized (this) {
-        if (fluxSink == null) {
-          present = false;
-          bufferedEvents.add(() -> {
-            fluxSink.complete();
-          });
-        }
+
+      if (fluxSink == null) {
+        present = false;
+        bufferedEvents.add(() -> {
+          fluxSink.complete();
+        });
       }
 
       if (present) {
