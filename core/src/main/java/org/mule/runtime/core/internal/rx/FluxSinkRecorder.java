@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.internal.rx;
 
-import org.mule.runtime.core.internal.exception.MessagingException;
+import static reactor.core.publisher.Flux.create;
+import static reactor.util.context.Context.empty;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+
+import org.mule.runtime.core.internal.exception.MessagingException;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
@@ -25,14 +28,19 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
   private volatile FluxSink<T> fluxSink;
 
   // If a fluxSink as not yet been accepted, events are buffered until one is accepted
-  private final List<Runnable> bufferedEvents = new ArrayList<>();
+  private final List<Runnable> bufferedEvents = new ArrayList<Runnable>();
+
+  public Flux<T> flux() {
+    return create(this)
+        .subscriberContext(ctx -> empty());
+  }
 
   @Override
   public void accept(FluxSink<T> fluxSink) {
     synchronized (this) {
       this.fluxSink = fluxSink;
+      bufferedEvents.forEach(e -> e.run());
     }
-    bufferedEvents.forEach(e -> e.run());
   }
 
   public FluxSink<T> getFluxSink() {

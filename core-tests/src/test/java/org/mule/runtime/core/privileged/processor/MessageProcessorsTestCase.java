@@ -27,9 +27,11 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApplyWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextAlwaysComplete;
+import static org.mule.tck.probe.PollingProber.probe;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+import static reactor.core.scheduler.Schedulers.single;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -42,6 +44,7 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistries;
 import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -59,6 +62,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.reactivestreams.Publisher;
+
+import io.qameta.allure.Issue;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SynchronousSink;
@@ -535,6 +540,26 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     thrown.expectCause((is(instanceOf(MessagingException.class))));
     thrown.expectCause(hasCause(is(exception)));
     from(responsePublisher).block();
+  }
+
+  @Test
+  @Issue("MULE-18419")
+  public void whenEventsAreBufferedFluxAsynchronouslyCompletedNoEventIsDropped() {
+    final FluxSinkRecorder<CoreEvent> emitter = new FluxSinkRecorder<>();
+    final AtomicBoolean nextOperationPerformed = new AtomicBoolean(false);
+    emitter.next(input);
+    emitter.flux()
+        .doOnNext(event -> nextOperationPerformed.set(true))
+        .subscribeOn(single())
+        .subscribe(event -> {
+        }, e -> {
+        }, () -> {
+        });
+    emitter.complete();
+    probe(() -> {
+      assertThat(nextOperationPerformed.get(), is(true));
+      return true;
+    });
   }
 
   private Processor createChain(ReactiveProcessor processor) throws InitialisationException {
