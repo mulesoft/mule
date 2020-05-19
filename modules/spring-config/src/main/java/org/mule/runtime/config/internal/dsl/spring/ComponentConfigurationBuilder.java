@@ -8,8 +8,13 @@ package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static org.mule.runtime.ast.api.ComponentAst.BODY_RAW_PARAM_NAME;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
@@ -19,9 +24,9 @@ import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
 import org.mule.runtime.dsl.api.component.SetterAttributeDefinition;
 import org.mule.runtime.dsl.api.component.TypeConverter;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -48,22 +53,19 @@ class ComponentConfigurationBuilder<T> {
   private final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper;
   private final ObjectReferencePopulator objectReferencePopulator = new ObjectReferencePopulator();
   private final List<ComponentValue> complexParameters;
-  private final Map<String, Object> simpleParameters;
-  private final ComponentModel componentModel;
+  private final ComponentAst componentModel;
   private final ComponentBuildingDefinition<T> componentBuildingDefinition;
 
-  public ComponentConfigurationBuilder(ComponentModel componentModel, ComponentBuildingDefinition<T> componentBuildingDefinition,
+  public ComponentConfigurationBuilder(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                                       ComponentAst componentModel, ComponentBuildingDefinition<T> componentBuildingDefinition,
                                        BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
     this.componentModel = componentModel;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.beanDefinitionBuilderHelper = beanDefinitionBuilderHelper;
-    this.simpleParameters = new HashMap<>(componentModel.getRawParameters());
-    this.complexParameters = collectComplexParametersWithTypes(componentModel);
+    this.complexParameters = collectComplexParametersWithTypes(springComponentModels, componentModel);
   }
 
   public void processConfiguration() {
-    componentBuildingDefinition.getIgnoredConfigurationParameters().stream().forEach(simpleParameters::remove);
-
     for (SetterAttributeDefinition setterAttributeDefinition : componentBuildingDefinition.getSetterParameterDefinitions()) {
       AttributeDefinition attributeDefinition = setterAttributeDefinition.getAttributeDefinition();
       attributeDefinition.accept(setterVisitor(setterAttributeDefinition.getAttributeName(), attributeDefinition));
@@ -73,39 +75,49 @@ class ComponentConfigurationBuilder<T> {
     }
   }
 
-  private List<ComponentValue> collectComplexParametersWithTypes(ComponentModel componentModel) {
+  private List<ComponentValue> collectComplexParametersWithTypes(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                                                                 ComponentAst componentModel) {
     /*
      * TODO: MULE-9638 This ugly code is required since we need to get the object type from the bean definition. This code will go
      * away one we remove the old parsing method.
      */
-    return componentModel.getInnerComponents().stream()
-        .map(model -> {
-          // When it comes from old model it does not have the type set
-          Class<?> beanDefinitionType = model.getType();
-          final SpringComponentModel springModel = (SpringComponentModel) model;
-          if (beanDefinitionType == null) {
-            if (springModel.getBeanDefinition() == null) {
-              // Some component do not have a bean definition since the element parsing is ignored. i.e: annotations
-              return null;
-            } else {
-              try {
-                String beanClassName = springModel.getBeanDefinition().getBeanClassName();
-                if (beanClassName != null) {
-                  beanDefinitionType = org.apache.commons.lang3.ClassUtils.getClass(beanClassName);
-                } else {
-                  // Happens in case of spring:property
-                  beanDefinitionType = Object.class;
-                }
-              } catch (ClassNotFoundException e) {
-                logger.debug("Exception trying to determine ComponentModel type: ", e);
-                beanDefinitionType = Object.class;
-              }
-            }
-          }
-          Object bean =
-              springModel.getBeanDefinition() != null ? springModel.getBeanDefinition() : springModel.getBeanReference();
-          return new ComponentValue(model, beanDefinitionType, bean);
-        }).filter(beanDefinitionTypePair -> beanDefinitionTypePair != null).collect(toList());
+    return componentModel.directChildrenStream()
+        .map(springComponentModels::get)
+        .filter(Objects::nonNull)
+        .map(springModel -> {
+          Class<?> beanDefinitionType = resolveBeanDefinitionType(springModel);
+          Object bean = springModel.getBeanDefinition() != null
+              ? springModel.getBeanDefinition()
+              : springModel.getBeanReference();
+          return new ComponentValue(springModel.getComponent(), beanDefinitionType, bean);
+        })
+        .filter(Objects::nonNull)
+        .collect(toList());
+  }
+
+  private Class<?> resolveBeanDefinitionType(SpringComponentModel springModel) {
+    // When it comes from old model it does not have the type set
+    if (springModel.getType() != null) {
+      return springModel.getType();
+    }
+
+    if (springModel.getBeanDefinition() == null) {
+      // Some component do not have a bean definition since the element parsing is ignored. i.e: annotations
+      return null;
+    }
+
+    try {
+      String beanClassName = springModel.getBeanDefinition().getBeanClassName();
+      if (beanClassName != null) {
+        return org.apache.commons.lang3.ClassUtils.getClass(beanClassName);
+      } else {
+        // Happens in case of spring:property
+        return Object.class;
+      }
+    } catch (ClassNotFoundException e) {
+      logger.debug("Exception trying to determine ComponentModel type: ", e);
+      return Object.class;
+    }
   }
 
   private ConfigurableAttributeDefinitionVisitor constructorVisitor() {
@@ -271,20 +283,18 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onReferenceSimpleParameter(final String configAttributeName) {
-      String reference = (String) simpleParameters.get(configAttributeName);
-      if (reference != null) {
-        this.value = new RuntimeBeanReference(reference);
+      if (!componentBuildingDefinition.getIgnoredConfigurationParameters().contains(configAttributeName)) {
+        componentModel.getRawParameterValue(configAttributeName)
+            .ifPresent(reference -> this.value = new RuntimeBeanReference(reference));
       }
-      simpleParameters.remove(configAttributeName);
     }
 
     @Override
     public void onSoftReferenceSimpleParameter(String softReference) {
-      String reference = (String) simpleParameters.get(softReference);
-      if (reference != null) {
-        this.value = reference;
+      if (!componentBuildingDefinition.getIgnoredConfigurationParameters().contains(softReference)) {
+        componentModel.getRawParameterValue(softReference)
+            .ifPresent(reference -> this.value = reference);
       }
-      simpleParameters.remove(softReference);
     }
 
     @Override
@@ -299,13 +309,16 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onConfigurationParameter(String parameterName, Object defaultValue, Optional<TypeConverter> typeConverter) {
-      Object parameterValue = simpleParameters.get(parameterName);
-      simpleParameters.remove(parameterName);
-      parameterValue = ofNullable(parameterValue).orElse(defaultValue);
-      if (parameterValue != null) {
-        parameterValue = typeConverter.isPresent() ? typeConverter.get().convert(parameterValue) : parameterValue;
+      if (!componentBuildingDefinition.getIgnoredConfigurationParameters().contains(parameterName)) {
+        Object parameterValue = componentModel.getRawParameterValue(parameterName)
+            .map(v -> (Object) v)
+            .orElse(defaultValue);
+
+        if (parameterValue != null) {
+          parameterValue = typeConverter.isPresent() ? typeConverter.get().convert(parameterValue) : parameterValue;
+        }
+        this.value = parameterValue;
       }
-      this.value = parameterValue;
     }
 
     @Override
@@ -316,7 +329,13 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onUndefinedSimpleParameters() {
-      this.value = simpleParameters;
+      this.value = componentModel.getModel(ParameterizedModel.class)
+          .map(pm -> componentModel.getParameters().stream()
+              .filter(param -> !componentBuildingDefinition.getIgnoredConfigurationParameters()
+                  .contains(param.getModel().getName()))
+              .filter(param -> param.getRawValue() != null)
+              .collect(toMap(param -> param.getModel().getName(), ComponentParameterAst::getRawValue)))
+          .orElse(null);
     }
 
     @Override
@@ -376,7 +395,7 @@ class ComponentConfigurationBuilder<T> {
 
     @Override
     public void onValueFromTextContent() {
-      this.value = componentModel.getTextContent();
+      this.value = componentModel.getRawParameterValue(BODY_RAW_PARAM_NAME).orElse(null);
     }
 
     @Override

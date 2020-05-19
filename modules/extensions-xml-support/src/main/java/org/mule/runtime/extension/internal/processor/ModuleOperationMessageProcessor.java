@@ -162,7 +162,9 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
 
     for (ParameterModel parameterModel : parameterModels) {
       final String parameterName = parameterModel.getName();
-      if (parameters.containsKey(parameterName)) {
+      if (parameterName.equals(TARGET_PARAMETER_NAME) || parameterName.equals(TARGET_VALUE_PARAMETER_NAME)) {
+        // nothing to do, these are not forwarded to the event for the inner chain
+      } else if (parameters.containsKey(parameterName)) {
         final String xmlValue = parameters.get(parameterName).trim();
         result.put(parameterName, new Pair<>(xmlValue, parameterModel.getType()));
       } else if (PRIMARY_CONTENT.equals(parameterModel.getRole())) {
@@ -366,7 +368,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   }
 
   /**
-   * Configure the nested {@link Processor}'s that error handling and transactional behaviour should be applied to.
+   * Configure the nested {@link Processor}'s of the XML SDK operation.
    *
    * @param processors
    */

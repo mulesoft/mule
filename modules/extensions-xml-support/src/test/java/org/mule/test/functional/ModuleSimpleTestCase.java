@@ -25,6 +25,8 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
+import io.qameta.allure.Issue;
+
 @RunnerDelegateTo(Parameterized.class)
 public class ModuleSimpleTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
@@ -136,6 +138,16 @@ public class ModuleSimpleTestCase extends AbstractCeXmlExtensionMuleArtifactFunc
     assertThat(targetVariable.getValue(), instanceOf(Message.class));
     Message targetMessage = (Message) targetVariable.getValue();
     assertThat(targetMessage.getPayload().getValue(), is("hardcoded value"));
+  }
+
+  @Test
+  @Issue("MULE-18397")
+  public void testSetPayloadHardcodedFlowWithTargetValueUsesPayload() throws Exception {
+    CoreEvent event = flowRunner("testSetPayloadHardcodedFlowWithTargetValueUsesPayload").run();
+    assertThat(event.getMessage().getPayload().getValue(), nullValue());
+    final TypedValue<?> targetVariable = event.getVariables().get("target-variable");
+    assertThat(targetVariable, notNullValue());
+    assertThat(targetVariable.getValue(), is("hardcoded"));
   }
 
   @Test

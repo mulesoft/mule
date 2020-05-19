@@ -8,7 +8,6 @@ package org.mule.runtime.config.internal.model;
 
 import static com.google.common.base.Joiner.on;
 import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
@@ -21,32 +20,30 @@ import static org.apache.commons.collections.CollectionUtils.disjunction;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_REF_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
-import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createMetadataTypeModelAdapterWithSterotype;
-import static org.mule.runtime.config.internal.model.MetadataTypeModelAdapter.createParameterizedTypeModelAdapter;
+import static org.mule.runtime.config.internal.model.type.ApplicationModelTypeUtils.resolveMetadataTypes;
+import static org.mule.runtime.config.internal.model.type.ApplicationModelTypeUtils.resolveTypedComponentIdentifier;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.model.UnionType;
-import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -55,11 +52,12 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
@@ -81,19 +79,18 @@ import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationProper
 import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.MapConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
-import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
+import org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
-import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 import org.mule.runtime.dsl.api.xml.parser.ConfigLine;
-import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
-import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -259,13 +256,11 @@ public class ApplicationModel implements ArtifactAst {
           .build();
 
   private final Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry;
-  private final List<ComponentModel> muleComponentModels = new LinkedList<>();
+  private ArtifactAst ast;
+  private ArtifactAst originalAst;
   private PropertiesResolverConfigurationProperties configurationProperties;
   private final ResourceProvider externalResourceProvider;
-  private final ExtensionModelHelper extensionModelHelper;
-  private final Map<String, ComponentModel> namedComponentModels = new HashMap<>();
-  private final Map<String, ComponentModel> namedTopLevelComponentModels = new HashMap<>();
-  private boolean runtimeMode = true;
+  private final Map<String, ComponentAst> namedTopLevelComponentModels = new HashMap<>();
 
   /**
    * Creates an {code ApplicationModel} from a {@link ArtifactConfig}.
@@ -288,11 +283,11 @@ public class ApplicationModel implements ArtifactAst {
    * <p/>
    * A set of validations are applied that may make creation fail.
    *
-   * @param artifactConfig                      the mule artifact configuration content.
-   * @param artifactDeclaration                 an {@link ArtifactDeclaration}
-   * @param extensionModels                     Set of {@link ExtensionModel extensionModels} that will be used to type componentModels
-   * @param parentConfigurationProperties       the {@link ConfigurationProperties} of the parent artifact. For instance, application
-   *                                            will receive the domain resolver.
+   * @param artifactConfig the mule artifact configuration content.
+   * @param artifactDeclaration an {@link ArtifactDeclaration}
+   * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to type componentModels
+   * @param parentConfigurationProperties the {@link ConfigurationProperties} of the parent artifact. For instance, application
+   *        will receive the domain resolver.
    * @param componentBuildingDefinitionRegistry an optional {@link ComponentBuildingDefinitionRegistry} used to correlate items in
    *                                            this model to their definitions expanded) false implies the mule is being created from a tooling perspective.
    * @param externalResourceProvider            the provider for configuration properties files and ${file::name.txt} placeholders
@@ -321,53 +316,77 @@ public class ApplicationModel implements ArtifactAst {
                           boolean runtimeMode)
       throws Exception {
 
-    this.runtimeMode = runtimeMode;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.externalResourceProvider = externalResourceProvider;
     createConfigurationAttributeResolver(artifactConfig, parentConfigurationProperties, deploymentProperties);
-    convertConfigFileToComponentModel(artifactConfig);
-    convertArtifactDeclarationToComponentModel(extensionModels, artifactDeclaration);
-    createEffectiveModel();
-    indexComponentModels();
+
+    List<ComponentAst> muleComponentModels = new LinkedList<>();
+    convertConfigFileToComponentModel(artifactConfig, muleComponentModels);
+    convertArtifactDeclarationToComponentModel(extensionModels, artifactDeclaration, muleComponentModels);
+    this.originalAst = new ArtifactAst() {
+
+      @Override
+      public Stream<ComponentAst> recursiveStream() {
+        return topLevelComponentsStream()
+            .flatMap(cm -> cm.recursiveStream());
+      }
+
+      @Override
+      public Spliterator<ComponentAst> recursiveSpliterator() {
+        return recursiveStream().spliterator();
+      }
+
+      @Override
+      public Stream<ComponentAst> topLevelComponentsStream() {
+        return muleComponentModels.stream();
+      }
+
+      @Override
+      public Spliterator<ComponentAst> topLevelComponentsSpliterator() {
+        return topLevelComponentsStream().spliterator();
+      }
+    };
+    indexComponentModels(originalAst);
+    this.ast = originalAst;
+
     validateModel(componentBuildingDefinitionRegistry);
-    extensionModelHelper = new ExtensionModelHelper(extensionModels);
+    ExtensionModelHelper extensionModelHelper = new ExtensionModelHelper(extensionModels);
+    resolveMetadataTypes(extensionModelHelper, ast.recursiveStream());
+    ast.recursiveStream().forEach(componentModel -> resolveTypedComponentIdentifier((ComponentModel) componentModel,
+                                                                                    extensionModelHelper, runtimeMode));
     // TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart connectors
     // and crafted declared extension models)
-    resolveComponentTypes();
-    topLevelComponentsStream()
-        .forEach(componentModel -> ((ComponentModel) componentModel).resolveTypedComponentIdentifier(extensionModelHelper,
-                                                                                                     runtimeMode));
-    recursiveStreamWithHierarchy().forEach(new ComponentLocationVisitor());
+    resolveMissingComponentTypes(ast.recursiveStream());
+    recursiveStreamWithHierarchy(ast).forEach(new ComponentLocationVisitor());
   }
 
-  public void macroExpandXmlSdkComponents(Set<ExtensionModel> extensionModels) {
-    expandModules(extensionModels, () -> {
-      // TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart connectors
-      // connectors and crafted declared extension models)
-
-      // TODO MULE-17419 (AST) Remove these 2 actions
-      resolveComponentTypes();
-      topLevelComponentsStream()
-          .forEach(componentModel -> ((ComponentModel) componentModel).resolveTypedComponentIdentifier(extensionModelHelper,
-                                                                                                       runtimeMode));
-
-      // Have to index again the component models with macro expanded ones
-      indexComponentModels();
-    });
+  private void indexComponentModels(ArtifactAst originalAst) {
+    originalAst.topLevelComponentsStream()
+        .forEach(componentModel -> componentModel.getComponentId()
+            .ifPresent(name -> namedTopLevelComponentModels.put(name, componentModel)));
   }
 
-  private void indexComponentModels() {
-    recursiveStream().forEach(componentModel -> {
-      componentModel.getComponentId().ifPresent(name -> {
-        namedComponentModels.put(name, (ComponentModel) componentModel);
-      });
-    });
+  /**
+   * Preprocesses the ArtifactAst so that it can be deployed to runtime.
+   *
+   * @param extensionModels
+   */
+  public void prepareAstForRuntime(Set<ExtensionModel> extensionModels) {
+    ast = processSourcesRedeliveryPolicy(ast);
+    ast = doXmlSdk1MacroExpansion(ast, extensionModels);
+  }
 
-    topLevelComponentsStream().forEach(componentModel -> {
-      componentModel.getComponentId().ifPresent(name -> {
-        namedTopLevelComponentModels.put(name, (ComponentModel) componentModel);
-      });
-    });
+  /**
+   * We force the current instance of {@link ApplicationModel} to be highly cohesive with {@link MacroExpansionModulesModel} as
+   * it's responsibility of this object to properly initialize and expand every global element/operation into the concrete set of
+   * message processors
+   *
+   * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to check if the element has to be
+   *        expanded.
+   * @param postProcess a closure to be executed after the macroexpansion of an extension.
+   */
+  private ArtifactAst doXmlSdk1MacroExpansion(ArtifactAst ast, Set<ExtensionModel> extensionModels) {
+    return new MacroExpansionModulesModel(ast, extensionModels).expand();
   }
 
   private void createConfigurationAttributeResolver(ArtifactConfig artifactConfig,
@@ -577,148 +596,99 @@ public class ApplicationModel implements ArtifactAst {
   /**
    * Resolves the types of each component model when possible.
    */
-  public void resolveComponentTypes() {
+  public void resolveMissingComponentTypes(Stream<ComponentAst> components) {
     // TODO MULE-13894 enable this once changes are completed and no componentBuildingDefinition is needed
     // checkState(componentBuildingDefinitionRegistry.isPresent(),
     // "ApplicationModel was created without a " + ComponentBuildingDefinitionProvider.class.getName());
-    componentBuildingDefinitionRegistry.ifPresent(buildingDefinitionRegistry -> {
-      recursiveStream().forEach(componentModel -> {
-        Optional<ComponentBuildingDefinition<?>> buildingDefinition =
-            buildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
-        buildingDefinition.map(definition -> {
-          ObjectTypeVisitor typeDefinitionVisitor = new ObjectTypeVisitor((ComponentModel) componentModel);
-          definition.getTypeDefinition().visit(typeDefinitionVisitor);
-          // We still have components without extension models
-          ((ComponentModel) componentModel).setType(typeDefinitionVisitor.getType());
+    componentBuildingDefinitionRegistry
+        .ifPresent(buildingDefinitionRegistry -> components
+            .filter(componentModel -> componentModel.getComponentType() == UNKNOWN
+                || componentModel.getComponentType() == null)
+            .forEach(componentModel -> buildingDefinitionRegistry
+                .getBuildingDefinition(componentModel.getIdentifier())
+                .ifPresent(definition -> {
+                  ObjectTypeVisitor typeDefinitionVisitor = new ObjectTypeVisitor(componentModel);
+                  definition.getTypeDefinition().visit(typeDefinitionVisitor);
+                  // We still have components without extension models
+                  final Class<?> type = typeDefinitionVisitor.getType();
 
-          return definition;
-        }).orElseGet(() -> {
-          String classParameter = ((ComponentModel) componentModel).getRawParameters().get(CLASS_ATTRIBUTE);
-          if (classParameter != null) {
-            try {
-              ((ComponentModel) componentModel)
-                  .setType(ClassUtils.loadClass(classParameter, currentThread().getContextClassLoader()));
-            } catch (ClassNotFoundException e) {
-              throw new RuntimeConfigurationException(createStaticMessage(e.getMessage()), e);
-            }
-          }
-          return null;
-        });
-      });
-    });
-
-    // Use ExtensionModel to register top level and subTypes elements
-    ReflectionCache reflectionCache = new ReflectionCache();
-    Map<ComponentIdentifier, MetadataTypeModelAdapter> registry = new HashMap<>();
-    extensionModelHelper.getExtensionsModels().stream().forEach(extensionModel -> extensionModel.getTypes().stream()
-        .filter(p -> isInstantiable(p, reflectionCache))
-        .forEach(parameterType -> registerTopLevelParameter(parameterType, reflectionCache, registry, extensionModel)));
-
-    recursiveStream().forEach(componentModel -> {
-      if (registry.containsKey(componentModel.getIdentifier())) {
-        ((ComponentModel) componentModel).setMetadataTypeModelAdapter(registry.get(componentModel.getIdentifier()));
-      }
-    });
-  }
-
-  private void registerTopLevelParameter(MetadataType parameterType, ReflectionCache reflectionCache,
-                                         Map<ComponentIdentifier, MetadataTypeModelAdapter> registry,
-                                         ExtensionModel extensionModel) {
-    Optional<DslElementSyntax> dslElement = extensionModelHelper.resolveDslElementModel(parameterType, extensionModel);
-    if (!dslElement.isPresent() ||
-        registry.containsKey(builder().name(dslElement.get().getElementName()).namespace(dslElement.get().getPrefix()).build())) {
-      return;
-    }
-
-    DslElementSyntax dsl = dslElement.get();
-
-    parameterType.accept(new MetadataTypeVisitor() {
-
-      @Override
-      public void visitObject(ObjectType objectType) {
-        if (dsl.supportsTopLevelDeclaration() || (dsl.supportsChildDeclaration() && dsl.isWrapped())
-            || getSubstitutionGroup(objectType).isPresent() ||
-            extensionModelHelper.getAllSubTypes().contains(objectType)) {
-
-          registry.put(builder().name(dsl.getElementName()).namespace(dsl.getPrefix())
-              .build(), createMetadataTypeModelAdapterWithSterotype(objectType, extensionModelHelper)
-                  .orElse(createParameterizedTypeModelAdapter(objectType, extensionModelHelper)));
-        }
-
-        registerSubTypes(objectType, reflectionCache, registry, extensionModel);
-      }
-
-      @Override
-      public void visitArrayType(ArrayType arrayType) {
-        registerTopLevelParameter(arrayType.getType(), reflectionCache, registry, extensionModel);
-      }
-
-      @Override
-      public void visitUnion(UnionType unionType) {
-        unionType.getTypes().forEach(type -> type.accept(this));
-      }
-
-    });
-  }
-
-  private void registerSubTypes(MetadataType type, ReflectionCache reflectionCache,
-                                Map<ComponentIdentifier, MetadataTypeModelAdapter> registry,
-                                ExtensionModel extensionModel) {
-    type.accept(new MetadataTypeVisitor() {
-
-      @Override
-      public void visitUnion(UnionType unionType) {
-        unionType.getTypes().forEach(type -> type.accept(this));
-      }
-
-      @Override
-      public void visitArrayType(ArrayType arrayType) {
-        arrayType.getType().accept(this);
-      }
-
-      @Override
-      public void visitObject(ObjectType objectType) {
-        Optional<MetadataType> openRestriction = objectType.getOpenRestriction();
-        if (objectType.isOpen() && openRestriction.isPresent()) {
-          openRestriction.get().accept(this);
-        } else {
-          extensionModelHelper.getSubTypes(objectType)
-              .forEach(subtype -> registerTopLevelParameter(subtype, reflectionCache, registry, extensionModel));
-        }
-      }
-    });
-  }
-
-
-  /**
-   * Creates the effective application model to be used to generate the runtime objects of the mule configuration.
-   */
-  private void createEffectiveModel() {
-    processSourcesRedeliveryPolicy();
+                  if (ComponentLocationVisitor.BATCH_JOB_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier())
+                      || ComponentLocationVisitor.BATCH_PROCESSS_RECORDS_COMPONENT_IDENTIFIER
+                          .equals(componentModel.getIdentifier())) {
+                    ((ComponentModel) componentModel).setComponentType(ROUTER);
+                  } else if (CommonBeanDefinitionCreator.areMatchingTypes(MessageSource.class, type)) {
+                    ((ComponentModel) componentModel).setComponentType(SOURCE);
+                  } else if (CommonBeanDefinitionCreator.areMatchingTypes(Processor.class, type)) {
+                    ((ComponentModel) componentModel).setComponentType(OPERATION);
+                  }
+                })));
   }
 
   /**
    * Process from any message source the redelivery-policy to make it part of the final pipeline.
    */
-  private void processSourcesRedeliveryPolicy() {
-    topLevelComponentsStream()
-        .filter(cm -> FLOW_IDENTIFIER.equals(cm.getIdentifier()))
-        .forEach(flowComponentModel -> {
-          if (!((ComponentModel) flowComponentModel).getInnerComponents().isEmpty()) {
-            ComponentModel possibleSourceComponent = ((ComponentModel) flowComponentModel).getInnerComponents().get(0);
-            possibleSourceComponent.getInnerComponents().stream()
-                .filter(childComponent -> childComponent.getIdentifier().equals(REDELIVERY_POLICY_IDENTIFIER))
+  private ArtifactAst processSourcesRedeliveryPolicy(ArtifactAst ast) {
+    return copyRecursively(ast, flow -> {
+
+      if (FLOW_IDENTIFIER.equals(flow.getIdentifier())) {
+        return flow.directChildrenStream().findFirst()
+            .filter(comp -> comp.getModel(SourceModel.class).isPresent())
+            .map(source -> source.directChildrenStream()
+                .filter(childComponent -> REDELIVERY_POLICY_IDENTIFIER.equals(childComponent.getIdentifier()))
                 .findAny()
-                .ifPresent(redeliveryPolicyComponentModel -> {
-                  possibleSourceComponent.getInnerComponents().remove(redeliveryPolicyComponentModel);
-                  ((ComponentModel) flowComponentModel).getInnerComponents().add(1, redeliveryPolicyComponentModel);
-                });
-          }
-        });
+                .map(redeliveryPolicy -> transformFlowWithRedeliveryPolicy(flow, source, redeliveryPolicy))
+                .orElse(flow))
+            .orElse(flow);
+      }
+
+      return flow;
+
+    });
+  }
+
+  private ComponentAst transformFlowWithRedeliveryPolicy(ComponentAst flow, ComponentAst source, ComponentAst redeliveryPolicy) {
+    final List<ComponentAst> newFlowChildren = new ArrayList<>();
+
+    newFlowChildren.add(new BaseComponentAstDecorator(source) {
+
+      @Override
+      public Stream<ComponentAst> directChildrenStream() {
+        // The transformed source is the same with the redelivery-policy removed...
+        return super.directChildrenStream()
+            .filter(sourceChild -> sourceChild != redeliveryPolicy);
+
+      }
+    });
+    newFlowChildren.add(new BaseComponentAstDecorator(redeliveryPolicy) {
+
+      @Override
+      public Stream<ComponentAst> directChildrenStream() {
+        // The redelivery-policy is added to the flow wrapping the flow processors
+        return flow.directChildrenStream()
+            .filter(comp -> !comp.getModel(SourceModel.class).isPresent()
+                && !ERROR_HANDLER_IDENTIFIER.equals(comp.getIdentifier()));
+      }
+
+    });
+
+    // The error handlers of the flow are kept
+    flow.directChildrenStream()
+        .filter(comp -> ERROR_HANDLER_IDENTIFIER.equals(comp.getIdentifier()))
+        .forEach(newFlowChildren::add);
+
+    return new BaseComponentAstDecorator(flow) {
+
+      @Override
+      public Stream<ComponentAst> directChildrenStream() {
+        return newFlowChildren.stream();
+      }
+
+    };
   }
 
   private void convertArtifactDeclarationToComponentModel(Set<ExtensionModel> extensionModels,
-                                                          ArtifactDeclaration artifactDeclaration) {
+                                                          ArtifactDeclaration artifactDeclaration,
+                                                          List<ComponentAst> muleComponentModels) {
     if (artifactDeclaration != null && !extensionModels.isEmpty()) {
       ExtensionModel muleModel = MuleExtensionModelProvider.getExtensionModel();
       if (!extensionModels.contains(muleModel)) {
@@ -734,32 +704,25 @@ public class ApplicationModel implements ArtifactAst {
           .map(e -> e.get().getConfiguration())
           .forEach(config -> config
               .ifPresent(c -> {
-                ComponentModel componentModel = convertComponentConfiguration(c, true);
+                ComponentModel componentModel = convertComponentConfiguration(c);
                 muleComponentModels.add(componentModel);
               }));
     }
   }
 
-  private ComponentModel convertComponentConfiguration(ComponentConfiguration componentConfiguration, boolean isRoot) {
+  private ComponentModel convertComponentConfiguration(ComponentConfiguration componentConfiguration) {
     ComponentModel.Builder builder = new ComponentModel.Builder()
         .setIdentifier(componentConfiguration.getIdentifier());
-    if (isRoot) {
-      builder.markAsRootComponent();
-    }
     for (Map.Entry<String, String> parameter : componentConfiguration.getParameters().entrySet()) {
       builder.addParameter(parameter.getKey(), parameter.getValue(), false);
     }
     for (ComponentConfiguration childComponentConfiguration : componentConfiguration.getNestedComponents()) {
-      builder.addChildComponentModel(convertComponentConfiguration(childComponentConfiguration, false));
+      builder.addChildComponentModel(convertComponentConfiguration(childComponentConfiguration));
     }
 
     componentConfiguration.getValue().ifPresent(builder::setTextContent);
 
-    ComponentModel componentModel = builder.build();
-    for (ComponentModel childComponent : componentModel.getInnerComponents()) {
-      childComponent.setParent(componentModel);
-    }
-    return componentModel;
+    return builder.build();
   }
 
 
@@ -781,24 +744,20 @@ public class ApplicationModel implements ArtifactAst {
     return new GlobalPropertyConfigurationPropertiesProvider(globalProperties);
   }
 
-  public Optional<ComponentModel> findComponentDefinitionModel(ComponentIdentifier componentIdentifier) {
+  public Optional<ComponentAst> findComponentDefinitionModel(ComponentIdentifier componentIdentifier) {
     return topLevelComponentsStream()
-        .map(cm -> (ComponentModel) cm)
-        .filter(ComponentModel::isRoot)
         .filter(componentModel -> componentModel.getIdentifier().equals(componentIdentifier)).findFirst();
   }
 
-  private void convertConfigFileToComponentModel(ArtifactConfig artifactConfig) {
+  private void convertConfigFileToComponentModel(ArtifactConfig artifactConfig,
+                                                 List<ComponentAst> muleComponentModels) {
     List<ConfigFile> configFiles = artifactConfig.getConfigFiles();
     ComponentModelReader componentModelReader =
         new ComponentModelReader(configurationProperties.getConfigurationPropertiesResolver());
-    configFiles.stream().forEach(configFile -> {
-      ComponentModel componentModel =
-          componentModelReader.extractComponentDefinitionModel(configFile.getConfigLines().get(0), configFile.getFilename());
-
-      muleComponentModels.addAll(componentModel.getInnerComponents());
-    });
-
+    configFiles.stream().forEach(configFile -> componentModelReader
+        .extractComponentDefinitionModel(configFile.getConfigLines().get(0), configFile.getFilename())
+        .directChildrenStream()
+        .forEach(muleComponentModels::add));
   }
 
   private void validateModel(Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry)
@@ -823,7 +782,7 @@ public class ApplicationModel implements ArtifactAst {
       if (componentModel.getIdentifier().equals(FLOW_REF_IDENTIFIER)) {
         String nameAttribute = componentModel.getComponentId().orElse(null);
         if (nameAttribute != null && !nameAttribute.startsWith(DEFAULT_EXPRESSION_PREFIX)) {
-          Optional<ComponentModel> referencedFlow = findTopLevelNamedComponent(nameAttribute);
+          Optional<ComponentAst> referencedFlow = findTopLevelNamedComponent(nameAttribute);
           referencedFlow
               .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("flow-ref at %s:%s is pointing to %s which does not exist",
                                                                               componentModel.getMetadata().getFileName()
@@ -981,16 +940,16 @@ public class ApplicationModel implements ArtifactAst {
   private void validateOnErrorsHaveTypeOrWhenAttribute(ComponentModel component) {
     List<ComponentModel> innerComponents = component.getInnerComponents();
     for (int i = 0; i < innerComponents.size() - 1; i++) {
-      ComponentModel componentModel = getOnErrorComponentModel(innerComponents.get(i));
-      Map<String, String> parameters = componentModel.getRawParameters();
-      if (parameters.get(WHEN_CHOICE_ES_ATTRIBUTE) == null && parameters.get(TYPE_ES_ATTRIBUTE) == null) {
+      ComponentAst componentModel = getOnErrorComponentModel(innerComponents.get(i));
+      if (!componentModel.getRawParameterValue(WHEN_CHOICE_ES_ATTRIBUTE).isPresent()
+          && !componentModel.getRawParameterValue(TYPE_ES_ATTRIBUTE).isPresent()) {
         throw new MuleRuntimeException(createStaticMessage(
                                                            "Every handler (except for the last one) within an 'error-handler' must specify a 'when' or 'type' attribute."));
       }
     }
   }
 
-  private ComponentModel getOnErrorComponentModel(ComponentModel onErrorModel) {
+  private ComponentAst getOnErrorComponentModel(ComponentModel onErrorModel) {
     if (ON_ERROR_IDENTIFIER.equals(onErrorModel.getIdentifier())) {
       String sharedOnErrorName = onErrorModel.getRawParameters().get(REFERENCE_ATTRIBUTE);
       return findTopLevelNamedComponent(sharedOnErrorName).orElseThrow(
@@ -1053,50 +1012,14 @@ public class ApplicationModel implements ArtifactAst {
         }));
   }
 
-  public void addRootComponentModel(ComponentModel root) {
-    root.getInnerComponents().forEach(ige -> {
-      ige.setRoot(true);
-      ige.setParent(root);
-    });
-
-    muleComponentModels.add(root);
-  }
-
   /**
    * Find a named component configuration.
    *
    * @param name the expected value for the name attribute configuration.
    * @return the component if present, if not, an empty {@link Optional}
    */
-  public Optional<ComponentModel> findTopLevelNamedComponent(String name) {
+  public Optional<ComponentAst> findTopLevelNamedComponent(String name) {
     return ofNullable(namedTopLevelComponentModels.getOrDefault(name, null));
-  }
-
-  /**
-   * Find a named component.
-   *
-   * @param name the expected value for the name attribute configuration.
-   * @return the component if present, if not, an empty {@link Optional}
-   */
-  public Optional<ComponentModel> findNamedElement(String name) {
-    final Optional<ComponentModel> topLevelNamedComponent = findTopLevelNamedComponent(name);
-    if (topLevelNamedComponent.isPresent()) {
-      return topLevelNamedComponent;
-    }
-    return ofNullable(namedComponentModels.getOrDefault(name, null));
-  }
-
-  /**
-   * We force the current instance of {@link ApplicationModel} to be highly cohesive with {@link MacroExpansionModulesModel} as
-   * it's responsibility of this object to properly initialize and expand every global element/operation into the concrete set of
-   * message processors
-   *
-   * @param extensionModels Set of {@link ExtensionModel extensionModels} that will be used to check if the element has to be
-   *                        expanded.
-   * @param postProcess     a closure to be executed after the macroexpansion of an extension.
-   */
-  private void expandModules(Set<ExtensionModel> extensionModels, Runnable postProcess) {
-    new MacroExpansionModulesModel(this, extensionModels).expand(postProcess);
   }
 
   /**
@@ -1120,51 +1043,22 @@ public class ApplicationModel implements ArtifactAst {
 
   @Override
   public Stream<ComponentAst> recursiveStream() {
-    return topLevelComponentsStream()
-        .flatMap(cm -> cm.recursiveStream());
-  }
-
-  public Stream<Pair<ComponentAst, List<ComponentAst>>> recursiveStreamWithHierarchy() {
-    final List<Pair<ComponentAst, List<ComponentAst>>> ret = new ArrayList<>();
-
-    topLevelComponentsStream().forEach(cm -> {
-      final List<ComponentAst> currentContext = new ArrayList<>();
-
-      ret.add(new Pair<>(cm, new ArrayList<>(currentContext)));
-      currentContext.add(cm);
-
-      recursiveStreamWithHierarchy(ret, cm, currentContext);
-    });
-
-    return ret.stream();
-  }
-
-  private void recursiveStreamWithHierarchy(final List<Pair<ComponentAst, List<ComponentAst>>> ret, ComponentAst cm,
-                                            final List<ComponentAst> currentContext) {
-    cm.directChildrenStream().forEach(cmi -> {
-      final List<ComponentAst> currentContextI = new ArrayList<>(currentContext);
-
-      ret.add(new Pair<>(cmi, new ArrayList<>(currentContextI)));
-      currentContextI.add(cmi);
-
-      recursiveStreamWithHierarchy(ret, cmi, currentContextI);
-    });
+    return ast.recursiveStream();
   }
 
   @Override
   public Spliterator<ComponentAst> recursiveSpliterator() {
-    return recursiveStream().spliterator();
+    return ast.recursiveSpliterator();
   }
 
   @Override
   public Stream<ComponentAst> topLevelComponentsStream() {
-    return muleComponentModels.stream()
-        .map(cm -> (ComponentAst) cm);
+    return ast.topLevelComponentsStream();
   }
 
   @Override
   public Spliterator<ComponentAst> topLevelComponentsSpliterator() {
-    return topLevelComponentsStream().spliterator();
+    return ast.topLevelComponentsSpliterator();
   }
 
 }

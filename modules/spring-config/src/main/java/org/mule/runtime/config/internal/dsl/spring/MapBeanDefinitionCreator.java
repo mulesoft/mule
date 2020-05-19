@@ -8,8 +8,8 @@ package org.mule.runtime.config.internal.dsl.spring;
 
 import static java.util.stream.Collectors.toCollection;
 
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
 import java.util.Map;
@@ -21,7 +21,7 @@ import org.springframework.beans.factory.support.ManagedList;
  * {@code BeanDefinitionCreator} that handles components that define a map in the configuration.
  *
  * <p>
- * 
+ *
  * <pre>
  *  <parsers-test:complex-type-map>
  *      <parsers-test:complex-type-entry key="1">
@@ -38,18 +38,19 @@ import org.springframework.beans.factory.support.ManagedList;
 class MapBeanDefinitionCreator extends BeanDefinitionCreator {
 
   @Override
-  boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {
-    SpringComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
-    ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
+  boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                        CreateBeanDefinitionRequest createBeanDefinitionRequest) {
+    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
     ComponentBuildingDefinition componentBuildingDefinition = createBeanDefinitionRequest.getComponentBuildingDefinition();
-    componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
-    Class<?> type = objectTypeVisitor.getType();
+    Class<?> type = createBeanDefinitionRequest.retrieveTypeVisitor().getType();
     if (Map.class.isAssignableFrom(type) && componentBuildingDefinition.getObjectFactoryType() == null) {
-      ManagedList managedList = componentModel.getInnerComponents().stream()
-          .map(c -> ((SpringComponentModel) c).getBeanDefinition())
+      ManagedList managedList = componentModel.directChildrenStream()
+          .map(springComponentModels::get)
+          .map(SpringComponentModel::getBeanDefinition)
           .collect(toCollection(ManagedList::new));
-      componentModel.setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(MapFactoryBean.class)
-          .addConstructorArgValue(managedList).addConstructorArgValue(type).getBeanDefinition());
+      createBeanDefinitionRequest.getSpringComponentModel()
+          .setBeanDefinition(BeanDefinitionBuilder.genericBeanDefinition(MapFactoryBean.class)
+              .addConstructorArgValue(managedList).addConstructorArgValue(type).getBeanDefinition());
       return true;
     }
     return false;

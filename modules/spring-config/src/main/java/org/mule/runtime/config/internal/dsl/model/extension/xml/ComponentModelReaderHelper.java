@@ -6,12 +6,7 @@
  */
 package org.mule.runtime.config.internal.dsl.model.extension.xml;
 
-import static java.lang.System.lineSeparator;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.repeat;
-import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.maskPasswords;
-
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 
@@ -28,26 +23,9 @@ class ComponentModelReaderHelper {
 
   private ComponentModelReaderHelper() {}
 
-  static String toXml(ComponentModel rootComponentModel) {
-    return toXml(rootComponentModel, 0);
-  }
-
-  static private String toXml(ComponentModel cm, int tab) {
-    final String spaces = repeat(" ", tab * 3);
-    final StringBuilder sb = new StringBuilder(spaces).append("<").append(cm.getIdentifier().toString());
-    cm.getRawParameters().forEach((id, value) -> sb.append(" ").append(id).append("=\"").append(value).append("\""));
-    if (cm.getInnerComponents().isEmpty() && isBlank(cm.getTextContent())) {
-      sb.append("/>");
-    } else {
-      sb.append(">");
-      cm.getInnerComponents()
-          .forEach(componentModel -> sb.append(lineSeparator()).append(toXml(componentModel, tab + 1)));
-      if (isNotBlank(cm.getTextContent())) {
-        sb.append("<![CDATA[").append(spaces).append(cm.getTextContent()).append("]]>");
-      }
-      sb.append(lineSeparator()).append(spaces).append("</").append(cm.getIdentifier().toString()).append(">");
-    }
-    return maskPasswords(sb.toString(), PASSWORD_MASK);
+  static String toXml(ComponentAst rootComponentModel) {
+    return rootComponentModel.getMetadata().getSourceCode()
+        .orElse("");
   }
 
 }

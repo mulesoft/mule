@@ -9,10 +9,10 @@ package org.mule.runtime.config.internal.dsl.spring;
 import static org.mule.runtime.config.internal.model.ApplicationModel.TRANSFORMER_IDENTIFIER;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
-import org.mule.runtime.config.internal.model.ComponentModel;
 
+import java.util.Map;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -47,18 +47,19 @@ class ReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
           .build();
 
   private Consumer<CreateBeanDefinitionRequest> getConsumer() {
-    return (beanDefinitionRequest) -> {
-      SpringComponentModel componentModel = beanDefinitionRequest.getComponentModel();
-      componentModel.setBeanReference(new RuntimeBeanReference(componentModel.getRawParameters().get(REF_ATTRIBUTE)));
-      ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
-      beanDefinitionRequest.getComponentBuildingDefinition().getTypeDefinition().visit(objectTypeVisitor);
-      componentModel.setType(objectTypeVisitor.getType());
+    return beanDefinitionRequest -> {
+      ComponentAst componentModel = beanDefinitionRequest.getComponentModel();
+      beanDefinitionRequest.getSpringComponentModel()
+          .setBeanReference(new RuntimeBeanReference(componentModel.getRawParameterValue(REF_ATTRIBUTE).orElse(null)));
+      beanDefinitionRequest.getSpringComponentModel()
+          .setType(beanDefinitionRequest.retrieveTypeVisitor().getType());
     };
   }
 
   @Override
-  boolean handleRequest(CreateBeanDefinitionRequest createBeanDefinitionRequest) {
-    ComponentModel componentModel = createBeanDefinitionRequest.getComponentModel();
+  boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                        CreateBeanDefinitionRequest createBeanDefinitionRequest) {
+    ComponentAst componentModel = createBeanDefinitionRequest.getComponentModel();
     if (referenceConsumers.containsKey(componentModel.getIdentifier())) {
       referenceConsumers.get(componentModel.getIdentifier()).accept(createBeanDefinitionRequest);
       return true;

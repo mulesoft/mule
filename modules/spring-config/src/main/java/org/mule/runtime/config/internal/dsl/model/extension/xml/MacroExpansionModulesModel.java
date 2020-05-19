@@ -15,6 +15,7 @@ import static org.apache.commons.lang3.StringUtils.repeat;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.ComponentModelReaderHelper.toXml;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
@@ -52,7 +53,7 @@ public class MacroExpansionModulesModel {
   private static final String FILE_MACRO_EXPANSION_DELIMITER = repeat('*', 80) + lineSeparator();
   private static final String FILE_MACRO_EXPANSION_SECTION_DELIMITER = repeat('-', 80) + lineSeparator();
 
-  private final ApplicationModel applicationModel;
+  private ArtifactAst applicationModel;
   private final List<ExtensionModel> sortedExtensions;
 
   /**
@@ -63,7 +64,7 @@ public class MacroExpansionModulesModel {
    * @param extensions set with all the loaded {@link ExtensionModel}s from the deployment that will be filtered by looking up
    *        only those that are coming from an XML context through the {@link XmlExtensionModelProperty} property.
    */
-  public MacroExpansionModulesModel(ApplicationModel applicationModel, Set<ExtensionModel> extensions) {
+  public MacroExpansionModulesModel(ArtifactAst applicationModel, Set<ExtensionModel> extensions) {
     this.applicationModel = applicationModel;
     this.sortedExtensions = calculateExtensionByTopologicalOrder(extensions);
   }
@@ -72,7 +73,7 @@ public class MacroExpansionModulesModel {
    * Goes through the entire xml mule application looking for the message processors that can be expanded, and then takes care of
    * the global elements if there are at least one {@link ExtensionModel} to macro expand.
    */
-  public void expand(Runnable postProcess) {
+  public ArtifactAst expand() {
     boolean hasMacroExpansionExtension = false;
 
     for (ExtensionModel extensionModel : sortedExtensions) {
@@ -85,8 +86,7 @@ public class MacroExpansionModulesModel {
                               extensionModel.getXmlDslModel().getPrefix(),
                               extensionModel.getXmlDslModel().getNamespace()));
         }
-        new MacroExpansionModuleModel(applicationModel, extensionModel).expand();
-        postProcess.run();
+        applicationModel = new MacroExpansionModuleModel(applicationModel, extensionModel).expand();
       }
     }
 
@@ -111,13 +111,15 @@ public class MacroExpansionModulesModel {
             lastFile.set(fileName);
           }
 
-          buf.append(toXml((ComponentModel) comp)).append(lineSeparator());
+          buf.append(toXml(comp)).append(lineSeparator());
         });
 
         buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_DELIMITER);
         LOGGER.debug(buf.toString());
       }
     }
+
+    return applicationModel;
   }
 
   /**
