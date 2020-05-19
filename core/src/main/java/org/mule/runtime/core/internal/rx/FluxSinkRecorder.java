@@ -33,23 +33,25 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
   @Override
   public void accept(FluxSink<T> fluxSink) {
     FluxSinkRecorderDelegate<T> previousDelegate = this.delegate;
-    delegate = new DirectDelegate<>(fluxSink);
-    previousDelegate.accept(fluxSink);
+    synchronized (this) {
+      delegate = new DirectDelegate<>(fluxSink);
+      previousDelegate.accept(fluxSink);
+    }
   }
 
-  public FluxSink<T> getFluxSink() {
+  public synchronized FluxSink<T> getFluxSink() {
     return delegate.getFluxSink();
   }
 
-  public void next(T response) {
+  public synchronized void next(T response) {
     delegate.next(response);
   }
 
-  public void error(Throwable error) {
+  public synchronized void error(Throwable error) {
     delegate.error(error);
   }
 
-  public void complete() {
+  public synchronized void complete() {
     delegate.complete();
   }
 
