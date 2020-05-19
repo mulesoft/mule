@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.applyWaitingInflightEvents;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.subscriberContext;
@@ -463,62 +464,25 @@ public class MessageProcessors {
 
                 return eventPub.flatMap(event -> internalProcessWithChildContext(event, processor, completeParentIfEmpty));
               } else {
-                Set<BaseEventContext> seenContexts = newSetFromMap(new WeakHashMap<>());
-
                 FluxSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
                 Flux<CoreEvent> upstream = Flux.from(eventChildCtxPub)
                     .doOnNext(eventChildCtx -> childContextResponseHandler(eventChildCtx,
                                                                            new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef),
                                                                            completeParentIfEmpty));
 
-                Function<Publisher<Either<MessagingException, CoreEvent>>, Publisher<CoreEvent>> postDoOnCompleteTransformer =
-                    pub -> (Publisher<CoreEvent>) Flux.from(pub)
-                        // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
-                        // it will be cancelled, ignoring the onErrorContinue of the parent Flux.
-                        .mergeWith(errorSwitchSinkSinkRef.flux())
-                        .map(childContextResponseMapper())
-                        .distinct(event -> (BaseEventContext) event.getContext(), () -> seenContexts);
-
-                return applyWaitingInflightEvents(upstream,
-                                                  processor,
-                                                  pub -> Flux.from(pub)
-                                                      .doOnNext(completeSuccessIfNeeded())
-                                                      .map(event -> right(MessagingException.class, event)),
-                                                  errorSwitchSinkSinkRef::complete,
-                                                  postDoOnCompleteTransformer).map(MessageProcessors::toParentContext);
+                return Flux.from(applyWaitingInflightEvents(upstream,
+                                                            errorSwitchSinkSinkRef.flux(),
+                                                            processor,
+                                                            pub -> Flux.from(pub)
+                                                                .doOnNext(completeSuccessIfNeeded())
+                                                                .map(event -> right(MessagingException.class, event)),
+                                                            errorSwitchSinkSinkRef::complete,
+                                                            pub -> Flux.from(pub).map(childContextResponseMapper()),
+                                                            event -> (BaseEventContext) event.getContext()))
+                    .map(MessageProcessors::toParentContext);
               }
             }));
   }
-
-  private static <T, U> Flux<T> applyWaitingInflightEvents(Publisher<T> upstream,
-                                                           Function<Publisher<T>, Publisher<T>> processor,
-                                                           Function<Publisher<T>, Publisher<Either<U, T>>> postProcessorTransformer,
-                                                           CheckedRunnable completer,
-                                                           Function<Publisher<Either<U, T>>, Publisher<T>> postCompleteTransformer) {
-    final AtomicInteger inflightEvents = new AtomicInteger(0);
-    final AtomicBoolean deferredCompletion = new AtomicBoolean(false);
-
-    return Flux.from(upstream)
-        .doOnNext(eventCtx -> {
-          inflightEvents.incrementAndGet();
-        })
-        .transform(processor)
-        .transform(postProcessorTransformer)
-        .doOnComplete(() -> {
-          if (inflightEvents.get() > 0) {
-            deferredCompletion.set(true);
-          } else {
-            completer.run();
-          }
-        })
-        .transform(postCompleteTransformer)
-        .doOnNext(eventCtx -> {
-          if (inflightEvents.decrementAndGet() == 0 && deferredCompletion.compareAndSet(true, false)) {
-            completer.run();
-          }
-        });
-  }
-
 
   private static void childContextResponseHandler(CoreEvent eventChildCtx,
                                                   SinkRecorderToReactorSinkAdapter<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef,
