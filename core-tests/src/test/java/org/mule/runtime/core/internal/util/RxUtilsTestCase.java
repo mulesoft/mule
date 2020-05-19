@@ -14,6 +14,7 @@ import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.functional.Either;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -73,7 +74,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
     final List<String> results = new ArrayList<>();
     final AtomicBoolean complete = new AtomicBoolean(false);
     final AtomicBoolean emitterComplete = new AtomicBoolean(false);
-    final FluxSinkRecorder<Either<RuntimeException, String>> emitter = new FluxSinkRecorder<>();
+    final FluxSinkRecorder<Either<MessagingException, String>> emitter = new FluxSinkRecorder<>();
     final Latch processorLatch = new Latch();
 
     Flux.<String>create(sink -> {
@@ -114,7 +115,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
     });
   }
 
-  private Publisher<String> transformer(final FluxSinkRecorder<Either<RuntimeException, String>> emitter,
+  private Publisher<String> transformer(final FluxSinkRecorder<Either<MessagingException, String>> emitter,
                                         Publisher<String> pub, final Latch processorLatch) {
     Flux<String> transformedFlux = Flux.from(pub)
         .publishOn(fromExecutorService(publisherExecutor))

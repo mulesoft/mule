@@ -129,13 +129,13 @@ public class RxUtils {
    *                     with a distinct. This parameter is used to extract the key for each element and do the mentioned filtering
    * @return the transformed {@link Publisher}
    */
-  public static <T, U, TKey> Publisher<T> applyWaitingInflightEvents(Publisher<T> upstream,
-                                                                     Publisher<Either<U, T>> errorSinkPublisher,
-                                                                     Function<Publisher<T>, Publisher<T>> processor,
-                                                                     Function<Publisher<T>, Publisher<Either<U, T>>> postProcessorTransformer,
-                                                                     CheckedRunnable errorSinkCompleter,
-                                                                     Function<Publisher<Either<U, T>>, Publisher<T>> postCompleteTransformer,
-                                                                     Function<T, TKey> keyExtractor) {
+  public static <T, TKey> Publisher<T> applyWaitingInflightEvents(Publisher<T> upstream,
+                                                                  Publisher<Either<MessagingException, T>> errorSinkPublisher,
+                                                                  Function<Publisher<T>, Publisher<T>> processor,
+                                                                  Function<Publisher<T>, Publisher<Either<MessagingException, T>>> postProcessorTransformer,
+                                                                  CheckedRunnable errorSinkCompleter,
+                                                                  Function<Publisher<Either<MessagingException, T>>, Publisher<T>> postCompleteTransformer,
+                                                                  Function<T, TKey> keyExtractor) {
     final AtomicInteger inflightEvents = new AtomicInteger(0);
     final AtomicBoolean deferredCompletion = new AtomicBoolean(false);
     Set<TKey> seenElements = newSetFromMap(new WeakHashMap<>());
@@ -154,13 +154,22 @@ public class RxUtils {
         // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
         // it will be cancelled, ignoring the onErrorContinue of the parent Flux.
         .mergeWith(errorSinkPublisher)
+        .doOnNext(either -> {
+          if (either.isLeft()) {
+            completeErrorSinkIfNeeded(errorSinkCompleter, inflightEvents, deferredCompletion);
+          }
+        })
         .compose(postCompleteTransformer)
         .distinct(keyExtractor, () -> seenElements)
-        .doOnNext(eventCtx -> {
-          int inflightEventsCount = inflightEvents.decrementAndGet();
-          if (inflightEventsCount == 0 && deferredCompletion.compareAndSet(true, false)) {
-            errorSinkCompleter.run();
-          }
-        });
+        .doOnNext(eventCtx -> completeErrorSinkIfNeeded(errorSinkCompleter, inflightEvents, deferredCompletion));
+  }
+
+  private static void completeErrorSinkIfNeeded(CheckedRunnable errorSinkCompleter,
+                                                AtomicInteger inflightEvents,
+                                                AtomicBoolean deferredCompletion) {
+    int inflightEventsCount = inflightEvents.decrementAndGet();
+    if (inflightEventsCount == 0 && deferredCompletion.compareAndSet(true, false)) {
+      errorSinkCompleter.run();
+    }
   }
 }
