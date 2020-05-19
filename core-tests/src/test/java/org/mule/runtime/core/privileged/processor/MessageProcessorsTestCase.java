@@ -32,9 +32,11 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextBlocking;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
+import static org.mule.tck.probe.PollingProber.probe;
 import static reactor.core.publisher.Mono.empty;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
+import static reactor.core.scheduler.Schedulers.single;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
@@ -724,6 +726,26 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     emitter.complete();
 
     assertThat(fluxCompleted.get(), is(true));
+  }
+
+  @Test
+  @Issue("MULE-18419")
+  public void whenEventsAreBufferedFluxAsynchronouslyCompletedNoEventIsDropped() {
+    final FluxSinkRecorder<CoreEvent> emitter = new FluxSinkRecorder<>();
+    final AtomicBoolean nextOperationPerformed = new AtomicBoolean(false);
+    emitter.next(input);
+    emitter.flux()
+        .doOnNext(event -> nextOperationPerformed.set(true))
+        .subscribeOn(single())
+        .subscribe(event -> {
+        }, e -> {
+        }, () -> {
+        });
+    emitter.complete();
+    probe(() -> {
+      assertThat(nextOperationPerformed.get(), is(true));
+      return true;
+    });
   }
 
   private Processor createChain(ReactiveProcessor processor) throws InitialisationException {
