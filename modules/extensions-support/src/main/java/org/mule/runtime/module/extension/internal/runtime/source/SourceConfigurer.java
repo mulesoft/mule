@@ -19,10 +19,10 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -134,7 +134,7 @@ public final class SourceConfigurer {
           }
         } else {
           context = ValueResolvingContext.builder(initialiserEvent, expressionManager).build();
-          Scheduler scheduler = (Scheduler) valueResolver.resolve(context);
+          SchedulingStrategy scheduler = (SchedulingStrategy) valueResolver.resolve(context);
           if (restarting) {
             scheduler = PollingSourceRestartSchedulerProvider.getScheduler(scheduler);
           }

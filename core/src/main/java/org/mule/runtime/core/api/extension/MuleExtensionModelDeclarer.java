@@ -84,10 +84,10 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.display.PathModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
+import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
-import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
@@ -213,7 +213,7 @@ class MuleExtensionModelDeclarer {
     scheduler.withOutput().ofType(typeLoader.load(Object.class));
     scheduler.withOutputAttributes().ofType(typeLoader.load(Object.class));
 
-    MetadataType baseSchedulingStrategy = typeLoader.load(Scheduler.class);
+    MetadataType baseSchedulingStrategy = typeLoader.load(SchedulingStrategy.class);
     scheduler.onDefaultParameterGroup()
         .withRequiredParameter("schedulingStrategy")
         .ofType(baseSchedulingStrategy)

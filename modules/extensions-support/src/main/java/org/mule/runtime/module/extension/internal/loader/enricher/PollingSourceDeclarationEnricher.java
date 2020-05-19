@@ -25,8 +25,8 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
+import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
@@ -63,7 +63,7 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
             ParameterDeclaration parameter = new ParameterDeclaration(SCHEDULING_STRATEGY_PARAMETER_NAME);
             parameter.setDescription(SCHEDULING_STRATEGY_PARAMETER_DESCRIPTION);
             parameter.setRequired(true);
-            parameter.setType(loader.load(Scheduler.class), false);
+            parameter.setType(loader.load(SchedulingStrategy.class), false);
             parameter.setExpressionSupport(NOT_SUPPORTED);
             parameter.addModelProperty(new InfrastructureParameterModelProperty(10));
             parameter.addModelProperty(new QNameModelProperty(new QName(CORE_NAMESPACE, SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER,
@@ -84,7 +84,7 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
 
     if (thereArePollingSources.get() && !isSchedulerAlreadyImported(extensionDeclarer.getDeclaration())) {
       ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-      extensionDeclarer.withImportedType(new ImportedTypeModel((ObjectType) typeLoader.load(Scheduler.class)));
+      extensionDeclarer.withImportedType(new ImportedTypeModel((ObjectType) typeLoader.load(SchedulingStrategy.class)));
     }
   }
 
@@ -94,7 +94,7 @@ public class PollingSourceDeclarationEnricher extends AbstractAnnotatedDeclarati
 
   private boolean isScheduler(MetadataType type) {
     return getTypeId(type)
-        .filter(typeId -> Scheduler.class.getName().equals(typeId))
+        .filter(typeId -> SchedulingStrategy.class.getName().equals(typeId))
         .isPresent();
   }
 

@@ -21,6 +21,29 @@
       "format": "java",
       "type": "Object",
       "annotations": {
+        "typeId": "org.mule.runtime.api.scheduler.SchedulingStrategy",
+        "classInformation": {
+          "classname": "org.mule.runtime.api.scheduler.SchedulingStrategy",
+          "hasDefaultConstructor": false,
+          "isInterface": true,
+          "isInstantiable": false,
+          "isAbstract": true,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "SchedulingStrategy"
+        }
+      },
+      "fields": []
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
         "typeId": "org.mule.runtime.api.store.ObjectStore",
         "extensibleType": {},
         "typeAlias": {
@@ -37,29 +60,6 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
-      },
-      "fields": []
-    },
-    {
-      "format": "java",
-      "type": "Object",
-      "annotations": {
-        "typeId": "org.mule.runtime.core.api.source.scheduler.Scheduler",
-        "classInformation": {
-          "classname": "org.mule.runtime.core.api.source.scheduler.Scheduler",
-          "hasDefaultConstructor": false,
-          "isInterface": true,
-          "isInstantiable": false,
-          "isAbstract": true,
-          "isFinal": false,
-          "implementedInterfaces": [],
-          "parent": "",
-          "genericTypes": [],
-          "isMap": false
-        },
-        "typeAlias": {
-          "value": "scheduling-strategy"
         }
       },
       "fields": []
@@ -11480,7 +11480,7 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "@ref:org.mule.runtime.core.api.source.scheduler.Scheduler"
+                    "type": "@ref:org.mule.runtime.api.scheduler.SchedulingStrategy"
                   },
                   "hasDynamicType": false,
                   "required": true,
@@ -12101,7 +12101,7 @@
                 {
                   "type": {
                     "format": "java",
-                    "type": "@ref:org.mule.runtime.core.api.source.scheduler.Scheduler"
+                    "type": "@ref:org.mule.runtime.api.scheduler.SchedulingStrategy"
                   },
                   "hasDynamicType": false,
                   "required": true,
@@ -22249,7 +22249,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "@ref:org.mule.runtime.core.api.source.scheduler.Scheduler"
+                "type": "@ref:org.mule.runtime.api.scheduler.SchedulingStrategy"
               },
               "hasDynamicType": false,
               "required": true,
@@ -22622,7 +22622,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "@ref:org.mule.runtime.core.api.source.scheduler.Scheduler"
+                "type": "@ref:org.mule.runtime.api.scheduler.SchedulingStrategy"
               },
               "hasDynamicType": false,
               "required": true,
@@ -22995,7 +22995,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "@ref:org.mule.runtime.core.api.source.scheduler.Scheduler"
+                "type": "@ref:org.mule.runtime.api.scheduler.SchedulingStrategy"
               },
               "hasDynamicType": false,
               "required": true,

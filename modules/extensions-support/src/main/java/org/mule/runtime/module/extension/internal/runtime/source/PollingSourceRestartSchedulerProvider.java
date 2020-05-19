@@ -7,11 +7,9 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
-import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.extension.api.runtime.source.PollContext;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
 /**
  * Class for providing schedulers for a polling source that was restarted.
@@ -28,7 +26,7 @@ public class PollingSourceRestartSchedulerProvider {
    * @return the scheduler that must be used by the polling source in case of a restart.
    * @throws MuleException
    */
-  public static Scheduler getScheduler(Scheduler scheduler) {
+  public static SchedulingStrategy getScheduler(SchedulingStrategy scheduler) {
     if (scheduler instanceof FixedFrequencyScheduler) {
       ((FixedFrequencyScheduler) scheduler).setStartDelay(0);
     }

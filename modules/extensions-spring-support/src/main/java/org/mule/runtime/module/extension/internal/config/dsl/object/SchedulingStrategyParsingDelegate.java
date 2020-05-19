@@ -10,8 +10,8 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.core.api.source.scheduler.PeriodicScheduler;
-import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
@@ -35,7 +35,7 @@ public class SchedulingStrategyParsingDelegate implements ObjectParsingDelegate 
    */
   @Override
   public boolean accepts(ObjectType objectType) {
-    return getType(objectType).map(Scheduler.class::isAssignableFrom).orElse(false);
+    return getType(objectType).map(SchedulingStrategy.class::isAssignableFrom).orElse(false);
   }
 
   /**

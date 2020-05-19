@@ -35,12 +35,12 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.PollContext;
@@ -83,7 +83,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   private static final String INFLIGHT_IDS_OS_NAME_SUFFIX = "inflight-ids";
 
   private final PollingSource<T, A> delegate;
-  private final Scheduler scheduler;
+  private final SchedulingStrategy scheduler;
 
   @Inject
   private LockFactory lockFactory;
@@ -105,7 +105,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   private final AtomicBoolean stopRequested = new AtomicBoolean(false);
   private org.mule.runtime.api.scheduler.Scheduler executor;
 
-  public PollingSourceWrapper(PollingSource<T, A> delegate, Scheduler scheduler) {
+  public PollingSourceWrapper(PollingSource<T, A> delegate, SchedulingStrategy scheduler) {
     super(delegate);
     this.delegate = delegate;
     this.scheduler = scheduler;
