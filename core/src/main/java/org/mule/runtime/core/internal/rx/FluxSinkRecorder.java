@@ -31,8 +31,8 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
   public void accept(FluxSink<T> fluxSink) {
     synchronized (this) {
       this.fluxSink = fluxSink;
+      bufferedEvents.forEach(e -> e.run());
     }
-    bufferedEvents.forEach(e -> e.run());
   }
 
   public FluxSink<T> getFluxSink() {
