@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import static java.lang.Thread.currentThread;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static org.mule.runtime.core.api.functional.Either.right;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.applyWaitingInflightEvents;
@@ -108,6 +109,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
         latch.await();
       } catch (InterruptedException e) {
         e.printStackTrace();
+        currentThread().interrupt();
       }
     });
   }
