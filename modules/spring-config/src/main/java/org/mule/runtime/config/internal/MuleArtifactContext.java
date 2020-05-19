@@ -570,8 +570,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         .filter(cm -> !mustBeRoot || rootComponents.contains(cm.getFirst()))
         .filter(cm -> !beanDefinitionFactory.isComponentIgnored(cm.getFirst().getIdentifier()))
         .forEach(cm -> {
-          cm.getFirst().getComponentId()
-              .ifPresent(componentName -> createdComponentModels.add(new Pair<>(componentName, cm.getFirst())));
+          if (rootComponents.contains(cm.getFirst())) {
+            cm.getFirst().getComponentId()
+                .ifPresent(componentName -> createdComponentModels.add(new Pair<>(componentName, cm.getFirst())));
+          }
 
           beanDefinitionFactory.resolveComponentRecursively(springComponentModels,
                                                             cm.getSecond().isEmpty() ? null

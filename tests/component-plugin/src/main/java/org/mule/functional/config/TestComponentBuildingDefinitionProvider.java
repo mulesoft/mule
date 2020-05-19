@@ -24,6 +24,7 @@ import org.mule.functional.api.component.EventCallback;
 import org.mule.functional.api.component.FunctionalTestProcessor;
 import org.mule.functional.api.component.InvocationCountMessageProcessor;
 import org.mule.functional.api.component.LifecycleObject;
+import org.mule.functional.api.component.LifecycleTrackerConfig;
 import org.mule.functional.api.component.LifecycleTrackerScope;
 import org.mule.functional.api.component.LifecycleTrackerSource;
 import org.mule.functional.api.component.LogChecker;
@@ -37,6 +38,7 @@ import org.mule.functional.api.component.SummaryLogChecker;
 import org.mule.functional.api.component.TestNonBlockingProcessor;
 import org.mule.functional.api.component.ThrowProcessor;
 import org.mule.functional.client.QueueWriterMessageProcessor;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.tck.core.lifecycle.LifecycleTrackerCheckProcessor;
@@ -154,6 +156,12 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("lifecycle-tracker-source")
         .withTypeDefinition(fromType(LifecycleTrackerSource.class))
+        .build());
+
+    componentBuildingDefinitions.add(baseDefinition
+        .withIdentifier("lifecycle-tracker-config")
+        .withTypeDefinition(fromType(LifecycleTrackerConfig.class))
+        .withSetterParameterDefinition("nested", fromChildCollectionConfiguration(Component.class).build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition

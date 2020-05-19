@@ -219,6 +219,24 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="lifecycle-tracker-config" type="lifecycleTrackerConfigType" substitutionGroup="mule:abstract-configuration-element">
+        <xsd:annotation>
+            <xsd:documentation>
+                Stores the lifecycle method calls received by this configs.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="lifecycleTrackerConfigType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractConfigurationElement">
+                <xsd:sequence>
+                    <xsd:element ref="mule:abstract-configuration-element"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="lifecycle-tracker-scope" substitutionGroup="mule:abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
