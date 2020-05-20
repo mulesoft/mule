@@ -16,7 +16,7 @@
     {
       "baseType": {
         "format": "java",
-        "type": "@ref:org.mule.runtime.core.api.source.scheduler.Scheduler"
+        "type": "@ref:org.mule.runtime.api.scheduler.SchedulingStrategy"
       },
       "subTypes": [
         {
@@ -2786,7 +2786,7 @@
             {
               "type": {
                 "format": "java",
-                "type": "@ref:org.mule.runtime.core.api.source.scheduler.Scheduler"
+                "type": "@ref:org.mule.runtime.api.scheduler.SchedulingStrategy"
               },
               "hasDynamicType": false,
               "required": true,
@@ -3321,9 +3321,9 @@
       "format": "java",
       "type": "Object",
       "annotations": {
-        "typeId": "org.mule.runtime.core.api.source.scheduler.Scheduler",
+        "typeId": "org.mule.runtime.api.scheduler.SchedulingStrategy",
         "classInformation": {
-          "classname": "org.mule.runtime.core.api.source.scheduler.Scheduler",
+          "classname": "org.mule.runtime.api.scheduler.SchedulingStrategy",
           "hasDefaultConstructor": false,
           "isInterface": true,
           "isInstantiable": false,

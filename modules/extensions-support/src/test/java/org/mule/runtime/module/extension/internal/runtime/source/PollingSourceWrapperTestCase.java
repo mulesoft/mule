@@ -20,9 +20,9 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
-import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.extension.api.runtime.source.PollingSource;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper;
@@ -64,7 +64,7 @@ public class PollingSourceWrapperTestCase {
 
   @InjectMocks
   private PollingSourceWrapper<Object, Object> pollingSourceWrapper =
-      new PollingSourceWrapper<Object, Object>(mock(PollingSource.class), mock(Scheduler.class));
+      new PollingSourceWrapper<Object, Object>(mock(PollingSource.class), mock(SchedulingStrategy.class));
 
   @Before
   public void setUp() throws Exception {

@@ -35,8 +35,8 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
@@ -368,7 +368,7 @@ final class ObjectTypeSchemaDelegate {
       return;
     }
 
-    if (id.equals(Scheduler.class.getName())) {
+    if (id.equals(SchedulingStrategy.class.getName())) {
       builder.addSchedulerSupport(all);
       return;
     }

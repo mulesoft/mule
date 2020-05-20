@@ -66,7 +66,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.core.api.source.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -108,7 +108,7 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
 
     SubTypesModel subTypesModel = coreExtensionModel.getSubTypes().iterator().next();
     assertThat(subTypesModel.getBaseType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
-               is(Scheduler.class.getName()));
+               is(SchedulingStrategy.class.getName()));
 
     assertThat(subTypesModel.getSubTypes(), hasSize(2));
     Iterator<ObjectType> iterator = subTypesModel.getSubTypes().iterator();
@@ -799,6 +799,6 @@ public class CoreExtensionModelTestCase extends AbstractMuleContextTestCase {
     assertThat(paramModel.getType(), instanceOf(DefaultObjectType.class));
     assertThat(paramModel.isRequired(), is(true));
     assertThat(paramModel.getType().getAnnotation(TypeIdAnnotation.class).get().getValue(),
-               is(Scheduler.class.getName()));
+               is(SchedulingStrategy.class.getName()));
   }
 }

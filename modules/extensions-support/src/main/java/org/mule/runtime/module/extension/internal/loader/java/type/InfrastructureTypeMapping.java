@@ -23,9 +23,9 @@ import static org.mule.runtime.internal.dsl.DslConstants.TLS_STANDARD_REVOCATION
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
+import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tx.TransactionType;
-import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
@@ -55,7 +55,7 @@ public final class InfrastructureTypeMapping {
       .put(SourceTransactionalAction.class, new InfrastructureType(TRANSACTIONAL_ACTION_PARAMETER_NAME, 6))
       .put(OperationTransactionalAction.class, new InfrastructureType(TRANSACTIONAL_ACTION_PARAMETER_NAME, 7))
       .put(TransactionType.class, new InfrastructureType(TRANSACTIONAL_TYPE_PARAMETER_NAME, 9))
-      .put(Scheduler.class, new InfrastructureType(SCHEDULING_STRATEGY_PARAMETER_NAME, 10))
+      .put(SchedulingStrategy.class, new InfrastructureType(SCHEDULING_STRATEGY_PARAMETER_NAME, 10))
       .build();
 
   private static final Map<Type, InfrastructureType> TYPE_MAPPING = MAPPING.entrySet()
