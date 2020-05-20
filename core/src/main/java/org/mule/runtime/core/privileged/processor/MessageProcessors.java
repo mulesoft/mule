@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.applyWaitingInflightEvents;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.subscriberContext;
@@ -35,6 +36,7 @@ import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorderToReactorSinkAdapter;
@@ -51,6 +53,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -461,25 +465,20 @@ public class MessageProcessors {
                 return eventPub.flatMap(event -> internalProcessWithChildContext(event, processor, completeParentIfEmpty));
               } else {
                 FluxSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
-                Set<BaseEventContext> seenContexts = newSetFromMap(new WeakHashMap<BaseEventContext, Boolean>());
+                Flux<CoreEvent> upstream = Flux.from(eventChildCtxPub)
+                    .doOnNext(eventChildCtx -> childContextResponseHandler(eventChildCtx,
+                                                                           new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef),
+                                                                           completeParentIfEmpty));
 
-                return Flux.from(eventChildCtxPub)
-                    .doOnNext(eventChildCtx -> {
-                      childContextResponseHandler(eventChildCtx,
-                                                  new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef),
-                                                  completeParentIfEmpty);
-                    })
-                    .transform(processor)
-                    .doOnNext(completeSuccessIfNeeded())
-                    .map(event -> right(MessagingException.class, event))
-
-                    // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
-                    // it will be cancelled, ignoring the onErrorcontinue of the parent Flux.
-                    .doOnComplete(() -> errorSwitchSinkSinkRef.complete())
-                    .mergeWith(errorSwitchSinkSinkRef.flux())
-
-                    .map(childContextResponseMapper())
-                    .distinct(event -> (BaseEventContext) event.getContext(), () -> seenContexts)
+                return Flux.from(applyWaitingInflightEvents(upstream,
+                                                            errorSwitchSinkSinkRef.flux(),
+                                                            processor,
+                                                            pub -> Flux.from(pub)
+                                                                .doOnNext(completeSuccessIfNeeded())
+                                                                .map(event -> right(MessagingException.class, event)),
+                                                            errorSwitchSinkSinkRef::complete,
+                                                            pub -> Flux.from(pub).map(childContextResponseMapper()),
+                                                            event -> (BaseEventContext) event.getContext()))
                     .map(MessageProcessors::toParentContext);
               }
             }));
