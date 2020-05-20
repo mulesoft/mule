@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.dsl.model;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ERROR_HANDLER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
@@ -18,6 +19,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.util.NameUtils.COMPONENT_NAME_SEPARATOR;
 import static org.mule.runtime.api.util.NameUtils.toCamelCase;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
@@ -51,7 +53,6 @@ import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.config.internal.model.ComponentModel;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeHandlerManagerFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
@@ -382,14 +383,30 @@ public class ExtensionModelHelper {
               }
             }
 
+            @Override
+            protected void onType(MetadataType type) {
+              final Optional<DslElementSyntax> dslElement = resolveDslElementModel(type, currentExtension);
+              if (dslElement
+                  .map(dsl -> builder().name(dsl.getElementName()).namespace(dsl.getPrefix()).build())
+                  .map(componentIdentifier::equals)
+                  .orElse(false)) {
+
+                DslElementSyntax dsl = dslElement.get();
+                if (dsl.supportsTopLevelDeclaration() || (dsl.supportsChildDeclaration() && dsl.isWrapped())
+                    || getSubstitutionGroup(type).isPresent() || getAllSubTypes().contains(type)) {
+
+                  delegate.onType(type);
+                }
+                stop();
+              }
+            }
+
           }.walk(currentExtension);
         });
   }
 
   public Optional<? extends MetadataType> findMetadataType(Class<?> type) {
-    if (type != null
-        // workaround for test components with no extension model
-        && !Processor.class.isAssignableFrom(type)) {
+    if (type != null) {
       return Optional.of(javaTypeLoader.load(type));
     } else {
       return empty();
@@ -469,6 +486,11 @@ public class ExtensionModelHelper {
     void onConstruct(ConstructModel model);
 
     void onNestableElement(NestableElementModel model);
+
+    /**
+     * @since 4.4
+     */
+    void onType(MetadataType type);
 
   }
 
