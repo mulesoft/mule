@@ -57,6 +57,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 
+import org.mule.metadata.api.model.impl.DefaultObjectType;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -152,7 +154,6 @@ import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
@@ -976,11 +977,31 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private void addCursorResetInterceptor(InterceptorChain.Builder chainBuilder) {
     List<String> streamParams = new ArrayList<>(5);
     componentModel.getAllParameterModels().forEach(
-                                                   p -> getType(p.getType(), getClassLoader(extensionModel))
-                                                       .filter(clazz -> InputStream.class.isAssignableFrom(clazz)
-                                                           || Iterator.class.isAssignableFrom(clazz))
-                                                       .ifPresent(clazz -> streamParams.add(p.getName())));
-
+                                                   p -> {
+                                                     getType(p.getType(), getClassLoader(extensionModel))
+                                                         .filter(clazz -> InputStream.class.isAssignableFrom(clazz)
+                                                             || Iterator.class.isAssignableFrom(clazz))
+                                                         .ifPresent(clazz -> streamParams.add(p.getName()));
+                                                     if (getType(p.getType(), getClassLoader(extensionModel))
+                                                         .filter(clazz -> Map.class.isAssignableFrom(clazz)
+                                                             || Collection.class.isAssignableFrom(clazz))
+                                                         .isPresent()) {
+                                                       p.getType().getAnnotations().forEach(ann -> {
+                                                         if (ann instanceof ClassInformationAnnotation) {
+                                                           ((ClassInformationAnnotation) ann).getGenericTypes().forEach(
+                                                                                                                        gen -> {
+                                                                                                                          if (gen
+                                                                                                                              .contains(InputStream.class
+                                                                                                                                  .getName())) {
+                                                                                                                            streamParams
+                                                                                                                                .add(p
+                                                                                                                                    .getName());
+                                                                                                                          }
+                                                                                                                        });
+                                                         }
+                                                       });
+                                                     }
+                                                   });
     if (!streamParams.isEmpty()) {
       chainBuilder.addInterceptor(new CursorResetInterceptor(streamParams));
     }

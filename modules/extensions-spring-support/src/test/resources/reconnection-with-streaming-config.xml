@@ -26,8 +26,21 @@
         <petstore:get-pets-typed-value config-ref="petstore" ownerName="jo" ownerSignature="#[vars.signature]"/>
     </flow>
 
+    <flow name="literalReconnect">
+        <petstore:get-pets-literal config-ref="petstore" ownerName="jo" ownerSignature="hn"/>
+        <set-payload value="SUCCESS"/>
+    </flow>
+
     <flow name="streamingParameterGroupReconnect">
-        <petstore:get-pets-typed-value config-ref="petstore" owner="#[payload]"/>
+        <petstore:get-pets-parameter-group config-ref="petstore" ownerName="#[payload]" ownerSignature="#[vars.signature]"/>
+    </flow>
+
+    <flow name="streamingMapReconnect">
+        <petstore:get-pets-map config-ref="petstore" ownerInformation="#[payload]"/>
+    </flow>
+
+    <flow name="streamingCollectionReconnect">
+        <petstore:get-pets-collection config-ref="petstore" ownerData="#[payload]"/>
     </flow>
 
     <flow name="streamingReconnectWithClosedStream">

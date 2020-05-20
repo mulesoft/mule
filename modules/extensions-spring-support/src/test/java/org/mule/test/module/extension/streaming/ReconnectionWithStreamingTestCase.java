@@ -21,13 +21,15 @@ import static org.mule.test.petstore.extension.PetStoreOperations.operationExecu
 import static org.mule.test.petstore.extension.PetStoreOperations.shouldFailWithConnectionException;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Test;
@@ -43,33 +45,82 @@ public class ReconnectionWithStreamingTestCase extends AbstractExtensionFunction
 
   @Test
   public void cursorComingFromProviderIsResetOnReconnection() throws Exception {
-    CursorStream cursorStream = createMockCursor();
-
+    CursorStream cursorStream = createFailingMockCursor("hn".getBytes());
     CursorStreamProvider provider = mock(CursorStreamProvider.class);
     when(provider.openCursor()).thenReturn(cursorStream);
 
-    assertReconnection("streamingReconnect", cursorStream, provider);
+    CoreEvent response = flowRunner("streamingReconnect").withVariable("signature", provider).run();
+    assertReconnection(response, cursorStream);
   }
 
   @Test
   public void standaloneCursorIsResetOnReconnection() throws Exception {
-    CursorStream cursorStream = createMockCursor();
-    assertReconnection("streamingReconnect", cursorStream, cursorStream);
+    CursorStream cursorStream = createFailingMockCursor("hn".getBytes());
+
+    CoreEvent response = flowRunner("streamingReconnect").withVariable("signature", cursorStream).run();
+    assertReconnection(response, cursorStream);
   }
 
   @Test
   public void typedValueCursorIsResetOnReconnection() throws Exception {
-    CursorStream cursorStream = createMockCursor();
-    TypedValue<CursorStream> typedCursorStream = TypedValue.of(cursorStream);
-    assertReconnection("streamingTypedValueReconnect", cursorStream, cursorStream);
+    CursorStream ownerSignature = createFailingMockCursor("hn".getBytes());
+
+    CoreEvent response = flowRunner("streamingTypedValueReconnect").withVariable("signature", ownerSignature).run();
+    assertReconnection(response, ownerSignature);
   }
 
   @Test
-  public void parameterGroupCursorsAreResetOnReconnection() throws Exception {
-    CursorStream ownerName = createMockCursor();
-    CursorStream ownerSignature = createMockCursor();;
-    TypedValue<CursorStream> typedCursorStream = TypedValue.of(cursorStream);
-    assertReconnection("streamingParameterGroupReconnect", cursorStream, cursorStream);
+  public void literalIsRepeatableOnReconnection() throws Exception {
+    shouldFailWithConnectionException = true;
+
+    CoreEvent response = flowRunner("literalReconnect").run();
+    assertThat(response.getMessage().getPayload().getValue(), is("SUCCESS"));
+  }
+
+  @Test
+  public void typedValueCursorInParameterGroupIsResetOnReconnection() throws Exception {
+    CursorStream ownerSignature = createFailingMockCursor("hn".getBytes());
+    CursorStream ownerName = createMockCursor("jo".getBytes());
+    CoreEvent response =
+        flowRunner("streamingParameterGroupReconnect").withVariable("signature", ownerSignature).withPayload(ownerName).run();
+
+    assertReconnection(response, ownerSignature);
+  }
+
+  @Test
+  public void cursorInParameterGroupIsResetOnReconnection() throws Exception {
+    CursorStream ownerSignature = createMockCursor("hn".getBytes());
+    CursorStream ownerName = createFailingMockCursor("jo".getBytes());
+    CoreEvent response =
+        flowRunner("streamingParameterGroupReconnect").withVariable("signature", ownerSignature).withPayload(ownerName).run();
+
+    assertReconnection(response, ownerName);
+  }
+
+  @Test
+  public void cursorInMapIsResetOnReconnection() throws Exception {
+    CursorStream ownerSignature = createMockCursor("hn".getBytes());
+    CursorStream ownerName = createFailingMockCursor("jo".getBytes());
+    HashMap<String, InputStream> ownerInformation = new HashMap<>();
+    ownerInformation.put("ownerName", ownerName);
+    ownerInformation.put("ownerSignature", ownerSignature);
+
+    CoreEvent response = flowRunner("streamingMapReconnect").withPayload(ownerInformation).run();
+
+    assertReconnection(response, ownerName);
+  }
+
+  @Test
+  public void cursorInCollectionIsResetOnReconnection() throws Exception {
+    CursorStream ownerSignature = createMockCursor("hn".getBytes());
+    CursorStream ownerName = createFailingMockCursor("jo".getBytes());
+    List<InputStream> ownerInformation = new ArrayList<>();
+    ownerInformation.add(ownerName);
+    ownerInformation.add(ownerSignature);
+
+    CoreEvent response = flowRunner("streamingCollectionReconnect").withPayload(ownerInformation).run();
+
+    assertReconnection(response, ownerName);
   }
 
   @Test
@@ -81,8 +132,7 @@ public class ReconnectionWithStreamingTestCase extends AbstractExtensionFunction
     assertThat(operationExecutionCounter.get(), greaterThanOrEqualTo(2));
   }
 
-  private void assertReconnection(String flow, CursorStream cursor, Object container) throws Exception {
-    CoreEvent response = flowRunner(flow).withVariable("signature", container).run();
+  private void assertReconnection(CoreEvent response, CursorStream cursor) throws Exception {
     verify(cursor).seek(ORIGINAL_POSITION);
     verify(cursor, times(3)).read(any(byte[].class), anyInt(), anyInt());
 
@@ -91,15 +141,39 @@ public class ReconnectionWithStreamingTestCase extends AbstractExtensionFunction
     assertThat((List<String>) payload, hasSize(3));
   }
 
-  private CursorStream createMockCursor() throws IOException {
+  private CursorStream createFailingMockCursor(byte[] bytes) throws IOException {
     CursorStream cursorStream = mock(CursorStream.class);
     when(cursorStream.getPosition()).thenReturn(ORIGINAL_POSITION);
     when(cursorStream.read(any(byte[].class), anyInt(), anyInt()))
         .thenThrow(new RuntimeException(new ConnectionException("kaboom")))
         .thenAnswer(i -> {
           byte[] buffer = (byte[]) i.getArguments()[0];
-          buffer[0] = 'h';
-          buffer[1] = 'n';
+          buffer[0] = bytes[0];
+          buffer[1] = bytes[1];
+
+          return 2;
+        })
+        .thenReturn(-1);
+
+    return cursorStream;
+  }
+
+  private CursorStream createMockCursor(byte[] bytes) throws IOException {
+    CursorStream cursorStream = mock(CursorStream.class);
+    when(cursorStream.getPosition()).thenReturn(ORIGINAL_POSITION);
+    when(cursorStream.read(any(byte[].class), anyInt(), anyInt()))
+        .thenAnswer(i -> {
+          byte[] buffer = (byte[]) i.getArguments()[0];
+          buffer[0] = bytes[0];
+          buffer[1] = bytes[1];
+
+          return 2;
+        })
+        .thenAnswer(i -> -1)
+        .thenAnswer(i -> {
+          byte[] buffer = (byte[]) i.getArguments()[0];
+          buffer[0] = bytes[0];
+          buffer[1] = bytes[1];
 
           return 2;
         })

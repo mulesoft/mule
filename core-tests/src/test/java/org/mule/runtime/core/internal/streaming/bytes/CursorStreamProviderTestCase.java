@@ -48,7 +48,7 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 @SmallTest
 @Feature(STREAMING)
-public class \CursorStreamProviderTestCase extends AbstractByteStreamingTestCase {
+public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase {
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {

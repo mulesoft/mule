@@ -10,15 +10,19 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionExc
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,14 +53,27 @@ public class CursorResetInterceptor implements Interceptor<OperationModel> {
     List<Pair<Cursor, Long>> cursorPositions = new ArrayList<>(cursorParamNames.size());
     for (String cursorParamName : cursorParamNames) {
       Object value = ctx.getParameterOrDefault(cursorParamName, null);
-      if (value instanceof Cursor) {
-        final Cursor cursor = (Cursor) value;
-        cursorPositions.add(new Pair<>(cursor, cursor.getPosition()));
+      if (value instanceof Map) {
+        ((Map) value).forEach((k, v) -> addCursor(v, cursorPositions));
+      } else if (value instanceof Collection) {
+        ((Collection) value).forEach(e -> addCursor(e, cursorPositions));
+      } else {
+        addCursor(value, cursorPositions);
       }
     }
 
     if (!cursorPositions.isEmpty()) {
       ((ExecutionContextAdapter<OperationModel>) ctx).setVariable(CURSOR_POSITIONS, cursorPositions);
+    }
+  }
+
+  private void addCursor(Object value, List<Pair<Cursor, Long>> cursorPositions) {
+    if (value instanceof TypedValue) {
+      value = ((TypedValue) value).getValue();
+    }
+    if (value instanceof Cursor) {
+      final Cursor cursor = (Cursor) value;
+      cursorPositions.add(new Pair<>(cursor, cursor.getPosition()));
     }
   }
 

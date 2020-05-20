@@ -37,6 +37,8 @@ import org.mule.runtime.extension.api.annotation.param.stereotype.AllowedStereot
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
+import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.security.AuthenticationHandler;
@@ -47,6 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -93,13 +96,56 @@ public class PetStoreOperations {
     return client.getPets(ownerName, config);
   }
 
-  public List<String> getPetsParameterGroup(@Connection PetStoreClient client,
-                                        @Config PetStoreConnector config,
-                                        @ParameterGroup(name = "Owner") Owner owner) {
+  public List<String> getPetsLiteral(@Connection PetStoreClient client,
+                                     @Config PetStoreConnector config,
+                                     String ownerName,
+                                     Literal<InputStream> ownerSignature) {
 
-    String ownerName = owner.getOwnerName() + IOUtils.toString(owner.getOwnerSignature().getValue());
+    if (ownerSignature.getLiteralValue().isPresent()) {
+      ownerName += ownerSignature.getLiteralValue().get();
+    }
+    if (shouldFailWithConnectionException) {
+      shouldFailWithConnectionException = false;
+      throw new RuntimeException(new ConnectionException("kaboom"));
+    }
 
     return client.getPets(ownerName, config);
+  }
+
+  public List<String> getPetsParameterGroup(@Connection PetStoreClient client,
+                                            @Config PetStoreConnector config,
+                                            @ParameterGroup(name = "owner") Owner owner) {
+
+    String ownerName = IOUtils.toString(owner.getOwnerName()) + IOUtils.toString(owner.getOwnerSignature().getValue());
+
+    return client.getPets(ownerName, config);
+  }
+
+  public List<String> getPetsMap(@Connection PetStoreClient client,
+                                 @Config PetStoreConnector config,
+                                 Map<String, InputStream> ownerInformation) {
+
+    InputStream ownerName = ownerInformation.get("ownerName");
+    InputStream ownerSignature = ownerInformation.get("ownerSignature");
+
+    String name = "";
+    if (ownerName != null && ownerSignature != null) {
+      name = IOUtils.toString(ownerName) + IOUtils.toString(ownerSignature);
+    }
+
+    return client.getPets(name, config);
+  }
+
+  public List<String> getPetsCollection(@Connection PetStoreClient client,
+                                        @Config PetStoreConnector config,
+                                        List<InputStream> ownerData) {
+
+    InputStream ownerName = ownerData.get(0);
+    InputStream ownerSignature = ownerData.get(1);
+
+    String name = IOUtils.toString(ownerName) + IOUtils.toString(ownerSignature);
+
+    return client.getPets(name, config);
   }
 
   @MediaType(TEXT_PLAIN)
