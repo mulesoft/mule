@@ -136,12 +136,39 @@ public class PetStoreOperations {
     return client.getPets(name, config);
   }
 
+  public List<String> getPetsTypedValueMap(@Connection PetStoreClient client,
+                                           @Config PetStoreConnector config,
+                                           Map<String, TypedValue<InputStream>> ownerInformation) {
+
+    InputStream ownerName = ownerInformation.get("ownerName").getValue();
+    InputStream ownerSignature = ownerInformation.get("ownerSignature").getValue();
+
+    String name = "";
+    if (ownerName != null && ownerSignature != null) {
+      name = IOUtils.toString(ownerName) + IOUtils.toString(ownerSignature);
+    }
+
+    return client.getPets(name, config);
+  }
+
   public List<String> getPetsCollection(@Connection PetStoreClient client,
                                         @Config PetStoreConnector config,
                                         List<InputStream> ownerData) {
 
     InputStream ownerName = ownerData.get(0);
     InputStream ownerSignature = ownerData.get(1);
+
+    String name = IOUtils.toString(ownerName) + IOUtils.toString(ownerSignature);
+
+    return client.getPets(name, config);
+  }
+
+  public List<String> getPetsTypedValueCollection(@Connection PetStoreClient client,
+                                                  @Config PetStoreConnector config,
+                                                  List<TypedValue<InputStream>> ownerData) {
+
+    InputStream ownerName = ownerData.get(0).getValue();
+    InputStream ownerSignature = ownerData.get(1).getValue();
 
     String name = IOUtils.toString(ownerName) + IOUtils.toString(ownerSignature);
 

@@ -111,7 +111,33 @@ public class ReconnectionWithStreamingTestCase extends AbstractExtensionFunction
   }
 
   @Test
+  public void typedValueCursorInMapIsResetOnReconnection() throws Exception {
+    CursorStream ownerSignature = createMockCursor("hn".getBytes());
+    CursorStream ownerName = createFailingMockCursor("jo".getBytes());
+    HashMap<String, InputStream> ownerInformation = new HashMap<>();
+    ownerInformation.put("ownerName", ownerName);
+    ownerInformation.put("ownerSignature", ownerSignature);
+
+    CoreEvent response = flowRunner("streamingMapReconnect").withPayload(ownerInformation).run();
+
+    assertReconnection(response, ownerName);
+  }
+
+  @Test
   public void cursorInCollectionIsResetOnReconnection() throws Exception {
+    CursorStream ownerSignature = createMockCursor("hn".getBytes());
+    CursorStream ownerName = createFailingMockCursor("jo".getBytes());
+    List<InputStream> ownerInformation = new ArrayList<>();
+    ownerInformation.add(ownerName);
+    ownerInformation.add(ownerSignature);
+
+    CoreEvent response = flowRunner("streamingCollectionReconnect").withPayload(ownerInformation).run();
+
+    assertReconnection(response, ownerName);
+  }
+
+  @Test
+  public void typedValueCursorInCollectionIsResetOnReconnection() throws Exception {
     CursorStream ownerSignature = createMockCursor("hn".getBytes());
     CursorStream ownerName = createFailingMockCursor("jo".getBytes());
     List<InputStream> ownerInformation = new ArrayList<>();

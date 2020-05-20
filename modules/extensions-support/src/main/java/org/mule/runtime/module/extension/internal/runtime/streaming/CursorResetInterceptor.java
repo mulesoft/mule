@@ -15,7 +15,6 @@ import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 import java.io.IOException;
@@ -54,11 +53,11 @@ public class CursorResetInterceptor implements Interceptor<OperationModel> {
     for (String cursorParamName : cursorParamNames) {
       Object value = ctx.getParameterOrDefault(cursorParamName, null);
       if (value instanceof Map) {
-        ((Map) value).forEach((k, v) -> addCursor(v, cursorPositions));
+        ((Map) value).forEach((k, v) -> addValue(v, cursorPositions));
       } else if (value instanceof Collection) {
-        ((Collection) value).forEach(e -> addCursor(e, cursorPositions));
+        ((Collection) value).forEach(v -> addValue(v, cursorPositions));
       } else {
-        addCursor(value, cursorPositions);
+        addValue(value, cursorPositions);
       }
     }
 
@@ -67,7 +66,7 @@ public class CursorResetInterceptor implements Interceptor<OperationModel> {
     }
   }
 
-  private void addCursor(Object value, List<Pair<Cursor, Long>> cursorPositions) {
+  private void addValue(Object value, List<Pair<Cursor, Long>> cursorPositions) {
     if (value instanceof TypedValue) {
       value = ((TypedValue) value).getValue();
     }
