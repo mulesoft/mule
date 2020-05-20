@@ -6,15 +6,22 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
+import static java.util.Collections.newSetFromMap;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.functional.Either;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
@@ -105,5 +112,64 @@ public class RxUtils {
    */
   public static Publisher<CoreEvent> justPublishOn(CoreEvent event, ExecutorService executor) {
     return Flux.just(event).publishOn(fromExecutorService(executor));
+  }
+
+  /**
+   * Transforms the upstream {@link Publisher} using the given processor, and maintaining an in-flight events counter
+   * in order to delay error sink completion until it's zero.
+   *
+   * @param upstream the upstream {@link Publisher}
+   * @param errorSinkPublisher sink to merge with after completer transformer
+   * @param processor the processor to transform the upstream publisher with
+   * @param postProcessorTransformer transformer to be applied after the above processor
+   * @param errorSinkCompleter callback to complete the error sink. It's applied onComplete or deferred until the last
+   *                           in-flight event onNext
+   * @param postCompleteTransformer transformer to be applied after merging with errorSinkCompleter
+   * @param keyExtractor the composed flow will be merged with the errorSinkCompleter, and so we are going to need filtering
+   *                     with a distinct. This parameter is used to extract the key for each element and do the mentioned filtering
+   * @return the transformed {@link Publisher}
+   */
+  public static <T, TKey> Publisher<T> applyWaitingInflightEvents(Publisher<T> upstream,
+                                                                  Publisher<Either<MessagingException, T>> errorSinkPublisher,
+                                                                  Function<Publisher<T>, Publisher<T>> processor,
+                                                                  Function<Publisher<T>, Publisher<Either<MessagingException, T>>> postProcessorTransformer,
+                                                                  CheckedRunnable errorSinkCompleter,
+                                                                  Function<Publisher<Either<MessagingException, T>>, Publisher<T>> postCompleteTransformer,
+                                                                  Function<T, TKey> keyExtractor) {
+    final AtomicInteger inflightEvents = new AtomicInteger(0);
+    final AtomicBoolean deferredCompletion = new AtomicBoolean(false);
+    Set<TKey> seenElements = newSetFromMap(new WeakHashMap<>());
+
+    return Flux.from(upstream)
+        .doOnNext(eventCtx -> inflightEvents.incrementAndGet())
+        .transform(processor)
+        .compose(postProcessorTransformer)
+        .doOnComplete(() -> {
+          if (inflightEvents.get() == 0) {
+            errorSinkCompleter.run();
+          } else {
+            deferredCompletion.set(true);
+          }
+        })
+        // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
+        // it will be cancelled, ignoring the onErrorContinue of the parent Flux.
+        .mergeWith(errorSinkPublisher)
+        .doOnNext(either -> {
+          if (either.isLeft()) {
+            completeErrorSinkIfNeeded(errorSinkCompleter, inflightEvents, deferredCompletion);
+          }
+        })
+        .compose(postCompleteTransformer)
+        .distinct(keyExtractor, () -> seenElements)
+        .doOnNext(eventCtx -> completeErrorSinkIfNeeded(errorSinkCompleter, inflightEvents, deferredCompletion));
+  }
+
+  private static void completeErrorSinkIfNeeded(CheckedRunnable errorSinkCompleter,
+                                                AtomicInteger inflightEvents,
+                                                AtomicBoolean deferredCompletion) {
+    int inflightEventsCount = inflightEvents.decrementAndGet();
+    if (inflightEventsCount == 0 && deferredCompletion.compareAndSet(true, false)) {
+      errorSinkCompleter.run();
+    }
   }
 }
