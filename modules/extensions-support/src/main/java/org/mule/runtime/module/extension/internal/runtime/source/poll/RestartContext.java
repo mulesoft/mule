@@ -15,8 +15,8 @@ import org.mule.runtime.api.scheduler.Scheduler;
  */
 public class RestartContext {
 
-  private Scheduler executor;
-  private DelegateRunnable delegateRunnable;
+  private final Scheduler executor;
+  private final DelegateRunnable delegateRunnable;
 
   public RestartContext(Scheduler executor, DelegateRunnable delegateRunnable) {
     this.executor = executor;

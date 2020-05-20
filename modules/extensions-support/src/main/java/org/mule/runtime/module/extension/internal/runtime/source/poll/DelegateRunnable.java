@@ -34,6 +34,7 @@ public class DelegateRunnable implements Runnable {
 
   @Override
   public void run() {
+    // We want to make sure that the delegate value is not changed when executing it.
     if (lock.tryLock()) {
       try {
         if (delegate != null) {

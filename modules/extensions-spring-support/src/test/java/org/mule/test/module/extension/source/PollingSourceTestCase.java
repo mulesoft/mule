@@ -16,6 +16,8 @@ import static org.mule.test.petstore.extension.NumberPetAdoptionSource.ALL_NUMBE
 import static org.mule.test.petstore.extension.PetAdoptionSource.ALL_PETS;
 import static org.mule.test.petstore.extension.PetAdoptionSource.FAILED_ADOPTION_COUNT;
 import static org.mule.test.petstore.extension.PetAdoptionSource.STARTED_POLLS;
+import static org.mule.test.petstore.extension.PetFailingPollingSource.POLL_INVOCATIONS;
+import static org.mule.test.petstore.extension.PetFailingPollingSource.STARTED_SOURCES;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -61,6 +63,8 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
   @Before
   public void resetCounters() throws Exception {
     PetFailingPollingSource.STARTED_POLLS = 0;
+    POLL_INVOCATIONS.clear();
+    STARTED_SOURCES.clear();
     STARTED_POLLS = 0;
   }
 
@@ -135,7 +139,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
     assertAllPetsAdopted();
   }
 
-  @Description("This test reflects a behavior that we must preserve, when a polling source is stopped and started the scheduler must be rescheduled.")
+  @Description("This test reflects a behavior that we must preserve, when a polling source is stopped and started the scheduler must be stopped and a new one must be started.")
   @Test
   public void whenSourceIsStopAndStartedSchedulerIsReset() throws Exception {
     startFlow("longFrequencyPoll");
@@ -149,7 +153,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
   @Test
   public void sourceRetriggersImmediatlyOnReconnection() throws Exception {
     startFlow("failingLongFrequencyPoll");
-    assertPetFailingSourcePolls(2);
+    assertPetFailingSourcePollsFromDifferentSources(2);
   }
 
   private void assertStartedPolls(int polls) {
@@ -159,11 +163,13 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
     });
   }
 
-  private void assertPetFailingSourcePolls(int polls) {
+  private void assertPetFailingSourcePollsFromDifferentSources(int polls) {
     check(5000, 200, () -> {
       assertThat(PetFailingPollingSource.STARTED_POLLS, is(polls));
       return true;
     });
+    assertThat(POLL_INVOCATIONS.size(), is(2));
+    POLL_INVOCATIONS.entrySet().forEach(entry -> assertThat(entry.getValue(), is(1)));
   }
 
   private void assertIdempotentAdoptions() {
