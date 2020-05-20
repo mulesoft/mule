@@ -35,6 +35,7 @@ public final class TemplateParser {
   private static final char START_EXPRESSION = '#';
   private static final char OPEN_EXPRESSION = '[';
   private static final char CLOSE_EXPRESSION = ']';
+  private static final Pattern ESCAPE_PATTERN = Pattern.compile("(^|[^\\\\])" + START_EXPRESSION + "\\" + OPEN_EXPRESSION);
   private static final String EXPRESSION_NOT_CLOSED_ERROR_MSG = "\tOpened expression (%c) at line %d, column %d is not closed\n";
   private static final String QUOTATION_NOT_CLOSED_ERROR_MSG =
       "\tQuotation (%c) at line %d, column %d is not closed. Remember to use backslash (\\) if you are trying to use that character as a literal";
@@ -205,7 +206,7 @@ public final class TemplateParser {
     if (original.contains("#")) {
       return processed;
     }
-    return processed.replaceAll("(^|[^\\\\])" + START_EXPRESSION, "$1\\\\" + START_EXPRESSION);
+    return ESCAPE_PATTERN.matcher(processed).replaceAll("$1\\\\" + START_EXPRESSION + OPEN_EXPRESSION);
   }
 
   protected String parse(Map<?, ?> props, String template, TemplateCallback callback) {
