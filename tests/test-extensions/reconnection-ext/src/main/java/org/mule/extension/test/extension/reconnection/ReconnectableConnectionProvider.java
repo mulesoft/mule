@@ -29,7 +29,6 @@ public class ReconnectableConnectionProvider implements CachedConnectionProvider
 
   public static volatile boolean fail;
   private int reconnectionAttempts = 0;
-  public static volatile int disconnectCalls = 0;
 
   @Override
   public ReconnectableConnection connect() throws ConnectionException {
@@ -41,16 +40,14 @@ public class ReconnectableConnectionProvider implements CachedConnectionProvider
       fail = false;
     }
 
-    ReconnectableConnection connection = new ReconnectableConnection(reconnectionAttempts, disconnectCalls);
+    ReconnectableConnection connection = new ReconnectableConnection(reconnectionAttempts);
     reconnectionAttempts = 0;
 
     return connection;
   }
 
   @Override
-  public void disconnect(ReconnectableConnection connection) {
-    disconnectCalls++;
-  }
+  public void disconnect(ReconnectableConnection connection) {}
 
   @Override
   public ConnectionValidationResult validate(ReconnectableConnection connection) {
