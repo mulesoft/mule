@@ -11,6 +11,7 @@ import static java.util.Optional.empty;
 import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.fail;
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
 
+import org.mule.extension.test.extension.reconnection.metadata.RetryPolicyOutputResolver;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
@@ -38,6 +39,7 @@ public class ReconnectionOperations {
     fail = !fail;
   }
 
+  @OutputResolver(output = RetryPolicyOutputResolver.class)
   public RetryPolicyTemplate getRetryPolicyTemplate(@Connection ReconnectableConnection connection,
                                                     RetryPolicyTemplate template) {
     return template;
