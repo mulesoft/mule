@@ -16,7 +16,6 @@ import static org.mule.runtime.api.component.ComponentIdentifier.buildFromString
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SUBFLOW_IDENTIFIER;
@@ -37,6 +36,7 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.MUNIT_TEST
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Pair;
@@ -45,6 +45,7 @@ import org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper;
 import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
+import org.mule.runtime.module.extension.internal.loader.java.property.CustomLocationPartModelProperty;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,14 +62,6 @@ import com.google.common.collect.ImmutableList;
 // TODO MULE-13618 - Migrate ComponentLocationVisitor to use ExtensionModels
 public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, List<ComponentAst>>> {
 
-  public static final ComponentIdentifier BATCH_JOB_COMPONENT_IDENTIFIER = buildFromStringRepresentation("batch:job");
-  public static final ComponentIdentifier BATCH_PROCESSS_RECORDS_COMPONENT_IDENTIFIER =
-      buildFromStringRepresentation("batch:process-records");
-  private static final ComponentIdentifier BATCH_ON_COMPLETE_IDENTIFIER =
-      buildFromStringRepresentation("batch:on-complete");
-  private static final ComponentIdentifier BATCH_STEP_COMPONENT_IDENTIFIER = buildFromStringRepresentation("batch:step");
-  private static final ComponentIdentifier BATCH_AGGREGATOR_COMPONENT_IDENTIFIER =
-      buildFromStringRepresentation("batch:aggregator");
   private static final String PROCESSORS_PART_NAME = "processors";
   private static final String SOURCE_PART_NAME = "source";
   private static final ComponentIdentifier ROUTE_COMPONENT_IDENTIFIER = buildFromStringRepresentation("mule:route");
@@ -114,7 +107,32 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
       ComponentAst parentComponentModel = hierarchy.get(hierarchy.size() - 1);
 
       DefaultComponentLocation parentComponentLocation = (DefaultComponentLocation) parentComponentModel.getLocation();
-      if (isHttpProxyPart(componentModel)) {
+
+      final Optional<DefaultComponentLocation> locationWithCustomPart = componentModel.getModel(EnrichableModel.class)
+          .flatMap(em -> em.getModelProperty(CustomLocationPartModelProperty.class))
+          .map(customLocationPart -> {
+            if (customLocationPart.isIndexed()) {
+              return parentComponentLocation
+                  .appendLocationPart(customLocationPart.getLocationPart(),
+                                      empty(), empty(), OptionalInt.empty(), OptionalInt.empty())
+                  .appendLocationPart(findNonProcessorPath(componentModel, hierarchy),
+                                      typedComponentIdentifier,
+                                      componentModel.getMetadata().getFileName(),
+                                      componentModel.getMetadata().getStartLine(),
+                                      componentModel.getMetadata().getStartColumn());
+            } else {
+              return parentComponentLocation
+                  .appendLocationPart(customLocationPart.getLocationPart(),
+                                      typedComponentIdentifier,
+                                      componentModel.getMetadata().getFileName(),
+                                      componentModel.getMetadata().getStartLine(),
+                                      componentModel.getMetadata().getStartColumn());
+            }
+          });
+
+      if (locationWithCustomPart.isPresent()) {
+        componentLocation = locationWithCustomPart.get();
+      } else if (isHttpProxyPart(componentModel)) {
         componentLocation =
             parentComponentLocation.appendLocationPart(componentModel.getIdentifier().getName(), typedComponentIdentifier,
                                                        componentModel.getMetadata().getFileName(),
@@ -222,17 +240,10 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
     return componentModel.getModel(ConnectionProviderModel.class).isPresent();
   }
 
-  private boolean isBatchAggregator(ComponentAst componentModel) {
-    return BATCH_AGGREGATOR_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier());
-  }
-
   private boolean isRoute(ComponentAst componentModel) {
     return componentModel.getIdentifier().equals(ROUTE_COMPONENT_IDENTIFIER)
         || componentModel.getIdentifier().equals(CHOICE_WHEN_COMPONENT_IDENTIFIER)
         || componentModel.getIdentifier().equals(CHOICE_OTHERWISE_COMPONENT_IDENTIFIER)
-        || componentModel.getIdentifier().equals(BATCH_PROCESSS_RECORDS_COMPONENT_IDENTIFIER)
-        || componentModel.getIdentifier().equals(BATCH_ON_COMPLETE_IDENTIFIER)
-        || componentModel.getIdentifier().equals(BATCH_STEP_COMPONENT_IDENTIFIER)
         || componentModel.getComponentType().equals(ROUTE);
   }
 

@@ -32,6 +32,7 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ComponentModelVisitor;
+import org.mule.runtime.api.meta.model.ComposableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -183,13 +184,23 @@ public class ExtensionModelHelper {
 
       @Override
       protected void onConstruct(ConstructModel model) {
+        onComposable(componentName, reference, model);
+      }
+
+      private void onComposable(String componentName, Reference<NestableElementModel> reference, ComposableModel model) {
         model.getNestedComponents().stream()
             .filter(nestedComponent -> nestedComponent.getName().equals(componentName))
             .findFirst()
-            .ifPresent((foundComponent) -> {
+            .ifPresent(foundComponent -> {
               reference.set(foundComponent);
               stop();
             });
+
+        if (reference.get() == null) {
+          model.getNestedComponents().stream()
+              .filter(nestedComponent -> nestedComponent instanceof ComposableModel)
+              .forEach(nestedComponent -> onComposable(componentName, reference, (ComposableModel) nestedComponent));
+        }
       }
     };
     walker.walk(extensionModel);
@@ -499,12 +510,13 @@ public class ExtensionModelHelper {
     public void visit(NestedComponentModel component) {}
 
     @Override
-    public void visit(NestedChainModel component) {}
+    public void visit(NestedChainModel component) {
+      reference.set(ROUTE);
+    }
 
     @Override
     public void visit(NestedRouteModel component) {
       reference.set(ROUTE);
-
     }
   }
 
