@@ -41,7 +41,7 @@ public class ReconnectableConnectionProvider implements CachedConnectionProvider
       fail = false;
     }
 
-    ReconnectableConnection connection = new ReconnectableConnection(reconnectionAttempts);
+    ReconnectableConnection connection = new ReconnectableConnection(reconnectionAttempts, disconnectCalls);
     reconnectionAttempts = 0;
 
     return connection;

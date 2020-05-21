@@ -73,18 +73,14 @@ public class ReconnectionOperations {
     };
   }
 
-  public PagingProvider<ReconnectableConnection, ReconnectableConnection> stickyPagedOperation(Integer failOn,
-                                                                                               MuleErrors withErrorType) {
+  public PagingProvider<ReconnectableConnection, ReconnectableConnection> stickyPagedOperation(Integer failOn) {
     return new PagingProvider<ReconnectableConnection, ReconnectableConnection>() {
 
       @Override
       public List<ReconnectableConnection> getPage(ReconnectableConnection connection) {
         getPageCalls++;
         if (getPageCalls == failOn) {
-          if (withErrorType.equals(CONNECTIVITY)) {
-            throw new ModuleException(withErrorType, new ConnectionException("Failed to retrieve Page"));
-          }
-          throw new IllegalArgumentException("An illegal argument was received.");
+          throw new ModuleException(CONNECTIVITY, new ConnectionException("Failed to retrieve Page"));
         }
         return singletonList(connection);
       }
