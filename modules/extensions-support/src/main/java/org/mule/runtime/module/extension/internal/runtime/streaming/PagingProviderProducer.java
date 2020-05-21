@@ -15,7 +15,6 @@ import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPONENT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.IS_TRANSACTIONAL;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
-import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.isPartOfActiveTransaction;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
 
@@ -109,8 +108,9 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
       CompletableFuture<R> future = retryPolicy.applyPolicy(() -> completedFuture(withConnection(function)),
                                                             e -> !isFirstPage && !delegate.useStickyConnections()
                                                                 && shouldRetry(e, executionContext),
-                                                            NULL_THROWABLE_CONSUMER,
-                                                            NULL_THROWABLE_CONSUMER,
+                                                            e -> {
+                                                            },
+                                                            e -> stats.ifPresent(s -> s.discountInflightOperation()),
                                                             identity(),
                                                             executionContext.getCurrentScheduler());
       try {
