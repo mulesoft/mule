@@ -133,8 +133,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
 
     stopRequested.set(false);
     if (restarting.compareAndSet(true, false)) {
-      delegateRunnable.setDelegate(() -> poll(sourceCallback));
       poll(sourceCallback);
+      delegateRunnable.setDelegate(() -> poll(sourceCallback));
     } else {
       executor = schedulerService.customScheduler(SchedulerConfig.config()
           .withMaxConcurrentTasks(1)
@@ -217,14 +217,14 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
   }
 
   @Override
-  public RestartContext getRestartContext() {
+  public RestartContext beginRestart() {
     restarting.set(true);
     delegateRunnable.setDelegate(null);
     return new RestartContext(executor, delegateRunnable);
   }
 
   @Override
-  public void restart(RestartContext restartContext) {
+  public void finishRestart(RestartContext restartContext) {
     restarting.set(true);
 
     executor = restartContext.getExecutor();

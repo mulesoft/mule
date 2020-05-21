@@ -273,17 +273,17 @@ public class SourceAdapter implements Lifecycle, Restartable {
   }
 
   @Override
-  public RestartContext getRestartContext() {
+  public RestartContext beginRestart() {
     if (source instanceof Restartable) {
-      return ((Restartable) source).getRestartContext();
+      return ((Restartable) source).beginRestart();
     }
     return null;
   }
 
   @Override
-  public void restart(RestartContext restartContext) {
+  public void finishRestart(RestartContext restartContext) {
     if (source instanceof Restartable) {
-      ((Restartable) source).restart(restartContext);
+      ((Restartable) source).finishRestart(restartContext);
     }
   }
 

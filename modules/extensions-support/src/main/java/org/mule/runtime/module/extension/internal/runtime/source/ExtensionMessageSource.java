@@ -239,7 +239,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         initialiserEvent = getInitialiserEvent(muleContext);
         try {
           stopUsingConfiguration(initialiserEvent);
-          return restarting ? sourceAdapter.getRestartContext() : null;
+          return restarting ? sourceAdapter.beginRestart() : null;
         } finally {
           sourceAdapter.stop();
           if (usesDynamicConfiguration()) {
@@ -530,7 +530,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         createSource(restarting);
         initialiseIfNeeded(sourceAdapter);
         if (restarting) {
-          sourceAdapter.restart(restartContext);
+          sourceAdapter.finishRestart(restartContext);
         }
         sourceAdapter.start();
         reconnecting.set(false);

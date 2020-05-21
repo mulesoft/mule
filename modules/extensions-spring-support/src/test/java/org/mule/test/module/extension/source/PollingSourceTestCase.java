@@ -168,7 +168,7 @@ public class PollingSourceTestCase extends AbstractExtensionFunctionalTestCase {
       assertThat(PetFailingPollingSource.STARTED_POLLS, is(polls));
       return true;
     });
-    assertThat(POLL_INVOCATIONS.size(), is(2));
+    assertThat(POLL_INVOCATIONS.size(), is(polls));
     POLL_INVOCATIONS.entrySet().forEach(entry -> assertThat(entry.getValue(), is(1)));
   }
 
