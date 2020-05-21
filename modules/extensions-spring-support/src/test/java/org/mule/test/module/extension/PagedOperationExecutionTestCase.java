@@ -14,8 +14,6 @@ import static org.hamcrest.Matchers.isIn;
 import static org.hamcrest.core.Is.is;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.INVOLVED_PEOPLE;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.closeEmptyOperationCalls;
-import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.closePagingProviderCalls;
-import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.getPageCalls;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.streaming.object.CursorIterator;
@@ -90,35 +88,11 @@ public class PagedOperationExecutionTestCase extends AbstractExtensionFunctional
     assertThat(iterator.next(), is(1));
   }
 
-  @Test
-  public void pagingProviderIsClosedSafelyDuringExceptionOnFirstPage() throws Exception {
-    resetCounters();
-    Iterator iterator = getCursorWithPayload("failAtClosePagedOperation", 1);
-    iterator.next();
-    assertThat("Paging provider was not closed.", closePagingProviderCalls, is(1));
-  }
-
-  @Test
-  public void pagingProviderIsClosedSafelyAfterDataSourceIsFullyConsumed() throws Exception {
-    resetCounters();
-    flowRunner("consumeFailAtClosePagedOperation").withPayload(4).run();
-    assertThat("Paging provider was not closed.", closePagingProviderCalls, is(1));
-  }
-
-  private <T> CursorIterator<T> getCursorWithPayload(String flowName, Object payload) throws Exception {
+  private <T> CursorIterator<T> getCursor(String flowName) throws Exception {
     CursorIteratorProvider provider =
-        (CursorIteratorProvider) flowRunner(flowName).keepStreamsOpen().withPayload(payload).run().getMessage().getPayload()
+        (CursorIteratorProvider) flowRunner(flowName).keepStreamsOpen().run().getMessage().getPayload()
             .getValue();
 
     return provider.openCursor();
-  }
-
-  private <T> CursorIterator<T> getCursor(String flowName) throws Exception {
-    return getCursorWithPayload(flowName, "");
-  }
-
-  public static void resetCounters() {
-    closePagingProviderCalls = 0;
-    getPageCalls = 0;
   }
 }
