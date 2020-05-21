@@ -1361,22 +1361,22 @@
             </dependency>
 
             <dependency>
-                <groupId>org.glassfish.grizzly</groupId>
+                <groupId>org.mule.glassfish.grizzly</groupId>
                 <artifactId>grizzly-framework</artifactId>
                 <version>${grizzlyVersion}</version>
             </dependency>
             <dependency>
-                <groupId>org.glassfish.grizzly</groupId>
+                <groupId>org.mule.glassfish.grizzly</groupId>
                 <artifactId>grizzly-http-server</artifactId>
                 <version>${grizzlyVersion}</version>
             </dependency>
             <dependency>
-                <groupId>org.glassfish.grizzly</groupId>
+                <groupId>org.mule.glassfish.grizzly</groupId>
                 <artifactId>grizzly-websockets</artifactId>
                 <version>${grizzlyVersion}</version>
             </dependency>
             <dependency>
-                <groupId>org.glassfish.grizzly</groupId>
+                <groupId>org.mule.glassfish.grizzly</groupId>
                 <artifactId>connection-pool</artifactId>
                 <version>${grizzlyVersion}</version>
             </dependency>
