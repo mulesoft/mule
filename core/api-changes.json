@@ -4,15 +4,6 @@
       "ignore": [
         {
           "code": "java.method.defaultMethodAddedToInterface",
-          "new": "method <T> java.util.concurrent.CompletableFuture<T> org.mule.runtime.core.api.retry.policy.RetryPolicy::applyPolicy(java.util.function.Supplier<java.util.concurrent.CompletableFuture<T>>, java.util.function.Predicate<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Function<java.lang.Throwable, java.lang.Throwable>, org.mule.runtime.api.scheduler.Scheduler)",
-          "package": "org.mule.runtime.core.api.retry.policy",
-          "classSimpleName": "RetryPolicy",
-          "methodName": "applyPolicy",
-          "elementKind": "method",
-          "justification": "Updating RetryPolicy to commit b8e159d6e7cd1bd31713a2d5d4c48d1f52f9f643 that cannot be fully cherry-picked"
-        },
-        {
-          "code": "java.method.defaultMethodAddedToInterface",
           "new": "method <T> java.util.concurrent.CompletableFuture<T> org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate::applyPolicy(java.util.function.Supplier<java.util.concurrent.CompletableFuture<T>>, java.util.function.Predicate<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Consumer<java.lang.Throwable>, java.util.function.Function<java.lang.Throwable, java.lang.Throwable>, org.mule.runtime.api.scheduler.Scheduler)",
           "package": "org.mule.runtime.core.api.retry.policy",
           "classSimpleName": "RetryPolicyTemplate",
