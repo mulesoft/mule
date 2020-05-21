@@ -12993,7 +12993,7 @@
                   "annotations": {
                     "typeId": "org.mule.test.vegan.extension.HealthyFood.TasteProfile",
                     "classInformation": {
-                      "classname": "org.mule.test.vegan.extension.HealthyFood.TasteProfile",
+                      "classname": "org.mule.test.vegan.extension.HealthyFood$TasteProfile",
                       "hasDefaultConstructor": true,
                       "isInterface": false,
                       "isInstantiable": true,
@@ -13155,7 +13155,7 @@
                   "annotations": {
                     "typeId": "org.mule.test.vegan.extension.HealthyFood.TasteProfile",
                     "classInformation": {
-                      "classname": "org.mule.test.vegan.extension.HealthyFood.TasteProfile",
+                      "classname": "org.mule.test.vegan.extension.HealthyFood$TasteProfile",
                       "hasDefaultConstructor": true,
                       "isInterface": false,
                       "isInstantiable": true,
@@ -13477,7 +13477,7 @@
             "annotations": {
               "typeId": "org.mule.test.vegan.extension.HealthyFood.TasteProfile",
               "classInformation": {
-                "classname": "org.mule.test.vegan.extension.HealthyFood.TasteProfile",
+                "classname": "org.mule.test.vegan.extension.HealthyFood$TasteProfile",
                 "hasDefaultConstructor": true,
                 "isInterface": false,
                 "isInstantiable": true,
