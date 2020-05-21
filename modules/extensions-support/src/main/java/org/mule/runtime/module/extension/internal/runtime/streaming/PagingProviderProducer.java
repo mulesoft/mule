@@ -14,7 +14,6 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionExc
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.COMPONENT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.IS_TRANSACTIONAL;
-import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.isPartOfActiveTransaction;
@@ -63,31 +62,18 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   private final ExtensionConnectionSupplier extensionConnectionSupplier;
   private final ExecutionContextAdapter executionContext;
   private final ConnectionSupplierFactory connectionSupplierFactory;
-  private final RetryPolicyTemplate retryPolicy;
-  private final Optional<MutableConfigurationStats> stats;
-  private final boolean supportsOAuth;
-  private boolean isFirstPage = true;
+  private Boolean isFirstPage = true;
 
   public PagingProviderProducer(PagingProvider<Object, T> delegate,
                                 ConfigurationInstance config,
                                 ExecutionContextAdapter executionContext,
                                 ExtensionConnectionSupplier extensionConnectionSupplier) {
-    this(delegate, config, executionContext, extensionConnectionSupplier, false);
-  }
-
-  public PagingProviderProducer(PagingProvider<Object, T> delegate,
-                                ConfigurationInstance config,
-                                ExecutionContextAdapter executionContext,
-                                ExtensionConnectionSupplier extensionConnectionSupplier,
-                                boolean supportsOAuth) {
     this.delegate = new PagingProviderWrapper(delegate, executionContext.getExtensionModel());
     this.config = config;
     this.executionContext = executionContext;
     this.extensionConnectionSupplier = extensionConnectionSupplier;
-    this.supportsOAuth = supportsOAuth;
-    retryPolicy = (RetryPolicyTemplate) executionContext.getRetryPolicyTemplate().orElseGet(NoRetryPolicyTemplate::new);
-    stats = getMutableConfigurationStats(executionContext);
-    connectionSupplierFactory = createConnectionSupplierFactory();
+
+    this.connectionSupplierFactory = createConnectionSupplierFactory();
   }
 
   /**
@@ -95,7 +81,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    */
   @Override
   public List<T> produce() {
-    List<T> page = performWithConnection(delegate::getPage);
+    List<T> page = performWithConnection(connection -> delegate.getPage(connection));
     isFirstPage = false;
     return page;
   }
@@ -116,8 +102,11 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
    * @return
    */
   private <R> R performWithConnection(Function<Object, R> function) {
+    RetryPolicyTemplate retryPolicy =
+        (RetryPolicyTemplate) executionContext.getRetryPolicyTemplate().orElseGet(NoRetryPolicyTemplate::new);
     if (retryPolicy.isEnabled()) {
-      CompletableFuture<R> future = retryPolicy.applyPolicy(() -> completedFuture(withConnection(function, supportsOAuth)),
+      Optional<MutableConfigurationStats> stats = getMutableConfigurationStats(executionContext);
+      CompletableFuture<R> future = retryPolicy.applyPolicy(() -> completedFuture(withConnection(function)),
                                                             e -> !isFirstPage && !delegate.useStickyConnections()
                                                                 && shouldRetry(e, executionContext),
                                                             NULL_THROWABLE_CONSUMER,
@@ -135,47 +124,35 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
         throw new MuleRuntimeException(createStaticMessage(COULD_NOT_EXECUTE), e);
       }
     } else {
-      return withConnection(function, supportsOAuth);
+      return withConnection(function);
     }
   }
 
-  private <R> R withConnection(Function<Object, R> function, boolean refreshOAuth) {
+  private <R> R withConnection(Function<Object, R> function) {
     ConnectionSupplier connectionSupplier = getConnectionSupplier();
     Object connection = getConnection(connectionSupplier);
     try {
-      return function.apply(connection);
+      R result = function.apply(connection);
+      return result;
     } catch (Exception caughtException) {
       if (isFirstPage) {
-        safely(() -> delegate.close(connection), e -> LOGGER.error("Found exception closing paging provider", e));
-      } else if (refreshOAuth) {
-        boolean tokenRefreshed;
-        try {
-          tokenRefreshed = refreshTokenIfNecessary(executionContext, caughtException);
-        } catch (Exception e) {
-          throw new MuleRuntimeException(e);
-        }
-
-        if (tokenRefreshed) {
-          return withConnection(function, false);
-        }
+        safely(() -> delegate.close(connection), e -> LOGGER.debug("Found exception closing paging provider", e));
       }
-
-      handleException(caughtException, connectionSupplier);
+      extractConnectionException(caughtException).ifPresent(e -> handleConnectionException(e, connectionSupplier));
       throw caughtException;
     } finally {
-      safely(connectionSupplier::close, e -> LOGGER.error("Found exception closing the connection supplier", e));
+      safely(connectionSupplier::close, e -> LOGGER.debug("Found exception closing the connection supplier", e));
     }
   }
 
-  private void handleException(Exception exception, ConnectionSupplier connectionSupplier) {
-    ConnectionException connectionException = extractConnectionException(exception).orElse(null);
-    if (connectionException != null) {
-      if (isPartOfActiveTransaction(config)) {
-        connectionException.addInfo(IS_TRANSACTIONAL, true);
-      }
-      connectionException.addInfo(COMPONENT_CONFIG_NAME, config.getName());
-      connectionSupplier.invalidateConnection();
+  private void handleConnectionException(ConnectionException connectionException, ConnectionSupplier connectionSupplier) {
+    Optional<String> exceptionConfigName =
+        executionContext.getConfiguration().map(config -> ((ConfigurationInstance) config).getName());
+    if (isPartOfActiveTransaction(config)) {
+      connectionException.addInfo(IS_TRANSACTIONAL, true);
     }
+    exceptionConfigName.ifPresent(name -> connectionException.addInfo(COMPONENT_CONFIG_NAME, name));
+    connectionSupplier.invalidateConnection();
   }
 
   /**
