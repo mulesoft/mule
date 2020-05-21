@@ -38354,7 +38354,7 @@
       "annotations": {
         "typeId": "org.mule.test.heisenberg.extension.model.Weapon.WeaponAttributes",
         "classInformation": {
-          "classname": "org.mule.test.heisenberg.extension.model.Weapon.WeaponAttributes",
+          "classname": "org.mule.test.heisenberg.extension.model.Weapon$WeaponAttributes",
           "hasDefaultConstructor": true,
           "isInterface": false,
           "isInstantiable": true,
