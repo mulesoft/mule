@@ -33,7 +33,6 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_REF_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_ROOT_ELEMENT;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.SOURCE_TYPE;
-import static org.mule.runtime.config.internal.model.type.ApplicationModelTypeUtils.resolveMetadataTypes;
 import static org.mule.runtime.config.internal.model.type.ApplicationModelTypeUtils.resolveTypedComponentIdentifier;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
@@ -351,7 +350,6 @@ public class ApplicationModel implements ArtifactAst {
 
     validateModel(componentBuildingDefinitionRegistry);
     ExtensionModelHelper extensionModelHelper = new ExtensionModelHelper(extensionModels);
-    resolveMetadataTypes(extensionModelHelper, ast.recursiveStream());
     ast.recursiveStream().forEach(componentModel -> resolveTypedComponentIdentifier((ComponentModel) componentModel,
                                                                                     extensionModelHelper, runtimeMode));
     // TODO MULE-13894 do this only on runtimeMode=true once unified extensionModel names to use camelCase (see smart connectors

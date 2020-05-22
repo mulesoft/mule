@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.dsl.model;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ERROR_HANDLER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
@@ -18,6 +19,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.util.NameUtils.COMPONENT_NAME_SEPARATOR;
 import static org.mule.runtime.api.util.NameUtils.toCamelCase;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.MetadataType;
@@ -28,30 +30,24 @@ import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ComponentModelVisitor;
-import org.mule.runtime.api.meta.model.ComposableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
-import org.mule.runtime.api.meta.model.construct.HasConstructModels;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
 import org.mule.runtime.api.meta.model.nested.NestableElementModelVisitor;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
 import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
-import org.mule.runtime.api.meta.model.operation.HasOperationModels;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.config.internal.model.ComponentModel;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeHandlerManagerFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
@@ -81,7 +77,7 @@ import com.google.common.collect.ImmutableMap;
 public class ExtensionModelHelper {
 
   private final Set<ExtensionModel> extensionsModels;
-  private final Cache<ComponentIdentifier, Optional<? extends org.mule.runtime.api.meta.model.ComponentModel>> extensionComponentModelByComponentIdentifier =
+  private final Cache<ComponentIdentifier, Optional<? extends ComponentModel>> extensionComponentModelByComponentIdentifier =
       Caffeine.newBuilder().build();
   private final Cache<ComponentIdentifier, Optional<? extends ConnectionProviderModel>> extensionConnectionProviderModelByComponentIdentifier =
       Caffeine.newBuilder().build();
@@ -111,7 +107,7 @@ public class ExtensionModelHelper {
   }
 
   /**
-   * Find a {@link ComponentType} for a given {@link ComponentModel}
+   * Find a {@link ComponentType} for a given {@link ComponentIdentifier}
    *
    * @param componentIdentifier the identifier to use for the search.
    * @return the {@link ComponentType} associated with the configuration or an {@link Optional#empty()} if there isn't one.
@@ -131,7 +127,7 @@ public class ExtensionModelHelper {
         });
   }
 
-  public ComponentType findComponentType(org.mule.runtime.api.meta.model.ComponentModel extensionComponentModel) {
+  public ComponentType findComponentType(ComponentModel extensionComponentModel) {
     Reference<TypedComponentIdentifier.ComponentType> componentTypeReference = new Reference<>();
     extensionComponentModel.accept(new ComponentModelVisitor() {
 
@@ -201,38 +197,37 @@ public class ExtensionModelHelper {
   }
 
   /**
-   * Finds a {@link org.mule.runtime.api.meta.model.ComponentModel} within the provided set of {@link ExtensionModel}s by a
-   * {@link ComponentIdentifier}.
+   * Finds a {@link ComponentModel} within the provided set of {@link ExtensionModel}s by a {@link ComponentIdentifier}.
    *
    * @param componentIdentifier the identifier to use for the search.
-   * @return the found {@link org.mule.runtime.api.meta.model.ComponentModel} or {@link Optional#empty()} if it couldn't be found.
+   * @return the found {@link ComponentModel} or {@link Optional#empty()} if it couldn't be found.
    */
-  public Optional<? extends org.mule.runtime.api.meta.model.ComponentModel> findComponentModel(ComponentIdentifier componentId) {
+  public Optional<? extends ComponentModel> findComponentModel(ComponentIdentifier componentId) {
     return extensionComponentModelByComponentIdentifier.get(componentId, componentIdentifier -> {
       return lookupExtensionModelFor(componentIdentifier)
           .flatMap(extensionModel -> {
-            AtomicReference<org.mule.runtime.api.meta.model.ComponentModel> modelRef = new AtomicReference<>();
+            AtomicReference<ComponentModel> modelRef = new AtomicReference<>();
 
-            new ExtensionWalker() {
+            new IdempotentExtensionWalker() {
 
               final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(extensionModel);
 
               @Override
-              protected void onOperation(HasOperationModels owner, OperationModel model) {
+              protected void onOperation(OperationModel model) {
                 if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                   modelRef.set(model);
                 }
               }
 
               @Override
-              protected void onSource(HasSourceModels owner, SourceModel model) {
+              protected void onSource(SourceModel model) {
                 if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                   modelRef.set(model);
                 }
               }
 
               @Override
-              protected void onConstruct(HasConstructModels owner, ConstructModel model) {
+              protected void onConstruct(ConstructModel model) {
                 if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                   modelRef.set(model);
                 }
@@ -258,12 +253,12 @@ public class ExtensionModelHelper {
         .get(componentId, componentIdentifier -> lookupExtensionModelFor(componentIdentifier)
             .flatMap(currentExtension -> {
               AtomicReference<ConnectionProviderModel> modelRef = new AtomicReference<>();
-              new ExtensionWalker() {
+              new IdempotentExtensionWalker() {
 
                 final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(currentExtension);
 
                 @Override
-                protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
+                protected void onConnectionProvider(ConnectionProviderModel model) {
                   if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                     modelRef.set(model);
                   }
@@ -288,7 +283,7 @@ public class ExtensionModelHelper {
           .flatMap(currentExtension -> {
             AtomicReference<ConfigurationModel> modelRef = new AtomicReference<>();
 
-            new ExtensionWalker() {
+            new IdempotentExtensionWalker() {
 
               final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(currentExtension);
 
@@ -329,7 +324,7 @@ public class ExtensionModelHelper {
   public void walkToComponent(ComponentIdentifier componentIdentifier, ExtensionWalkerModelDelegate delegate) {
     lookupExtensionModelFor(componentIdentifier)
         .ifPresent(currentExtension -> {
-          new ExtensionWalker() {
+          new IdempotentExtensionWalker() {
 
             final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolversByExtension.get(currentExtension);
 
@@ -342,8 +337,7 @@ public class ExtensionModelHelper {
             }
 
             @Override
-            protected void onConnectionProvider(org.mule.runtime.api.meta.model.connection.HasConnectionProviderModels owner,
-                                                ConnectionProviderModel model) {
+            protected void onConnectionProvider(ConnectionProviderModel model) {
               if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                 delegate.onConnectionProvider(model);
                 stop();
@@ -351,7 +345,7 @@ public class ExtensionModelHelper {
             }
 
             @Override
-            protected void onOperation(HasOperationModels owner, OperationModel model) {
+            protected void onOperation(OperationModel model) {
               if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                 delegate.onOperation(model);
                 stop();
@@ -359,7 +353,7 @@ public class ExtensionModelHelper {
             }
 
             @Override
-            protected void onSource(HasSourceModels owner, SourceModel model) {
+            protected void onSource(SourceModel model) {
               if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                 delegate.onSource(model);
                 stop();
@@ -367,7 +361,7 @@ public class ExtensionModelHelper {
             }
 
             @Override
-            protected void onConstruct(HasConstructModels owner, ConstructModel model) {
+            protected void onConstruct(ConstructModel model) {
               if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                 delegate.onConstruct(model);
                 stop();
@@ -375,9 +369,27 @@ public class ExtensionModelHelper {
             }
 
             @Override
-            protected void onNestable(ComposableModel owner, NestableElementModel model) {
+            protected void onNestable(NestableElementModel model) {
               if (dslSyntaxResolver.resolve(model).getElementName().equals(componentIdentifier.getName())) {
                 delegate.onNestableElement(model);
+                stop();
+              }
+            }
+
+            @Override
+            protected void onType(MetadataType type) {
+              final Optional<DslElementSyntax> dslElement = resolveDslElementModel(type, currentExtension);
+              if (dslElement
+                  .map(dsl -> builder().name(dsl.getElementName()).namespace(dsl.getPrefix()).build())
+                  .map(componentIdentifier::equals)
+                  .orElse(false)) {
+
+                DslElementSyntax dsl = dslElement.get();
+                if (dsl.supportsTopLevelDeclaration() || (dsl.supportsChildDeclaration() && dsl.isWrapped())
+                    || getSubstitutionGroup(type).isPresent() || getAllSubTypes().contains(type)) {
+
+                  delegate.onType(type);
+                }
                 stop();
               }
             }
@@ -387,9 +399,7 @@ public class ExtensionModelHelper {
   }
 
   public Optional<? extends MetadataType> findMetadataType(Class<?> type) {
-    if (type != null
-        // workaround for test components with no extension model
-        && !Processor.class.isAssignableFrom(type)) {
+    if (type != null) {
       return Optional.of(javaTypeLoader.load(type));
     } else {
       return empty();
@@ -469,6 +479,11 @@ public class ExtensionModelHelper {
     void onConstruct(ConstructModel model);
 
     void onNestableElement(NestableElementModel model);
+
+    /**
+     * @since 4.4
+     */
+    void onType(MetadataType type);
 
   }
 

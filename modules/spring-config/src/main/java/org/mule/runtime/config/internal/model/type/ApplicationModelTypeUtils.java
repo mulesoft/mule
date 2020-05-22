@@ -22,11 +22,9 @@ import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.r
 import static org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter.createMetadataTypeModelAdapterWithSterotype;
 import static org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter.createParameterizedTypeModelAdapter;
 import static org.mule.runtime.core.api.util.StringUtils.trim;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -39,7 +37,6 @@ import org.mule.metadata.api.model.SimpleType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
@@ -59,7 +56,6 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.model.parameter.ImmutableParameterModel;
 import org.mule.runtime.module.extension.internal.loader.java.type.InfrastructureTypeMapping;
-import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.HashMap;
 import java.util.List;
@@ -125,6 +121,29 @@ public final class ApplicationModelTypeUtils {
         if (model instanceof ParameterizedModel) {
           onParameterizedModel((ParameterizedModel) model);
         }
+      }
+
+      @Override
+      public void onType(MetadataType type) {
+        type.accept(new MetadataTypeVisitor() {
+
+          @Override
+          public void visitObject(ObjectType objectType) {
+            componentModel
+                .setMetadataTypeModelAdapter(createMetadataTypeModelAdapterWithSterotype(objectType, extensionModelHelper)
+                    .orElseGet(() -> createParameterizedTypeModelAdapter(objectType, extensionModelHelper)));
+          }
+
+          @Override
+          public void visitArrayType(ArrayType arrayType) {
+            arrayType.getType().accept(this);
+          }
+
+          @Override
+          public void visitUnion(UnionType unionType) {
+            unionType.getTypes().forEach(type -> type.accept(this));
+          }
+        });
       }
 
       private void onParameterizedModel(ParameterizedModel model) {
@@ -590,91 +609,6 @@ public final class ApplicationModelTypeUtils {
     }
 
     return empty();
-  }
-
-  public static void resolveMetadataTypes(ExtensionModelHelper extensionModelHelper, Stream<ComponentAst> components) {
-    // Use ExtensionModel to register top level and subTypes elements
-    ReflectionCache reflectionCache = new ReflectionCache();
-    Map<ComponentIdentifier, MetadataTypeModelAdapter> registry = new HashMap<>();
-    extensionModelHelper.getExtensionsModels().stream()
-        .forEach(extensionModel -> extensionModel.getTypes().stream()
-            .filter(p -> isInstantiable(p, reflectionCache))
-            .forEach(parameterType -> registerTopLevelParameter(parameterType, reflectionCache, registry, extensionModel,
-                                                                extensionModelHelper)));
-
-    components
-        .filter(componentModel -> registry.containsKey(componentModel.getIdentifier()))
-        .forEach(componentModel -> ((ComponentModel) componentModel)
-            .setMetadataTypeModelAdapter(registry.get(componentModel.getIdentifier())));
-  }
-
-  private static void registerTopLevelParameter(MetadataType parameterType, ReflectionCache reflectionCache,
-                                                Map<ComponentIdentifier, MetadataTypeModelAdapter> registry,
-                                                ExtensionModel extensionModel, ExtensionModelHelper extensionModelHelper) {
-    Optional<DslElementSyntax> dslElement = extensionModelHelper.resolveDslElementModel(parameterType, extensionModel);
-    if (!dslElement.isPresent() ||
-        registry.containsKey(builder().name(dslElement.get().getElementName()).namespace(dslElement.get().getPrefix()).build())) {
-      return;
-    }
-
-    DslElementSyntax dsl = dslElement.get();
-
-    parameterType.accept(new MetadataTypeVisitor() {
-
-      @Override
-      public void visitObject(ObjectType objectType) {
-        if (dsl.supportsTopLevelDeclaration() || (dsl.supportsChildDeclaration() && dsl.isWrapped())
-            || getSubstitutionGroup(objectType).isPresent() ||
-            extensionModelHelper.getAllSubTypes().contains(objectType)) {
-
-          registry.put(builder().name(dsl.getElementName()).namespace(dsl.getPrefix())
-              .build(), createMetadataTypeModelAdapterWithSterotype(objectType, extensionModelHelper)
-                  .orElse(createParameterizedTypeModelAdapter(objectType, extensionModelHelper)));
-        }
-
-        registerSubTypes(objectType, reflectionCache, registry, extensionModel, extensionModelHelper);
-      }
-
-      @Override
-      public void visitArrayType(ArrayType arrayType) {
-        registerTopLevelParameter(arrayType.getType(), reflectionCache, registry, extensionModel, extensionModelHelper);
-      }
-
-      @Override
-      public void visitUnion(UnionType unionType) {
-        unionType.getTypes().forEach(type -> type.accept(this));
-      }
-
-    });
-  }
-
-  private static void registerSubTypes(MetadataType type, ReflectionCache reflectionCache,
-                                       Map<ComponentIdentifier, MetadataTypeModelAdapter> registry,
-                                       ExtensionModel extensionModel, ExtensionModelHelper extensionModelHelper) {
-    type.accept(new MetadataTypeVisitor() {
-
-      @Override
-      public void visitUnion(UnionType unionType) {
-        unionType.getTypes().forEach(type -> type.accept(this));
-      }
-
-      @Override
-      public void visitArrayType(ArrayType arrayType) {
-        arrayType.getType().accept(this);
-      }
-
-      @Override
-      public void visitObject(ObjectType objectType) {
-        Optional<MetadataType> openRestriction = objectType.getOpenRestriction();
-        if (objectType.isOpen() && openRestriction.isPresent()) {
-          openRestriction.get().accept(this);
-        } else {
-          extensionModelHelper.getSubTypes(objectType)
-              .forEach(subtype -> registerTopLevelParameter(subtype, reflectionCache, registry, extensionModel,
-                                                            extensionModelHelper));
-        }
-      }
-    });
   }
 
 }

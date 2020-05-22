@@ -30,7 +30,6 @@ import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpa
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel.getUsedNamespaces;
 import static org.mule.runtime.config.internal.model.ApplicationModel.GLOBAL_PROPERTY;
-import static org.mule.runtime.config.internal.model.type.ApplicationModelTypeUtils.resolveMetadataTypes;
 import static org.mule.runtime.config.internal.model.type.ApplicationModelTypeUtils.resolveTypedComponentIdentifier;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
@@ -437,7 +436,6 @@ public final class XmlExtensionLoaderDelegate {
                                                                 moduleModel.getIdentifier().toString())));
     }
 
-    resolveMetadataTypes(extensionModelHelper, moduleModel.recursiveStream());
     moduleModel.recursiveStream()
         .forEach(componentModel -> resolveTypedComponentIdentifier((ComponentModel) componentModel, extensionModelHelper, true));
     recursiveStreamWithHierarchy(moduleModel).forEach(new ComponentLocationVisitor());

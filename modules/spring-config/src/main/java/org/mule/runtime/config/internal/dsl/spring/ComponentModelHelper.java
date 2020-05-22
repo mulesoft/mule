@@ -15,11 +15,9 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_PROPAGATE_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.ORIGINAL_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.REDELIVERY_POLICY_IDENTIFIER;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.ExtensionModelHelper;
@@ -50,10 +48,7 @@ public class ComponentModelHelper {
         || componentModel.getIdentifier().equals(ON_ERROR_PROPAGATE_IDENTIFIER)) {
       return ON_ERROR;
     }
-    return extensionModelHelper
-        .findComponentType(componentModel.getMetadata().getParserAttributes().containsKey(ORIGINAL_IDENTIFIER.toString())
-            ? (ComponentIdentifier) componentModel.getMetadata().getParserAttributes().get(ORIGINAL_IDENTIFIER.toString())
-            : componentModel.getIdentifier());
+    return extensionModelHelper.findComponentType(componentModel.getIdentifier());
   }
 
   public static boolean isAnnotatedObject(SpringComponentModel springComponentModel) {
