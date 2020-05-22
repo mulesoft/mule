@@ -135,9 +135,6 @@ public final class SourceConfigurer {
         } else {
           context = ValueResolvingContext.builder(initialiserEvent, expressionManager).build();
           Scheduler scheduler = (Scheduler) valueResolver.resolve(context);
-          if (restarting) {
-            scheduler = PollingSourceRestartSchedulerProvider.getScheduler(scheduler);
-          }
           configuredSource = new PollingSourceWrapper<>((PollingSource) configuredSource, scheduler);
         }
       }

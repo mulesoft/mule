@@ -87,6 +87,24 @@
         <flow-ref name="adopt"/>
     </flow>
 
+    <flow name="longFrequencyPoll" initialState="stopped">
+        <petstore:pet-adoption-source>
+            <scheduling-strategy>
+                <fixed-frequency startDelay="200" frequency="100000"/>
+            </scheduling-strategy>
+        </petstore:pet-adoption-source>
+        <logger level="INFO" message="#[payload]"/>
+    </flow>
+
+    <flow name="failingLongFrequencyPoll" initialState="stopped">
+        <petstore:pet-failing-source config-ref="petstore" failAtPoll="1">
+            <scheduling-strategy>
+                <fixed-frequency startDelay="500" frequency="100000"/>
+            </scheduling-strategy>
+        </petstore:pet-failing-source>
+        <logger level="INFO" message="#[payload]"/>
+    </flow>
+
     <flow name="adopt">
         <test:processor class="org.mule.test.module.extension.source.PollingSourceTestCase$AdoptionProcessor"/>
     </flow>

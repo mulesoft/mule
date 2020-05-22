@@ -21,10 +21,13 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.PollContext;
 import org.mule.runtime.extension.api.runtime.source.PollingSource;
+import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 @Alias("pet-failing-source")
@@ -34,7 +37,9 @@ public class PetFailingPollingSource extends PollingSource<String, Void> {
   public static final List<String> ALL_PETS =
       asList("Grumpy Cat", "Colonel Meow", "Skipped Cat", "Silvester", "Lil bub", "Macri", "Pappo");
   protected List<String> pets;
-  private static Integer numberOfPolls = 0;
+  public static Integer STARTED_POLLS = 0;
+  public static Map<Source, Integer> POLL_INVOCATIONS = new HashMap<>();
+  public static List<Source> STARTED_SOURCES = new ArrayList<>();
   public static ExecutorService executor;
 
   @Connection
@@ -50,6 +55,10 @@ public class PetFailingPollingSource extends PollingSource<String, Void> {
 
   @Override
   protected void doStart() throws MuleException {
+    if (!STARTED_SOURCES.contains(this)) {
+      STARTED_SOURCES.add(this);
+      POLL_INVOCATIONS.put(this, 0);
+    }
     pets = new ArrayList<>(ALL_PETS);
   }
 
@@ -58,12 +67,13 @@ public class PetFailingPollingSource extends PollingSource<String, Void> {
 
   @Override
   public void poll(PollContext<String, Void> pollContext) {
-    numberOfPolls++;
-    if (numberOfPolls == failAtPoll) {
+    STARTED_POLLS++;
+    POLL_INVOCATIONS.put(this, POLL_INVOCATIONS.get(this) + 1);
+    if (STARTED_POLLS == failAtPoll) {
       pollContext.onConnectionException(new ConnectionException("Polling Fail"));
-    } else if (numberOfPolls - 1 <= adoptionLimit) {
+    } else if (STARTED_POLLS - 1 <= adoptionLimit) {
       pollContext.accept(item -> {
-        String pet = ALL_PETS.get((numberOfPolls - 1) % 7);
+        String pet = ALL_PETS.get((STARTED_POLLS - 1) % 7);
         item.setResult(Result.<String, Void>builder().output(pet).build());
       });
     }
