@@ -37,7 +37,6 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreManager;
-import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.source.scheduler.Scheduler;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
@@ -53,6 +52,7 @@ import org.mule.runtime.module.extension.internal.runtime.source.SourceWrapper;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -75,12 +75,14 @@ import org.slf4j.Logger;
  *
  * @since 4.1
  */
-public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
+public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements Restartable {
 
   private static final Logger LOGGER = getLogger(PollingSourceWrapper.class);
   private static final String ITEM_RELEASER_CTX_VAR = "itemReleaser";
   private static final String UPDATE_PROCESSED_LOCK = "OSClearing";
   private static final String INFLIGHT_IDS_OS_NAME_SUFFIX = "inflight-ids";
+  private static final String POLLING_SOURCE_EXECUTOR_KEY = "Polling source executor";
+  private static final String RUNNABLE_KEY = "Runnable";
 
   private final PollingSource<T, A> delegate;
   private final Scheduler scheduler;
@@ -104,6 +106,8 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   private String flowName;
   private final AtomicBoolean stopRequested = new AtomicBoolean(false);
   private org.mule.runtime.api.scheduler.Scheduler executor;
+  private AtomicBoolean restarting = new AtomicBoolean(false);
+  private DelegateRunnable delegateRunnable;
 
   public PollingSourceWrapper(PollingSource<T, A> delegate, Scheduler scheduler) {
     super(delegate);
@@ -127,13 +131,18 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
     watermarkObjectStore = objectStoreManager.getOrCreateObjectStore(formatKey(WATERMARK_OS_NAME_SUFFIX),
                                                                      unmanagedPersistent());
 
-    executor = schedulerService.customScheduler(SchedulerConfig.config()
-        .withMaxConcurrentTasks(1)
-        .withWaitAllowed(true)
-        .withName(formatKey("executor")));
-
     stopRequested.set(false);
-    scheduler.schedule(executor, () -> poll(sourceCallback));
+    if (restarting.compareAndSet(true, false)) {
+      poll(sourceCallback);
+      delegateRunnable.setDelegate(() -> poll(sourceCallback));
+    } else {
+      executor = schedulerService.customScheduler(SchedulerConfig.config()
+          .withMaxConcurrentTasks(1)
+          .withWaitAllowed(true)
+          .withName(formatKey("executor")));
+      delegateRunnable = new DelegateRunnable(() -> poll(sourceCallback));
+      scheduler.schedule(executor, delegateRunnable);
+    }
   }
 
   private String formatKey(String key) {
@@ -143,7 +152,10 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   @Override
   public void onStop() {
     stopRequested.set(true);
-    shutdownScheduler();
+    if (!restarting.get()) {
+      shutdownScheduler();
+      delegateRunnable = null;
+    }
     try {
       delegate.onStop();
     } catch (Throwable t) {
@@ -197,6 +209,21 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
     }
 
     return comparator.compare(w1, w2);
+  }
+
+  @Override
+  public RestartContext beginRestart() {
+    restarting.set(true);
+    delegateRunnable.setDelegate(null);
+    return new RestartContext(executor, delegateRunnable);
+  }
+
+  @Override
+  public void finishRestart(RestartContext restartContext) {
+    restarting.set(true);
+
+    executor = restartContext.getExecutor();
+    delegateRunnable = restartContext.getDelegateRunnable();
   }
 
   private class DefaultPollContext implements PollContext<T, A> {
@@ -589,6 +616,7 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> {
   private void shutdownScheduler() {
     if (executor != null) {
       executor.stop();
+      executor = null;
     }
   }
 
