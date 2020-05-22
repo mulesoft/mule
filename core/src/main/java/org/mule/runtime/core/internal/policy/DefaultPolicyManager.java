@@ -244,13 +244,12 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
     policyProvider = registry.lookupByType(PolicyProvider.class).orElse(new NullPolicyProvider());
 
     if (muleContext.getArtifactType().equals(APP)) {
+      isPoliciesAvailable.set(policyProvider.isPoliciesAvailable());
       policyProvider.onPoliciesChanged(() -> {
         evictCaches();
         isPoliciesAvailable.set(policyProvider.isPoliciesAvailable());
       });
     }
-
-    isPoliciesAvailable.set(policyProvider.isPoliciesAvailable());
 
     policyPointcutParametersManager =
         new PolicyPointcutParametersManager(registry.lookupAllByType(SourcePolicyPointcutParametersFactory.class),

@@ -117,6 +117,32 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     doApplicationPolicyExecutionTest(parameters -> true, 1, POLICY_PROPERTY_VALUE);
   }
 
+
+  @Test
+  @Issue("MULE-18433")
+  public void policyWithOperationAfterPolicy() throws Exception {
+    policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
+    policyManager.registerPolicyTemplate(policyIncludingPluginFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
+                                                      singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
+                            new PolicyParametrization(BAR_POLICY_ID, poinparameters -> true, 2, emptyMap(),
+                                                      getResourceFile("/policyWithOperation.xml"), emptyList()));
+
+    executeApplicationFlow("main");
+    assertThat(invocationCount, equalTo(2));
+  }
+
   @Test
   public void appliesMultipleApplicationPolicies() throws Exception {
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
