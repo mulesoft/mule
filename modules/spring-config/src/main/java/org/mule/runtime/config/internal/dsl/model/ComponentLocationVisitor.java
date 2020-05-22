@@ -191,22 +191,12 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
                                                                          componentModel.getMetadata().getStartLine(),
                                                                          componentModel.getMetadata().getStartColumn());
       } else {
-        if (isBatchAggregator(componentModel)) {
-          componentLocation = parentComponentLocation
-              .appendLocationPart(BATCH_AGGREGATOR_COMPONENT_IDENTIFIER.getName(),
-                                  of(TypedComponentIdentifier.builder().type(UNKNOWN)
-                                      .identifier(BATCH_AGGREGATOR_COMPONENT_IDENTIFIER).build()),
-                                  componentModel.getMetadata().getFileName(),
-                                  componentModel.getMetadata().getStartLine(),
-                                  componentModel.getMetadata().getStartColumn());
-        } else {
-          componentLocation =
-              parentComponentLocation.appendLocationPart(findNonProcessorPath(componentModel, hierarchy),
-                                                         typedComponentIdentifier,
-                                                         componentModel.getMetadata().getFileName(),
-                                                         componentModel.getMetadata().getStartLine(),
-                                                         componentModel.getMetadata().getStartColumn());
-        }
+        componentLocation =
+            parentComponentLocation.appendLocationPart(findNonProcessorPath(componentModel, hierarchy),
+                                                       typedComponentIdentifier,
+                                                       componentModel.getMetadata().getFileName(),
+                                                       componentModel.getMetadata().getStartLine(),
+                                                       componentModel.getMetadata().getStartColumn());
       }
     } else if (componentModel.getIdentifier().equals(MODULE_BODY_IDENTIFIER)) {
       ComponentAst parentComponentModel = hierarchy.get(hierarchy.size() - 1);
