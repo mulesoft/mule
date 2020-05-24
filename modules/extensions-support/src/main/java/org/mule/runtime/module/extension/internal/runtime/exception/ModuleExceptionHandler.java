@@ -117,25 +117,11 @@ public class ModuleExceptionHandler {
     // For subclasses of ModuleException, we use it as it already contains additional information
     if (throwable.getClass().equals(ModuleException.class)) {
       return throwable.getCause() != null
-          ? throwable.getCause()
+          ? SuppressedMuleException.suppressIfPresent(throwable.getCause(), MessagingException.class)
           : new MuleRuntimeException(createStaticMessage(throwable.getMessage()));
     } else {
-      return suppressMessagingException(throwable);
+      return throwable;
     }
   }
 
-  private Throwable suppressMessagingException(Throwable throwable) {
-    Throwable cause = throwable;
-    while (cause != null && !(cause instanceof SuppressedMuleException)) {
-      if (cause instanceof MessagingException) {
-        return new SuppressedMuleException(throwable, (MessagingException) cause);
-      }
-      cause = getExceptionReader(cause).getCause(cause);
-      // Address some misbehaving exceptions, avoid endless loop
-      if (throwable == cause) {
-        break;
-      }
-    }
-    return throwable;
-  }
 }

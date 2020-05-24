@@ -25,6 +25,7 @@ import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.util.context.Context.empty;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -278,10 +279,9 @@ class UntilSuccessfulRouter {
     return throwable -> {
       CoreEvent exceptionEvent = event;
       Throwable retryPolicyExhaustionCause = getMessagingExceptionCause(throwable);
-      Optional<MuleException> firstMuleCause = extractOfType(retryPolicyExhaustionCause, MuleException.class);
-      if (firstMuleCause.isPresent()) {
-        retryPolicyExhaustionCause = new SuppressedMuleException(retryPolicyExhaustionCause, firstMuleCause.get());
-      }
+      // ConnectionException is treated in a way that prioritize it's error type over any other (see ErrorTypeLocator#getErrorTypeFromException)
+      retryPolicyExhaustionCause =
+          SuppressedMuleException.suppressIfPresent(retryPolicyExhaustionCause, ConnectionException.class);
       if (throwable instanceof MessagingException) {
         exceptionEvent = ((MessagingException) throwable).getEvent();
       }

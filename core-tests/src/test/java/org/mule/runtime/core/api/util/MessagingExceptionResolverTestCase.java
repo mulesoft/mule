@@ -200,7 +200,8 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   public void resolveSuppressedMuleException() {
     ErrorType expected = DISPATCH;
     Throwable exception = new DispatchException(createStaticMessage("DISPATCH PROBLEM"), new ValidateResponse(),
-                                                new SuppressedMuleException(CONNECTION_EXCEPTION));
+                                                SuppressedMuleException.suppressIfPresent(CONNECTION_EXCEPTION,
+                                                                                          CONNECTION_EXCEPTION.getClass()));
     MessagingException me = newMessagingException(exception, event, processor);
     MessagingExceptionResolver anotherResolver = new MessagingExceptionResolver(new TestProcessor());
     MessagingException resolved = anotherResolver.resolve(me, locator, emptyList());
