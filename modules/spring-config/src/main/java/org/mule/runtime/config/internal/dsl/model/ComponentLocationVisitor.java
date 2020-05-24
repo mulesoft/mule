@@ -8,14 +8,14 @@ package org.mule.runtime.config.internal.dsl.model;
 
 import static java.lang.Math.max;
 import static java.lang.String.valueOf;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.BODY;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTE;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isErrorHandler;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isMessageSource;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isProcessor;
@@ -23,7 +23,6 @@ import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.i
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isTemplateOnErrorHandler;
 
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -49,14 +48,10 @@ import com.google.common.collect.ImmutableList;
  *
  * @since 4.0
  */
-// TODO MULE-13618 - Migrate ComponentLocationVisitor to use ExtensionModels
 public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, List<ComponentAst>>> {
 
   private static final String PROCESSORS_PART_NAME = "processors";
   private static final String SOURCE_PART_NAME = "source";
-  private static final ComponentIdentifier ROUTE_COMPONENT_IDENTIFIER = buildFromStringRepresentation("mule:route");
-  private static final ComponentIdentifier MODULE_BODY_IDENTIFIER =
-      ComponentIdentifier.builder().namespace("module").name("body").build();
 
   /**
    * For every {@link ComponentModel} in the configuration, sets the {@link DefaultComponentLocation} associated within an
@@ -119,6 +114,16 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
 
       if (locationWithCustomPart.isPresent()) {
         componentLocation = locationWithCustomPart.get();
+      } else if (componentModel.getComponentType().equals(BODY)) {
+        DefaultLocationPart newLastPart = new DefaultLocationPart(parentComponentModel.getComponentId().orElse(null),
+                                                                  typedComponentIdentifier,
+                                                                  componentModel.getMetadata().getFileName(),
+                                                                  componentModel.getMetadata().getStartLine(),
+                                                                  componentModel.getMetadata().getStartColumn());
+
+
+        componentLocation = new DefaultComponentLocation(parentComponentModel.getComponentId(),
+                                                         singletonList(newLastPart));
       } else if (isRootProcessorScope(parentComponentModel)) {
         componentLocation = processFlowDirectChild(componentModel, hierarchy, parentComponentLocation, typedComponentIdentifier);
       } else if (isErrorHandler(componentModel)) {
@@ -128,8 +133,7 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
       } else if (parentComponentIsRouter(componentModel, hierarchy)) {
         if (isRoute(componentModel)) {
           componentLocation = parentComponentLocation.appendRoutePart()
-              .appendLocationPart(findRoutePath(componentModel, hierarchy), of(TypedComponentIdentifier.builder().type(SCOPE)
-                  .identifier(ROUTE_COMPONENT_IDENTIFIER).build()),
+              .appendLocationPart(findRoutePath(componentModel, hierarchy), typedComponentIdentifier,
                                   componentModel.getMetadata().getFileName(),
                                   componentModel.getMetadata().getStartLine(),
                                   componentModel.getMetadata().getStartColumn());
@@ -173,22 +177,6 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
                                                        componentModel.getMetadata().getStartLine(),
                                                        componentModel.getMetadata().getStartColumn());
       }
-    } else if (componentModel.getIdentifier().equals(MODULE_BODY_IDENTIFIER)) {
-      ComponentAst parentComponentModel = hierarchy.get(hierarchy.size() - 1);
-
-      String componentModelNameAttribute = parentComponentModel.getComponentId().orElse(null);
-      ImmutableList<DefaultLocationPart> parts =
-          ImmutableList.<DefaultLocationPart>builder()
-              .add(new DefaultLocationPart(componentModelNameAttribute,
-                                           typedComponentIdentifier,
-                                           componentModel.getMetadata().getFileName(),
-                                           componentModel.getMetadata().getStartLine(),
-                                           componentModel.getMetadata().getStartColumn()))
-
-              .build();
-      componentLocation = new DefaultComponentLocation(ofNullable(componentModelNameAttribute), parts)
-          .appendProcessorsPart();
-
     } else {
       ComponentAst parentComponentModel = hierarchy.get(hierarchy.size() - 1);
       DefaultComponentLocation parentComponentLocation = (DefaultComponentLocation) parentComponentModel.getLocation();

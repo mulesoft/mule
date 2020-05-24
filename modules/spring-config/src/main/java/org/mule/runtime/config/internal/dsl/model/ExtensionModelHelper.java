@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.dsl.model;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.BODY;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ERROR_HANDLER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
@@ -150,6 +151,10 @@ public class ExtensionModelHelper {
         }
         if (model.getStereotype().equals(MuleStereotypes.FLOW)) {
           componentTypeReference.set(FLOW);
+          return;
+        }
+        if (model.getStereotype().equals(MuleStereotypes.BODY)) {
+          componentTypeReference.set(BODY);
           return;
         }
         NestedComponentVisitor nestedComponentVisitor = new NestedComponentVisitor(componentTypeReference);
