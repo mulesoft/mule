@@ -12,16 +12,15 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
+import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -47,7 +46,6 @@ import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.connector.DispatchException;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
-import org.mule.runtime.internal.exception.SuppressedMuleException;
 import org.mule.tck.integration.transformer.ValidateResponse;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -209,7 +207,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   public void resolveSuppressedMuleException() {
     ErrorType expected = DISPATCH;
     Throwable exception = new DispatchException(createStaticMessage("DISPATCH PROBLEM"), new ValidateResponse(),
-                                                SuppressedMuleException.suppressIfPresent(CONNECTION_EXCEPTION,
+                                                suppressIfPresent(CONNECTION_EXCEPTION,
                                                                                           CONNECTION_EXCEPTION.getClass(),
                                                                                           false));
     MessagingException me = newMessagingException(exception, event, processor);
@@ -225,7 +223,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   public void resolveSuppressedMuleExceptionLoggingCause() {
     ErrorType expected = DISPATCH;
     Throwable exception = new DispatchException(createStaticMessage("DISPATCH PROBLEM"), new ValidateResponse(),
-                                                SuppressedMuleException.suppressIfPresent(CONNECTION_EXCEPTION,
+                                                suppressIfPresent(CONNECTION_EXCEPTION,
                                                                                           CONNECTION_EXCEPTION.getClass(), true));
     MessagingException me = newMessagingException(exception, event, processor);
     MessagingExceptionResolver anotherResolver = new MessagingExceptionResolver(new TestProcessor());
@@ -240,8 +238,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   public void resolveSuppressedMessagingExceptionLoggingCause() {
     ErrorType expected = DISPATCH;
     Throwable exception = new DispatchException(createStaticMessage("DISPATCH PROBLEM"), new ValidateResponse(),
-                                                SuppressedMuleException
-                                                    .suppressIfPresent(new MessagingException(createStaticMessage("CONNECTION PROBLEM"),
+                                                suppressIfPresent(new MessagingException(createStaticMessage("CONNECTION PROBLEM"),
                                                                                               event),
                                                                        MessagingException.class, true));
     MessagingException me = newMessagingException(exception, event, processor);

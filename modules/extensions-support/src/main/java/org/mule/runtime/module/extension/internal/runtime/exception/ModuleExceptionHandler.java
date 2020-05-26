@@ -8,11 +8,13 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionReader;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getExtensionsNamespace;
 
-import org.mule.runtime.api.exception.*;
+import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -26,7 +28,6 @@ import java.util.Set;
 import java.util.function.Function;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import org.mule.runtime.internal.exception.SuppressedMuleException;
 
 /**
  * Handler of {@link ModuleException ModuleExceptions}, which given a {@link Throwable} checks whether the exceptions is
@@ -117,7 +118,7 @@ public class ModuleExceptionHandler {
     // For subclasses of ModuleException, we use it as it already contains additional information
     if (throwable.getClass().equals(ModuleException.class)) {
       return throwable.getCause() != null
-          ? SuppressedMuleException.suppressIfPresent(throwable.getCause(), MessagingException.class, true)
+          ? suppressIfPresent(throwable.getCause(), MessagingException.class, true)
           : new MuleRuntimeException(createStaticMessage(throwable.getMessage()));
     } else {
       return throwable;
