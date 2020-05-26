@@ -281,7 +281,7 @@ class UntilSuccessfulRouter {
       Throwable retryPolicyExhaustionCause = getMessagingExceptionCause(throwable);
       // ConnectionException is treated in a way that prioritize it's error type over any other (see ErrorTypeLocator#getErrorTypeFromException)
       retryPolicyExhaustionCause =
-          SuppressedMuleException.suppressIfPresent(retryPolicyExhaustionCause, ConnectionException.class);
+          SuppressedMuleException.suppressIfPresent(retryPolicyExhaustionCause, ConnectionException.class, false);
       if (throwable instanceof MessagingException) {
         exceptionEvent = ((MessagingException) throwable).getEvent();
       }

@@ -9,14 +9,19 @@ package org.mule.runtime.core.api.util;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -24,6 +29,7 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleExceptionInfo;
 import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
@@ -53,8 +59,10 @@ import javax.xml.namespace.QName;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mule.test.allure.AllureConstants;
 
 @SmallTest
+@Feature(AllureConstants.ErrorHandlingFeature.ERROR_HANDLING)
 public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
 
   private static final String ERROR_MESSAGE = "Messaging Error Message";
@@ -197,16 +205,48 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("MULE-18041")
   public void resolveSuppressedMuleException() {
     ErrorType expected = DISPATCH;
     Throwable exception = new DispatchException(createStaticMessage("DISPATCH PROBLEM"), new ValidateResponse(),
                                                 SuppressedMuleException.suppressIfPresent(CONNECTION_EXCEPTION,
-                                                                                          CONNECTION_EXCEPTION.getClass()));
+                                                                                          CONNECTION_EXCEPTION.getClass(), false));
     MessagingException me = newMessagingException(exception, event, processor);
     MessagingExceptionResolver anotherResolver = new MessagingExceptionResolver(new TestProcessor());
     MessagingException resolved = anotherResolver.resolve(me, locator, emptyList());
     assertExceptionErrorType(resolved, expected);
     assertExceptionMessage(resolved.getMessage(), "DISPATCH PROBLEM");
+    assertThat(resolved.getInfo().get(MuleExceptionInfo.INFO_CAUSED_BY_KEY), is(nullValue()));
+  }
+
+  @Test
+  @Issue("MULE-18041")
+  public void resolveSuppressedMuleExceptionLoggingCause() {
+    ErrorType expected = DISPATCH;
+    Throwable exception = new DispatchException(createStaticMessage("DISPATCH PROBLEM"), new ValidateResponse(),
+            SuppressedMuleException.suppressIfPresent(CONNECTION_EXCEPTION,
+                    CONNECTION_EXCEPTION.getClass(), true));
+    MessagingException me = newMessagingException(exception, event, processor);
+    MessagingExceptionResolver anotherResolver = new MessagingExceptionResolver(new TestProcessor());
+    MessagingException resolved = anotherResolver.resolve(me, locator, emptyList());
+    assertExceptionErrorType(resolved, expected);
+    assertExceptionMessage(resolved.getMessage(), "DISPATCH PROBLEM");
+    assertExceptionMessage(resolved.getInfo().get(MuleExceptionInfo.INFO_CAUSED_BY_KEY).toString(), "CONNECTION PROBLEM");
+  }
+
+  @Test
+  @Issue("MULE-18041")
+  public void resolveSuppressedMessagingExceptionLoggingCause() {
+    ErrorType expected = DISPATCH;
+    Throwable exception = new DispatchException(createStaticMessage("DISPATCH PROBLEM"), new ValidateResponse(),
+            SuppressedMuleException.suppressIfPresent(new MessagingException(createStaticMessage("CONNECTION PROBLEM"), event),
+                    MessagingException.class, true));
+    MessagingException me = newMessagingException(exception, event, processor);
+    MessagingExceptionResolver anotherResolver = new MessagingExceptionResolver(new TestProcessor());
+    MessagingException resolved = anotherResolver.resolve(me, locator, emptyList());
+    assertExceptionErrorType(resolved, expected);
+    assertExceptionMessage(resolved.getMessage(), "DISPATCH PROBLEM");
+    assertExceptionMessage(resolved.getInfo().get(MuleExceptionInfo.INFO_CAUSED_BY_KEY).toString(), "CONNECTION PROBLEM");
   }
 
   private void assertExceptionMessage(String result, String expected) {
