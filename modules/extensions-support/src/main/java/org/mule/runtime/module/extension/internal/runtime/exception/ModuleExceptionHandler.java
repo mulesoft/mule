@@ -117,7 +117,7 @@ public class ModuleExceptionHandler {
     // For subclasses of ModuleException, we use it as it already contains additional information
     if (throwable.getClass().equals(ModuleException.class)) {
       return throwable.getCause() != null
-          ? SuppressedMuleException.suppressIfPresent(throwable.getCause(), MessagingException.class)
+          ? SuppressedMuleException.suppressIfPresent(throwable.getCause(), MessagingException.class, true)
           : new MuleRuntimeException(createStaticMessage(throwable.getMessage()));
     } else {
       return throwable;

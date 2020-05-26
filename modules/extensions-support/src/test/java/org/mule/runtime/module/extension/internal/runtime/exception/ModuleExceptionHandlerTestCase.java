@@ -14,6 +14,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
@@ -21,6 +22,7 @@ import static org.mule.runtime.core.internal.exception.ErrorTypeRepositoryFactor
 import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
 import static org.mule.runtime.module.extension.internal.runtime.exception.TestError.CHILD;
 import static org.mule.runtime.module.extension.internal.runtime.exception.TestError.PARENT;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -31,12 +33,18 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.extension.api.exception.ModuleException;
+import org.mule.runtime.internal.exception.SuppressedMuleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +63,9 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
 
   @Mock
   private ExtensionModel extensionModel;
+
+  @Mock
+  CoreEvent event;
 
   private ErrorTypeRepository typeRepository = createDefaultErrorTypeRepository();
 
@@ -135,6 +146,30 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
     ErrorType errorType = ((TypedException) exception).getErrorType();
     assertThat(errorType.getIdentifier(), is(CONNECTIVITY_ERROR_IDENTIFIER));
     assertThat(errorType.getNamespace(), is(ERROR_NAMESPACE));
+  }
+
+  @Test
+  @Issue("MULE-18041")
+  @Story(ERROR_HANDLING)
+  public void supressMessagingException() {
+    when(event.getError()).thenReturn(Optional.empty());
+    when(operationModel.getErrorModels()).thenReturn(singleton(newError(CONNECTIVITY_ERROR_IDENTIFIER, ERROR_NAMESPACE).build()));
+    ModuleExceptionHandler handler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository);
+    typeRepository.addErrorType(builder()
+        .name(CONNECTIVITY_ERROR_IDENTIFIER)
+        .namespace(ERROR_NAMESPACE)
+        .build(),
+                                typeRepository.getAnyErrorType());
+
+    ModuleException moduleException =
+        new ModuleException(CONNECTIVITY, new RuntimeException(new MessagingException(
+                                                                                      createStaticMessage("Suppressed exception"),
+                                                                                      event)));
+    Throwable exception = handler.processException(moduleException);
+
+    assertThat(exception.getCause(), is(instanceOf(SuppressedMuleException.class)));
+    assertThat(((SuppressedMuleException) exception.getCause()).getSuppressedMuleException(),
+               is(instanceOf(MessagingException.class)));
   }
 
   private ComponentIdentifier getIdentifier(ErrorModel parent) {
