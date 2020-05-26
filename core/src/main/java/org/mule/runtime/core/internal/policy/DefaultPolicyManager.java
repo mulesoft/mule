@@ -82,13 +82,51 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       (operationEvent, operationExecutionFunction, opParamProcessor, componentLocation, callback) -> operationExecutionFunction
           .execute(opParamProcessor.getOperationParameters(), operationEvent, callback);
 
+  /**
+   * @return A no-op policy that will directly execute the operation function.
+   */
+  public static OperationPolicy noPolicyOperation() {
+    return NO_POLICY_OPERATION;
+  }
+
+  /**
+   * @param policy the {@link OperationPolicy} to evaluate
+   * @return {@code true} if the provided policy is a no-op, {@code false} if a policy is actually applied.
+   */
+  public static boolean isNoPolicyOperation(OperationPolicy policy) {
+    return NO_POLICY_OPERATION.equals(policy);
+  }
+
+  @Inject
+  private ErrorTypeLocator errorTypeLocator;
+
+  @Inject
+  private Collection<ExceptionContextProvider> exceptionContextProviders;
+
+  @Inject
+  private ServerNotificationManager notificationManager;
+
+  private MuleContext muleContext;
+
+  private Registry registry;
+
+  private CompositePolicyFactory compositePolicyFactory = new CompositePolicyFactory();
+
   private final AtomicBoolean isSourcePoliciesAvailable = new AtomicBoolean(false);
   private final AtomicBoolean isOperationPoliciesAvailable = new AtomicBoolean(false);
 
   // This set holds the references that are needed to do the dispose after the referenced policy is no longer used.
   private final ReferenceQueue<DeferredDisposable> stalePoliciesQueue = new ReferenceQueue<>();
+
   private final Set<DeferredDisposableWeakReference> activePolicies = new HashSet<>();
+
   private final ReentrantReadWriteLock cacheInvalidateLock = new ReentrantReadWriteLock();
+
+  private volatile boolean stopped = true;
+  private Future<?> taskHandle;
+  @Inject
+  private SchedulerService schedulerService;
+  private Scheduler scheduler;
 
   private final Cache<String, SourcePolicy> noPolicySourceInstances =
       Caffeine.newBuilder()
@@ -115,45 +153,11 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
           .expireAfterAccess(60, SECONDS)
           .build();
 
-  @Inject
-  private ErrorTypeLocator errorTypeLocator;
-
-  @Inject
-  private Collection<ExceptionContextProvider> exceptionContextProviders;
-
-  @Inject
-  private ServerNotificationManager notificationManager;
-
-  @Inject
-  private SchedulerService schedulerService;
-
-  private MuleContext muleContext;
-  private Registry registry;
-
-  private CompositePolicyFactory compositePolicyFactory = new CompositePolicyFactory();
-  private Future<?> taskHandle;
-  private Scheduler scheduler;
   private PolicyProvider policyProvider;
   private OperationPolicyProcessorFactory operationPolicyProcessorFactory;
   private SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
+
   private PolicyPointcutParametersManager policyPointcutParametersManager;
-
-  private volatile boolean stopped = true;
-
-  /**
-   * @return A no-op policy that will directly execute the operation function.
-   */
-  public static OperationPolicy noPolicyOperation() {
-    return NO_POLICY_OPERATION;
-  }
-
-  /**
-   * @param policy the {@link OperationPolicy} to evaluate
-   * @return {@code true} if the provided policy is a no-op, {@code false} if a policy is actually applied.
-   */
-  public static boolean isNoPolicyOperation(OperationPolicy policy) {
-    return NO_POLICY_OPERATION.equals(policy);
-  }
 
   @Override
   public SourcePolicy createSourcePolicyInstance(Component source, CoreEvent sourceEvent,
@@ -183,6 +187,8 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       return policy;
     }
 
+    // Although cache is being written in the locked section, read Lock is being used since the intention is to avoid cache being
+    // invalidated while being populated and not to avoid multiple threads populating it at the same time.
     cacheInvalidateLock.readLock().lock();
 
     try {
@@ -239,6 +245,8 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       return policy;
     }
 
+    // Although cache is being written in the locked section, read Lock is being used since the intention is to avoid cache being
+    // invalidated while being populated and not to avoid multiple threads populating it at the same time.
     cacheInvalidateLock.readLock().lock();
 
     try {
