@@ -51,6 +51,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
 
@@ -87,6 +88,8 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   private final ReferenceQueue<DeferredDisposable> stalePoliciesQueue = new ReferenceQueue<>();
 
   private final Set<DeferredDisposableWeakReference> activePolicies = new HashSet<>();
+
+  private final ReentrantReadWriteLock cacheInvalidateLock = new ReentrantReadWriteLock();
 
   private volatile boolean stopped = true;
   private Future<?> taskHandle;
@@ -152,24 +155,32 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       return policy;
     }
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Source policy - populating outer cache for {}", policyKey);
-    }
+    // Although cache is being written in the locked section, read Lock is being used since the intention is to avoid cache being
+    // invalidated while being populated and not to avoid multiple threads populating it at the same time.
+    cacheInvalidateLock.readLock().lock();
 
-    SourcePolicy sourcePolicy = sourcePolicyOuterCache.get(policyKey, outerKey -> sourcePolicyInnerCache
+    try {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Source policy - populating outer cache for {}", policyKey);
+      }
+
+      SourcePolicy sourcePolicy = sourcePolicyOuterCache.get(policyKey, outerKey -> sourcePolicyInnerCache
         .get(new Pair<>(source.getLocation().getRootContainerName(),
                         policyProvider.findSourceParameterizedPolicies(sourcePointcutParameters)),
              innerKey -> innerKey.getSecond().isEmpty()
-                 ? new NoSourcePolicy(flowExecutionProcessor)
-                 : compositePolicyFactory.createSourcePolicy(innerKey.getSecond(), flowExecutionProcessor,
-                                                             lookupSourceParametersTransformer(sourceIdentifier),
-                                                             sourcePolicyProcessorFactory,
-                                                             exception -> new MessagingExceptionResolver(source)
-                                                                 .resolve(exception, muleContext))));
+               ? new NoSourcePolicy(flowExecutionProcessor)
+               : compositePolicyFactory.createSourcePolicy(innerKey.getSecond(), flowExecutionProcessor,
+                                                           lookupSourceParametersTransformer(sourceIdentifier),
+                                                           sourcePolicyProcessorFactory,
+                                                           exception -> new MessagingExceptionResolver(source)
+                                                             .resolve(exception, muleContext))));
 
-    activePolicies.add(new DeferredDisposableWeakReference((DeferredDisposable) sourcePolicy, stalePoliciesQueue));
+      activePolicies.add(new DeferredDisposableWeakReference((DeferredDisposable) sourcePolicy, stalePoliciesQueue));
 
-    return sourcePolicy;
+      return sourcePolicy;
+    } finally {
+      cacheInvalidateLock.readLock().unlock();
+    }
   }
 
   @Override
@@ -201,23 +212,31 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       return policy;
     }
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Operation policy - populating outer cache for {}", policyKey);
-    }
+    // Although cache is being written in the locked section, read Lock is being used since the intention is to avoid cache being
+    // invalidated while being populated and not to avoid multiple threads populating it at the same time.
+    cacheInvalidateLock.readLock().lock();
 
-    final OperationPolicy operationPolicy = operationPolicyOuterCache.get(policyKey, outerKey -> operationPolicyInnerCache
+    try {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Operation policy - populating outer cache for {}", policyKey);
+      }
+
+      final OperationPolicy operationPolicy = operationPolicyOuterCache.get(policyKey, outerKey -> operationPolicyInnerCache
         .get(policyProvider.findOperationParameterizedPolicies(outerKey.getSecond()),
              innerKey -> innerKey.isEmpty()
-                 ? NO_POLICY_OPERATION
-                 : compositePolicyFactory.createOperationPolicy(operation, innerKey,
-                                                                lookupOperationParametersTransformer(outerKey.getFirst()),
-                                                                operationPolicyProcessorFactory)));
+               ? NO_POLICY_OPERATION
+               : compositePolicyFactory.createOperationPolicy(operation, innerKey,
+                                                              lookupOperationParametersTransformer(outerKey.getFirst()),
+                                                              operationPolicyProcessorFactory)));
 
-    if (operationPolicy instanceof DeferredDisposable) {
-      activePolicies.add(new DeferredDisposableWeakReference((DeferredDisposable) operationPolicy, stalePoliciesQueue));
+      if (operationPolicy instanceof DeferredDisposable) {
+        activePolicies.add(new DeferredDisposableWeakReference((DeferredDisposable) operationPolicy, stalePoliciesQueue));
+      }
+
+      return operationPolicy;
+    } finally {
+      cacheInvalidateLock.readLock().unlock();
     }
-
-    return operationPolicy;
   }
 
   private Optional<OperationPolicyParametersTransformer> lookupOperationParametersTransformer(ComponentIdentifier componentIdentifier) {
@@ -354,13 +373,19 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   }
 
   private void evictCaches() {
-    noPolicySourceInstances.invalidateAll();
+    cacheInvalidateLock.writeLock().lock();
 
-    sourcePolicyInnerCache.invalidateAll();
-    operationPolicyInnerCache.invalidateAll();
+    try {
+      noPolicySourceInstances.invalidateAll();
 
-    sourcePolicyOuterCache.invalidateAll();
-    operationPolicyOuterCache.invalidateAll();
+      sourcePolicyInnerCache.invalidateAll();
+      operationPolicyInnerCache.invalidateAll();
+
+      sourcePolicyOuterCache.invalidateAll();
+      operationPolicyOuterCache.invalidateAll();
+    } finally {
+      cacheInvalidateLock.writeLock().unlock();
+    }
   }
 
   @Inject
