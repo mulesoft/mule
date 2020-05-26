@@ -15,18 +15,16 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
+import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
-import static reactor.core.publisher.Mono.first;
 import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.util.context.Context.empty;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
@@ -39,7 +37,6 @@ import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
-import org.mule.runtime.internal.exception.SuppressedMuleException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -281,7 +278,7 @@ class UntilSuccessfulRouter {
       Throwable retryPolicyExhaustionCause = getMessagingExceptionCause(throwable);
       // ConnectionException is treated in a way that prioritize it's error type over any other (see ErrorTypeLocator#getErrorTypeFromException)
       retryPolicyExhaustionCause =
-          SuppressedMuleException.suppressIfPresent(retryPolicyExhaustionCause, ConnectionException.class, false);
+          suppressIfPresent(retryPolicyExhaustionCause, ConnectionException.class, false);
       if (throwable instanceof MessagingException) {
         exceptionEvent = ((MessagingException) throwable).getEvent();
       }
