@@ -12,6 +12,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
@@ -98,6 +99,8 @@ public class SpringComponentModel extends ComponentModel implements ComponentAst
         .map(cm -> cm.getName().equals("object"))
         .orElse(false)) {
       return ofNullable(getRawParameters().get(NAME_ATTRIBUTE_NAME));
+    } else if (getIdentifier().equals(ERROR_HANDLER_IDENTIFIER) && getRawParameterValue("ref").isPresent()) {
+      return empty();
     } else if (getModel(ParameterizedModel.class).isPresent()) {
       populateParameterAsts();
       return ofNullable(componentId);
