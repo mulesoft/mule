@@ -59,6 +59,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.qameta.allure.Issue;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
