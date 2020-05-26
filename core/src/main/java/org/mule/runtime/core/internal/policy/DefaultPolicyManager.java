@@ -56,6 +56,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
 
@@ -81,49 +82,13 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       (operationEvent, operationExecutionFunction, opParamProcessor, componentLocation, callback) -> operationExecutionFunction
           .execute(opParamProcessor.getOperationParameters(), operationEvent, callback);
 
-  /**
-   * @return A no-op policy that will directly execute the operation function.
-   */
-  public static OperationPolicy noPolicyOperation() {
-    return NO_POLICY_OPERATION;
-  }
-
-  /**
-   * @param policy the {@link OperationPolicy} to evaluate
-   * @return {@code true} if the provided policy is a no-op, {@code false} if a policy is actually applied.
-   */
-  public static boolean isNoPolicyOperation(OperationPolicy policy) {
-    return NO_POLICY_OPERATION.equals(policy);
-  }
-
-  @Inject
-  private ErrorTypeLocator errorTypeLocator;
-
-  @Inject
-  private Collection<ExceptionContextProvider> exceptionContextProviders;
-
-  @Inject
-  private ServerNotificationManager notificationManager;
-
-  private MuleContext muleContext;
-
-  private Registry registry;
-
-  private CompositePolicyFactory compositePolicyFactory = new CompositePolicyFactory();
-
   private final AtomicBoolean isSourcePoliciesAvailable = new AtomicBoolean(false);
   private final AtomicBoolean isOperationPoliciesAvailable = new AtomicBoolean(false);
 
   // This set holds the references that are needed to do the dispose after the referenced policy is no longer used.
   private final ReferenceQueue<DeferredDisposable> stalePoliciesQueue = new ReferenceQueue<>();
-
   private final Set<DeferredDisposableWeakReference> activePolicies = new HashSet<>();
-
-  private volatile boolean stopped = true;
-  private Future<?> taskHandle;
-  @Inject
-  private SchedulerService schedulerService;
-  private Scheduler scheduler;
+  private final ReentrantReadWriteLock cacheInvalidateLock = new ReentrantReadWriteLock();
 
   private final Cache<String, SourcePolicy> noPolicySourceInstances =
       Caffeine.newBuilder()
@@ -150,11 +115,45 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
           .expireAfterAccess(60, SECONDS)
           .build();
 
+  @Inject
+  private ErrorTypeLocator errorTypeLocator;
+
+  @Inject
+  private Collection<ExceptionContextProvider> exceptionContextProviders;
+
+  @Inject
+  private ServerNotificationManager notificationManager;
+
+  @Inject
+  private SchedulerService schedulerService;
+
+  private MuleContext muleContext;
+  private Registry registry;
+
+  private CompositePolicyFactory compositePolicyFactory = new CompositePolicyFactory();
+  private Future<?> taskHandle;
+  private Scheduler scheduler;
   private PolicyProvider policyProvider;
   private OperationPolicyProcessorFactory operationPolicyProcessorFactory;
   private SourcePolicyProcessorFactory sourcePolicyProcessorFactory;
-
   private PolicyPointcutParametersManager policyPointcutParametersManager;
+
+  private volatile boolean stopped = true;
+
+  /**
+   * @return A no-op policy that will directly execute the operation function.
+   */
+  public static OperationPolicy noPolicyOperation() {
+    return NO_POLICY_OPERATION;
+  }
+
+  /**
+   * @param policy the {@link OperationPolicy} to evaluate
+   * @return {@code true} if the provided policy is a no-op, {@code false} if a policy is actually applied.
+   */
+  public static boolean isNoPolicyOperation(OperationPolicy policy) {
+    return NO_POLICY_OPERATION.equals(policy);
+  }
 
   @Override
   public SourcePolicy createSourcePolicyInstance(Component source, CoreEvent sourceEvent,
@@ -184,25 +183,31 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       return policy;
     }
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Source policy - populating outer cache for {}", policyKey);
+    cacheInvalidateLock.readLock().lock();
+
+    try {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Source policy - populating outer cache for {}", policyKey);
+      }
+
+      SourcePolicy sourcePolicy = sourcePolicyOuterCache.get(policyKey, outerKey -> sourcePolicyInnerCache
+          .get(new Pair<>(source.getLocation().getRootContainerName(),
+                          policyProvider.findSourceParameterizedPolicies(sourcePointcutParameters)),
+               innerKey -> innerKey.getSecond().isEmpty()
+                   ? new NoSourcePolicy(flowExecutionProcessor)
+                   : compositePolicyFactory.createSourcePolicy(innerKey.getSecond(), flowExecutionProcessor,
+                                                               lookupSourceParametersTransformer(sourceIdentifier),
+                                                               sourcePolicyProcessorFactory,
+                                                               exception -> new MessagingExceptionResolver(source)
+                                                                   .resolve(exception, errorTypeLocator,
+                                                                            exceptionContextProviders))));
+
+      activePolicies.add(new DeferredDisposableWeakReference((DeferredDisposable) sourcePolicy, stalePoliciesQueue));
+
+      return sourcePolicy;
+    } finally {
+      cacheInvalidateLock.readLock().unlock();
     }
-
-    SourcePolicy sourcePolicy = sourcePolicyOuterCache.get(policyKey, outerKey -> sourcePolicyInnerCache
-        .get(new Pair<>(source.getLocation().getRootContainerName(),
-                        policyProvider.findSourceParameterizedPolicies(sourcePointcutParameters)),
-             innerKey -> innerKey.getSecond().isEmpty()
-                 ? new NoSourcePolicy(flowExecutionProcessor)
-                 : compositePolicyFactory.createSourcePolicy(innerKey.getSecond(), flowExecutionProcessor,
-                                                             lookupSourceParametersTransformer(sourceIdentifier),
-                                                             sourcePolicyProcessorFactory,
-                                                             exception -> new MessagingExceptionResolver(source)
-                                                                 .resolve(exception, errorTypeLocator,
-                                                                          exceptionContextProviders))));
-
-    activePolicies.add(new DeferredDisposableWeakReference((DeferredDisposable) sourcePolicy, stalePoliciesQueue));
-
-    return sourcePolicy;
   }
 
   @Override
@@ -234,30 +239,36 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       return policy;
     }
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Operation policy - populating outer cache for {}", policyKey);
+    cacheInvalidateLock.readLock().lock();
+
+    try {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Operation policy - populating outer cache for {}", policyKey);
+      }
+
+      OperationPolicy operationPolicy =
+          operationPolicyOuterCache.get(policyKey, outerKey -> operationPolicyInnerCache
+              .get(policyProvider.findOperationParameterizedPolicies(outerKey.getSecond()),
+                   innerKey -> innerKey.isEmpty()
+                       ? NO_POLICY_OPERATION
+                       : compositePolicyFactory.createOperationPolicy(operation, innerKey,
+                                                                      lookupOperationParametersTransformer(outerKey.getFirst()),
+                                                                      operationPolicyProcessorFactory,
+                                                                      muleContext.getConfiguration().getShutdownTimeout(),
+                                                                      muleContext.getSchedulerService()
+                                                                          .ioScheduler(muleContext.getSchedulerBaseConfig()
+                                                                              .withMaxConcurrentTasks(1)
+                                                                              .withName(operation.getLocation().getLocation()
+                                                                                  + ".policy.flux.")))));
+
+      if (operationPolicy instanceof DeferredDisposable) {
+        activePolicies.add(new DeferredDisposableWeakReference((DeferredDisposable) operationPolicy, stalePoliciesQueue));
+      }
+
+      return operationPolicy;
+    } finally {
+      cacheInvalidateLock.readLock().unlock();
     }
-
-    OperationPolicy operationPolicy =
-        operationPolicyOuterCache.get(policyKey, outerKey -> operationPolicyInnerCache
-            .get(policyProvider.findOperationParameterizedPolicies(outerKey.getSecond()),
-                 innerKey -> innerKey.isEmpty()
-                     ? NO_POLICY_OPERATION
-                     : compositePolicyFactory.createOperationPolicy(operation, innerKey,
-                                                                    lookupOperationParametersTransformer(outerKey.getFirst()),
-                                                                    operationPolicyProcessorFactory,
-                                                                    muleContext.getConfiguration().getShutdownTimeout(),
-                                                                    muleContext.getSchedulerService()
-                                                                        .ioScheduler(muleContext.getSchedulerBaseConfig()
-                                                                            .withMaxConcurrentTasks(1)
-                                                                            .withName(operation.getLocation().getLocation()
-                                                                                + ".policy.flux.")))));
-
-    if (operationPolicy instanceof DeferredDisposable) {
-      activePolicies.add(new DeferredDisposableWeakReference((DeferredDisposable) operationPolicy, stalePoliciesQueue));
-    }
-
-    return operationPolicy;
   }
 
   private Optional<OperationPolicyParametersTransformer> lookupOperationParametersTransformer(ComponentIdentifier componentIdentifier) {
@@ -398,13 +409,19 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
   }
 
   private void evictCaches() {
-    noPolicySourceInstances.invalidateAll();
+    cacheInvalidateLock.writeLock().lock();
 
-    sourcePolicyInnerCache.invalidateAll();
-    operationPolicyInnerCache.invalidateAll();
+    try {
+      noPolicySourceInstances.invalidateAll();
 
-    sourcePolicyOuterCache.invalidateAll();
-    operationPolicyOuterCache.invalidateAll();
+      sourcePolicyInnerCache.invalidateAll();
+      operationPolicyInnerCache.invalidateAll();
+
+      sourcePolicyOuterCache.invalidateAll();
+      operationPolicyOuterCache.invalidateAll();
+    } finally {
+      cacheInvalidateLock.writeLock().unlock();
+    }
   }
 
   @Inject
