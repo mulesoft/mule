@@ -1811,7 +1811,7 @@
                         <!-- List dependencies in the MANIFEST.MF -->
                         <manifest>
                             <!-- Note that we do not generate a classpath into the manifest, since doing so
-                                 significnatly slows down compilations that use the jar -->
+                                 significantly slows down compilations that use the jar -->
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
@@ -1847,13 +1847,8 @@
                                         <Git-branch>${git.branch}</Git-branch>
                                         <Git-remote-origin-url>${git.remote.origin.url}</Git-remote-origin-url>
                                         <Git-commit-id>${git.commit.id}</Git-commit-id>
-                                        <Git-commit-id-abbrev>${git.commit.id.abbrev}</Git-commit-id-abbrev>
                                         <Git-commit-id-describe>${git.commit.id.describe}</Git-commit-id-describe>
-                                        <Git-commit-user-name>${git.commit.user.name}</Git-commit-user-name>
-                                        <Git-commit-user-email>${git.commit.user.email}</Git-commit-user-email>
                                         <Git-commit-time>${git.commit.time}</Git-commit-time>
-                                        <Git-build-time>${git.build.time}</Git-build-time>
-                                        <Git-build-version>${git.build.version}</Git-build-version>
                                     </manifestEntries>
                                 </manifestSection>
                             </manifestSections>
@@ -1865,7 +1860,7 @@
                 <artifactId>allure-maven</artifactId>
             </plugin>
             <plugin>
-                <!-- Aggregate sources artifact must be explicitely required from the maven command -->
+                <!-- Aggregate sources artifact must be explicitly required from the maven command -->
                 <!-- Attempting to generate it automatically by configuring the execution here will cause issues when adding new modules -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
