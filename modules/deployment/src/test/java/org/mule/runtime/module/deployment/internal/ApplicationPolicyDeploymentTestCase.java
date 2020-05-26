@@ -159,6 +159,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   }
 
   @Test
+  @Issue("MULE-18442")
   public void applicationPolicyHasNoOpPolicyManagerInjected() throws Exception {
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
 
