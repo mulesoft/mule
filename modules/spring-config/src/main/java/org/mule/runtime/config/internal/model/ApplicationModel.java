@@ -21,7 +21,6 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -610,11 +609,7 @@ public class ApplicationModel implements ArtifactAst {
                   // We still have components without extension models
                   final Class<?> type = typeDefinitionVisitor.getType();
 
-                  if (ComponentLocationVisitor.BATCH_JOB_COMPONENT_IDENTIFIER.equals(componentModel.getIdentifier())
-                      || ComponentLocationVisitor.BATCH_PROCESSS_RECORDS_COMPONENT_IDENTIFIER
-                          .equals(componentModel.getIdentifier())) {
-                    ((ComponentModel) componentModel).setComponentType(ROUTER);
-                  } else if (CommonBeanDefinitionCreator.areMatchingTypes(MessageSource.class, type)) {
+                  if (CommonBeanDefinitionCreator.areMatchingTypes(MessageSource.class, type)) {
                     ((ComponentModel) componentModel).setComponentType(SOURCE);
                   } else if (CommonBeanDefinitionCreator.areMatchingTypes(Processor.class, type)) {
                     ((ComponentModel) componentModel).setComponentType(OPERATION);
