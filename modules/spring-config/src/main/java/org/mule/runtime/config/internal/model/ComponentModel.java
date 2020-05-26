@@ -18,6 +18,7 @@ import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
+import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_PROPAGATE_IDENTIFIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
@@ -174,6 +175,8 @@ public class ComponentModel implements ComponentAst {
         .orElse(getIdentifier().equals(ON_ERROR_CONTINE_IDENTIFIER)
             || getIdentifier().equals(ON_ERROR_PROPAGATE_IDENTIFIER))) {
       return ofNullable(getRawParameters().get(NAME_ATTRIBUTE_NAME));
+    } else if (getIdentifier().equals(ERROR_HANDLER_IDENTIFIER) && getRawParameters().get("ref") != null) {
+      return empty();
     } else if (getModel(ParameterizedModel.class).isPresent()) {
       populateParameterAsts();
       return ofNullable(componentId);
