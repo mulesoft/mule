@@ -208,8 +208,8 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     ErrorType expected = DISPATCH;
     Throwable exception = new DispatchException(createStaticMessage("DISPATCH PROBLEM"), new ValidateResponse(),
                                                 suppressIfPresent(CONNECTION_EXCEPTION,
-                                                                                          CONNECTION_EXCEPTION.getClass(),
-                                                                                          false));
+                                                                  CONNECTION_EXCEPTION.getClass(),
+                                                                  false));
     MessagingException me = newMessagingException(exception, event, processor);
     MessagingExceptionResolver anotherResolver = new MessagingExceptionResolver(new TestProcessor());
     MessagingException resolved = anotherResolver.resolve(me, locator, emptyList());
@@ -224,7 +224,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     ErrorType expected = DISPATCH;
     Throwable exception = new DispatchException(createStaticMessage("DISPATCH PROBLEM"), new ValidateResponse(),
                                                 suppressIfPresent(CONNECTION_EXCEPTION,
-                                                                                          CONNECTION_EXCEPTION.getClass(), true));
+                                                                  CONNECTION_EXCEPTION.getClass(), true));
     MessagingException me = newMessagingException(exception, event, processor);
     MessagingExceptionResolver anotherResolver = new MessagingExceptionResolver(new TestProcessor());
     MessagingException resolved = anotherResolver.resolve(me, locator, emptyList());
@@ -239,8 +239,8 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     ErrorType expected = DISPATCH;
     Throwable exception = new DispatchException(createStaticMessage("DISPATCH PROBLEM"), new ValidateResponse(),
                                                 suppressIfPresent(new MessagingException(createStaticMessage("CONNECTION PROBLEM"),
-                                                                                              event),
-                                                                       MessagingException.class, true));
+                                                                                         event),
+                                                                  MessagingException.class, true));
     MessagingException me = newMessagingException(exception, event, processor);
     MessagingExceptionResolver anotherResolver = new MessagingExceptionResolver(new TestProcessor());
     MessagingException resolved = anotherResolver.resolve(me, locator, emptyList());
