@@ -8,10 +8,12 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
+
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
 import org.mule.runtime.api.deployment.meta.Product;
@@ -20,9 +22,11 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileB
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 /**
  * Contains test for application deployment with policies on the default domain
@@ -34,6 +38,11 @@ public class ApplicationPolicyRedeploymentTestCase extends AbstractDeploymentTes
   private static final String OS_POLICY_NAME = "object-store-policy";
   private static final String OS_POLICY_ID = "object-store-policy";
   public static final String FLOW_NAME = "main";
+
+  @Parameterized.Parameters(name = "Parallel: {0}")
+  public static List<Boolean> params() {
+    return asList(false);
+  }
 
   public ApplicationPolicyRedeploymentTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
