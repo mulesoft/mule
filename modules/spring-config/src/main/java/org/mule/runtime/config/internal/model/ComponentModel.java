@@ -175,7 +175,7 @@ public class ComponentModel implements ComponentAst {
         .orElse(getIdentifier().equals(ON_ERROR_CONTINE_IDENTIFIER)
             || getIdentifier().equals(ON_ERROR_PROPAGATE_IDENTIFIER))) {
       return ofNullable(getRawParameters().get(NAME_ATTRIBUTE_NAME));
-    } else if (getIdentifier().equals(ERROR_HANDLER_IDENTIFIER) && getRawParameters().get("ref") != null) {
+    } else if (getIdentifier().equals(ERROR_HANDLER_IDENTIFIER) && getRawParameterValue("ref").isPresent()) {
       return empty();
     } else if (getModel(ParameterizedModel.class).isPresent()) {
       populateParameterAsts();
