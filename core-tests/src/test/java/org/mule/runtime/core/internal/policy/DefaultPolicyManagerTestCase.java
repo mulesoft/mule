@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.policy;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -53,6 +54,7 @@ import org.mule.tck.probe.PollingProber;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
@@ -392,6 +394,50 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     }));
 
     stopIfNeeded(policyManager);
+  }
+
+  @Test
+  public void cachesEvictedWhileLookingForPolicies() throws InterruptedException {
+    final Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
+    when(policyProvider.isSourcePoliciesAvailable()).thenReturn(true);
+    when(policyProvider.findSourceParameterizedPolicies(any())).thenReturn(asList(policy));
+    policiesChangeCallbackCaptor.getValue().run();
+
+    InternalEvent event = mock(InternalEvent.class);
+    SourcePolicyContext ctx = mock(SourcePolicyContext.class);
+    when(event.getSourcePolicyContext()).thenReturn((EventInternalContext) ctx);
+    when(ctx.getPointcutParameters()).thenReturn(mock(PolicyPointcutParameters.class));
+
+    CountDownLatch lookingForPoliciesLatch = new CountDownLatch(1);
+    CountDownLatch cacheEvictedLatch = new CountDownLatch(1);
+
+    when(policyProvider.findSourceParameterizedPolicies(any())).thenAnswer(invocation -> {
+      lookingForPoliciesLatch.countDown();
+      assertThat("Eviction should not possible while looking for policies",
+                 cacheEvictedLatch.await(3, SECONDS), is(false));
+      return asList(policy);
+    });
+
+    // While findSourceParameterizedPolicies is executed, policy is removed, therefore caches should be evicted
+    new Thread(() -> {
+      try {
+        lookingForPoliciesLatch.await();
+        when(policyProvider.isSourcePoliciesAvailable()).thenReturn(false);
+        policiesChangeCallbackCaptor.getValue().run();
+        cacheEvictedLatch.countDown();
+      } catch (InterruptedException e) {
+        throw new AssertionError(e);
+      }
+    }).start();
+
+    final SourcePolicy policy1 = policyManager.createSourcePolicyInstance(flow1Component, event, ePub -> ePub,
+                                                                          mock(MessageSourceResponseParametersProcessor.class));
+    cacheEvictedLatch.await();
+    final SourcePolicy policy2 = policyManager.createSourcePolicyInstance(flow1Component, event, ePub -> ePub,
+                                                                          mock(MessageSourceResponseParametersProcessor.class));
+
+    assertThat(policy1, instanceOf(CompositeSourcePolicy.class));
+    assertThat(policy2, instanceOf(NoSourcePolicy.class));
   }
 
   private Policy mockPolicy() {
