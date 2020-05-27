@@ -40,9 +40,9 @@
         <module>extensions-spring-support</module>
         <module>repository</module>
         <module>tls</module>
-        <module>tooling-support</module>
         <module>soap-api</module>
         <module>extensions-soap-support</module>
+        <module>tooling-support-parent</module>
     </modules>
 
     <build>

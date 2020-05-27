@@ -41,10 +41,10 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
   private final Map<String, String> showInDslParameters;
   private final ReflectionCache reflectionCache;
 
-  OperationParameterValueResolver(ExecutionContext<T> executionContext,
-                                  ResolverSet resolverSet,
-                                  ReflectionCache reflectionCache,
-                                  ExpressionManager expressionManager) {
+  public OperationParameterValueResolver(ExecutionContext<T> executionContext,
+                                         ResolverSet resolverSet,
+                                         ReflectionCache reflectionCache,
+                                         ExpressionManager expressionManager) {
     this.executionContext = executionContext;
     this.operationModel = executionContext.getComponentModel();
     this.resolverSet = resolverSet;

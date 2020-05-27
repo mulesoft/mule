@@ -158,6 +158,10 @@ public class FakeMuleServer {
     deploymentService.start();
   }
 
+  public ToolingService toolingService() {
+    return this.toolingService;
+  }
+
   public void assertDeploymentSuccess(String appName) {
     assertDeploymentSuccess(deploymentListener, appName);
   }
