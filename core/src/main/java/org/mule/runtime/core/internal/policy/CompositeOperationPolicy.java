@@ -201,7 +201,6 @@ public class CompositeOperationPolicy
             .addInternalParameter(POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction)
             .addInternalParameter(POLICY_OPERATION_CHILD_CTX, operationEvent.getContext())
             .addInternalParameter(POLICY_OPERATION_CALLER_SINK, callerSink)
-            .removeInternalParameter(POLICY_OPERATION_NEXT_OPERATION_RESPONSE)
             .build()
         : quickCopy(operationEvent, of(POLICY_OPERATION_PARAMETERS_PROCESSOR, parametersProcessor,
                                        POLICY_OPERATION_OPERATION_EXEC_FUNCTION, operationExecutionFunction,
