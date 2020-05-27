@@ -165,15 +165,15 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       }
 
       SourcePolicy sourcePolicy = sourcePolicyOuterCache.get(policyKey, outerKey -> sourcePolicyInnerCache
-        .get(new Pair<>(source.getLocation().getRootContainerName(),
-                        policyProvider.findSourceParameterizedPolicies(sourcePointcutParameters)),
-             innerKey -> innerKey.getSecond().isEmpty()
-               ? new NoSourcePolicy(flowExecutionProcessor)
-               : compositePolicyFactory.createSourcePolicy(innerKey.getSecond(), flowExecutionProcessor,
-                                                           lookupSourceParametersTransformer(sourceIdentifier),
-                                                           sourcePolicyProcessorFactory,
-                                                           exception -> new MessagingExceptionResolver(source)
-                                                             .resolve(exception, muleContext))));
+          .get(new Pair<>(source.getLocation().getRootContainerName(),
+                          policyProvider.findSourceParameterizedPolicies(sourcePointcutParameters)),
+               innerKey -> innerKey.getSecond().isEmpty()
+                   ? new NoSourcePolicy(flowExecutionProcessor)
+                   : compositePolicyFactory.createSourcePolicy(innerKey.getSecond(), flowExecutionProcessor,
+                                                               lookupSourceParametersTransformer(sourceIdentifier),
+                                                               sourcePolicyProcessorFactory,
+                                                               exception -> new MessagingExceptionResolver(source)
+                                                                   .resolve(exception, muleContext))));
 
       activePolicies.add(new DeferredDisposableWeakReference((DeferredDisposable) sourcePolicy, stalePoliciesQueue));
 
@@ -222,12 +222,12 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
       }
 
       final OperationPolicy operationPolicy = operationPolicyOuterCache.get(policyKey, outerKey -> operationPolicyInnerCache
-        .get(policyProvider.findOperationParameterizedPolicies(outerKey.getSecond()),
-             innerKey -> innerKey.isEmpty()
-               ? NO_POLICY_OPERATION
-               : compositePolicyFactory.createOperationPolicy(operation, innerKey,
-                                                              lookupOperationParametersTransformer(outerKey.getFirst()),
-                                                              operationPolicyProcessorFactory)));
+          .get(policyProvider.findOperationParameterizedPolicies(outerKey.getSecond()),
+               innerKey -> innerKey.isEmpty()
+                   ? NO_POLICY_OPERATION
+                   : compositePolicyFactory.createOperationPolicy(operation, innerKey,
+                                                                  lookupOperationParametersTransformer(outerKey.getFirst()),
+                                                                  operationPolicyProcessorFactory)));
 
       if (operationPolicy instanceof DeferredDisposable) {
         activePolicies.add(new DeferredDisposableWeakReference((DeferredDisposable) operationPolicy, stalePoliciesQueue));
