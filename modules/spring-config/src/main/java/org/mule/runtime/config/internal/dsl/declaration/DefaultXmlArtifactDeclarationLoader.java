@@ -560,19 +560,23 @@ public class DefaultXmlArtifactDeclarationLoader implements XmlArtifactDeclarati
 
   private void declareComposableModel(ComposableModel model, DslElementSyntax elementDsl,
                                       List<ConfigLine> children, HasNestedComponentDeclarer declarer) {
-    children.forEach((ConfigLine child) -> {
+    children.forEach(child -> {
       ExtensionModel extensionModel = getExtensionModel(child);
       ElementDeclarer extensionElementsDeclarer = forExtension(extensionModel.getName());
+
       Reference<Boolean> componentFound = new Reference<>(false);
-      getComponentDeclaringWalker(declaration -> {
-        declarer.withComponent(declaration);
-        componentFound.set(true);
-      }, child, extensionElementsDeclarer)
-          .walk(extensionModel);
+
+      declareRoute(model, elementDsl, child, extensionElementsDeclarer)
+          .ifPresent(route -> {
+            declarer.withComponent(route);
+            componentFound.set(true);
+          });
 
       if (!componentFound.get()) {
-        declareRoute(model, elementDsl, child, extensionElementsDeclarer)
-            .ifPresent(declarer::withComponent);
+        getComponentDeclaringWalker(declaration -> {
+          declarer.withComponent(declaration);
+        }, child, extensionElementsDeclarer)
+            .walk(extensionModel);
       }
     });
   }
