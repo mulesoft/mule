@@ -14,7 +14,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.BODY;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.CHAIN;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTE;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isErrorHandler;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.isMessageSource;
@@ -114,7 +114,7 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
 
       if (locationWithCustomPart.isPresent()) {
         componentLocation = locationWithCustomPart.get();
-      } else if (componentModel.getComponentType().equals(BODY)) {
+      } else if (componentModel.getComponentType().equals(CHAIN)) {
         DefaultLocationPart newLastPart = new DefaultLocationPart(parentComponentModel.getComponentId().orElse(null),
                                                                   typedComponentIdentifier,
                                                                   componentModel.getMetadata().getFileName(),

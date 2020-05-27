@@ -8,7 +8,7 @@ package org.mule.runtime.extension.api.extension;
 
 import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.BODY;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CHAIN;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -57,10 +57,10 @@ public class XmlSdk1ExtensionModelDeclarer {
         .ofType(typeBuilder.stringType().build());
 
     operationDeclaration.withOptionalComponent("body")
-        .withAllowedStereotypes(BODY);
+        .withAllowedStereotypes(CHAIN);
 
     extensionDeclarer.withConstruct("body")
-        .withStereotype(BODY)
+        .withStereotype(CHAIN)
         .withChain();
 
     return extensionDeclarer;
