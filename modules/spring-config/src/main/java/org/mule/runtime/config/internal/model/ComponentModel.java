@@ -12,11 +12,14 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
+<<<<<<< Upstream, based on origin/fix/MULE-18661
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+=======
+import static org.mule.runtime.api.util.NameUtils.toCamelCase;
+>>>>>>> ec6bfa1 lalala
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
@@ -38,7 +41,6 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentMetadataAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.AstTraversalDirection;
-import org.mule.runtime.config.internal.model.type.MetadataTypeModelAdapter;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 
 import java.util.ArrayList;
@@ -56,8 +58,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import javax.xml.namespace.QName;
 
 /**
  * An {@code ComponentModel} represents the user configuration of a component (flow, config, message processor, etc) defined in an
@@ -98,7 +98,6 @@ public class ComponentModel implements ComponentAst {
   private NestableElementModel nestableElementModel;
   private ConfigurationModel configurationModel;
   private ConnectionProviderModel connectionProviderModel;
-  private MetadataTypeModelAdapter metadataTypeModelAdapter;
 
   private ComponentMetadataAst componentMetadata;
 
@@ -372,12 +371,6 @@ public class ComponentModel implements ComponentAst {
       }
     }
 
-    if (metadataTypeModelAdapter != null) {
-      if (modelClass.isAssignableFrom(metadataTypeModelAdapter.getClass())) {
-        return Optional.of((M) metadataTypeModelAdapter);
-      }
-    }
-
     return empty();
   }
 
@@ -395,10 +388,6 @@ public class ComponentModel implements ComponentAst {
 
   public void setConnectionProviderModel(ConnectionProviderModel connectionProviderModel) {
     this.connectionProviderModel = connectionProviderModel;
-  }
-
-  public void setMetadataTypeModelAdapter(MetadataTypeModelAdapter metadataTypeModelAdapter) {
-    this.metadataTypeModelAdapter = metadataTypeModelAdapter;
   }
 
   /**
@@ -468,161 +457,6 @@ public class ComponentModel implements ComponentAst {
   @Override
   public ComponentMetadataAst getMetadata() {
     return componentMetadata;
-  }
-
-  /**
-   * Builder to create instances of {@code ComponentModel}.
-   */
-  public static class Builder {
-
-    private final ComponentModel model = new ComponentModel();
-    private ComponentModel root;
-
-    private final org.mule.runtime.ast.api.ComponentMetadataAst.Builder metadataBuilder = ComponentMetadataAst.builder();
-
-    /**
-     * Default constructor for this builder.
-     */
-    public Builder() {}
-
-    /**
-     * Creates an instance of the Builder which will allow to merge other root component models to the given one. The root
-     * component model provided here will be modified instead of cloned.
-     *
-     * @param root {@link ComponentModel} to be used as root. It will be modified.
-     */
-    public Builder(ComponentModel root) {
-      this.root = root;
-    }
-
-    /**
-     * @param identifier identifier for the configuration element this object represents.
-     * @return the builder.
-     */
-    public Builder setIdentifier(ComponentIdentifier identifier) {
-      this.model.identifier = identifier;
-      return this;
-    }
-
-    /**
-     * @param parameterName   name of the configuration parameter.
-     * @param value           value contained by the configuration parameter.
-     * @param valueFromSchema
-     * @return the builder.
-     */
-    public Builder addParameter(String parameterName, String value, boolean valueFromSchema) {
-      this.model.parameters.put(parameterName, value);
-      if (valueFromSchema) {
-        this.model.schemaValueParameter.add(parameterName);
-      }
-      return this;
-    }
-
-    /**
-     * Adds a new complex child object to this {@code ComponentModel}.
-     *
-     * @param componentModel child {@code ComponentModel} declared in the configuration.
-     * @return the builder.
-     */
-    public Builder addChildComponentModel(ComponentModel componentModel) {
-      this.model.innerComponents.add(componentModel);
-      return this;
-    }
-
-    /**
-     * Sets the inner content of the configuration element.
-     *
-     * @param textContent inner text content from the configuration.
-     * @return the builder.
-     */
-    public Builder setTextContent(String textContent) {
-      this.model.textContent = textContent;
-      return this;
-    }
-
-    /**
-     * Adds a custom attribute to the {@code ComponentModel}. This custom attribute is meant to hold metadata of the configuration
-     * and not to be used to instantiate the runtime object that corresponds to this configuration.
-     *
-     * @param name  custom attribute name.
-     * @param value custom attribute value.
-     * @return the builder.
-     */
-    public Builder addCustomAttribute(String name, Object value) {
-      return addCustomAttribute(QName.valueOf(name), value);
-    }
-
-    /**
-     * Adds a custom attribute to the {@code ComponentModel}. This custom attribute is meant to hold metadata of the configuration
-     * and not to be used to instantiate the runtime object that corresponds to this configuration.
-     *
-     * @param name  custom attribute name.
-     * @param value custom attribute value.
-     * @return the builder.
-     */
-    public Builder addCustomAttribute(final QName qname, Object value) {
-      if (isEmpty(qname.getNamespaceURI()) || NS_MULE_PARSER_METADATA.equals(qname.getNamespaceURI())) {
-        this.metadataBuilder.putParserAttribute(qname.getLocalPart(), value);
-      } else {
-        this.metadataBuilder.putDocAttribute(qname.toString(), value.toString());
-        if (NS_MULE_DOCUMENTATION.equals(qname.getNamespaceURI())) {
-          // This is added for compatibility, since in previous versions the doc attributes were looked up without the namespace.
-          this.metadataBuilder.putDocAttribute(qname.getLocalPart(), value.toString());
-        }
-      }
-      return this;
-    }
-
-    /**
-     * @param configFileName the config file name in which this component was defined.
-     * @return the builder.
-     */
-    public Builder setConfigFileName(String configFileName) {
-      this.metadataBuilder.setFileName(configFileName);
-      return this;
-    }
-
-    /**
-     * @param lineNumber the line number within the config file in which this component was defined.
-     * @return the builder.
-     */
-    public Builder setLineNumber(int lineNumber) {
-      this.metadataBuilder.setStartLine(lineNumber);
-      this.metadataBuilder.setEndLine(lineNumber);
-      return this;
-    }
-
-    /**
-     * @param startColumn the start column within the config file in which this component was defined.
-     * @return the builder.
-     */
-    public Builder setStartColumn(int startColumn) {
-      this.metadataBuilder.setStartColumn(startColumn);
-      this.metadataBuilder.setEndColumn(startColumn);
-      return this;
-    }
-
-    /**
-     * @param sourceCode the source code associated with this component.
-     * @return the builder.
-     */
-    public Builder setSourceCode(String sourceCode) {
-      this.metadataBuilder.setSourceCode(sourceCode);
-      return this;
-    }
-
-    /**
-     * @return a {@code ComponentModel} created based on the supplied parameters.
-     */
-    public ComponentModel build() {
-      if (root != null) {
-        return root;
-      }
-      checkState(model.identifier != null, "An identifier must be provided");
-      model.componentMetadata = metadataBuilder.build();
-      return model;
-    }
-
   }
 
   @Override

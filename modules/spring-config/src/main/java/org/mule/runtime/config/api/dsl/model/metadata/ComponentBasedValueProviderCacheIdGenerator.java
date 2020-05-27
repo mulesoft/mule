@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.config.api.dsl.model.metadata;
 
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.DslElementModel;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
@@ -49,9 +48,6 @@ public class ComponentBasedValueProviderCacheIdGenerator implements ValueProvide
   }
 
   private Optional<DslElementModel<ComponentAst>> getConnectionModel(ComponentAst componentAst) {
-    if (componentAst instanceof ComponentModel) {
-      return elementModelFactory.create(componentAst);
-    }
-    return empty();
+    return elementModelFactory.create(componentAst);
   }
 }

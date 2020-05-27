@@ -11,7 +11,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
-import org.mule.runtime.config.internal.model.ComponentModel;
 import org.mule.runtime.core.internal.locator.ComponentLocator;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheId;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
@@ -19,7 +18,7 @@ import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGenerator;
 import java.util.Optional;
 
 /**
- * A {@link ComponentModel} based implementation of a {@link MetadataCacheIdGenerator}
+ * A {@link ComponentAst} based implementation of a {@link MetadataCacheIdGenerator}
  *
  * @since 4.1.4, 4.2.0
  */

@@ -7,17 +7,20 @@
 
 package org.mule.runtime.config.dsl.processor;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ComponentMetadataAst;
+import org.mule.runtime.ast.api.builder.ComponentAstBuilder;
+import org.mule.runtime.ast.internal.builder.DefaultComponentAstBuilder;
+import org.mule.runtime.ast.internal.builder.PropertiesResolver;
+import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
-import org.mule.runtime.config.internal.model.ComponentModel;
-import org.mule.runtime.config.internal.model.ComponentModel.Builder;
 import org.mule.runtime.core.internal.processor.AbstractProcessor;
 import org.mule.runtime.core.internal.processor.ReferenceProcessor;
 import org.mule.runtime.dsl.api.component.TypeDefinition;
@@ -40,7 +43,7 @@ public class ObjectTypeVisitorTestCase {
 
   @Test
   public void typeIsInstanceOfGivenClass() {
-    ObjectTypeVisitor visitor = new ObjectTypeVisitor((ComponentAst) baseComponentModelBuilder().build());
+    ObjectTypeVisitor visitor = new ObjectTypeVisitor(baseComponentModelBuilder().build());
     TypeDefinition typeDefinition = fromType(String.class);
     typeDefinition.visit(visitor);
     assertTrue(String.class.isAssignableFrom(visitor.getType()));
@@ -49,8 +52,8 @@ public class ObjectTypeVisitorTestCase {
 
   @Test
   public void typeIsInstanceOfGivenClassFromAttribute() throws ClassNotFoundException {
-    ObjectTypeVisitor visitor = new ObjectTypeVisitor((ComponentAst) baseComponentModelBuilder()
-        .addParameter("type", "org.mule.runtime.core.internal.processor.ReferenceProcessor", false).build());
+    ObjectTypeVisitor visitor = new ObjectTypeVisitor(baseComponentModelBuilder()
+        .withRawParameter("type", "org.mule.runtime.core.internal.processor.ReferenceProcessor").build());
     TypeDefinition typeDefinition = fromConfigurationAttribute("type");
     typeDefinition.visit(visitor);
     assertTrue(ReferenceProcessor.class.isAssignableFrom(visitor.getType()));
@@ -58,8 +61,8 @@ public class ObjectTypeVisitorTestCase {
 
   @Test
   public void typeIsInstanceOfCheckedClassFromAttribute() throws ClassNotFoundException {
-    ObjectTypeVisitor visitor = new ObjectTypeVisitor((ComponentAst) baseComponentModelBuilder()
-        .addParameter("type", "org.mule.runtime.core.internal.processor.ReferenceProcessor", false).build());
+    ObjectTypeVisitor visitor = new ObjectTypeVisitor(baseComponentModelBuilder()
+        .withRawParameter("type", "org.mule.runtime.core.internal.processor.ReferenceProcessor").build());
     TypeDefinition typeDefinition = fromConfigurationAttribute("type")
         .checkingThatIsClassOrInheritsFrom(ReferenceProcessor.class);
     typeDefinition.visit(visitor);
@@ -68,8 +71,8 @@ public class ObjectTypeVisitorTestCase {
 
   @Test
   public void typeIsInstanceOfClassInheritedFromCheckedClassFromAttribute() throws ClassNotFoundException {
-    ObjectTypeVisitor visitor = new ObjectTypeVisitor((ComponentAst) baseComponentModelBuilder()
-        .addParameter("type", "org.mule.runtime.core.internal.processor.ReferenceProcessor", false).build());
+    ObjectTypeVisitor visitor = new ObjectTypeVisitor(baseComponentModelBuilder()
+        .withRawParameter("type", "org.mule.runtime.core.internal.processor.ReferenceProcessor").build());
     // Check that ReferenceProcessor inherits from AbstractProcessor
     TypeDefinition typeDefinition = fromConfigurationAttribute("type")
         .checkingThatIsClassOrInheritsFrom(AbstractProcessor.class);
@@ -81,15 +84,18 @@ public class ObjectTypeVisitorTestCase {
   public void testFailsIfTypeIsNotOfCheckedClass() throws ClassNotFoundException {
     exception.expect(MuleRuntimeException.class);
     exception.expectMessage("is not the same nor inherits from");
-    ObjectTypeVisitor visitor = new ObjectTypeVisitor((ComponentAst) baseComponentModelBuilder()
-        .addParameter("type", this.getClass().getName(), false).build());
+    ObjectTypeVisitor visitor = new ObjectTypeVisitor(baseComponentModelBuilder()
+        .withRawParameter("type", this.getClass().getName()).build());
     TypeDefinition typeDefinition = fromConfigurationAttribute("type")
         .checkingThatIsClassOrInheritsFrom(ReferenceProcessor.class);
     typeDefinition.visit(visitor);
   }
 
-  private Builder baseComponentModelBuilder() {
-    return new ComponentModel.Builder().setIdentifier(mock(ComponentIdentifier.class));
+
+  private ComponentAstBuilder baseComponentModelBuilder() {
+    return new DefaultComponentAstBuilder(new PropertiesResolver(), new ExtensionModelHelper(emptySet()), emptyList())
+        .withIdentifier(ComponentIdentifier.builder().namespace("ns").name("comp").build())
+        .withMetadata(ComponentMetadataAst.builder().build());
   }
 
 }
