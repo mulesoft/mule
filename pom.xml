@@ -1818,6 +1818,17 @@
                         <!-- Custom Entries -->
                             <manifestSections>
                                 <manifestSection>
+                                    <name>Repository revision</name>
+                                    <manifestEntries>
+                                        <!-- include repository revision from buildnumber plugin -->
+                                        <Build-Revision>${buildNumber}</Build-Revision>
+                                        <Build-Date>${timestamp}</Build-Date>
+                                        <Dev-List-Email>${dev.list}</Dev-List-Email>
+                                        <Supported-Jdks>[${javaVersion}.0,12)</Supported-Jdks>
+                                        <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12)</Recommended-Jdks>
+                                    </manifestEntries>
+                                </manifestSection>
+                                <manifestSection>
                                     <name>Product info</name>
                                     <manifestEntries>
                                         <More-Info>For more information go to ${productUrl}</More-Info>
@@ -1827,17 +1838,6 @@
                                         <Vendor-Url>${project.organization.url}</Vendor-Url>
                                         <Product-Url>${productUrl}</Product-Url>
                                         <Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date>
-                                    </manifestEntries>
-                                </manifestSection>
-                                <manifestSection>
-                                    <name>Repository revision</name>
-                                    <manifestEntries>
-                                        <!-- include repository revision from buildnumber plugin -->
-                                        <Build-Revision>${buildNumber}</Build-Revision>
-                                        <Build-Date>${timestamp}</Build-Date>
-                                        <Dev-List-Email>${dev.list}</Dev-List-Email>
-                                        <Supported-Jdks>[${javaVersion}.0,12)</Supported-Jdks>
-                                        <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12)</Recommended-Jdks>
                                     </manifestEntries>
                                 </manifestSection>
                                 <manifestSection>
