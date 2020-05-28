@@ -13,7 +13,10 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
+
+import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
+import org.mule.runtime.core.api.policy.PolicyProvider;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationPolicyManager;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
@@ -21,6 +24,7 @@ import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory;
+import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.io.File;
 import java.io.IOException;
@@ -112,6 +116,39 @@ public class TestPolicyManager implements DeploymentListener {
     }
 
     return application.getPolicyManager().removePolicy(policyId);
+  }
+
+  /**
+   * Retrieves the source policies that match the given {@link PolicyPointcutParameters}
+   * 
+   * @param appName application from which to look for the policies. Non empty.
+   * @param policyPointcutParameters parameters to match against existing policies
+   * @return List of source {@link Policy}s that matched the parameters
+   */
+  public List<Policy> findSourcePolicies(String appName, PolicyPointcutParameters policyPointcutParameters) {
+    return getPolicyProvider(appName).findSourceParameterizedPolicies(policyPointcutParameters);
+  }
+
+  /**
+   * Retrieves the operation policies that match the given {@link PolicyPointcutParameters}Retrieves the source policies that
+   * match the given {@link PolicyPointcutParameters}
+   * 
+   * @param appName application from which to look for the policies. Non empty.
+   * @param policyPointcutParameters parameters to match against existing policies
+   * @return List of operation {@link Policy}s that matched the parameters
+   */
+  public List<Policy> findOperationPolicies(String appName, PolicyPointcutParameters policyPointcutParameters) {
+    return getPolicyProvider(appName).findOperationParameterizedPolicies(policyPointcutParameters);
+  }
+
+  private PolicyProvider getPolicyProvider(String appName) {
+    Application application = deploymentService.findApplication(appName);
+    if (application == null) {
+      throw new IllegalArgumentException("Cannot find application named: " + appName);
+    }
+
+    return application.getRegistry().lookupByType(PolicyProvider.class)
+        .orElseThrow(() -> new IllegalArgumentException("Cannot find a Polict Provider in application named: " + appName));
   }
 
   private File getPoliciesTempFolder() {
