@@ -9,15 +9,16 @@ package org.mule.runtime.core.api.util;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.api.exception.MuleExceptionInfo.INFO_CAUSED_BY_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
+import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
@@ -57,10 +58,9 @@ import javax.xml.namespace.QName;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mule.test.allure.AllureConstants;
 
 @SmallTest
-@Feature(AllureConstants.ErrorHandlingFeature.ERROR_HANDLING)
+@Feature(ERROR_HANDLING)
 public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
 
   private static final String ERROR_MESSAGE = "Messaging Error Message";
@@ -214,7 +214,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     MessagingException resolved = anotherResolver.resolve(me, locator, emptyList());
     assertExceptionErrorType(resolved, expected);
     assertExceptionMessage(resolved.getMessage(), "DISPATCH PROBLEM");
-    assertThat(resolved.getInfo().get(MuleExceptionInfo.INFO_CAUSED_BY_KEY), is(nullValue()));
+    assertExceptionMessage(resolved.getInfo().get(INFO_CAUSED_BY_KEY).toString(), "CONNECTION PROBLEM");
   }
 
   @Test
@@ -229,7 +229,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     MessagingException resolved = anotherResolver.resolve(me, locator, emptyList());
     assertExceptionErrorType(resolved, expected);
     assertExceptionMessage(resolved.getMessage(), "DISPATCH PROBLEM");
-    assertExceptionMessage(resolved.getInfo().get(MuleExceptionInfo.INFO_CAUSED_BY_KEY).toString(), "CONNECTION PROBLEM");
+    assertExceptionMessage(resolved.getInfo().get(INFO_CAUSED_BY_KEY).toString(), "CONNECTION PROBLEM");
   }
 
   @Test
@@ -245,7 +245,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
     MessagingException resolved = anotherResolver.resolve(me, locator, emptyList());
     assertExceptionErrorType(resolved, expected);
     assertExceptionMessage(resolved.getMessage(), "DISPATCH PROBLEM");
-    assertExceptionMessage(resolved.getInfo().get(MuleExceptionInfo.INFO_CAUSED_BY_KEY).toString(), "CONNECTION PROBLEM");
+    assertExceptionMessage(resolved.getInfo().get(INFO_CAUSED_BY_KEY).toString(), "CONNECTION PROBLEM");
   }
 
   private void assertExceptionMessage(String result, String expected) {
