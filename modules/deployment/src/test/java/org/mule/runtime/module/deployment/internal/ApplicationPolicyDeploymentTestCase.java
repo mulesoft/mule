@@ -93,6 +93,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
   @Parameterized.Parameters(name = "Parallel: {0}")
   public static List<Boolean> params() {
+    // Only run without parallel deployment since this configuration does not affect policy deployment at all
     return asList(false);
   }
 
