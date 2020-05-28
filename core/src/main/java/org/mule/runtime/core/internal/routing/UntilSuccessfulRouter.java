@@ -24,7 +24,8 @@ import static reactor.core.publisher.Mono.subscriberContext;
 import static reactor.util.context.Context.empty;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleExceptionInfo;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
@@ -67,8 +68,8 @@ class UntilSuccessfulRouter {
   private static final Logger LOGGER = getLogger(UntilSuccessfulRouter.class);
 
   static final String RETRY_CTX_INTERNAL_PARAM_KEY = "untilSuccessful.router.retryContext";
-  private static final String UNTIL_SUCCESSFUL_MSG_PREFIX =
-      "'until-successful' retries exhausted. Last exception message was: %s";
+  private static final String UNTIL_SUCCESSFUL_MSG =
+      "'until-successful' retries exhausted";
   private final EventInternalContextResolver<Map<String, RetryContext>> retryContextResolver;
 
   private final Component owner;
@@ -275,19 +276,21 @@ class UntilSuccessfulRouter {
   private Function<Throwable, Throwable> getThrowableFunction(CoreEvent event) {
     return throwable -> {
       CoreEvent exceptionEvent = event;
-      Throwable retryPolicyExhaustionCause = getMessagingExceptionCause(throwable);
-      // ConnectionException is treated in a way that prioritize it's error type over any other (see ErrorTypeLocator#getErrorTypeFromException)
-      retryPolicyExhaustionCause =
-          suppressIfPresent(retryPolicyExhaustionCause, ConnectionException.class, false);
+      // Prevent any MuleException from replacing the retry exhausted error message or error type
+      // (see MessagingExceptionResolver#findRoot)
+      Throwable retryPolicyExhaustionCause =
+          suppressIfPresent(getMessagingExceptionCause(throwable), MuleException.class);
+      RetryPolicyExhaustedException retryPolicyExhaustedException =
+          new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG),
+                                            retryPolicyExhaustionCause,
+                                            owner);
+      // Info about the cause is added. Note that if a MuleException has been suppressed, it will later overwrite this
+      // (see ExceptionHelper#getRootMuleException)
+      retryPolicyExhaustedException.addInfo(MuleExceptionInfo.INFO_CAUSED_BY_KEY, retryPolicyExhaustionCause.getMessage());
       if (throwable instanceof MessagingException) {
         exceptionEvent = ((MessagingException) throwable).getEvent();
       }
-      return new MessagingException(exceptionEvent,
-                                    new RetryPolicyExhaustedException(createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX,
-                                                                                          retryPolicyExhaustionCause
-                                                                                              .getMessage()),
-                                                                      retryPolicyExhaustionCause, owner),
-                                    owner);
+      return new MessagingException(exceptionEvent, retryPolicyExhaustedException, owner);
     };
   }
 
