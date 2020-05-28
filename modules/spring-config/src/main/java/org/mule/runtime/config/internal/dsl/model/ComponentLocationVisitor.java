@@ -28,6 +28,7 @@ import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper;
@@ -156,7 +157,7 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
                                                          componentModel.getMetadata().getStartLine(),
                                                          componentModel.getMetadata().getStartColumn());
         }
-      } else if (isProcessor(componentModel)) {
+      } else if (isProcessor(componentModel) && !existsWithinSource(componentModel, hierarchy)) {
         componentLocation = parentComponentLocation
             .appendProcessorsPart()
             .appendLocationPart(findProcessorPath(componentModel, hierarchy),
@@ -290,6 +291,11 @@ public class ComponentLocationVisitor implements Consumer<Pair<ComponentAst, Lis
     return hierarchy.stream()
         .anyMatch(p -> p.getModel(ConfigurationModel.class).isPresent()
             || isRootProcessorScope(p));
+  }
+
+  private boolean existsWithinSource(ComponentAst componentModel, List<ComponentAst> hierarchy) {
+    return hierarchy.stream()
+        .anyMatch(p -> p.getModel(SourceModel.class).isPresent());
   }
 
 }
