@@ -52,6 +52,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
@@ -313,8 +314,7 @@ public class ApplicationModel implements ArtifactAst {
                           Optional<ConfigurationProperties> parentConfigurationProperties,
                           Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry,
                           ResourceProvider externalResourceProvider,
-                          boolean runtimeMode)
-      throws Exception {
+                          boolean runtimeMode) {
 
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.externalResourceProvider = externalResourceProvider;
@@ -788,22 +788,20 @@ public class ApplicationModel implements ArtifactAst {
   }
 
   private void validateParameterAndChildForSameAttributeAreNotDefinedTogether() {
-    recursiveStream().forEach(componentModel -> {
-      componentModel.directChildrenStream()
-          .forEach(child -> {
-            final String paramName = toCamelCase(child.getIdentifier().getName(), "-");
-            final String singularParamName = pluralize(paramName);
+    recursiveStream().forEach(componentModel -> componentModel.directChildrenStream()
+        .forEach(child -> {
+          final String paramName = toCamelCase(child.getIdentifier().getName(), "-");
+          final String singularParamName = pluralize(paramName);
 
-            if (componentModel.getRawParameterValue(paramName).isPresent()
-                || componentModel.getRawParameterValue(singularParamName).isPresent()) {
-              throw new MuleRuntimeException(createStaticMessage(
-                                                                 format("Component %s has a child element %s which is used for the same purpose of the configuration parameter %s. "
-                                                                     + "Only one must be used.", componentModel.getIdentifier(),
-                                                                        child.getIdentifier(),
-                                                                        singularParamName)));
-            }
-          });
-    });
+          if (componentModel.getRawParameterValue(paramName).isPresent()
+              || componentModel.getRawParameterValue(singularParamName).isPresent()) {
+            throw new MuleRuntimeException(createStaticMessage(
+                                                               format("Component %s has a child element %s which is used for the same purpose of the configuration parameter %s. "
+                                                                   + "Only one must be used.", componentModel.getIdentifier(),
+                                                                      child.getIdentifier(),
+                                                                      singularParamName)));
+          }
+        }));
   }
 
   private void validateSingletonsAreNotRepeated() {
@@ -947,10 +945,11 @@ public class ApplicationModel implements ArtifactAst {
 
   private ComponentAst getOnErrorComponentModel(ComponentAst onErrorModel) {
     if (ON_ERROR_IDENTIFIER.equals(onErrorModel.getIdentifier())) {
-      String sharedOnErrorName = onErrorModel.getRawParameterValue(REFERENCE_ATTRIBUTE).get();
-      return findTopLevelNamedComponent(sharedOnErrorName).orElseThrow(
-                                                                       () -> new MuleRuntimeException(createStaticMessage(format("Could not find on-error reference named '%s'",
-                                                                                                                                 sharedOnErrorName))));
+      return onErrorModel.getRawParameterValue(REFERENCE_ATTRIBUTE)
+          .map(sharedOnErrorName -> findTopLevelNamedComponent(sharedOnErrorName)
+              .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("Could not find on-error reference named '%s'",
+                                                                                     sharedOnErrorName)))))
+          .orElse(onErrorModel);
     } else {
       return onErrorModel;
     }
@@ -977,7 +976,7 @@ public class ApplicationModel implements ArtifactAst {
       if (!topLevelComponent.getModel(ConstructModel.class).isPresent()
           || topLevelComponent.getModel(ParameterizedModel.class)
               .map(pmzd -> pmzd.getAllParameterModels().stream()
-                  .anyMatch(p -> p.isComponentId()))
+                  .anyMatch(ParameterModel::isComponentId))
               .orElse(false)) {
         final ComponentIdentifier identifier = topLevelComponent.getIdentifier();
         throw new MuleRuntimeException(createStaticMessage(format("Global element %s:%s does not provide a name attribute.",
