@@ -16,6 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
@@ -42,14 +43,19 @@ import org.mule.runtime.api.notification.PolicyNotification;
 import org.mule.runtime.api.notification.PolicyNotificationListener;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityException;
+import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.security.AbstractSecurityProvider;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
+import org.mule.runtime.module.extension.internal.policy.NoOpPolicyManager;
 import org.mule.runtime.policy.api.PolicyPointcut;
+import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.util.CompilerUtils;
@@ -62,6 +68,7 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
@@ -83,6 +90,13 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
   private static File simpleExtensionJarFile;
   private static File withErrorDeclarationExtensionJarFile;
+
+  @Parameterized.Parameters(name = "Parallel: {0}")
+  public static List<Boolean> params() {
+    // Only run without parallel deployment since this configuration does not affect policy deployment at all
+    return asList(false);
+  }
+
   // Policy artifact file builders
   private final PolicyFileBuilder fooPolicyFileBuilder =
       new PolicyFileBuilder(FOO_POLICY_NAME).describedBy(new MulePolicyModel.MulePolicyModelBuilder()
@@ -143,6 +157,31 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(2));
+  }
+
+  @Test
+  @Issue("MULE-18442")
+  public void applicationPolicyHasNoOpPolicyManagerInjected() throws Exception {
+    policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
+                            new PolicyParametrization(FOO_POLICY_ID, parameters -> true, 1,
+                                                      singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
+
+    List<Policy> policy = policyManager.findOperationPolicies(applicationFileBuilder.getId(), new PolicyPointcutParameters(null));
+
+    assertThat(policy, hasSize(1));
+    PolicyManager policyPolicyManager = ((MuleContextWithRegistry) policy.get(0).getPolicyChain().getMuleContext()).getRegistry()
+        .lookupObject(PolicyManager.class);
+    assertThat(policyPolicyManager, instanceOf(NoOpPolicyManager.class));
   }
 
   @Test
