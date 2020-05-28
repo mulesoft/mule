@@ -805,15 +805,15 @@ public class ApplicationModel implements ArtifactAst {
   }
 
   private void validateSingletonsAreNotRepeated() {
-    Map<String, ComponentAst> existingObjectsWithName = new HashMap<>();
+    Map<ComponentIdentifier, ComponentAst> existingSingletonsByIdentifier = new HashMap<>();
 
     topLevelComponentsStream().forEach(componentModel -> {
       if (componentModel.getModel(EnrichableModel.class)
           .map(enrchModel -> enrchModel.getModelProperty(SingletonModelProperty.class).isPresent())
           .orElse(false)) {
-        String nameAttributeValue = componentModel.getComponentId().orElse(null);
-        if (existingObjectsWithName.containsKey(nameAttributeValue)) {
-          ComponentAst otherComponentModel = existingObjectsWithName.get(nameAttributeValue);
+        ComponentIdentifier singletonIdentifier = componentModel.getIdentifier();
+        if (existingSingletonsByIdentifier.containsKey(singletonIdentifier)) {
+          ComponentAst otherComponentModel = existingSingletonsByIdentifier.get(singletonIdentifier);
           if (componentModel.getMetadata().getFileName().isPresent()
               && componentModel.getMetadata().getStartLine().isPresent()
               && otherComponentModel.getMetadata().getFileName().isPresent()
@@ -829,7 +829,7 @@ public class ApplicationModel implements ArtifactAst {
                                                                componentModel.getIdentifier()));
           }
         }
-        existingObjectsWithName.put(nameAttributeValue, componentModel);
+        existingSingletonsByIdentifier.put(singletonIdentifier, componentModel);
       }
     });
   }
