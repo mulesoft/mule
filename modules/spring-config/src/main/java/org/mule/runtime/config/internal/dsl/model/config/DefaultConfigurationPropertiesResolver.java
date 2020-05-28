@@ -61,11 +61,12 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
       return -1;
     }
     if (prefixIndex != 0 && value.charAt(prefixIndex - 1) == '\\') {
-      int relativeOffset = prefixIndex + PLACEHOLDER_PREFIX.length();
-      return findPrefixIndex(value.substring(relativeOffset), offset + relativeOffset);
-    } else {
-      return prefixIndex + offset;
+      if (prefixIndex > 1 && value.charAt(prefixIndex - 2) != '\\') {
+        int relativeOffset = prefixIndex + PLACEHOLDER_PREFIX.length();
+        return findPrefixIndex(value.substring(relativeOffset), offset + relativeOffset);
+      }
     }
+    return prefixIndex + offset;
   }
 
   private int findPrefixIndex(String value) {
@@ -174,7 +175,8 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
                                     objectValueFound.toString());
       prefixIndex = prefixIndexConsideringBackslash(testValue);
     }
-    return CORRECT_USE_OF_BACKSLASH ? testValue.replace("\\" + PLACEHOLDER_PREFIX, PLACEHOLDER_PREFIX) : testValue;
+    return CORRECT_USE_OF_BACKSLASH ? testValue.replace("\\" + PLACEHOLDER_PREFIX, PLACEHOLDER_PREFIX).replace("\\\\", "\\")
+        : testValue;
   }
 
   private void propagateRootResolver(ConfigurationPropertiesResolver rootResolver) {

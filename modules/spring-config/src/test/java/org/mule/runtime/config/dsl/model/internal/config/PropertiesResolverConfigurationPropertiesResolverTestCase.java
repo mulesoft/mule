@@ -162,4 +162,9 @@ public class PropertiesResolverConfigurationPropertiesResolverTestCase extends A
                is("Hello ${child-value1-parent-value1-parent-value2-child-value2"));
   }
 
+  @Test
+  public void resolveWithDoubleEscape() {
+    assertThat(resolver.resolveValue("Hello \\\\${child-key1}"), is("Hello \\child-value1"));
+  }
+
 }
