@@ -55,18 +55,32 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
     this.configurationPropertiesProvider = configurationPropertiesProvider;
   }
 
+  private boolean shouldResolvePlaceholder(String value, int prefixIndex) {
+    if (prefixIndex == 0) {
+      return true;
+    } else if (value.charAt(prefixIndex - 1) != '\\') {
+      return true;
+    } else if (prefixIndex == 1) {
+      return false;
+    } else if (prefixIndex > 1 && value.charAt(prefixIndex - 2) != '\\') {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   private int findPrefixIndex(String value, int offset) {
     int prefixIndex = value.indexOf(PLACEHOLDER_PREFIX);
     if (prefixIndex == -1) {
       return -1;
     }
-    if (prefixIndex != 0 && value.charAt(prefixIndex - 1) == '\\') {
-      if (prefixIndex <= 1 || (prefixIndex > 1 && value.charAt(prefixIndex - 2) != '\\')) {
-        int relativeOffset = prefixIndex + PLACEHOLDER_PREFIX.length();
-        return findPrefixIndex(value.substring(relativeOffset), offset + relativeOffset);
-      }
+
+    if (shouldResolvePlaceholder(value, prefixIndex)) {
+      return prefixIndex + offset;
+    } else {
+      int relativeOffset = prefixIndex + PLACEHOLDER_PREFIX.length();
+      return findPrefixIndex(value.substring(relativeOffset), offset + relativeOffset);
     }
-    return prefixIndex + offset;
   }
 
   private int findPrefixIndex(String value) {
