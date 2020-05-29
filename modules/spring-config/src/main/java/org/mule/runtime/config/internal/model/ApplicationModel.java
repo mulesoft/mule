@@ -8,7 +8,6 @@ package org.mule.runtime.config.internal.model;
 
 import static com.google.common.base.Joiner.on;
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
@@ -24,7 +23,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.UNKNOWN;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.api.util.NameUtils.toCamelCase;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ERROR_HANDLER_IDENTIFIER;
@@ -37,6 +36,7 @@ import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_
 import static org.mule.runtime.core.api.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
@@ -49,8 +49,13 @@ import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -80,11 +85,10 @@ import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfi
 import org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModulesModel;
 import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator;
-import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
@@ -101,7 +105,6 @@ import java.util.OptionalInt;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.Spliterator;
-import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 import javax.xml.namespace.QName;
@@ -115,10 +118,10 @@ import com.google.common.collect.ImmutableSet;
  * An {@code ApplicationModel} holds a representation of all the artifact configuration using an abstract model to represent any
  * configuration option.
  * <p/>
- * This model is represented by a set of {@link ComponentModel}. Each {@code ComponentModel} holds a piece of configuration and
- * may have children {@code ComponentModel}s as defined in the artifact configuration.
+ * This model is represented by a set of {@link ComponentAst}a. Each {@code ComponentAst} holds a piece of configuration and may
+ * have children {@code ComponentAst}s as defined in the artifact configuration.
  * <p/>
- * Once the set of {@code ComponentModel} gets created from the application {@link ConfigFile}s the {@code ApplicationModel}
+ * Once the set of {@code ComponentAst}s gets created from the application {@link ConfigFile}s the {@code ApplicationModel}
  * executes a set of common validations dictated by the configuration semantics.
  *
  * @since 4.0
@@ -311,8 +314,7 @@ public class ApplicationModel implements ArtifactAst {
                           Optional<ConfigurationProperties> parentConfigurationProperties,
                           Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry,
                           ResourceProvider externalResourceProvider,
-                          boolean runtimeMode)
-      throws Exception {
+                          boolean runtimeMode) {
 
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
     this.externalResourceProvider = externalResourceProvider;
@@ -346,8 +348,6 @@ public class ApplicationModel implements ArtifactAst {
     };
     indexComponentModels(originalAst);
     this.ast = originalAst;
-
-    validateModel(componentBuildingDefinitionRegistry);
     ExtensionModelHelper extensionModelHelper = new ExtensionModelHelper(extensionModels);
     ast.recursiveStream().forEach(componentModel -> resolveTypedComponentIdentifier((ComponentModel) componentModel,
                                                                                     extensionModelHelper, runtimeMode));
@@ -355,6 +355,8 @@ public class ApplicationModel implements ArtifactAst {
     // and crafted declared extension models)
     resolveMissingComponentTypes(ast.recursiveStream());
     recursiveStreamWithHierarchy(ast).forEach(new ComponentLocationVisitor());
+
+    validateModel();
   }
 
   private void indexComponentModels(ArtifactAst originalAst) {
@@ -753,8 +755,7 @@ public class ApplicationModel implements ArtifactAst {
         .forEach(muleComponentModels::add));
   }
 
-  private void validateModel(Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry)
-      throws ConfigurationException {
+  private void validateModel() {
     // TODO MULE-18318 (AST) all this validations will be moved to an entity that does the validation and allows to aggregate all
     // validations instead of failing fast.
     validateSingletonsAreNotRepeated();
@@ -763,11 +764,9 @@ public class ApplicationModel implements ArtifactAst {
     validateFlowRefPointsToExistingFlow();
     validateErrorMappings();
     validateErrorHandlerStructure();
-    validateParameterAndChildForSameAttributeAreNotDefinedTogether();
-    if (componentBuildingDefinitionRegistry.isPresent()) {
-      validateNamedTopLevelElementsHaveName(componentBuildingDefinitionRegistry.get());
-    }
-    validateSingleElementsExistence();
+    // TODO MULE-17711 (AST) re-enable (and possibly refactor) this validation
+    // validateParameterAndChildForSameAttributeAreNotDefinedTogether();
+    validateNamedTopLevelElementsHaveName();
   }
 
   private void validateFlowRefPointsToExistingFlow() {
@@ -789,43 +788,32 @@ public class ApplicationModel implements ArtifactAst {
   }
 
   private void validateParameterAndChildForSameAttributeAreNotDefinedTogether() {
-    recursiveStream().forEach(componentModel -> {
-      for (String parameterName : ((ComponentModel) componentModel).getRawParameters().keySet()) {
-        if (!((ComponentModel) componentModel).isParameterValueProvidedBySchema(parameterName)) {
-          String mapChildName = hyphenize(pluralize(parameterName));
-          String listOrPojoChildName = hyphenize(parameterName);
-          Optional<ComponentModel> childOptional =
-              findRelatedChildForParameter(((ComponentModel) componentModel).getInnerComponents(), mapChildName,
-                                           listOrPojoChildName);
-          if (childOptional.isPresent()) {
+    recursiveStream().forEach(componentModel -> componentModel.directChildrenStream()
+        .forEach(child -> {
+          final String paramName = toCamelCase(child.getIdentifier().getName(), "-");
+          final String singularParamName = pluralize(paramName);
+
+          if (componentModel.getRawParameterValue(paramName).isPresent()
+              || componentModel.getRawParameterValue(singularParamName).isPresent()) {
             throw new MuleRuntimeException(createStaticMessage(
                                                                format("Component %s has a child element %s which is used for the same purpose of the configuration parameter %s. "
                                                                    + "Only one must be used.", componentModel.getIdentifier(),
-                                                                      childOptional.get().getIdentifier(),
-                                                                      parameterName)));
+                                                                      child.getIdentifier(),
+                                                                      singularParamName)));
           }
-        }
-      }
-    });
-  }
-
-  private Optional<ComponentModel> findRelatedChildForParameter(List<ComponentModel> chilrenComponents, String... possibleNames) {
-    Set<String> possibleNamesSet = new HashSet<>(asList(possibleNames));
-    for (ComponentModel childrenComponent : chilrenComponents) {
-      if (possibleNamesSet.contains(childrenComponent.getIdentifier().getName())) {
-        return of(childrenComponent);
-      }
-    }
-    return empty();
+        }));
   }
 
   private void validateSingletonsAreNotRepeated() {
-    Map<String, ComponentAst> existingObjectsWithName = new HashMap<>();
-    executeOnEveryRootElementWithBuildingDefinition(((componentModel, componentBuildingDefinition) -> {
-      if (componentBuildingDefinition.getRegistrationName() != null) {
-        String nameAttributeValue = componentModel.getComponentId().orElse(null);
-        if (existingObjectsWithName.containsKey(nameAttributeValue)) {
-          ComponentAst otherComponentModel = existingObjectsWithName.get(nameAttributeValue);
+    Map<ComponentIdentifier, ComponentAst> existingSingletonsByIdentifier = new HashMap<>();
+
+    topLevelComponentsStream().forEach(componentModel -> {
+      if (componentModel.getModel(EnrichableModel.class)
+          .map(enrchModel -> enrchModel.getModelProperty(SingletonModelProperty.class).isPresent())
+          .orElse(false)) {
+        ComponentIdentifier singletonIdentifier = componentModel.getIdentifier();
+        if (existingSingletonsByIdentifier.containsKey(singletonIdentifier)) {
+          ComponentAst otherComponentModel = existingSingletonsByIdentifier.get(singletonIdentifier);
           if (componentModel.getMetadata().getFileName().isPresent()
               && componentModel.getMetadata().getStartLine().isPresent()
               && otherComponentModel.getMetadata().getFileName().isPresent()
@@ -841,9 +829,9 @@ public class ApplicationModel implements ArtifactAst {
                                                                componentModel.getIdentifier()));
           }
         }
-        existingObjectsWithName.put(nameAttributeValue, componentModel);
+        existingSingletonsByIdentifier.put(singletonIdentifier, componentModel);
       }
-    }));
+    });
   }
 
   private void validateNameIsNotRepeated() {
@@ -881,19 +869,24 @@ public class ApplicationModel implements ArtifactAst {
 
   private void validateErrorMappings() {
     recursiveStream().forEach(componentModel -> {
-      List<ComponentModel> errorMappings = componentModel.directChildrenStream()
+      List<ComponentAst> errorMappings = componentModel.directChildrenStream()
           .filter(c -> c.getIdentifier().equals(ERROR_MAPPING_IDENTIFIER))
-          .map(cm -> (ComponentModel) cm)
           .collect(toList());
       if (!errorMappings.isEmpty()) {
-        List<ComponentModel> anyMappings = errorMappings.stream().filter(this::isErrorMappingWithSourceAny).collect(toList());
+        List<ComponentAst> anyMappings = errorMappings.stream()
+            .filter(this::isErrorMappingWithSourceAny)
+            .collect(toList());
         if (anyMappings.size() > 1) {
           throw new MuleRuntimeException(createStaticMessage("Only one mapping for 'ANY' or an empty source type is allowed."));
         } else if (anyMappings.size() == 1 && !isErrorMappingWithSourceAny(errorMappings.get(errorMappings.size() - 1))) {
           throw new MuleRuntimeException(createStaticMessage("Only the last error mapping can have 'ANY' or an empty source type."));
         }
-        List<String> sources = errorMappings.stream().map(model -> model.getRawParameters().get(SOURCE_TYPE)).collect(toList());
-        List<String> distinctSources = sources.stream().distinct().collect(toList());
+        List<String> sources = errorMappings.stream()
+            .map(model -> model.getRawParameterValue(SOURCE_TYPE).orElse(ANY_IDENTIFIER))
+            .collect(toList());
+        List<String> distinctSources = sources.stream()
+            .distinct()
+            .collect(toList());
         if (sources.size() != distinctSources.size()) {
           throw new MuleRuntimeException(createStaticMessage(format("Repeated source types are not allowed. Offending types are '%s'.",
                                                                     on("', '").join(disjunction(sources, distinctSources)))));
@@ -902,107 +895,94 @@ public class ApplicationModel implements ArtifactAst {
     });
   }
 
-  private boolean isErrorMappingWithSourceAny(ComponentModel model) {
-    String sourceType = model.getRawParameters().get(SOURCE_TYPE);
-    return sourceType == null || sourceType.equals(ANY_IDENTIFIER);
+  private boolean isErrorMappingWithSourceAny(ComponentAst model) {
+    return ANY_IDENTIFIER
+        .equals(model.getRawParameterValue(SOURCE_TYPE).orElse(ANY_IDENTIFIER));
   }
 
   private void validateErrorHandlerStructure() {
     recursiveStream().forEach(component -> {
       if (component.getIdentifier().equals(ERROR_HANDLER_IDENTIFIER)) {
-        validateRefOrOnErrorsExclusiveness((ComponentModel) component);
-        validateOnErrorsHaveTypeOrWhenAttribute((ComponentModel) component);
-        validateNoMoreThanOneOnErrorPropagateWithRedelivery((ComponentModel) component);
+        validateRefOrOnErrorsExclusiveness(component);
+        validateOnErrorsHaveTypeOrWhenAttribute(component);
+        validateNoMoreThanOneOnErrorPropagateWithRedelivery(component);
       }
     });
   }
 
-  private void validateRefOrOnErrorsExclusiveness(ComponentModel component) {
-    if (component.getRawParameters().get(REFERENCE_ATTRIBUTE) != null && !component.getInnerComponents().isEmpty()) {
+  private void validateRefOrOnErrorsExclusiveness(ComponentAst component) {
+    if (component.getRawParameterValue(REFERENCE_ATTRIBUTE).isPresent()
+        && component.directChildrenStream().count() > 0) {
       throw new MuleRuntimeException(createStaticMessage("A reference error-handler cannot have on-errors."));
     }
   }
 
-  private void validateNoMoreThanOneOnErrorPropagateWithRedelivery(ComponentModel component) {
-    if (component.getInnerComponents().stream().filter(exceptionStrategyComponent -> exceptionStrategyComponent.getRawParameters()
-        .get(MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE) != null).count() > 1) {
+  private void validateNoMoreThanOneOnErrorPropagateWithRedelivery(ComponentAst component) {
+    if (component.directChildrenStream()
+        .filter(exceptionStrategyComponent -> exceptionStrategyComponent
+            .getRawParameterValue(MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE).isPresent())
+        .count() > 1) {
       throw new MuleRuntimeException(createStaticMessage("Only one on-error-propagate within a error-handler can handle message redelivery. Remove one of the maxRedeliveryAttempts attributes"));
     }
   }
 
-  private void validateOnErrorsHaveTypeOrWhenAttribute(ComponentModel component) {
-    List<ComponentModel> innerComponents = component.getInnerComponents();
-    for (int i = 0; i < innerComponents.size() - 1; i++) {
-      ComponentAst componentModel = getOnErrorComponentModel(innerComponents.get(i));
-      if (!componentModel.getRawParameterValue(WHEN_CHOICE_ES_ATTRIBUTE).isPresent()
-          && !componentModel.getRawParameterValue(TYPE_ES_ATTRIBUTE).isPresent()) {
-        throw new MuleRuntimeException(createStaticMessage(
-                                                           "Every handler (except for the last one) within an 'error-handler' must specify a 'when' or 'type' attribute."));
-      }
+  private void validateOnErrorsHaveTypeOrWhenAttribute(ComponentAst component) {
+    final long count = component.directChildrenStream().count();
+    if (count > 0) {
+      component.directChildrenStream()
+          // last error handler should be the catch all, so that one is not validated
+          .limit(count - 1)
+          .forEach(innerComponent -> {
+            ComponentAst componentModel = getOnErrorComponentModel(innerComponent);
+            if (!componentModel.getRawParameterValue(WHEN_CHOICE_ES_ATTRIBUTE).isPresent()
+                && !componentModel.getRawParameterValue(TYPE_ES_ATTRIBUTE).isPresent()) {
+              throw new MuleRuntimeException(createStaticMessage(
+                                                                 "Every handler (except for the last one) within an 'error-handler' must specify a 'when' or 'type' attribute."));
+            }
+          });
     }
   }
 
-  private ComponentAst getOnErrorComponentModel(ComponentModel onErrorModel) {
+  private ComponentAst getOnErrorComponentModel(ComponentAst onErrorModel) {
     if (ON_ERROR_IDENTIFIER.equals(onErrorModel.getIdentifier())) {
-      String sharedOnErrorName = onErrorModel.getRawParameters().get(REFERENCE_ATTRIBUTE);
-      return findTopLevelNamedComponent(sharedOnErrorName).orElseThrow(
-                                                                       () -> new MuleRuntimeException(createStaticMessage(format("Could not find on-error reference named '%s'",
-                                                                                                                                 sharedOnErrorName))));
+      return onErrorModel.getRawParameterValue(REFERENCE_ATTRIBUTE)
+          .map(sharedOnErrorName -> findTopLevelNamedComponent(sharedOnErrorName)
+              .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("Could not find on-error reference named '%s'",
+                                                                                     sharedOnErrorName)))))
+          .orElse(onErrorModel);
     } else {
       return onErrorModel;
     }
   }
 
-  private void validateNamedTopLevelElementsHaveName(ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry)
-      throws ConfigurationException {
-    try {
-      topLevelComponentsStream().forEach(topLevelComponent -> {
+  private void validateNamedTopLevelElementsHaveName() {
+    topLevelComponentsStream().forEach(topLevelComponent -> {
+      if (topLevelComponent.getComponentId().isPresent()) {
+        // We have a name, good to go!
+        return;
+      }
+      if (!topLevelComponent.getModel(Object.class).isPresent()) {
+        // Skip the validation if there is no model available. This situation happens in some test cases.
+        return;
+      }
+      if (topLevelComponent.getModel(HasStereotypeModel.class)
+          .map(sm -> sm.getStereotype().isAssignableTo(APP_CONFIG))
+          .orElse(false)) {
+        // APP_CONFIGs need not be referenced by name, so this exception is ok
+        // Not making this exception would break backwards compatibility in spring:security-manager
+        return;
+      }
+
+      if (!topLevelComponent.getModel(ConstructModel.class).isPresent()
+          || topLevelComponent.getModel(ParameterizedModel.class)
+              .map(pmzd -> pmzd.getAllParameterModels().stream()
+                  .anyMatch(ParameterModel::isComponentId))
+              .orElse(false)) {
         final ComponentIdentifier identifier = topLevelComponent.getIdentifier();
-        componentBuildingDefinitionRegistry.getBuildingDefinition(identifier).filter(ComponentBuildingDefinition::isNamed)
-            .ifPresent(buildingDefinition -> {
-              if (!topLevelComponent.getComponentId().isPresent()) {
-                throw new MuleRuntimeException(createStaticMessage(format("Global element %s:%s does not provide a name attribute.",
-                                                                          identifier.getNamespace(), identifier.getName())));
-              }
-            });
-      });
-    } catch (Exception e) {
-      throw new ConfigurationException(e);
-    }
-  }
-
-  private void validateSingleElementsExistence() {
-    validateSingleElementExistence(MUNIT_AFTER_SUITE_IDENTIFIER);
-    validateSingleElementExistence(MUNIT_AFTER_SUITE_IDENTIFIER);
-    validateSingleElementExistence(MUNIT_BEFORE_TEST_IDENTIFIER);
-    validateSingleElementExistence(MUNIT_AFTER_TEST_IDENTIFIER);
-  }
-
-  private void validateSingleElementExistence(ComponentIdentifier componentIdentifier) {
-    Map<String, Map<ComponentIdentifier, ComponentAst>> existingComponentsPerFile = new HashMap<>();
-
-    recursiveStream().forEach(componentModel -> componentModel.getMetadata().getFileName()
-        .ifPresent(configFileName -> {
-          ComponentIdentifier identifier = componentModel.getIdentifier();
-
-          if (componentIdentifier.getNamespace().equals(identifier.getNamespace())
-              && componentIdentifier.getName().equals(identifier.getName())) {
-
-            if (existingComponentsPerFile.containsKey(configFileName)
-                && existingComponentsPerFile.get(configFileName).containsKey(identifier)) {
-              throw new MuleRuntimeException(createStaticMessage(
-                                                                 "Two configuration elements %s have been defined. Element [%s] must be unique. Clashing components are %s and %s",
-                                                                 identifier.getNamespace() + ":" + identifier.getName(),
-                                                                 identifier.getNamespace() + ":" + identifier.getName(),
-                                                                 componentModel.getComponentId().orElse(null),
-                                                                 existingComponentsPerFile.get(configFileName).get(identifier)
-                                                                     .getComponentId().orElse(null)));
-            }
-            Map<ComponentIdentifier, ComponentAst> existingComponentWithName = new HashMap<>();
-            existingComponentWithName.put(identifier, componentModel);
-            existingComponentsPerFile.put(configFileName, existingComponentWithName);
-          }
-        }));
+        throw new MuleRuntimeException(createStaticMessage(format("Global element %s:%s does not provide a name attribute.",
+                                                                  identifier.getNamespace(), identifier.getName())));
+      }
+    });
   }
 
   /**
@@ -1020,18 +1000,6 @@ public class ApplicationModel implements ArtifactAst {
    */
   public ConfigurationProperties getConfigurationProperties() {
     return configurationProperties;
-  }
-
-  private void executeOnEveryRootElementWithBuildingDefinition(BiConsumer<ComponentAst, ComponentBuildingDefinition<?>> action) {
-    if (componentBuildingDefinitionRegistry.isPresent()) {
-      ComponentBuildingDefinitionRegistry definitionRegistry = componentBuildingDefinitionRegistry.get();
-
-      topLevelComponentsStream().forEach(componentModel -> {
-        Optional<ComponentBuildingDefinition<?>> buildingDefinition =
-            definitionRegistry.getBuildingDefinition(componentModel.getIdentifier());
-        buildingDefinition.ifPresent(componentBuildingDefinition -> action.accept(componentModel, componentBuildingDefinition));
-      });
-    }
   }
 
   @Override
