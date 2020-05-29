@@ -11,7 +11,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.core.api.config.MuleManifest;
+import org.mule.runtime.core.api.context.MuleContextLifecycleTestCase;
 import org.mule.runtime.core.internal.util.JdkVersionUtils.JdkVersion;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -23,11 +26,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
 
 public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   private String originalJavaVersion;
   private Manifest originalManifest;
+
+  private static final Logger LOGGER = getLogger(JdkVersionUtilsTestCase.class);
 
   @Before
   public void before() {
@@ -54,6 +60,8 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testIsSupportedJdkVersion() {
+    LOGGER.error(String.valueOf(originalManifest));
+
     // supported
     assertTrue(JdkVersionUtils.isSupportedJdkVersion());
     setJdkVersion("1.8.0");
@@ -80,6 +88,8 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testUndefinedJdkPreferences() throws Exception {
+    LOGGER.error(String.valueOf(originalManifest));
+
     setJdkVersion("1.4.2");
 
     // not defined - blank
@@ -118,6 +128,8 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testRecommendedJdkVersion() {
+    LOGGER.error(String.valueOf(originalManifest));
+
     // recommended
     setJdkVersion("1.8.0_181");
     assertTrue(JdkVersionUtils.isRecommendedJdkVersion());
@@ -145,6 +157,8 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testJdkVersion() {
+    LOGGER.error(String.valueOf(originalManifest));
+
     JdkVersion jdkVersion = new JdkVersion("1.7");
     assertEquals(new Integer(1), jdkVersion.getMajor());
     assertEquals(new Integer(7), jdkVersion.getMinor());
@@ -169,6 +183,8 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testJdkVersionComparison() {
+    LOGGER.error(String.valueOf(originalManifest));
+
     JdkVersion jdk1_3 = new JdkVersion("1.3");
     JdkVersion jdk1_6_0_5 = new JdkVersion("1.6.0_5");
     JdkVersion jdk1_7 = new JdkVersion("1.7");
@@ -197,6 +213,8 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testValidateJdk() {
+    LOGGER.error(String.valueOf(originalManifest));
+
     JdkVersionUtils.validateJdk();
     setJdkVersion("1.8.0");
     JdkVersionUtils.validateJdk();
@@ -215,12 +233,16 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test(expected = java.lang.RuntimeException.class)
   public void testValidateJdk5() {
+    LOGGER.error(String.valueOf(originalManifest));
+
     setJdkVersion("1.5.1");
     JdkVersionUtils.validateJdk();
   }
 
   @Test
   public void testValidateJdk8() {
+    LOGGER.error(String.valueOf(originalManifest));
+
     setJdkVersion("1.8.0");
     JdkVersionUtils.validateJdk();
   }
