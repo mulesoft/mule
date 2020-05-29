@@ -71,7 +71,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
    * @param processorPath the path to mark as invoked.
    * @throws EmptyStackException if this stack is empty.
    */
-  public void setCurrentProcessorPath(String processorPath) {
+  public void pushCurrentProcessorPath(String processorPath) {
     if (!innerStack.isEmpty()) {
       synchronized (innerStack) {
         innerStack.push(new FlowStackElement(innerStack.pop().getFlowName(), processorPath));
