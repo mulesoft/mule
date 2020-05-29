@@ -9,8 +9,8 @@ package org.mule.module.http.functional.listener;
 import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.module.http.api.HttpConstants.HttpStatus.REQUEST_TOO_LONG;
 import static org.mule.module.http.internal.listener.grizzly.GrizzlyServerManager.MAXIMUM_HEADER_SECTION_SIZE_PROPERTY_KEY;
 
 import org.apache.http.client.fluent.Request;
@@ -38,14 +38,15 @@ public class HttpListenerHeaderSizeTestCase extends FunctionalTestCase
     @Test
     public void maxHeaderSizeExceeded() throws Exception
     {
-        Response response = sendRequestWithQueryParam(Integer.valueOf(maxHeaderSectionSizeSystemProperty.getValue()) + SIZE_DELTA);
-        assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(BAD_REQUEST.getStatusCode()));
+        int queryParamSize = Integer.parseInt(maxHeaderSectionSizeSystemProperty.getValue()) + SIZE_DELTA;
+        Response response = sendRequestWithQueryParam(queryParamSize);
+        assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(REQUEST_TOO_LONG.getStatusCode()));
     }
 
     @Test
     public void maxHeaderSizeNotExceeded() throws Exception
     {
-        int queryParamSize = Integer.valueOf(maxHeaderSectionSizeSystemProperty.getValue()) - SIZE_DELTA;
+        int queryParamSize = Integer.parseInt(maxHeaderSectionSizeSystemProperty.getValue()) - SIZE_DELTA;
         Response response = sendRequestWithQueryParam(queryParamSize);
         assertThat(response.returnResponse().getStatusLine().getStatusCode(), is(OK.getStatusCode()));
 
