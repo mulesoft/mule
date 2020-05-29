@@ -55,16 +55,31 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
     this.configurationPropertiesProvider = configurationPropertiesProvider;
   }
 
+  private boolean shouldResolvePlaceholder(String value, int prefixIndex) {
+    if (prefixIndex == 0) {
+      return true;
+    } else if (value.charAt(prefixIndex - 1) != '\\') {
+      return true;
+    } else if (prefixIndex == 1) {
+      return false;
+    } else if (prefixIndex > 1 && value.charAt(prefixIndex - 2) != '\\') {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   private int findPrefixIndex(String value, int offset) {
     int prefixIndex = value.indexOf(PLACEHOLDER_PREFIX);
     if (prefixIndex == -1) {
       return -1;
     }
-    if (prefixIndex != 0 && value.charAt(prefixIndex - 1) == '\\') {
+
+    if (shouldResolvePlaceholder(value, prefixIndex)) {
+      return prefixIndex + offset;
+    } else {
       int relativeOffset = prefixIndex + PLACEHOLDER_PREFIX.length();
       return findPrefixIndex(value.substring(relativeOffset), offset + relativeOffset);
-    } else {
-      return prefixIndex + offset;
     }
   }
 
@@ -170,11 +185,16 @@ public class DefaultConfigurationPropertiesResolver implements ConfigurationProp
       if (value.equals(PLACEHOLDER_PREFIX + innerPlaceholderKey + PLACEHOLDER_SUFFIX)) {
         return objectValueFound;
       }
-      testValue = testValue.replace(PLACEHOLDER_PREFIX + innerPlaceholderKey + PLACEHOLDER_SUFFIX,
-                                    objectValueFound.toString());
+      // Avoid propagating the escaped backslash
+      if (prefixIndex > 1 && testValue.charAt(prefixIndex - 1) == '\\' && testValue.charAt(prefixIndex - 2) == '\\') {
+        prefixIndex--;
+      }
+      testValue = testValue.substring(0, prefixIndex) + objectValueFound.toString() + testValue.substring(suffixIndex + 1);
+
       prefixIndex = prefixIndexConsideringBackslash(testValue);
     }
-    return CORRECT_USE_OF_BACKSLASH ? testValue.replace("\\" + PLACEHOLDER_PREFIX, PLACEHOLDER_PREFIX) : testValue;
+    return CORRECT_USE_OF_BACKSLASH ? testValue.replace("\\" + PLACEHOLDER_PREFIX, PLACEHOLDER_PREFIX)
+        : testValue;
   }
 
   private void propagateRootResolver(ConfigurationPropertiesResolver rootResolver) {
