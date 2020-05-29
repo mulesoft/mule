@@ -410,7 +410,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
       if (location != null) {
         ((DefaultFlowCallStack) event.getFlowCallStack())
-            .setCurrentProcessorPath(resolvedProcessorRepresentation);
+            .pushCurrentProcessorPath(resolvedProcessorRepresentation);
         sdkInternalContext.getPolicyToApply(location, eventId)
             .process(event, operationExecutionFunction, () -> resolutionResult, location, executorCallback);
       } else {
