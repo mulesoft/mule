@@ -759,6 +759,7 @@ public class ApplicationModel implements ArtifactAst {
     // TODO MULE-18318 (AST) all this validations will be moved to an entity that does the validation and allows to aggregate all
     // validations instead of failing fast.
     validateSingletonsAreNotRepeated();
+    validateSingletonsAreNotRepeatedPerFile();
     validateNameIsNotRepeated();
     validateNameHasValidCharacters();
     validateFlowRefPointsToExistingFlow();
@@ -809,7 +810,7 @@ public class ApplicationModel implements ArtifactAst {
 
     topLevelComponentsStream().forEach(componentModel -> {
       if (componentModel.getModel(EnrichableModel.class)
-          .map(enrchModel -> enrchModel.getModelProperty(SingletonModelProperty.class).isPresent())
+          .flatMap(enrchModel -> enrchModel.getModelProperty(SingletonModelProperty.class).map(smp -> !smp.isAppliesToFile()))
           .orElse(false)) {
         ComponentIdentifier singletonIdentifier = componentModel.getIdentifier();
         if (existingSingletonsByIdentifier.containsKey(singletonIdentifier)) {
@@ -830,6 +831,44 @@ public class ApplicationModel implements ArtifactAst {
           }
         }
         existingSingletonsByIdentifier.put(singletonIdentifier, componentModel);
+      }
+    });
+  }
+
+  private void validateSingletonsAreNotRepeatedPerFile() {
+    Map<String, Map<ComponentIdentifier, ComponentAst>> existingSingletonsByIdentifierByFileName = new HashMap<>();
+
+    topLevelComponentsStream().forEach(componentModel -> {
+      if (componentModel.getModel(EnrichableModel.class)
+          .flatMap(enrchModel -> enrchModel.getModelProperty(SingletonModelProperty.class)
+              .map(SingletonModelProperty::isAppliesToFile))
+          .orElse(false)) {
+
+        componentModel.getMetadata().getFileName()
+            .ifPresent(fileName -> {
+              Map<ComponentIdentifier, ComponentAst> existingSingletonsByIdentifier =
+                  existingSingletonsByIdentifierByFileName.computeIfAbsent(fileName, k -> new HashMap<>());
+
+              ComponentIdentifier singletonIdentifier = componentModel.getIdentifier();
+              if (existingSingletonsByIdentifier.containsKey(singletonIdentifier)) {
+                ComponentAst otherComponentModel = existingSingletonsByIdentifier.get(singletonIdentifier);
+                if (componentModel.getMetadata().getFileName().isPresent()
+                    && componentModel.getMetadata().getStartLine().isPresent()
+                    && otherComponentModel.getMetadata().getFileName().isPresent()
+                    && otherComponentModel.getMetadata().getStartLine().isPresent()) {
+                  throw new MuleRuntimeException(createStaticMessage("The configuration element [%s] can only appear once, but was present in both [%s:%d] and [%s:%d]",
+                                                                     componentModel.getIdentifier(),
+                                                                     otherComponentModel.getMetadata().getFileName().get(),
+                                                                     otherComponentModel.getMetadata().getStartLine().getAsInt(),
+                                                                     componentModel.getMetadata().getFileName().get(),
+                                                                     componentModel.getMetadata().getStartLine().getAsInt()));
+                } else {
+                  throw new MuleRuntimeException(createStaticMessage("The configuration element [%s] can only appear once, but was present multiple times",
+                                                                     componentModel.getIdentifier()));
+                }
+              }
+              existingSingletonsByIdentifier.put(singletonIdentifier, componentModel);
+            });
       }
     });
   }
