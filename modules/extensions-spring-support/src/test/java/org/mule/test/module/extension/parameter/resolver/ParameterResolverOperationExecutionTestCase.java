@@ -83,7 +83,7 @@ public class ParameterResolverOperationExecutionTestCase extends AbstractParamet
 
   @Test
   public void parameterResolverOfListOfComplexType() throws Exception {
-    assertExpressionResolverWeapon("processWeaponList", "#[mel:payload]",
+    assertExpressionResolverWeapon("processWeaponList", "#[payload]",
                                    allOf((Matcher) hasSize(1), hasItem(is(instanceOf(Weapon.class)))));
   }
 
@@ -95,7 +95,7 @@ public class ParameterResolverOperationExecutionTestCase extends AbstractParamet
 
   @Test
   public void parameterResolverOfListOfSimpleType() throws Exception {
-    assertExpressionResolverWeapon("processAddressBookAsExpression", "#[mel:['123-333-33','333-333-333']]",
+    assertExpressionResolverWeapon("processAddressBookAsExpression", "#[['123-333-33','333-333-333']]",
                                    allOf((Matcher) hasSize(2), hasItem(is(instanceOf(String.class)))));
   }
 
@@ -111,5 +111,10 @@ public class ParameterResolverOperationExecutionTestCase extends AbstractParamet
         (ParameterResolver) flowRunner(flowName).run().getMessage().getPayload().getValue();
     assertThat(weaponInfo.getExpression(), is(ofNullable(expression)));
     assertThat(weaponInfo.resolve(), weaponMatcher);
+  }
+
+  public static Ricin setMicrogramsPerKilo(Ricin payload, long value) {
+    payload.setMicrogramsPerKilo(value);
+    return payload;
   }
 }

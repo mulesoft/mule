@@ -9,7 +9,7 @@
 
     <flow name="listenAndByteBanana">
         <vegan:get-lunch config-ref="banana" />
-        <expression-component>mel:payload.bite()</expression-component>
+        <set-payload value="#[java!org::mule::test::module::extension::operation::FlowListenerOperationExecutionTestCase::bite(payload)]"/>
     </flow>
 
     <flow name="listenAndEatMeat">
@@ -19,7 +19,7 @@
 
     <flow name="listenAndFail">
         <vegan:get-lunch config-ref="banana"/>
-        <expression-component>mel:bla bla bla</expression-component>
+        <set-payload value="#[!null.a]"/>
     </flow>
                   
 </mule>

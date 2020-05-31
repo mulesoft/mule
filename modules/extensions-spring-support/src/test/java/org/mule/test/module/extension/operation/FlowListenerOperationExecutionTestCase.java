@@ -76,4 +76,9 @@ public class FlowListenerOperationExecutionTestCase extends AbstractExtensionFun
       return true;
     });
   }
+
+  public static Fruit bite(Fruit payload) {
+    payload.bite();
+    return payload;
+  }
 }

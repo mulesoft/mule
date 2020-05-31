@@ -176,16 +176,6 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="expression-component" substitutionGroup="abstract-mixed-content-message-processor">
-        <xsd:complexType>
-            <xsd:complexContent mixed="true">
-                <xsd:extension base="abstractMixedContentMessageProcessorType">
-                    <xsd:attribute name="file" use="optional"/>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-
     <xsd:element name="invoke" type="invokeType" substitutionGroup="top-level-processor">
         <xsd:annotation>
             <xsd:documentation>

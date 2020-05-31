@@ -113,7 +113,6 @@ import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.internal.el.ExpressionLanguageComponent;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.el.mvel.configuration.AliasEntry;
 import org.mule.runtime.core.internal.el.mvel.configuration.ImportEntry;
@@ -630,12 +629,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("initialisationPolicy", fromSimpleParameter("initialisationPolicy",
                                                                                    PoolingProfile.POOL_INITIALISATION_POLICIES::get)
                                                                                        .build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("expression-component")
-        .withTypeDefinition(fromType(ExpressionLanguageComponent.class))
-        .withSetterParameterDefinition("expression", fromTextContent().build())
-        .withSetterParameterDefinition("expressionFile", fromSimpleParameter("file").build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("invoke")

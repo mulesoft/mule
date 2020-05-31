@@ -70,6 +70,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
@@ -569,4 +570,25 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     return ImmutableMap.<QName, Object>builder().put(LOCATION_KEY, from(rootComponentName)).build();
   }
 
+  public static Object sleepFor(Object payload, long millis) {
+    try {
+      Thread.sleep(millis);
+    } catch (InterruptedException e) {
+      Thread.interrupted();
+      return payload;
+    }
+    return payload;
+
+  }
+
+  public static Object awaitLatch(Object payload, CountDownLatch latch) {
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      Thread.interrupted();
+      return payload;
+    }
+    return payload;
+
+  }
 }

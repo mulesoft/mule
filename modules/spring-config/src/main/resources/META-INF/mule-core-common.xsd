@@ -287,19 +287,6 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="abstract-mixed-content-message-processor" abstract="true" type="abstractMixedContentMessageProcessorType" >
-        <xsd:annotation>
-            <xsd:documentation>
-                A placeholder for message processor elements.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="abstractMixedContentMessageProcessorType">
-        <xsd:complexContent>
-            <xsd:extension base="annotatedMixedContentType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-
     <!--Operators-->
     <xsd:element name="abstract-operator" abstract="true" type="abstractOperatorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
@@ -355,7 +342,6 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:element ref="abstract-mixed-content-message-processor"/>
         </xsd:choice>
     </xsd:group>
 
