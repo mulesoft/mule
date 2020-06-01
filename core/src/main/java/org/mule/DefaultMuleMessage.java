@@ -175,10 +175,19 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         this(message, inboundProperties, outboundProperties, attachments, muleContext, createDefaultDataType(message, muleContext));
     }
+    
+    public DefaultMuleMessage(Object message, Map<String, Object> inboundProperties,
+            Map<String, Object> outboundProperties, Map<String, DataHandler> attachments,
+            MuleContext muleContext, DataType dataType)
+    {
+        this(message, inboundProperties,
+                outboundProperties, attachments,
+                muleContext, dataType, false);
+    }
 
     public DefaultMuleMessage(Object message, Map<String, Object> inboundProperties,
                               Map<String, Object> outboundProperties, Map<String, DataHandler> attachments,
-                              MuleContext muleContext, DataType dataType)
+                              MuleContext muleContext, DataType dataType, boolean isTargetSet)
     {
         id =  UUID.getUUID();
         rootId = id;
@@ -196,7 +205,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             setPayload(message, dataType);
             originalPayload = message;
         }
-        addProperties(inboundProperties, PropertyScope.INBOUND);
+        addProperties(inboundProperties, PropertyScope.INBOUND, isTargetSet);
         addProperties(outboundProperties);
 
         //Add inbound attachments
@@ -491,16 +500,30 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     @Override
     public void setProperty(String key, Object value, PropertyScope scope)
     {
+        setProperty(key, value, scope, false);
+    }
+    
+    private void setProperty(String key, Object value, PropertyScope scope, boolean isTargetSet)
+    {
         DataType dataType = DataTypeFactory.createFromObject(value);
-        setProperty(key, value, scope, dataType);
+        setProperty(key, value, scope, dataType, isTargetSet);
     }
 
     @Override
     public void setProperty(String key, Object value, PropertyScope scope, DataType<?> dataType)
     {
+    	setProperty(key, value, scope, dataType, false);
+    }
+    
+    private void setProperty(String key, Object value, PropertyScope scope, DataType<?> dataType, boolean isTargetSet)
+    {
         setPropertyInternal(key, value, scope, dataType);
 
-        updateDataTypeWithProperty(key, value);
+        // MULE-18461: in case the target is set the original data type should preserverd
+        if (!isTargetSet)
+        {
+            updateDataTypeWithProperty(key, value);
+        }
     }
 
     private void setPropertyInternal(String key, Object value, PropertyScope scope, DataType<?> dataType)
@@ -1389,6 +1412,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     @Override
     public void addProperties(Map<String, Object> props, PropertyScope scope)
     {
+    	addProperties(props, scope, false);
+    }
+    
+    private void addProperties(Map<String, Object> props, PropertyScope scope, boolean isTargetSet)
+    {
         assertAccess(WRITE);
         if (props != null)
         {
@@ -1396,7 +1424,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             {
                 for (Map.Entry<String, Object> entry : props.entrySet())
                 {
-                    setProperty(entry.getKey(), entry.getValue(), scope);
+                    setProperty(entry.getKey(), entry.getValue(), scope, isTargetSet);
                 }
             }
         }
