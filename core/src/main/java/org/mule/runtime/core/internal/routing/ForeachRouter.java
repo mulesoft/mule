@@ -256,11 +256,6 @@ class ForeachRouter {
 
   private void subscribeUpstreamChains(Context downstreamContext) {
     innerFlux.subscriberContext(downstreamContext)
-        .doOnError(e -> {
-          if (!(e.getCause() instanceof IndexOutOfBoundsException)) {
-            LOGGER.error("Exception during foreach execution: " + e.getCause());
-          }
-        })
         .subscribe();
     upstreamFlux.subscriberContext(downstreamContext).subscribe();
   }
