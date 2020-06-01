@@ -63,6 +63,7 @@ public class PolicyEventMapper {
    */
   public CoreEvent onOperationPolicyBegin(CoreEvent event) {
     Map<String, TypedValue<?>> variables = loadVars(event);
+    from(event).setOriginalEvent(event);
 
     return InternalEvent
         .builder(event)
