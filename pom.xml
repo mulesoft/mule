@@ -129,7 +129,7 @@
         <javadocPluginVersion>2.9.1</javadocPluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
         <mavenCompilerVersion>3.1</mavenCompilerVersion>
-        
+
         <!--
             The above project.url will not be picked up in the manifest,
             instead a module artifact id is erroneously substituted.
@@ -2222,6 +2222,10 @@
                         </executions>
                         <configuration>
                             <skip>${skipGpg}</skip>
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
                         </configuration>
                     </plugin>
                 </plugins>
