@@ -574,7 +574,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     try {
       Thread.sleep(millis);
     } catch (InterruptedException e) {
-      Thread.interrupted();
+      currentThread().interrupt();
       return payload;
     }
     return payload;
@@ -585,7 +585,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     try {
       latch.await();
     } catch (InterruptedException e) {
-      Thread.interrupted();
+      currentThread().interrupt();
       return payload;
     }
     return payload;
