@@ -128,7 +128,7 @@ public class HttpResponseToMuleEvent
         String requestMessageId = muleEvent.getMessage().getUniqueId();
         String requestMessageRootId = muleEvent.getMessage().getMessageRootId();
         DefaultMuleMessage message = new DefaultMuleMessage(muleEvent.getMessage().getPayload(), inboundProperties,
-                                                            null, inboundAttachments, muleContext, dataType);
+                                                            null, inboundAttachments, muleContext, dataType, isTargetSet());
 
         if (encoding != null)
         {
@@ -216,7 +216,7 @@ public class HttpResponseToMuleEvent
      */
     private void setResponsePayload(Object payload, MuleEvent muleEvent)
     {
-        if (isEmpty(requester.getTarget()) || DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getTarget()) )
+        if (!isTargetSet())
         {
             muleEvent.getMessage().setPayload(payload, muleEvent.getMessage().getDataType());
         }
@@ -225,6 +225,10 @@ public class HttpResponseToMuleEvent
             muleContext.getExpressionManager().enrich(requester.getTarget(), muleEvent, payload);
         }
     }
+
+	private boolean isTargetSet() {
+		return !isEmpty(requester.getTarget()) && !DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getTarget());
+	}
 
 
     private void processCookies(HttpResponse response, String uri)
