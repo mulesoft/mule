@@ -841,7 +841,7 @@ class MuleExtensionModelDeclarer {
     ConstructDeclarer configuration = extensionDeclarer.withConstruct("configuration")
         .allowingTopLevelDefinition()
         .withStereotype(APP_CONFIG)
-        .withModelProperty(new SingletonModelProperty())
+        .withModelProperty(new SingletonModelProperty(false))
         .describedAs("Specifies defaults and general settings for the Mule instance.");
 
     addReconnectionStrategyParameter(configuration.getDeclaration());
