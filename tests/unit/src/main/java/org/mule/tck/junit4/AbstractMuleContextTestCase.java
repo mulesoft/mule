@@ -7,6 +7,7 @@
 package org.mule.tck.junit4;
 
 import static java.lang.Thread.currentThread;
+import static java.lang.Thread.sleep;
 import static java.lang.reflect.Proxy.getInvocationHandler;
 import static java.lang.reflect.Proxy.isProxyClass;
 import static java.util.Collections.emptyList;
@@ -572,10 +573,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   public static Object sleepFor(Object payload, long millis) {
     try {
-      Thread.sleep(millis);
+      sleep(millis);
     } catch (InterruptedException e) {
       currentThread().interrupt();
-      return payload;
     }
     return payload;
 
@@ -586,7 +586,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       latch.await();
     } catch (InterruptedException e) {
       currentThread().interrupt();
-      return payload;
     }
     return payload;
 
