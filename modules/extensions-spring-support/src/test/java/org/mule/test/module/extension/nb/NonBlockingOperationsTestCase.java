@@ -67,9 +67,8 @@ public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTe
 
   @Test
   public void failingNonBlockingConnectedOperation() throws Exception {
-    // TODO MULE-18366 fix this location
     expectedException.expectFailingComponent(is(locator
-        .find(Location.builder().globalName("fireMissile").addProcessorsPart().addIndexPart(0).build()).get()));
+        .find(Location.builder().globalName("fireMissile").addProcessorsPart().addIndexPart(1).build()).get()));
     expectedException.expectMessage(is(MISSILE_PROOF));
     expectedException.expectCause(instanceOf(UnsupportedOperationException.class));
 
