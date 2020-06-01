@@ -60,7 +60,8 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testIsSupportedJdkVersion() {
-    LOGGER.error(String.valueOf(originalManifest));
+    LOGGER.error("Main attributes");
+    LOGGER.error(String.valueOf(originalManifest.getMainAttributes().entrySet()));
 
     // supported
     assertTrue(JdkVersionUtils.isSupportedJdkVersion());
@@ -88,7 +89,8 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testUndefinedJdkPreferences() throws Exception {
-    LOGGER.error(String.valueOf(originalManifest));
+    LOGGER.error("Main attributes");
+    LOGGER.error(String.valueOf(originalManifest.getMainAttributes().entrySet()));
 
     setJdkVersion("1.4.2");
 
@@ -128,7 +130,8 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testRecommendedJdkVersion() {
-    LOGGER.error(String.valueOf(originalManifest));
+    LOGGER.error("Main attributes");
+    LOGGER.error(String.valueOf(originalManifest.getMainAttributes().entrySet()));
 
     // recommended
     setJdkVersion("1.8.0_181");
@@ -157,7 +160,8 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testJdkVersion() {
-    LOGGER.error(String.valueOf(originalManifest));
+    LOGGER.error("Main attributes");
+    LOGGER.error(String.valueOf(originalManifest.getMainAttributes().entrySet()));
 
     JdkVersion jdkVersion = new JdkVersion("1.7");
     assertEquals(new Integer(1), jdkVersion.getMajor());
@@ -183,7 +187,8 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testJdkVersionComparison() {
-    LOGGER.error(String.valueOf(originalManifest));
+    LOGGER.error("Main attributes");
+    LOGGER.error(String.valueOf(originalManifest.getMainAttributes().entrySet()));
 
     JdkVersion jdk1_3 = new JdkVersion("1.3");
     JdkVersion jdk1_6_0_5 = new JdkVersion("1.6.0_5");
@@ -213,7 +218,8 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testValidateJdk() {
-    LOGGER.error(String.valueOf(originalManifest));
+    LOGGER.error("Main attributes");
+    LOGGER.error(String.valueOf(originalManifest.getMainAttributes().entrySet()));
 
     JdkVersionUtils.validateJdk();
     setJdkVersion("1.8.0");
@@ -233,7 +239,8 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test(expected = java.lang.RuntimeException.class)
   public void testValidateJdk5() {
-    LOGGER.error(String.valueOf(originalManifest));
+    LOGGER.error("Main attributes");
+    LOGGER.error(String.valueOf(originalManifest.getMainAttributes().entrySet()));
 
     setJdkVersion("1.5.1");
     JdkVersionUtils.validateJdk();
@@ -241,7 +248,8 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testValidateJdk8() {
-    LOGGER.error(String.valueOf(originalManifest));
+    LOGGER.error("Main attributes");
+    LOGGER.error(String.valueOf(originalManifest.getMainAttributes().entrySet()));
 
     setJdkVersion("1.8.0");
     JdkVersionUtils.validateJdk();
