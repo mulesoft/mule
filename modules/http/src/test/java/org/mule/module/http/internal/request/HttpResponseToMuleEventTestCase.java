@@ -9,9 +9,12 @@ package org.mule.module.http.internal.request;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.api.config.MuleProperties.CONTENT_TYPE_PROPERTY;
 import static org.mule.api.transport.PropertyScope.INBOUND;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.transformer.types.MimeTypes.ANY;
+import static org.mule.transformer.types.MimeTypes.TEXT;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.module.http.internal.domain.InputStreamHttpEntity;
@@ -46,8 +49,8 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
     {
         httpRequester = new DefaultHttpRequester();
         httpRequester.setConfig(new DefaultHttpRequesterConfig());
-        httpResponseToMuleEvent = new HttpResponseToMuleEvent(httpRequester, muleContext, new AttributeEvaluator("true"));
-
+        httpResponseToMuleEvent = new HttpResponseToMuleEvent(httpRequester, muleContext, new AttributeEvaluator("true").initialize(null));
+        
         HttpResponseBuilder builder = new HttpResponseBuilder();
         builder.setEntity(new InputStreamHttpEntity(new ByteArrayInputStream(TEST_MESSAGE.getBytes())));
         builder.addHeader(TEST_HEADER, TEST_VALUE);
@@ -81,6 +84,41 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
         httpResponseToMuleEvent.convert(event, httpResponse, null);
         InputStream responseStream = (InputStream) event.getMessage().getPayload();
         assertThat(IOUtils.toString(responseStream), equalTo(TEST_MESSAGE));
+    }
+    
+    @Test
+    public void responseMimeTypeIsPreservedWhenTargetInRequester() throws Exception
+    {   
+        testMimeTypePropagation("#[flowVars.target]", TEXT, ANY);
+    }
+    
+    @Test
+    public void responseMimeTypeIsPreservedWhenTargetIsPayloadInRequester() throws Exception
+    {
+        testMimeTypePropagation("#[payload]", TEXT, TEXT);
+    }
+
+    @Test
+    public void responseMimeTypeIsPreservedWhenNoTargetInRequester() throws Exception
+    {
+        testMimeTypePropagation(null, TEXT, TEXT);
+    }
+
+    private void testMimeTypePropagation(String target, String originalTargetType, String expectedMimetype) throws Exception, MessagingException
+    {
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
+        HttpResponseBuilder builder = new HttpResponseBuilder();
+        builder.setEntity(new InputStreamHttpEntity(new ByteArrayInputStream(TEST_MESSAGE.getBytes())));
+        builder.addHeader(CONTENT_TYPE_PROPERTY, TEXT);
+        builder.setStatusCode(200);
+        builder.setReasonPhrase("OK");
+        if (target != null)
+        {
+            httpRequester.setTarget(target);
+        }
+        httpResponse = builder.build();
+        httpResponseToMuleEvent.convert(event, httpResponse, null);
+        assertThat(event.getMessage().getDataType().getMimeType(), equalTo(expectedMimetype));
     }
 
     @Test
