@@ -31,7 +31,6 @@ import static org.mule.runtime.ast.api.util.MuleAstUtils.resolveOrphanComponents
 import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.generateFor;
 import static org.mule.runtime.config.internal.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.config.internal.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
-import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
@@ -40,6 +39,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.metadata.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore.SHARED_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
@@ -52,6 +52,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
+import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.util.Pair;
@@ -62,7 +63,6 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
 import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
@@ -78,7 +78,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.dsl.api.ConfigResource;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
@@ -94,9 +93,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Spliterator;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -220,7 +217,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     }
 
     initialize();
-    //Graph should be generated after the initialize() method since the applicationModel will change by macro expanding XmlSdk components.
+    // Graph should be generated after the initialize() method since the applicationModel will change by macro expanding XmlSdk
+    // components.
     this.graph = generateFor(getApplicationModel());
   }
 
@@ -414,64 +412,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   }
 
   private ArtifactAst buildMinimalApplicationModel(final Predicate<ComponentAst> basePredicate) {
-    final Predicate<? super ComponentAst> txManagerPredicate = componentModel -> {
-      final ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(componentModel);
-      return componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
-          .map(componentBuildingDefinition -> {
-            componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
-            return TransactionManagerFactory.class.isAssignableFrom(objectTypeVisitor.getType());
-          }).orElse(false);
-    };
-
-    final Predicate<? super ComponentAst> alwaysEnabledPredicate =
-        componentModel -> componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
-            .map(ComponentBuildingDefinition::isAlwaysEnabled).orElse(false);
-
-    final Predicate<? super ComponentAst> languageConstructPredicate =
-        componentModel -> beanDefinitionFactory.isLanguageConstructComponent(componentModel.getIdentifier());
-
-    final ArtifactAst predicatedModel = graph.minimalArtifactFor(basePredicate
-        .or(txManagerPredicate)
-        .or(alwaysEnabledPredicate)
-        .or(languageConstructPredicate));
-
-    final Set<String> allNamespaces = predicatedModel.recursiveStream()
-        .map(comp -> comp.getIdentifier().getNamespaceUri())
-        .collect(toSet());
-
-    return new ArtifactAst() {
-
-      @Override
-      public Stream<ComponentAst> topLevelComponentsStream() {
-        return Stream.concat(getDefaultGlobalElements(), predicatedModel.topLevelComponentsStream());
-      }
-
-      @Override
-      public Spliterator<ComponentAst> topLevelComponentsSpliterator() {
-        return Stream.concat(getDefaultGlobalElements(), predicatedModel.topLevelComponentsStream()).spliterator();
-      }
-
-      @Override
-      public Stream<ComponentAst> recursiveStream() {
-        return Stream.concat(getDefaultGlobalElements()
-            .flatMap(comp -> comp.recursiveStream()), predicatedModel.recursiveStream());
-      }
-
-      @Override
-      public Spliterator<ComponentAst> recursiveSpliterator() {
-        return Stream.concat(getDefaultGlobalElements()
-            .flatMap(comp -> comp.recursiveStream()), predicatedModel.recursiveStream()).spliterator();
-      }
-
-      private Stream<ComponentAst> getDefaultGlobalElements() {
-        // defaultGlobalElements from XML DSK components are not referenced from the app, so we need to initialize those if there
-        // is any operation that may use it in the app.
-        return getApplicationModel().topLevelComponentsStream()
-            .filter(comp -> DEFAULT_GLOBAL_ELEMENTS.equals(comp.getIdentifier().getName())
-                && allNamespaces.contains(comp.getIdentifier().getNamespaceUri()))
-            .flatMap(comp -> comp.directChildrenStream());
-      }
-    };
+    return graph.minimalArtifactFor(basePredicate
+        .or(cm -> cm.getModel(HasStereotypeModel.class)
+            .map(stm -> stm.getStereotype().isAssignableTo(APP_CONFIG))
+            .orElse(false)));
   }
 
   /**
@@ -690,10 +634,13 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     }
   }
 
+  /*
+   * Just register the locations, do not do any initialization!
+   */
   @Override
   protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
     getApplicationModel().recursiveStream()
-        .filter(cm -> !beanDefinitionFactory.isComponentIgnored(cm.getIdentifier()))
+        .filter(cm -> !isIgnored(cm))
         .forEach(cm -> componentLocator.addComponentLocation(cm.getLocation()));
   }
 

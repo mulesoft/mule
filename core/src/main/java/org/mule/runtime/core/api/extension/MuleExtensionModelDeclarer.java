@@ -17,6 +17,7 @@ import static org.mule.runtime.api.meta.model.display.PathModel.Location.EMBEDDE
 import static org.mule.runtime.api.meta.model.display.PathModel.Type.FILE;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.COMPOSITE_ROUTING;
@@ -169,12 +170,16 @@ class MuleExtensionModelDeclarer {
     // errors
     declareErrors(extensionDeclarer);
 
+    // misc
+    declareNotifications(extensionDeclarer);
+
     return extensionDeclarer;
   }
 
   private void declareObject(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     ConstructDeclarer object = extensionDeclarer.withConstruct("object")
         .allowingTopLevelDefinition()
+        .withStereotype(newStereotype("OBJECT", "MULE").withParent(APP_CONFIG).build())
         .describedAs("Element to declare a java object. Objects declared globally can be referenced from other parts of the " +
             "configuration or recovered programmatically through org.mule.runtime.api.artifact.Registry.")
         .withDeprecation(new ImmutableDeprecationModel("Only meant to be used for backwards compatibility.", "4.0", "5.0"));
@@ -951,6 +956,15 @@ class MuleExtensionModelDeclarer {
             + "It may be a location in the classpath or an absolute location. \nThe file location"
             + " value may also contains references to properties that will only be resolved based on "
             + "system properties or properties set at deployment time.");
+  }
+
+  private void declareNotifications(ExtensionDeclarer extensionDeclarer) {
+    // TODO MULE-17778: Complete this declaration
+    extensionDeclarer.withConstruct("notifications")
+        .allowingTopLevelDefinition()
+        .withStereotype(newStereotype("NOTIFICATIONS", "MULE").withParent(APP_CONFIG).build())
+        .describedAs("Registers listeners for notifications and associates interfaces with particular events.")
+        .withDeprecation(new ImmutableDeprecationModel("Only meant to be used for backwards compatibility.", "4.0", "5.0"));;
   }
 
 }

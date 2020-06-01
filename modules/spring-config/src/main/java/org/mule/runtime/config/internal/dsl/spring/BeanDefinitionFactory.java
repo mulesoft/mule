@@ -16,9 +16,6 @@ import static org.mule.runtime.api.component.Component.Annotations.REPRESENTATIO
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_DOMAIN_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_EE_DOMAIN_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.MULE_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry.WrapperElementType.SINGLE;
 import static org.mule.runtime.config.internal.dsl.spring.CommonBeanDefinitionCreator.areMatchingTypes;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.addAnnotation;
@@ -96,9 +93,6 @@ public class BeanDefinitionFactory {
 
   private final ImmutableSet<ComponentIdentifier> ignoredMuleCoreComponentIdentifiers =
       ImmutableSet.<ComponentIdentifier>builder()
-          .add(MULE_IDENTIFIER)
-          .add(MULE_DOMAIN_IDENTIFIER)
-          .add(MULE_EE_DOMAIN_IDENTIFIER)
           .add(ERROR_MAPPING_IDENTIFIER)
           .add(DESCRIPTION_IDENTIFIER)
           .add(ANNOTATIONS_ELEMENT_IDENTIFIER)

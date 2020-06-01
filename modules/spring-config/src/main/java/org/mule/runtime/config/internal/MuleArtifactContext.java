@@ -43,6 +43,7 @@ import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationProcessor.processXmlConfiguration;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
@@ -58,6 +59,7 @@ import org.mule.runtime.api.ioc.ObjectProvider;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.stereotype.HasStereotypeModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.ResourceLocator;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
@@ -148,7 +150,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   public static final String INNER_BEAN_PREFIX = "(inner bean)";
 
-  protected final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry =
+  private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry =
       new ComponentBuildingDefinitionRegistry();
   private final OptionalObjectsController optionalObjectsController;
   private final Map<String, String> artifactProperties;
@@ -160,7 +162,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final ApplicationModel applicationModel;
   private final MuleContextWithRegistry muleContext;
   private final ConfigResource[] artifactConfigResources;
-  protected BeanDefinitionFactory beanDefinitionFactory;
+  private final BeanDefinitionFactory beanDefinitionFactory;
   private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
   private final ArtifactType artifactType;
   protected SpringConfigurationComponentLocator componentLocator = new SpringConfigurationComponentLocator(componentName -> {
@@ -450,8 +452,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
           resolveErrorTypes(innerComponent, syntheticErrorNamespaces);
         });
 
-    componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
-        .ifPresent(componentBuildingDefinition -> registerErrorMappings(componentModel, syntheticErrorNamespaces));
+    registerErrorMappings(componentModel, syntheticErrorNamespaces);
   }
 
   private void registerErrorMappings(ComponentAst componentModel, Set<String> syntheticErrorNamespaces) {
@@ -548,15 +549,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   protected List<Pair<String, ComponentAst>> doCreateApplicationComponents(DefaultListableBeanFactory beanFactory,
                                                                            ArtifactAst applicationModel, boolean mustBeRoot,
                                                                            Map<ComponentAst, SpringComponentModel> springComponentModels) {
-    Set<String> alwaysEnabledTopLevelComponents = applicationModel.topLevelComponentsStream()
-        .filter(cm -> this.componentBuildingDefinitionRegistry.getBuildingDefinition(cm.getIdentifier())
-            .map(buildingDefinition -> buildingDefinition.isAlwaysEnabled()).orElse(false))
-        .filter(cm -> cm.getComponentId().isPresent())
-        .map(cm -> cm.getComponentId().get())
-        .collect(toSet());
+    Set<String> alwaysEnabledTopLevelComponents = new HashSet<>();
     Set<ComponentIdentifier> alwaysEnabledUnnamedTopLevelComponents = applicationModel.topLevelComponentsStream()
-        .filter(cm -> this.componentBuildingDefinitionRegistry.getBuildingDefinition(cm.getIdentifier())
-            .map(buildingDefinition -> buildingDefinition.isAlwaysEnabled()).orElse(false))
+        .filter(cm -> cm.getModel(HasStereotypeModel.class)
+            .map(stm -> stm.getStereotype().isAssignableTo(APP_CONFIG))
+            .orElse(false))
+        .peek(cm -> cm.getComponentId().ifPresent(alwaysEnabledTopLevelComponents::add))
         .filter(cm -> !cm.getComponentId().isPresent())
         .map(cm -> cm.getIdentifier())
         .collect(toSet());
@@ -568,7 +566,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     recursiveStreamWithHierarchy(applicationModel)
         .filter(cm -> !mustBeRoot || rootComponents.contains(cm.getFirst()))
-        .filter(cm -> !beanDefinitionFactory.isComponentIgnored(cm.getFirst().getIdentifier()))
+        .filter(cm -> !isIgnored(cm.getFirst()))
         .forEach(cm -> {
           if (rootComponents.contains(cm.getFirst())) {
             cm.getFirst().getComponentId()
@@ -620,6 +618,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }));
 
     return createdComponentModels;
+  }
+
+  protected boolean isIgnored(ComponentAst componentAst) {
+    return beanDefinitionFactory.isComponentIgnored(componentAst.getIdentifier());
   }
 
   private Set<ComponentAst> resolveRootComponents(ArtifactAst applicationModel) {
