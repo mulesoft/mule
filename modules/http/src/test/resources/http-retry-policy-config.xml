@@ -12,4 +12,8 @@
         <http:request config-ref="requestConfig" method="#[flowVars.httpMethod]"  path="test" />
     </flow>
 
+    <flow name="testRetryPolicyWithPayload">
+        <http:request config-ref="requestConfig" method="#[flowVars.httpMethod]"  path="test" source="#[payload]"/>
+    </flow>
+
 </mule>
