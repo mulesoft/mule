@@ -1816,42 +1816,27 @@
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                         <!-- Custom Entries -->
-                            <manifestSections>
-                                <manifestSection>
-                                    <name>Repository revision</name>
-                                    <manifestEntries>
-                                        <!-- include repository revision from buildnumber plugin -->
-                                        <Build-Revision>${buildNumber}</Build-Revision>
-                                        <Build-Date>${timestamp}</Build-Date>
-                                        <Dev-List-Email>${dev.list}</Dev-List-Email>
-                                        <Supported-Jdks>[${javaVersion}.0,12)</Supported-Jdks>
-                                        <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12)</Recommended-Jdks>
-                                    </manifestEntries>
-                                </manifestSection>
-                                <manifestSection>
-                                    <name>Product info</name>
-                                    <manifestEntries>
-                                        <More-Info>For more information go to ${productUrl}</More-Info>
-                                        <Support>Get commercial support: ${project.organization.url}/support</Support>
-                                        <Description>Mule Runtime and Integration Platform</Description>
-                                        <License>CPAL v1.0 http://www.mulesoft.com/CPAL/</License>
-                                        <Vendor-Url>${project.organization.url}</Vendor-Url>
-                                        <Product-Url>${productUrl}</Product-Url>
-                                        <Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date>
-                                    </manifestEntries>
-                                </manifestSection>
-                                <manifestSection>
-                                    <name>Git info</name>
-                                    <manifestEntries>
-                                        <Git-tags>${git.tags}</Git-tags>
-                                        <Git-branch>${git.branch}</Git-branch>
-                                        <Git-remote-origin-url>${git.remote.origin.url}</Git-remote-origin-url>
-                                        <Git-commit-id>${git.commit.id}</Git-commit-id>
-                                        <Git-commit-id-describe>${git.commit.id.describe}</Git-commit-id-describe>
-                                        <Git-commit-time>${git.commit.time}</Git-commit-time>
-                                    </manifestEntries>
-                                </manifestSection>
-                            </manifestSections>
+                        <manifestEntries>
+                            <!-- include repository revision from buildnumber plugin -->
+                            <Build-Revision>${buildNumber}</Build-Revision>
+                            <Build-Date>${timestamp}</Build-Date>
+                            <Dev-List-Email>${dev.list}</Dev-List-Email>
+                            <Supported-Jdks>[${javaVersion}.0,12)</Supported-Jdks>
+                            <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12)</Recommended-Jdks>
+                            <More-Info>For more information go to ${productUrl}</More-Info>
+                            <Support>Get commercial support: ${project.organization.url}/support</Support>
+                            <Description>Mule Runtime and Integration Platform</Description>
+                            <License>CPAL v1.0 http://www.mulesoft.com/CPAL/</License>
+                            <Vendor-Url>${project.organization.url}</Vendor-Url>
+                            <Product-Url>${productUrl}</Product-Url>
+                            <Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date>
+                            <Git-tags>${git.tags}</Git-tags>
+                            <Git-branch>${git.branch}</Git-branch>
+                            <Git-remote-origin-url>${git.remote.origin.url}</Git-remote-origin-url>
+                            <Git-commit-id>${git.commit.id}</Git-commit-id>
+                            <Git-commit-id-describe>${git.commit.id.describe}</Git-commit-id-describe>
+                            <Git-commit-time>${git.commit.time}</Git-commit-time>
+                        </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
