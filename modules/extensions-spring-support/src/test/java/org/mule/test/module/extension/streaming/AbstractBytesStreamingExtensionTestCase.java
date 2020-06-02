@@ -62,10 +62,11 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
   private static final int DELAY = 200;
   private static List<String> CASTED_SPELLS = new LinkedList<>();
 
-  public static void addSpell(String spell) {
+  public static String addSpell(String spell) {
     synchronized (CASTED_SPELLS) {
       CASTED_SPELLS.add(spell);
     }
+    return spell;
   }
 
   @Inject

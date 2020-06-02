@@ -188,9 +188,7 @@
     </flow>
 
     <sub-flow name="castSpell">
-        <expression-component>mel:
-            org.mule.test.module.extension.streaming.AbstractBytesStreamingExtensionTestCase.addSpell(payload)
-        </expression-component>
+        <set-payload value="#[java!org::mule::test::module::extension::streaming::AbstractBytesStreamingExtensionTestCase::addSpell(payload)]"/>
     </sub-flow>
 
     <sub-flow name="assertPayloadIsStreamProvider">

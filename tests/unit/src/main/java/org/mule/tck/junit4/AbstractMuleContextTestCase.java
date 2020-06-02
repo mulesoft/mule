@@ -7,6 +7,7 @@
 package org.mule.tck.junit4;
 
 import static java.lang.Thread.currentThread;
+import static java.lang.Thread.sleep;
 import static java.lang.reflect.Proxy.getInvocationHandler;
 import static java.lang.reflect.Proxy.isProxyClass;
 import static java.util.Collections.emptyList;
@@ -70,6 +71,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
@@ -569,4 +571,23 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     return ImmutableMap.<QName, Object>builder().put(LOCATION_KEY, from(rootComponentName)).build();
   }
 
+  public static Object sleepFor(Object payload, long millis) {
+    try {
+      sleep(millis);
+    } catch (InterruptedException e) {
+      currentThread().interrupt();
+    }
+    return payload;
+
+  }
+
+  public static Object awaitLatch(Object payload, CountDownLatch latch) {
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      currentThread().interrupt();
+    }
+    return payload;
+
+  }
 }

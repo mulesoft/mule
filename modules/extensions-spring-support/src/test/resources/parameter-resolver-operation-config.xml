@@ -9,7 +9,7 @@
 
     <heisenberg:door victim="Top Level Skyler" address="308 Negra Arroyo Lane" name="door"/>
 
-    <heisenberg:door victim="#[mel:victim]" address="308 Negra Arroyo Lane" name="dynamicDoor"/>
+    <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane" name="dynamicDoor"/>
 
     <heisenberg:ricin microgramsPerKilo="22" name="ricin-weapon">
         <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
@@ -26,10 +26,10 @@
     </flow>
 
     <flow name="processWeaponAsDynamicChildElement">
-        <set-payload value="#[mel:100L]"/>
+        <set-payload value="#[100]"/>
         <heisenberg:process-weapon>
             <heisenberg:weapon>
-                <heisenberg:ricin microgramsPerKilo="#[mel:payload]">
+                <heisenberg:ricin microgramsPerKilo="#[payload]">
                     <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
                 </heisenberg:ricin>
             </heisenberg:weapon>
@@ -37,8 +37,8 @@
     </flow>
 
     <flow name="processWeapon">
-        <set-payload value="#[mel:new org.mule.test.heisenberg.extension.model.Ricin()]"/>
-        <expression-component><![CDATA[mel:payload.microgramsPerKilo = 100L]]></expression-component>
+        <set-payload value="#[java!org::mule::test::heisenberg::extension::model::Ricin::new()]"/>
+        <set-payload value="#[java!org::mule::test::module::extension::parameter::resolver::ParameterResolverOperationExecutionTestCase::setMicrogramsPerKilo(payload, 100)]"/>
         <heisenberg:process-weapon weapon="#[payload]"/>
     </flow>
 
@@ -47,8 +47,8 @@
     </flow>
 
     <flow name="processWeaponWithDefaultValue">
-        <set-payload value="#[mel:new org.mule.test.heisenberg.extension.model.Ricin()]"/>
-        <expression-component><![CDATA[mel:payload.microgramsPerKilo = 100L]]></expression-component>
+        <set-payload value="#[java!org::mule::test::heisenberg::extension::model::Ricin::new()]"/>
+        <set-payload value="#[java!org::mule::test::module::extension::parameter::resolver::ParameterResolverOperationExecutionTestCase::setMicrogramsPerKilo(payload, 100)]"/>
         <heisenberg:process-weapon-with-default-value/>
     </flow>
 
@@ -58,16 +58,16 @@
     </flow>
 
     <flow name="processWeaponList">
-        <set-payload value="#[mel:new org.mule.test.heisenberg.extension.model.Ricin()]"/>
-        <expression-component><![CDATA[mel:payload.microgramsPerKilo = 100L]]></expression-component>
-        <set-payload value="#[mel:[payload]]"/>
-        <heisenberg:process-weapon-list weapons="#[mel:payload]"/>
+        <set-payload value="#[java!org::mule::test::heisenberg::extension::model::Ricin::new()]"/>
+        <set-payload value="#[java!org::mule::test::module::extension::parameter::resolver::ParameterResolverOperationExecutionTestCase::setMicrogramsPerKilo(payload, 100)]"/>
+        <set-payload value="#[[payload]]"/>
+        <heisenberg:process-weapon-list weapons="#[payload]"/>
     </flow>
 
     <flow name="processWeaponListAsChild">
-        <set-payload value="#[mel:new org.mule.test.heisenberg.extension.model.Ricin()]"/>
-        <expression-component><![CDATA[mel:payload.microgramsPerKilo = 100L]]></expression-component>
-        <set-payload value="#[mel:[payload]]"/>
+        <set-payload value="#[java!org::mule::test::heisenberg::extension::model::Ricin::new()]"/>
+        <set-payload value="#[java!org::mule::test::module::extension::parameter::resolver::ParameterResolverOperationExecutionTestCase::setMicrogramsPerKilo(payload, 100)]"/>
+        <set-payload value="#[[payload]]"/>
         <heisenberg:process-weapon-list>
             <heisenberg:weapons>
                 <heisenberg:ricin microgramsPerKilo="100">
@@ -81,7 +81,7 @@
     </flow>
 
     <flow name="processAddressBookAsExpression">
-        <heisenberg:process-address-book phoneNumbers="#[mel:['123-333-33','333-333-333']]"/>
+        <heisenberg:process-address-book phoneNumbers="#[['123-333-33','333-333-333']]"/>
     </flow>
     <flow name="processAddressBookAsChild">
         <heisenberg:process-address-book>
