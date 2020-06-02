@@ -131,7 +131,6 @@ public class ApplicationModel implements ArtifactAst {
   private static final Logger LOGGER = getLogger(ApplicationModel.class);
 
   // TODO MULE-9692 move this logic elsewhere. This are here just for the language rules and those should be processed elsewhere.
-  public static final String POLICY_ROOT_ELEMENT = "policy";
   public static final String ERROR_MAPPING = "error-mapping";
   public static final String ON_ERROR = "on-error";
   public static final String MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE = "maxRedeliveryAttempts";
@@ -145,19 +144,11 @@ public class ApplicationModel implements ArtifactAst {
   public static final String CUSTOM_TRANSFORMER = "custom-transformer";
   public static final String DESCRIPTION_ELEMENT = "description";
   public static final String PROPERTIES_ELEMENT = "properties";
-  private static final String MODULE_OPERATION_CHAIN_ELEMENT = "module-operation-chain";
 
   public static final String REDELIVERY_POLICY_ELEMENT = "redelivery-policy";
   // TODO MULE-9638 Remove once all bean definitions parsers have been migrated
   public static final String TEST_NAMESPACE = "test";
   public static final String DOC_NAMESPACE = "doc";
-  public static final String SPRING_SECURITY_NAMESPACE = "ss";
-  public static final String MULE_SECURITY_NAMESPACE = "mule-ss";
-  public static final String MULE_XML_NAMESPACE = "mulexml";
-  public static final String PGP_NAMESPACE = "pgp";
-  public static final String XSL_NAMESPACE = "xsl";
-  public static final String BATCH_NAMESPACE = "batch";
-  public static final String PARSER_TEST_NAMESPACE = "parsers-test";
   public static final String GLOBAL_PROPERTY = "global-property";
   public static final String SECURITY_MANAGER = "security-manager";
   public static final String OBJECT_ELEMENT = "object";
@@ -189,36 +180,11 @@ public class ApplicationModel implements ArtifactAst {
       builder().namespace(CORE_PREFIX).name(GLOBAL_PROPERTY).build();
   public static final ComponentIdentifier SECURITY_MANAGER_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(SECURITY_MANAGER).build();
-  public static final ComponentIdentifier MODULE_OPERATION_CHAIN =
-      builder().namespace(CORE_PREFIX).name(MODULE_OPERATION_CHAIN_ELEMENT).build();
-
-
-  // TODO MULE-13042 - remove this constants and their usages one this code gets migrated to use extension models.
-  public static final String MUNIT_PREFIX = "munit";
-  public static final ComponentIdentifier MUNIT_TEST_IDENTIFIER =
-      builder().namespace(MUNIT_PREFIX).name("test").build();
-  public static final ComponentIdentifier MUNIT_BEFORE_TEST_IDENTIFIER =
-      builder().namespace(MUNIT_PREFIX).name("before-test").build();
-  public static final ComponentIdentifier MUNIT_BEFORE_SUITE_IDENTIFIER =
-      builder().namespace(MUNIT_PREFIX).name("before-suite").build();
-  public static final ComponentIdentifier MUNIT_AFTER_TEST_IDENTIFIER =
-      builder().namespace(MUNIT_PREFIX).name("after-test").build();
-  public static final ComponentIdentifier MUNIT_AFTER_SUITE_IDENTIFIER =
-      builder().namespace(MUNIT_PREFIX).name("after-suite").build();
-
-  public static final String HTTP_POLICY = "http-policy";
-  public static final ComponentIdentifier HTTP_PROXY_SOURCE_POLICY_IDENTIFIER =
-      builder().namespace(HTTP_POLICY).name("source").build();
-  public static final ComponentIdentifier HTTP_PROXY_OPERATION_IDENTIFIER =
-      builder().namespace(HTTP_POLICY).name("operation").build();
-  public static final ComponentIdentifier HTTP_PROXY_POLICY_IDENTIFIER =
-      builder().namespace(HTTP_POLICY).name("proxy").build();
 
   public static final String CLASS_ATTRIBUTE = "class";
 
   private static ImmutableSet<ComponentIdentifier> ignoredNameValidationComponentList =
       ImmutableSet.<ComponentIdentifier>builder()
-          .add(builder().namespace(MULE_ROOT_ELEMENT).name("flow-ref").build())
           .add(builder().namespace(MULE_ROOT_ELEMENT).name("alias").build())
           .add(builder().namespace(MULE_ROOT_ELEMENT).name("password-encryption-strategy")
               .build())
@@ -234,26 +200,9 @@ public class ApplicationModel implements ArtifactAst {
               .name("string-to-byte-array-transformer")
               .build())
           .add(builder().namespace(MULE_ROOT_ELEMENT).name("security-manager").build())
+          // TODO MULE-18366 Remove these entries from test namespace
           .add(builder().namespace(TEST_NAMESPACE).name("queue").build())
           .add(builder().namespace(TEST_NAMESPACE).name("invocation-counter").build())
-          .add(builder().namespace(SPRING_SECURITY_NAMESPACE).name("user").build())
-          .add(builder().namespace(MULE_SECURITY_NAMESPACE)
-              .name("delegate-security-provider")
-              .build())
-          .add(builder().namespace(MULE_SECURITY_NAMESPACE).name("security-manager")
-              .build())
-          .add(builder().namespace(MULE_XML_NAMESPACE).name("xslt-transformer").build())
-          .add(builder().namespace(MULE_XML_NAMESPACE).name("alias").build())
-          .add(builder().namespace(PGP_NAMESPACE).name("security-provider").build())
-          .add(builder().namespace(PGP_NAMESPACE).name("keybased-encryption-strategy")
-              .build())
-          .add(builder().namespace(XSL_NAMESPACE).name("param").build())
-          .add(builder().namespace(XSL_NAMESPACE).name("attribute").build())
-          .add(builder().namespace(XSL_NAMESPACE).name("element").build())
-          .add(builder().namespace(BATCH_NAMESPACE).name("step").build())
-          .add(builder().namespace(BATCH_NAMESPACE).name("execute").build())
-          .add(builder().namespace(PARSER_TEST_NAMESPACE).name("child").build())
-          .add(builder().namespace(PARSER_TEST_NAMESPACE).name("kid").build())
           .build();
 
   private final Optional<ComponentBuildingDefinitionRegistry> componentBuildingDefinitionRegistry;

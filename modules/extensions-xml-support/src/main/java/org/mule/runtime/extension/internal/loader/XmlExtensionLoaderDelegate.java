@@ -12,6 +12,7 @@ import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -270,9 +271,18 @@ public final class XmlExtensionLoaderDelegate {
     loadDeclaration();
     final ExtensionModelHelper extensionModelHelper =
         new ExtensionModelHelper(context.getDslResolvingContext().getExtensions(), context.getDslResolvingContext());
-    Document moduleDocument = getModuleDocument(extensionModelHelper, resource);
+
+    final Set<ExtensionModel> extensions = new HashSet<>(extensionModelHelper.getExtensionsModels());
+    try {
+      createTnsExtensionModel(resource, extensionModelHelper).ifPresent(extensions::add);
+    } catch (IOException e) {
+      throw new MuleRuntimeException(createStaticMessage(format("There was an issue reading the stream for the resource %s",
+                                                                resource.getFile())));
+    }
+
+    Document moduleDocument = getModuleDocument(extensions, resource);
     loadModuleExtension(context.getExtensionDeclarer(), resource, moduleDocument,
-                        extensionModelHelper, false);
+                        new ExtensionModelHelper(extensions), false);
   }
 
   private URL getResource(String resource) {
@@ -325,18 +335,17 @@ public final class XmlExtensionLoaderDelegate {
     });
   }
 
-  private Document getModuleDocument(ExtensionModelHelper extensionModelHelper, URL resource) {
+  private Document getModuleDocument(Set<ExtensionModel> extensions, URL resource) {
     XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader =
-        validateXml ? schemaValidatingDocumentLoader() : schemaValidatingDocumentLoader(NoOpXmlErrorHandler::new);
+        validateXml
+            ? schemaValidatingDocumentLoader()
+            : schemaValidatingDocumentLoader(NoOpXmlErrorHandler::new);
     try {
-      final Set<ExtensionModel> extensions = new HashSet<>(extensionModelHelper.getExtensionsModels());
-      createTnsExtensionModel(resource, extensionModelHelper).ifPresent(extensions::add);
       return xmlConfigurationDocumentLoader.loadDocument(() -> XMLSecureFactories.createDefault().getSAXParserFactory(),
                                                          new ModuleDelegatingEntityResolver(extensions), resource.getFile(),
                                                          resource.openStream());
     } catch (IOException e) {
-      throw new MuleRuntimeException(
-                                     createStaticMessage(format("There was an issue reading the stream for the resource %s",
+      throw new MuleRuntimeException(createStaticMessage(format("There was an issue reading the stream for the resource %s",
                                                                 resource.getFile())));
     }
   }
@@ -444,10 +453,12 @@ public final class XmlExtensionLoaderDelegate {
     final String version = "4.0.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
     final String category = moduleModel.getRawParameterValue(CATEGORY).orElse(null);
     final String vendor = moduleModel.getRawParameterValue(VENDOR).orElse(null);
-    final XmlDslModel xmlDslModel = getXmlDslModel(moduleModel, name, version);
+    final XmlDslModel xmlDslModel = comesFromTNS
+        ? getTnsXmlDslModel(moduleModel, name, version)
+        : getXmlDslModel(moduleModel, name, version);
     final String description = getDescription(moduleModel);
     final String xmlnsTnsValue = moduleModel.getRawParameterValue(XMLNS_TNS).orElse(null);
-    if (xmlnsTnsValue != null && !xmlDslModel.getNamespace().equals(xmlnsTnsValue)) {
+    if (!comesFromTNS && xmlnsTnsValue != null && !xmlDslModel.getNamespace().equals(xmlnsTnsValue)) {
       throw new MuleRuntimeException(createStaticMessage(format("The %s attribute value of the module must be '%s', but found '%s'",
                                                                 XMLNS_TNS,
                                                                 xmlDslModel.getNamespace(),
@@ -576,6 +587,32 @@ public final class XmlExtensionLoaderDelegate {
         .filter(namespace -> !xmlDslModel.getNamespace().equals(namespace))
         .collect(toSet());
     return new XmlExtensionModelProperty(namespaceDependencies);
+  }
+
+  private XmlDslModel getTnsXmlDslModel(ComponentAst moduleModel, String name, String version) {
+    final Optional<String> namespace = moduleModel.getRawParameterValue(XMLNS_TNS);
+    final String stringPrefix = TNS_PREFIX;
+
+    final Map<String, String> schemaLocations = moduleModel.getRawParameterValue("xsi:schemaLocation")
+        .map(schLoc -> {
+          Map<String, String> myMap = new HashMap<>();
+          String[] pairs = schLoc.split(" ");
+          for (int i = 0; i < pairs.length; i = i + 2) {
+            myMap.put(pairs[i], pairs[i + 1]);
+          }
+          return myMap;
+        })
+        .orElse(emptyMap());
+
+    final String[] tnsSchemaLocationParts = schemaLocations.get(namespace.get()).split("/");
+
+    return XmlDslModel.builder()
+        .setSchemaVersion(version)
+        .setPrefix(stringPrefix)
+        .setNamespace(namespace.get())
+        .setSchemaLocation(schemaLocations.get(namespace.get()))
+        .setXsdFileName(tnsSchemaLocationParts[tnsSchemaLocationParts.length - 1])
+        .build();
   }
 
   private XmlDslModel getXmlDslModel(ComponentAst moduleModel, String name, String version) {
