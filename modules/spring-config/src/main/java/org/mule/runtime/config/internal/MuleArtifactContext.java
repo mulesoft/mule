@@ -31,7 +31,6 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPP
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getArtifactComponentBuildingDefinitions;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getExtensionModelsComponentBuildingDefinitions;
-import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
@@ -53,6 +52,7 @@ import static org.springframework.context.annotation.AnnotationConfigUtils.REQUI
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
@@ -82,6 +82,7 @@ import org.mule.runtime.config.internal.processor.DiscardedOptionalBeanPostProce
 import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.config.internal.processor.PostRegistrationActionsPostProcessor;
+import org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils;
 import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -150,8 +151,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   public static final String INNER_BEAN_PREFIX = "(inner bean)";
 
-  private static final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
-
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry =
       new ComponentBuildingDefinitionRegistry();
   private final OptionalObjectsController optionalObjectsController;
@@ -165,6 +164,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final MuleContextWithRegistry muleContext;
   private final ConfigResource[] artifactConfigResources;
   private final BeanDefinitionFactory beanDefinitionFactory;
+  private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
   private final ArtifactType artifactType;
   protected SpringConfigurationComponentLocator componentLocator = new SpringConfigurationComponentLocator(componentName -> {
     try {
@@ -226,15 +226,16 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     this.resourceLocator = new DefaultResourceLocator();
     originalRegistry = ((MuleRegistryHelper) getMuleRegistry()).getDelegate();
 
-    getRuntimeComponentBuildingDefinitionProvider(serviceRegistry).getComponentBuildingDefinitions()
+    ComponentBuildingDefinitionUtils.getRuntimeComponentBuildingDefinitionProvider().getComponentBuildingDefinitions()
         .forEach(componentBuildingDefinitionRegistry::register);
 
     extensionManager = muleContext.getExtensionManager();
-    getExtensionModelsComponentBuildingDefinitions(serviceRegistry, getExtensions())
+    final Set<ExtensionModel> extensions = getExtensions();
+    getExtensionModelsComponentBuildingDefinitions(extensions, DslResolvingContext.getDefault(extensions))
         .forEach(componentBuildingDefinitionRegistry::register);
 
     for (ClassLoader pluginArtifactClassLoader : pluginsClassLoaders) {
-      getArtifactComponentBuildingDefinitions(serviceRegistry, pluginArtifactClassLoader)
+      getArtifactComponentBuildingDefinitions(pluginArtifactClassLoader)
           .forEach(componentBuildingDefinitionRegistry::register);
     }
 

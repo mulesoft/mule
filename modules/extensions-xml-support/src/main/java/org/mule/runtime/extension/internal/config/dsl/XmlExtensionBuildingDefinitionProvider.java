@@ -62,11 +62,16 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
   private final List<ComponentBuildingDefinition> definitions = new LinkedList<>();
 
   private Set<ExtensionModel> extensions = emptySet();
+  private DslResolvingContext dslResolvingContext;
 
   @Override
   public void init() {
     checkState(extensions != null, "extensions cannot be null");
-    extensions.stream().forEach(this::registerExtensionParsers);
+    extensions.stream()
+        .filter(extensionModel -> !extensionModel.getModelProperty(CustomBuildingDefinitionProviderModelProperty.class)
+            .isPresent()
+            && extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent())
+        .forEach(this::registerExtensionParsers);
   }
 
   @Override
@@ -79,70 +84,62 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
 
     final Builder definitionBuilder = new Builder().withNamespace(xmlDslModel.getPrefix());
     final Builder tnsDefinitionBuilder = new Builder().withNamespace(TNS_PREFIX);
-    final DslSyntaxResolver dslSyntaxResolver =
-        DslSyntaxResolver.getDefault(extensionModel, DslResolvingContext.getDefault(extensions));
+    final DslSyntaxResolver dslSyntaxResolver = DslSyntaxResolver.getDefault(extensionModel, dslResolvingContext);
 
-    if (extensionModel.getModelProperty(CustomBuildingDefinitionProviderModelProperty.class).isPresent()) {
-      return;
-    }
+    // For private operations, register its parser for use from within its same extensions
+    extensionModel.getModelProperty(PrivateOperationsModelProperty.class)
+        .ifPresent(privateOperations -> privateOperations.getOperationNames()
+            .forEach(privateOperationName -> privateOperations.getOperationModel(privateOperationName)
+                .ifPresent(opModel -> addModuleOperationChainParser(tnsDefinitionBuilder, dslSyntaxResolver,
+                                                                    extensionModel, opModel))));
 
-    if (extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent()) {
-      // For private operations, register its parser for use from within its same extensions
-      extensionModel.getModelProperty(PrivateOperationsModelProperty.class)
-          .ifPresent(privateOperations -> privateOperations.getOperationNames()
-              .forEach(privateOperationName -> privateOperations.getOperationModel(privateOperationName)
-                  .ifPresent(opModel -> addModuleOperationChainParser(tnsDefinitionBuilder, dslSyntaxResolver,
-                                                                      extensionModel, opModel))));
+    AtomicBoolean configPresent = new AtomicBoolean(false);
 
-      AtomicBoolean configPresent = new AtomicBoolean(false);
+    new IdempotentExtensionWalker() {
 
-      new IdempotentExtensionWalker() {
+      @SuppressWarnings("unchecked")
+      @Override
+      public void onConfiguration(ConfigurationModel configurationModel) {
+        configPresent.set(true);
 
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onConfiguration(ConfigurationModel configurationModel) {
-          configPresent.set(true);
+        List<KeyAttributeDefinitionPair> paramsDefinitions =
+            processParametersDefinitions(definitionBuilder, dslSyntaxResolver, configurationModel);
 
-          List<KeyAttributeDefinitionPair> paramsDefinitions =
-              processParametersDefinitions(definitionBuilder, dslSyntaxResolver, configurationModel);
-
-          definitions.add(definitionBuilder
-              .withIdentifier(dslSyntaxResolver.resolve(configurationModel).getElementName())
-              .withTypeDefinition(fromType(ConfigurationProvider.class))
-              .withObjectFactoryType(XmlSdkConfigurationProviderFactory.class)
-              .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
-              .withConstructorParameterDefinition(fromFixedValue(configurationModel).build())
-              .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
-              .withConstructorParameterDefinition(fromReferenceObject(Registry.class).build())
-              .withSetterParameterDefinition("parameters",
-                                             fromMultipleDefinitions(paramsDefinitions
-                                                 .toArray(new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
-                                                     .build())
-              .build());
-        }
-
-        @Override
-        public void onOperation(OperationModel model) {
-          // For public operations, register them with the extension namespace for external use, as well as with the `tns`
-          // namespace for internal use
-          addModuleOperationChainParser(definitionBuilder, dslSyntaxResolver, extensionModel, model);
-          addModuleOperationChainParser(tnsDefinitionBuilder, dslSyntaxResolver, extensionModel, model);
-        }
-      }.walk(extensionModel);
-
-      if (!configPresent.get()) {
         definitions.add(definitionBuilder
-            .withIdentifier(DEFAULT_GLOBAL_ELEMENTS)
+            .withIdentifier(dslSyntaxResolver.resolve(configurationModel).getElementName())
             .withTypeDefinition(fromType(ConfigurationProvider.class))
             .withObjectFactoryType(XmlSdkConfigurationProviderFactory.class)
             .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
-            .withConstructorParameterDefinition(fromFixedValue(null).build())
+            .withConstructorParameterDefinition(fromFixedValue(configurationModel).build())
             .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
             .withConstructorParameterDefinition(fromReferenceObject(Registry.class).build())
-            .withSetterParameterDefinition("parameters", fromFixedValue(null).build())
+            .withSetterParameterDefinition("parameters",
+                                           fromMultipleDefinitions(paramsDefinitions
+                                               .toArray(new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
+                                                   .build())
             .build());
       }
 
+      @Override
+      public void onOperation(OperationModel model) {
+        // For public operations, register them with the extension namespace for external use, as well as with the `tns`
+        // namespace for internal use
+        addModuleOperationChainParser(definitionBuilder, dslSyntaxResolver, extensionModel, model);
+        addModuleOperationChainParser(tnsDefinitionBuilder, dslSyntaxResolver, extensionModel, model);
+      }
+    }.walk(extensionModel);
+
+    if (!configPresent.get()) {
+      definitions.add(definitionBuilder
+          .withIdentifier(DEFAULT_GLOBAL_ELEMENTS)
+          .withTypeDefinition(fromType(ConfigurationProvider.class))
+          .withObjectFactoryType(XmlSdkConfigurationProviderFactory.class)
+          .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
+          .withConstructorParameterDefinition(fromFixedValue(null).build())
+          .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
+          .withConstructorParameterDefinition(fromReferenceObject(Registry.class).build())
+          .withSetterParameterDefinition("parameters", fromFixedValue(null).build())
+          .build());
     }
   }
 
@@ -202,4 +199,8 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
     this.extensions = extensionModels;
   }
 
+  @Override
+  public void setDslResolvingContext(DslResolvingContext dslResolvingContext) {
+    this.dslResolvingContext = dslResolvingContext;
+  }
 }
