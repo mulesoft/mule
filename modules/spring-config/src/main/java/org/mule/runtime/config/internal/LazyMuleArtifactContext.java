@@ -78,7 +78,6 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.dsl.api.ConfigResource;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.io.File;
@@ -148,12 +147,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                  List<ClassLoader> pluginsClassLoaders,
                                  Optional<ComponentModelInitializer> parentComponentModelInitializer,
                                  Optional<ConfigurationProperties> parentConfigurationProperties, boolean disableXmlValidations,
-                                 ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider,
                                  LockFactory runtimeLockFactory)
       throws BeansException {
     super(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
           extendArtifactProperties(artifactProperties), artifactType, pluginsClassLoaders, parentConfigurationProperties,
-          disableXmlValidations, runtimeComponentBuildingDefinitionProvider);
+          disableXmlValidations);
 
     // Changes the component locator in order to allow accessing any component by location even when they are prototype
     this.componentLocator = new SpringConfigurationComponentLocator();

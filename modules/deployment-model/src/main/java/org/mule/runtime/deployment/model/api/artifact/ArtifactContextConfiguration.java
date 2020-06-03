@@ -25,7 +25,7 @@ import java.util.Optional;
 
 /**
  * Configuration required for the creation of an {@link ArtifactContext}.
- * 
+ *
  * @since 4.0
  */
 @NoInstantiate
@@ -47,7 +47,7 @@ public final class ArtifactContextConfiguration {
 
   /**
    * Creates a new builder for creating instances of {@code ArtifactContextConfiguration}
-   * 
+   *
    * @return a new builder instance.
    */
   public static ArtifactContextConfigurationBuilder builder() {
@@ -92,7 +92,7 @@ public final class ArtifactContextConfiguration {
   /**
    * When an {@link ArtifactContext} is created lazily then not all components will be created during the creation of the
    * artifact. Only the minimum set of required components will be created upon request of functionality.
-   * 
+   *
    * @return true if the artifact context will be created lazily upon requests to the {@link ArtifactContext}, false otherwise.
    */
   public boolean isEnableLazyInitialization() {
@@ -122,6 +122,10 @@ public final class ArtifactContextConfiguration {
     return parentContext;
   }
 
+  /**
+   * @deprecated no longer used since 4.4, providers are resolved internally
+   */
+  @Deprecated
   public ComponentBuildingDefinitionProvider getRuntimeComponentBuildingDefinitionProvider() {
     return runtimeComponentBuildingDefinitionProvider;
   }
@@ -135,7 +139,7 @@ public final class ArtifactContextConfiguration {
    */
   public static class ArtifactContextConfigurationBuilder {
 
-    private ArtifactContextConfiguration artifactContextConfiguration = new ArtifactContextConfiguration();
+    private final ArtifactContextConfiguration artifactContextConfiguration = new ArtifactContextConfiguration();
 
 
     /**
@@ -230,7 +234,10 @@ public final class ArtifactContextConfiguration {
      * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
      *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
      * @return {@code this} builder
+     *
+     * @deprecated no longer used since 4.4, providers are resolved internally
      */
+    @Deprecated
     public ArtifactContextConfigurationBuilder setRuntimeComponentBuildingDefinitionProvider(ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
       artifactContextConfiguration.runtimeComponentBuildingDefinitionProvider = runtimeComponentBuildingDefinitionProvider;
       return this;

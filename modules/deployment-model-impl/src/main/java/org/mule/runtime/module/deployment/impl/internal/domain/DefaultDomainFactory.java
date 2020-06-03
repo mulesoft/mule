@@ -25,7 +25,6 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderBuilder;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableArtifactFactory;
@@ -48,7 +47,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
   private final PluginDependenciesResolver pluginDependenciesResolver;
   private final DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory;
 
-  private ExtensionModelLoaderManager extensionModelLoaderManager;
+  private final ExtensionModelLoaderManager extensionModelLoaderManager;
 
   /**
    * Creates a new domain factory
@@ -70,10 +69,9 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
                               DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory,
                               ExtensionModelLoaderManager extensionModelLoaderManager,
                               LicenseValidator licenseValidator,
-                              ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider,
                               LockFactory runtimeLockFactory) {
 
-    super(licenseValidator, runtimeComponentBuildingDefinitionProvider, runtimeLockFactory);
+    super(licenseValidator, runtimeLockFactory);
 
     checkArgument(domainDescriptorFactory != null, "domainDescriptorFactory cannot be null");
     checkArgument(domainManager != null, "Domain manager cannot be null");
@@ -162,8 +160,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
 
     DefaultMuleDomain defaultMuleDomain =
         new DefaultMuleDomain(domainDescriptor, domainClassLoader, classLoaderRepository, serviceRepository, artifactPlugins,
-                              extensionModelLoaderManager, getRuntimeComponentBuildingDefinitionProvider(),
-                              getRuntimeLockFactory());
+                              extensionModelLoaderManager, getRuntimeLockFactory());
 
     DomainWrapper domainWrapper = new DomainWrapper(defaultMuleDomain, this);
     domainManager.addDomain(domainWrapper);

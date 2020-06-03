@@ -35,7 +35,6 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.impl.internal.artifact.CompositeArtifactExtensionManagerFactory;
@@ -65,7 +64,6 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   private final MuleContextListener muleContextListener;
   private ArtifactContext policyContext;
   private LazyValue<PolicyInstance> policyInstance;
-  private final ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
 
   /**
    * Creates a new policy instance
@@ -90,8 +88,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
                                           List<ArtifactPlugin> artifactPlugins,
                                           List<ArtifactPlugin> ownArtifactPlugins,
                                           ExtensionModelLoaderRepository extensionModelLoaderRepository,
-                                          MuleContextListener muleContextListener,
-                                          ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
+                                          MuleContextListener muleContextListener) {
     this.application = application;
     this.template = template;
     this.parametrization = parametrization;
@@ -101,7 +98,6 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     this.ownArtifactPlugins = ownArtifactPlugins;
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
     this.muleContextListener = muleContextListener;
-    this.runtimeComponentBuildingDefinitionProvider = runtimeComponentBuildingDefinitionProvider;
   }
 
   private void initPolicyContext() throws InitialisationException {
@@ -118,7 +114,6 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
             .setExtensionManagerFactory(new CompositeArtifactExtensionManagerFactory(application, extensionModelLoaderRepository,
                                                                                      ownArtifactPlugins,
                                                                                      new DefaultExtensionManagerFactory()))
-            .setRuntimeComponentBuildingDefinitionProvider(runtimeComponentBuildingDefinitionProvider)
             .setMuleContextListener(muleContextListener);
 
     artifactBuilder.withServiceConfigurator(customizationService -> {

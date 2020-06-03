@@ -40,6 +40,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
+import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationProcessor.processXmlConfiguration;
@@ -98,7 +99,6 @@ import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
 import org.mule.runtime.core.internal.util.DefaultResourceLocator;
 import org.mule.runtime.dsl.api.ConfigResource;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 import org.mule.runtime.dsl.api.xml.parser.ConfigFile;
 import org.mule.runtime.dsl.api.xml.parser.ParsingPropertyResolver;
@@ -199,21 +199,18 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              Map<String, String> artifactProperties, ArtifactType artifactType,
                              List<ClassLoader> pluginsClassLoaders,
                              Optional<ConfigurationProperties> parentConfigurationProperties,
-                             boolean disableXmlValidations,
-                             ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider)
+                             boolean disableXmlValidations)
       throws BeansException {
     this(muleContext, artifactConfigResources, artifactDeclaration, optionalObjectsController,
          parentConfigurationProperties, artifactProperties,
-         artifactType, pluginsClassLoaders, disableXmlValidations,
-         runtimeComponentBuildingDefinitionProvider);
+         artifactType, pluginsClassLoaders, disableXmlValidations);
   }
 
   public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
                              ArtifactDeclaration artifactDeclaration, OptionalObjectsController optionalObjectsController,
                              Optional<ConfigurationProperties> parentConfigurationProperties,
                              Map<String, String> artifactProperties, ArtifactType artifactType,
-                             List<ClassLoader> pluginsClassLoaders, boolean disableXmlValidations,
-                             ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
+                             List<ClassLoader> pluginsClassLoaders, boolean disableXmlValidations) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
     this.muleContext = (MuleContextWithRegistry) muleContext;
     this.artifactConfigResources = artifactConfigResources;
@@ -228,7 +225,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     this.resourceLocator = new DefaultResourceLocator();
     originalRegistry = ((MuleRegistryHelper) getMuleRegistry()).getDelegate();
 
-    runtimeComponentBuildingDefinitionProvider.getComponentBuildingDefinitions()
+    getRuntimeComponentBuildingDefinitionProvider().getComponentBuildingDefinitions()
         .forEach(componentBuildingDefinitionRegistry::register);
 
     extensionManager = muleContext.getExtensionManager();

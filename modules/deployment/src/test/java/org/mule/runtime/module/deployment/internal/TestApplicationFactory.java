@@ -11,7 +11,6 @@ import static org.mule.runtime.module.license.api.LicenseValidatorProvider.disco
 
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.ModuleRepository;
-import org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil;
 import org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
@@ -62,7 +61,6 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
           serviceRepository, extensionModelLoaderRepository, classLoaderRepository, policyTemplateClassLoaderBuilderFactory,
           pluginDependenciesResolver, artifactPluginDescriptorLoader,
           discoverLicenseValidator(TestApplicationFactory.class.getClassLoader()),
-          RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider(),
           RuntimeLockFactoryUtil.getRuntimeLockFactory());
   }
 

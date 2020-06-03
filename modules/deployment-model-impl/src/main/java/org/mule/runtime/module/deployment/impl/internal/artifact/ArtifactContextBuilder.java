@@ -52,7 +52,6 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationMuleContextBuilder;
@@ -118,7 +117,6 @@ public class ArtifactContextBuilder {
   private DeployableArtifact parentArtifact;
   private Optional<Properties> properties = empty();
   private String dataFolderName;
-  private ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
   private LockFactory runtimeLockFactory;
 
   private ArtifactContextBuilder() {}
@@ -364,16 +362,6 @@ public class ArtifactContextBuilder {
   }
 
   /**
-   * @param runtimeComponentBuildingDefinitionProvider provider for the runtime
-   *        {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinition}s
-   * @return the builder
-   */
-  public ArtifactContextBuilder setRuntimeComponentBuildingDefinitionProvider(ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider) {
-    this.runtimeComponentBuildingDefinitionProvider = runtimeComponentBuildingDefinitionProvider;
-    return this;
-  }
-
-  /**
    * @param runtimeLockFactory {@link LockFactory} for the runtime that can be shared along deployable artifacts to synchronize
    *        access on different deployable artifacts to the same resources.
    * @return the builder
@@ -458,7 +446,6 @@ public class ArtifactContextBuilder {
                     .setEnableLazyInitialization(enableLazyInit)
                     .setDisableXmlValidations(disableXmlValidations)
                     .setServiceConfigurators(serviceConfigurators)
-                    .setRuntimeComponentBuildingDefinitionProvider(runtimeComponentBuildingDefinitionProvider)
                     .setRuntimeLockFactory(runtimeLockFactory);
 
             withArtifactMuleContext(parentArtifact, artifactContextConfigurationBuilder::setParentContext);
