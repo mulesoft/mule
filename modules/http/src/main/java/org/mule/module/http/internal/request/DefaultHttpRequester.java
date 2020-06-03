@@ -351,15 +351,15 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
 
         if (shouldRetry)
         {
-            boolean entitySupportRetry = entitySupportRetry(httpRequest);
-
-            if (entitySupportRetry)
+            if (entitySupportRetry(httpRequest))
             {
                 logger.warn("Sending HTTP message failed with `" + IOException.class.getCanonicalName() + ": " + REMOTELY_CLOSED
                         + "`. Request will be retried " + retryCount + " time(s) before failing.");
             } else {
-                logger.warn("Sending HTTP message failed with `" + IOException.class.getCanonicalName() + ": " + REMOTELY_CLOSED
-                        + "`. Request will not be retried because entity not support retry.");
+                if(logger.isDebugEnabled()) {
+                    logger.debug("Sending HTTP message failed with `" + IOException.class.getCanonicalName() + ": " + REMOTELY_CLOSED
+                            + "`. Request will not be retried because entity not support retry.");
+                }
                 shouldRetry = false;
             }
         }
@@ -373,19 +373,17 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
 
     /**
      * Verify if http request entity support retry.
+     *
      * @param request
      * @return true if entity support retry
      */
     private boolean entitySupportRetry(HttpRequest request)
     {
         boolean entitySupportRetry = true;
-        if (request.getEntity() != null)
+        if (request.getEntity() != null && request.getEntity() instanceof InputStreamHttpEntity)
         {
-            if (request.getEntity() instanceof InputStreamHttpEntity)
-            {
-                // If input stream is not 'mark supported' can not be consumed again so retry is not supported
-                entitySupportRetry = ((InputStreamHttpEntity) request.getEntity()).getInputStream().markSupported();
-            }
+            // If input stream is not 'mark supported' can not be consumed again so retry is not supported
+            entitySupportRetry = ((InputStreamHttpEntity) request.getEntity()).getInputStream().markSupported();
         }
         return entitySupportRetry;
     }
