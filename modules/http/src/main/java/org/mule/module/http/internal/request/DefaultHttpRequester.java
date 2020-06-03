@@ -346,13 +346,13 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
 
     private boolean shouldRetryRemotelyClosed(Exception exception, int retryCount, HttpRequest httpRequest)
     {
-        boolean entitySupportRetry = entitySupportRetry(httpRequest);
-
         boolean shouldRetry = exception instanceof IOException && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)
           && supportsRetry(httpRequest.getMethod()) && retryCount > 0;
 
         if (shouldRetry)
         {
+            boolean entitySupportRetry = entitySupportRetry(httpRequest);
+
             if (entitySupportRetry)
             {
                 logger.warn("Sending HTTP message failed with `" + IOException.class.getCanonicalName() + ": " + REMOTELY_CLOSED
