@@ -29,7 +29,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
@@ -77,7 +76,10 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
   @Override
   public void init() {
     checkState(extensions != null, "extensions cannot be null");
-    extensions.stream().forEach(this::registerExtensionParsers);
+    extensions.stream()
+        .filter(extensionModel -> !extensionModel.getModelProperty(CustomBuildingDefinitionProviderModelProperty.class)
+            .isPresent())
+        .forEach(this::registerExtensionParsers);
   }
 
   @Override
@@ -92,10 +94,6 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
     final Builder definitionBuilder = new Builder().withNamespace(xmlDslModel.getPrefix());
     final DslSyntaxResolver dslSyntaxResolver =
         DslSyntaxResolver.getDefault(extensionModel, DslResolvingContext.getDefault(extensions));
-
-    if (extensionModel.getModelProperty(CustomBuildingDefinitionProviderModelProperty.class).isPresent()) {
-      return;
-    }
 
     if (!extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent()) {
       final ClassLoader extensionClassLoader = getClassLoader(extensionModel);

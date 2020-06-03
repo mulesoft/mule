@@ -7,10 +7,6 @@
 
 package org.mule.runtime.config.internal.util;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.internal.MuleArtifactContext;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
@@ -18,10 +14,44 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Utility class for registering {@link ComponentBuildingDefinition}.
  */
 public final class ComponentBuildingDefinitionUtils {
+
+  private static ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitions;
+
+  /**
+   * Utility method to find all {@link ComponentBuildingDefinition}s provided by the runtime.
+   *
+   * @return a {@link ComponentBuildingDefinitionProvider} containing all the runtime definitions.
+   */
+  public static ComponentBuildingDefinitionProvider getRuntimeComponentBuildingDefinitionProvider(ServiceRegistry serviceRegistry) {
+    if (runtimeComponentBuildingDefinitions == null) {
+      List<ComponentBuildingDefinition> allDefinitions = new ArrayList<>();
+      serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, MuleArtifactContext.class.getClassLoader())
+          .forEach(componentBuildingDefinitionProvider -> {
+            componentBuildingDefinitionProvider.init();
+
+            allDefinitions.addAll(componentBuildingDefinitionProvider.getComponentBuildingDefinitions());
+          });
+      runtimeComponentBuildingDefinitions = new ComponentBuildingDefinitionProvider() {
+
+        @Override
+        public void init() {}
+
+        @Override
+        public List<ComponentBuildingDefinition> getComponentBuildingDefinitions() {
+          return allDefinitions;
+        }
+      };
+    }
+    return runtimeComponentBuildingDefinitions;
+  }
 
   /**
    * Retrieve the {@link ComponentBuildingDefinition}s from a set of extension models.
@@ -33,16 +63,11 @@ public final class ComponentBuildingDefinitionUtils {
   public static List<ComponentBuildingDefinition> getExtensionModelsComponentBuildingDefinitions(ServiceRegistry serviceRegistry,
                                                                                                  Set<ExtensionModel> extensionModels) {
     List<ComponentBuildingDefinition> componentBuildingDefinitions = new ArrayList<>();
-    serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, MuleArtifactContext.class.getClassLoader())
-        .forEach(componentBuildingDefinitionProvider -> {
-          if (componentBuildingDefinitionProvider instanceof ExtensionBuildingDefinitionProvider) {
-            ExtensionBuildingDefinitionProvider extensionBuildingDefinitionProvider =
-                (ExtensionBuildingDefinitionProvider) componentBuildingDefinitionProvider;
-            extensionBuildingDefinitionProvider
-                .setExtensionModels(extensionModels);
-            extensionBuildingDefinitionProvider.init();
-            componentBuildingDefinitions.addAll(extensionBuildingDefinitionProvider.getComponentBuildingDefinitions());
-          }
+    serviceRegistry.lookupProviders(ExtensionBuildingDefinitionProvider.class, MuleArtifactContext.class.getClassLoader())
+        .forEach(extensionBuildingDefinitionProvider -> {
+          extensionBuildingDefinitionProvider.setExtensionModels(extensionModels);
+          extensionBuildingDefinitionProvider.init();
+          componentBuildingDefinitions.addAll(extensionBuildingDefinitionProvider.getComponentBuildingDefinitions());
         });
     return componentBuildingDefinitions;
   }
@@ -62,11 +87,12 @@ public final class ComponentBuildingDefinitionUtils {
                                                                                           ClassLoader classLoader) {
     List<ComponentBuildingDefinition> componentBuildingDefinitions = new ArrayList<>();
     serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class, classLoader)
+        .stream()
+        .filter(componentBuildingDefinitionProvider -> componentBuildingDefinitionProvider.getClass().getClassLoader()
+            .equals(classLoader))
         .forEach(componentBuildingDefinitionProvider -> {
-          if (componentBuildingDefinitionProvider.getClass().getClassLoader().equals(classLoader)) {
-            componentBuildingDefinitionProvider.init();
-            componentBuildingDefinitions.addAll(componentBuildingDefinitionProvider.getComponentBuildingDefinitions());
-          }
+          componentBuildingDefinitionProvider.init();
+          componentBuildingDefinitions.addAll(componentBuildingDefinitionProvider.getComponentBuildingDefinitions());
         });
     return componentBuildingDefinitions;
   }

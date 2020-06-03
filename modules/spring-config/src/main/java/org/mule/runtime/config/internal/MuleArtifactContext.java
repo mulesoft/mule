@@ -31,6 +31,7 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPP
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getArtifactComponentBuildingDefinitions;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getExtensionModelsComponentBuildingDefinitions;
+import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
@@ -40,7 +41,6 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
-import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.noValidationDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationDocumentLoader.schemaValidatingDocumentLoader;
 import static org.mule.runtime.dsl.api.xml.parser.XmlConfigurationProcessor.processXmlConfiguration;
@@ -150,6 +150,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   public static final String INNER_BEAN_PREFIX = "(inner bean)";
 
+  private static final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
+
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry =
       new ComponentBuildingDefinitionRegistry();
   private final OptionalObjectsController optionalObjectsController;
@@ -163,7 +165,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final MuleContextWithRegistry muleContext;
   private final ConfigResource[] artifactConfigResources;
   private final BeanDefinitionFactory beanDefinitionFactory;
-  private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
   private final ArtifactType artifactType;
   protected SpringConfigurationComponentLocator componentLocator = new SpringConfigurationComponentLocator(componentName -> {
     try {
@@ -225,7 +226,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     this.resourceLocator = new DefaultResourceLocator();
     originalRegistry = ((MuleRegistryHelper) getMuleRegistry()).getDelegate();
 
-    getRuntimeComponentBuildingDefinitionProvider().getComponentBuildingDefinitions()
+    getRuntimeComponentBuildingDefinitionProvider(serviceRegistry).getComponentBuildingDefinitions()
         .forEach(componentBuildingDefinitionRegistry::register);
 
     extensionManager = muleContext.getExtensionManager();
