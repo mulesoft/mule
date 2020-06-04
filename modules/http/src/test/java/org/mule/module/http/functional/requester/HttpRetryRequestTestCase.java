@@ -25,6 +25,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.net.URL;
+
 
 @RunWith(Parameterized.class)
 public class HttpRetryRequestTestCase extends FunctionalTestCase
@@ -72,25 +76,45 @@ public class HttpRetryRequestTestCase extends FunctionalTestCase
     @Test
     public void nonIdempotentMethod() throws Exception
     {
-        runRetryPolicyTest("POST", getIdempotentMethodExpectedRetries());
+        MuleEvent event = getTestEvent(null);
+        event.setFlowVariable("httpMethod", "POST");
+        runRetryPolicyTest("testRetryPolicy", event, getIdempotentMethodExpectedRetries());
     }
 
     @Test
     public void idempotentMethod() throws Exception
     {
-        runRetryPolicyTest("GET", retryAttempts);
+        MuleEvent event = getTestEvent(null);
+        event.setFlowVariable("httpMethod", "GET");
+        runRetryPolicyTest("testRetryPolicy", event, retryAttempts);
     }
 
-    void runRetryPolicyTest(String httpMethod, int numberOfRetryExpected) throws Exception
+    @Test
+    public void entityNotSupportRetry() throws Exception
+    {
+        URL url = Thread.currentThread().getContextClassLoader().getResource("./http-retry-policy-payload.json");
+        InputStream in = new FileInputStream(url.getFile());
+        MuleEvent event = getTestEvent(in);
+        event.setFlowVariable("httpMethod", "PUT");
+        runRetryPolicyTest("testRetryPolicyWithPayload", event, 0);
+    }
+
+    @Test
+    public void entitySupportRetry() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
+        event.setFlowVariable("httpMethod", "PUT");
+        runRetryPolicyTest("testRetryPolicyWithPayload", event, retryAttempts);
+    }
+
+    void runRetryPolicyTest(String flowName, MuleEvent event, int numberOfRetryExpected) throws Exception
     {
         TestServerSocket testServerSocket = new TestServerSocket(port.getNumber(), numberOfRetryExpected + 1);
         assertThat("Http server can't be initialized.", testServerSocket.startServer(5000), is(true));
         expectedException.expectCause(REMOTELY_CLOSE_CAUSE_MATCHER);
         try
         {
-            MuleEvent event = getTestEvent(null);
-            event.setFlowVariable("httpMethod", httpMethod);
-            runFlow("testRetryPolicy", event);
+            runFlow(flowName, event);
         }
         finally
         {
@@ -98,5 +122,4 @@ public class HttpRetryRequestTestCase extends FunctionalTestCase
             assertThat("There was an error trying to dispose the http server.", testServerSocket.dispose(5000), is(true));
         }
     }
-
 }
