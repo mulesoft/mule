@@ -34,6 +34,8 @@ public interface ExtensionBuildingDefinitionProvider extends ComponentBuildingDe
    * This method is expected to be invoked before calling to {@link ComponentBuildingDefinitionProvider#init()}
    *
    * @param dslResolvingContext dsl context to use for the definitions
+   *
+   * @since 4.4
    */
   void setDslResolvingContext(DslResolvingContext dslResolvingContext);
 

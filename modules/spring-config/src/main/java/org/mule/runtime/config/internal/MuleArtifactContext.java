@@ -31,6 +31,7 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPP
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getArtifactComponentBuildingDefinitions;
 import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getExtensionModelsComponentBuildingDefinitions;
+import static org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
@@ -82,7 +83,6 @@ import org.mule.runtime.config.internal.processor.DiscardedOptionalBeanPostProce
 import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.config.internal.processor.PostRegistrationActionsPostProcessor;
-import org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils;
 import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -226,7 +226,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     this.resourceLocator = new DefaultResourceLocator();
     originalRegistry = ((MuleRegistryHelper) getMuleRegistry()).getDelegate();
 
-    ComponentBuildingDefinitionUtils.getRuntimeComponentBuildingDefinitionProvider().getComponentBuildingDefinitions()
+    getRuntimeComponentBuildingDefinitionProvider().getComponentBuildingDefinitions()
         .forEach(componentBuildingDefinitionRegistry::register);
 
     extensionManager = muleContext.getExtensionManager();
