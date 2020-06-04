@@ -77,9 +77,14 @@ class ForeachRouter {
           }
 
           final CoreEvent responseEvent = prepareEvent(event, expression);
-          inflightEvents.getAndIncrement();
-          // Inject it into the inner flux
-          innerRecorder.next(responseEvent);
+          if (responseEvent != null) {
+            inflightEvents.getAndIncrement();
+            // Inject it into the inner flux
+            innerRecorder.next(responseEvent);
+          } else {
+            downstreamRecorder.next(right(Throwable.class, event));
+            completeRouterIfNecessary();
+          }
 
         })
         .doOnComplete(() -> {
@@ -177,6 +182,9 @@ class ForeachRouter {
 
     try {
       Iterator<TypedValue<?>> typedValueIterator = owner.splitRequest(responseEvent, expression);
+      if (!typedValueIterator.hasNext()) {
+        return null;
+      }
 
       // Create ForEachContext
       ForeachContext foreachContext = this.createForeachContext(event, typedValueIterator);
@@ -262,6 +270,9 @@ class ForeachRouter {
 
   private CoreEvent createResponseEvent(CoreEvent event) {
     ForeachContext foreachContext = foreachContextResolver.getCurrentContextFromEvent(event).get(event.getContext().getId());
+    if (foreachContext == null) {
+      return event;
+    }
 
     final CoreEvent.Builder responseBuilder =
         builder(event).message(foreachContext.getOriginalMessage()).itemSequenceInfo(foreachContext.getItemSequenceInfo());
