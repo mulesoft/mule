@@ -42,6 +42,7 @@ import org.mule.module.http.api.HttpAuthentication;
 import org.mule.module.http.api.requester.HttpSendBodyMode;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.ParameterMap;
+import org.mule.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.module.http.internal.domain.request.HttpRequest;
 import org.mule.module.http.internal.domain.request.HttpRequestAuthentication;
 import org.mule.module.http.internal.domain.request.HttpRequestBuilder;
@@ -270,7 +271,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                     checkIfRemotelyClosed(exception);
                     // Only retry request in case of race condition where connection is closed after it is obtained from pool causing
                     // a "IOException: Remotely Closed"
-                    if(shouldRetryRemotelyClosed(exception, retryCount, httpRequest.getMethod()))
+                    if(shouldRetryRemotelyClosed(exception, retryCount, httpRequest))
                     {
                         try
                         {
@@ -343,14 +344,24 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         };
     }
 
-    private boolean shouldRetryRemotelyClosed(Exception exception, int retryCount, String httpMethod)
+    private boolean shouldRetryRemotelyClosed(Exception exception, int retryCount, HttpRequest httpRequest)
     {
         boolean shouldRetry = exception instanceof IOException && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)
-          && supportsRetry(httpMethod) && retryCount > 0;
-        if(shouldRetry)
+          && supportsRetry(httpRequest.getMethod()) && retryCount > 0;
+
+        if (shouldRetry)
         {
-            logger.warn("Sending HTTP message failed with `" + IOException.class.getCanonicalName() + ": " + REMOTELY_CLOSED
+            if (entitySupportRetry(httpRequest))
+            {
+                logger.warn("Sending HTTP message failed with `" + IOException.class.getCanonicalName() + ": " + REMOTELY_CLOSED
                         + "`. Request will be retried " + retryCount + " time(s) before failing.");
+            } else {
+                if(logger.isDebugEnabled()) {
+                    logger.debug("Sending HTTP message failed with `" + IOException.class.getCanonicalName() + ": " + REMOTELY_CLOSED
+                            + "`. Request will not be retried because entity not support retry.");
+                }
+                shouldRetry = false;
+            }
         }
         return shouldRetry;
     }
@@ -358,6 +369,23 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
     private boolean supportsRetry(String httpMethod)
     {
         return retryOnAllMethods || IDEMPOTENT_METHODS.contains(httpMethod);
+    }
+
+    /**
+     * Verify if http request entity support retry.
+     *
+     * @param request
+     * @return true if entity support retry
+     */
+    private boolean entitySupportRetry(HttpRequest request)
+    {
+        boolean entitySupportRetry = true;
+        if (request.getEntity() != null && request.getEntity() instanceof InputStreamHttpEntity)
+        {
+            // If input stream is not 'mark supported' can not be consumed again so retry is not supported
+            entitySupportRetry = ((InputStreamHttpEntity) request.getEntity()).getInputStream().markSupported();
+        }
+        return entitySupportRetry;
     }
 
     private void checkIfRemotelyClosed(Exception exception)
@@ -396,7 +424,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
             checkIfRemotelyClosed(e);
             // Only retry request in case of race condition where connection is closed after it is obtained from pool causing
             // a "IOException: Remotely Closed"
-            if(shouldRetryRemotelyClosed(e, retryCount, httpRequest.getMethod()))
+            if(shouldRetryRemotelyClosed(e, retryCount, httpRequest))
             {
                 return innerProcess(muleEvent, retryCount - 1, alreadyRetriedByAuth);
             }
