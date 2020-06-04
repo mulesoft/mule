@@ -7,7 +7,6 @@
 package org.mule.runtime.config.internal.factories;
 
 import static java.util.Arrays.asList;
-
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
@@ -47,8 +46,6 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -85,6 +82,16 @@ import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
 
 import org.junit.Before;
@@ -98,18 +105,11 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 
 @SmallTest
@@ -357,19 +357,15 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
 
   private Callable<Void> sendEventsThroughFlowRefAsynchronously(CountDownLatch countDownLatch,
                                                                 FlowRefFactoryBean flowRefFactoryBean) {
-    return new Callable<Void>() {
-
-      @Override
-      public Void call() throws Exception {
-        try {
-          countDownLatch.countDown();
-          countDownLatch.await();
-          sendEventsThroughFlowRef(flowRefFactoryBean);
-        } catch (Exception e) {
-          throw new RuntimeException("Error sending events to a flowRef", e);
-        }
-        return null;
+    return () -> {
+      try {
+        countDownLatch.countDown();
+        countDownLatch.await();
+        sendEventsThroughFlowRef(flowRefFactoryBean);
+      } catch (Exception e) {
+        throw new RuntimeException("Error sending events to a flowRef", e);
       }
+      return null;
     };
   }
 
@@ -389,7 +385,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
 
   private static class StubbedProcessor extends AbstractComponent implements Processor {
 
-    private CoreEvent applyResult;
+    private final CoreEvent applyResult;
 
     public StubbedProcessor(CoreEvent applyResult) {
       this.applyResult = applyResult;
@@ -414,7 +410,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     MuleArtifactContext muleArtifactContext =
         new MuleArtifactContext(mockMuleContext, new ConfigResource[0], new ArtifactDeclaration(),
                                 mock(OptionalObjectsController.class), new HashMap<>(), ArtifactType.APP, new ArrayList<>(),
-                                Optional.empty(), true, mock(CoreComponentBuildingDefinitionProvider.class)) {
+                                Optional.empty(), true) {
 
           @Override
           protected DefaultListableBeanFactory createBeanFactory() {

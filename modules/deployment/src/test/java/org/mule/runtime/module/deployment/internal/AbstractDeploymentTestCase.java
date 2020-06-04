@@ -53,7 +53,6 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPO
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
@@ -1052,7 +1051,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                                                                                                                 emptySet())),
                                                                           new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()),
                                  artifactClassLoaderManager, serviceManager, emptyList(), extensionModelLoaderManager,
-                                 getRuntimeComponentBuildingDefinitionProvider(),
                                  getRuntimeLockFactory());
   }
 

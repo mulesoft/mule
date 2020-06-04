@@ -17,7 +17,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
-import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -66,8 +65,7 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
                                              mock(ClassLoaderRepository.class),
                                              emptyList(), emptyList(),
                                              mock(ExtensionModelLoaderRepository.class),
-                                             muleContextListener,
-                                             getRuntimeComponentBuildingDefinitionProvider());
+                                             muleContextListener);
 
     applicationPolicyInstance.initialise();
 

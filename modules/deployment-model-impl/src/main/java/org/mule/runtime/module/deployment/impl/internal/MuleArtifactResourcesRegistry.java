@@ -8,7 +8,6 @@ package org.mule.runtime.module.deployment.impl.internal;
 
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 
 import org.mule.runtime.container.api.ModuleRepository;
@@ -30,7 +29,6 @@ import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactor
 import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderFactory;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
@@ -167,21 +165,17 @@ public class MuleArtifactResourcesRegistry {
                                             pluginClassLoadersFactory);
     ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory = new ServiceClassLoaderFactory();
     serviceManager =
-        ServiceManager.create(new DefaultServiceDiscoverer(
-                                                           new FileSystemServiceProviderDiscoverer(containerClassLoader,
+        ServiceManager.create(new DefaultServiceDiscoverer(new FileSystemServiceProviderDiscoverer(containerClassLoader,
                                                                                                    trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
                                                                                                    descriptorLoaderRepository,
                                                                                                    artifactDescriptorValidatorBuilder),
                                                            new ReflectionServiceResolver(new ServiceRegistry())));
     extensionModelLoaderManager = new MuleExtensionModelLoaderManager(containerClassLoader);
-    ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider =
-        getRuntimeComponentBuildingDefinitionProvider();
-    domainFactory =
-        new DefaultDomainFactory(domainDescriptorFactory, domainManager,
-                                 artifactClassLoaderManager, serviceManager,
-                                 pluginDependenciesResolver, domainClassLoaderBuilderFactory,
-                                 extensionModelLoaderManager, licenseValidator, runtimeComponentBuildingDefinitionProvider,
-                                 runtimeLockFactory);
+    domainFactory = new DefaultDomainFactory(domainDescriptorFactory, domainManager,
+                                             artifactClassLoaderManager, serviceManager,
+                                             pluginDependenciesResolver, domainClassLoaderBuilderFactory,
+                                             extensionModelLoaderManager, licenseValidator,
+                                             runtimeLockFactory);
 
     DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> policyClassLoaderFactory =
         trackDeployableArtifactClassLoaderFactory(new PolicyTemplateClassLoaderFactory());
@@ -195,7 +189,6 @@ public class MuleArtifactResourcesRegistry {
                                                        pluginDependenciesResolver,
                                                        artifactPluginDescriptorLoader,
                                                        licenseValidator,
-                                                       runtimeComponentBuildingDefinitionProvider,
                                                        runtimeLockFactory);
     toolingApplicationDescriptorFactory =
         new ToolingApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,

@@ -11,7 +11,6 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
@@ -29,9 +28,8 @@ import java.util.Properties;
  */
 public abstract class AbstractDeployableArtifactFactory<T extends DeployableArtifact> implements ArtifactFactory<T> {
 
-  private LicenseValidator licenseValidator;
-  private ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
-  private LockFactory runtimeLockFactory;
+  private final LicenseValidator licenseValidator;
+  private final LockFactory runtimeLockFactory;
 
   /**
    * Creates a new {@link AbstractDeployableArtifactFactory}
@@ -41,10 +39,8 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
    * @param runtimeLockFactory {@link LockFactory} for Runtime, a unique and shared lock factory to be used between different artifacts.
    */
   public AbstractDeployableArtifactFactory(LicenseValidator licenseValidator,
-                                           ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider,
                                            LockFactory runtimeLockFactory) {
     this.licenseValidator = licenseValidator;
-    this.runtimeComponentBuildingDefinitionProvider = runtimeComponentBuildingDefinitionProvider;
     this.runtimeLockFactory = runtimeLockFactory;
   }
 
@@ -74,13 +70,6 @@ public abstract class AbstractDeployableArtifactFactory<T extends DeployableArti
    */
   public abstract DeployableArtifactDescriptor createArtifactDescriptor(File artifactLocation,
                                                                         Optional<Properties> deploymentProperties);
-
-  /**
-   * @return {@link ComponentBuildingDefinitionProvider} for runtime components.
-   */
-  public ComponentBuildingDefinitionProvider getRuntimeComponentBuildingDefinitionProvider() {
-    return runtimeComponentBuildingDefinitionProvider;
-  }
 
   /**
    * @return {@link LockFactory} associated to the Runtime.

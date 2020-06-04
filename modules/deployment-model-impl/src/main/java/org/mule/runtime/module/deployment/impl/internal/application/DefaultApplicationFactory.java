@@ -24,7 +24,6 @@ import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.deployment.model.internal.application.ApplicationClassLoaderBuilder;
 import org.mule.runtime.deployment.model.internal.plugin.PluginDependenciesResolver;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -80,9 +79,8 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                    PluginDependenciesResolver pluginDependenciesResolver,
                                    ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader,
                                    LicenseValidator licenseValidator,
-                                   ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider,
                                    LockFactory runtimeLockFactory) {
-    super(licenseValidator, runtimeComponentBuildingDefinitionProvider, runtimeLockFactory);
+    super(licenseValidator, runtimeLockFactory);
     checkArgument(applicationClassLoaderBuilderFactory != null, "Application classloader builder factory cannot be null");
     checkArgument(applicationDescriptorFactory != null, "Application descriptor factory cannot be null");
     checkArgument(domainRepository != null, "Domain repository cannot be null");
@@ -155,17 +153,13 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                           new DefaultPolicyTemplateFactory(policyTemplateClassLoaderBuilderFactory,
                                                                            pluginDependenciesResolver,
                                                                            licenseValidator),
-                                          new DefaultPolicyInstanceProviderFactory(
-                                                                                   serviceRepository,
+                                          new DefaultPolicyInstanceProviderFactory(serviceRepository,
                                                                                    classLoaderRepository,
-                                                                                   extensionModelLoaderRepository,
-                                                                                   getRuntimeComponentBuildingDefinitionProvider()));
+                                                                                   extensionModelLoaderRepository));
     DefaultMuleApplication delegate =
         new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository,
                                    serviceRepository, extensionModelLoaderRepository, descriptor.getArtifactLocation(),
-                                   classLoaderRepository,
-                                   applicationPolicyProvider, getRuntimeComponentBuildingDefinitionProvider(),
-                                   getRuntimeLockFactory());
+                                   classLoaderRepository, applicationPolicyProvider, getRuntimeLockFactory());
 
     applicationPolicyProvider.setApplication(delegate);
     return new ApplicationWrapper(delegate);

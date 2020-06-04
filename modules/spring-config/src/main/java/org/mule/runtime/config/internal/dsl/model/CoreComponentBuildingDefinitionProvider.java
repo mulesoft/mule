@@ -16,7 +16,6 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.createNewInstance;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getMuleMessageTransformerBaseBuilder;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getTransformerBaseBuilder;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair.ANY_SELECTOR_STRING;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
@@ -482,8 +481,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("extensions", fromChildCollectionConfiguration(Object.class).build())
         .withSetterParameterDefinition(INHERIT_ITERABLE_REPEATABILITY,
                                        fromSimpleParameter(INHERIT_ITERABLE_REPEATABILITY).build())
-        .withRegistrationName(OBJECT_MULE_CONFIGURATION)
-        .alwaysEnabled(true)
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("dynamic-config-expiration")
@@ -524,7 +521,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                            .build())
         .withSetterParameterDefinition("notificationListeners",
                                        fromChildCollectionConfiguration(ListenerSubscriptionPair.class).build())
-        .alwaysEnabled(true)
         .build());
 
     ComponentBuildingDefinition.Builder baseNotificationDefinition =

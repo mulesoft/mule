@@ -54,7 +54,6 @@ import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
-import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
@@ -91,16 +90,15 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
   private final ClassLoaderRepository classLoaderRepository;
   private final File location;
-  private final ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider;
   private ApplicationStatus status;
 
   protected MuleContextListener muleContextListener;
   private NotificationListener<MuleContextNotification> statusListener;
-  private ApplicationPolicyProvider policyManager;
+  private final ApplicationPolicyProvider policyManager;
 
   private NotificationListenerRegistry notificationRegistrer;
 
-  private LockFactory runtimeLockFactory;
+  private final LockFactory runtimeLockFactory;
 
   public DefaultMuleApplication(ApplicationDescriptor descriptor,
                                 MuleDeployableArtifactClassLoader deploymentClassLoader,
@@ -109,7 +107,6 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
                                 ExtensionModelLoaderRepository extensionModelLoaderRepository, File location,
                                 ClassLoaderRepository classLoaderRepository,
                                 ApplicationPolicyProvider applicationPolicyProvider,
-                                ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitionProvider,
                                 LockFactory runtimeLockFactory) {
     super("app", "application", deploymentClassLoader);
     this.descriptor = descriptor;
@@ -120,7 +117,6 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     this.artifactPlugins = artifactPlugins;
     this.location = location;
     this.policyManager = applicationPolicyProvider;
-    this.runtimeComponentBuildingDefinitionProvider = runtimeComponentBuildingDefinitionProvider;
     this.runtimeLockFactory = runtimeLockFactory;
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
     if (this.deploymentClassLoader == null) {
@@ -226,7 +222,6 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
               .setProperties(ofNullable(resolveDeploymentProperties(descriptor.getDataFolderName(),
                                                                     descriptor.getDeploymentProperties())))
               .setPolicyProvider(policyManager)
-              .setRuntimeComponentBuildingDefinitionProvider(runtimeComponentBuildingDefinitionProvider)
               .setRuntimeLockFactory(runtimeLockFactory);
 
       Domain domain = getApplicationDomain(domainRepository, descriptor);

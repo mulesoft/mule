@@ -29,7 +29,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
@@ -68,6 +67,7 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
   private final List<ComponentBuildingDefinition> definitions = new LinkedList<>();
 
   private Set<ExtensionModel> extensions = emptySet();
+  private DslResolvingContext dslResolvingContext;
 
   /**
    * Gets a hold on a {@link ExtensionManager} instance and generates the definitions.
@@ -77,7 +77,11 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
   @Override
   public void init() {
     checkState(extensions != null, "extensions cannot be null");
-    extensions.stream().forEach(this::registerExtensionParsers);
+    extensions.stream()
+        .filter(extensionModel -> !extensionModel.getModelProperty(CustomBuildingDefinitionProviderModelProperty.class)
+            .isPresent()
+            && !extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent())
+        .forEach(this::registerExtensionParsers);
   }
 
   @Override
@@ -90,63 +94,56 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
 
     final ExtensionParsingContext parsingContext = createParsingContext(extensionModel);
     final Builder definitionBuilder = new Builder().withNamespace(xmlDslModel.getPrefix());
-    final DslSyntaxResolver dslSyntaxResolver =
-        DslSyntaxResolver.getDefault(extensionModel, DslResolvingContext.getDefault(extensions));
+    final DslSyntaxResolver dslSyntaxResolver = DslSyntaxResolver.getDefault(extensionModel, dslResolvingContext);
 
-    if (extensionModel.getModelProperty(CustomBuildingDefinitionProviderModelProperty.class).isPresent()) {
-      return;
-    }
+    final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
+    withContextClassLoader(extensionClassLoader, () -> {
+      ReflectionCache reflectionCache = new ReflectionCache();
+      new IdempotentExtensionWalker() {
 
-    if (!extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent()) {
-      final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
-      withContextClassLoader(extensionClassLoader, () -> {
-        ReflectionCache reflectionCache = new ReflectionCache();
-        new IdempotentExtensionWalker() {
+        @Override
+        public void onConfiguration(ConfigurationModel model) {
+          parseWith(new ConfigurationDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver,
+                                                      parsingContext));
+        }
 
-          @Override
-          public void onConfiguration(ConfigurationModel model) {
-            parseWith(new ConfigurationDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver,
-                                                        parsingContext));
-          }
+        @Override
+        protected void onConstruct(ConstructModel model) {
+          parseWith(new ConstructDefinitionParser(definitionBuilder, extensionModel,
+                                                  model, dslSyntaxResolver, parsingContext));
+        }
 
-          @Override
-          protected void onConstruct(ConstructModel model) {
-            parseWith(new ConstructDefinitionParser(definitionBuilder, extensionModel,
-                                                    model, dslSyntaxResolver, parsingContext));
-          }
+        @Override
+        public void onOperation(OperationModel model) {
+          parseWith(new OperationDefinitionParser(definitionBuilder, extensionModel,
+                                                  model, dslSyntaxResolver, parsingContext));
+        }
 
-          @Override
-          public void onOperation(OperationModel model) {
-            parseWith(new OperationDefinitionParser(definitionBuilder, extensionModel,
-                                                    model, dslSyntaxResolver, parsingContext));
-          }
+        @Override
+        public void onConnectionProvider(ConnectionProviderModel model) {
+          parseWith(new ConnectionProviderDefinitionParser(definitionBuilder, model, extensionModel, dslSyntaxResolver,
+                                                           parsingContext));
+        }
 
-          @Override
-          public void onConnectionProvider(ConnectionProviderModel model) {
-            parseWith(new ConnectionProviderDefinitionParser(definitionBuilder, model, extensionModel, dslSyntaxResolver,
-                                                             parsingContext));
-          }
+        @Override
+        public void onSource(SourceModel model) {
+          parseWith(new SourceDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver,
+                                               parsingContext));
+        }
 
-          @Override
-          public void onSource(SourceModel model) {
-            parseWith(new SourceDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver,
-                                                 parsingContext));
-          }
+        @Override
+        protected void onParameter(ParameterGroupModel groupModel, ParameterModel model) {
+          registerTopLevelParameter(model.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver,
+                                    parsingContext, reflectionCache);
+        }
 
-          @Override
-          protected void onParameter(ParameterGroupModel groupModel, ParameterModel model) {
-            registerTopLevelParameter(model.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver,
-                                      parsingContext, reflectionCache);
-          }
+      }.walk(extensionModel);
 
-        }.walk(extensionModel);
+      registerExportedTypesTopLevelParsers(extensionModel, definitionBuilder, extensionClassLoader, dslSyntaxResolver,
+                                           parsingContext, reflectionCache);
 
-        registerExportedTypesTopLevelParsers(extensionModel, definitionBuilder, extensionClassLoader, dslSyntaxResolver,
-                                             parsingContext, reflectionCache);
-
-        registerSubTypes(definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext, reflectionCache);
-      });
-    }
+      registerSubTypes(definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext, reflectionCache);
+    });
   }
 
   private void registerSubTypes(MetadataType type, Builder definitionBuilder,
@@ -273,5 +270,10 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
   @Override
   public void setExtensionModels(Set<ExtensionModel> extensionModels) {
     this.extensions = extensionModels;
+  }
+
+  @Override
+  public void setDslResolvingContext(DslResolvingContext dslResolvingContext) {
+    this.dslResolvingContext = dslResolvingContext;
   }
 }

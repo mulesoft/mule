@@ -19,7 +19,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
-import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -60,7 +59,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
   private ArtifactContext mockArtifactContext;
 
   private DefaultMuleApplication application;
-  private File appLocation = new File("fakeLocation");
+  private final File appLocation = new File("fakeLocation");
 
   @Override
   protected void doSetUp() throws Exception {
@@ -75,7 +74,6 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
                                              null, mock(ServiceRepository.class),
                                              mock(ExtensionModelLoaderRepository.class),
                                              appLocation, null, null,
-                                             getRuntimeComponentBuildingDefinitionProvider(),
                                              getRuntimeLockFactory());
     application.setArtifactContext(mockArtifactContext);
 
@@ -121,7 +119,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
 
     DefaultMuleApplication application =
         new DefaultMuleApplication(descriptor, mock(MuleApplicationClassLoader.class), emptyList(), null,
-                                   null, null, appLocation, null, null, null, null);
+                                   null, null, appLocation, null, null, null);
     application.install();
     assertThat(application.getDeploymentClassLoader(), is(notNullValue()));
     application.dispose();

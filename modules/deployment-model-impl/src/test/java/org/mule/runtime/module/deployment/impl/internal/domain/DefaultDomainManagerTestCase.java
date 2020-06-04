@@ -17,7 +17,6 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
-import static org.mule.runtime.core.internal.config.RuntimeComponentBuildingDefinitionsUtil.getRuntimeComponentBuildingDefinitionProvider;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 
 import org.mule.runtime.api.service.ServiceRepository;
@@ -60,7 +59,6 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
                                                                               domainClassLoaderBuilderFactory,
                                                                               extensionModelLoaderManager,
                                                                               licenseValidator,
-                                                                              getRuntimeComponentBuildingDefinitionProvider(),
                                                                               getRuntimeLockFactory());
   private DefaultDomainManager domainManager;
 
