@@ -10,11 +10,14 @@ package org.mule.runtime.core.internal.processor.interceptor;
 import static java.lang.Integer.MAX_VALUE;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
+import static org.mule.runtime.api.interception.FlowInterceptorFactory.FLOW_INTERCEPTORS_ORDER_REGISTRY_KEY;
 import static org.mule.runtime.api.interception.ProcessorInterceptorFactory.INTERCEPTORS_ORDER_REGISTRY_KEY;
 import static org.mule.runtime.api.interception.SourceInterceptorFactory.SOURCE_INTERCEPTORS_ORDER_REGISTRY_KEY;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.interception.FlowInterceptorFactory;
+import org.mule.runtime.api.interception.FlowInterceptorFactory.FlowInterceptorOrder;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory.ProcessorInterceptorOrder;
 import org.mule.runtime.api.interception.SourceInterceptorFactory;
@@ -37,8 +40,10 @@ public class DefaultProcessorInterceptorManager implements InterceptorManager, I
   private MuleContext context;
 
   private List<ProcessorInterceptorFactory> interceptorFactories = new ArrayList<>();
+  private List<FlowInterceptorFactory> flowInterceptorFactories = new ArrayList<>();
   private List<SourceInterceptorFactory> sourceInterceptorFactories = new ArrayList<>();
   private List<String> interceptorsOrder = new ArrayList<>();
+  private List<String> flowInterceptorsOrder = new ArrayList<>();
   private List<String> sourceInterceptorsOrder = new ArrayList<>();
 
   @Override
@@ -46,6 +51,13 @@ public class DefaultProcessorInterceptorManager implements InterceptorManager, I
   @Named(INTERCEPTORS_ORDER_REGISTRY_KEY)
   public void setInterceptorsOrder(Optional<ProcessorInterceptorOrder> packagesOrder) {
     interceptorsOrder = packagesOrder.map(order -> order.get()).orElse(emptyList());
+  }
+
+  @Override
+  @Inject
+  @Named(FLOW_INTERCEPTORS_ORDER_REGISTRY_KEY)
+  public void setFlowInterceptorsOrder(Optional<FlowInterceptorOrder> packagesOrder) {
+    flowInterceptorsOrder = packagesOrder.map(order -> order.get()).orElse(emptyList());
   }
 
   @Override
@@ -81,6 +93,12 @@ public class DefaultProcessorInterceptorManager implements InterceptorManager, I
 
   @Override
   @Inject
+  public void setFlowInterceptorFactories(Optional<List<FlowInterceptorFactory>> interceptorFactories) {
+    this.flowInterceptorFactories = interceptorFactories.orElse(emptyList());
+  }
+
+  @Override
+  @Inject
   public void setSourceInterceptorFactories(Optional<List<SourceInterceptorFactory>> interceptorFactories) {
     this.sourceInterceptorFactories = interceptorFactories.orElse(emptyList());
   }
@@ -97,6 +115,26 @@ public class DefaultProcessorInterceptorManager implements InterceptorManager, I
   private int orderIndexOf(ProcessorInterceptorFactory factory) {
     int i = 0;
     for (String interceptorsOrderItem : interceptorsOrder) {
+      if (factory.getClass().getName().startsWith(interceptorsOrderItem)) {
+        return i;
+      }
+      ++i;
+    }
+    return MAX_VALUE;
+  }
+
+  @Override
+  public List<FlowInterceptorFactory> getFlowInterceptorFactories() {
+    final List<FlowInterceptorFactory> sortedInterceptors = new ArrayList<>(flowInterceptorFactories);
+
+    sortedInterceptors.sort((o1, o2) -> orderIndexOf(o1) - orderIndexOf(o2));
+
+    return unmodifiableList(sortedInterceptors);
+  }
+
+  private int orderIndexOf(FlowInterceptorFactory factory) {
+    int i = 0;
+    for (String interceptorsOrderItem : flowInterceptorsOrder) {
       if (factory.getClass().getName().startsWith(interceptorsOrderItem)) {
         return i;
       }

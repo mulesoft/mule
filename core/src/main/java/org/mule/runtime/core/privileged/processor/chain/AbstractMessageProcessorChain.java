@@ -60,6 +60,7 @@ import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
+import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveAroundInterceptorAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
@@ -69,7 +70,6 @@ import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
-import org.mule.runtime.core.privileged.interception.ReactiveInterceptor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -367,12 +367,12 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             if (processorPath != null) {
               MDC.put("processorPath", processorPath);
             }
-            preNotification(event, processor);
+            preNotification(event, (Processor) processor);
           })
           .transform(next)
           .map(result -> {
             try {
-              postNotification(processor).accept(result);
+              postNotification((Processor) processor).accept(result);
               setCurrentEvent((PrivilegedEvent) result);
               // If the processor returns a CursorProvider, then have the StreamingManager manage it
               return updateEventForStreaming(streamingManager).apply(result);

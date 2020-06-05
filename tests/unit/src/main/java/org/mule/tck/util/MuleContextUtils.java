@@ -52,6 +52,7 @@ import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
+import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
@@ -180,6 +181,7 @@ public class MuleContextUtils {
       when(registry.lookupObject(ComponentInitialStateManager.SERVICE_ID)).thenReturn(componentInitialStateManager);
       doReturn(streamingManager).when(registry).lookupObject(StreamingManager.class);
       doReturn(mock(NotificationDispatcher.class)).when(registry).lookupObject(NotificationDispatcher.class);
+      doReturn(mock(InterceptorManager.class)).when(registry).lookupObject(InterceptorManager.class);
       doReturn(mock(ObjectStoreManager.class, RETURNS_DEEP_STUBS)).when(registry).lookupObject(OBJECT_STORE_MANAGER);
     } catch (RegistrationException e) {
       throw new RuntimeException(e);

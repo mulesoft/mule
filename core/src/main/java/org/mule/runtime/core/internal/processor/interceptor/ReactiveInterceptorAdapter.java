@@ -28,8 +28,7 @@ import static reactor.core.publisher.Mono.subscriberContext;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.interception.InterceptionEvent;
+import org.mule.runtime.api.interception.FlowInterceptorFactory;
 import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.interception.ProcessorParameterValue;
@@ -39,11 +38,11 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
+import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
-import org.mule.runtime.core.privileged.interception.ReactiveInterceptor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import java.util.Map;
@@ -61,19 +60,20 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
 
   private static final Logger LOGGER = getLogger(ReactiveInterceptorAdapter.class);
 
-  private static final String BEFORE_METHOD_NAME = "before";
-  private static final String AFTER_METHOD_NAME = "after";
-
-  private final ProcessorInterceptorFactory interceptorFactory;
+  private final ComponentInterceptorFactoryWrapper interceptorFactory;
 
   public ReactiveInterceptorAdapter(ProcessorInterceptorFactory interceptorFactory) {
-    this.interceptorFactory = interceptorFactory;
+    this.interceptorFactory = new ProcessorInterceptorFactoryWrapper(interceptorFactory);
+  }
+
+  public ReactiveInterceptorAdapter(FlowInterceptorFactory interceptorFactory) {
+    this.interceptorFactory = new FlowInterceptorFactoryWrapper(interceptorFactory);
   }
 
   // TODO MULE-13449 Loggers in this method must be INFO
   @Override
-  public ReactiveProcessor apply(Processor component, ReactiveProcessor next) {
-    if (!isInterceptable(component)) {
+  public ReactiveProcessor apply(ReactiveProcessor component, ReactiveProcessor next) {
+    if (!interceptorFactory.isInterceptable(component)) {
       return next;
     }
 
@@ -82,7 +82,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
       return next;
     }
 
-    final ProcessorInterceptor interceptor = interceptorFactory.get();
+    final ComponentInterceptorWrapper interceptor = interceptorFactory.get();
     Map<String, String> dslParameters = (Map<String, String>) ((Component) component).getAnnotation(ANNOTATION_PARAMETERS);
 
     ReactiveProcessor interceptedProcessor = doApply(component, next, componentLocation, interceptor, dslParameters);
@@ -91,9 +91,10 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
     return interceptedProcessor;
   }
 
-  protected ReactiveProcessor doApply(Processor component, ReactiveProcessor next, final ComponentLocation componentLocation,
-                                      final ProcessorInterceptor interceptor, Map<String, String> dslParameters) {
-    if (implementsBeforeOrAfter(interceptor)) {
+  protected ReactiveProcessor doApply(ReactiveProcessor component, ReactiveProcessor next,
+                                      final ComponentLocation componentLocation,
+                                      final ComponentInterceptorWrapper interceptor, Map<String, String> dslParameters) {
+    if (interceptor.implementsBeforeOrAfter()) {
       LOGGER.debug("Configuring interceptor '{}' before and after processor '{}'...", interceptor,
                    componentLocation.getLocation());
 
@@ -117,7 +118,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
     }
   }
 
-  protected Function<InternalEvent, InternalEvent> doBefore(ProcessorInterceptor interceptor, Component component,
+  protected Function<InternalEvent, InternalEvent> doBefore(ComponentInterceptorWrapper interceptor, Component component,
                                                             Map<String, String> dslParameters) {
     return event -> {
       final InternalEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
@@ -147,7 +148,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
     };
   }
 
-  protected Function<InternalEvent, InternalEvent> doAfter(ProcessorInterceptor interceptor, Component component,
+  protected Function<InternalEvent, InternalEvent> doAfter(ComponentInterceptorWrapper interceptor, Component component,
                                                            Optional<Throwable> thrown) {
     return event -> {
       final InternalEvent eventWithResolvedParams = removeResolvedParameters(event);
@@ -175,18 +176,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
     };
   }
 
-  private boolean implementsBeforeOrAfter(ProcessorInterceptor interceptor) {
-    try {
-      return !(interceptor.getClass().getMethod(BEFORE_METHOD_NAME, ComponentLocation.class, Map.class, InterceptionEvent.class)
-          .isDefault()
-          && interceptor.getClass()
-              .getMethod(AFTER_METHOD_NAME, ComponentLocation.class, InterceptionEvent.class, Optional.class).isDefault());
-    } catch (NoSuchMethodException | SecurityException e) {
-      throw new MuleRuntimeException(e);
-    }
-  }
-
-  private boolean isInterceptable(Processor component) {
+  private boolean isInterceptable(ReactiveProcessor component) {
     return component instanceof Component && ((Component) component).getLocation() != null;
   }
 

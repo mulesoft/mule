@@ -17,7 +17,7 @@ import static reactor.core.publisher.Mono.subscriberContext;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.interception.FlowInterceptorFactory;
 import org.mule.runtime.api.interception.InterceptionAction;
 import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.interception.ProcessorInterceptor;
@@ -47,16 +47,18 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
 
   private static final Logger LOGGER = getLogger(ReactiveAroundInterceptorAdapter.class);
 
-  private static final String AROUND_METHOD_NAME = "around";
-
   public ReactiveAroundInterceptorAdapter(ProcessorInterceptorFactory interceptorFactory) {
     super(interceptorFactory);
   }
 
+  public ReactiveAroundInterceptorAdapter(FlowInterceptorFactory interceptorFactory) {
+    super(interceptorFactory);
+  }
+
   @Override
-  protected ReactiveProcessor doApply(Processor component, ReactiveProcessor next, ComponentLocation componentLocation,
-                                      ProcessorInterceptor interceptor, Map<String, String> dslParameters) {
-    if (implementsAround(interceptor)) {
+  protected ReactiveProcessor doApply(ReactiveProcessor component, ReactiveProcessor next, ComponentLocation componentLocation,
+                                      ComponentInterceptorWrapper interceptor, Map<String, String> dslParameters) {
+    if (interceptor.implementsAround()) {
       LOGGER.debug("Configuring interceptor '{}' around processor '{}'...", interceptor, componentLocation.getLocation());
 
       return publisher -> subscriberContext()
@@ -70,18 +72,8 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
     }
   }
 
-  private boolean implementsAround(ProcessorInterceptor interceptor) {
-    try {
-      return !interceptor.getClass()
-          .getMethod(AROUND_METHOD_NAME, ComponentLocation.class, Map.class, InterceptionEvent.class, InterceptionAction.class)
-          .isDefault();
-    } catch (NoSuchMethodException | SecurityException e) {
-      throw new MuleRuntimeException(e);
-    }
-  }
-
-  private CompletableFuture<InternalEvent> doAround(InternalEvent event, ProcessorInterceptor interceptor,
-                                                    Processor component, Map<String, String> dslParameters,
+  private CompletableFuture<InternalEvent> doAround(InternalEvent event, ComponentInterceptorWrapper interceptor,
+                                                    ReactiveProcessor component, Map<String, String> dslParameters,
                                                     ReactiveProcessor next, Context ctx) {
     final InternalEvent eventWithResolvedParams = addResolvedParameters(event, (Component) component, dslParameters);
 

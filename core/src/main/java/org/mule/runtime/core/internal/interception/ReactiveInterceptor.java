@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.interception;
+package org.mule.runtime.core.internal.interception;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.processor.Processor;
@@ -21,6 +21,6 @@ import java.util.function.BiFunction;
  * @since 4.3
  */
 @NoImplement
-public interface ReactiveInterceptor extends BiFunction<Processor, ReactiveProcessor, ReactiveProcessor> {
+public interface ReactiveInterceptor extends BiFunction<ReactiveProcessor, ReactiveProcessor, ReactiveProcessor> {
 
 }

@@ -10,7 +10,6 @@ import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger;
 
@@ -26,12 +25,12 @@ import reactor.core.publisher.Flux;
  */
 public final class InterceptedReactiveProcessor implements ReactiveProcessor {
 
-  private final Processor processor;
+  private final ReactiveProcessor processor;
   private final ReactiveProcessor next;
   private final ProcessingType processingType;
   private final ThreadNotificationLogger threadNotificationLogger;
 
-  public InterceptedReactiveProcessor(Processor processor, ReactiveProcessor next,
+  public InterceptedReactiveProcessor(ReactiveProcessor processor, ReactiveProcessor next,
                                       ThreadNotificationLogger threadNotificationLogger) {
     this.processor = processor;
     this.processingType = processor.getProcessingType();
@@ -62,7 +61,7 @@ public final class InterceptedReactiveProcessor implements ReactiveProcessor {
     return processingType;
   }
 
-  public Processor getProcessor() {
+  public ReactiveProcessor getProcessor() {
     return processor;
   }
 
