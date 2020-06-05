@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.routing;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
@@ -25,6 +26,7 @@ import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurer;
@@ -81,9 +83,6 @@ class ForeachRouter {
             inflightEvents.getAndIncrement();
             // Inject it into the inner flux
             innerRecorder.next(responseEvent);
-          } else {
-            downstreamRecorder.next(right(Throwable.class, event));
-            completeRouterIfNecessary();
           }
 
         })
@@ -101,6 +100,10 @@ class ForeachRouter {
           ForeachContext foreachContext =
               foreachContextResolver.getCurrentContextFromEvent(event).get(event.getContext().getId());
 
+          if (foreachContext == null) {
+            return event;
+          }
+
           Iterator<TypedValue<?>> iterator = foreachContext.getIterator();
           if (!iterator.hasNext() && foreachContext.getElementNumber().get() == 0) {
             downstreamRecorder.next(right(Throwable.class, event));
@@ -110,6 +113,11 @@ class ForeachRouter {
           TypedValue currentValue = owner.setCurrentValue(batchSize, foreachContext);
           return createTypedValuePartToProcess(owner, event, foreachContext, currentValue);
 
+        })
+        .onErrorContinue(MessagingException.class, (e, o) -> {
+          this.eventWithCurrentContextDeleted(((MessagingException) e).getEvent());
+          downstreamRecorder.next(left(e));
+          completeRouterIfNecessary();
         })
         .transform(innerPub -> applyWithChildContext(innerPub, nestedChain, of(owner.getLocation())))
         .doOnNext(evt -> {
@@ -134,7 +142,8 @@ class ForeachRouter {
             downstreamRecorder.next(left(new MessagingException(evt, e, owner)));
             completeRouterIfNecessary();
           }
-        }).onErrorContinue(MessagingException.class, (e, o) -> {
+        })
+        .onErrorContinue(MessagingException.class, (e, o) -> {
           this.eventWithCurrentContextDeleted(((MessagingException) e).getEvent());
           downstreamRecorder.next(left(e));
           completeRouterIfNecessary();
@@ -183,6 +192,8 @@ class ForeachRouter {
     try {
       Iterator<TypedValue<?>> typedValueIterator = owner.splitRequest(responseEvent, expression);
       if (!typedValueIterator.hasNext()) {
+        downstreamRecorder.next(right(Throwable.class, event));
+        completeRouterIfNecessary();
         return null;
       }
 
@@ -203,6 +214,7 @@ class ForeachRouter {
       // automatic wrapping is only applied when the signal is an Event.
       downstreamRecorder.next(left(new MessagingException(responseEvent, e, owner)));
       completeRouterIfNecessary();
+      return null;
     }
     return responseEvent;
   }
