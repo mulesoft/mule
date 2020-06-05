@@ -100,10 +100,6 @@ class ForeachRouter {
           ForeachContext foreachContext =
               foreachContextResolver.getCurrentContextFromEvent(event).get(event.getContext().getId());
 
-          if (foreachContext == null) {
-            return event;
-          }
-
           Iterator<TypedValue<?>> iterator = foreachContext.getIterator();
           if (!iterator.hasNext() && foreachContext.getElementNumber().get() == 0) {
             downstreamRecorder.next(right(Throwable.class, event));
