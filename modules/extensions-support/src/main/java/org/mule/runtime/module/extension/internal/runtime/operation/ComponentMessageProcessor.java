@@ -417,17 +417,17 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
           @Override
           public void complete(Object o) {
-            CoreEvent policyResult = (CoreEvent) o;
             if (isTargetWithPolicies(event)) {
               try {
                 ExecutionContextAdapter operationContext = createExecutionContext(event);
-                policyResult = returnDelegate.asReturnValue(o, operationContext);
-                executorCallback.complete(policyResult);
+                executorCallback.complete(returnDelegate.asReturnValue(o, operationContext));
               } catch (MuleException e) {
                 executorCallback.error(e);
               } catch (Throwable t) {
                 executorCallback.error(unwrap(t));
               }
+            } else {
+              executorCallback.complete(o);
             }
           }
 
