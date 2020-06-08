@@ -417,17 +417,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
           @Override
           public void complete(Object o) {
-            if (isTargetWithPolicies(event)) {
-              try {
-                ExecutionContextAdapter operationContext = createExecutionContext(event);
-                executorCallback.complete(returnDelegate.asReturnValue(o, operationContext));
-              } catch (MuleException e) {
-                executorCallback.error(e);
-              } catch (Throwable t) {
-                executorCallback.error(unwrap(t));
-              }
-            } else {
-              executorCallback.complete(o);
+            try {
+              ExecutionContextAdapter operationContext = createExecutionContext(event);
+              executorCallback.complete(returnDelegate.asReturnValue(o, operationContext));
+            } catch (MuleException e) {
+              executorCallback.error(e);
+            } catch (Throwable t) {
+              executorCallback.error(unwrap(t));
             }
           }
 
@@ -469,13 +465,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
   }
 
-  private ExecutorCallback mapped(ExecutorCallback callback, ExecutionContextAdapter<T> operationContext,
-                                  ReturnDelegate delegate) {
+  private ExecutorCallback mapped(ExecutorCallback callback, ExecutionContextAdapter<T> operationContext) {
     return new ExecutorCallback() {
 
       @Override
       public void complete(Object value) {
-        callback.complete(delegate.asReturnValue(value, operationContext));
+        callback.complete(valueReturnDelegate.asReturnValue(value, operationContext));
       }
 
       @Override
@@ -691,13 +686,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                                 currentScheduler);
     }
 
-    executeOperation(operationContext, mapped(callbackSupplier.get(),
-                                              operationContext,
-                                              isTargetWithPolicies(event) ? valueReturnDelegate : returnDelegate));
-  }
-
-  private boolean isTargetWithPolicies(CoreEvent event) {
-    return !SdkInternalContext.from(event).isNoPolicyOperation(getLocation(), event.getContext().getId()) && !isBlank(target);
+    executeOperation(operationContext, mapped(callbackSupplier.get(), operationContext));
   }
 
   private void initRetryPolicyResolver() {
