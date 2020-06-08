@@ -108,11 +108,6 @@ class ForeachRouter {
           return createTypedValuePartToProcess(owner, event, foreachContext, currentValue);
 
         })
-        .onErrorContinue(MessagingException.class, (e, o) -> {
-          this.eventWithCurrentContextDeleted(((MessagingException) e).getEvent());
-          downstreamRecorder.next(left(e));
-          completeRouterIfNecessary();
-        })
         .transform(innerPub -> applyWithChildContext(innerPub, nestedChain, of(owner.getLocation())))
         .doOnNext(evt -> {
           try {
