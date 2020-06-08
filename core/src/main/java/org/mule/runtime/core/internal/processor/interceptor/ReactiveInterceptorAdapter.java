@@ -265,7 +265,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
   /**
    * Create and configure the {@link ReactiveInterceptorAdapter} from the provided factories.
    *
-   * @return the adaoters, in the order they have to be applied.
+   * @return the adapters, in the order they have to be applied.
    */
   public static List<ReactiveInterceptorAdapter> createInterceptors(List<ComponentInterceptorFactoryAdapter> interceptorFactoryAdapters,
                                                                     Injector injector) {
