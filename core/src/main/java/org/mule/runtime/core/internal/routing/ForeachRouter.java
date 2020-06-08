@@ -78,9 +78,9 @@ class ForeachRouter {
             downstreamRecorder.next(left(new IllegalArgumentException(MAP_NOT_SUPPORTED_MESSAGE)));
           }
 
+          inflightEvents.getAndIncrement();
           final CoreEvent responseEvent = prepareEvent(event, expression);
           if (responseEvent != null) {
-            inflightEvents.getAndIncrement();
             // Inject it into the inner flux
             innerRecorder.next(responseEvent);
           }
