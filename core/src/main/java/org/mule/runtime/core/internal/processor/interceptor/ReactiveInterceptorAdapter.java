@@ -28,10 +28,12 @@ import static reactor.core.publisher.Mono.subscriberContext;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.interception.FlowInterceptorFactory;
 import org.mule.runtime.api.interception.ProcessorInterceptor;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.api.interception.ProcessorParameterValue;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -45,6 +47,8 @@ import org.mule.runtime.core.internal.processor.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -63,11 +67,15 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
   private final ComponentInterceptorFactoryAdapter interceptorFactory;
 
   public ReactiveInterceptorAdapter(ProcessorInterceptorFactory interceptorFactory) {
-    this.interceptorFactory = new ProcessorInterceptorFactoryWrapper(interceptorFactory);
+    this(new ProcessorInterceptorFactoryAdapter(interceptorFactory));
   }
 
   public ReactiveInterceptorAdapter(FlowInterceptorFactory interceptorFactory) {
-    this.interceptorFactory = new FlowInterceptorFactoryWrapper(interceptorFactory);
+    this(new FlowInterceptorFactoryAdapter(interceptorFactory));
+  }
+
+  public ReactiveInterceptorAdapter(ComponentInterceptorFactoryAdapter interceptorFactoryAdapter) {
+    this.interceptorFactory = interceptorFactoryAdapter;
   }
 
   // TODO MULE-13449 Loggers in this method must be INFO
@@ -252,5 +260,36 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
     } else {
       return super.setInternalParamsForNotParamResolver(component, resolvedParameters, event, builder);
     }
+  }
+
+  /**
+   * Create and configure the {@link ReactiveInterceptorAdapter} from the provided factories.
+   *
+   * @return the adaoters, in the order they have to be applied.
+   */
+  public static List<ReactiveInterceptorAdapter> createInterceptors(List<ComponentInterceptorFactoryAdapter> interceptorFactoryAdapters,
+                                                                    Injector injector) {
+    List<ReactiveInterceptorAdapter> interceptors = new LinkedList<>();
+
+    interceptorFactoryAdapters.stream().forEach(interceptorFactory -> {
+      ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptorFactory);
+      try {
+        injector.inject(reactiveInterceptorAdapter);
+      } catch (MuleException e) {
+        throw new MuleRuntimeException(e);
+      }
+      interceptors.add(0, reactiveInterceptorAdapter);
+    });
+    interceptorFactoryAdapters.stream().forEach(interceptorFactory -> {
+      ReactiveAroundInterceptorAdapter reactiveInterceptorAdapter = new ReactiveAroundInterceptorAdapter(interceptorFactory);
+      try {
+        injector.inject(reactiveInterceptorAdapter);
+      } catch (MuleException e) {
+        throw new MuleRuntimeException(e);
+      }
+      interceptors.add(0, reactiveInterceptorAdapter);
+    });
+
+    return interceptors;
   }
 }

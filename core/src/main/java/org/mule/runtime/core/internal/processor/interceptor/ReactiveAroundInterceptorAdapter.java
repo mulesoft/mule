@@ -55,6 +55,10 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
     super(interceptorFactory);
   }
 
+  public ReactiveAroundInterceptorAdapter(ComponentInterceptorFactoryAdapter interceptorFactoryAdapter) {
+    super(interceptorFactoryAdapter);
+  }
+
   @Override
   protected ReactiveProcessor doApply(ReactiveProcessor component, ReactiveProcessor next, ComponentLocation componentLocation,
                                       ComponentInterceptorAdapter interceptor, Map<String, String> dslParameters) {

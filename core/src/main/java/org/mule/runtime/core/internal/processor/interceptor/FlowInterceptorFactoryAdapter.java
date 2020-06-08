@@ -6,33 +6,33 @@
  */
 package org.mule.runtime.core.internal.processor.interceptor;
 
-import org.mule.runtime.api.component.Component;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
+import org.mule.runtime.api.interception.FlowInterceptorFactory;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
-class ProcessorInterceptorFactoryWrapper implements ComponentInterceptorFactoryAdapter {
+public class FlowInterceptorFactoryAdapter implements ComponentInterceptorFactoryAdapter {
 
-  private final ProcessorInterceptorFactory interceptorFactory;
+  private final FlowInterceptorFactory interceptorFactory;
 
-  public ProcessorInterceptorFactoryWrapper(ProcessorInterceptorFactory interceptorFactory) {
+  public FlowInterceptorFactoryAdapter(FlowInterceptorFactory interceptorFactory) {
     this.interceptorFactory = interceptorFactory;
   }
 
   @Override
   public boolean isInterceptable(ReactiveProcessor component) {
-    return component instanceof Component
-        && ((Component) component).getLocation() != null;
+    return true;
   }
 
   @Override
   public boolean intercept(ComponentLocation componentLocation) {
-    return interceptorFactory.intercept(componentLocation);
+    return componentLocation.getComponentIdentifier().getType() == FLOW
+        && interceptorFactory.intercept(componentLocation.getRootContainerName());
   }
 
   @Override
   public ComponentInterceptorAdapter get() {
-    return new ProcessorInterceptorWrapper(interceptorFactory.get());
+    return new FlowInterceptorWrapper(interceptorFactory.get());
   }
-
 }

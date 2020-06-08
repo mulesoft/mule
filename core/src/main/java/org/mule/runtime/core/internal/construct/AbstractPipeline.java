@@ -12,6 +12,7 @@ import static java.lang.System.getProperty;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
@@ -27,6 +28,7 @@ import static org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Un
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
+import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter.createInterceptors;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.ON_NEXT_FAILURE_STRATEGY;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
@@ -72,8 +74,7 @@ import org.mule.runtime.core.internal.execution.FlowProcessor;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
-import org.mule.runtime.core.internal.processor.interceptor.ReactiveAroundInterceptorAdapter;
-import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
+import org.mule.runtime.core.internal.processor.interceptor.FlowInterceptorFactoryAdapter;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -263,24 +264,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         .withMaxConcurrentTasks(1)
         .withName(getName() + ".flux.completionCallback"));
 
-    interceptorManager.getFlowInterceptorFactories().stream().forEach(interceptorFactory -> {
-      ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptorFactory);
-      try {
-        muleContext.getInjector().inject(reactiveInterceptorAdapter);
-      } catch (MuleException e) {
-        throw new MuleRuntimeException(e);
-      }
-      flowInterceptors.add(0, reactiveInterceptorAdapter);
-    });
-    interceptorManager.getFlowInterceptorFactories().stream().forEach(interceptorFactory -> {
-      ReactiveAroundInterceptorAdapter reactiveInterceptorAdapter = new ReactiveAroundInterceptorAdapter(interceptorFactory);
-      try {
-        muleContext.getInjector().inject(reactiveInterceptorAdapter);
-      } catch (MuleException e) {
-        throw new MuleRuntimeException(e);
-      }
-      flowInterceptors.add(0, reactiveInterceptorAdapter);
-    });
+    flowInterceptors.addAll(createInterceptors(interceptorManager.getFlowInterceptorFactories()
+        .stream()
+        .map(FlowInterceptorFactoryAdapter::new)
+        .collect(toList()), muleContext.getInjector()));
   }
 
   /**

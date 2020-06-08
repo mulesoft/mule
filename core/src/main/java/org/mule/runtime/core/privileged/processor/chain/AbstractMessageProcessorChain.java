@@ -8,6 +8,7 @@ package org.mule.runtime.core.privileged.processor.chain;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
@@ -25,6 +26,7 @@ import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStream
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.runtime.core.internal.context.thread.notification.ThreadNotificationLogger.THREAD_NOTIFICATION_LOGGER_CONTEXT_KEY;
+import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter.createInterceptors;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
@@ -40,7 +42,6 @@ import static reactor.core.publisher.Operators.lift;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -62,7 +63,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
-import org.mule.runtime.core.internal.processor.interceptor.ReactiveAroundInterceptorAdapter;
+import org.mule.runtime.core.internal.processor.interceptor.ProcessorInterceptorFactoryAdapter;
 import org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
@@ -533,24 +534,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   @Override
   public void initialise() throws InitialisationException {
-    processorInterceptorManager.getInterceptorFactories().stream().forEach(interceptorFactory -> {
-      ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptorFactory);
-      try {
-        muleContext.getInjector().inject(reactiveInterceptorAdapter);
-      } catch (MuleException e) {
-        throw new MuleRuntimeException(e);
-      }
-      additionalInterceptors.add(0, reactiveInterceptorAdapter);
-    });
-    processorInterceptorManager.getInterceptorFactories().stream().forEach(interceptorFactory -> {
-      ReactiveAroundInterceptorAdapter reactiveInterceptorAdapter = new ReactiveAroundInterceptorAdapter(interceptorFactory);
-      try {
-        muleContext.getInjector().inject(reactiveInterceptorAdapter);
-      } catch (MuleException e) {
-        throw new MuleRuntimeException(e);
-      }
-      additionalInterceptors.add(0, reactiveInterceptorAdapter);
-    });
+    additionalInterceptors.addAll(createInterceptors(processorInterceptorManager.getInterceptorFactories()
+        .stream()
+        .map(ProcessorInterceptorFactoryAdapter::new)
+        .collect(toList()), muleContext.getInjector()));
 
     threadNotificationLogger =
         new ThreadNotificationLogger(threadNotificationService, muleContext.getConfiguration().isThreadLoggingEnabled());
