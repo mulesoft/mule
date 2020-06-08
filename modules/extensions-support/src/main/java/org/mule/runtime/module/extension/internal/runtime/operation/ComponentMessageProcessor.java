@@ -413,28 +413,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         ((DefaultFlowCallStack) event.getFlowCallStack())
             .pushCurrentProcessorPath(resolvedProcessorRepresentation);
 
-        ExecutorCallback effectiveCallback = new ExecutorCallback() {
-
-          @Override
-          public void complete(Object o) {
-            try {
-              ExecutionContextAdapter operationContext = createExecutionContext(event);
-              executorCallback.complete(returnDelegate.asReturnValue(o, operationContext));
-            } catch (MuleException e) {
-              executorCallback.error(e);
-            } catch (Throwable t) {
-              executorCallback.error(unwrap(t));
-            }
-          }
-
-          @Override
-          public void error(Throwable t) {
-            executorCallback.error(unwrap(t));
-          }
-        };
-
         sdkInternalContext.getPolicyToApply(location, eventId).process(event, operationExecutionFunction, () -> resolutionResult,
-                                                                       location, effectiveCallback);
+                                                                       location,
+                                                                       computeOperationReturnExecutionCallback(event,
+                                                                                                               executorCallback));
       } else {
         // If this operation has no component location then it is internal. Don't apply policies on internal operations.
         operationExecutionFunction.execute(resolutionResult, event, executorCallback);
@@ -459,10 +441,54 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         prepareAndExecuteOperation(event, () -> callback, ctx);
       };
 
-      operationExecutionFunction.execute(resolutionResult, event, executorCallback);
+      operationExecutionFunction.execute(resolutionResult, event,
+                                         computeOperationReturnExecutionCallback(event, executorCallback));
     } catch (Throwable t) {
       executorCallback.error(unwrap(t));
     }
+  }
+
+  private ExecutorCallback computeOperationReturnExecutionCallback(CoreEvent event, ExecutorCallback delegateCallback) {
+    return new ExecutorCallback() {
+
+      @Override
+      public void complete(Object o) {
+        ExecutionContextAdapter operationContext = null;
+        CoreEvent originalEvent = null;
+        try {
+          if (returnDelegate instanceof ValueReturnDelegate) {
+            delegateCallback.complete(o);
+          } else {
+            OperationExecutionParams operationExecutionParams =
+                from(event).getOperationExecutionParams(getLocation(), event.getContext().getId());
+
+            if (operationExecutionParams != null) {
+              operationContext =
+                  operationExecutionParams.getExecutionContextAdapter();
+              originalEvent = operationContext.getEvent();
+              operationContext.changeEvent(event);
+            } else {
+              operationContext = createExecutionContext(event);
+            }
+
+            delegateCallback.complete(returnDelegate.asReturnValue(o, operationContext));
+          }
+        } catch (MuleException e) {
+          delegateCallback.error(e);
+        } catch (Throwable t) {
+          delegateCallback.error(unwrap(t));
+        } finally {
+          if (operationContext != null && originalEvent != null) {
+            operationContext.changeEvent(originalEvent);
+          }
+        }
+      }
+
+      @Override
+      public void error(Throwable t) {
+        delegateCallback.error(unwrap(t));
+      }
+    };
   }
 
   private ExecutorCallback mapped(ExecutorCallback callback, ExecutionContextAdapter<T> operationContext) {
@@ -685,6 +711,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                                 oep.getOperationEvent(),
                                                 currentScheduler);
     }
+
+    OperationExecutionParams operationExecutionParams = from(event)
+        .getOperationExecutionParams(getLocation(), event.getContext().getId());
+    operationExecutionParams.setExecutionContextAdapter(operationContext);
 
     executeOperation(operationContext, mapped(callbackSupplier.get(), operationContext));
   }

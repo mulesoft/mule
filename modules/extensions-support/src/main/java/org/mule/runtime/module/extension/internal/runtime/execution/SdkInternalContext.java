@@ -20,6 +20,7 @@ import org.mule.runtime.core.internal.policy.DefaultPolicyManager;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
+import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 import java.util.Map;
 import java.util.Optional;
@@ -175,6 +176,7 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     private final Map<String, Object> parameters;
     private final CoreEvent operationEvent;
     private final ExecutorCallback callback;
+    private ExecutionContextAdapter executionContextAdapter;
 
     public OperationExecutionParams(Optional<ConfigurationInstance> configuration, Map<String, Object> parameters,
                                     CoreEvent operationEvent, ExecutorCallback callback) {
@@ -198,6 +200,14 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
 
     public ExecutorCallback getCallback() {
       return callback;
+    }
+
+    public void setExecutionContextAdapter(ExecutionContextAdapter executionContextAdapter) {
+      this.executionContextAdapter = executionContextAdapter;
+    }
+
+    public ExecutionContextAdapter getExecutionContextAdapter() {
+      return executionContextAdapter;
     }
   }
 }
