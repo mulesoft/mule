@@ -76,10 +76,12 @@ class ForeachRouter {
             downstreamRecorder.next(left(new IllegalArgumentException(MAP_NOT_SUPPORTED_MESSAGE)));
           }
 
-          final CoreEvent responseEvent = prepareEvent(event, expression);
           inflightEvents.getAndIncrement();
-          // Inject it into the inner flux
-          innerRecorder.next(responseEvent);
+          final CoreEvent responseEvent = prepareEvent(event, expression);
+          if (responseEvent != null) {
+            // Inject it into the inner flux
+            innerRecorder.next(responseEvent);
+          }
 
         })
         .doOnComplete(() -> {
@@ -129,7 +131,8 @@ class ForeachRouter {
             downstreamRecorder.next(left(new MessagingException(evt, e, owner)));
             completeRouterIfNecessary();
           }
-        }).onErrorContinue(MessagingException.class, (e, o) -> {
+        })
+        .onErrorContinue(MessagingException.class, (e, o) -> {
           this.eventWithCurrentContextDeleted(((MessagingException) e).getEvent());
           downstreamRecorder.next(left(e));
           completeRouterIfNecessary();
@@ -177,6 +180,11 @@ class ForeachRouter {
 
     try {
       Iterator<TypedValue<?>> typedValueIterator = owner.splitRequest(responseEvent, expression);
+      if (!typedValueIterator.hasNext()) {
+        downstreamRecorder.next(right(Throwable.class, event));
+        completeRouterIfNecessary();
+        return null;
+      }
 
       // Create ForEachContext
       ForeachContext foreachContext = this.createForeachContext(event, typedValueIterator);
@@ -195,6 +203,7 @@ class ForeachRouter {
       // automatic wrapping is only applied when the signal is an Event.
       downstreamRecorder.next(left(new MessagingException(responseEvent, e, owner)));
       completeRouterIfNecessary();
+      return null;
     }
     return responseEvent;
   }
@@ -256,13 +265,15 @@ class ForeachRouter {
 
   private void subscribeUpstreamChains(Context downstreamContext) {
     innerFlux.subscriberContext(downstreamContext)
-        .doOnError(e -> LOGGER.error("Exception during foreach execution: " + e.getCause()))
         .subscribe();
     upstreamFlux.subscriberContext(downstreamContext).subscribe();
   }
 
   private CoreEvent createResponseEvent(CoreEvent event) {
     ForeachContext foreachContext = foreachContextResolver.getCurrentContextFromEvent(event).get(event.getContext().getId());
+    if (foreachContext == null) {
+      return event;
+    }
 
     final CoreEvent.Builder responseBuilder =
         builder(event).message(foreachContext.getOriginalMessage()).itemSequenceInfo(foreachContext.getItemSequenceInfo());
