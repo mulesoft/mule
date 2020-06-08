@@ -15,10 +15,22 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-interface ComponentInterceptorWrapper {
+/**
+ * Wraps different interceptors so they can be used seamlessly from {@link ReactiveInterceptionAction} and
+ * {@link ReactiveAroundInterceptorAdapter}.
+ *
+ * @since 4.4
+ */
+interface ComponentInterceptorAdapter {
 
+  /**
+   * @return {@code true} if the adapted interceptor implements a {@code before} or {@code after} method.
+   */
   boolean implementsBeforeOrAfter();
 
+  /**
+   * @return {@code true} if the adapted interceptor implements an {@code around} method.
+   */
   boolean implementsAround();
 
   void before(ComponentLocation location, Map<String, ProcessorParameterValue> resolvedParams,

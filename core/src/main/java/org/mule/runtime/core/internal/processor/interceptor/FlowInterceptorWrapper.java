@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-class FlowInterceptorWrapper implements ComponentInterceptorWrapper {
+class FlowInterceptorWrapper implements ComponentInterceptorAdapter {
 
   private static final String BEFORE_METHOD_NAME = "before";
   private static final String AFTER_METHOD_NAME = "after";

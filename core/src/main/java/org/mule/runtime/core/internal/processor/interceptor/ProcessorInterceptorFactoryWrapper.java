@@ -11,7 +11,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.interception.ProcessorInterceptorFactory;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
-class ProcessorInterceptorFactoryWrapper implements ComponentInterceptorFactoryWrapper {
+class ProcessorInterceptorFactoryWrapper implements ComponentInterceptorFactoryAdapter {
 
   private final ProcessorInterceptorFactory interceptorFactory;
 
@@ -21,7 +21,8 @@ class ProcessorInterceptorFactoryWrapper implements ComponentInterceptorFactoryW
 
   @Override
   public boolean isInterceptable(ReactiveProcessor component) {
-    return component instanceof Component && ((Component) component).getLocation() != null;
+    return component instanceof Component
+        && ((Component) component).getLocation() != null;
   }
 
   @Override
@@ -30,7 +31,7 @@ class ProcessorInterceptorFactoryWrapper implements ComponentInterceptorFactoryW
   }
 
   @Override
-  public ComponentInterceptorWrapper get() {
+  public ComponentInterceptorAdapter get() {
     return new ProcessorInterceptorWrapper(interceptorFactory.get());
   }
 

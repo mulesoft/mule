@@ -19,6 +19,11 @@ import javax.xml.namespace.QName;
 
 import org.reactivestreams.Publisher;
 
+/**
+ * Wraps a {@link ReactiveProcessor} that represents the execution of a flow with the metadata from the flow itself.
+ *
+ * @since 4.4, extracted from {@link FlowProcessMediator}.
+ */
 public class FlowProcessor implements ReactiveProcessor, Component {
 
   private final ReactiveProcessor processor;

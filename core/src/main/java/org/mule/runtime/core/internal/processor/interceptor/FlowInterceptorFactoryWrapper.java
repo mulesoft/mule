@@ -12,7 +12,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.interception.FlowInterceptorFactory;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
-class FlowInterceptorFactoryWrapper implements ComponentInterceptorFactoryWrapper {
+class FlowInterceptorFactoryWrapper implements ComponentInterceptorFactoryAdapter {
 
   private final FlowInterceptorFactory interceptorFactory;
 
@@ -32,7 +32,7 @@ class FlowInterceptorFactoryWrapper implements ComponentInterceptorFactoryWrappe
   }
 
   @Override
-  public ComponentInterceptorWrapper get() {
+  public ComponentInterceptorAdapter get() {
     return new FlowInterceptorWrapper(interceptorFactory.get());
   }
 }

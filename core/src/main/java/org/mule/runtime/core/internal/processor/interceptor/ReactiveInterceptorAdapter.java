@@ -60,7 +60,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
 
   private static final Logger LOGGER = getLogger(ReactiveInterceptorAdapter.class);
 
-  private final ComponentInterceptorFactoryWrapper interceptorFactory;
+  private final ComponentInterceptorFactoryAdapter interceptorFactory;
 
   public ReactiveInterceptorAdapter(ProcessorInterceptorFactory interceptorFactory) {
     this.interceptorFactory = new ProcessorInterceptorFactoryWrapper(interceptorFactory);
@@ -82,7 +82,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
       return next;
     }
 
-    final ComponentInterceptorWrapper interceptor = interceptorFactory.get();
+    final ComponentInterceptorAdapter interceptor = interceptorFactory.get();
     Map<String, String> dslParameters = (Map<String, String>) ((Component) component).getAnnotation(ANNOTATION_PARAMETERS);
 
     ReactiveProcessor interceptedProcessor = doApply(component, next, componentLocation, interceptor, dslParameters);
@@ -93,7 +93,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
 
   protected ReactiveProcessor doApply(ReactiveProcessor component, ReactiveProcessor next,
                                       final ComponentLocation componentLocation,
-                                      final ComponentInterceptorWrapper interceptor, Map<String, String> dslParameters) {
+                                      final ComponentInterceptorAdapter interceptor, Map<String, String> dslParameters) {
     if (interceptor.implementsBeforeOrAfter()) {
       LOGGER.debug("Configuring interceptor '{}' before and after processor '{}'...", interceptor,
                    componentLocation.getLocation());
@@ -118,7 +118,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
     }
   }
 
-  protected Function<InternalEvent, InternalEvent> doBefore(ComponentInterceptorWrapper interceptor, Component component,
+  protected Function<InternalEvent, InternalEvent> doBefore(ComponentInterceptorAdapter interceptor, Component component,
                                                             Map<String, String> dslParameters) {
     return event -> {
       final InternalEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
@@ -148,7 +148,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
     };
   }
 
-  protected Function<InternalEvent, InternalEvent> doAfter(ComponentInterceptorWrapper interceptor, Component component,
+  protected Function<InternalEvent, InternalEvent> doAfter(ComponentInterceptorAdapter interceptor, Component component,
                                                            Optional<Throwable> thrown) {
     return event -> {
       final InternalEvent eventWithResolvedParams = removeResolvedParameters(event);

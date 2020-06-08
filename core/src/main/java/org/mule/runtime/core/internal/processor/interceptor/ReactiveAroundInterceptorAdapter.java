@@ -57,7 +57,7 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
 
   @Override
   protected ReactiveProcessor doApply(ReactiveProcessor component, ReactiveProcessor next, ComponentLocation componentLocation,
-                                      ComponentInterceptorWrapper interceptor, Map<String, String> dslParameters) {
+                                      ComponentInterceptorAdapter interceptor, Map<String, String> dslParameters) {
     if (interceptor.implementsAround()) {
       LOGGER.debug("Configuring interceptor '{}' around processor '{}'...", interceptor, componentLocation.getLocation());
 
@@ -72,7 +72,7 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
     }
   }
 
-  private CompletableFuture<InternalEvent> doAround(InternalEvent event, ComponentInterceptorWrapper interceptor,
+  private CompletableFuture<InternalEvent> doAround(InternalEvent event, ComponentInterceptorAdapter interceptor,
                                                     ReactiveProcessor component, Map<String, String> dslParameters,
                                                     ReactiveProcessor next, Context ctx) {
     final InternalEvent eventWithResolvedParams = addResolvedParameters(event, (Component) component, dslParameters);
