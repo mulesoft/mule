@@ -415,17 +415,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   }
 
   @Test
-  public void executeWithPolicyReturnsOperationResultOnTarget() throws Exception {
-    // Assert return delegate only once
-    // fail("implemet");
-  }
-
-  @Test
-  public void executeReturnsOperationResultButKeepsAttributes() {
-    // fail("implemet");
-  }
-
-  @Test
   public void skipPolicyWithNoComponentLocation() throws Exception {
     messageProcessor.setAnnotations(new HashMap<>());
     messageProcessor.process(event);
