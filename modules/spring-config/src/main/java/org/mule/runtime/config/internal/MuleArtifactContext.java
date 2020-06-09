@@ -70,6 +70,8 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.dsl.model.ResourceProvider;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 import org.mule.runtime.config.api.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
@@ -262,8 +264,44 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   private ApplicationModel createApplicationModel() {
     try {
+      LOGGER.error("dev prop provider CAMBIADOO");
       DefaultConfigurationPropertiesResolver propertyResolver =
-          new DefaultConfigurationPropertiesResolver(empty(), new EnvironmentPropertiesConfigurationProvider());
+          new DefaultConfigurationPropertiesResolver(empty(), new ConfigurationPropertiesProvider() {
+
+            ConfigurationPropertiesProvider parentProvider = new EnvironmentPropertiesConfigurationProvider();
+
+            @Override
+            public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+              final String propertyValue = artifactProperties.get(configurationAttributeKey);
+
+              if (propertyValue == null) {
+                return parentProvider.getConfigurationProperty(configurationAttributeKey);
+              }
+              return of(new ConfigurationProperty() {
+
+                @Override
+                public Object getSource() {
+                  return this;
+                }
+
+                @Override
+                public Object getRawValue() {
+                  return propertyValue;
+                }
+
+                @Override
+                public String getKey() {
+                  return configurationAttributeKey;
+                }
+              });
+            }
+
+            @Override
+            public String getDescription() {
+              return "Deployment properties";
+            }
+          });
+
       List<ConfigFile> configFiles = processXmlConfiguration(new XmlParsingConfiguration() {
 
         @Override
@@ -298,7 +336,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
         @Override
         public List<XmlNamespaceInfoProvider> getXmlNamespaceInfoProvider() {
-          return XmlNamespaceInfoProviderSupplier.createFromExtensionModels(getExtensions(), Optional.of(cl -> serviceRegistry
+          return XmlNamespaceInfoProviderSupplier.createFromExtensionModels(getExtensions(), of(cl -> serviceRegistry
               .lookupProviders(XmlNamespaceInfoProvider.class, cl).stream().collect(toList())));
         }
       });
