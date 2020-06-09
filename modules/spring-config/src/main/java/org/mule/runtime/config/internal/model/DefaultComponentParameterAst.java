@@ -64,11 +64,7 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
         // previous implementations were assuming that an empty string was the same as the param not being present...
       } else if (isEmpty(rawValue)) {
         final Object defaultValue = getModel().getDefaultValue();
-        if (isExpression(defaultValue)) {
-          return left(extractExpression(defaultValue).get());
-        } else {
-          return right(defaultValue);
-        }
+        return extractExpression(defaultValue).map(Either::left).orElseGet(() -> right(defaultValue));
       } else {
         AtomicReference<String> expression = new AtomicReference<>();
         AtomicReference<Object> value = new AtomicReference<>();
@@ -137,9 +133,10 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
               // For references, just return the name of the referenced object
               value.set(rawValue);
             } else if (!NOT_SUPPORTED.equals(getModel().getExpressionSupport())) {
-              if (isExpression(rawValue)) {
+              Optional<String> expressionOpt = extractExpression(rawValue);
+              if (expressionOpt.isPresent()) {
                 // For complex types that may be the result of an expression, just return the expression
-                expression.set(extractExpression(rawValue).get());
+                expression.set(expressionOpt.get());
               } else {
                 value.set(rawValue);
               }

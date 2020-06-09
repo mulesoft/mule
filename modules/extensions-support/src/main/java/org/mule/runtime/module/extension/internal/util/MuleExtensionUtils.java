@@ -10,6 +10,8 @@ import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
@@ -488,14 +490,14 @@ public class MuleExtensionUtils {
    * @return a String containing the expression without markers or null if the value is not an expression.
    */
   public static Optional<String> extractExpression(Object value) {
-    Optional<String> result = Optional.empty();
+    Optional<String> result = empty();
     if (isExpression(value)) {
       String expression = (String) value;
-      if (expression != null && !expression.isEmpty()) {
+      if (isNotEmpty(expression)) {
         String trimmedText = expression.trim();
         result =
-            Optional.of(trimmedText.substring(DEFAULT_EXPRESSION_PREFIX.length(),
-                                              trimmedText.length() - DEFAULT_EXPRESSION_POSTFIX.length()));
+            of(trimmedText.substring(DEFAULT_EXPRESSION_PREFIX.length(),
+                                     trimmedText.length() - DEFAULT_EXPRESSION_POSTFIX.length()));
       }
     }
 
