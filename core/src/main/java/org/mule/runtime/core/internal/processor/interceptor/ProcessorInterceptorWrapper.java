@@ -73,4 +73,8 @@ class ProcessorInterceptorWrapper implements ComponentInterceptorAdapter {
     processorInterceptor.after(location, interceptionEvent, thrown);
   }
 
+  @Override
+  public ClassLoader getClassLoader() {
+    return processorInterceptor.getClass().getClassLoader();
+  }
 }

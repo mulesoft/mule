@@ -42,4 +42,9 @@ interface ComponentInterceptorAdapter {
 
   void after(ComponentLocation location, DefaultInterceptionEvent interceptionEvent, Optional<Throwable> thrown);
 
+  /**
+   * @return The classLoader to use as TCCL when executing the adapted interceptor.
+   */
+  ClassLoader getClassLoader();
+
 }

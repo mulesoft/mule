@@ -72,4 +72,8 @@ class FlowInterceptorWrapper implements ComponentInterceptorAdapter {
     flowInterceptor.after(location.getRootContainerName(), interceptionEvent, thrown);
   }
 
+  @Override
+  public ClassLoader getClassLoader() {
+    return flowInterceptor.getClass().getClassLoader();
+  }
 }

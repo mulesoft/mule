@@ -139,7 +139,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
       try {
         Thread currentThread = currentThread();
         ClassLoader currentClassLoader = currentThread.getContextClassLoader();
-        ClassLoader contextClassLoader = interceptor.getClass().getClassLoader();
+        ClassLoader contextClassLoader = interceptor.getClassLoader();
         setContextClassLoader(currentThread, currentClassLoader, contextClassLoader);
         try {
           interceptor.before(component.getLocation(),
