@@ -28,6 +28,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
+
 public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase {
 
 
@@ -77,6 +80,8 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
   }
 
   @Test
+  @Issue("MULE-18480")
+  @Description("When an artifact is redeployed, objects associated to the original deployment are released befroe deploying the new one.")
   public void redeployPreviousAppEagerlyGCd() throws Exception {
     DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     deploymentService.addDeploymentListener(mockDeploymentListener);
