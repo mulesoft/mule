@@ -12,7 +12,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
@@ -53,6 +52,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -83,7 +83,7 @@ public class ComponentModel implements ComponentAst {
   private ComponentIdentifier identifier;
   private String componentId;
   private final Map<String, String> parameters = new HashMap<>();
-  private final Map<String, ComponentParameterAst> parameterAsts = new HashMap<>();
+  private final Map<String, ComponentParameterAst> parameterAsts = new TreeMap<>(String::compareTo);
   private final AtomicBoolean parameterAstsPopulated = new AtomicBoolean(false);
   private final Set<String> schemaValueParameter = new HashSet<>();
   // TODO MULE-9638 This must go away from component model once it's immutable.
@@ -222,7 +222,7 @@ public class ComponentModel implements ComponentAst {
     return parameterAsts.values()
         .stream()
         .filter(param -> param.getValue().getValue().isPresent())
-        .collect(toSet());
+        .collect(toList());
   }
 
   private void populateParameterAsts() {
