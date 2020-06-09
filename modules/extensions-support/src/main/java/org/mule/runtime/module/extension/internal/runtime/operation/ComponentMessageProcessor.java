@@ -234,7 +234,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
    * {@link #valueReturnDelegate} as a helper class to do this transformation. It's used only when there is an operation that
    * defines a target, and at the same time, there are operation policies applied to it. Finally, when the policy finishes, the
    * proper {@link #returnDelegate} is executed.
-   * 
+   * <p>
    * It's an horrible solution, we only need a piece of code that transforms an {@link Object} into a {@link CoreEvent} and not a
    * {@link ReturnDelegate} .
    */
@@ -370,7 +370,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
               if (!async && from(event).isNoPolicyOperation(getLocation(), event.getContext().getId())) {
                 onEventSynchronous(event, executorCallback, ctx);
               } else {
-                onEvent(event, executorCallback);
+                onEvent(event, executorCallback, ctx);
               }
             })
             .map(e -> Either.empty());
@@ -406,7 +406,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     }
   }
 
-  private void onEvent(CoreEvent event, ExecutorCallback executorCallback) {
+  private void onEvent(CoreEvent event, ExecutorCallback executorCallback, Context ctx) {
     try {
       SdkInternalContext sdkInternalContext = from(event);
       final ComponentLocation location = getLocation();
@@ -416,7 +416,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       final Map<String, Object> resolutionResult = sdkInternalContext.getResolutionResult(location, eventId);
 
       OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent, callback) -> {
-        sdkInternalContext.setOperationExecutionParams(location, eventId, configuration, parameters, operationEvent, callback);
+        setOperationExecutionParams(location, event, configuration, parameters, operationEvent, callback, ctx);
 
         fluxSupplier.get().next(operationEvent);
       };
@@ -450,7 +450,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       final Map<String, Object> resolutionResult = sdkInternalContext.getResolutionResult(location, eventId);
 
       OperationExecutionFunction operationExecutionFunction = (parameters, operationEvent, callback) -> {
-        sdkInternalContext.setOperationExecutionParams(location, eventId, configuration, parameters, operationEvent, callback);
+        setOperationExecutionParams(location, event, configuration, parameters, operationEvent, callback, ctx);
 
         prepareAndExecuteOperation(event, () -> callback, ctx);
       };
@@ -467,12 +467,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   /**
    * Only used in case the operation defines a target and there are operation policies applied to it.
-   * 
-   * @see {@link #valueReturnDelegate}
-   * 
+   *
    * @param event
    * @param delegateCallback
    * @return
+   * @see {@link #valueReturnDelegate}
    */
   private ExecutorCallback getExecutionCallbackForPolicyAndOperationWithTarget(CoreEvent event,
                                                                                ExecutorCallback delegateCallback) {
@@ -723,6 +722,33 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return event;
   }
 
+  private void setOperationExecutionParams(ComponentLocation location, CoreEvent event,
+                                           Optional<ConfigurationInstance> configuration, Map<String, Object> parameters,
+                                           CoreEvent operationEvent, ExecutorCallback callback, Context ctx) {
+
+    SdkInternalContext sdkInternalContext = SdkInternalContext.from(event);
+
+    final Scheduler currentScheduler = (Scheduler) ctx.getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY)
+        .orElse(IMMEDIATE_SCHEDULER);
+
+    ExecutionContextAdapter<T> operationContext;
+    if (shouldUsePrecalculatedContext(event)) {
+      operationContext = getPrecalculatedContext(operationEvent);
+      operationContext.setCurrentScheduler(currentScheduler);
+      ((InternalEvent) operationContext.getEvent()).setSdkInternalContext(((InternalEvent) event).getSdkInternalContext());
+    } else {
+      operationContext = createExecutionContext(configuration,
+                                                parameters,
+                                                operationEvent,
+                                                currentScheduler);
+    }
+
+    sdkInternalContext.setOperationExecutionParams(location, event.getContext().getId(), configuration, parameters,
+                                                   operationEvent, callback, operationContext);
+
+  }
+
+
   private void prepareAndExecuteOperation(CoreEvent event, Supplier<ExecutorCallback> callbackSupplier, Context ctx) {
     OperationExecutionParams oep = from(event).getOperationExecutionParams(getLocation(), event.getContext().getId());
 
@@ -741,9 +767,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                                 currentScheduler);
     }
 
-    OperationExecutionParams operationExecutionParams = from(event)
-        .getOperationExecutionParams(getLocation(), event.getContext().getId());
-    operationExecutionParams.setExecutionContextAdapter(operationContext);
 
     executeOperation(operationContext, mapped(callbackSupplier.get(), operationContext,
                                               isTargetWithPolicies(event) ? valueReturnDelegate : returnDelegate));

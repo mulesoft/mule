@@ -80,10 +80,11 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
 
   public void setOperationExecutionParams(ComponentLocation location, String eventId,
                                           Optional<ConfigurationInstance> configuration,
-                                          Map<String, Object> parameters, CoreEvent operationEvent, ExecutorCallback callback) {
+                                          Map<String, Object> parameters, CoreEvent operationEvent, ExecutorCallback callback,
+                                          ExecutionContextAdapter executionContextAdapter) {
     locationSpecificContext.get(new Pair<>(location, eventId)).setOperationExecutionParams(configuration, parameters,
                                                                                            operationEvent,
-                                                                                           callback);
+                                                                                           callback, executionContextAdapter);
   }
 
   public OperationExecutionParams getOperationExecutionParams(ComponentLocation location, String eventId) {
@@ -141,8 +142,10 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     }
 
     public void setOperationExecutionParams(Optional<ConfigurationInstance> configuration, Map<String, Object> parameters,
-                                            CoreEvent operationEvent, ExecutorCallback callback) {
-      this.operationExecutionParams = new OperationExecutionParams(configuration, parameters, operationEvent, callback);
+                                            CoreEvent operationEvent, ExecutorCallback callback,
+                                            ExecutionContextAdapter executionContextAdapter) {
+      this.operationExecutionParams =
+          new OperationExecutionParams(configuration, parameters, operationEvent, callback, executionContextAdapter);
     }
 
     public Optional<ConfigurationInstance> getConfiguration() {
@@ -176,14 +179,16 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     private final Map<String, Object> parameters;
     private final CoreEvent operationEvent;
     private final ExecutorCallback callback;
-    private ExecutionContextAdapter executionContextAdapter;
+    private final ExecutionContextAdapter executionContextAdapter;
 
     public OperationExecutionParams(Optional<ConfigurationInstance> configuration, Map<String, Object> parameters,
-                                    CoreEvent operationEvent, ExecutorCallback callback) {
+                                    CoreEvent operationEvent, ExecutorCallback callback,
+                                    ExecutionContextAdapter executionContextAdapter) {
       this.configuration = configuration;
       this.parameters = parameters;
       this.operationEvent = operationEvent;
       this.callback = callback;
+      this.executionContextAdapter = executionContextAdapter;
     }
 
     public Optional<ConfigurationInstance> getConfiguration() {
@@ -200,10 +205,6 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
 
     public ExecutorCallback getCallback() {
       return callback;
-    }
-
-    public void setExecutionContextAdapter(ExecutionContextAdapter executionContextAdapter) {
-      this.executionContextAdapter = executionContextAdapter;
     }
 
     public ExecutionContextAdapter getExecutionContextAdapter() {
