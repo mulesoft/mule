@@ -37,6 +37,15 @@ public class ModuleContentTestCase extends AbstractCeXmlExtensionMuleArtifactFun
   }
 
   @Test
+  @Issue("MULE-18475")
+  public void testSetPayloadUsingOptionalContent() throws Exception {
+    final CoreEvent muleEvent = flowRunner("testSetPayloadUsingOptionalContent").run();
+    final Object value = muleEvent.getMessage().getPayload().getValue();
+    assertThat(value, instanceOf(String.class));
+    assertThat(value, is("param was null"));
+  }
+
+  @Test
   public void testSetPayloadUsingContentAndSimpleParameter() throws Exception {
     final CoreEvent muleEvent = flowRunner("testSetPayloadUsingContentAndSimpleParameter").run();
     assertThat(muleEvent.getMessage().getPayload().getValue(),

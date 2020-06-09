@@ -15,6 +15,7 @@ import static java.util.Optional.ofNullable;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.config.internal.dsl.model.extension.xml.MacroExpansionModuleModel.MODULE_CONFIG_GLOBAL_ELEMENT_NAME;
@@ -167,7 +168,9 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
       } else if (parameters.containsKey(parameterName)) {
         final String xmlValue = parameters.get(parameterName).trim();
         result.put(parameterName, new Pair<>(xmlValue, parameterModel.getType()));
-      } else if (PRIMARY_CONTENT.equals(parameterModel.getRole())) {
+      } else if (parameterModel.getDefaultValue() != null
+          && (PRIMARY_CONTENT.equals(parameterModel.getRole())
+              || CONTENT.equals(parameterModel.getRole()))) {
         result.put(parameterName, new Pair<>((String) parameterModel.getDefaultValue(), parameterModel.getType()));
       }
     }
