@@ -14,6 +14,10 @@
         </module-content:set-payload-using-content-parameter>
     </flow>
 
+    <flow name="testSetPayloadUsingOptionalContent">
+        <module-content:set-payload-using-optional-content-parameter/>
+    </flow>
+
     <flow name="testSetPayloadUsingContentAndSimpleParameter">
         <module-content:set-payload-using-content-and-simple-parameter parameter1="value from attribute">
             <module-content:content>#['smart' ++ ' connector content']</module-content:content>

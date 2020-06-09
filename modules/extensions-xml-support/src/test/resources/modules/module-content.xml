@@ -17,6 +17,16 @@
         <output type="string"/>
     </operation>
 
+    <operation name="set-payload-using-optional-content-parameter">
+        <parameters>
+            <parameter name="content" type="string" use="OPTIONAL" role="CONTENT"/>
+        </parameters>
+        <body>
+            <mule:set-payload value="#[vars.content default 'param was null']"/>
+        </body>
+        <output type="string"/>
+    </operation>
+
     <operation name="set-payload-using-content-and-simple-parameter">
         <parameters>
             <parameter name="parameter1" type="string"/>
