@@ -1,4 +1,18 @@
 {
+  "4.4.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.interception.ReactiveInterceptor",
+          "package": "org.mule.runtime.core.privileged.interception",
+          "classSimpleName": "ReactiveInterceptor",
+          "elementKind": "interface",
+          "justification": "MULE-18177: This should have neven been made privileged"
+        }
+      ]
+    }
+  },
   "4.3.0": {
     "revapi": {
       "ignore": [

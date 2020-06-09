@@ -29,14 +29,12 @@ import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessageCollection;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.connection.SourceRemoteConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -56,7 +54,6 @@ import org.mule.runtime.core.api.context.notification.NotificationHelper;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -92,9 +89,7 @@ import java.util.function.Function;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import javax.xml.namespace.QName;
 
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 /**
@@ -176,7 +171,9 @@ public class FlowProcessMediator implements Initialisable {
       final MessageSource messageSource = messageProcessContext.getMessageSource();
       final Pipeline flowConstruct = (Pipeline) messageProcessContext.getFlowConstruct();
       final CompletableFuture<Void> responseCompletion = new CompletableFuture<>();
-      final FlowProcessor flowExecutionProcessor = new FlowProcessor(template, flowConstruct);
+      final FlowProcessor flowExecutionProcessor =
+          new FlowProcessor(publisher -> applyWithChildContext(from(publisher), template::routeEventAsync, Optional.empty()),
+                            flowConstruct);
       final CoreEvent event = createEvent(template, messageSource, responseCompletion, flowConstruct);
       policyManager.addSourcePointcutParametersIntoEvent(messageSource, event.getMessage().getAttributes(),
                                                          (InternalEvent) event);
@@ -563,53 +560,6 @@ public class FlowProcessMediator implements Initialisable {
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
   }
-
-  private class FlowProcessor implements Processor, Component {
-
-    private final FlowProcessTemplate template;
-    private final FlowConstruct flowConstruct;
-
-    public FlowProcessor(FlowProcessTemplate template, FlowConstruct flowConstruct) {
-      this.template = template;
-      this.flowConstruct = flowConstruct;
-    }
-
-    @Override
-    public CoreEvent process(CoreEvent event) throws MuleException {
-      return processToApply(event, this);
-    }
-
-    @Override
-    public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-      return applyWithChildContext(from(publisher), template::routeEventAsync, Optional.empty());
-    }
-
-    @Override
-    public Object getAnnotation(QName name) {
-      return flowConstruct.getAnnotation(name);
-    }
-
-    @Override
-    public Map<QName, Object> getAnnotations() {
-      return flowConstruct.getAnnotations();
-    }
-
-    @Override
-    public void setAnnotations(Map<QName, Object> annotations) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ComponentLocation getLocation() {
-      return flowConstruct.getLocation();
-    }
-
-    @Override
-    public Location getRootContainerLocation() {
-      return flowConstruct.getRootContainerLocation();
-    }
-  }
-
 
   /**
    * Container for passing relevant context between private methods to avoid long method signatures everywhere.

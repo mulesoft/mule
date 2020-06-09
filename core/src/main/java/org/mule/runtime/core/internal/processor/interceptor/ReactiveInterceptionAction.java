@@ -18,7 +18,6 @@ import org.mule.runtime.api.interception.InterceptionEvent;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
@@ -42,13 +41,14 @@ class ReactiveInterceptionAction implements InterceptionAction {
 
   private final ErrorTypeLocator errorTypeLocator;
 
-  private final Processor processor;
+  private final ReactiveProcessor processor;
   private final ReactiveProcessor next;
   private final Context ctx;
   private final DefaultInterceptionEvent interceptionEvent;
 
   public ReactiveInterceptionAction(DefaultInterceptionEvent interceptionEvent,
-                                    ReactiveProcessor next, Context ctx, Processor processor, ErrorTypeLocator errorTypeLocator) {
+                                    ReactiveProcessor next, Context ctx, ReactiveProcessor processor,
+                                    ErrorTypeLocator errorTypeLocator) {
     this.interceptionEvent = interceptionEvent;
     this.next = next;
     this.ctx = ctx;

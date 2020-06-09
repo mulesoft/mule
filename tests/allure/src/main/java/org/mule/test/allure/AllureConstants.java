@@ -547,6 +547,8 @@ public interface AllureConstants {
 
       String COMPONENT_INTERCEPTION_STORY = "Component Interception Story";
 
+      String FLOW_INTERCEPTION_STORY = "Flow Interception Story";
+
     }
 
   }
