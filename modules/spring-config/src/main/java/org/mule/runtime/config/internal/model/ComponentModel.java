@@ -12,7 +12,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
 import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
@@ -44,6 +43,7 @@ import org.mule.runtime.dsl.internal.component.config.InternalComponentConfigura
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -53,6 +53,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -83,7 +84,7 @@ public class ComponentModel implements ComponentAst {
   private ComponentIdentifier identifier;
   private String componentId;
   private final Map<String, String> parameters = new HashMap<>();
-  private final Map<String, ComponentParameterAst> parameterAsts = new HashMap<>();
+  private Map<String, ComponentParameterAst> parameterAsts = new HashMap<>();
   private final AtomicBoolean parameterAstsPopulated = new AtomicBoolean(false);
   private final Set<String> schemaValueParameter = new HashSet<>();
   // TODO MULE-9638 This must go away from component model once it's immutable.
@@ -222,7 +223,7 @@ public class ComponentModel implements ComponentAst {
     return parameterAsts.values()
         .stream()
         .filter(param -> param.getValue().getValue().isPresent())
-        .collect(toSet());
+        .collect(toList());
   }
 
   private void populateParameterAsts() {
@@ -236,34 +237,53 @@ public class ComponentModel implements ComponentAst {
     }
 
     getModel(ParameterizedModel.class)
-        .ifPresent(parameterizedModel -> parameterizedModel.getAllParameterModels().forEach(paramModel -> {
-          final ComponentParameterAst computedParam = parameterAsts.computeIfAbsent(paramModel
-              .getName(), paramNameKey -> findParameterModel(paramNameKey)
-                  .map(foundParamModel -> getRawParameterValue(paramNameKey)
-                      .map(rawParamValue -> new DefaultComponentParameterAst(rawParamValue, () -> foundParamModel))
-                      .orElseGet(() -> new DefaultComponentParameterAst(null, () -> foundParamModel)))
-                  .orElseThrow(() -> {
-                    // Try to provide as much troubleshooting information as possible
-                    final String msgPrefix = format("Wanted paramName '%s' from object '%s'.", paramNameKey,
-                                                    getModel(NamedObject.class)
-                                                        .map(NamedObject::getName)
-                                                        .orElse("(null)"));
+        .ifPresent(parameterizedModel -> {
+          // Keep parameter order defined on parameterized model
+          final Map<String, ComponentParameterAst> initialParameterAsts = new TreeMap<>(new Comparator<String>() {
 
-                    if (!getModel(ParameterizedModel.class).isPresent()) {
-                      return new NoSuchElementException(msgPrefix + " The model is not parameterizable.");
-                    } else {
-                      final List<String> availableParams = getModel(ParameterizedModel.class).get().getAllParameterModels()
-                          .stream()
-                          .map(NamedObject::getName)
-                          .collect(toList());
-                      return new NoSuchElementException(msgPrefix + " Available: " + availableParams);
-                    }
-                  }));
+            final List<String> params = parameterizedModel.getAllParameterModels()
+                .stream()
+                .map(NamedObject::getName)
+                .collect(toList());
 
-          if (paramModel.isComponentId()) {
-            componentId = (String) computedParam.getValue().getRight();
-          }
-        }));
+            @Override
+            public int compare(String c1, String c2) {
+              return Integer.compare(params.indexOf(c1), params.indexOf(c2));
+            }
+          });
+
+          initialParameterAsts.putAll(parameterAsts);
+
+          parameterizedModel.getAllParameterModels().forEach(paramModel -> {
+            final ComponentParameterAst computedParam = initialParameterAsts.computeIfAbsent(paramModel
+                .getName(), paramNameKey -> findParameterModel(paramNameKey)
+                    .map(foundParamModel -> getRawParameterValue(paramNameKey)
+                        .map(rawParamValue -> new DefaultComponentParameterAst(rawParamValue, () -> foundParamModel))
+                        .orElseGet(() -> new DefaultComponentParameterAst(null, () -> foundParamModel)))
+                    .orElseThrow(() -> {
+                      // Try to provide as much troubleshooting information as possible
+                      final String msgPrefix = format("Wanted paramName '%s' from object '%s'.", paramNameKey,
+                                                      getModel(NamedObject.class)
+                                                          .map(NamedObject::getName)
+                                                          .orElse("(null)"));
+
+                      if (!getModel(ParameterizedModel.class).isPresent()) {
+                        return new NoSuchElementException(msgPrefix + " The model is not parameterizable.");
+                      } else {
+                        final List<String> availableParams = getModel(ParameterizedModel.class).get().getAllParameterModels()
+                            .stream()
+                            .map(NamedObject::getName)
+                            .collect(toList());
+                        return new NoSuchElementException(msgPrefix + " Available: " + availableParams);
+                      }
+                    }));
+
+            if (paramModel.isComponentId()) {
+              componentId = (String) computedParam.getValue().getRight();
+            }
+          });
+          this.parameterAsts = initialParameterAsts;
+        });
   }
 
   private Optional<ParameterModel> findParameterModel(String paramName) {
