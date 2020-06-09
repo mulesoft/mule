@@ -138,11 +138,10 @@ public class DynamicMetadataDeclarationEnricher implements DeclarationEnricher {
       declaration.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
           .map(ExtensionOperationDescriptorModelProperty::getOperationElement)
           .ifPresent(operation -> {
+            MetadataScopeAdapter metadataScope = new DefaultMetadataScopeAdapter(extensionType, operation, declaration);
+            enrichResolversInformation(declaration, metadataScope);
             if (operation.isAnnotatedWith(Query.class)) {
               enrichWithDsql(declaration, operation);
-            } else {
-              MetadataScopeAdapter metadataScope = new DefaultMetadataScopeAdapter(extensionType, operation, declaration);
-              enrichResolversInformation(declaration, metadataScope);
             }
           });
     }
