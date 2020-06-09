@@ -17,7 +17,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
+import static org.mule.runtime.api.metadata.resolving.MetadataComponent.OUTPUT_PAYLOAD;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.extension.api.metadata.NullMetadataResolver.NULL_RESOLVER_NAME;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.checkIsPresent;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getDeclaration;
 import static org.mule.test.metadata.extension.resolver.TestInputAndOutputResolverWithKeyResolver.TEST_INPUT_AND_OUTPUT_RESOLVER_WITH_KEY_RESOLVER;
@@ -249,13 +251,14 @@ public class DynamicMetadataDeclarationEnricherTestCase extends AbstractMuleTest
   }
 
   @Test
-  public void typeResolverInformationSkippedForDsql() throws Exception {
+  public void outputTypeResolverInformationSetForDsql() throws Exception {
     OperationDeclaration query = getDeclaration(declaration.getOperations(), "doQuery");
     Optional<TypeResolversInformationModelProperty> info = query
         .getModelProperty(TypeResolversInformationModelProperty.class);
 
-    assertThat("Query resolvers information should not be declared in the model",
-               info.isPresent(), is(false));
+    assertThat(info.isPresent(), is(true));
+    assertThat(info.get().getCategoryName(), is("MetadataExtensionEntityResolver"));
+    assertThat(info.get().getOutputResolver().get().getResolverName(), is(OUTPUT_PAYLOAD.name()));
   }
 
   private void assertParameterIsMetadataKeyPart(ParameterDeclaration param) {
