@@ -11,6 +11,8 @@ import static java.lang.Thread.currentThread;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
+import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
@@ -473,10 +475,31 @@ public class MuleExtensionUtils {
   public static boolean isExpression(Object value) {
     if (value instanceof String) {
       String trim = ((String) value).trim();
-      return trim.startsWith("#[") && trim.endsWith("]");
+      return trim.startsWith(DEFAULT_EXPRESSION_PREFIX) && trim.endsWith(DEFAULT_EXPRESSION_POSTFIX);
     } else {
       return false;
     }
+  }
+
+  /**
+   * Parse the given value and remove expression markers if it is considered as an expression.
+   *
+   * @param value Value to parse
+   * @return a String containing the expression without markers or null if the value is not an expression.
+   */
+  public static Optional<String> extractExpression(Object value) {
+    Optional<String> result = Optional.empty();
+    if (isExpression(value)) {
+      String expression = (String) value;
+      if (expression != null && !expression.isEmpty()) {
+        String trimmedText = expression.trim();
+        result =
+            Optional.of(trimmedText.substring(DEFAULT_EXPRESSION_PREFIX.length(),
+                                              trimmedText.length() - DEFAULT_EXPRESSION_POSTFIX.length()));
+      }
+    }
+
+    return result;
   }
 
   /**

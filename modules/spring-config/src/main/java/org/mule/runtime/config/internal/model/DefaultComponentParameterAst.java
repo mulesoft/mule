@@ -11,6 +11,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.extractExpression;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 
 import org.mule.metadata.api.model.BooleanType;
@@ -64,7 +65,7 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
       } else if (isEmpty(rawValue)) {
         final Object defaultValue = getModel().getDefaultValue();
         if (isExpression(defaultValue)) {
-          return left((String) defaultValue);
+          return left(extractExpression(defaultValue).get());
         } else {
           return right(defaultValue);
         }
@@ -138,7 +139,7 @@ public class DefaultComponentParameterAst implements ComponentParameterAst {
             } else if (!NOT_SUPPORTED.equals(getModel().getExpressionSupport())) {
               if (isExpression(rawValue)) {
                 // For complex types that may be the result of an expression, just return the expression
-                expression.set(rawValue);
+                expression.set(extractExpression(rawValue).get());
               } else {
                 value.set(rawValue);
               }
